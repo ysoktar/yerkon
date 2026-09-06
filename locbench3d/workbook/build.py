@@ -63,6 +63,10 @@ def _to_native(value):
         return None
     if isinstance(value, float) and value != value:  # NaN
         return None
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return "|".join(str(v) for v in value)
+    if isinstance(value, dict):
+        return "|".join(f"{k}:{v}" for k, v in value.items())
     if hasattr(value, "item"):
         try:
             return value.item()

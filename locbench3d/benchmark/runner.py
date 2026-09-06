@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional
 
+from locbench3d.core.timing import fractional_bandwidth, range_resolution_heuristic_m, wavelength_m
+from locbench3d.environment.environment3d import anchor_density_3d, poisson_expected_anchors_in_range
 from locbench3d.experiment.generator import ExperimentDesign, generate_scenarios
 from locbench3d.experiment.schema import ScenarioSpec
 from locbench3d.feasibility.requirements import (
@@ -42,6 +44,9 @@ class BenchmarkOutputs:
     geometry_comparison_rows: list[dict] = field(default_factory=list)
     scalability_comparison_rows: list[dict] = field(default_factory=list)
     skipped_scenarios: list[dict] = field(default_factory=list)
+    environment_comparison_rows: list[dict] = field(default_factory=list)
+    volume_comparison_rows: list[dict] = field(default_factory=list)
+    channel_comparison_rows: list[dict] = field(default_factory=list)
     gnss_rows: list[dict] = field(default_factory=list)
     gnss_summary_row: Optional[dict] = None
     evidence_records: list[dict] = field(default_factory=list)
@@ -82,6 +87,7 @@ def run_benchmark(
             continue
 
         result = run_scenario(spec, n_repeats=n_repeats, seed=seed)
+        anchor_count = spec.anchor_count if spec.anchor_count is not None else 5
         hw = (
             get_profile(spec.hardware_profile)
             if spec.hardware_profile in HARDWARE_PROFILE_REGISTRY
@@ -153,6 +159,59 @@ def run_benchmark(
         scalability_row = {"scenario_id": spec.scenario_id, "method": spec.method}
         scalability_row.update(flatten_dataclass(result.scalability))
         outputs.scalability_comparison_rows.append(scalability_row)
+
+        floor_area_m2 = spec.width_m * spec.length_m
+        volume_m3 = floor_area_m2 * spec.height_m
+        outputs.environment_comparison_rows.append(
+            {
+                "scenario_id": spec.scenario_id,
+                "width_m": spec.width_m,
+                "length_m": spec.length_m,
+                "height_m": spec.height_m,
+                "floor_area_m2": floor_area_m2,
+                "volume_m3": volume_m3,
+                "anchor_count": anchor_count,
+                "anchors_per_sqm": anchor_count / floor_area_m2,
+                "anchors_per_cubic_m": anchor_count / volume_m3,
+                "nlos_probability": spec.nlos_probability,
+                "nlos_bias_m": spec.nlos_bias_m,
+                "packet_loss_probability": spec.packet_loss_probability,
+            }
+        )
+
+        density = anchor_density_3d(anchor_count, volume_m3)
+        radius_m = max(spec.width_m, spec.length_m, spec.height_m) / 2.0
+        outputs.volume_comparison_rows.append(
+            {
+                "scenario_id": spec.scenario_id,
+                "anchor_count": anchor_count,
+                "volume_m3": volume_m3,
+                "radius_m": radius_m,
+                "anchor_density_3d_per_m3": density,
+                "expected_anchors_in_range": poisson_expected_anchors_in_range(density, radius_m),
+                "planning_approximation": True,
+            }
+        )
+
+        if spec.center_freq_hz is not None and spec.bandwidth_hz is not None:
+            outputs.channel_comparison_rows.append(
+                {
+                    "scenario_id": spec.scenario_id,
+                    "center_freq_hz": spec.center_freq_hz,
+                    "bandwidth_hz": spec.bandwidth_hz,
+                    "fractional_bandwidth": fractional_bandwidth(
+                        spec.bandwidth_hz, spec.center_freq_hz
+                    ),
+                    "wavelength_m": wavelength_m(spec.center_freq_hz),
+                    "range_resolution_heuristic_m": range_resolution_heuristic_m(
+                        spec.bandwidth_hz
+                    ),
+                    "resolution_heuristic_note": (
+                        "delta_d ~ c/B is a resolution heuristic, not a "
+                        "positioning accuracy figure."
+                    ),
+                }
+            )
 
         ev = result.error_model_evidence
         key = (ev.evidence_type.value, ev.source_name, ev.source_url)

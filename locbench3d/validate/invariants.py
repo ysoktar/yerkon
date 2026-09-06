@@ -72,6 +72,10 @@ def _check_nonnegative(df: pd.DataFrame, col: str) -> list[InvariantViolation]:
 
 _RATE_LIKE_SUFFIXES = ("_rate", "_fraction", "_probability", "_availability")
 _COUNT_LIKE_SUFFIXES = ("_count", "_fixes", "_samples")
+# Utilization/load ratios are legitimately unbounded above 1 (that is what
+# "overloaded" means); they must not be checked against the [0, 1] range a
+# true rate/fraction/probability is checked against.
+_UNBOUNDED_LOAD_SUBSTRINGS = ("airtime", "occupancy")
 
 _PERCENTILE_TRIPLES = [
     ("acc_error_3d_p50_m", "acc_error_3d_p95_m", "acc_error_3d_p99_m"),
@@ -93,7 +97,9 @@ def check_master_table(df: pd.DataFrame) -> list[InvariantViolation]:
         violations += _check_le(df, p95, p99, "p99_ge_p95", f"{p99} is below {p95}")
 
     for col in df.columns:
-        if col.endswith(_RATE_LIKE_SUFFIXES):
+        if col.endswith(_RATE_LIKE_SUFFIXES) and not any(
+            s in col for s in _UNBOUNDED_LOAD_SUBSTRINGS
+        ):
             violations += _check_range_0_1(df, col)
         if col.endswith(_COUNT_LIKE_SUFFIXES):
             violations += _check_nonnegative(df, col)

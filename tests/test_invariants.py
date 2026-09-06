@@ -79,6 +79,17 @@ def test_range_comparison_flags_a_synthetic_empty_bin():
     assert any("empty" in v.message.lower() for v in violations)
 
 
+def test_airtime_and_occupancy_fields_may_legitimately_exceed_one():
+    """Utilization ratios are unbounded above 1 by definition (that is what
+    'overloaded' means); they must not be flagged as an out-of-range
+    percentage the way a true rate/fraction/probability would be."""
+    df = pd.DataFrame(
+        [{"scenario_id": "s1", "scale_airtime_fraction": 1.44, "scale_scheduled_occupancy": 1.44}]
+    )
+    violations = check_master_table(df)
+    assert violations == []
+
+
 def test_overloaded_scalability_result_flagged_if_not_marked_infeasible():
     from locbench3d.metrics.scalability import ScalabilityResult
     from locbench3d.protocol.traffic import RangingMethod
