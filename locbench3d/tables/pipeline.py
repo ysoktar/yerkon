@@ -31,7 +31,7 @@ from locbench3d.metrics.path_metrics import PathMetricsResult, compute_path_metr
 from locbench3d.metrics.reliability import ReliabilityResult, compute_reliability_metrics
 from locbench3d.metrics.scalability import ScalabilityResult, evaluate_scalability
 from locbench3d.paths.trajectories import Path3D, straight_line_path
-from locbench3d.protocol.traffic import RangingMethod
+from locbench3d.protocol.traffic import RangingMethod, sequential_fix_latency_s
 from locbench3d.simulate.monte_carlo import FixResult, simulate_path_fixes
 from locbench3d.experiment.schema import ScenarioSpec
 
@@ -66,6 +66,7 @@ class ScenarioResult:
     representative_crlb: CRLBResult
     error_model_evidence: EvidenceRecord
     n_path_samples: int
+    sequential_fix_latency_s: float
 
 
 def default_anchor_layout(
@@ -234,4 +235,7 @@ def run_scenario(spec: ScenarioSpec, n_repeats: int = 20, seed: int = 0) -> Scen
         representative_crlb=representative_crlb,
         error_model_evidence=evidence,
         n_path_samples=path.n_samples,
+        sequential_fix_latency_s=sequential_fix_latency_s(
+            ranging_method, anchor_count, spec.frame_duration_s, spec.guard_duration_s
+        ),
     )

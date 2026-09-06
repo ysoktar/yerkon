@@ -33,6 +33,7 @@ def build_master_row(
     row.update(flatten_dataclass(result.reliability, prefix="rel_"))
     row.update(flatten_dataclass(result.scalability, prefix="scale_"))
     row.update(flatten_dataclass(result.path_metrics, prefix="pathm_"))
+    row["latency_sequential_fix_s"] = result.sequential_fix_latency_s
     row["geom_geometry_valid_fraction"] = result.geometry_valid_fraction
     row.update(flatten_dataclass(result.representative_geometry, prefix="geom_"))
     row.update(flatten_dataclass(result.representative_crlb, prefix="crlb_"))
