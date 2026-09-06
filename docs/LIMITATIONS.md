@@ -134,23 +134,38 @@ Built and tested in a Linux x86_64 container with Python 3.11.
 repeatedly in that environment, including from a clean ZIP extraction with
 no access to the original checkout (see `docs/VALIDATION.md`).
 
-`scripts/run.ps1` (Windows PowerShell) was added to mirror `run.sh` step
-for step and reviewed carefully for PowerShell syntax and semantics, but
-**it has not been executed on an actual Windows machine or under
-PowerShell at all** - no Windows environment or PowerShell interpreter
-(including PowerShell Core / `pwsh`, which runs on Linux) was available
-in the environment this project was built in. The underlying Python code
-it drives (the CLI, the test suite) has no Windows-specific code path and
-uses `os.path.join`/`pathlib`-safe path construction throughout, so it is
-expected to work; the untested part is specifically the PowerShell script
-itself (parameter binding, `$LASTEXITCODE` propagation across the exact
-PowerShell version a user has, and execution-policy interaction). If it
-does not work as written, every command it runs is one line - see
+`scripts/run.ps1` (Windows PowerShell) was written by hand (no Windows
+machine or PowerShell interpreter was available while building it) and
+reviewed carefully for syntax and semantics, but was not itself executed
+before release.
+
+The underlying steps it drives *have* since been confirmed on real
+Windows 11 (PowerShell, Python 3.13, a `conda`-managed base environment)
+by a user running the equivalent commands directly:
+`python -m venv .venv`, `Activate.ps1`, `pip install -r requirements.txt`,
+`pytest -q`, and `python -m locbench3d.cli run-all --smoke --out
+output\smoke` - all succeeded, 269/270 tests passed, and the smoke
+benchmark produced a valid workbook. That run caught one real bug:
+`tests/test_run_sh_passes_bash_syntax_check` failed because Windows
+provides a `bash.exe` relay stub (`C:\Windows\System32\bash.exe`, part of
+the WSL launcher) that `shutil.which("bash")` finds even with no WSL
+distro installed, then fails at invocation with an unrelated
+`execvpe(/bin/bash)` error - not a problem with `run.sh` itself. Fixed by
+having the test actually try running `bash -c "true"` before trusting
+`which`, rather than skip only on `bash` being entirely absent from PATH.
+
+`scripts/run.ps1` as a script (the exact file, run via `.\scripts\run.ps1`)
+has still not been executed - the confirmation above ran its underlying
+commands one at a time, not the script itself. What remains genuinely
+unverified is narrower than before: PowerShell-specific mechanics in the
+script (parameter binding for `-SmokeOnly`/`-SkipTests`, `$LASTEXITCODE`
+propagation through the `&` call operator, execution-policy interaction).
+If it does not work as written, every command it runs is one line - see
 "Running it yourself, step by step" in `README.md` - and can be typed
-directly into PowerShell or `cmd.exe` with a normal `venv`/`pip` setup.
+directly into PowerShell, as was already done above.
 
 Regression tests (`tests/test_run_scripts.py`) check both scripts exist,
 have balanced braces, and cover the same seven phases; `run.sh`
-additionally passes a real `bash -n` syntax check in CI/test runs on
-Linux. No equivalent real syntax check exists for `run.ps1` in this
-environment, for the reason above.
+additionally passes a real `bash -n` syntax check when a working bash is
+available (true on Linux; on Windows, only when a real WSL distro is
+installed, which the test now detects rather than assumes).

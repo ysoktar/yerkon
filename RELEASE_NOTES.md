@@ -1,5 +1,22 @@
 # Release notes
 
+## 0.1.2 - Windows verified on real hardware; a genuine test bug fixed
+
+A user ran this project's underlying commands directly on Windows 11
+(PowerShell, Python 3.13, `conda` base environment): venv creation,
+dependency install, `pytest -q`, and `run-all --smoke`. Result: 269/270
+tests passed, and the smoke benchmark produced a valid workbook end to
+end.
+
+- Fixed `tests/test_run_sh_passes_bash_syntax_check`: it assumed
+  `shutil.which("bash") is not None` meant bash actually works, which is
+  false on Windows when the `bash.exe` WSL-relay stub is on PATH but no
+  WSL distro is installed - the test now verifies bash actually runs
+  (`bash -c "true"`) before trusting it, and skips otherwise instead of
+  failing on an environment condition unrelated to `run.sh`'s syntax.
+- `scripts/run.ps1` as a script (invoked directly, not its commands typed
+  one at a time) remains unconfirmed - see `docs/LIMITATIONS.md`.
+
 ## 0.1.1 - Windows support and optional MATLAB UWB waveform evidence
 
 - Added `scripts/run.ps1`, a PowerShell equivalent of `scripts/run.sh`

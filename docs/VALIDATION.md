@@ -95,25 +95,37 @@ from table shape alone.
 
 See `docs/LIMITATIONS.md` for the full list: no physical hardware was
 available, network access for source verification was blocked except for
-two search-confirmed facts, and the project was validated in one Linux
-x86_64 container, not on Windows or macOS.
+two search-confirmed facts, and this project's own test/benchmark runs
+were done in one Linux x86_64 container.
 
-Two pieces added after the initial release are explicitly split into a
-tested half and an untested half:
+## Windows: confirmed on real hardware after release
 
-- `scripts/run.ps1` (Windows PowerShell): structurally checked (exists,
-  balanced brackets, covers the same seven phases as `run.sh`), but never
-  executed - no Windows machine or PowerShell interpreter (including
-  PowerShell Core on Linux) was available.
-- The MATLAB UWB waveform pipeline: `matlab/uwb_waveform_ranging.m`
-  itself has never been executed (no MATLAB license was available), but
-  everything downstream of its documented CSV output - the Python
-  importer, the workbook sheet it populates, and the CLI's
-  `--matlab-uwb-csv` wiring - is exercised by `tests/test_matlab_uwb_import.py`
-  and `tests/test_cli_matlab_uwb.py` against a synthetic CSV matching that
-  schema, and confirmed end to end with `python -m locbench3d.cli run-all
-  --smoke --matlab-uwb-csv <synthetic csv>` producing a correctly
-  populated `matlab_uwb_waveform` sheet.
+A user ran the underlying commands directly on Windows 11 (PowerShell,
+Python 3.13, `conda` base environment): `python -m venv .venv`,
+`Activate.ps1`, `pip install -r requirements.txt`, `pytest -q`, and
+`python -m locbench3d.cli run-all --smoke --out output\smoke`. Result:
+269/270 tests passed, and the smoke benchmark produced a valid workbook.
+The one failure (`test_run_sh_passes_bash_syntax_check`) was a real bug in
+the test, not the project: Windows's `bash.exe` WSL-relay stub is found by
+`shutil.which` even with no WSL distro installed, then fails at
+invocation - fixed by having the test verify bash actually runs before
+trusting that it's present.
+
+`scripts/run.ps1` as a script (run via `.\scripts\run.ps1` itself, not its
+underlying commands typed one at a time) is still unconfirmed - see
+`docs/LIMITATIONS.md` for exactly what that gap covers.
+
+## MATLAB: still fully unconfirmed on the MATLAB side
+
+`matlab/uwb_waveform_ranging.m` itself has never been executed (no MATLAB
+license was available), but everything downstream of its documented CSV
+output - the Python importer, the workbook sheet it populates, and the
+CLI's `--matlab-uwb-csv` wiring - is exercised by
+`tests/test_matlab_uwb_import.py` and `tests/test_cli_matlab_uwb.py`
+against a synthetic CSV matching that schema, and confirmed end to end
+with `python -m locbench3d.cli run-all --smoke --matlab-uwb-csv
+<synthetic csv>` producing a correctly populated `matlab_uwb_waveform`
+sheet.
 
 ## Packaging checks
 

@@ -59,7 +59,28 @@ def test_run_ps1_braces_and_parens_are_balanced():
     assert _balanced(text, "(", ")")
 
 
-@pytest.mark.skipif(shutil.which("bash") is None, reason="bash not available")
+def _bash_actually_works() -> bool:
+    """True only if invoking bash actually runs a shell, not just if it's on PATH.
+
+    On Windows, ``bash`` is frequently a relay stub at
+    C:\\Windows\\System32\\bash.exe that launches WSL - it is found by
+    shutil.which even when no WSL distro is installed, and then fails at
+    invocation time with an unrelated "execvpe(/bin/bash) failed" error.
+    That is an environment problem, not a run.sh syntax problem, so it
+    must not be reported as this test failing.
+    """
+    if shutil.which("bash") is None:
+        return False
+    try:
+        result = subprocess.run(
+            ["bash", "-c", "true"], capture_output=True, text=True, timeout=10
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return result.returncode == 0
+
+
+@pytest.mark.skipif(not _bash_actually_works(), reason="bash not available or not runnable")
 def test_run_sh_passes_bash_syntax_check():
     """A real syntax check (bash -n), not just balanced-bracket heuristics."""
     result = subprocess.run(

@@ -1,6 +1,6 @@
 [project]
 name = "locbench3d"
-version = "0.1.1"
+version = "0.1.2"
 description = "3D localization benchmark and comparison system"
 requires-python = ">=3.10"
 dependencies = [
