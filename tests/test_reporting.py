@@ -37,6 +37,15 @@ def test_write_outputs_returns_dataframes_matching_csvs(tmp_path):
     assert len(df_from_csv) == len(tables["master_comparison"])
 
 
+def test_energy_and_cost_tables_are_genuinely_empty_when_not_configured(tmp_path):
+    """A rollup with no matching prefix columns must not look populated
+    with nothing but identity columns; it must be truly empty."""
+    outputs = run_benchmark(_design(), n_repeats=5, seed=0, range_bin_edges_m=[0, 5, 10, 20])
+    _, tables = write_outputs(outputs, str(tmp_path))
+    assert tables["energy"].empty
+    assert tables["cost"].empty
+
+
 def test_build_static_tables_includes_hardware_and_method_catalog():
     tables = build_static_tables()
     assert "hardware_profiles" in tables

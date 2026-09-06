@@ -18,11 +18,19 @@ from locbench3d.tables import builders
 
 
 def _select_columns(df: pd.DataFrame, id_cols: list[str], prefix: str) -> pd.DataFrame:
+    """Roll up a prefix's columns from the master table, plus identity columns.
+
+    Returns an empty DataFrame (not a table of bare identity columns with
+    no actual data) when nothing in this run has a column under the given
+    prefix, so a truly empty result reads as empty in the workbook rather
+    than looking populated with nothing in it.
+    """
     if df.empty:
         return pd.DataFrame()
-    cols = [c for c in df.columns if c in id_cols or c.startswith(prefix)]
-    if not cols:
+    prefixed = [c for c in df.columns if c.startswith(prefix)]
+    if not prefixed:
         return pd.DataFrame()
+    cols = [c for c in df.columns if c in id_cols] + prefixed
     return df[cols]
 
 

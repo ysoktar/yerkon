@@ -95,8 +95,11 @@ METHOD_CATALOG: dict[str, MethodDefinition] = {
     ),
     "ACOUSTIC_RANGING": _local(
         "ACOUSTIC_RANGING", "Acoustic (ultrasonic) ranging", 4, 5, True,
-        "Uses the same TWR/ToA solver with the speed of sound instead of "
-        "the speed of light; no acoustic propagation physics is simulated.",
+        "Uses the same TWR/ToA solver as the RF-based methods, operating "
+        "directly on range-domain measurements; the solver has no "
+        "dependence on propagation speed either way, so no acoustic-"
+        "specific propagation physics (attenuation, reflection, medium "
+        "temperature/humidity dependence) is simulated.",
     ),
 }
 
