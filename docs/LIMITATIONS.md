@@ -112,10 +112,28 @@ being a short, formulaic sentence rather than a bespoke paragraph.
 
 ## Platform and environment
 
-Built and tested in a Linux x86_64 container with Python 3.11. `scripts/run.sh`
-is a bash script using standard `venv`/`pip` conventions that should work
-on Linux and macOS; it has not been tested on Windows (a Windows user
-would need WSL, Git Bash, or an equivalent, or to run the underlying
-Python commands directly - see `README.md`). The single-machine test run
-recorded in `docs/VALIDATION.md` is the only environment this was verified
-in end to end.
+Built and tested in a Linux x86_64 container with Python 3.11.
+`scripts/run.sh` (bash) has been executed and verified end to end
+repeatedly in that environment, including from a clean ZIP extraction with
+no access to the original checkout (see `docs/VALIDATION.md`).
+
+`scripts/run.ps1` (Windows PowerShell) was added to mirror `run.sh` step
+for step and reviewed carefully for PowerShell syntax and semantics, but
+**it has not been executed on an actual Windows machine or under
+PowerShell at all** - no Windows environment or PowerShell interpreter
+(including PowerShell Core / `pwsh`, which runs on Linux) was available
+in the environment this project was built in. The underlying Python code
+it drives (the CLI, the test suite) has no Windows-specific code path and
+uses `os.path.join`/`pathlib`-safe path construction throughout, so it is
+expected to work; the untested part is specifically the PowerShell script
+itself (parameter binding, `$LASTEXITCODE` propagation across the exact
+PowerShell version a user has, and execution-policy interaction). If it
+does not work as written, every command it runs is one line - see
+"Running it yourself, step by step" in `README.md` - and can be typed
+directly into PowerShell or `cmd.exe` with a normal `venv`/`pip` setup.
+
+Regression tests (`tests/test_run_scripts.py`) check both scripts exist,
+have balanced braces, and cover the same seven phases; `run.sh`
+additionally passes a real `bash -n` syntax check in CI/test runs on
+Linux. No equivalent real syntax check exists for `run.ps1` in this
+environment, for the reason above.

@@ -11,19 +11,49 @@ specification are never mixed together as equivalent.
 
 From a clean checkout, one command prepares the environment, runs the
 tests, runs the smoke and standard benchmarks, builds the Excel workbook,
-and validates the outputs:
+and validates the outputs.
+
+**Linux / macOS:**
 
 ```bash
 ./scripts/run.sh
 ```
 
+**Windows (PowerShell):**
+
+```powershell
+.\scripts\run.ps1
+```
+
+If Windows blocks the script from running, either run it with the policy
+bypassed for that one invocation:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\run.ps1
+```
+
+or allow local scripts once per machine/user:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
 Faster smoke-only run (skips the 96-scenario standard sweep):
 
 ```bash
-./scripts/run.sh --smoke-only
+./scripts/run.sh --smoke-only        # Linux/macOS
+.\scripts\run.ps1 -SmokeOnly         # Windows
 ```
 
-This does not require Microsoft Excel; the workbook is written directly
+Both scripts require Python 3.10+ on PATH (`python3`/`python` on
+Linux/macOS, `py` or `python` on Windows) and do the same seven steps in
+the same order; `scripts/run.ps1`'s syntax has been checked carefully but
+has not been executed on an actual Windows machine (none was available
+while building this project - see `docs/LIMITATIONS.md`). If it doesn't
+work as expected, running the underlying commands directly (see "Running
+it yourself, step by step" below) works identically on any platform.
+
+Neither script requires Microsoft Excel; the workbook is written directly
 with `openpyxl`. Outputs land in `output/smoke/` and `output/standard/`:
 
 - `tables/*.csv` - every result table, plus `tables/manifest.json` mapping
@@ -75,7 +105,8 @@ or verify in the environment it was built in.
 locbench3d/            the package (see docs/ARCHITECTURE.md)
 tests/                 pytest test suite (test-first; run before every commit)
 examples/              example experiment configs and a sample GNSS log
-scripts/run.sh         the single command described above
+scripts/run.sh         the single command described above (Linux/macOS)
+scripts/run.ps1        the same single command, for Windows PowerShell
 docs/                  architecture, field definitions, equations, sources, limitations
 RELEASE_NOTES.md        what changed in this version
 VERSION                 current version string

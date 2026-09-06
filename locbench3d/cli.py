@@ -7,6 +7,8 @@ including environment setup and tests):
 """
 from __future__ import annotations
 
+import json
+import os
 import sys
 
 import click
@@ -78,8 +80,9 @@ def run_cmd(config: str, out: str, gnss_log: str | None) -> None:
         hard_requirements=cfg.hard_requirements,
         gnss_fixes=gnss_fixes,
     )
-    table_paths, tables = write_outputs(outputs, f"{out}/tables")
-    click.echo(f"Wrote {len(table_paths)} table(s) to {out}/tables")
+    tables_dir = os.path.join(out, "tables")
+    table_paths, tables = write_outputs(outputs, tables_dir)
+    click.echo(f"Wrote {len(table_paths)} table(s) to {tables_dir}")
     click.echo(f"Simulated: {len(outputs.master_rows)}, skipped: {len(outputs.skipped_scenarios)}")
 
 
@@ -88,9 +91,6 @@ def run_cmd(config: str, out: str, gnss_log: str | None) -> None:
 @click.option("--out", default="output/workbook.xlsx", help="Output workbook path.")
 def build_workbook_cmd(tables_dir: str, out: str) -> None:
     """Build the Excel workbook from previously written CSV tables."""
-    import json
-    import os
-
     manifest_path = os.path.join(tables_dir, "manifest.json")
     with open(manifest_path, encoding="utf-8") as f:
         manifest = json.load(f)
@@ -123,6 +123,9 @@ def build_workbook_cmd(tables_dir: str, out: str) -> None:
     tables.update(narrative)
     tables["dashboard"] = build_dashboard_sheet(_FakeOutputs(), tables)
 
+    out_parent = os.path.dirname(out)
+    if out_parent:
+        os.makedirs(out_parent, exist_ok=True)
     build_workbook(tables, out)
     click.echo(f"Wrote workbook to {out}")
 
@@ -132,9 +135,6 @@ def build_workbook_cmd(tables_dir: str, out: str) -> None:
 @click.option("--workbook", default="output/workbook.xlsx")
 def validate_outputs_cmd(tables_dir: str, workbook: str) -> None:
     """Run result-invariant checks and workbook structural validation."""
-    import json
-    import os
-
     errors: list[str] = []
     manifest_path = os.path.join(tables_dir, "manifest.json")
     with open(manifest_path, encoding="utf-8") as f:
@@ -165,23 +165,25 @@ def validate_outputs_cmd(tables_dir: str, workbook: str) -> None:
 
 
 @main.command("run-all")
-@click.option("--config", default="examples/experiment_standard.yaml")
+@click.option("--config", default=os.path.join("examples", "experiment_standard.yaml"))
 @click.option("--smoke", is_flag=True, help="Use examples/experiment_smoke.yaml instead of --config.")
 @click.option("--out", default="output")
-@click.option("--gnss-log", default="examples/gnss_sample_log.csv")
+@click.option("--gnss-log", default=os.path.join("examples", "gnss_sample_log.csv"))
 @click.pass_context
 def run_all_cmd(ctx: click.Context, config: str, smoke: bool, out: str, gnss_log: str) -> None:
     """Validate config, run the benchmark, write tables, build and validate the workbook."""
-    config_path = "examples/experiment_smoke.yaml" if smoke else config
+    config_path = os.path.join("examples", "experiment_smoke.yaml") if smoke else config
+    tables_dir = os.path.join(out, "tables")
+    workbook_path = os.path.join(out, "workbook.xlsx")
     ctx.invoke(validate_config_cmd, config_path=config_path)
     ctx.invoke(run_cmd, config=config_path, out=out, gnss_log=gnss_log)
-    ctx.invoke(build_workbook_cmd, tables_dir=f"{out}/tables", out=f"{out}/workbook.xlsx")
-    ctx.invoke(validate_outputs_cmd, tables_dir=f"{out}/tables", workbook=f"{out}/workbook.xlsx")
+    ctx.invoke(build_workbook_cmd, tables_dir=tables_dir, out=workbook_path)
+    ctx.invoke(validate_outputs_cmd, tables_dir=tables_dir, workbook=workbook_path)
     click.echo("")
     click.echo("Done. Output locations:")
-    click.echo(f"  Tables:   {out}/tables/")
-    click.echo(f"  Manifest: {out}/tables/manifest.json")
-    click.echo(f"  Workbook: {out}/workbook.xlsx")
+    click.echo(f"  Tables:   {tables_dir}{os.sep}")
+    click.echo(f"  Manifest: {os.path.join(tables_dir, 'manifest.json')}")
+    click.echo(f"  Workbook: {workbook_path}")
 
 
 if __name__ == "__main__":

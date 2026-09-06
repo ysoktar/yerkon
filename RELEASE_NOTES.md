@@ -51,5 +51,25 @@ parsing.
 - Python 3.10+ (developed and tested on 3.11).
 - Dependencies: numpy, scipy, pandas, openpyxl, PyYAML, click, pytest (see
   `requirements.txt` for pinned ranges).
-- Tested on Linux x86_64 in a container environment. Not tested on Windows
-  or macOS; `scripts/run.sh` requires bash.
+- Tested end to end on Linux x86_64 in a container environment, including
+  from a clean ZIP extraction.
+- `scripts/run.ps1` provides the same single-command workflow for Windows
+  PowerShell. It has not been executed on a real Windows machine (none was
+  available during development); the underlying CLI has no Windows-
+  specific code path and uses platform-safe path construction throughout.
+  See `docs/LIMITATIONS.md` for what that specifically means and how to
+  work around it if the script itself misbehaves on a given machine.
+- Not tested on macOS specifically, though `scripts/run.sh` uses only
+  POSIX-portable bash/`venv`/`pip` conventions.
+
+## 0.1.1 - Windows support
+
+- Added `scripts/run.ps1`, a PowerShell equivalent of `scripts/run.sh`
+  covering the same seven steps (environment prep, tests, config
+  validation, smoke benchmark, standard benchmark, output validation,
+  printed output locations).
+- Replaced remaining hardcoded forward-slash path concatenation in the CLI
+  (`locbench3d/cli.py`) with `os.path.join`, so output paths are
+  constructed correctly on Windows as well as Linux/macOS.
+- Added `tests/test_run_scripts.py`: structural checks on both run
+  scripts, including a real `bash -n` syntax check for `run.sh`.
