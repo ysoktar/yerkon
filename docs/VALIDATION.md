@@ -9,7 +9,7 @@ yourself from a clean checkout.
 pytest -q
 ```
 
-253 tests pass, 0 failures, in `tests/` (38 test files covering every
+270 tests pass, 0 failures, in `tests/` (41 test files covering every
 module listed in `docs/ARCHITECTURE.md`). The suite is test-first: the
 protocol-traffic, TDoA range-difference, geometry-validity, invariant, and
 evidence-provenance rules each have a dedicated regression test written
@@ -37,8 +37,9 @@ python -m locbench3d.cli run-all --config examples/experiment_standard.yaml --ou
 96 scenarios (UWB SS-TWR/DS-TWR, TDoA, SX1280 ranging in a multilateration
 configuration; 4/5/8 anchors; 1/10 tags; 1/5 Hz; with and without the
 SX1280 hardware profile; 20 Monte Carlo repeats each) run end to end with
-zero invariant violations. The resulting workbook has 37 sheets and a
-382-field `field_catalog`. Runtime: about 27 seconds after the venv and
+zero invariant violations. The resulting workbook has 38 sheets (34
+required plus a few extra dynamic ones this run happened to produce) and
+a 382-field `field_catalog`. Runtime: about 27 seconds after the venv and
 tests from the smoke run above.
 
 ## Larger experiment configuration
@@ -82,7 +83,7 @@ from table shape alone.
 `locbench3d/validate/workbook_validate.py`, also run by `validate-outputs`:
 
 - every required sheet (see `workbook/build.py:REQUIRED_SHEET_NAMES`,
-  33 sheets) is present
+  34 sheets) is present
 - each dynamic result table's row count and column headers match the
   sheet the workbook actually contains
 - every cell is scanned for a literal Excel error token
@@ -96,6 +97,23 @@ See `docs/LIMITATIONS.md` for the full list: no physical hardware was
 available, network access for source verification was blocked except for
 two search-confirmed facts, and the project was validated in one Linux
 x86_64 container, not on Windows or macOS.
+
+Two pieces added after the initial release are explicitly split into a
+tested half and an untested half:
+
+- `scripts/run.ps1` (Windows PowerShell): structurally checked (exists,
+  balanced brackets, covers the same seven phases as `run.sh`), but never
+  executed - no Windows machine or PowerShell interpreter (including
+  PowerShell Core on Linux) was available.
+- The MATLAB UWB waveform pipeline: `matlab/uwb_waveform_ranging.m`
+  itself has never been executed (no MATLAB license was available), but
+  everything downstream of its documented CSV output - the Python
+  importer, the workbook sheet it populates, and the CLI's
+  `--matlab-uwb-csv` wiring - is exercised by `tests/test_matlab_uwb_import.py`
+  and `tests/test_cli_matlab_uwb.py` against a synthetic CSV matching that
+  schema, and confirmed end to end with `python -m locbench3d.cli run-all
+  --smoke --matlab-uwb-csv <synthetic csv>` producing a correctly
+  populated `matlab_uwb_waveform` sheet.
 
 ## Packaging checks
 

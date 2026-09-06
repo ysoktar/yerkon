@@ -45,6 +45,19 @@ manufacturer, distributor, and standards-body web pages was blocked
 | Android Wi-Fi RTT | https://developer.android.com/develop/connectivity/wifi/wifi-rtt | No |
 | MATLAB UWB toolbox | https://www.mathworks.com/help/comm/uwb.html | No |
 
+## MATLAB UWB waveform evidence
+
+`matlab/uwb_waveform_ranging.m` implements a waveform-level UWB ranging
+simulation (Gaussian RF pulse via `gauspuls`, synthetic multipath, AWGN,
+matched-filter leading-edge detection) that produces `MATLAB_WAVEFORM`
+evidence when its output CSV is imported via `--matlab-uwb-csv`. It uses
+IEEE 802.15.4 UWB channel 5 nominal parameters (center frequency 6489.6
+MHz, bandwidth 499.2 MHz) as its default pulse configuration - general
+knowledge of the 802.15.4 UWB PHY channelization, not independently
+re-verified against the standard text this session. This script has never
+been executed (no MATLAB license was available); see `matlab/README.md`
+and `docs/LIMITATIONS.md` before trusting any output from it.
+
 ## Stuart Robinson's published SX1280 field data
 
 Primary source: https://stuartsprojects.github.io/2019/04/26/Semtech-SX1280-2-4Ghz-LoRa-ranging-tranceivers.html

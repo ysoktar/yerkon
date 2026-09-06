@@ -34,6 +34,7 @@ REQUIRED_SHEET_NAMES: tuple[str, ...] = (
     "sx1280_raw_measurements",
     "sx1280_published_data",
     "standardized_external",
+    "matlab_uwb_waveform",
     "range_comparison",
     "path_comparison",
     "geometry_comparison",

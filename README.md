@@ -77,6 +77,13 @@ with `openpyxl`. Outputs land in `output/smoke/` and `output/standard/`:
   built from it.
 - GNSS fix import from a CSV log schema, keeping constellation, signal
   bands, positioning mode, and fix state as separate fields.
+- Optional MATLAB UWB waveform-level ranging evidence (`matlab/`):
+  generate physically grounded UWB ranging errors (Gaussian pulse,
+  multipath, AWGN, matched-filter leading-edge detection) in MATLAB and
+  import the result as `MATLAB_WAVEFORM` evidence with
+  `--matlab-uwb-csv`. Not required to run this project - see
+  `matlab/README.md` and `docs/LIMITATIONS.md` (this script has never
+  been executed; no MATLAB license was available while building it).
 - Protocol traffic modeling where SS-TWR/DS-TWR frame counts and
   sequential-fix latency scale with anchor count (not a fixed 2-3 frames
   per fix), plus ALOHA-style collision modeling and scheduled-occupancy
@@ -105,6 +112,7 @@ or verify in the environment it was built in.
 locbench3d/            the package (see docs/ARCHITECTURE.md)
 tests/                 pytest test suite (test-first; run before every commit)
 examples/              example experiment configs and a sample GNSS log
+matlab/                optional MATLAB UWB waveform script (never executed - see docs/LIMITATIONS.md)
 scripts/run.sh         the single command described above (Linux/macOS)
 scripts/run.ps1        the same single command, for Windows PowerShell
 docs/                  architecture, field definitions, equations, sources, limitations

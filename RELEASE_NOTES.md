@@ -1,5 +1,29 @@
 # Release notes
 
+## 0.1.1 - Windows support and optional MATLAB UWB waveform evidence
+
+- Added `scripts/run.ps1`, a PowerShell equivalent of `scripts/run.sh`
+  covering the same seven steps (environment prep, tests, config
+  validation, smoke benchmark, standard benchmark, output validation,
+  printed output locations). Reviewed carefully but not executed on a
+  real Windows machine or under any PowerShell interpreter - none was
+  available in this environment. See `docs/LIMITATIONS.md`.
+- Replaced remaining hardcoded forward-slash path concatenation in the CLI
+  (`locbench3d/cli.py`) with `os.path.join`, so output paths are
+  constructed correctly on Windows as well as Linux/macOS.
+- Added `tests/test_run_scripts.py`: structural checks on both run
+  scripts, including a real `bash -n` syntax check for `run.sh`.
+- Added an optional MATLAB UWB waveform ranging pipeline:
+  `matlab/uwb_waveform_ranging.m` (Gaussian pulse, synthetic multipath,
+  AWGN, matched-filter leading-edge detection, self-calibrating against a
+  known reference delay), a Python importer
+  (`locbench3d/hardware/matlab_uwb_import.py`, fully tested) producing
+  `MATLAB_WAVEFORM` evidence, and `--matlab-uwb-csv` on `run`/`run-all`
+  populating the new `matlab_uwb_waveform` workbook sheet. This is
+  optional and does not change the default workflow; the `.m` script
+  itself has never been executed (no MATLAB license was available) - see
+  `matlab/README.md` and `docs/LIMITATIONS.md`.
+
 ## 0.1.0 - initial release
 
 First release of `locbench3d`, built from scratch (no prior codebase or
@@ -16,7 +40,8 @@ end-to-end workflow.
 
 ### Highlights
 
-- 253 tests, all passing, written test-first alongside the implementation.
+- 253 tests, all passing, written test-first alongside the implementation
+  (270 as of 0.1.1).
 - Smoke (2 scenarios), standard (96 scenarios), and a larger stress
   configuration (288 scenarios) all validate end to end with zero result
   invariants violated.
@@ -35,16 +60,18 @@ end-to-end workflow.
   required sheet even when a specific run produced no data for it (with
   an explicit placeholder notice rather than a silently missing sheet).
 
-### Known limitations in this release
+### Known limitations
 
 See `docs/LIMITATIONS.md` for the full, explicit list. In short: no
 physical hardware was available during development (no `MEASURED_HARDWARE`
 evidence exists anywhere in this codebase), network access for source
 verification was blocked except for two search-confirmed facts, the
 `energy`/`cost` workbook sheets are empty by default because
-`ScenarioTemplate` has no power/cost configuration fields yet, and GNSS
-import supports only this project's own CSV schema, not raw NMEA/UBX/RINEX
-parsing.
+`ScenarioTemplate` has no power/cost configuration fields yet, GNSS import
+supports only this project's own CSV schema (not raw NMEA/UBX/RINEX), the
+optional MATLAB UWB waveform script has never been executed (no MATLAB
+license was available), and `scripts/run.ps1` has never been executed on
+a real Windows machine (none was available).
 
 ### Compatibility
 
@@ -54,22 +81,11 @@ parsing.
 - Tested end to end on Linux x86_64 in a container environment, including
   from a clean ZIP extraction.
 - `scripts/run.ps1` provides the same single-command workflow for Windows
-  PowerShell. It has not been executed on a real Windows machine (none was
-  available during development); the underlying CLI has no Windows-
-  specific code path and uses platform-safe path construction throughout.
-  See `docs/LIMITATIONS.md` for what that specifically means and how to
-  work around it if the script itself misbehaves on a given machine.
+  PowerShell; not executed on a real Windows machine (see above). The
+  underlying CLI has no Windows-specific code path and uses platform-safe
+  path construction throughout.
 - Not tested on macOS specifically, though `scripts/run.sh` uses only
   POSIX-portable bash/`venv`/`pip` conventions.
-
-## 0.1.1 - Windows support
-
-- Added `scripts/run.ps1`, a PowerShell equivalent of `scripts/run.sh`
-  covering the same seven steps (environment prep, tests, config
-  validation, smoke benchmark, standard benchmark, output validation,
-  printed output locations).
-- Replaced remaining hardcoded forward-slash path concatenation in the CLI
-  (`locbench3d/cli.py`) with `os.path.join`, so output paths are
-  constructed correctly on Windows as well as Linux/macOS.
-- Added `tests/test_run_scripts.py`: structural checks on both run
-  scripts, including a real `bash -n` syntax check for `run.sh`.
+- MATLAB (optional, for `matlab/uwb_waveform_ranging.m` only): requires
+  Communications Toolbox and Signal Processing Toolbox. Never executed by
+  this project (see above); not required to run anything else here.

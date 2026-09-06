@@ -79,6 +79,25 @@ def test_master_comparison_table_from_rows():
     assert list(df.columns) == ["a", "b"] or set(df.columns) == {"a", "b"}
 
 
+def test_matlab_uwb_waveform_table_from_records():
+    from locbench3d.hardware.matlab_uwb_import import load_matlab_uwb_csv
+    import io
+
+    csv_text = (
+        "true_range_m,estimated_range_m,error_m\n"
+        "1,1.02,0.02\n"
+    )
+    records = load_matlab_uwb_csv(io.StringIO(csv_text))
+    df = builders.build_matlab_uwb_waveform_table(records)
+    assert len(df) == 1
+    assert df.loc[0, "evidence_type"] == "MATLAB_WAVEFORM"
+
+
+def test_matlab_uwb_waveform_table_empty_when_no_records():
+    df = builders.build_matlab_uwb_waveform_table([])
+    assert df.empty
+
+
 def test_empty_rows_produce_empty_dataframe_not_error():
     df = builders.rows_to_dataframe([])
     assert isinstance(df, pd.DataFrame)

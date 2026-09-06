@@ -1,6 +1,6 @@
 {
   "master_comparison": {
-    "csv_path": "/tmp/standard_final/tables/master_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/master_comparison.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -199,7 +199,7 @@
     ]
   },
   "range_comparison": {
-    "csv_path": "/tmp/standard_final/tables/range_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/range_comparison.csv",
     "row_count": 288,
     "columns": [
       "scenario_id",
@@ -233,7 +233,7 @@
     ]
   },
   "path_comparison": {
-    "csv_path": "/tmp/standard_final/tables/path_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/path_comparison.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -259,7 +259,7 @@
     ]
   },
   "geometry_comparison": {
-    "csv_path": "/tmp/standard_final/tables/geometry_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/geometry_comparison.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -278,7 +278,7 @@
     ]
   },
   "scalability_comparison": {
-    "csv_path": "/tmp/standard_final/tables/scalability_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/scalability_comparison.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -304,12 +304,12 @@
     ]
   },
   "skipped_scenarios": {
-    "csv_path": "/tmp/standard_final/tables/skipped_scenarios.csv",
+    "csv_path": "/tmp/standard_final2/tables/skipped_scenarios.csv",
     "row_count": 0,
     "columns": []
   },
   "evidence_record": {
-    "csv_path": "/tmp/standard_final/tables/evidence_record.csv",
+    "csv_path": "/tmp/standard_final2/tables/evidence_record.csv",
     "row_count": 3,
     "columns": [
       "evidence_type",
@@ -323,7 +323,7 @@
     ]
   },
   "environment_comparison": {
-    "csv_path": "/tmp/standard_final/tables/environment_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/environment_comparison.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -341,7 +341,7 @@
     ]
   },
   "volume_comparison": {
-    "csv_path": "/tmp/standard_final/tables/volume_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/volume_comparison.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -354,12 +354,12 @@
     ]
   },
   "channel_comparison": {
-    "csv_path": "/tmp/standard_final/tables/channel_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/channel_comparison.csv",
     "row_count": 0,
     "columns": []
   },
   "gnss_comparison": {
-    "csv_path": "/tmp/standard_final/tables/gnss_comparison.csv",
+    "csv_path": "/tmp/standard_final2/tables/gnss_comparison.csv",
     "row_count": 4,
     "columns": [
       "scenario_id",
@@ -414,7 +414,7 @@
     ]
   },
   "gnss_summary": {
-    "csv_path": "/tmp/standard_final/tables/gnss_summary.csv",
+    "csv_path": "/tmp/standard_final2/tables/gnss_summary.csv",
     "row_count": 1,
     "columns": [
       "gnss_session_fix_count",
@@ -430,7 +430,7 @@
     ]
   },
   "accuracy": {
-    "csv_path": "/tmp/standard_final/tables/accuracy.csv",
+    "csv_path": "/tmp/standard_final2/tables/accuracy.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -482,7 +482,7 @@
     ]
   },
   "latency": {
-    "csv_path": "/tmp/standard_final/tables/latency.csv",
+    "csv_path": "/tmp/standard_final2/tables/latency.csv",
     "row_count": 96,
     "columns": [
       "scenario_id",
@@ -493,12 +493,12 @@
     ]
   },
   "energy": {
-    "csv_path": "/tmp/standard_final/tables/energy.csv",
+    "csv_path": "/tmp/standard_final2/tables/energy.csv",
     "row_count": 0,
     "columns": []
   },
   "cost": {
-    "csv_path": "/tmp/standard_final/tables/cost.csv",
+    "csv_path": "/tmp/standard_final2/tables/cost.csv",
     "row_count": 0,
     "columns": []
   }

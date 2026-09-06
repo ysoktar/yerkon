@@ -18,12 +18,14 @@ from locbench3d.benchmark.runner import run_benchmark
 from locbench3d.experiment.config_io import load_experiment_config
 from locbench3d.experiment.generator import preview_scenario_count, validate_design
 from locbench3d.gnss.model import load_gnss_log_csv_path
+from locbench3d.hardware.matlab_uwb_import import load_matlab_uwb_csv_path
 from locbench3d.reporting import (
     build_dashboard_sheet,
     build_narrative_sheets,
     build_static_tables,
     write_outputs,
 )
+from locbench3d.tables.builders import build_matlab_uwb_waveform_table
 from locbench3d.tables.master_fields import build_field_catalog
 from locbench3d.validate.invariants import check_master_table, check_range_comparison_table
 from locbench3d.validate.workbook_validate import validate_workbook
@@ -63,7 +65,15 @@ def validate_config_cmd(config_path: str) -> None:
 @click.option("--config", required=True, help="Path to the experiment YAML file.")
 @click.option("--out", default="output", help="Output directory for result tables.")
 @click.option("--gnss-log", default=None, help="Optional GNSS CSV log to import.")
-def run_cmd(config: str, out: str, gnss_log: str | None) -> None:
+@click.option(
+    "--matlab-uwb-csv",
+    default=None,
+    help=(
+        "Optional MATLAB UWB waveform ranging results CSV (see matlab/README.md). "
+        "Never executed by this project - see docs/LIMITATIONS.md."
+    ),
+)
+def run_cmd(config: str, out: str, gnss_log: str | None, matlab_uwb_csv: str | None) -> None:
     """Run the benchmark and write result tables (CSV + manifest) to --out."""
     cfg = load_experiment_config(config)
     gnss_fixes = None
@@ -81,7 +91,18 @@ def run_cmd(config: str, out: str, gnss_log: str | None) -> None:
         gnss_fixes=gnss_fixes,
     )
     tables_dir = os.path.join(out, "tables")
-    table_paths, tables = write_outputs(outputs, tables_dir)
+
+    extra_tables = None
+    if matlab_uwb_csv:
+        matlab_records = load_matlab_uwb_csv_path(matlab_uwb_csv)
+        extra_tables = {"matlab_uwb_waveform": build_matlab_uwb_waveform_table(matlab_records)}
+        click.echo(
+            f"Imported {len(matlab_records)} MATLAB UWB waveform row(s) from {matlab_uwb_csv} "
+            "(evidence type MATLAB_WAVEFORM; the producing script has never been executed - "
+            "see docs/LIMITATIONS.md)"
+        )
+
+    table_paths, tables = write_outputs(outputs, tables_dir, extra_tables=extra_tables)
     click.echo(f"Wrote {len(table_paths)} table(s) to {tables_dir}")
     click.echo(f"Simulated: {len(outputs.master_rows)}, skipped: {len(outputs.skipped_scenarios)}")
 
@@ -169,14 +190,32 @@ def validate_outputs_cmd(tables_dir: str, workbook: str) -> None:
 @click.option("--smoke", is_flag=True, help="Use examples/experiment_smoke.yaml instead of --config.")
 @click.option("--out", default="output")
 @click.option("--gnss-log", default=os.path.join("examples", "gnss_sample_log.csv"))
+@click.option(
+    "--matlab-uwb-csv",
+    default=None,
+    help="Optional MATLAB UWB waveform ranging results CSV (see matlab/README.md).",
+)
 @click.pass_context
-def run_all_cmd(ctx: click.Context, config: str, smoke: bool, out: str, gnss_log: str) -> None:
+def run_all_cmd(
+    ctx: click.Context,
+    config: str,
+    smoke: bool,
+    out: str,
+    gnss_log: str,
+    matlab_uwb_csv: str | None,
+) -> None:
     """Validate config, run the benchmark, write tables, build and validate the workbook."""
     config_path = os.path.join("examples", "experiment_smoke.yaml") if smoke else config
     tables_dir = os.path.join(out, "tables")
     workbook_path = os.path.join(out, "workbook.xlsx")
     ctx.invoke(validate_config_cmd, config_path=config_path)
-    ctx.invoke(run_cmd, config=config_path, out=out, gnss_log=gnss_log)
+    ctx.invoke(
+        run_cmd,
+        config=config_path,
+        out=out,
+        gnss_log=gnss_log,
+        matlab_uwb_csv=matlab_uwb_csv,
+    )
     ctx.invoke(build_workbook_cmd, tables_dir=tables_dir, out=workbook_path)
     ctx.invoke(validate_outputs_cmd, tables_dir=tables_dir, workbook=workbook_path)
     click.echo("")

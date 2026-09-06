@@ -22,6 +22,7 @@ from locbench3d.environment.environment3d import (
     anchor_density_3d,
     poisson_expected_anchors_in_range,
 )
+from locbench3d.hardware.matlab_uwb_import import MatlabUwbWaveformResult
 from locbench3d.hardware.profiles import HARDWARE_PROFILE_REGISTRY
 from locbench3d.hardware.sx1280_published import (
     ROBINSON_CALIBRATION_NOTES,
@@ -155,3 +156,12 @@ def build_channel_comparison_table(entries: list[dict]) -> pd.DataFrame:
             }
         )
     return rows_to_dataframe(rows)
+
+
+def build_matlab_uwb_waveform_table(records: list[MatlabUwbWaveformResult]) -> pd.DataFrame:
+    """Imported MATLAB UWB waveform ranging results, tagged MATLAB_WAVEFORM.
+
+    Empty when no ``--matlab-uwb-csv`` was supplied to the CLI - this is
+    optional evidence, not a required simulation.
+    """
+    return rows_to_dataframe([r.to_dict() for r in records])

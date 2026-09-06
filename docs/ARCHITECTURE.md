@@ -16,6 +16,8 @@ locbench3d/
     sx1280_published.py     Stuart Robinson's published ranging observations
     sx1280_measurements.py  Raw ranging measurement schema + CSV importer
     sx1280_error_model.py   Hardware-calibrated bootstrap error model
+    matlab_uwb_import.py    Importer for matlab/uwb_waveform_ranging.m output
+                              (MATLAB_WAVEFORM evidence; see docs/LIMITATIONS.md)
 
   methods/
     catalog.py       Method definitions, minimum/preferred anchor counts,

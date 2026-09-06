@@ -34,7 +34,18 @@ def _select_columns(df: pd.DataFrame, id_cols: list[str], prefix: str) -> pd.Dat
     return df[cols]
 
 
-def write_outputs(outputs: BenchmarkOutputs, out_dir: str) -> tuple[dict[str, str], dict[str, pd.DataFrame]]:
+def write_outputs(
+    outputs: BenchmarkOutputs,
+    out_dir: str,
+    extra_tables: dict[str, pd.DataFrame] | None = None,
+) -> tuple[dict[str, str], dict[str, pd.DataFrame]]:
+    """Write every result table to CSV plus a manifest.
+
+    ``extra_tables`` merges in tables this run produced outside the normal
+    ``BenchmarkOutputs`` flow (for example, imported MATLAB UWB waveform
+    results); a caller-supplied table with the same name as one built here
+    overrides it.
+    """
     os.makedirs(out_dir, exist_ok=True)
 
     tables: dict[str, pd.DataFrame] = {
@@ -61,6 +72,9 @@ def write_outputs(outputs: BenchmarkOutputs, out_dir: str) -> tuple[dict[str, st
     )
     tables["energy"] = _select_columns(master, ["scenario_id", "method"], "energy_")
     tables["cost"] = _select_columns(master, ["scenario_id", "method"], "cost_")
+
+    if extra_tables:
+        tables.update(extra_tables)
 
     table_paths: dict[str, str] = {}
     manifest: dict[str, dict] = {}

@@ -102,6 +102,23 @@ turns in a box-perimeter or staircase path).
   to check for beyond the defensive literal-error-token scan this project
   does perform.
 
+## The MATLAB UWB waveform script has never been executed
+
+`matlab/uwb_waveform_ranging.m` (optional; see `matlab/README.md`)
+simulates UWB ranging at the waveform level and can supply
+`MATLAB_WAVEFORM` evidence via `--matlab-uwb-csv`. No MATLAB license or
+Communications Toolbox was available in this environment, so **this
+script has never been run**. It was written carefully, including a
+self-calibration step specifically designed to cancel a possible constant
+error in its hand-derived delay-alignment math (a risk that comes
+directly from not being able to execute and check it), but it does not
+carry a passing test suite the way every Python module in this project
+does. Run the sanity check in `matlab/README.md` before trusting any
+output from it. The Python side of this feature (the importer in
+`hardware/matlab_uwb_import.py` and its CLI wiring) is fully tested
+against a synthetic CSV matching the documented schema, since that part
+runs in ordinary Python and could be executed and checked normally.
+
 ## Field catalog descriptions are generated, not individually hand-written
 
 `tables/master_fields.py` infers each field's category and unit from its
