@@ -150,7 +150,10 @@ def validate_outputs_cmd(tables_dir: str, workbook: str) -> None:
             errors.append(f"[range_comparison] {v.check}: {v.message}")
 
     if os.path.exists(workbook):
-        report = validate_workbook(workbook)
+        # Validate the dynamic, per-run tables against the workbook's sheets
+        # (the static reference sheets like hardware_profiles are not part
+        # of a specific run and are not re-validated here).
+        report = validate_workbook(workbook, expected_tables=tables)
         errors.extend(report.errors)
 
     if errors:
