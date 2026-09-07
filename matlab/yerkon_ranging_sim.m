@@ -124,10 +124,23 @@ function cases = buildCases()
 %BUILDCASES The radios and conditions the YERKON report specifies.
 %
 % UWB is the DWM3000: IEEE 802.15.4z HRP, channel 5, 499.2 MHz bandwidth.
-% The 2.4 GHz cases are the SX1280 ranging modes; the part supports several
-% bandwidths and the report does not say which is used, so the two ends of
-% the useful range are simulated. Bandwidth is the dominant term in timing
-% resolution, so this sweep is the point of the exercise.
+%
+% The 2.4 GHz cases are the SX1280 ranging modes. The part supports exactly
+% four LoRa bandwidths - 203, 406, 812 and 1625 kHz - and the report does
+% not say which YERKON uses, so all four are simulated. Bandwidth is the
+% dominant term in timing resolution, so this sweep is the point of the
+% exercise.
+%
+% All four are swept at the same SNR set, and that is a modelling decision
+% worth stating. In Turkey and across CEPT the 2400-2483.5 MHz band is
+% capped both in total power (100 mW e.i.r.p.) and in density (10 mW/MHz
+% e.i.r.p. for non-FHSS wideband modulation). The density cap binds first
+% at every SX1280 bandwidth, so the legal transmit power scales with the
+% bandwidth: 3.1 dBm at 203 kHz through 12.1 dBm at 1625 kHz. Thermal
+% noise scales with bandwidth by the same factor, so the received SNR at a
+% given distance is the same in all four configurations. Sweeping one SNR
+% set across all four is therefore the like-for-like comparison, and it
+% means the wider bandwidths do not buy their accuracy with range.
 
 cases = struct('name', {}, 'radio', {}, 'condition', {}, 'bandwidthHz', {}, ...
     'carrierHz', {}, 'waveform', {}, 'estimator', {}, 'snrDb', {}, ...
@@ -146,13 +159,25 @@ cases(end+1) = mkCase('uwb_nlos', 'DWM3000', 'NLOS', 499.2e6, 6489.6e6, 'pulse',
 cases(end+1) = mkCase('uwb_tunnel', 'DWM3000', 'TUNNEL', 499.2e6, 6489.6e6, 'pulse', 'leading', ...
     [10 15 20 25], [30 75 150], svParams('tunnel'));
 
-cases(end+1) = mkCase('sx1280_1600k_los',  'SX1280', 'LOS',  1625e3, 2450e6, 'chirp', 'peak', ...
+% All four SX1280 LoRa bandwidths, LOS and NLOS. 406 kHz is the setting
+% Robinson's published ranging sketches use, so that pair is the one with a
+% hardware measurement to check against; 1625 kHz is the widest the part
+% offers.
+cases(end+1) = mkCase('sx1280_203k_los',   'SX1280', 'LOS',  203e3,  2450e6, 'chirp', 'peak', ...
     [10 15 20 25], [50 150 250], svParams('outdoor_los'));
-cases(end+1) = mkCase('sx1280_1600k_nlos', 'SX1280', 'NLOS', 1625e3, 2450e6, 'chirp', 'peak', ...
+cases(end+1) = mkCase('sx1280_203k_nlos',  'SX1280', 'NLOS', 203e3,  2450e6, 'chirp', 'peak', ...
     [10 15 20 25], [50 150 250], svParams('urban_nlos'));
 cases(end+1) = mkCase('sx1280_406k_los',   'SX1280', 'LOS',  406e3,  2450e6, 'chirp', 'peak', ...
     [10 15 20 25], [50 150 250], svParams('outdoor_los'));
 cases(end+1) = mkCase('sx1280_406k_nlos',  'SX1280', 'NLOS', 406e3,  2450e6, 'chirp', 'peak', ...
+    [10 15 20 25], [50 150 250], svParams('urban_nlos'));
+cases(end+1) = mkCase('sx1280_812k_los',   'SX1280', 'LOS',  812e3,  2450e6, 'chirp', 'peak', ...
+    [10 15 20 25], [50 150 250], svParams('outdoor_los'));
+cases(end+1) = mkCase('sx1280_812k_nlos',  'SX1280', 'NLOS', 812e3,  2450e6, 'chirp', 'peak', ...
+    [10 15 20 25], [50 150 250], svParams('urban_nlos'));
+cases(end+1) = mkCase('sx1280_1600k_los',  'SX1280', 'LOS',  1625e3, 2450e6, 'chirp', 'peak', ...
+    [10 15 20 25], [50 150 250], svParams('outdoor_los'));
+cases(end+1) = mkCase('sx1280_1600k_nlos', 'SX1280', 'NLOS', 1625e3, 2450e6, 'chirp', 'peak', ...
     [10 15 20 25], [50 150 250], svParams('urban_nlos'));
 end
 
