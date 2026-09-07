@@ -44,19 +44,29 @@ genişliği, raporun belirtmediği ama her şeyi belirleyen parametre.**
 
 ## Bant genişliği seçiminin sonuca etkisi
 
-Aynı senaryo, yalnızca menzil hata modeli değiştirilerek (füzyonlu, 8 koşu):
+Bu bir **karşı-olgusal denemedir, tabloya girmez.** Aynı senaryo, tablonun
+kendi ayarlarıyla (füzyonlu, 16 koşu, seed 42), yalnızca menzil hata modeli
+değiştirilerek tekrar çalıştırıldı. İlk satır tablodaki satırın kendisidir,
+yani karşılaştırmanın referansı tabloyla birebir aynı sayıdır:
 
 | Senaryo | Menzil hata modeli | σ | HPE P50 | HPE P95 |
 |---|---|---|---|---|
-| Şehir içi | Robinson (mevcut) | 3,06 m | 2,30 m | 4,69 m |
-| Şehir içi | MATLAB 406 kHz | 2,81 m | 1,99 m | 4,19 m |
-| Şehir içi | **MATLAB 1,6 MHz** | **0,68 m** | **0,49 m** | **1,07 m** |
-| Kırsal | Robinson (mevcut) | 3,04 m | 9,82 m | 33,71 m |
-| Kırsal | MATLAB 406 kHz | 2,81 m | 7,20 m | 25,83 m |
-| Kırsal | **MATLAB 1,6 MHz** | **0,68 m** | **1,70 m** | **5,23 m** |
+| Şehir içi | **Robinson (tablodaki satır)** | 3,04 m | **2,44 m** | **4,86 m** |
+| Şehir içi | MATLAB 406 kHz | 2,69 m | 2,12 m | 4,31 m |
+| Şehir içi | MATLAB 1,6 MHz | 0,71 m | 0,52 m | 1,07 m |
+| Kırsal | **Robinson (tablodaki satır)** | 3,01 m | **7,77 m** | **36,84 m** |
+| Kırsal | MATLAB 406 kHz | 2,68 m | 6,15 m | 30,92 m |
+| Kırsal | MATLAB 1,6 MHz | 0,69 m | 1,67 m | 13,10 m |
 
-Şehir içi yatay hata 2,30 m'den 0,49 m'ye, kırsal 9,82 m'den 1,70 m'ye
-iniyor. **Ek donanım yok, ek düğüm yok, sadece bir konfigürasyon seçimi.**
+1,6 MHz'e geçilseydi şehir içi yatay hata 2,44 m'den 0,52 m'ye, kırsal
+7,77 m'den 1,67 m'ye inerdi. **Ek donanım yok, ek düğüm yok, sadece bir
+konfigürasyon seçimi.**
+
+Tablo yine de Robinson satırını kullanıyor. Sebebi: 1,6 MHz satırı bir
+simülasyonun çıktısı, Robinson satırı ise açılmış bir donanımın ölçümü.
+Rapor SX1280'i hangi menzil bandında çalıştıracağını söylemediği sürece,
+tabloda duracak olan ölçülmüş sayıdır. Rapor bandı belirtirse tablo o
+satıra geçebilir.
 
 Bedeli var: daha geniş bant daha düşük alıcı hassasiyeti, yani daha kısa
 menzil demek. Kırsalda bu, düğüm aralığını sıklaştırmayı gerektirebilir. Bu

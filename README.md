@@ -88,18 +88,27 @@ kullanılabilirliğin %99,3'te kalmasının sebebi budur.
 
 ## En etkili tek bulgu: menzil bant genişliği
 
+**Bu bölüm tablonun içinde değil.** Yukarıdaki tablo Robinson'ın gerçek
+donanımda ölçtüğü hatalarla üretiliyor ve öyle kalıyor. Aşağıdaki, aynı
+senaryonun yalnızca menzil hata modeli değiştirilerek tekrar çalıştırılmış
+hâli: "SX1280 daha geniş menzil bandında çalıştırılsaydı ne olurdu"
+sorusunun cevabı.
+
 MATLAB'da dalga formu seviyesinde yapılan simülasyon
 ([docs/WAVEFORM.md](docs/WAVEFORM.md)), SX1280'in menzil bant genişliğinin
 her şeyi belirlediğini gösteriyor. Rapor bu parametreyi belirtmiyor.
 
 | Menzil hata modeli | σ | Şehir içi HPE P50 | Kırsal HPE P50 |
 |---|---|---|---|
-| Robinson (mevcut, gerçek donanım) | 3,06 m | 2,30 m | 9,82 m |
-| MATLAB 406 kHz | 2,81 m | 1,99 m | 7,20 m |
-| **MATLAB 1,6 MHz** | **0,68 m** | **0,49 m** | **1,70 m** |
+| Robinson (mevcut, gerçek donanım) — **tablodaki satır** | 3,04 m | **2,44 m** | **7,77 m** |
+| MATLAB 406 kHz | 2,69 m | 2,12 m | 6,15 m |
+| MATLAB 1,6 MHz | 0,71 m | 0,52 m | 1,67 m |
 
 Ek donanım veya ek düğüm olmadan, sadece konfigürasyon seçimiyle şehir içi
-yatay hata 2,30 m'den 0,49 m'ye, kırsal 9,82 m'den 1,70 m'ye iniyor.
+yatay hata 2,44 m'den 0,52 m'ye, kırsal 7,77 m'den 1,67 m'ye inebilirdi.
+Tabloya taşımadım, çünkü SX1280'in hangi bantta çalıştırılacağı bir tasarım
+kararı ve rapor bunu söylemiyor; ölçüme dayanan tek sayı Robinson'ınki.
+
 Bedeli daha kısa menzil olur (geniş bant, düşük hassasiyet), ve bu
 ödünleşim ölçülmedi. **Rapora öneri: menzil bant genişliği açıkça
 belirtilsin.**
