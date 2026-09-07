@@ -58,6 +58,20 @@ fprintf(fidP, 'gyro_random_walk,%g,(rad/s)*sqrt(Hz)\n', params.gyroRandomWalk);
 fclose(fidP);
 
 % ---- build the sensor ----
+% Two sensors: the real one, and an ideal one with default (noiseless)
+% parameters used only as the reference. Differencing against the ideal
+% sensor removes gravity and any frame convention the model applies,
+% leaving the sensor error and nothing else.
+%
+% The first version of this file differenced against the kinematic
+% acceleration instead. imuSensor reports specific force, which includes
+% the reaction to gravity, so the "drift" it measured was gravity: 10.0 m/s
+% of velocity error after one second, and 5.10 m of position error against
+% the 4.90 m that half of g t-squared predicts.
+ideal = imuSensor('accel-gyro', 'SampleRate', fs);
+ideal.Accelerometer = accelparams();
+ideal.Gyroscope = gyroparams();
+
 imu = imuSensor('accel-gyro', 'SampleRate', fs);
 imu.Accelerometer = accelparams( ...
     'NoiseDensity', params.accelNoiseDensity, ...
@@ -86,14 +100,18 @@ trueAngVel(:, 3) = turnRateRad;
 drift = zeros(opts.Runs, numel(opts.OutageSeconds));
 velErr = zeros(opts.Runs, numel(opts.OutageSeconds));
 
+reset(ideal);
+[refAccel, ~] = ideal(trueAccel, trueAngVel);
+
 fprintf('\nrunning');
 for r = 1:opts.Runs
     reset(imu);
     [measAccel, ~] = imu(trueAccel, trueAngVel);
 
-    % Free inertial: integrate what the sensor reported against what was
-    % true. No aiding, which is exactly the situation during a range gap.
-    accelError = measAccel - trueAccel;
+    % Free inertial: integrate the sensor's error, which is what it reports
+    % minus what an ideal unit in the same motion would report. No aiding,
+    % which is exactly the situation during a range gap.
+    accelError = measAccel - refAccel;
     velocityError = cumsum(accelError, 1) / fs;
     positionError = cumsum(velocityError, 1) / fs;
 

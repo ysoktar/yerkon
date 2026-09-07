@@ -185,11 +185,46 @@ yüzdelik fonksiyonu kullanılıyor. **Ek kurulum gerekmiyor.**
 - **Anten ve RF ön uç modellenmedi.** Anten faz merkezi kayması ve grup
   gecikmesi gerçek sistemde sabit ofsete katkı verir.
 
+## İlk koşudan çıkan düzeltmeler (2026-09-07)
+
+Senin makinende çalışan ilk sürüm üç hata ortaya çıkardı. Üçü de sonuçlara
+bakınca görünür oldu, hepsi düzeltildi.
+
+**1. IMU sonucu yerçekimini ölçüyordu.** 1 saniyede 10,0 m/s hız hatası ve
+5,10 m konum sürüklenmesi bildirdi. 10,0 m/s tam olarak *g*, ve 5,10 m de
+`½·g·t²`'nin verdiği 4,90 m. `imuSensor` özgül kuvvet döndürür, yani
+yerçekimine tepkiyi içerir; ben onu saf kinematik ivmeyle karşılaştırmıştım.
+Artık referans, aynı hareketi gören **gürültüsüz bir ikinci `imuSensor`**;
+fark alınca yerçekimi de, modelin kullandığı eksen düzeni de kendiliğinden
+düşüyor. Düzeltilmiş sürüklenme santimetre mertebesinde olmalı, metre değil.
+
+**2. UWB, dar bant SX1280'den kötü çıkıyordu.** 499,2 MHz'in 406 kHz'den
+kötü zamanlama vermesi fiziksel olarak imkânsız: bin kat bant genişliği bin
+kat zamanlama çözünürlüğü demek. Sebep, kanal modelinde görüş hattı için
+baskın doğrudan yol olmamasıydı; erken bir yansıma şansa doğrudan yolu
+geçebiliyor ve ön kenar dedektörü ona kilitleniyordu. Kanala **Rician K
+faktörü** eklendi: görüş hattında doğrudan yol deterministik ve baskın
+(12 dB), NLOS'ta zayıf (−6 dB), tünelde ortada (0 dB).
+
+**3. SNR neredeyse hiçbir şeyi değiştirmiyordu.** 10 dB ile 25 dB arasında
+sonuçlar aynı çıkıyordu, çünkü gürültü gücü tamponun **ortalamasına** göre
+ölçekleniyordu ve tampon varış anının iki yanında çoğunlukla boş. İstenen
+SNR uygulanmıyordu. Artık sinyal **tepe** gücüne göre referanslanıyor ve
+SNR beklendiği gibi çalışıyor: 406 kHz görüş hattında standart sapma
+5 dB'de 8,5 m iken 25 dB'de 0,80 m'ye iniyor.
+
+Düzeltmelerden sonra beklenen sıralama (25 dB, görüş hattı, standart sapma):
+UWB 499 MHz < SX1280 1,6 MHz < SX1280 406 kHz. Bant genişliği arttıkça hata
+düşüyor, olması gerektiği gibi.
+
 ## Algoritma doğrulaması
 
 MATLAB burada çalıştırılamadığı için algoritma Python'a port edilip test
-edildi ve üç hata bu sayede yakalandı: korelasyon referans gecikmesi
-yanlıştı, dar bant vakalarında yayılım gecikmesi korelasyon tepesinden
-kısa olduğu için ölçüm dejenere oluyordu, ve tek bir kestirici iki radyo
-için de kullanılıyordu. Düzeltilmiş hali burada. Yine de MATLAB
-sözdiziminin senin sürümünde çalıştığı doğrulanmadı; 2. adımın amacı bu.
+edildi. İlk turda üç hata bu sayede yakalandı: korelasyon referans
+gecikmesi yanlıştı, dar bant vakalarında yayılım gecikmesi korelasyon
+tepesinden kısa olduğu için ölçüm dejenere oluyordu, ve tek bir kestirici
+iki radyo için de kullanılıyordu.
+
+Yukarıdaki üç düzeltme de aynı yöntemle, senin gönderdiğin sonuçlara
+bakılıp Python portunda doğrulandıktan sonra uygulandı. MATLAB
+sözdiziminin çalıştığı ilk koşuda teyit edildi.

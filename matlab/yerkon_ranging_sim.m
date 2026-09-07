@@ -168,10 +168,19 @@ function p = svParams(kind)
 %SVPARAMS Cluster-based multipath parameters, Saleh-Valenzuela style.
 %
 % Cluster arrival rate, ray arrival rate, cluster and ray decay constants,
-% and how much the direct path is attenuated. The NLOS and tunnel entries
-% carry a first-path attenuation, which is what turns a timing problem into
-% a bias: when the direct path is weaker than a reflection, a detector that
-% locks to the strongest peak reports the reflection's longer path.
+% a Rician K factor, and how much the direct path is attenuated.
+%
+% The K factor is what separates line of sight from the rest, and leaving
+% it out was a real error in the first version of this file. Without a
+% dominant direct path an early reflection can outrank it by chance, the
+% leading-edge detector locks to whichever crossed threshold first, and
+% 499.2 MHz of UWB came out worse than 406 kHz of narrowband LoRa. That is
+% backwards: a thousand times the bandwidth is a thousand times the timing
+% resolution. With K set, the ordering is right.
+%
+% NLOS and tunnel entries also carry a first-path attenuation, which is what
+% turns a timing problem into a bias: when the direct path is weaker than a
+% reflection, a detector reports the reflection's longer path.
 %
 % Figures follow the shape of the IEEE 802.15.4a channel models rather than
 % reproducing any one of them exactly, and are this project's parameters.
@@ -180,29 +189,34 @@ switch kind
     case 'industrial_los'
         p = struct('clusterRate', 0.0048e9, 'rayRate', 1.13e9, ...
             'clusterDecayS', 17e-9, 'rayDecayS', 6.0e-9, ...
-            'firstPathAttenDb', 0, 'nClusters', 4, 'raysPerCluster', 12, ...
+            'firstPathAttenDb', 0, 'riceanKDb', 12, ...
+            'nClusters', 4, 'raysPerCluster', 12, ...
             'excessDelaySpreadS', 40e-9);
     case 'industrial_nlos'
         p = struct('clusterRate', 0.0048e9, 'rayRate', 1.13e9, ...
             'clusterDecayS', 27e-9, 'rayDecayS', 10.0e-9, ...
-            'firstPathAttenDb', 9, 'nClusters', 6, 'raysPerCluster', 16, ...
+            'firstPathAttenDb', 9, 'riceanKDb', -6, ...
+            'nClusters', 6, 'raysPerCluster', 16, ...
             'excessDelaySpreadS', 90e-9);
     case 'tunnel'
         % A bore guides the signal: strong late arrivals from the walls,
         % long delay spread, direct path still present but not dominant.
         p = struct('clusterRate', 0.008e9, 'rayRate', 2.0e9, ...
             'clusterDecayS', 40e-9, 'rayDecayS', 14.0e-9, ...
-            'firstPathAttenDb', 4, 'nClusters', 6, 'raysPerCluster', 20, ...
+            'firstPathAttenDb', 4, 'riceanKDb', 0, ...
+            'nClusters', 6, 'raysPerCluster', 20, ...
             'excessDelaySpreadS', 120e-9);
     case 'outdoor_los'
         p = struct('clusterRate', 0.0033e9, 'rayRate', 0.4e9, ...
             'clusterDecayS', 60e-9, 'rayDecayS', 20.0e-9, ...
-            'firstPathAttenDb', 0, 'nClusters', 3, 'raysPerCluster', 8, ...
+            'firstPathAttenDb', 0, 'riceanKDb', 12, ...
+            'nClusters', 3, 'raysPerCluster', 8, ...
             'excessDelaySpreadS', 200e-9);
     case 'urban_nlos'
         p = struct('clusterRate', 0.0033e9, 'rayRate', 0.4e9, ...
             'clusterDecayS', 90e-9, 'rayDecayS', 30.0e-9, ...
-            'firstPathAttenDb', 11, 'nClusters', 5, 'raysPerCluster', 12, ...
+            'firstPathAttenDb', 11, 'riceanKDb', -6, ...
+            'nClusters', 5, 'raysPerCluster', 12, ...
             'excessDelaySpreadS', 400e-9);
     otherwise
         error('yerkon:badChannel', 'Unknown channel kind %s', kind);
@@ -270,8 +284,8 @@ end
 
 function [delaysS, gains] = makeChannel(p, bandwidthHz)
 %MAKECHANNEL Draw one realisation of the cluster-based multipath channel.
-delaysS = 0;
-gains = 10^(-p.firstPathAttenDb / 20) * (randn + 1j * randn) / sqrt(2);
+delaysS = [];
+gains = [];
 
 clusterDelay = 0;
 for ci = 1:p.nClusters
@@ -287,18 +301,29 @@ for ci = 1:p.nClusters
         if tau > p.excessDelaySpreadS
             continue
         end
+        if tau == 0
+            continue    % the direct path is placed separately below
+        end
         power = exp(-clusterDelay / p.clusterDecayS) * exp(-rayDelay / p.rayDecayS);
         amplitude = sqrt(power / 2) * (randn + 1j * randn);
-        if tau == 0
-            continue    % the direct path is already placed above
-        end
         delaysS(end+1) = tau;             %#ok<AGROW>
         gains(end+1) = amplitude;         %#ok<AGROW>
     end
 end
 
-% Normalise so total received power does not depend on how many taps the
-% draw happened to produce; SNR is then set independently below.
+% Normalise the diffuse part, then add the direct path at the strength the
+% Rician K factor calls for. In line of sight the direct path is
+% deterministic and dominant; in NLOS it is weak and attenuated.
+diffusePower = sum(abs(gains).^2);
+if diffusePower > 0
+    gains = gains / sqrt(diffusePower);
+end
+directGain = sqrt(10^(p.riceanKDb / 10)) * 10^(-p.firstPathAttenDb / 20);
+delaysS = [0, delaysS];
+gains = [directGain, gains];
+
+% Total received power is then independent of how many taps the draw
+% produced; SNR is set separately below.
 gains = gains / norm(gains);
 
 % Taps closer together than the waveform can resolve are not separable, and
@@ -340,7 +365,14 @@ end
 end
 
 function rx = addNoise(rx, snrDb)
-signalPower = mean(abs(rx).^2);
+%ADDNOISE Add noise at a stated SNR, referenced to the signal peak.
+%
+% Not to the buffer average. The buffer is mostly empty either side of the
+% arrival, so averaging over it puts the noise far below what the SNR asked
+% for, and the first version of this file did exactly that: results barely
+% moved between 10 dB and 25 dB because the requested SNR was not the one
+% being applied.
+signalPower = max(abs(rx).^2);
 if signalPower <= 0
     return
 end
