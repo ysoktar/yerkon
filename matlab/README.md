@@ -14,12 +14,50 @@ değil, radyonun parametrelerinden türetilmiş bir hata dağılımıdır.
 
 **Hiçbir toolbox gerektirmez.** Saf MATLAB.
 
+## Önce: bunlar MATLAB komutları, PowerShell komutu değil
+
+Aşağıdaki komutlar **MATLAB'ın kendi komut penceresinde** çalışır.
+PowerShell'de yazarsan `is not recognized as the name of a cmdlet` hatası
+alırsın.
+
+İki yol var.
+
+**Yol A - MATLAB'ı aç, içinde çalıştır (önerilen).**
+
+MATLAB'ı başlat, sonra MATLAB komut penceresinde:
+
+```matlab
+cd 'C:\Users\yavuz\git\yerkon\matlab'
+yerkon_env_check
+```
+
+**Yol B - PowerShell'den tek satırda.**
+
+MATLAB PATH'te ise, PowerShell'den:
+
+```powershell
+matlab -batch "cd('C:\Users\yavuz\git\yerkon\matlab'); yerkon_env_check"
+```
+
+PATH'te değilse tam yolla (sürüm numarası seninkine göre değişir):
+
+```powershell
+& "C:\Program Files\MATLAB\R2024b\bin\matlab.exe" -batch "cd('C:\Users\yavuz\git\yerkon\matlab'); yerkon_env_check"
+```
+
+`-batch` çıktıyı doğrudan PowerShell'e basar, dosyaya yönlendirmek için:
+
+```powershell
+matlab -batch "cd('C:\Users\yavuz\git\yerkon\matlab'); yerkon_env_check" | Tee-Object env_check.txt
+```
+
 ## Çalıştırma sırası
 
 ### 1. Ortam kontrolü
 
+MATLAB içinde:
+
 ```matlab
-cd matlab
 yerkon_env_check
 ```
 
@@ -29,8 +67,16 @@ değiştiremeyeceğimizi belirler.
 
 ### 2. Kısa deneme
 
+MATLAB içinde:
+
 ```matlab
 yerkon_ranging_sim('Trials', 20)
+```
+
+PowerShell'den:
+
+```powershell
+matlab -batch "cd('C:\Users\yavuz\git\yerkon\matlab'); yerkon_ranging_sim('Trials', 20)"
 ```
 
 Birkaç dakika sürer. Amaç script'in senin sürümünde hatasız çalıştığını
@@ -38,8 +84,16 @@ görmek. Ekran çıktısını gönder.
 
 ### 3. Tam koşu
 
+MATLAB içinde:
+
 ```matlab
 yerkon_ranging_sim('Trials', 300)
+```
+
+PowerShell'den:
+
+```powershell
+matlab -batch "cd('C:\Users\yavuz\git\yerkon\matlab'); yerkon_ranging_sim('Trials', 300)"
 ```
 
 Uzun sürebilir (yarım saat mertebesinde olabilir). Bitince şu iki dosyayı

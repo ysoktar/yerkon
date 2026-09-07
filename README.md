@@ -193,6 +193,13 @@ Testler:
 pip install pytest && python -m pytest -q
 ```
 
+`output/` klasörü sürüm takibinde değil: her çalıştırmada yeniden üretilir,
+bu yüzden takip edilseydi her `git pull` çakışırdı. Referans kopya
+`docs/reference_output/` içinde duruyor.
+
+MATLAB tarafı için [matlab/README.md](matlab/README.md). Oradaki komutlar
+MATLAB'ın kendi komut penceresinde çalışır, PowerShell'de değil.
+
 ## Depo yapısı
 
 ```

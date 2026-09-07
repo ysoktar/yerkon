@@ -6,3 +6,6 @@ __pycache__/
 venv/
 build/
 dist/
+
+# Çalıştırınca yeniden üretilen çıktılar. Referans kopya docs/reference_output/ içinde.
+output/
