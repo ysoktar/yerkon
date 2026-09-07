@@ -16,36 +16,35 @@ fprintf('release      : %s\n', version('-release'));
 fprintf('computer     : %s\n', computer);
 fprintf('pwd          : %s\n', pwd);
 
-wanted = { ...
-    'Signal Processing Toolbox',        'signal'; ...
-    'Communications Toolbox',           'comm'; ...
-    'Navigation Toolbox',               'nav'; ...
-    'Sensor Fusion and Tracking Toolbox','shared_positioning'; ...
-    'Statistics and Machine Learning Toolbox', 'stats'; ...
-    'Phased Array System Toolbox',      'phased'; ...
-    'Parallel Computing Toolbox',       'distcomp'};
+% Ask MATLAB what is installed rather than guessing at licence feature
+% names. An earlier version of this check called license('test', 'signal')
+% and friends, which are ver() arguments and not licence features, so every
+% toolbox came back missing while the functions in them were plainly there.
+installed = ver;
+names = {installed.Name};
 
-fprintf('\ntoolboxes:\n');
-for k = 1:size(wanted, 1)
-    name = wanted{k, 1};
-    lic  = wanted{k, 2};
-    ok = license('test', lic) == 1;
-    if ok
-        % A licence can exist without the toolbox being installed.
-        ok = ~isempty(ver(lic));
-    end
-    if ok
-        status = 'YES';
-    else
-        status = 'no ';
-    end
-    fprintf('  [%s] %s\n', status, name);
+fprintf('\ninstalled products (%d):\n', numel(names));
+for k = 1:numel(names)
+    fprintf('  %s  %s\n', names{k}, installed(k).Version);
+end
+
+wanted = {'Signal Processing Toolbox', 'Communications Toolbox', ...
+    'Navigation Toolbox', 'Sensor Fusion and Tracking Toolbox', ...
+    'Statistics and Machine Learning Toolbox', 'Phased Array System Toolbox', ...
+    'Parallel Computing Toolbox'};
+
+fprintf('\ntoolboxes this project could use:\n');
+for k = 1:numel(wanted)
+    present = any(strcmp(wanted{k}, names));
+    fprintf('  [%s] %s\n', tern(present, 'YES', 'no '), wanted{k});
 end
 
 fprintf('\nfunctions the scripts may use:\n');
-probe = {'gauspuls', 'xcorr', 'awgn', 'imuSensor', 'writematrix', 'randn'};
+probe = {'gauspuls', 'xcorr', 'awgn', 'imuSensor', 'insfilterNonholonomic', ...
+    'insfilterErrorState', 'gpsSensor', 'writematrix', 'randn'};
 for k = 1:numel(probe)
-    fprintf('  [%s] %s\n', tern(exist(probe{k}, 'file') || exist(probe{k}, 'builtin'), 'YES', 'no '), probe{k});
+    found = exist(probe{k}, 'file') || exist(probe{k}, 'builtin');
+    fprintf('  [%s] %s\n', tern(found, 'YES', 'no '), probe{k});
 end
 
 fprintf('\nwrite test:\n');
