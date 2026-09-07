@@ -82,7 +82,31 @@ matlab -batch "cd('C:\Users\yavuz\git\yerkon\matlab'); yerkon_ranging_sim('Trial
 Birkaç dakika sürer. Amaç script'in senin sürümünde hatasız çalıştığını
 görmek. Ekran çıktısını gönder.
 
-### 3. Tam koşu
+### 3. IMU karakterizasyonu
+
+Sensor Fusion and Tracking Toolbox gerekiyor (sende var).
+
+```matlab
+yerkon_imu_char
+```
+
+Bir iki dakika sürer. Şunları gönder:
+
+```
+matlab/export/yerkon_imu_drift.csv
+matlab/export/yerkon_imu_params.csv
+```
+
+Bu, füzyon filtresindeki en zayıf varsayımlardan birini düzeltiyor. Şu an
+IMU ivme gürültüsü ve sapması benim seçtiğim sayılar (0,08 ve 0,03 m/s²) ve
+menzil ölçümü gelmediği anlarda kestirimin ne kadar sürükleneceğini bunlar
+belirliyor — tünelde sonucun tamamı bu. `imuSensor` gerçek bir MEMS
+biriminin stokastik terimlerini taşıyor, sapma kararsızlığını benim
+modelimdeki sabit ofset yerine rastgele yürüyüş olarak veriyor. Çıktı, aynen
+filtrenin ihtiyaç duyduğu büyüklük: **kesinti süresine göre serbest ataletsel
+sürüklenme.**
+
+### 4. Tam koşu
 
 MATLAB içinde:
 
@@ -139,6 +163,16 @@ Kanıt sınıfı `WAVEFORM_SIMULATION`: raporun hedefinden türetilmiş bir
 Gauss'tan güçlü (bant genişliği bağımlılığı ve LOS/NLOS farkı fizikten
 çıkıyor, seçilmiyor), donanım ölçümünden zayıf (kanal parametreleri bu
 projenin ve hiçbir anten açılmadı).
+
+## Bu makinede doğrulanan ortam
+
+R2026a, ve şunlar kurulu: Communications, DSP System, Parallel Computing,
+Phased Array, Sensor Fusion and Tracking, Signal Processing, Simulink.
+
+Navigation Toolbox ve Statistics and Machine Learning Toolbox yok, ama
+gerekmiyor: `imuSensor`, `insfilterNonholonomic` ve `gpsSensor` Sensor
+Fusion and Tracking ile geliyor, `prctile` yerine de elle yazılmış bir
+yüzdelik fonksiyonu kullanılıyor. **Ek kurulum gerekmiyor.**
 
 ## Bilinen sınırlar
 

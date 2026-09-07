@@ -19,9 +19,15 @@ function yerkon_ranging_sim(varargin)
 %
 %   Usage:
 %       cd matlab
-%       yerkon_ranging_sim                     % default sweep
-%       yerkon_ranging_sim('Trials', 400)      % more trials, slower
+%       yerkon_ranging_sim                       % default sweep
+%       yerkon_ranging_sim('Trials', 400)        % more trials, slower
 %       yerkon_ranging_sim('Cases', {'uwb_los'})
+%       yerkon_ranging_sim('Trials', 300, 'Parallel', true)
+%
+%   'Parallel' uses parfor across trials, which needs Parallel Computing
+%   Toolbox and is worth it for the long run. It is off by default because
+%   the workers draw their own random numbers: results stay statistically
+%   the same but stop being bit-for-bit reproducible from the seed.
 %
 %   Output:
 %       export/yerkon_ranging_errors.csv   one row per trial
@@ -62,6 +68,7 @@ fprintf(fidSummary, ['case,radio,condition,bandwidth_hz,snr_db,true_range_m,tria
 fprintf('YERKON ranging simulation\n');
 fprintf('  trials per point : %d\n', opts.Trials);
 fprintf('  seed             : %d\n', opts.Seed);
+fprintf('  parallel         : %d\n', opts.Parallel);
 
 rngSeed(opts.Seed);
 totalStart = tic;
@@ -75,9 +82,19 @@ for c = 1:numel(cases)
         snr = cs.snrDb(s);
         for r = 1:numel(cs.trueRangeM)
             trueRange = cs.trueRangeM(r);
+            % Trials first, file second: parfor cannot write to a shared
+            % file handle, and the write is cheap next to the simulation.
             errors = zeros(1, opts.Trials);
+            if opts.Parallel
+                parfor t = 1:opts.Trials
+                    errors(t) = oneTrial(cs, snr, trueRange);
+                end
+            else
+                for t = 1:opts.Trials
+                    errors(t) = oneTrial(cs, snr, trueRange);
+                end
+            end
             for t = 1:opts.Trials
-                errors(t) = oneTrial(cs, snr, trueRange);
                 fprintf(fidTrial, '%s,%s,%s,%.0f,%.1f,%.1f,%d,%.6f\n', ...
                     cs.name, cs.radio, cs.condition, cs.bandwidthHz, snr, ...
                     trueRange, t, errors(t));
@@ -416,7 +433,7 @@ end
 end
 
 function opts = parseOptions(varargin)
-opts = struct('Trials', 200, 'Seed', 42, 'Cases', {{}});
+opts = struct('Trials', 200, 'Seed', 42, 'Cases', {{}}, 'Parallel', false);
 for k = 1:2:numel(varargin)
     name = varargin{k};
     value = varargin{k+1};
@@ -424,6 +441,7 @@ for k = 1:2:numel(varargin)
         case 'trials'; opts.Trials = value;
         case 'seed';   opts.Seed = value;
         case 'cases';  opts.Cases = value;
+        case 'parallel'; opts.Parallel = logical(value);
         otherwise
             error('yerkon:badOption', 'Unknown option %s', name);
     end

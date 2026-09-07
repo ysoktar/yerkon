@@ -35,6 +35,7 @@ DEFAULT_EXPORT_DIR = os.path.join(
 )
 TRIAL_FILENAME = "yerkon_ranging_errors.csv"
 SUMMARY_FILENAME = "yerkon_ranging_summary.csv"
+IMU_DRIFT_FILENAME = "yerkon_imu_drift.csv"
 
 REQUIRED_TRIAL_COLUMNS = (
     "case", "radio", "condition", "bandwidth_hz", "snr_db",
@@ -196,3 +197,69 @@ def summarise(cases: dict[str, WaveformCase]) -> list[dict]:
             }
         )
     return rows
+
+
+@dataclass(frozen=True)
+class ImuDrift:
+    """How far a receiver drifts on inertial data alone, per outage length.
+
+    This is the quantity the filter needs and the one the Python model was
+    guessing at. It comes from MATLAB's ``imuSensor``, which carries the
+    stochastic terms a real MEMS unit has, including bias instability as a
+    random walk rather than the constant offset assumed here.
+    """
+
+    outage_s: np.ndarray
+    drift_p50_m: np.ndarray
+    drift_p95_m: np.ndarray
+
+    def drift_at(self, seconds: float, percentile: str = "p50") -> float:
+        """Interpolate the drift for an outage of a given length."""
+        curve = self.drift_p50_m if percentile == "p50" else self.drift_p95_m
+        return float(np.interp(seconds, self.outage_s, curve))
+
+    def implied_accel_noise_m_s2(self, seconds: float = 1.0) -> float:
+        """Acceleration noise that reproduces the measured drift.
+
+        Free-inertial position error from white acceleration noise grows as
+        roughly ``sigma * t^2 / 2``, so inverting at one outage length gives
+        the figure the Python filter should be using instead of a guess.
+        """
+        drift = self.drift_at(seconds)
+        return float(2.0 * drift / (seconds**2))
+
+
+def load_imu_drift(path: Optional[str] = None) -> ImuDrift:
+    """Read the drift curve written by matlab/yerkon_imu_char.m."""
+    path = path or os.path.join(DEFAULT_EXPORT_DIR, IMU_DRIFT_FILENAME)
+    if not os.path.exists(path):
+        raise FileNotFoundError(
+            "No MATLAB IMU characterisation at {}. Run "
+            "matlab/yerkon_imu_char.m and copy its export/ files here "
+            "first.".format(path)
+        )
+
+    required = ("outage_s", "position_drift_p50_m", "position_drift_p95_m")
+    outages, p50, p95 = [], [], []
+    with open(path, newline="", encoding="utf-8-sig") as handle:
+        reader = csv.DictReader(handle)
+        missing = [c for c in required if c not in (reader.fieldnames or [])]
+        if missing:
+            raise ValueError(
+                "{} is missing columns {}; expected the layout written by "
+                "matlab/yerkon_imu_char.m".format(path, missing)
+            )
+        for row in reader:
+            outages.append(float(row["outage_s"]))
+            p50.append(float(row["position_drift_p50_m"]))
+            p95.append(float(row["position_drift_p95_m"]))
+
+    if not outages:
+        raise ValueError("{} contains no rows".format(path))
+
+    order = np.argsort(outages)
+    return ImuDrift(
+        outage_s=np.array(outages)[order],
+        drift_p50_m=np.array(p50)[order],
+        drift_p95_m=np.array(p95)[order],
+    )
