@@ -15,10 +15,10 @@ python run.py
 
 | Sistem | Teknoloji | Ortam | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX |
 |---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,31 m | 4,82 m | 1,07 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
-| YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 3,02 m | 6,34 m | 1,05 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
-| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 5,45 m | 25,47 m | 0,98 m | %100,0 | 1,01 km² | ≈ 200.854 TL/km² |
-| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,15 m | 0,56 m | 0,63 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
+| YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,44 m | 4,86 m | 0,96 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
+| YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 3,19 m | 6,57 m | 0,95 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
+| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 7,77 m | 36,84 m | 0,98 m | %100,0 | 1,01 km² | ≈ 200.854 TL/km² |
+| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,63 m | 2,19 m | 0,70 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
 
 Doğruluk değerleri **filtrelenmiş** sonuçtan geliyor: menzil ölçümleri
 BNO085 IMU, tekerlek odometrisi ve harita kısıtıyla bir Kalman filtresinde
@@ -86,6 +86,28 @@ götürür. Şehir içi ve kırsalda sekiz ölçümden birini kaybetmek fix'i
 etkilemez. Tünelde beş ölçümden ikisini kaybetmek fix'i bitirir, ve
 kullanılabilirliğin %99,3'te kalmasının sebebi budur.
 
+## En etkili tek bulgu: menzil bant genişliği
+
+MATLAB'da dalga formu seviyesinde yapılan simülasyon
+([docs/WAVEFORM.md](docs/WAVEFORM.md)), SX1280'in menzil bant genişliğinin
+her şeyi belirlediğini gösteriyor. Rapor bu parametreyi belirtmiyor.
+
+| Menzil hata modeli | σ | Şehir içi HPE P50 | Kırsal HPE P50 |
+|---|---|---|---|
+| Robinson (mevcut, gerçek donanım) | 3,06 m | 2,30 m | 9,82 m |
+| MATLAB 406 kHz | 2,81 m | 1,99 m | 7,20 m |
+| **MATLAB 1,6 MHz** | **0,68 m** | **0,49 m** | **1,70 m** |
+
+Ek donanım veya ek düğüm olmadan, sadece konfigürasyon seçimiyle şehir içi
+yatay hata 2,30 m'den 0,49 m'ye, kırsal 9,82 m'den 1,70 m'ye iniyor.
+Bedeli daha kısa menzil olur (geniş bant, düşük hassasiyet), ve bu
+ödünleşim ölçülmedi. **Rapora öneri: menzil bant genişliği açıkça
+belirtilsin.**
+
+Ayrıca Robinson'ın ölçtüğü saçılma (2,94 m) 406 kHz simülasyonuyla (2,68 m)
+neredeyse birebir örtüşüyor; bu, onun dar bantta ölçmüş olabileceğini
+düşündürüyor.
+
 ## Menzil değerleri nereden geliyor
 
 Bağlantı menzili bu çalışmanın döndüğü eksen: kaç anchor'ın duyulduğunu,
@@ -146,10 +168,12 @@ Harita kısıtı kaldırıldığında dikey hata şehir içinde 1,07 m'den 12,70
 kırsalda 31 m'ye çıkıyor. Ayrıntı:
 [docs/METHOD.md](docs/METHOD.md#dikey-hata-neden-yatay-hatadan-kötü).
 
-**Tünelde sensör füzyonu bir iyileştirme değil, çalışma şartı.** Koridor
-geometrisi eksen boyunca neredeyse hiçbir bilgi vermiyor: odometri ve
-pusula kapatıldığında filtre sürükleniyor ve yatay P95 0,56 m'den 295 m'ye
-çıkıyor.
+**Tünelde yardımcı sensörlerin katkısı dikeyde.** Odometri, pusula ve
+harita kapatıldığında yatay P95 2,19 m'den 3,21 m'ye çıkıyor (%32 kayıp),
+dikey P95 ise 0,70 m'den 7,40 m'ye. Daha önce burada "füzyon olmadan filtre
+ıraksıyor" diye bir bulgu raporlamıştım; o bir artefaktmış ve geri alındı,
+gerekçesi [docs/WAVEFORM.md](docs/WAVEFORM.md#geri-alınan-bir-bulgu)
+içinde.
 
 **Açık alanda odometri yatayda küçük bir zarar veriyor.** %2'lik tekerlek
 ölçek sapması 13,9 m/s'de 0,28 m/s'lik hız sapması demek; şehir içinde
@@ -160,7 +184,7 @@ sağlıyor (P95 25,54 → 21,65 m).
 **Kalibrasyon bedava ve fark yaratıyor.** Robinson'un yayımladığı SX1280
 verisinde 2,83 m sabit sapma var. Sabit sapma tüm anchor'lara aynı anda
 bindiği için ne geometri ne de filtreleme onu kaldırabiliyor: modül başına
-ofset kalibrasyonu yatay hatayı 3,02 m'den 2,31 m'ye düşürüyor. Dikeyde
+ofset kalibrasyonu yatay hatayı 3,19 m'den 2,44 m'ye düşürüyor. Dikeyde
 fark kapanıyor, çünkü orada belirleyici olan harita kısıtı. Raporun
 mimarisi bu adımı zaten öngörüyor.
 
@@ -225,6 +249,7 @@ docs/
   METHOD.md             her tablo değerinin nasıl hesaplandığı
   SCENARIOS.md          her senaryonun tam parametre dökümü
   FUSION.md             alıcı modeli, Kalman filtresi, duyarlılık analizleri
+  WAVEFORM.md           MATLAB dalga formu simülasyonu ve bulguları
   EVIDENCE.md           kanıt sınıfları ve sınırlar
 matlab/README.md        MATLAB tarafının çalıştırma sırası ve sınırları
 ```

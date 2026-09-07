@@ -52,6 +52,7 @@ class WaveformCase:
     condition: str
     bandwidth_hz: float
     errors_m: np.ndarray
+    true_ranges_m: np.ndarray
 
     @property
     def mean_bias_m(self) -> float:
@@ -85,6 +86,7 @@ def load_trials(path: Optional[str] = None) -> dict[str, WaveformCase]:
         )
 
     grouped: dict[str, list[float]] = {}
+    ranges: dict[str, list[float]] = {}
     meta: dict[str, tuple[str, str, float]] = {}
     with open(path, newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
@@ -97,6 +99,7 @@ def load_trials(path: Optional[str] = None) -> dict[str, WaveformCase]:
         for row in reader:
             case = row["case"]
             grouped.setdefault(case, []).append(float(row["range_error_m"]))
+            ranges.setdefault(case, []).append(float(row["true_range_m"]))
             meta.setdefault(
                 case,
                 (row["radio"], row["condition"], float(row["bandwidth_hz"])),
@@ -114,6 +117,7 @@ def load_trials(path: Optional[str] = None) -> dict[str, WaveformCase]:
             condition=condition,
             bandwidth_hz=bandwidth,
             errors_m=np.array(errors, dtype=float),
+            true_ranges_m=np.array(ranges[case], dtype=float),
         )
     return cases
 
@@ -177,6 +181,15 @@ def build_model_from_cases(
         sample=lambda n: rng.choice(population, size=n, replace=True),
         population_errors_m=tuple(float(v) for v in population),
         mean_bias_m=0.0 if calibrated else bias,
+        # The channel is already in these errors, so the scenario must not
+        # add its own NLOS term on top.
+        includes_multipath=True,
+        # The distances the simulation actually covered. Beyond them the
+        # model is extrapolating just as the published data would be.
+        valid_range_m=(
+            float(min(c.true_ranges_m.min() for c in cases)),
+            float(max(c.true_ranges_m.max() for c in cases)),
+        ),
     )
 
 

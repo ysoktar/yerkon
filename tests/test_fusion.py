@@ -70,9 +70,15 @@ def test_calibration_still_matters_after_fusion():
     assert raw.hpe_p50_m > calibrated.hpe_p50_m
 
 
-def test_aiding_rescues_the_tunnel_where_radio_alone_drifts():
-    # A corridor gives the radio almost nothing along its axis. Without
-    # odometry and heading the filter wanders; with them it holds.
+def test_aiding_helps_the_tunnel_most_in_the_vertical():
+    # An earlier version of this test asserted that aiding rescued the
+    # tunnel from divergence, on a tenfold margin. That was an artefact:
+    # the error model was a Gaussian at the report's target sigma, the
+    # outlier gate scaled to that sigma was tight enough to reject the NLOS
+    # bias being layered on top, and the filter then coasted. With the
+    # waveform-derived model, and with the NLOS term no longer counted
+    # twice, radio-only holds in the tunnel. Aiding still helps, and where
+    # it helps most is the axis the radio cannot see.
     scenario = critical_zone_scenario()
     aided = run_fused(scenario, n_runs=4)
     radio_only = run_fused(
@@ -82,7 +88,8 @@ def test_aiding_rescues_the_tunnel_where_radio_alone_drifts():
         ),
         n_runs=4,
     )
-    assert aided.hpe_p95_m < 0.2 * radio_only.hpe_p95_m
+    assert aided.vpe_p95_m < 0.3 * radio_only.vpe_p95_m
+    assert aided.hpe_p95_m < radio_only.hpe_p95_m
 
 
 def test_the_filter_follows_a_turn_rather_than_coasting_through_it():

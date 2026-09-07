@@ -53,12 +53,12 @@ from yerkon.path import (
 )
 from yerkon.receiver import ReceiverProfile, vehicle_receiver
 from yerkon.ranging_error import (
-    ROBINSON_VALID_RANGE_M,
     RangingErrorModel,
     add_nlos,
     build_dwm3000_model,
     build_sx1280_model,
 )
+from yerkon.matlab_import import build_model_from_cases, load_trials
 from yerkon.simulate import (
     RangingMethod,
     anchors_in_range,
@@ -488,13 +488,40 @@ def rural_scenario(seed: int = SEED) -> Scenario:
     )
 
 
+def tunnel_error_model(seed: int = SEED) -> RangingErrorModel:
+    """The UWB error model, preferring the waveform simulation over the target.
+
+    The fallback is a Gaussian parameterised to the accuracy the report
+    targets for the DWM3000. A target is a statement of intent, and the
+    MATLAB run supersedes it: that derives the error from the waveform, a
+    multipath channel and the SNR, and says the target is not reached.
+    Where the export is absent the fallback still runs, so a fresh clone
+    works without MATLAB.
+    """
+    try:
+        cases = load_trials()
+    except (FileNotFoundError, ValueError):
+        return build_dwm3000_model(
+            seed=seed, sigma_m=0.03, nlos_probability=0.10, nlos_bias_m=0.30
+        )
+    tunnel_cases = [c for c in cases.values() if c.case == "uwb_tunnel"]
+    if not tunnel_cases:
+        return build_dwm3000_model(
+            seed=seed, sigma_m=0.03, nlos_probability=0.10, nlos_bias_m=0.30
+        )
+    return build_model_from_cases(
+        tunnel_cases,
+        name="Qorvo DWM3000 (MATLAB waveform simulation, tunnel channel)",
+        seed=seed,
+        calibrated=True,
+    )
+
+
 def critical_zone_scenario(seed: int = SEED) -> Scenario:
     """50 km tunnel network, the running length that reaches 1 km² of plan area."""
     length_m = 50000.0
     width_m = 20.0
-    model = build_dwm3000_model(
-        seed=seed, sigma_m=0.03, nlos_probability=0.10, nlos_bias_m=0.30
-    )
+    model = tunnel_error_model(seed=seed)
     return Scenario(
         key="critical",
         display_name="YERKON (Kritik Bölge/Tünel)",
@@ -611,10 +638,13 @@ def profile_geometry(scenario: Scenario, minimum_anchors: int = 4) -> GeometryPr
         hdops.append(dop.hdop)
         vdops.append(dop.vdop)
 
-    envelope_max = ROBINSON_VALID_RANGE_M[1]
+    # Each model states the link distances its evidence covers. Comparing a
+    # tunnel link against the SX1280 data's envelope would report a number
+    # about the wrong radio.
+    envelope = scenario.error_model.valid_range_m
     beyond = None
-    if ranges and scenario.error_model.population_errors_m is not None:
-        beyond = float(np.mean(np.array(ranges) > envelope_max))
+    if ranges and envelope is not None:
+        beyond = float(np.mean(np.array(ranges) > envelope[1]))
 
     return GeometryProfile(
         median_anchors_reachable=float(np.median(reachable)) if reachable else 0.0,
@@ -737,11 +767,15 @@ def run_fused(
 
 
 def _nlos_terms(scenario: Scenario) -> tuple[float, float]:
-    """Recover the NLOS probability and bias a scenario was built with.
+    """The NLOS probability and bias to layer on during a filtered pass.
 
-    They live inside the error model's sampler, so they are kept here
-    alongside the scenario definitions rather than reverse-engineered.
+    Zero where the error model already carries multipath. The waveform
+    simulation puts the signal through a channel, so its errors already
+    contain the reflections; adding an NLOS bias on top would count the
+    same physics twice.
     """
+    if scenario.error_model.includes_multipath:
+        return 0.0, 0.0
     return _NLOS_BY_SCENARIO.get(scenario.key, (0.0, 0.0))
 
 

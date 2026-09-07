@@ -24,7 +24,6 @@ function yerkon_imu_char(varargin)
 %       export/yerkon_imu_drift.csv    free-inertial drift vs outage length
 %       export/yerkon_imu_params.csv   the sensor parameters used
 %
-%   Send both files back.
 
 opts = parseOptions(varargin{:});
 
@@ -145,7 +144,6 @@ fclose(fidD);
 
 fprintf('\nWrote %s\n', fullfile(outDir, 'yerkon_imu_drift.csv'));
 fprintf('Wrote %s\n', fullfile(outDir, 'yerkon_imu_params.csv'));
-fprintf('\nSend both CSV files back.\n');
 end
 
 function p = bno085ClassParameters()

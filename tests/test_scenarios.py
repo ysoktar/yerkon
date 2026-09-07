@@ -90,10 +90,16 @@ def test_corridor_scenarios_also_report_cost_per_kilometre():
 
 
 def test_tunnel_row_is_not_presented_as_hardware_calibrated():
+    # Its error model is derived from a waveform simulation, not measured
+    # on a DWM3000, and the evidence type has to keep that visible.
     scenario = critical_zone_scenario()
+    assert scenario.error_model.evidence.evidence_type in (
+        EvidenceType.WAVEFORM_SIMULATION,
+        EvidenceType.SIMULATED_MONTE_CARLO,
+    )
     assert (
         scenario.error_model.evidence.evidence_type
-        is EvidenceType.SIMULATED_MONTE_CARLO
+        is not EvidenceType.HARDWARE_CALIBRATED_MODEL
     )
 
 
@@ -105,9 +111,32 @@ def test_geometry_profile_reports_how_far_links_run_past_the_calibrated_range():
     assert beyond is not None and beyond > 0.5
 
 
-def test_uwb_scenario_has_no_calibrated_envelope_to_compare_against():
-    result = run_scenario(critical_zone_scenario(), n_repeats=2, n_track_runs=1)
-    assert result.geometry.links_beyond_calibrated_envelope is None
+def test_each_scenario_is_judged_against_its_own_evidence_envelope():
+    # The SX1280 data covers 0-250 m; the UWB waveform simulation covers
+    # the distances it was run at. Comparing a tunnel link against the
+    # SX1280 envelope would report a number about the wrong radio.
+    urban = urban_scenario()
+    tunnel = critical_zone_scenario()
+    assert urban.error_model.valid_range_m == (0.0, 250.0)
+    assert tunnel.error_model.valid_range_m is not None
+    assert tunnel.error_model.valid_range_m != urban.error_model.valid_range_m
+
+    result = run_scenario(tunnel, n_repeats=2, n_track_runs=1)
+    assert result.geometry.links_beyond_calibrated_envelope is not None
+
+
+def test_a_model_carrying_its_own_multipath_is_not_given_more():
+    # The waveform simulation put the signal through a channel, so its
+    # errors already contain the reflections. Layering the scenario's NLOS
+    # term on top would count the same physics twice.
+    from yerkon.scenarios import _nlos_terms
+
+    tunnel = critical_zone_scenario()
+    if tunnel.error_model.includes_multipath:
+        assert _nlos_terms(tunnel) == (0.0, 0.0)
+    urban = urban_scenario()
+    assert not urban.error_model.includes_multipath
+    assert _nlos_terms(urban) == (0.35, 1.5)
 
 
 def test_denser_urban_grid_buys_vertical_accuracy_not_horizontal():

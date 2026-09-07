@@ -24,6 +24,17 @@ from dataclasses import dataclass
 from typing import Optional
 
 from yerkon.evidence import EvidenceRecord, EvidenceType, assumption
+from yerkon.matlab_import import load_imu_drift
+
+#: Outage length the acceleration noise is fitted at, in seconds. The
+#: ranging interval is 0.2 s, so that is the gap the filter actually has to
+#: bridge and the one the figure should describe.
+DRIFT_FIT_OUTAGE_S = 0.2
+
+#: Fallback acceleration noise, used when no MATLAB characterisation is
+#: present. It was this project's guess before one existed, and the
+#: measured figure came out roughly half of it.
+FALLBACK_ACCEL_NOISE_M_S2 = 0.08
 
 BNO085_URL = "https://www.ceva-ip.com/wp-content/uploads/BNO080_085-Datasheet.pdf"
 
@@ -151,16 +162,57 @@ _PEDESTRIAN_MAP_EVIDENCE = assumption(
 )
 
 
+def measured_accel_noise_m_s2() -> tuple[float, EvidenceRecord]:
+    """Acceleration noise from the MATLAB IMU characterisation, if present.
+
+    Free-inertial position error grows as roughly ``sigma * t^2 / 2``, so
+    the measured drift at the ranging interval inverts to the noise figure
+    the filter should carry. Falls back to this project's earlier guess
+    when the export is absent.
+    """
+    try:
+        drift = load_imu_drift()
+    except (FileNotFoundError, ValueError):
+        return FALLBACK_ACCEL_NOISE_M_S2, assumption(
+            "Acceleration noise of {:.2f} m/s^2".format(FALLBACK_ACCEL_NOISE_M_S2),
+            "This project's figure for a consumer MEMS unit. No "
+            "characterisation of the part was available when it was chosen.",
+        )
+    sigma = drift.implied_accel_noise_m_s2(DRIFT_FIT_OUTAGE_S)
+    return sigma, EvidenceRecord(
+        evidence_type=EvidenceType.SIMULATED_MONTE_CARLO,
+        source_name="MATLAB imuSensor free-inertial drift characterisation",
+        source_scope=(
+            "Acceleration noise of {:.3f} m/s^2, inverted from the measured "
+            "free-inertial position drift of {:.1f} cm over {:.1f} s. Drift "
+            "was produced by MathWorks' imuSensor with noise density, bias "
+            "instability and random walk set for a consumer MEMS part, "
+            "along the same turning motion the scenario tracks use, and "
+            "differenced against an ideal sensor so gravity cancels."
+        ).format(
+            sigma,
+            drift.drift_at(DRIFT_FIT_OUTAGE_S) * 100,
+            DRIFT_FIT_OUTAGE_S,
+        ),
+        caveats=(
+            "The sensor parameters fed to imuSensor are this project's "
+            "figures for the class of MEMS part inside a BNO085, not the "
+            "vendor's Allan-variance numbers, which are not published."
+        ),
+    )
+
+
 def vehicle_receiver() -> ReceiverProfile:
     """The report's road vehicle unit: IMU, CAN wheel odometry, map."""
+    accel_noise, accel_evidence = measured_accel_noise_m_s2()
     return ReceiverProfile(
         key="vehicle",
         display_name="Kara aracı alıcısı (IMU + odometri + harita)",
         imu=ImuSpec(
             heading_error_deg=3.5,
-            accel_noise_m_s2=0.08,
+            accel_noise_m_s2=accel_noise,
             accel_bias_m_s2=0.03,
-            evidence=_BNO085_EVIDENCE,
+            evidence=accel_evidence,
         ),
         odometry=OdometrySpec(
             scale_error=0.02,

@@ -33,9 +33,8 @@ function yerkon_ranging_sim(varargin)
 %       export/yerkon_ranging_errors.csv   one row per trial
 %       export/yerkon_ranging_summary.csv  one row per case
 %
-%   Send both files back. The Python side reads them and replaces the
-%   assumed error models with these, tagged as waveform simulation rather
-%   than as measurement.
+%   The Python side reads these and replaces the assumed error models,
+%   tagged as waveform simulation rather than as measurement.
 
 opts = parseOptions(varargin{:});
 cases = buildCases();
@@ -115,7 +114,6 @@ fclose(fidSummary);
 fprintf('\nDone in %.1f s.\n', toc(totalStart));
 fprintf('Wrote %s\n', trialPath);
 fprintf('Wrote %s\n', summaryPath);
-fprintf('\nSend both CSV files back.\n');
 end
 
 % =====================================================================

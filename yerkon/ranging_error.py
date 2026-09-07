@@ -75,6 +75,15 @@ class RangingErrorModel:
     sample: Callable[[int], np.ndarray] = field(repr=False)
     population_errors_m: Optional[tuple[float, ...]] = None
     mean_bias_m: float = 0.0
+    #: True when the model's own errors already contain multipath, as a
+    #: waveform simulation through a channel does. Layering a separate NLOS
+    #: bias on top of such a model counts the same physics twice.
+    includes_multipath: bool = False
+    #: Link distances the model's evidence actually covers, in metres.
+    #: ``None`` means the model makes no distance-dependent claim, so there
+    #: is nothing to extrapolate beyond. Reporting a link as outside the
+    #: envelope only means something when the model has one.
+    valid_range_m: Optional[tuple[float, float]] = None
 
     def sigma_m(self, n: int = 4000) -> float:
         """Standard deviation of the sampled error, estimated by sampling.
@@ -131,6 +140,7 @@ def build_sx1280_model(seed: int = 0, calibrated: bool = True) -> RangingErrorMo
         sample=lambda n: rng.choice(population, size=n, replace=True),
         population_errors_m=tuple(float(v) for v in population),
         mean_bias_m=0.0 if calibrated else bias,
+        valid_range_m=ROBINSON_VALID_RANGE_M,
     )
 
 
@@ -210,4 +220,5 @@ def add_nlos(
         sample=sample,
         population_errors_m=model.population_errors_m,
         mean_bias_m=model.mean_bias_m,
+        valid_range_m=model.valid_range_m,
     )
