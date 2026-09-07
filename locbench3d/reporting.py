@@ -17,6 +17,15 @@ from locbench3d.hardware.sx1280_published import COMMUNITY_REFERENCES, SOFTWARE_
 from locbench3d.tables import builders
 
 
+def _locked_file_error(path: str, exc: PermissionError) -> PermissionError:
+    """A clean, actionable message for the common "file open in Excel" case."""
+    return PermissionError(
+        f"Could not write '{path}': permission denied. This usually means "
+        "the file is currently open in Excel or another program - Windows "
+        "locks open files, so close it there and run this again."
+    )
+
+
 def _select_columns(df: pd.DataFrame, id_cols: list[str], prefix: str) -> pd.DataFrame:
     """Roll up a prefix's columns from the master table, plus identity columns.
 
@@ -80,7 +89,10 @@ def write_outputs(
     manifest: dict[str, dict] = {}
     for name, df in tables.items():
         path = os.path.join(out_dir, f"{name}.csv")
-        df.to_csv(path, index=False)
+        try:
+            df.to_csv(path, index=False)
+        except PermissionError as exc:
+            raise _locked_file_error(path, exc) from exc
         table_paths[name] = path
         manifest[name] = {
             "csv_path": path,
@@ -88,8 +100,12 @@ def write_outputs(
             "columns": list(df.columns),
         }
 
-    with open(os.path.join(out_dir, "manifest.json"), "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2)
+    manifest_path = os.path.join(out_dir, "manifest.json")
+    try:
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2)
+    except PermissionError as exc:
+        raise _locked_file_error(manifest_path, exc) from exc
 
     return table_paths, tables
 

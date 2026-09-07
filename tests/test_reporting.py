@@ -19,6 +19,27 @@ def _design():
     )
 
 
+def test_write_outputs_reports_a_locked_csv_file_cleanly(tmp_path, monkeypatch):
+    """Same failure mode as a locked workbook: a CSV open in Excel on
+    Windows raises PermissionError from df.to_csv. Must become an
+    actionable message, not an opaque pandas/OS traceback."""
+    import pandas.core.generic as pd_generic
+
+    def _raise_permission_error(self, *args, **kwargs):
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(pd_generic.NDFrame, "to_csv", _raise_permission_error)
+
+    outputs = run_benchmark(_design(), n_repeats=5, seed=0, range_bin_edges_m=[0, 5, 10, 20])
+    try:
+        write_outputs(outputs, str(tmp_path))
+        assert False, "expected a PermissionError"
+    except PermissionError as exc:
+        message = str(exc)
+        assert "open" in message.lower()
+        assert "excel" in message.lower() or "another program" in message.lower()
+
+
 def test_write_outputs_creates_csv_files_and_manifest(tmp_path):
     outputs = run_benchmark(_design(), n_repeats=5, seed=0, range_bin_edges_m=[0, 5, 10, 20])
     table_paths, tables = write_outputs(outputs, str(tmp_path))

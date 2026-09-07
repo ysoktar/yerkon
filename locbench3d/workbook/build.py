@@ -141,4 +141,12 @@ def build_workbook(
             )
             _write_placeholder(ws, note)
 
-    wb.save(output_path)
+    try:
+        wb.save(output_path)
+    except PermissionError as exc:
+        raise PermissionError(
+            f"Could not write workbook to '{output_path}': permission denied. "
+            "This usually means the file is currently open in Excel or "
+            "another program - Windows locks open files, so close it there "
+            "and run this again."
+        ) from exc

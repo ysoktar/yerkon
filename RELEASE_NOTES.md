@@ -1,5 +1,31 @@
 # Release notes
 
+## 0.1.4 - clean error when an output file is locked
+
+Found via real Windows use: running `run.ps1` a second time while the
+previous run's `output\smoke\workbook.xlsx` was still open in Excel
+failed with a raw `PermissionError` traceback surfaced through
+`openpyxl`/`zipfile` internals, then a generic "smoke benchmark failed"
+from the PowerShell wrapper - correct behavior (it can't write through an
+OS-level file lock) but a poor way to find out why.
+
+- `workbook.build.build_workbook` and `reporting.write_outputs` (CSV and
+  manifest writes) now catch `PermissionError` and re-raise it with a
+  plain message: which file, and that it's probably open in Excel or
+  another program.
+- The CLI's `run`/`build-workbook` commands catch that and print
+  `ERROR: ...` with a clean exit(1), instead of a Python traceback.
+- Regression tests added for both layers
+  (`tests/test_workbook.py::test_permission_error_on_save_gets_an_actionable_message`,
+  `tests/test_reporting.py::test_write_outputs_reports_a_locked_csv_file_cleanly`,
+  `tests/test_cli.py::test_build_workbook_command_reports_locked_file_cleanly`),
+  using a mocked `PermissionError` rather than relying on OS-level file
+  locking being reproducible in the test environment.
+
+This does not make writing to a locked file succeed - that is an OS-level
+constraint this project cannot and should not work around - it only makes
+the failure immediately understandable.
+
 ## 0.1.3 - scripts/run.ps1 confirmed working on real Windows
 
 Following up on 0.1.2's underlying-commands confirmation, the same user

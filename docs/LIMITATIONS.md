@@ -119,6 +119,19 @@ output from it. The Python side of this feature (the importer in
 against a synthetic CSV matching the documented schema, since that part
 runs in ordinary Python and could be executed and checked normally.
 
+## A locked output file still stops the run - now with a clear reason
+
+If a previous run's `workbook.xlsx` or a table CSV is open in Excel (or
+any other program holding a lock on it) when you re-run the benchmark,
+writing to it fails - Windows enforces this at the OS level, and there is
+no way to write through it. This project cannot make that succeed; what
+it can do, and does, is fail with a plain message telling you to close
+the file and try again, instead of a raw `PermissionError` traceback
+pointing into `openpyxl`/`pandas`/`zipfile` internals. Found via an actual
+Windows run in the field (a workbook opened for review, then a re-run
+attempted while it was still open) and fixed the same day; see
+`RELEASE_NOTES.md`.
+
 ## Field catalog descriptions are generated, not individually hand-written
 
 `tables/master_fields.py` infers each field's category and unit from its

@@ -102,7 +102,11 @@ def run_cmd(config: str, out: str, gnss_log: str | None, matlab_uwb_csv: str | N
             "see docs/LIMITATIONS.md)"
         )
 
-    table_paths, tables = write_outputs(outputs, tables_dir, extra_tables=extra_tables)
+    try:
+        table_paths, tables = write_outputs(outputs, tables_dir, extra_tables=extra_tables)
+    except PermissionError as exc:
+        click.echo(f"ERROR: {exc}")
+        sys.exit(1)
     click.echo(f"Wrote {len(table_paths)} table(s) to {tables_dir}")
     click.echo(f"Simulated: {len(outputs.master_rows)}, skipped: {len(outputs.skipped_scenarios)}")
 
@@ -147,7 +151,11 @@ def build_workbook_cmd(tables_dir: str, out: str) -> None:
     out_parent = os.path.dirname(out)
     if out_parent:
         os.makedirs(out_parent, exist_ok=True)
-    build_workbook(tables, out)
+    try:
+        build_workbook(tables, out)
+    except PermissionError as exc:
+        click.echo(f"ERROR: {exc}")
+        sys.exit(1)
     click.echo(f"Wrote workbook to {out}")
 
 

@@ -39,6 +39,41 @@ def test_validate_config_command(tmp_path):
     assert "scenario" in result.output.lower()
 
 
+def test_build_workbook_command_reports_locked_file_cleanly(tmp_path, monkeypatch):
+    """A workbook file locked by another program (e.g. open in Excel) must
+    produce a clean, actionable CLI error and a nonzero exit, not a raw
+    traceback pointing into openpyxl/zipfile internals."""
+    import openpyxl.workbook.workbook as wb_module
+
+    config_path = tmp_path / "cfg.yaml"
+    config_path.write_text(SMALL_CONFIG)
+    out_dir = tmp_path / "out"
+
+    runner = CliRunner()
+    run_result = runner.invoke(
+        main, ["run", "--config", str(config_path), "--out", str(out_dir)]
+    )
+    assert run_result.exit_code == 0, run_result.output
+
+    def _raise_permission_error(self, filename):
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(wb_module.Workbook, "save", _raise_permission_error)
+
+    result = runner.invoke(
+        main,
+        [
+            "build-workbook",
+            "--tables-dir", str(out_dir / "tables"),
+            "--out", str(out_dir / "workbook.xlsx"),
+        ],
+    )
+    assert result.exit_code == 1
+    assert "ERROR" in result.output
+    assert "excel" in result.output.lower() or "another program" in result.output.lower()
+    assert "Traceback" not in result.output
+
+
 def test_run_all_command_produces_workbook_and_tables(tmp_path):
     config_path = tmp_path / "cfg.yaml"
     config_path.write_text(SMALL_CONFIG)

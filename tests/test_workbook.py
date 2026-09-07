@@ -83,6 +83,27 @@ def test_empty_table_still_produces_a_sheet_with_a_notice(tmp_path):
     assert ws.cell(row=1, column=1).value  # some notice text, not a blank sheet
 
 
+def test_permission_error_on_save_gets_an_actionable_message(tmp_path, monkeypatch):
+    """A common real-world failure: the output file is open in Excel and
+    Windows has it locked. The raw openpyxl/zipfile traceback ('Permission
+    denied' pointing into library internals) must become an actionable
+    message, not just propagate as-is."""
+    import openpyxl.workbook.workbook as wb_module
+
+    def _raise_permission_error(self, filename):
+        raise PermissionError(13, "Permission denied")
+
+    monkeypatch.setattr(wb_module.Workbook, "save", _raise_permission_error)
+
+    path = tmp_path / "locked.xlsx"
+    with pytest.raises(PermissionError) as exc_info:
+        build_workbook(_sample_tables(), str(path))
+    message = str(exc_info.value)
+    assert "open" in message.lower()
+    assert "excel" in message.lower() or "another program" in message.lower()
+    assert str(path) in message
+
+
 def test_no_formula_cells_are_written_that_start_with_unsupported_prefix(tmp_path):
     """Guards against a common corruption cause: a cell value that starts
     with '=' from raw string data being misread as a formula on reopen."""
