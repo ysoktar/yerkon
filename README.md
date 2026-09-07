@@ -208,13 +208,18 @@ yerkon/
   fusion.py             IMU + odometri + pusula + harita Kalman filtresi
   metrics.py            doğruluk, güvenilirlik, maliyet
   scenarios.py          dört kurulum senaryosunun tanımı
+  matlab_import.py      MATLAB dalga formu simülasyonu çıktısını okur
   table.py              satır biçimlendirme ve CSV
   render.py             PNG görsel (opsiyonel)
+matlab/
+  yerkon_env_check.m    hangi MATLAB sürümü ve toolbox'lar var
+  yerkon_ranging_sim.m  dalga formu + çok yolluluk seviyesinde menzil hatası
 docs/
   METHOD.md             her tablo değerinin nasıl hesaplandığı
   SCENARIOS.md          her senaryonun tam parametre dökümü
   FUSION.md             alıcı modeli, Kalman filtresi, duyarlılık analizleri
   EVIDENCE.md           kanıt sınıfları ve sınırlar
+matlab/README.md        MATLAB tarafının çalıştırma sırası ve sınırları
 ```
 
 ## Sınırlar

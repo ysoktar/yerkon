@@ -32,6 +32,11 @@ class EvidenceType(str, Enum):
     HARDWARE_CALIBRATED_MODEL = "HARDWARE_CALIBRATED_MODEL"
     """A model whose error distribution is drawn from real measurements."""
 
+    WAVEFORM_SIMULATION = "WAVEFORM_SIMULATION"
+    """Derived from the signal and the channel rather than assumed: the
+    bandwidth dependence and the line-of-sight asymmetry fall out of
+    physics, but no hardware was involved."""
+
     DESIGN_DOCUMENT = "DESIGN_DOCUMENT"
     """Taken from the YERKON presentation: prices, node counts, target specs.
     A design target is a statement of intent, not a measured result."""
