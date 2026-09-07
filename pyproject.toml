@@ -1,31 +1,23 @@
 [project]
-name = "locbench3d"
-version = "0.1.4"
-description = "3D localization benchmark and comparison system"
+name = "yerkon"
+version = "1.0.0"
+description = "Simulates the YERKON deployment cases and produces four comparison-table rows"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.26,<3",
     "scipy>=1.11,<2",
-    "pandas>=2.0,<3",
-    "openpyxl>=3.1,<4",
-    "PyYAML>=6.0,<7",
-    "click>=8.1,<9",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.4,<9",
-]
-
-[project.scripts]
-locbench3d = "locbench3d.cli:main"
+image = ["matplotlib>=3.7"]
+dev = ["pytest>=7.4,<9"]
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["locbench3d*"]
+include = ["yerkon*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

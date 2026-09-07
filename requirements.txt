@@ -1,7 +1,5 @@
 numpy>=1.26,<3
 scipy>=1.11,<2
-pandas>=2.0,<3
-openpyxl>=3.1,<4
-PyYAML>=6.0,<7
-click>=8.1,<9
-pytest>=7.4,<9
+
+# Only needed for `python run.py --image`:
+# matplotlib>=3.7

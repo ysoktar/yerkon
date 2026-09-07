@@ -6,6 +6,3 @@ __pycache__/
 venv/
 build/
 dist/
-outputs/
-*.xlsx.tmp
-.DS_Store
