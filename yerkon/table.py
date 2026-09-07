@@ -59,6 +59,12 @@ def fmt_area(value: float) -> str:
 def build_rows(results: Sequence[ScenarioResult]) -> list[tuple[str, ...]]:
     """One formatted row per scenario, in :data:`COLUMNS` order.
 
+    Accuracy comes from the filtered result, not from single-epoch
+    trilateration. The report describes a receiver that fuses ranges with
+    an IMU, wheel odometry and map constraints, so the radio-only figure
+    would describe a system nobody proposed. Both are in the JSON output
+    and the gap between them is tabulated in docs/FUSION.md.
+
     OPEX is left as "-" for every row. The presentation gives no annual
     operating cost, and the comparison table already uses "-" for the other
     systems whose operators do not publish one. Putting a guess there would
@@ -72,9 +78,9 @@ def build_rows(results: Sequence[ScenarioResult]) -> list[tuple[str, ...]]:
                 scenario.display_name + marker,
                 scenario.technology,
                 scenario.environment,
-                fmt_metres(result.accuracy.horizontal_p50_m),
-                fmt_metres(result.accuracy.horizontal_p95_m),
-                fmt_metres(result.accuracy.vertical_p95_m),
+                fmt_metres(result.fused.hpe_p50_m),
+                fmt_metres(result.fused.hpe_p95_m),
+                fmt_metres(result.fused.vpe_p95_m),
                 fmt_percent(result.reliability.valid_fix_rate),
                 fmt_area(scenario.area_km2),
                 fmt_lira(result.capex_per_km2_tl),
@@ -131,12 +137,36 @@ def detail_records(results: Sequence[ScenarioResult]) -> list[dict]:
                 "coverage_gap_rate": reliability.coverage_gap_rate,
                 "dropout_rate": reliability.dropout_rate,
                 "solver_failure_rate": reliability.solver_failure_rate,
-                "hpe_p50_m": accuracy.horizontal_p50_m,
-                "hpe_p95_m": accuracy.horizontal_p95_m,
-                "hpe_max_m": accuracy.horizontal_max_m,
-                "vpe_p50_m": accuracy.vertical_p50_m,
-                "vpe_p95_m": accuracy.vertical_p95_m,
-                "error_3d_p95_m": accuracy.error_3d_p95_m,
+                "fused": result.fused.to_dict(),
+                "fused_radio_only": result.fused_radio_only.to_dict(),
+                "receiver": {
+                    "key": scenario.receiver.key,
+                    "display_name": scenario.receiver.display_name,
+                    "ranging_rate_hz": scenario.receiver.ranging_rate_hz,
+                    "filter_rate_hz": scenario.receiver.filter_rate_hz,
+                    "imu_heading_error_deg": (
+                        scenario.receiver.imu.heading_error_deg
+                        if scenario.receiver.imu
+                        else None
+                    ),
+                    "odometry_scale_error": (
+                        scenario.receiver.odometry.scale_error
+                        if scenario.receiver.odometry
+                        else None
+                    ),
+                    "map_height_sigma_m": (
+                        scenario.receiver.map_constraint.height_sigma_m
+                        if scenario.receiver.map_constraint
+                        else None
+                    ),
+                },
+                "track_speed_m_s": float(scenario.track.speeds().mean()),
+                "single_epoch_hpe_p50_m": accuracy.horizontal_p50_m,
+                "single_epoch_hpe_p95_m": accuracy.horizontal_p95_m,
+                "single_epoch_hpe_max_m": accuracy.horizontal_max_m,
+                "single_epoch_vpe_p50_m": accuracy.vertical_p50_m,
+                "single_epoch_vpe_p95_m": accuracy.vertical_p95_m,
+                "single_epoch_error_3d_p95_m": accuracy.error_3d_p95_m,
                 "availability_by_threshold_m": reliability.availability_by_threshold,
                 "median_anchors_reachable": geometry.median_anchors_reachable,
                 "median_anchors_used": geometry.median_anchors_used,

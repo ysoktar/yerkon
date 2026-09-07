@@ -23,6 +23,9 @@ class EvidenceType(str, Enum):
     ordering; the vocabulary exists so a reader can apply their own.
     """
 
+    OFFICIAL_SPECIFICATION = "OFFICIAL_SPECIFICATION"
+    """The manufacturer specifies it for the named part."""
+
     PUBLISHED_EXPERIMENT = "PUBLISHED_EXPERIMENT"
     """Someone measured it and published the measurement."""
 

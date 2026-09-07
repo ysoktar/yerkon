@@ -8,7 +8,7 @@
     "error_model": "Semtech SX1280 (Robinson bootstrap, calibrated) + NLOS",
     "error_model_scope": "Bootstrap resample of Stuart Robinson's six published short-range SX1280 ranging observations (0-250 m, one hardware and environment configuration, published on a personal engineering blog). Errors are drawn with replacement from those six values. The model does not condition on range, bandwidth, spreading factor, line-of-sight state, temperature or antenna orientation, because six unrepeated points cannot support fitting any of those. It is a small-sample stand-in for a characterised error model, not a validated one.",
     "error_model_caveats": "Mean bias of 2.83 m removed, modelling the per-unit ranging offset calibration the YERKON architecture specifies. The residual spread is unchanged and still comes from six points. NLOS bias of 1.50 m applied to 35% of links is an engineering assumption layered on top of the measured error distribution.",
-    "ranging_sigma_m": 3.034398684665547,
+    "ranging_sigma_m": 3.0378837410893462,
     "anchor_groups": [
       {
         "label": "Şehir içi yayın birimi (direk / cephe / çatı montajı)",
@@ -26,12 +26,52 @@
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.0,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 1.9970750073935415,
-    "hpe_p95_m": 4.129326041120639,
-    "hpe_max_m": 10.012887975385139,
-    "vpe_p50_m": 6.318988246194491,
-    "vpe_p95_m": 35.56123771495083,
-    "error_3d_p95_m": 35.715242111803754,
+    "fused": {
+      "hpe_p50_m": 2.306386553271162,
+      "hpe_p95_m": 4.816820240772007,
+      "vpe_p50_m": 0.2630301362075157,
+      "vpe_p95_m": 1.0666976145901979,
+      "error_3d_p95_m": 4.8206011603509955,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 0.0,
+      "gated_range_fraction": 0.0004342224912640606,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": true,
+      "used_heading": true,
+      "used_map_height": true
+    },
+    "fused_radio_only": {
+      "hpe_p50_m": 1.8432637087305377,
+      "hpe_p95_m": 3.918323938504297,
+      "vpe_p50_m": 4.926541840826303,
+      "vpe_p95_m": 35.631188965495696,
+      "error_3d_p95_m": 35.71206899570458,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 0.4000000000000001,
+      "gated_range_fraction": 0.0014702000087057578,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": false,
+      "used_heading": false,
+      "used_map_height": false
+    },
+    "receiver": {
+      "key": "vehicle",
+      "display_name": "Kara aracı alıcısı (IMU + odometri + harita)",
+      "ranging_rate_hz": 5.0,
+      "filter_rate_hz": 10.0,
+      "imu_heading_error_deg": 3.5,
+      "odometry_scale_error": 0.02,
+      "map_height_sigma_m": 0.5
+    },
+    "track_speed_m_s": 13.900786012852437,
+    "single_epoch_hpe_p50_m": 1.9970750073935415,
+    "single_epoch_hpe_p95_m": 4.129326041120639,
+    "single_epoch_hpe_max_m": 10.012887975385139,
+    "single_epoch_vpe_p50_m": 6.318988246194491,
+    "single_epoch_vpe_p95_m": 35.56123771495083,
+    "single_epoch_error_3d_p95_m": 35.715242111803754,
     "availability_by_threshold_m": {
       "0.5": 0.0015277777777777779,
       "1.0": 0.01125,
@@ -86,6 +126,27 @@
         "source_url": "",
         "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
         "caveats": ""
+      },
+      {
+        "evidence_type": "OFFICIAL_SPECIFICATION",
+        "source_name": "BNO085 rotation vector heading accuracy",
+        "source_url": "https://www.ceva-ip.com/wp-content/uploads/BNO080_085-Datasheet.pdf",
+        "source_scope": "Manufacturer specification for the BNO085, the IMU the YERKON report names: 2.0 degrees static and 3.5 degrees dynamic heading error for the rotation vector output. The dynamic figure is used here because the receivers are moving.",
+        "caveats": "The acceleration noise and bias values used alongside it are this project's figures for a consumer MEMS unit of this class, not quoted from the datasheet."
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Wheel odometry scale error of 2% and 0.05 m/s speed noise",
+        "source_url": "",
+        "source_scope": "No single published figure exists: the dominant term is wheel radius scale error, which varies with tyre pressure, load, wear and temperature. 2% is a conventional magnitude for an uncalibrated vehicle and is modelled as a bias that persists for the run rather than as noise that averages away.",
+        "caveats": ""
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Road surface height known to 0.5 m (1 sigma) from a digital map",
+        "source_url": "",
+        "source_scope": "The YERKON architecture lists map constraints as a fusion input. A surveyed road centreline carries a surface elevation, and a vehicle sits on that surface. 0.5 m is this project's figure for the combined map elevation error and vehicle-height uncertainty; no accuracy specification for the intended map source was available. Applying this constraint makes the vertical result a statement about the map rather than about the radio.",
+        "caveats": ""
       }
     ],
     "notes": [
@@ -101,7 +162,7 @@
     "error_model": "Semtech SX1280 (Robinson bootstrap, uncalibrated) + NLOS",
     "error_model_scope": "Bootstrap resample of Stuart Robinson's six published short-range SX1280 ranging observations (0-250 m, one hardware and environment configuration, published on a personal engineering blog). Errors are drawn with replacement from those six values. The model does not condition on range, bandwidth, spreading factor, line-of-sight state, temperature or antenna orientation, because six unrepeated points cannot support fitting any of those. It is a small-sample stand-in for a characterised error model, not a validated one.",
     "error_model_caveats": "Raw published errors, including their 2.83 m mean bias. Represents a deployment that skips per-unit offset calibration. NLOS bias of 1.50 m applied to 35% of links is an engineering assumption layered on top of the measured error distribution.",
-    "ranging_sigma_m": 3.034398684665547,
+    "ranging_sigma_m": 3.037883741089346,
     "anchor_groups": [
       {
         "label": "Şehir içi yayın birimi (direk / cephe / çatı montajı)",
@@ -119,12 +180,52 @@
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.0,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 2.443814390861446,
-    "hpe_p95_m": 5.735544834984542,
-    "hpe_max_m": 11.216554352824318,
-    "vpe_p50_m": 19.944631288156543,
-    "vpe_p95_m": 49.84507735602929,
-    "error_3d_p95_m": 49.93489768587875,
+    "fused": {
+      "hpe_p50_m": 3.019343236573766,
+      "hpe_p95_m": 6.337879961773457,
+      "vpe_p50_m": 0.26908501949058994,
+      "vpe_p95_m": 1.049915954043054,
+      "error_3d_p95_m": 6.342966890921479,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 0.0,
+      "gated_range_fraction": 0.00022154825926308074,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": true,
+      "used_heading": true,
+      "used_map_height": true
+    },
+    "fused_radio_only": {
+      "hpe_p50_m": 2.079441012600423,
+      "hpe_p95_m": 4.477538061709351,
+      "vpe_p50_m": 14.142554140109354,
+      "vpe_p95_m": 26.800381051229657,
+      "error_3d_p95_m": 26.919590426048043,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 79.10000000000001,
+      "gated_range_fraction": 0.0013378927252209517,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": false,
+      "used_heading": false,
+      "used_map_height": false
+    },
+    "receiver": {
+      "key": "vehicle",
+      "display_name": "Kara aracı alıcısı (IMU + odometri + harita)",
+      "ranging_rate_hz": 5.0,
+      "filter_rate_hz": 10.0,
+      "imu_heading_error_deg": 3.5,
+      "odometry_scale_error": 0.02,
+      "map_height_sigma_m": 0.5
+    },
+    "track_speed_m_s": 13.900786012852437,
+    "single_epoch_hpe_p50_m": 2.443814390861446,
+    "single_epoch_hpe_p95_m": 5.735544834984542,
+    "single_epoch_hpe_max_m": 11.216554352824318,
+    "single_epoch_vpe_p50_m": 19.944631288156543,
+    "single_epoch_vpe_p95_m": 49.84507735602929,
+    "single_epoch_error_3d_p95_m": 49.93489768587875,
     "availability_by_threshold_m": {
       "0.5": 0.0001388888888888889,
       "1.0": 0.0006944444444444445,
@@ -179,6 +280,27 @@
         "source_url": "",
         "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
         "caveats": ""
+      },
+      {
+        "evidence_type": "OFFICIAL_SPECIFICATION",
+        "source_name": "BNO085 rotation vector heading accuracy",
+        "source_url": "https://www.ceva-ip.com/wp-content/uploads/BNO080_085-Datasheet.pdf",
+        "source_scope": "Manufacturer specification for the BNO085, the IMU the YERKON report names: 2.0 degrees static and 3.5 degrees dynamic heading error for the rotation vector output. The dynamic figure is used here because the receivers are moving.",
+        "caveats": "The acceleration noise and bias values used alongside it are this project's figures for a consumer MEMS unit of this class, not quoted from the datasheet."
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Wheel odometry scale error of 2% and 0.05 m/s speed noise",
+        "source_url": "",
+        "source_scope": "No single published figure exists: the dominant term is wheel radius scale error, which varies with tyre pressure, load, wear and temperature. 2% is a conventional magnitude for an uncalibrated vehicle and is modelled as a bias that persists for the run rather than as noise that averages away.",
+        "caveats": ""
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Road surface height known to 0.5 m (1 sigma) from a digital map",
+        "source_url": "",
+        "source_scope": "The YERKON architecture lists map constraints as a fusion input. A surveyed road centreline carries a surface elevation, and a vehicle sits on that surface. 0.5 m is this project's figure for the combined map elevation error and vehicle-height uncertainty; no accuracy specification for the intended map source was available. Applying this constraint makes the vertical result a statement about the map rather than about the radio.",
+        "caveats": ""
       }
     ],
     "notes": [
@@ -194,7 +316,7 @@
     "error_model": "Semtech SX1280 (Robinson bootstrap, calibrated) + NLOS",
     "error_model_scope": "Bootstrap resample of Stuart Robinson's six published short-range SX1280 ranging observations (0-250 m, one hardware and environment configuration, published on a personal engineering blog). Errors are drawn with replacement from those six values. The model does not condition on range, bandwidth, spreading factor, line-of-sight state, temperature or antenna orientation, because six unrepeated points cannot support fitting any of those. It is a small-sample stand-in for a characterised error model, not a validated one.",
     "error_model_caveats": "Mean bias of 2.83 m removed, modelling the per-unit ranging offset calibration the YERKON architecture specifies. The residual spread is unchanged and still comes from six points. NLOS bias of 2.00 m applied to 15% of links is an engineering assumption layered on top of the measured error distribution.",
-    "ranging_sigma_m": 3.0538512369629274,
+    "ranging_sigma_m": 3.0079030835450804,
     "anchor_groups": [
       {
         "label": "Yol levhası üstü yayın birimi (karşılıklı, iki yol kenarı)",
@@ -217,12 +339,52 @@
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.0,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 7.152865979300544,
-    "hpe_p95_m": 26.819850202134536,
-    "hpe_max_m": 48.263531392580134,
-    "vpe_p50_m": 7.096709989524299,
-    "vpe_p95_m": 29.715330967755364,
-    "error_3d_p95_m": 35.41095362799562,
+    "fused": {
+      "hpe_p50_m": 5.454639533468873,
+      "hpe_p95_m": 25.468154796234675,
+      "vpe_p50_m": 0.37369264442373873,
+      "vpe_p95_m": 0.9818556181330609,
+      "error_3d_p95_m": 25.4683757469462,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 0.0,
+      "gated_range_fraction": 0.002677866109620324,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": true,
+      "used_heading": true,
+      "used_map_height": true
+    },
+    "fused_radio_only": {
+      "hpe_p50_m": 5.500057350289088,
+      "hpe_p95_m": 21.872622253264417,
+      "vpe_p50_m": 10.289865027765597,
+      "vpe_p95_m": 30.514343611273897,
+      "error_3d_p95_m": 34.27531188471227,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 16.099999999999998,
+      "gated_range_fraction": 0.003112097996799847,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": false,
+      "used_heading": false,
+      "used_map_height": false
+    },
+    "receiver": {
+      "key": "vehicle",
+      "display_name": "Kara aracı alıcısı (IMU + odometri + harita)",
+      "ranging_rate_hz": 5.0,
+      "filter_rate_hz": 10.0,
+      "imu_heading_error_deg": 3.5,
+      "odometry_scale_error": 0.02,
+      "map_height_sigma_m": 0.5
+    },
+    "track_speed_m_s": 30.604673438269693,
+    "single_epoch_hpe_p50_m": 7.152865979300544,
+    "single_epoch_hpe_p95_m": 26.819850202134536,
+    "single_epoch_hpe_max_m": 48.263531392580134,
+    "single_epoch_vpe_p50_m": 7.096709989524299,
+    "single_epoch_vpe_p95_m": 29.715330967755364,
+    "single_epoch_error_3d_p95_m": 35.41095362799562,
     "availability_by_threshold_m": {
       "0.5": 0.0009722222222222222,
       "1.0": 0.0033333333333333335,
@@ -284,6 +446,27 @@
         "source_url": "",
         "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
         "caveats": ""
+      },
+      {
+        "evidence_type": "OFFICIAL_SPECIFICATION",
+        "source_name": "BNO085 rotation vector heading accuracy",
+        "source_url": "https://www.ceva-ip.com/wp-content/uploads/BNO080_085-Datasheet.pdf",
+        "source_scope": "Manufacturer specification for the BNO085, the IMU the YERKON report names: 2.0 degrees static and 3.5 degrees dynamic heading error for the rotation vector output. The dynamic figure is used here because the receivers are moving.",
+        "caveats": "The acceleration noise and bias values used alongside it are this project's figures for a consumer MEMS unit of this class, not quoted from the datasheet."
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Wheel odometry scale error of 2% and 0.05 m/s speed noise",
+        "source_url": "",
+        "source_scope": "No single published figure exists: the dominant term is wheel radius scale error, which varies with tyre pressure, load, wear and temperature. 2% is a conventional magnitude for an uncalibrated vehicle and is modelled as a bias that persists for the run rather than as noise that averages away.",
+        "caveats": ""
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Road surface height known to 0.5 m (1 sigma) from a digital map",
+        "source_url": "",
+        "source_scope": "The YERKON architecture lists map constraints as a fusion input. A surveyed road centreline carries a surface elevation, and a vehicle sits on that surface. 0.5 m is this project's figure for the combined map elevation error and vehicle-height uncertainty; no accuracy specification for the intended map source was available. Applying this constraint makes the vertical result a statement about the map rather than about the radio.",
+        "caveats": ""
       }
     ],
     "notes": [
@@ -301,7 +484,7 @@
     "error_model": "Qorvo DWM3000 (configured, not calibrated)",
     "error_model_scope": "Configured Gaussian range error, N(0, 0.03 m), plus an NLOS bias applied to a fraction of links. Parameterised to the +/-10 cm class accuracy the YERKON presentation states for the DWM3000 module. No calibrated DWM3000 measurements were available to this project, so this is a design target expressed as a distribution, not a measured error model.",
     "error_model_caveats": "NLOS probability 10% and bias 0.30 m are this project's assumptions, not measurements.",
-    "ranging_sigma_m": 0.09519399897163465,
+    "ranging_sigma_m": 0.09359174727281504,
     "anchor_groups": [
       {
         "label": "Tünel duvar/tavan yayın birimi (UWB)",
@@ -319,12 +502,52 @@
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.006944444444444444,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 0.11389688693950158,
-    "hpe_p95_m": 0.8635529647809992,
-    "hpe_max_m": 2.2735185649292156,
-    "vpe_p50_m": 0.5453985514635076,
-    "vpe_p95_m": 4.214680720770645,
-    "error_3d_p95_m": 4.2681941326775545,
+    "fused": {
+      "hpe_p50_m": 0.15152696493473583,
+      "hpe_p95_m": 0.5596686715018734,
+      "vpe_p50_m": 0.25139636703625456,
+      "vpe_p95_m": 0.6345800807968235,
+      "error_3d_p95_m": 0.7648075175173146,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 0.0,
+      "gated_range_fraction": 0.012749229508189686,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": true,
+      "used_heading": true,
+      "used_map_height": true
+    },
+    "fused_radio_only": {
+      "hpe_p50_m": 0.24424063634393728,
+      "hpe_p95_m": 191.21408825960125,
+      "vpe_p50_m": 1.0251526541661975,
+      "vpe_p95_m": 132.52845269232938,
+      "error_3d_p95_m": 268.53231260040934,
+      "epochs": 26880,
+      "runs": 16,
+      "median_convergence_s": 0.0,
+      "gated_range_fraction": 0.14159127088288134,
+      "bias_variance_fraction": 0.5,
+      "used_odometry": false,
+      "used_heading": false,
+      "used_map_height": false
+    },
+    "receiver": {
+      "key": "vehicle",
+      "display_name": "Kara aracı alıcısı (IMU + odometri + harita)",
+      "ranging_rate_hz": 5.0,
+      "filter_rate_hz": 10.0,
+      "imu_heading_error_deg": 3.5,
+      "odometry_scale_error": 0.02,
+      "map_height_sigma_m": 0.5
+    },
+    "track_speed_m_s": 22.20161053782175,
+    "single_epoch_hpe_p50_m": 0.11389688693950158,
+    "single_epoch_hpe_p95_m": 0.8635529647809992,
+    "single_epoch_hpe_max_m": 2.2735185649292156,
+    "single_epoch_vpe_p50_m": 0.5453985514635076,
+    "single_epoch_vpe_p95_m": 4.214680720770645,
+    "single_epoch_error_3d_p95_m": 4.2681941326775545,
     "availability_by_threshold_m": {
       "0.5": 0.4575,
       "1.0": 0.6227777777777778,
@@ -378,6 +601,27 @@
         "source_name": "NLOS probabilities and bias magnitudes per environment",
         "source_url": "",
         "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
+        "caveats": ""
+      },
+      {
+        "evidence_type": "OFFICIAL_SPECIFICATION",
+        "source_name": "BNO085 rotation vector heading accuracy",
+        "source_url": "https://www.ceva-ip.com/wp-content/uploads/BNO080_085-Datasheet.pdf",
+        "source_scope": "Manufacturer specification for the BNO085, the IMU the YERKON report names: 2.0 degrees static and 3.5 degrees dynamic heading error for the rotation vector output. The dynamic figure is used here because the receivers are moving.",
+        "caveats": "The acceleration noise and bias values used alongside it are this project's figures for a consumer MEMS unit of this class, not quoted from the datasheet."
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Wheel odometry scale error of 2% and 0.05 m/s speed noise",
+        "source_url": "",
+        "source_scope": "No single published figure exists: the dominant term is wheel radius scale error, which varies with tyre pressure, load, wear and temperature. 2% is a conventional magnitude for an uncalibrated vehicle and is modelled as a bias that persists for the run rather than as noise that averages away.",
+        "caveats": ""
+      },
+      {
+        "evidence_type": "ENGINEERING_ASSUMPTION",
+        "source_name": "Road surface height known to 0.5 m (1 sigma) from a digital map",
+        "source_url": "",
+        "source_scope": "The YERKON architecture lists map constraints as a fusion input. A surveyed road centreline carries a surface elevation, and a vehicle sits on that surface. 0.5 m is this project's figure for the combined map elevation error and vehicle-height uncertainty; no accuracy specification for the intended map source was available. Applying this constraint makes the vertical result a statement about the map rather than about the radio.",
         "caveats": ""
       }
     ],

@@ -20,15 +20,26 @@ Monte Carlo             yerkon/simulate.py     (simulate_path_fixes)
     menzil içindeki anchor'lardan en yakın 8'ini seç
     her tekrar için:
       gerçek menzil + hata örneği -> ölçülen menzil
-      teslim edildi mi (Bernoulli)
+      her anchor için teslim edildi mi (Bernoulli)
       3B en küçük kareler ile [x, y, z] çöz
         |
         v
-metrikler               yerkon/metrics.py
+Kalman filtresi         yerkon/fusion.py       (run_filter)     <- tablo buradan
+  sürüş izi boyunca 10 Hz:
+    IMU ivmesiyle yayılım
+    5 Hz menzil güncellemeleri (4 sigma kapısı)
+    tekerlek hızı, IMU pusulası, harita yüksekliği güncellemeleri
+        |
+        v
+metrikler               yerkon/metrics.py (tek-atım), yerkon/scenarios.py (filtreli)
         |
         v
 satır biçimlendirme     yerkon/table.py
 ```
+
+Tablodaki doğruluk değerleri filtre çıktısından gelir. Tek-atım zinciri
+geometriyi ve radyonun tek başına ne yapabildiğini ölçmek için korunur ve
+JSON çıktısında ayrıca raporlanır.
 
 Her senaryoda 24 yörünge noktası × 300 tekrar = 7.200 konum denemesi
 yapılır. Seed sabittir (42), yani aynı komut her zaman aynı sayıları verir.
@@ -37,7 +48,13 @@ yapılır. Seed sabittir (42), yani aynı komut her zaman aynı sayıları verir
 
 ### HPE P50 ve HPE P95 [m]
 
-Başarılı fix'lerin yatay hatasının 50. ve 95. yüzdelikleri.
+**Filtrelenmiş** yatay hatanın 50. ve 95. yüzdelikleri. Alıcı, menzil
+ölçümlerini IMU, tekerlek odometrisi ve harita kısıtıyla bir Kalman
+filtresinde birleştirir; raporun tarif ettiği alıcı bu. Filtrenin kendisi
+ve neyin ortalamayla yok olmadığı [FUSION.md](FUSION.md) içinde.
+
+Tek-atım (filtresiz) karşılığı JSON çıktısında `single_epoch_hpe_*`
+alanlarında duruyor.
 
 Yatay hata, kestirim ile gerçek konum arasındaki x-y düzlemi mesafesidir:
 `sqrt((x̂-x)² + (ŷ-y)²)`. Kod: `yerkon/geometry.py::error_horizontal`,
@@ -48,11 +65,18 @@ ortalamasına girmez, kullanılabilirlik sütununa girer.
 
 ### VPE P95 [m]
 
-Başarılı fix'lerin dikey hatasının 95. yüzdeliği: `|ẑ - z|`.
+Filtrelenmiş dikey hatanın 95. yüzdeliği: `|ẑ - z|`.
 
-Yükseklik ayrı bir geçişte değil, x ve y ile birlikte tek bir doğrusal
-olmayan sistemde çözülür (`yerkon/simulate.py::solve_position_3d`). Önce
-2B çözüp sonra yüksekliği eklemek, dikey hatayı yapay olarak küçültürdü.
+Bu sütun **haritayı ölçüyor.** Karasal geometri yüksekliği çözemediği için
+dikey sonucu belirleyen şey, aracın ölçülmüş bir yol yüzeyinin üstünde
+olduğunun bilinmesi. Harita belirsizliği 0,2 m'den 2,0 m'ye çıkarıldığında
+VPE P95 0,45 m'den 4,36 m'ye çıkarken HPE hiç değişmiyor
+([FUSION.md](FUSION.md#harita-doğruluğu-doğrudan-dikey-sonuca-geçiyor)).
+
+Yükseklik ayrı bir geçişte değil, x ve y ile birlikte çözülür
+(`yerkon/simulate.py::solve_position_3d` tek-atım için,
+`yerkon/fusion.py` filtre için). Önce 2B çözüp sonra yüksekliği eklemek,
+dikey hatayı yapay olarak küçültürdü.
 
 ### Kullanılabilirlik
 

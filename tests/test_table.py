@@ -20,7 +20,7 @@ from yerkon.table import (
 
 @pytest.fixture(scope="module")
 def results():
-    return [run_scenario(s, n_repeats=3) for s in all_scenarios()]
+    return [run_scenario(s, n_repeats=3, n_track_runs=1) for s in all_scenarios()]
 
 
 def test_numbers_are_formatted_turkish_style():

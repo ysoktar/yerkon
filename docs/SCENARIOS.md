@@ -10,8 +10,11 @@ Kaynak sütunundaki etiketler:
 - **Ölçüm**: yayımlanmış donanım ölçümünden geliyor.
 - **Varsayım**: bu projenin seçimi; hiçbir kaynak bu değeri vermiyor.
 
-Ortak parametre: alıcı fix başına en yakın **8** anchor ile mesafe ölçümü
-yapar (tünelde menzilde yalnız 5 olduğu için 5). TWR her anchor için hava süresi harcar ve rapor alıcıyı "yeterli
+Ortak parametreler: alıcı fix başına en yakın **8** anchor ile mesafe
+ölçümü yapar (tünelde menzilde yalnız 5 olduğu için 5). Her senaryonun bir
+de zaman-serili sürüş izi vardır; tablodaki doğruluk değerleri o iz boyunca
+çalışan Kalman filtresinden gelir ([FUSION.md](FUSION.md)). Aşağıdaki
+"tek-atım" sonuçlar filtresiz, yalnız radyo geometrisini gösterir. TWR her anchor için hava süresi harcar ve rapor alıcıyı "yeterli
 sayıda yayın birimi ile konuşacak" diye tarif eder, menzildeki hepsiyle
 değil. Sekiz, 3B fix için gereken dördün üstünde yedek bırakır ve
 bağlantıları SX1280 ölçümlerinin kapsadığı mesafe aralığına yaklaştırır.
@@ -55,10 +58,21 @@ Montaj yükseklikleri komşu anchor'lar arasında değişir. Tek yükseklikte bi
 | 250 m'yi aşan bağlantı oranı | %6,3 | %6,3 |
 | HDOP / VDOP (medyan) | 0,73 / 2,37 | 0,73 / 2,37 |
 | En kötü VDOP | 6,54 | 6,54 |
-| HPE P50 / P95 | 2,00 m / 4,13 m | 2,44 m / 5,74 m |
-| VPE P50 / P95 | 6,50 m / 35,56 m | 19,75 m / 49,85 m |
+| Tek-atım HPE P50 / P95 | 2,00 m / 4,13 m | 2,44 m / 5,74 m |
+| Tek-atım VPE P50 / P95 | 6,50 m / 35,56 m | 19,75 m / 49,85 m |
+| **Filtreli HPE P50 / P95** | **2,31 m / 4,82 m** | **3,02 m / 6,34 m** |
+| **Filtreli VPE P50 / P95** | **0,26 m / 1,07 m** | **0,27 m / 1,05 m** |
 | Kullanılabilirlik | %100,0 | %100,0 |
 | CAPEX | 66.937 TL/km² | 66.937 TL/km² |
+
+Sürüş izi: 50 km/h'de, 2,5 derece/s dönüşle hücre içinde kalan bir
+yay üzerinde 180 saniye, ±1,2 m şerit değişimiyle. Dönüş kasıtlı: hep düz
+giden bir alıcı IMU pusula hatasını hiç sınamaz.
+
+Kalibrasyonun etkisi filtre sonrasında da sürüyor. Sabit ofset tüm
+anchor'lara aynı anda bindiği için ne geometri ne de filtreleme onu
+kaldırabiliyor; dikeyde ise fark kapanıyor, çünkü orada belirleyici olan
+harita kısıtı.
 
 Kalibrasyon yatay hatayı %18, dikey hatayı %29 iyileştiriyor. Sabit sapma
 dikey eksende daha çok büyütülür, çünkü o eksenin DOP'u daha yüksektir.
@@ -118,10 +132,17 @@ kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır 
 | 250 m'yi aşan bağlantı oranı | %72,4 |
 | HDOP / VDOP (medyan) | 5,84 / 11,56 |
 | En kötü VDOP | 28,30 |
-| HPE P50 / P95 | 7,15 m / 26,82 m |
-| VPE P50 / P95 | 7,08 m / 29,72 m |
+| Tek-atım HPE P50 / P95 | 7,15 m / 26,82 m |
+| Tek-atım VPE P50 / P95 | 7,08 m / 29,72 m |
+| **Filtreli HPE P50 / P95** | **5,45 m / 25,47 m** |
+| **Filtreli VPE P50 / P95** | **0,37 m / 0,98 m** |
 | Kullanılabilirlik | %100,0 |
 | CAPEX | 200.854 TL/km², 4.821 TL/km |
+
+Sürüş izi: 110 km/h'de koridor boyunca 180 saniye (5,5 km), ±3 m şerit
+değişimiyle. Kırsal, odometrinin en çok fayda verdiği senaryo: radyo
+geometrisi zayıf olduğu için tekerlek hızı gerçek bilgi ekliyor
+(filtreli HPE P95 odometresiz 25,54 m, odometriyle 21,65 m).
 
 ### Nokta sıklığı ne satın alıyor
 
@@ -214,10 +235,20 @@ doğru her zaman eş düzlemlidir; dikey eksen kaç anchor eklenirse eklensin
 | Medyan / en uzun bağlantı | 75 m / 149 m |
 | HDOP / VDOP (medyan) | 3,16 / 13,49 |
 | En kötü VDOP | 21,84 |
-| HPE P50 / P95 | 0,11 m / 0,86 m |
-| VPE P50 / P95 | 0,54 m / 4,21 m |
+| Tek-atım HPE P50 / P95 | 0,11 m / 0,86 m |
+| Tek-atım VPE P50 / P95 | 0,54 m / 4,21 m |
+| **Filtreli HPE P50 / P95** | **0,15 m / 0,56 m** |
+| **Filtreli VPE P50 / P95** | **0,25 m / 0,63 m** |
 | Kullanılabilirlik | %99,3 |
 | CAPEX | 1.363.123 TL/km², 27.230 TL/km |
+
+Sürüş izi: 80 km/h'de tünel boyunca 180 saniye (4 km), ±1,5 m şerit
+değişimiyle.
+
+Tünel, sensör füzyonunun zorunlu olduğu tek senaryo. Odometri ve pusula
+kapatıldığında filtre koridor ekseni boyunca sürükleniyor ve yatay P95
+0,56 m'den 295 m'ye çıkıyor. Koridor geometrisi eksen yönünde neredeyse
+hiçbir bilgi vermediği için, o yönü tutan şey tekerlek ve pusula.
 
 DOP değerleri dört senaryonun ortasında, sonuçlar ise açık ara en iyisi.
 Çelişki değil: UWB'nin menzil hatası σ = 0,096 m, SX1280'in 3,03 m'sinin

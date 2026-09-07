@@ -15,16 +15,28 @@ python run.py
 
 | Sistem | Teknoloji | Ortam | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX |
 |---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,00 m | 4,13 m | 35,56 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
-| YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,44 m | 5,74 m | 49,85 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
-| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 7,15 m | 26,82 m | 29,72 m | %100,0 | 1,01 km² | ≈ 200.854 TL/km² |
-| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,11 m | 0,86 m | 4,21 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
+| YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,31 m | 4,82 m | 1,07 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
+| YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 3,02 m | 6,34 m | 1,05 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
+| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 5,45 m | 25,47 m | 0,98 m | %100,0 | 1,01 km² | ≈ 200.854 TL/km² |
+| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,15 m | 0,56 m | 0,63 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
+
+Doğruluk değerleri **filtrelenmiş** sonuçtan geliyor: menzil ölçümleri
+BNO085 IMU, tekerlek odometrisi ve harita kısıtıyla bir Kalman filtresinde
+birleştirildi, çünkü raporun tarif ettiği alıcı bu. Radyo-tek sonuç da
+hesaplanıyor ve JSON çıktısında duruyor. Ayrıntı:
+[docs/FUSION.md](docs/FUSION.md).
+
+**VPE sütunu haritayı ölçüyor, radyoyu değil.** Karasal geometri yüksekliği
+çözemiyor; çözen şey aracın ölçülmüş bir yol yüzeyinin üstünde olduğunun
+bilinmesi. Harita belirsizliği 0,5 m alındı ve VPE bununla doğrusal
+ölçekleniyor (σ 2 m olsaydı VPE P95 4,36 m olurdu). Rapora yazılırken bu
+belirtilmeli.
 
 Dipnotlar:
 
 1. 1 km × 1 km şehir hücresi, 150 m aralıklı 49 yayın birimi (8/20/35 m
    montaj yüksekliği). Modül başına menzil ofseti kalibrasyonu uygulanmış.
-   HPE P50 = 2,00 m, raporun kendi `<2 m` hedefinin sınırında.
+   HPE P50 = 2,31 m, raporun kendi `<2 m` hedefinin biraz üstünde.
 2. Aynı kurulum, kalibrasyon adımı atlanmış. Tek fark bu; birim sayısı,
    geometri ve maliyet birebir aynı.
 3. 42 km karayolu koridoru. 500 m'de bir, yolun iki tarafında karşılıklı
@@ -123,20 +135,34 @@ Bu, simülasyonun rapora geri verdiği tek somut tasarım düzeltmesidir.
 
 ## Sonuçlar nasıl okunmalı
 
-**Yatay doğruluk hedefin sınırında.** Şehir içi HPE P50 = 2,00 m, raporun
-kendi "ideal senaryolarda <2 m" hedefiyle aynı yerde. Tünelde 11 cm.
+**Yatay doğruluk hedefe yakın.** Şehir içi HPE P50 = 2,31 m, raporun kendi
+"ideal senaryolarda <2 m" hedefinin biraz üstünde. Tünelde 15 cm.
 
-**Dikey doğruluk her yerde yataydan çok daha kötü.** Sebebi donanım değil,
-geometri. Karasal bir sistemde her anchor alıcıya göre neredeyse aynı
-yükseklikte durur. Alıcıdan 6 m'lik bir yol kenarı ünitesine 250 m mesafede
-bakış açısı 1,03 derece, 500 m'de 0,52 derecedir; GNSS uydusunda aynı açı
-45 derece civarındadır. Ayrıntı:
+**Radyo tek başına yüksekliği çözemiyor; harita çözüyor.** Karasal bir
+sistemde her anchor alıcıya göre neredeyse aynı yükseklikte durur. Alıcıdan
+6 m'lik bir yol kenarı ünitesine 250 m mesafede bakış açısı 1,03 derece,
+500 m'de 0,52 derecedir; GNSS uydusunda aynı açı 45 derece civarındadır.
+Harita kısıtı kaldırıldığında dikey hata şehir içinde 1,07 m'den 12,70 m'ye,
+kırsalda 31 m'ye çıkıyor. Ayrıntı:
 [docs/METHOD.md](docs/METHOD.md#dikey-hata-neden-yatay-hatadan-kötü).
 
-**Kalibrasyon bedava ve büyük fark yaratıyor.** Robinson'un yayımladığı
-SX1280 verisinde 2,83 m sabit sapma var. Modül başına ofset kalibrasyonu
-bunu siler; dikey hatayı 49,85 m'den 35,56 m'ye düşürür. Raporun mimarisi
-bu adımı zaten öngörüyor.
+**Tünelde sensör füzyonu bir iyileştirme değil, çalışma şartı.** Koridor
+geometrisi eksen boyunca neredeyse hiçbir bilgi vermiyor: odometri ve
+pusula kapatıldığında filtre sürükleniyor ve yatay P95 0,56 m'den 295 m'ye
+çıkıyor.
+
+**Açık alanda odometri yatayda küçük bir zarar veriyor.** %2'lik tekerlek
+ölçek sapması 13,9 m/s'de 0,28 m/s'lik hız sapması demek; şehir içinde
+radyo geometrisi zaten iyi olduğu için odometri bilgi yerine sapma ekliyor
+(HPE P50 1,76 → 2,19 m). Kırsalda tersi, geometri zayıf olduğu için fayda
+sağlıyor (P95 25,54 → 21,65 m).
+
+**Kalibrasyon bedava ve fark yaratıyor.** Robinson'un yayımladığı SX1280
+verisinde 2,83 m sabit sapma var. Sabit sapma tüm anchor'lara aynı anda
+bindiği için ne geometri ne de filtreleme onu kaldırabiliyor: modül başına
+ofset kalibrasyonu yatay hatayı 3,02 m'den 2,31 m'ye düşürüyor. Dikeyde
+fark kapanıyor, çünkü orada belirleyici olan harita kısıtı. Raporun
+mimarisi bu adımı zaten öngörüyor.
 
 **Kırsalda "az sayıda yüksek kapsamalı nokta" bedelini doğrulukta ödüyor.**
 Rapor Grup 2 için bunu açıkça istiyor. 500 m aralıklı 187 birim, 200 m
@@ -176,8 +202,10 @@ yerkon/
   link_budget.py        yayımlanmış menzil değerleri ve derating gerekçeleri
   geometry.py           3B menzil geometrisi, HDOP/VDOP, geometri kalitesi
   ranging_error.py      SX1280 (ölçüme dayalı) ve DWM3000 (yapılandırılmış) hata modelleri
-  path.py               test yörüngeleri
+  receiver.py           raporun üç alıcısı: IMU, odometri, harita kısıtı
+  path.py               tek-atım yörüngeleri ve zaman-serili sürüş izleri
   simulate.py           menzil kısıtlı Monte Carlo konum çözümü
+  fusion.py             IMU + odometri + pusula + harita Kalman filtresi
   metrics.py            doğruluk, güvenilirlik, maliyet
   scenarios.py          dört kurulum senaryosunun tanımı
   table.py              satır biçimlendirme ve CSV
@@ -185,6 +213,7 @@ yerkon/
 docs/
   METHOD.md             her tablo değerinin nasıl hesaplandığı
   SCENARIOS.md          her senaryonun tam parametre dökümü
+  FUSION.md             alıcı modeli, Kalman filtresi, duyarlılık analizleri
   EVIDENCE.md           kanıt sınıfları ve sınırlar
 ```
 
@@ -204,6 +233,10 @@ Kısa liste; tamamı [docs/EVIDENCE.md](docs/EVIDENCE.md) içinde.
   işçilik dahil değil.
 - Kullanılabilirlik yalnızca modellenen paket kaybını içerir. Kanal
   doluluğu, girişim, düğüm arızası ve alıcı açılış süresi modellenmedi.
-- Sonuçlar tek atımlık (single-epoch) radyo-only konum hatası. IMU,
-  odometri, harita kısıtı ve Kalman filtresi kullanılmadı; raporun mimarisi
-  bunların hepsini öngörüyor ve gerçek sistem bunlarla daha iyi olacaktır.
+- VPE sütunu harita doğruluğuyla doğrusal ölçekleniyor; radyonun dikey
+  performansını değil, haritanınkini ölçüyor.
+- Menzil hatasının ne kadarının ortalamayla yok olmayan sabit ofset olduğu
+  ölçülemedi. Varsayılan %50 alındı; %0 ile %100 arasında şehir içi hata
+  iki, kırsal dört katına çıkıyor.
+- Manyetik bozulma, tekerlek kayması, yanal harita eşleme ve kanal
+  doluluğu modellenmedi.

@@ -43,7 +43,15 @@ from yerkon.metrics import (
     compute_reliability_metrics,
     cost_per_area,
 )
-from yerkon.path import Path3D, straight_line_path, zigzag_path
+from yerkon.fusion import FusionSettings, TrackResult, run_filter
+from yerkon.path import (
+    Path3D,
+    Track,
+    driving_track,
+    straight_line_path,
+    zigzag_path,
+)
+from yerkon.receiver import ReceiverProfile, vehicle_receiver
 from yerkon.ranging_error import (
     ROBINSON_VALID_RANGE_M,
     RangingErrorModel,
@@ -62,6 +70,18 @@ SEED = 42
 N_REPEATS = 300
 N_PATH_SAMPLES = 24
 ACCURACY_THRESHOLDS_M = [0.5, 1.0, 2.0, 5.0]
+
+#: Filtered passes per scenario. Each pass yields hundreds of correlated
+#: epochs, so fewer passes are needed than for independent single-epoch
+#: draws, but several are still required: the per-anchor offsets and the
+#: odometry scale error are drawn once per pass and dominate the result.
+N_TRACK_RUNS = 16
+
+#: Seconds discarded at the start of each pass while the filter converges
+#: from its first single-epoch fix. A receiver that has been running for a
+#: minute is not still in that transient, and convergence time is reported
+#: separately rather than folded into the accuracy percentiles.
+FILTER_WARMUP_S = 12.0
 
 #: How many anchors a receiver ranges to per fix, nearest first. Two-way
 #: ranging spends airtime per anchor, and the report describes the receiver
@@ -118,6 +138,8 @@ class Scenario:
     environment: str
     groups: tuple[AnchorGroup, ...]
     path: Path3D
+    track: Track
+    receiver: ReceiverProfile
     error_model: RangingErrorModel
     area_km2: float
     max_link_range_m: float
@@ -134,6 +156,7 @@ class Scenario:
             (self.error_model.evidence,)
             + tuple(g.evidence for g in self.groups)
             + self.parameter_evidence
+            + self.receiver.evidence_records
         )
 
     @property
@@ -369,6 +392,20 @@ def urban_scenario(calibrated: bool = True, seed: int = SEED) -> Scenario:
             n_samples=N_PATH_SAMPLES,
             duration_s=600.0,
         ),
+        track=driving_track(
+            "urban-drive",
+            # Placed so the turning circle sits inside the cell: at 50 km/h
+            # and 2.5 deg/s the radius is about 320 m, so the route stays
+            # roughly 180 m clear of every edge.
+            start=(609.0, 200.0, 1.5),
+            heading_deg=20.0,
+            speed_m_s=13.9,          # 50 km/h
+            duration_s=180.0,
+            dt_s=0.1,
+            lane_change_amplitude_m=1.2,
+            turn_rate_deg_s=2.5,
+        ),
+        receiver=vehicle_receiver(),
         error_model=model,
         area_km2=(side_m / 1000.0) ** 2,
         max_link_range_m=URBAN_LINK_RANGE_M,
@@ -411,6 +448,16 @@ def rural_scenario(seed: int = SEED) -> Scenario:
             roadside_layout(length_m=length_m, sign_spacing_m=500.0, seed=seed),
             mast_layout(length_m=length_m, spacing_m=2500.0, seed=seed),
         ),
+        track=driving_track(
+            "rural-drive",
+            start=(2000.0, 0.0, 1.5),
+            heading_deg=0.0,
+            speed_m_s=30.6,          # 110 km/h
+            duration_s=180.0,
+            dt_s=0.1,
+            lane_change_amplitude_m=3.0,
+        ),
+        receiver=vehicle_receiver(),
         path=zigzag_path(
             "rural-corridor-sweep",
             x_start=500.0,
@@ -459,6 +506,16 @@ def critical_zone_scenario(seed: int = SEED) -> Scenario:
                 width_m=width_m,
                 seed=seed,
             ),),
+        track=driving_track(
+            "tunnel-drive",
+            start=(400.0, 9.0, 1.5),
+            heading_deg=0.0,
+            speed_m_s=22.2,          # 80 km/h
+            duration_s=180.0,
+            dt_s=0.1,
+            lane_change_amplitude_m=1.5,
+        ),
+        receiver=vehicle_receiver(),
         path=straight_line_path(
             "tunnel-run",
             (320.0, 0.45 * width_m, 1.5),
@@ -575,11 +632,135 @@ def profile_geometry(scenario: Scenario, minimum_anchors: int = 4) -> GeometryPr
 
 
 @dataclass(frozen=True)
+class FusedResult:
+    """What the receiver actually delivers, after the filter.
+
+    The single-epoch numbers describe the radio on its own. These describe
+    the system the report proposes: ranges fused with the IMU, wheel
+    odometry and the map constraint, held across gaps.
+    """
+
+    hpe_p50_m: float
+    hpe_p95_m: float
+    vpe_p50_m: float
+    vpe_p95_m: float
+    error_3d_p95_m: float
+    epochs: int
+    runs: int
+    median_convergence_s: Optional[float]
+    gated_range_fraction: float
+    settings: FusionSettings
+
+    def to_dict(self) -> dict:
+        return {
+            "hpe_p50_m": self.hpe_p50_m,
+            "hpe_p95_m": self.hpe_p95_m,
+            "vpe_p50_m": self.vpe_p50_m,
+            "vpe_p95_m": self.vpe_p95_m,
+            "error_3d_p95_m": self.error_3d_p95_m,
+            "epochs": self.epochs,
+            "runs": self.runs,
+            "median_convergence_s": self.median_convergence_s,
+            "gated_range_fraction": self.gated_range_fraction,
+            "bias_variance_fraction": self.settings.bias_variance_fraction,
+            "used_odometry": self.settings.use_odometry,
+            "used_heading": self.settings.use_heading,
+            "used_map_height": self.settings.use_map_height,
+        }
+
+
+def run_fused(
+    scenario: Scenario,
+    settings: FusionSettings = FusionSettings(),
+    n_runs: int = N_TRACK_RUNS,
+    seed: int = SEED,
+) -> FusedResult:
+    """Run the receiver's filter along the scenario track, several times.
+
+    Each pass draws its own per-anchor offsets and odometry scale error,
+    which are what the result actually turns on: they persist for the whole
+    pass, so a single pass would report one draw of them rather than their
+    spread.
+    """
+    sigma = scenario.error_model.sigma_m()
+    nlos_probability, nlos_bias_m = _nlos_terms(scenario)
+
+    horizontal: list[np.ndarray] = []
+    vertical: list[np.ndarray] = []
+    three_d: list[np.ndarray] = []
+    convergences: list[float] = []
+    gated: list[float] = []
+    warmup_steps = int(FILTER_WARMUP_S / scenario.track.dt_s)
+
+    for run in range(n_runs):
+        result = run_filter(
+            track=scenario.track,
+            anchors=scenario.anchors,
+            receiver=scenario.receiver,
+            sigma_range_m=sigma,
+            common_bias_m=scenario.error_model.mean_bias_m,
+            max_range_m=scenario.max_link_range_m,
+            max_anchors_per_fix=MAX_ANCHORS_PER_FIX,
+            packet_loss_probability=scenario.packet_loss_probability,
+            nlos_probability=nlos_probability,
+            nlos_bias_m=nlos_bias_m,
+            seed=seed + 1000 * run,
+            settings=settings,
+        )
+        if result.error_3d_m.size <= warmup_steps:
+            continue
+        horizontal.append(result.error_horizontal_m[warmup_steps:])
+        vertical.append(result.error_vertical_m[warmup_steps:])
+        three_d.append(result.error_3d_m[warmup_steps:])
+        gated.append(result.gated_range_fraction)
+        if result.converged_after_s is not None:
+            convergences.append(result.converged_after_s)
+
+    if not three_d:
+        raise RuntimeError("no filtered pass produced a usable track")
+
+    h = np.concatenate(horizontal)
+    v = np.concatenate(vertical)
+    e = np.concatenate(three_d)
+    return FusedResult(
+        hpe_p50_m=float(np.percentile(h, 50)),
+        hpe_p95_m=float(np.percentile(h, 95)),
+        vpe_p50_m=float(np.percentile(v, 50)),
+        vpe_p95_m=float(np.percentile(v, 95)),
+        error_3d_p95_m=float(np.percentile(e, 95)),
+        epochs=int(e.size),
+        runs=len(three_d),
+        median_convergence_s=float(np.median(convergences)) if convergences else None,
+        gated_range_fraction=float(np.mean(gated)) if gated else 0.0,
+        settings=settings,
+    )
+
+
+def _nlos_terms(scenario: Scenario) -> tuple[float, float]:
+    """Recover the NLOS probability and bias a scenario was built with.
+
+    They live inside the error model's sampler, so they are kept here
+    alongside the scenario definitions rather than reverse-engineered.
+    """
+    return _NLOS_BY_SCENARIO.get(scenario.key, (0.0, 0.0))
+
+
+_NLOS_BY_SCENARIO = {
+    "urban_calibrated": (0.35, 1.5),
+    "urban_uncalibrated": (0.35, 1.5),
+    "rural": (0.15, 2.0),
+    "critical": (0.10, 0.3),
+}
+
+
+@dataclass(frozen=True)
 class ScenarioResult:
     scenario: Scenario
     accuracy: AccuracyResult
     reliability: ReliabilityResult
     geometry: GeometryProfile
+    fused: FusedResult
+    fused_radio_only: FusedResult
     capex_per_km2_tl: float
     capex_per_km_tl: Optional[float]
 
@@ -589,7 +770,10 @@ class ScenarioResult:
 
 
 def run_scenario(
-    scenario: Scenario, n_repeats: int = N_REPEATS, seed: int = SEED
+    scenario: Scenario,
+    n_repeats: int = N_REPEATS,
+    seed: int = SEED,
+    n_track_runs: int = N_TRACK_RUNS,
 ) -> ScenarioResult:
     """Simulate one scenario end to end and collect every reported metric."""
     sigma = scenario.error_model.sigma_m()
@@ -615,6 +799,17 @@ def run_scenario(
             fixes, accuracy_thresholds_m=ACCURACY_THRESHOLDS_M
         ),
         geometry=profile_geometry(scenario),
+        fused=run_fused(scenario, seed=seed, n_runs=n_track_runs),
+        # The same filter with every aiding source switched off, so the
+        # gain from each one is measurable rather than asserted.
+        fused_radio_only=run_fused(
+            scenario,
+            settings=FusionSettings(
+                use_odometry=False, use_heading=False, use_map_height=False
+            ),
+            seed=seed,
+            n_runs=n_track_runs,
+        ),
         capex_per_km2_tl=cost_per_area(capex, scenario.area_km2),
         capex_per_km_tl=(
             scenario.capex_total_tl / scenario.corridor_length_km
@@ -624,5 +819,12 @@ def run_scenario(
     )
 
 
-def run_all(n_repeats: int = N_REPEATS, seed: int = SEED) -> list[ScenarioResult]:
-    return [run_scenario(s, n_repeats=n_repeats, seed=seed) for s in all_scenarios(seed)]
+def run_all(
+    n_repeats: int = N_REPEATS,
+    seed: int = SEED,
+    n_track_runs: int = N_TRACK_RUNS,
+) -> list[ScenarioResult]:
+    return [
+        run_scenario(s, n_repeats=n_repeats, seed=seed, n_track_runs=n_track_runs)
+        for s in all_scenarios(seed)
+    ]

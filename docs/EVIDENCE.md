@@ -14,7 +14,8 @@ güvenmek yanlış olur. Bu yüzden her parametre ve her sonuç bir
 | `HARDWARE_CALIBRATED_MODEL` | Hata dağılımı gerçek ölçümden çekilen model | Şehir içi ve kırsal satırlar |
 | `DESIGN_DOCUMENT` | Rapordan alınmış: fiyat, düğüm sayısı, hedef doğruluk | Birim fiyatlar, tünel düğüm aralığı, UWB hedefi |
 | `SIMULATED_MONTE_CARLO` | Kalibre edilmemiş bir modelden üretilmiş simülasyon | Tünel satırı |
-| `ENGINEERING_ASSUMPTION` | Kaynak vermediği için bu projenin seçtiği değer | Menziller, NLOS oranları, montaj yükseklikleri, aralıklar |
+| `ENGINEERING_ASSUMPTION` | Kaynak vermediği için bu projenin seçtiği değer | Menziller, NLOS oranları, montaj yükseklikleri, aralıklar, harita doğruluğu |
+| `OFFICIAL_SPECIFICATION` | Üretici, adı geçen parça için belirtiyor | BNO085 pusula doğruluğu (3,5° dinamik) |
 
 Bir tasarım hedefi bir ölçüm değildir. Rapor DWM3000 için ±10 cm sınıfı
 doğruluk hedefliyor; bu hedefi bir dağılıma çevirip simüle etmek, o
@@ -150,18 +151,39 @@ zorunda kalır, tünel CAPEX'i 2,5 katına çıkar. Gerçek menzil 300 m ise
 raporun aralığı çalışır ve bu düzeltme gereksizdir; 75 m ise 30 m aralık
 gerekir ve maliyet iki katına daha çıkar.
 
+## Alıcı ve füzyon varsayımları
+
+Tablodaki doğruluk artık filtrelenmiş sonuçtan geliyor, dolayısıyla filtre
+ve sensör varsayımları da sonucu doğrudan belirliyor. Tamamı
+[FUSION.md](FUSION.md) içinde; en etkili ikisi:
+
+| Varsayım | Değer | Etkisi |
+|---|---|---|
+| Menzil hatasının kalıcı sapma oranı | %50 | %0 ile %100 arasında şehir içi hata iki, kırsal dört katına çıkıyor |
+| Harita yükseklik belirsizliği | 0,5 m | VPE bununla doğrusal ölçekleniyor; VPE sütunu haritayı ölçüyor |
+
+BNO085'in 3,5 derecelik dinamik pusula hatası üreticinin yayımladığı
+değerdir. Onunla birlikte kullanılan ivme gürültüsü ve sapması, odometri
+ölçek hatası ve harita doğruluğu bu projenin figürleridir.
+
 ## Modellenmeyen katmanlar
 
-Sonuçlar tek atımlık konum hatasıdır. Aşağıdakiler modellenmedi ve
-hepsi gerçek sistemin lehine çalışır:
+Aşağıdakiler hâlâ modellenmedi:
 
-- **Kalman filtresi veya benzeri izleme.** Ardışık fix'ler bağımsız
-  varsayıldı; gerçekte hareket modeli hatayı bastırır.
-- **Harita kısıtı.** Yol yüksekliği biliniyorsa dikey eksen çözülmek
-  zorunda değildir. Raporun füzyon mimarisi bunu öngörüyor; dikey hata
-  rakamları bu katman olmadan geçerlidir.
-- **Ataletsel ölçüm birimi desteği.** Rapor IMU füzyonundan söz ediyor.
-- **NLOS tespiti ve dışlama.** NLOS sapması eklendi, ayıklanmadı.
+- **Manyetik bozulma.** Tünelde ve şehir kanyonunda pusula, demir ve akım
+  kaynaklı bozulmadan 3,5 derecelik spesifikasyonun ötesinde etkilenir.
+  Gerçek sistemin aleyhine.
+- **Tekerlek kayması.** Frenleme ve virajda odometri yolu yanlış sayar.
+  Aleyhine.
+- **Yanal harita eşleme.** Yalnızca yükseklik kısıtı uygulandı; aracın
+  şeritte olduğu bilgisi kullanılsa yatay hata da düşerdi. Lehine.
+- **NLOS tespiti ve dışlama.** NLOS sapması eklendi, ayıklanmadı. Lehine.
+- **Menzile bağlı hata büyümesi.** Uzak bağlantılar kısa bağlantılarla aynı
+  hata dağılımını kullanıyor. Aleyhine.
+- **Anchor konum belirsizliği.** Anchor koordinatları kusursuz biliniyor
+  varsayıldı. Aleyhine.
+- **Kanal doluluğu ve çakışma.** Paket kaybı sabit olasılık, trafik yüküne
+  bağlı değil. Aleyhine.
 
 Buna karşılık aşağıdakiler de modellenmedi ve gerçek sistemin aleyhine
 çalışır:

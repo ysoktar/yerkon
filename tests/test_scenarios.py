@@ -83,9 +83,9 @@ def test_capex_is_anchor_count_times_the_deck_unit_price():
 def test_corridor_scenarios_also_report_cost_per_kilometre():
     # Cost per km² flatters an area deployment and punishes a ribbon, so a
     # corridor has to carry the per-km figure alongside it.
-    result = run_scenario(critical_zone_scenario(), n_repeats=2)
+    result = run_scenario(critical_zone_scenario(), n_repeats=2, n_track_runs=1)
     assert result.capex_per_km_tl is not None
-    urban = run_scenario(urban_scenario(), n_repeats=2)
+    urban = run_scenario(urban_scenario(), n_repeats=2, n_track_runs=1)
     assert urban.capex_per_km_tl is None
 
 
@@ -98,7 +98,7 @@ def test_tunnel_row_is_not_presented_as_hardware_calibrated():
 
 
 def test_geometry_profile_reports_how_far_links_run_past_the_calibrated_range():
-    result = run_scenario(rural_scenario(), n_repeats=2)
+    result = run_scenario(rural_scenario(), n_repeats=2, n_track_runs=1)
     beyond = result.geometry.links_beyond_calibrated_envelope
     # The rural links are kilometre-scale while the source data stops at
     # 250 m. That extrapolation has to be visible, not silent.
@@ -106,7 +106,7 @@ def test_geometry_profile_reports_how_far_links_run_past_the_calibrated_range():
 
 
 def test_uwb_scenario_has_no_calibrated_envelope_to_compare_against():
-    result = run_scenario(critical_zone_scenario(), n_repeats=2)
+    result = run_scenario(critical_zone_scenario(), n_repeats=2, n_track_runs=1)
     assert result.geometry.links_beyond_calibrated_envelope is None
 
 
@@ -122,7 +122,7 @@ def test_denser_urban_grid_buys_vertical_accuracy_not_horizontal():
 
 
 def test_running_a_scenario_produces_metrics_for_every_attempt():
-    result = run_scenario(urban_scenario(), n_repeats=5)
+    result = run_scenario(urban_scenario(), n_repeats=5, n_track_runs=1)
     expected = urban_scenario().path.n_samples * 5
     assert result.reliability.attempted_fixes == expected
     assert result.accuracy.horizontal_p50_m is not None
