@@ -100,20 +100,27 @@ were done in one Linux x86_64 container.
 
 ## Windows: confirmed on real hardware after release
 
-A user ran the underlying commands directly on Windows 11 (PowerShell,
-Python 3.13, `conda` base environment): `python -m venv .venv`,
-`Activate.ps1`, `pip install -r requirements.txt`, `pytest -q`, and
-`python -m locbench3d.cli run-all --smoke --out output\smoke`. Result:
-269/270 tests passed, and the smoke benchmark produced a valid workbook.
-The one failure (`test_run_sh_passes_bash_syntax_check`) was a real bug in
-the test, not the project: Windows's `bash.exe` WSL-relay stub is found by
-`shutil.which` even with no WSL distro installed, then fails at
-invocation - fixed by having the test verify bash actually runs before
-trusting that it's present.
+A user confirmed this project on real Windows 11 (PowerShell, Python
+3.13, `conda` base environment) in two stages:
 
-`scripts/run.ps1` as a script (run via `.\scripts\run.ps1` itself, not its
-underlying commands typed one at a time) is still unconfirmed - see
-`docs/LIMITATIONS.md` for exactly what that gap covers.
+1. The underlying commands run directly - `python -m venv .venv`,
+   `Activate.ps1`, `pip install -r requirements.txt`, `pytest -q`, and
+   `python -m locbench3d.cli run-all --smoke --out output\smoke`.
+   269/270 tests passed, and the smoke benchmark produced a valid
+   workbook. The one failure (`test_run_sh_passes_bash_syntax_check`) was
+   a real bug in the test, not the project: Windows's `bash.exe`
+   WSL-relay stub is found by `shutil.which` even with no WSL distro
+   installed, then fails at invocation - fixed by having the test verify
+   bash actually runs before trusting that it's present.
+2. `.\scripts\run.ps1 -SmokeOnly` run directly as a script: all seven
+   phases completed, 269 passed/1 skipped (the fix from stage 1), and a
+   correctly validated workbook - closing the gap stage 1 left open
+   (that run exercised the underlying commands, not the script's own
+   PowerShell mechanics: parameter binding, `$LASTEXITCODE` propagation,
+   execution-policy interaction). All of that worked as written.
+
+Not run on Windows: the standard (non-smoke) benchmark via `run.ps1`, and
+any Windows build/PowerShell version other than the one used above.
 
 ## MATLAB: still fully unconfirmed on the MATLAB side
 

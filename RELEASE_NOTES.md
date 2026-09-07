@@ -1,5 +1,20 @@
 # Release notes
 
+## 0.1.3 - scripts/run.ps1 confirmed working on real Windows
+
+Following up on 0.1.2's underlying-commands confirmation, the same user
+ran `.\scripts\run.ps1 -SmokeOnly` directly (the script itself, not its
+commands typed one at a time) on the same Windows 11 machine. Result: all
+seven phases completed, 269 passed / 1 skipped, and a correctly validated
+workbook. No PowerShell-specific issue turned up - parameter binding,
+`$LASTEXITCODE` propagation, and execution-policy interaction all worked
+as written.
+
+No code changes in this release; `docs/LIMITATIONS.md`, `docs/VALIDATION.md`,
+and `README.md` updated to reflect that `run.ps1` itself is now confirmed,
+narrowing what remains untested to the full (non-smoke) run on Windows and
+other Windows/PowerShell version combinations.
+
 ## 0.1.2 - Windows verified on real hardware; a genuine test bug fixed
 
 A user ran this project's underlying commands directly on Windows 11

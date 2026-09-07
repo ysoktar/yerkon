@@ -47,11 +47,12 @@ Faster smoke-only run (skips the 96-scenario standard sweep):
 
 Both scripts require Python 3.10+ on PATH (`python3`/`python` on
 Linux/macOS, `py` or `python` on Windows) and do the same seven steps in
-the same order; `scripts/run.ps1`'s syntax has been checked carefully but
-has not been executed on an actual Windows machine (none was available
-while building this project - see `docs/LIMITATIONS.md`). If it doesn't
-work as expected, running the underlying commands directly (see "Running
-it yourself, step by step" below) works identically on any platform.
+the same order. `scripts/run.ps1` has been confirmed working end to end
+on real Windows 11 with `-SmokeOnly`; the full (non-smoke) run has not
+been tried on Windows yet, though it exercises the same code at larger
+scale rather than a new path. If anything doesn't work as expected,
+running the underlying commands directly (see "Running it yourself, step
+by step" below) works identically on any platform.
 
 Neither script requires Microsoft Excel; the workbook is written directly
 with `openpyxl`. Outputs land in `output/smoke/` and `output/standard/`:

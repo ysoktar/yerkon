@@ -135,34 +135,34 @@ repeatedly in that environment, including from a clean ZIP extraction with
 no access to the original checkout (see `docs/VALIDATION.md`).
 
 `scripts/run.ps1` (Windows PowerShell) was written by hand (no Windows
-machine or PowerShell interpreter was available while building it) and
-reviewed carefully for syntax and semantics, but was not itself executed
-before release.
+machine or PowerShell interpreter was available while building it), then
+confirmed on real Windows 11 (PowerShell, Python 3.13, a `conda`-managed
+base environment) by a user in two stages:
 
-The underlying steps it drives *have* since been confirmed on real
-Windows 11 (PowerShell, Python 3.13, a `conda`-managed base environment)
-by a user running the equivalent commands directly:
-`python -m venv .venv`, `Activate.ps1`, `pip install -r requirements.txt`,
-`pytest -q`, and `python -m locbench3d.cli run-all --smoke --out
-output\smoke` - all succeeded, 269/270 tests passed, and the smoke
-benchmark produced a valid workbook. That run caught one real bug:
-`tests/test_run_sh_passes_bash_syntax_check` failed because Windows
-provides a `bash.exe` relay stub (`C:\Windows\System32\bash.exe`, part of
-the WSL launcher) that `shutil.which("bash")` finds even with no WSL
-distro installed, then fails at invocation with an unrelated
-`execvpe(/bin/bash)` error - not a problem with `run.sh` itself. Fixed by
-having the test actually try running `bash -c "true"` before trusting
-`which`, rather than skip only on `bash` being entirely absent from PATH.
+1. Running the underlying commands directly - `python -m venv .venv`,
+   `Activate.ps1`, `pip install -r requirements.txt`, `pytest -q`, and
+   `python -m locbench3d.cli run-all --smoke --out output\smoke` - all
+   succeeded, 269/270 tests passed, and the smoke benchmark produced a
+   valid workbook. That run caught one real bug:
+   `tests/test_run_sh_passes_bash_syntax_check` failed because Windows
+   provides a `bash.exe` relay stub (`C:\Windows\System32\bash.exe`, part
+   of the WSL launcher) that `shutil.which("bash")` finds even with no
+   WSL distro installed, then fails at invocation with an unrelated
+   `execvpe(/bin/bash)` error - not a problem with `run.sh` itself. Fixed
+   by having the test actually try running `bash -c "true"` before
+   trusting `which`, rather than skip only on `bash` being entirely
+   absent from PATH.
+2. Running `.\scripts\run.ps1 -SmokeOnly` itself (the script file, not
+   its commands typed one at a time): all seven phases completed -
+   environment prep, 269 passed/1 skipped, config validation, the smoke
+   benchmark, and a correctly validated workbook - with no PowerShell-
+   specific failure (parameter binding, `$LASTEXITCODE` propagation, and
+   execution-policy interaction all worked as written).
 
-`scripts/run.ps1` as a script (the exact file, run via `.\scripts\run.ps1`)
-has still not been executed - the confirmation above ran its underlying
-commands one at a time, not the script itself. What remains genuinely
-unverified is narrower than before: PowerShell-specific mechanics in the
-script (parameter binding for `-SmokeOnly`/`-SkipTests`, `$LASTEXITCODE`
-propagation through the `&` call operator, execution-policy interaction).
-If it does not work as written, every command it runs is one line - see
-"Running it yourself, step by step" in `README.md` - and can be typed
-directly into PowerShell, as was already done above.
+`scripts/run.ps1` has not been run with the standard (non-`-SmokeOnly`)
+benchmark on Windows, and not on any PowerShell version/Windows build
+other than the one used above; both are considered low-risk since they
+exercise the same code paths at larger scale, not new ones.
 
 Regression tests (`tests/test_run_scripts.py`) check both scripts exist,
 have balanced braces, and cover the same seven phases; `run.sh`
