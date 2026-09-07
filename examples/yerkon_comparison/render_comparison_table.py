@@ -23,6 +23,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from format_rows import build_yerkon_rows
 from simulate_yerkon import run_all
 
 HEADER_BG = "#4472C4"
@@ -33,6 +34,8 @@ YERKON_BG_A = "#FDE9D9"
 YERKON_BG_B = "#FEF3E8"
 BORDER = "#8EA9DB"
 
+# Same columns as format_rows.COLUMNS, with line breaks for the image's
+# narrower header cells.
 COLUMNS = [
     "Sistem", "Teknoloji", "Ortam", "HPE\nP50 [m]", "HPE\nP95 [m]", "VPE\nP95 [m]",
     "Kullanılabilirlik", "Alan [km²]", "CAPEX\n[TL/km²]", "OPEX\n[TL/km²/yıl]",
@@ -54,52 +57,21 @@ BASELINE_ROWS = [
 ]
 
 
-def fmt_m(value_m, decimals=2):
-    if value_m >= 100:
-        return f"≈ {value_m:,.0f}".replace(",", ".")
-    return f"{value_m:.{decimals}f}".replace(".", ",")
+# format_rows.build_yerkon_rows() returns single-line cell text (it also
+# backs the CSV output, where line breaks would be wrong). For the image's
+# narrower columns, re-wrap just the long Sistem/Teknoloji cells.
+_IMAGE_WRAP = {
+    "YERKON (Şehir İçi - Kalibreli)¹": "YERKON (Şehir İçi -\nKalibreli)¹",
+    "YERKON (Şehir İçi - Ham)⁵": "YERKON (Şehir İçi -\nHam)⁵",
+    "YERKON (Kritik Bölge/Tünel)⁴": "YERKON (Kritik Bölge/\nTünel)⁴",
+    "Karasal PNT (SX1280/LoRa TWR)": "Karasal PNT (SX1280/\nLoRa TWR)",
+    "Karasal PNT (E28-SX1280 TWR)": "Karasal PNT (E28-\nSX1280 TWR)",
+    "Karasal PNT (UWB/DWM3000 TWR)": "Karasal PNT (UWB/\nDWM3000 TWR)",
+}
 
 
-def fmt_pct(fraction):
-    return f"≈ %{fraction * 100:.1f}".replace(".", ",")
-
-
-def fmt_tl_per_km2(value_tl):
-    return f"≈ {value_tl:,.0f}".replace(",", ".")
-
-
-def build_yerkon_rows(results):
-    urban = results["urban"]
-    urban_raw = results["urban_uncalibrated"]
-    rural = results["rural"]
-    tunnel = results["tunnel"]
-
-    return [
-        (
-            "YERKON (Şehir İçi -\nKalibreli)¹", "Karasal PNT (SX1280/\nLoRa TWR)", "Dış",
-            fmt_m(urban["hpe_p50_m"]), fmt_m(urban["hpe_p95_m"]), fmt_m(urban["vpe_p95_m"]),
-            fmt_pct(urban["valid_fix_rate"]), fmt_m(urban["area_km2"]),
-            fmt_tl_per_km2(urban["capex_per_km2_tl"]), "-",
-        ),
-        (
-            "YERKON (Şehir İçi -\nHam)⁵", "Karasal PNT (SX1280/\nLoRa TWR)", "Dış",
-            fmt_m(urban_raw["hpe_p50_m"]), fmt_m(urban_raw["hpe_p95_m"]), fmt_m(urban_raw["vpe_p95_m"]),
-            fmt_pct(urban_raw["valid_fix_rate"]), fmt_m(urban_raw["area_km2"]),
-            fmt_tl_per_km2(urban_raw["capex_per_km2_tl"]), "-",
-        ),
-        (
-            "YERKON (Kırsal)²", "Karasal PNT (E28-\nSX1280 TWR)", "Dış",
-            fmt_m(rural["hpe_p50_m"]), fmt_m(rural["hpe_p95_m"]), fmt_m(rural["vpe_p95_m"]) + "³",
-            fmt_pct(rural["valid_fix_rate"]), fmt_m(rural["area_km2"]),
-            fmt_tl_per_km2(rural["capex_per_km2_tl"]), "-",
-        ),
-        (
-            "YERKON (Kritik Bölge/\nTünel)⁴", "Karasal PNT (UWB/\nDWM3000 TWR)", "İç + dış",
-            fmt_m(tunnel["hpe_p50_m"]), fmt_m(tunnel["hpe_p95_m"]), fmt_m(tunnel["vpe_p95_m"]),
-            fmt_pct(tunnel["valid_fix_rate"]), fmt_m(tunnel["area_km2"]),
-            fmt_tl_per_km2(tunnel["capex_per_km2_tl"]), "-",
-        ),
-    ]
+def wrap_for_image(rows):
+    return [tuple(_IMAGE_WRAP.get(cell, cell) for cell in row) for row in rows]
 
 
 def render(all_rows, out_path):
@@ -146,7 +118,7 @@ def render(all_rows, out_path):
 
 if __name__ == "__main__":
     results = run_all()
-    all_rows = BASELINE_ROWS + build_yerkon_rows(results)
+    all_rows = BASELINE_ROWS + wrap_for_image(build_yerkon_rows(results))
     out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yerkon_comparison_table.png")
     render(all_rows, out_path)
     print(f"Saved {out_path}")

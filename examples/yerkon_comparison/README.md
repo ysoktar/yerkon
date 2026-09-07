@@ -20,13 +20,20 @@ results:
 pip install -e .            # from the repo root, if not already installed
 pip install matplotlib      # only needed for the table image, not a locbench3d dependency
 
-python examples/yerkon_comparison/simulate_yerkon.py           # prints + writes yerkon_results.json
-python examples/yerkon_comparison/render_comparison_table.py   # writes yerkon_comparison_table.png
+python examples/yerkon_comparison/simulate_yerkon.py
+# -> writes yerkon_rows.csv: just the 4 formatted YERKON rows
+
+python examples/yerkon_comparison/simulate_yerkon.py --json
+# -> also prints + writes the full raw metrics as yerkon_results.json
+
+python examples/yerkon_comparison/render_comparison_table.py
+# -> writes yerkon_comparison_table.png (10 baseline rows + the 4 YERKON rows)
 ```
 
-`render_comparison_table.py` calls `simulate_yerkon.run_all()` directly, so
-the numbers baked into the PNG always match a fresh simulation run - there
-is no separate, hand-copied set of numbers to go stale.
+Both `render_comparison_table.py` and the CSV output call
+`simulate_yerkon.run_all()` / `format_rows.build_yerkon_rows()` directly, so
+the numbers in the CSV and the PNG always match a fresh simulation run -
+there is no separate, hand-copied set of numbers to go stale.
 
 ## Method
 

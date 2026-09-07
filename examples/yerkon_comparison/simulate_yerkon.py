@@ -34,11 +34,18 @@ Run directly:
 
     python examples/yerkon_comparison/simulate_yerkon.py
 
-This prints the full result dict as JSON and also writes
-``yerkon_results.json`` next to this script.
+By default this writes only the 4 formatted YERKON comparison-table rows to
+``yerkon_rows.csv`` next to this script (the columns match the source
+comparison table this was built to extend). Pass ``--json`` to instead (or
+additionally) print/write the full raw metrics as JSON
+(``yerkon_results.json``) - useful for debugging or feeding other tooling.
 """
+import argparse
+import csv
 import json
 import os
+
+from format_rows import COLUMNS, build_yerkon_rows
 
 import numpy as np
 
@@ -263,11 +270,32 @@ def run_all():
     return results
 
 
+def _write_csv(rows, out_path):
+    with open(out_path, "w", newline="", encoding="utf-8-sig") as f:
+        writer = csv.writer(f)
+        writer.writerow(COLUMNS)
+        writer.writerows(rows)
+
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--json", action="store_true",
+        help="also print the full raw metrics and write yerkon_results.json",
+    )
+    args = parser.parse_args()
+
+    here = os.path.dirname(os.path.abspath(__file__))
     results = run_all()
-    text = json.dumps(results, indent=2, ensure_ascii=False)
-    print(text)
-    out_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "yerkon_results.json")
-    with open(out_path, "w", encoding="utf-8") as f:
-        f.write(text)
-    print(f"\nWrote {out_path}")
+
+    csv_path = os.path.join(here, "yerkon_rows.csv")
+    _write_csv(build_yerkon_rows(results), csv_path)
+    print(f"Wrote {csv_path}")
+
+    if args.json:
+        text = json.dumps(results, indent=2, ensure_ascii=False)
+        print(text)
+        json_path = os.path.join(here, "yerkon_results.json")
+        with open(json_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        print(f"Wrote {json_path}")
