@@ -11,7 +11,7 @@ Kaynak sütunundaki etiketler:
 - **Varsayım**: bu projenin seçimi; hiçbir kaynak bu değeri vermiyor.
 
 Ortak parametre: alıcı fix başına en yakın **8** anchor ile mesafe ölçümü
-yapar. TWR her anchor için hava süresi harcar ve rapor alıcıyı "yeterli
+yapar (tünelde menzilde yalnız 5 olduğu için 5). TWR her anchor için hava süresi harcar ve rapor alıcıyı "yeterli
 sayıda yayın birimi ile konuşacak" diye tarif eder, menzildeki hepsiyle
 değil. Sekiz, 3B fix için gereken dördün üstünde yedek bırakır ve
 bağlantıları SX1280 ölçümlerinin kapsadığı mesafe aralığına yaklaştırır.
@@ -50,17 +50,17 @@ Montaj yükseklikleri komşu anchor'lar arasında değişir. Tek yükseklikte bi
 
 | | Kalibreli | Ham |
 |---|---|---|
-| Fix başına kullanılan anchor | 8 | 8 |
+| Menzilde duyulan / fix'te kullanılan | 20 / 8 | 20 / 8 |
 | Medyan / en uzun bağlantı | 171 m / 377 m | 171 m / 377 m |
 | 250 m'yi aşan bağlantı oranı | %6,3 | %6,3 |
 | HDOP / VDOP (medyan) | 0,73 / 2,37 | 0,73 / 2,37 |
 | En kötü VDOP | 6,54 | 6,54 |
-| HPE P50 / P95 | 1,98 m / 4,05 m | 2,39 m / 5,63 m |
-| VPE P50 / P95 | 6,55 m / 35,98 m | 19,91 m / 50,11 m |
-| Kullanılabilirlik | %97,9 | %97,9 |
+| HPE P50 / P95 | 2,00 m / 4,13 m | 2,44 m / 5,74 m |
+| VPE P50 / P95 | 6,50 m / 35,56 m | 19,75 m / 49,85 m |
+| Kullanılabilirlik | %100,0 | %100,0 |
 | CAPEX | 66.937 TL/km² | 66.937 TL/km² |
 
-Kalibrasyon yatay hatayı %17, dikey hatayı %28 iyileştiriyor. Sabit sapma
+Kalibrasyon yatay hatayı %18, dikey hatayı %29 iyileştiriyor. Sabit sapma
 dikey eksende daha çok büyütülür, çünkü o eksenin DOP'u daha yüksektir.
 
 ### Izgara aralığı ne satın alıyor
@@ -113,14 +113,14 @@ kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır 
 
 | | Değer |
 |---|---|
-| Fix başına kullanılan anchor | 8 (menzilde 26) |
+| Menzilde duyulan / fix'te kullanılan | 26 / 8 |
 | Medyan / en uzun bağlantı | 458 m / 1.000 m |
 | 250 m'yi aşan bağlantı oranı | %72,4 |
 | HDOP / VDOP (medyan) | 5,84 / 11,56 |
 | En kötü VDOP | 28,30 |
-| HPE P50 / P95 | 7,02 m / 26,04 m |
-| VPE P50 / P95 | 7,11 m / 29,94 m |
-| Kullanılabilirlik | %98,8 |
+| HPE P50 / P95 | 7,15 m / 26,82 m |
+| VPE P50 / P95 | 7,08 m / 29,72 m |
+| Kullanılabilirlik | %100,0 |
 | CAPEX | 200.854 TL/km², 4.821 TL/km |
 
 ### Nokta sıklığı ne satın alıyor
@@ -210,16 +210,45 @@ doğru her zaman eş düzlemlidir; dikey eksen kaç anchor eklenirse eklensin
 
 | | Değer |
 |---|---|
-| Fix başına kullanılan anchor | 5 |
+| Menzilde duyulan / fix'te kullanılan | 5 / 5 |
 | Medyan / en uzun bağlantı | 75 m / 149 m |
 | HDOP / VDOP (medyan) | 3,16 / 13,49 |
 | En kötü VDOP | 21,84 |
-| HPE P50 / P95 | 0,11 m / 0,83 m |
-| VPE P50 / P95 | 0,51 m / 3,83 m |
-| Kullanılabilirlik | %97,0 |
+| HPE P50 / P95 | 0,11 m / 0,86 m |
+| VPE P50 / P95 | 0,54 m / 4,21 m |
+| Kullanılabilirlik | %99,3 |
 | CAPEX | 1.363.123 TL/km², 27.230 TL/km |
 
 DOP değerleri dört senaryonun ortasında, sonuçlar ise açık ara en iyisi.
 Çelişki değil: UWB'nin menzil hatası σ = 0,096 m, SX1280'in 3,03 m'sinin
 otuzda biri. Kötü geometri küçük bir hatayı büyütüyor ve yine de küçük
 kalıyor.
+
+
+---
+
+## Dört anchor sınırına yakınlık
+
+3B konum çözümü en az dört mesafe ölçümü ister. Senaryolar bu sınıra çok
+farklı mesafelerde duruyor ve fark kullanılabilirlik sütununda görünüyor.
+
+| Senaryo | Menzilde | Kullanılan | Sınıra pay | Kullanılabilirlik |
+|---|---|---|---|---|
+| Şehir içi | 20 | 8 | 4 ölçüm | %100,0 |
+| Kırsal | 26 | 8 | 4 ölçüm | %100,0 |
+| Tünel | 5 | 5 | 1 ölçüm | %99,3 |
+
+Paket kaybı her anchor için ayrı ayrı uygulanır. TWR her anchor ile ayrı
+bir alışveriştir, dolayısıyla kaybolan bir alışveriş bir ölçümü götürür,
+tüm konumu değil. Sekiz ölçümü olan bir alıcı dördünü birden kaybetmedikçe
+konum üretir; beş ölçümü olan bir alıcı ikisini kaybettiğinde üretemez.
+
+Tünelde beş anchor'ın hepsinin kullanılmasının sebebi menzilde daha
+fazlasının olmaması. Bu, düğüm aralığını 60 m'nin altına indirmek için ek
+bir gerekçedir: 50 m aralıkta alıcı yedi anchor duyar ve iki kayba
+dayanabilir, ama tünel CAPEX'i 32.689 TL/km'ye çıkar.
+
+Şehir içi ve kırsalda %100,0 değeri 7.200 denemenin tamamında çözüm
+üretildiği anlamına gelir. Yalnızca modellenen paket kaybı altındaki
+radyo bağlantısı kullanılabilirliğidir; kanal doluluğu, girişim, düğüm
+arızası ve alıcı açılış süresi modellenmedi.

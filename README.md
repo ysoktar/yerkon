@@ -15,16 +15,16 @@ python run.py
 
 | Sistem | Teknoloji | Ortam | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX |
 |---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,98 m | 4,05 m | 35,98 m | ≈ %97,9 | 1,00 km² | ≈ 66.937 TL/km² |
-| YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,39 m | 5,63 m | 50,11 m | ≈ %97,9 | 1,00 km² | ≈ 66.937 TL/km² |
-| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 7,02 m | 26,04 m | 29,94 m | ≈ %98,8 | 1,01 km² | ≈ 200.854 TL/km² |
-| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,11 m | 0,83 m | 3,83 m | ≈ %97,0 | 1,00 km² | ≈ 1.363.123 TL/km² |
+| YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,00 m | 4,13 m | 35,56 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
+| YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,44 m | 5,74 m | 49,85 m | %100,0 | 1,00 km² | ≈ 66.937 TL/km² |
+| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 7,15 m | 26,82 m | 29,72 m | %100,0 | 1,01 km² | ≈ 200.854 TL/km² |
+| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,11 m | 0,86 m | 4,21 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
 
 Dipnotlar:
 
 1. 1 km × 1 km şehir hücresi, 150 m aralıklı 49 yayın birimi (8/20/35 m
    montaj yüksekliği). Modül başına menzil ofseti kalibrasyonu uygulanmış.
-   HPE P50 = 1,98 m, raporun kendi `<2 m` hedefinin hemen altında.
+   HPE P50 = 2,00 m, raporun kendi `<2 m` hedefinin sınırında.
 2. Aynı kurulum, kalibrasyon adımı atlanmış. Tek fark bu; birim sayısı,
    geometri ve maliyet birebir aynı.
 3. 42 km karayolu koridoru. 500 m'de bir, yolun iki tarafında karşılıklı
@@ -37,6 +37,42 @@ Dipnotlar:
 OPEX her satırda "-". Rapor yıllık işletme maliyeti vermiyor ve
 karşılaştırma tablosu, yayımlanmış işletme maliyeti olmayan diğer
 sistemler için zaten "-" kullanıyor.
+
+Şehir içi ve kırsalda kullanılabilirlik yuvarlama sonucu değil: 7.200
+denemenin 7.200'ünde konum çözümü üretildi. Bu, **yalnızca modellenen
+kayıp altındaki radyo bağlantısı kullanılabilirliğidir**. Kanal doluluğu,
+girişim, düğüm arızası, alıcı açılış süresi gibi sebepler modellenmedi;
+gerçek hizmet kullanılabilirliği bunlardan dolayı daha düşük olacaktır.
+GNSS satırlarındaki yüzdelerle aynı ölçüt gibi okunmamalıdır.
+
+## Kaç anchor gerekiyor, kaç tane var
+
+3B konum çözümü en az dört mesafe ölçümü ister. Menzil düzeltmesinden
+sonra düğüm sayısının her senaryoda artması gerekmedi, çünkü şehir içi ve
+kırsal zaten bu sınırın çok üstündeydi:
+
+| Senaryo | Menzilde duyulan | Fix'te kullanılan | Gereken |
+|---|---|---|---|
+| Şehir içi | 20 | 8 | 4 |
+| Kırsal | 26 | 8 | 4 |
+| Tünel | 5 | 5 | 4 |
+
+Sadece tünel sınıra yakındı, ve düğüm sayısı orada zaten 334'ten **834'e**
+çıktı (150 m → 60 m aralık). Şehir içinde ve kırsalda anchor eklemek
+kullanılabilirliği değil, yalnızca geometriyi iyileştirirdi; onun bedeli
+ve kazancı [docs/SCENARIOS.md](docs/SCENARIOS.md) içindeki aralık
+tablolarında.
+
+Kırsalda düğüm sayısı 439'dan 187'ye **düştü**, çünkü rapor Grup 2 için
+"az sayıda yüksek kapsamalı nokta" istiyor ve 187 birim de dört anchor
+sınırının altı kat üstünde kalıyor.
+
+Tünelin sınıra yakınlığı ölçülebilir bir sonuç doğuruyor. Paket kaybı
+artık her anchor için ayrı ayrı uygulanıyor; TWR her anchor ile ayrı bir
+alışveriş olduğu için kaybolan bir alışveriş tüm konumu değil bir ölçümü
+götürür. Şehir içi ve kırsalda sekiz ölçümden birini kaybetmek fix'i
+etkilemez. Tünelde beş ölçümden ikisini kaybetmek fix'i bitirir, ve
+kullanılabilirliğin %99,3'te kalmasının sebebi budur.
 
 ## Menzil değerleri nereden geliyor
 
@@ -87,8 +123,8 @@ Bu, simülasyonun rapora geri verdiği tek somut tasarım düzeltmesidir.
 
 ## Sonuçlar nasıl okunmalı
 
-**Yatay doğruluk hedefe yakın.** Şehir içi HPE P50 = 1,98 m, raporun kendi
-"ideal senaryolarda <2 m" hedefinin hemen altında. Tünelde 11 cm.
+**Yatay doğruluk hedefin sınırında.** Şehir içi HPE P50 = 2,00 m, raporun
+kendi "ideal senaryolarda <2 m" hedefiyle aynı yerde. Tünelde 11 cm.
 
 **Dikey doğruluk her yerde yataydan çok daha kötü.** Sebebi donanım değil,
 geometri. Karasal bir sistemde her anchor alıcıya göre neredeyse aynı
@@ -99,7 +135,7 @@ bakış açısı 1,03 derece, 500 m'de 0,52 derecedir; GNSS uydusunda aynı aç�
 
 **Kalibrasyon bedava ve büyük fark yaratıyor.** Robinson'un yayımladığı
 SX1280 verisinde 2,83 m sabit sapma var. Modül başına ofset kalibrasyonu
-bunu siler; dikey hatayı 50,11 m'den 35,98 m'ye düşürür. Raporun mimarisi
+bunu siler; dikey hatayı 49,85 m'den 35,56 m'ye düşürür. Raporun mimarisi
 bu adımı zaten öngörüyor.
 
 **Kırsalda "az sayıda yüksek kapsamalı nokta" bedelini doğrulukta ödüyor.**
@@ -166,6 +202,8 @@ Kısa liste; tamamı [docs/EVIDENCE.md](docs/EVIDENCE.md) içinde.
 - CAPEX yalnızca ana bileşen maliyeti. PCB ve dizgi, pasifler, kablolama,
   mekanik işleme, test, sertifikasyon, vergi, kargo, saha kurulumu ve
   işçilik dahil değil.
+- Kullanılabilirlik yalnızca modellenen paket kaybını içerir. Kanal
+  doluluğu, girişim, düğüm arızası ve alıcı açılış süresi modellenmedi.
 - Sonuçlar tek atımlık (single-epoch) radyo-only konum hatası. IMU,
   odometri, harita kısıtı ve Kalman filtresi kullanılmadı; raporun mimarisi
   bunların hepsini öngörüyor ve gerçek sistem bunlarla daha iyi olacaktır.

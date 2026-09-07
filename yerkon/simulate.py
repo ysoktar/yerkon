@@ -97,6 +97,7 @@ class FixResult:
     timeout: bool
     out_of_coverage: bool
     anchors_in_range: int
+    anchors_used: int
     error_3d_m: Optional[float]
     error_horizontal_m: Optional[float]
     error_vertical_m: Optional[float]
@@ -121,6 +122,7 @@ class FixResult:
             "timeout": self.timeout,
             "out_of_coverage": self.out_of_coverage,
             "anchors_in_range": self.anchors_in_range,
+            "anchors_used": self.anchors_used,
             "error_3d_m": self.error_3d_m,
             "error_horizontal_m": self.error_horizontal_m,
             "error_vertical_m": self.error_vertical_m,
@@ -195,9 +197,17 @@ def simulate_path_fixes(
 ) -> list[FixResult]:
     """Simulate repeated position fixes along a path.
 
-    For each path sample: find the anchors within link range, judge the
-    geometry they form, then for each repeat draw per-anchor range noise,
-    decide delivery with a Bernoulli trial, and solve.
+    For each path sample: find the anchors the receiver would range to,
+    judge the geometry they form, then for each repeat draw per-anchor
+    range noise, decide delivery per anchor, and solve on whatever
+    arrived.
+
+    Delivery is per anchor, not per fix. Two-way ranging is a separate
+    exchange with each anchor, so one lost exchange costs one measurement
+    rather than the whole position. That distinction only matters where
+    the anchor count is close to the four a 3D fix needs, which is exactly
+    the situation in a tunnel: with five anchors in range, losing two ends
+    the fix, and a per-fix loss model would never show it.
     """
     if not 0.0 <= delivery_probability <= 1.0:
         raise ValueError("delivery_probability must be in [0, 1]")
@@ -214,6 +224,7 @@ def simulate_path_fixes(
 
     for idx in range(path.n_samples):
         true_p = np.array([path.x_m[idx], path.y_m[idx], path.z_m[idx]])
+        reachable = int(anchors_in_range(true_p, anchors, max_range_m).sum())
         visible = select_anchors(
             true_p, anchors, max_range_m, max_anchors_per_fix
         )
@@ -236,7 +247,7 @@ def simulate_path_fixes(
                 true_x_m=float(true_p[0]),
                 true_y_m=float(true_p[1]),
                 true_z_m=float(true_p[2]),
-                anchors_in_range=n_visible,
+                anchors_in_range=reachable,
                 geometry_valid=geom.geometry_valid,
                 geometry_failure_reason=geom.failure_reason,
                 condition_number=geom.condition_number,
@@ -254,30 +265,43 @@ def simulate_path_fixes(
 
             if not solvable:
                 results.append(
-                    FixResult(**base, **failed, timeout=False, out_of_coverage=True)
+                    FixResult(
+                        **base, **failed, anchors_used=0,
+                        timeout=False, out_of_coverage=True,
+                    )
                 )
                 continue
 
-            if rng.random() >= delivery_probability:
+            delivered = rng.random(n_visible) < delivery_probability
+            n_delivered = int(delivered.sum())
+            if n_delivered < minimum_anchors:
                 results.append(
-                    FixResult(**base, **failed, timeout=True, out_of_coverage=False)
+                    FixResult(
+                        **base, **failed, anchors_used=n_delivered,
+                        timeout=True, out_of_coverage=False,
+                    )
                 )
                 continue
 
-            measured = true_ranges(true_p, visible) + np.asarray(
-                error_sampler(n_visible), dtype=float
+            arrived = visible[delivered]
+            measured = true_ranges(true_p, arrived) + np.asarray(
+                error_sampler(n_delivered), dtype=float
             )
-            estimate, solved = solve_position_3d(visible, measured)
+            estimate, solved = solve_position_3d(arrived, measured)
 
             if not solved:
                 results.append(
-                    FixResult(**base, **failed, timeout=False, out_of_coverage=False)
+                    FixResult(
+                        **base, **failed, anchors_used=n_delivered,
+                        timeout=False, out_of_coverage=False,
+                    )
                 )
                 continue
 
             results.append(
                 FixResult(
                     **base,
+                    anchors_used=n_delivered,
                     timeout=False,
                     out_of_coverage=False,
                     estimated_x=float(estimate[0]),

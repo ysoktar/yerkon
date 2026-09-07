@@ -168,3 +168,66 @@ def test_the_anchor_cap_never_reaches_past_the_link_range():
     )
     chosen = select_anchors(np.zeros(3), anchors, max_range_m=100.0, max_anchors=4)
     assert len(chosen) == 2
+
+
+def test_losing_one_link_costs_one_measurement_not_the_whole_fix():
+    # Two-way ranging is a separate exchange per anchor, so a lost exchange
+    # removes one range, not the position. With plenty of anchors the fix
+    # still succeeds.
+    path = straight_line_path("p", (30.0, 30.0, 1.5), (60.0, 60.0, 1.5), 3, 10.0)
+    fixes = simulate_path_fixes(
+        scenario_id="perlink",
+        anchors=BOX,
+        path=path,
+        error_sampler=zero_error,
+        evidence=EVIDENCE,
+        n_repeats=200,
+        seed=3,
+        delivery_probability=0.8,
+    )
+    # Five anchors at 80% delivery. A fix that lost one link still has four
+    # and must succeed; only losing two or more ends it.
+    survived_a_loss = [f for f in fixes if f.success and f.anchors_used == 4]
+    assert survived_a_loss, "losing one link must not end the fix"
+    assert all(f.anchors_used >= 4 for f in fixes if f.success)
+    assert all(f.anchors_used < 4 for f in fixes if not f.success)
+
+
+def test_a_fix_fails_once_losses_take_it_below_four_anchors():
+    # Exactly four anchors and heavy loss: any lost link ends the fix.
+    four = BOX[:4]
+    path = straight_line_path("p", (30.0, 30.0, 1.5), (30.0, 30.0, 1.5), 1, 1.0)
+    fixes = simulate_path_fixes(
+        scenario_id="marginal",
+        anchors=four,
+        path=path,
+        error_sampler=zero_error,
+        evidence=EVIDENCE,
+        n_repeats=300,
+        seed=11,
+        delivery_probability=0.5,
+    )
+    failed = [f for f in fixes if not f.success]
+    assert failed, "with four anchors at 50% delivery some fixes must fail"
+    assert all(f.timeout and f.anchors_used < 4 for f in failed)
+    assert all(f.anchors_used == 4 for f in fixes if f.success)
+
+
+def test_anchors_in_range_is_reported_separately_from_anchors_used():
+    # The cap means a receiver ranges to fewer anchors than it can hear;
+    # both numbers are recorded so neither is mistaken for the other.
+    many = np.array([[x, y, 8.0 + (x % 3)] for x in range(0, 100, 10)
+                     for y in range(0, 100, 10)], dtype=float)
+    path = straight_line_path("p", (50.0, 50.0, 1.5), (50.0, 50.0, 1.5), 1, 1.0)
+    fixes = simulate_path_fixes(
+        scenario_id="cap",
+        anchors=many,
+        path=path,
+        error_sampler=zero_error,
+        evidence=EVIDENCE,
+        n_repeats=5,
+        max_range_m=1000.0,
+        max_anchors_per_fix=6,
+    )
+    assert all(f.anchors_in_range == len(many) for f in fixes)
+    assert all(f.anchors_used <= 6 for f in fixes)

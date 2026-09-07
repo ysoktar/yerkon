@@ -51,7 +51,12 @@ from yerkon.ranging_error import (
     build_dwm3000_model,
     build_sx1280_model,
 )
-from yerkon.simulate import RangingMethod, select_anchors, simulate_path_fixes
+from yerkon.simulate import (
+    RangingMethod,
+    anchors_in_range,
+    select_anchors,
+    simulate_path_fixes,
+)
 
 SEED = 42
 N_REPEATS = 300
@@ -500,8 +505,9 @@ class GeometryProfile:
     would hide the entire vertical story.
     """
 
-    median_anchors_in_range: float
-    min_anchors_in_range: int
+    median_anchors_reachable: float
+    median_anchors_used: float
+    min_anchors_used: int
     median_hdop: Optional[float]
     median_vdop: Optional[float]
     worst_vdop: Optional[float]
@@ -516,6 +522,7 @@ def profile_geometry(scenario: Scenario, minimum_anchors: int = 4) -> GeometryPr
     """Measure what geometry the layout actually offers along the path."""
     anchors = scenario.anchors
     sigma = scenario.error_model.sigma_m()
+    reachable: list[int] = []
     counts: list[int] = []
     hdops: list[float] = []
     vdops: list[float] = []
@@ -523,6 +530,9 @@ def profile_geometry(scenario: Scenario, minimum_anchors: int = 4) -> GeometryPr
     ranges: list[float] = []
 
     for point in scenario.path.points():
+        reachable.append(
+            int(anchors_in_range(point, anchors, scenario.max_link_range_m).sum())
+        )
         visible = select_anchors(
             point, anchors, scenario.max_link_range_m, MAX_ANCHORS_PER_FIX
         )
@@ -550,8 +560,9 @@ def profile_geometry(scenario: Scenario, minimum_anchors: int = 4) -> GeometryPr
         beyond = float(np.mean(np.array(ranges) > envelope_max))
 
     return GeometryProfile(
-        median_anchors_in_range=float(np.median(counts)) if counts else 0.0,
-        min_anchors_in_range=int(np.min(counts)) if counts else 0,
+        median_anchors_reachable=float(np.median(reachable)) if reachable else 0.0,
+        median_anchors_used=float(np.median(counts)) if counts else 0.0,
+        min_anchors_used=int(np.min(counts)) if counts else 0,
         median_hdop=float(np.median(hdops)) if hdops else None,
         median_vdop=float(np.median(vdops)) if vdops else None,
         worst_vdop=float(np.max(vdops)) if vdops else None,

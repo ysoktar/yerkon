@@ -64,13 +64,29 @@ Bir deneme üç şekilde başarısız olabilir ve üçü ayrı ayrı sayılır
 | Başarısızlık | Anlamı | Çözümü |
 |---|---|---|
 | `coverage_gap_rate` | Menzil içinde 4'ten az anchor var | Daha çok anchor ya da daha uzun menzil |
-| `dropout_rate` | Paket kaybı; Bernoulli denemesi | Bağlantı katmanı |
+| `dropout_rate` | Paket kaybı 4'ün altına düşürdü | Bağlantı katmanı ya da daha çok anchor |
 | `solver_failure_rate` | Çözücü yakınsayamadı | Geometri |
 
-Dört senaryoda da kapsama boşluğu sıfır çıkıyor; kullanılabilirlik
-tamamen varsayılan paket kaybı oranından geliyor (%2-3). Bu, kurulum
-yoğunluklarının test yörüngesi boyunca yeterli olduğu anlamına gelir,
-kapsama probleminin genel olarak yok olduğu anlamına gelmez.
+Paket kaybı **her anchor için ayrı ayrı** uygulanır. TWR her anchor ile
+ayrı bir alışveriş olduğundan kaybolan bir alışveriş bir ölçümü götürür,
+tüm konumu değil. Fix ancak teslim edilen ölçüm sayısı dördün altına
+düştüğünde başarısız olur.
+
+Bu ayrım yalnızca anchor sayısının sınıra yakın olduğu yerde önemlidir.
+Şehir içi ve kırsalda alıcı sekiz ölçüm alır ve dördünü birden
+kaybetmediği sürece konum üretir; ikisinde de 7.200 denemenin tamamı
+başarılı. Tünelde beş ölçüm vardır ve ikisinin kaybı fix'i bitirir, bu da
+kullanılabilirliği %99,3'e indirir.
+
+Kapsama boşluğu dört senaryoda da sıfır: test yörüngesi boyunca her
+noktada dörtten fazla anchor menzilde. Bu, kapsama probleminin genel
+olarak yok olduğu anlamına gelmez, yalnızca test edilen yörünge boyunca
+görülmediği anlamına gelir.
+
+%100,0 değeri yalnızca modellenen kayıp altındaki radyo bağlantısı
+kullanılabilirliğidir. Kanal doluluğu, girişim, düğüm arızası ve alıcı
+açılış süresi modellenmedi; GNSS satırlarındaki hizmet kullanılabilirliği
+yüzdeleriyle aynı ölçüt gibi okunmamalıdır.
 
 ### Alan [km²]
 
@@ -147,7 +163,7 @@ görünür:
 
 Ölçülen dikey hatalar bu çarpanlarla tutarlı. Şehir içi kalibreli
 senaryoda menzil hatasının standart sapması 3,03 m, medyan VDOP 2,37;
-`2,37 × 3,03 ≈ 7,2 m` beklenir, ölçülen VPE P50 6,55 m.
+`2,37 × 3,03 ≈ 7,2 m` beklenir, ölçülen VPE P50 6,50 m.
 
 Bunu iyileştirmenin üç yolu var ve üçü de maliyetli:
 
