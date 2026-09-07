@@ -23,6 +23,12 @@ from typing import Optional
 import numpy as np
 
 from yerkon.evidence import EvidenceRecord, assumption, from_deck
+from yerkon.link_budget import (
+    RURAL_LINK_RANGE,
+    TUNNEL_LINK_RANGE,
+    URBAN_LINK_RANGE,
+    minimum_spacing_for_fix,
+)
 from yerkon.geometry import (
     dop_from_jacobian,
     evaluate_geometry,
@@ -45,12 +51,20 @@ from yerkon.ranging_error import (
     build_dwm3000_model,
     build_sx1280_model,
 )
-from yerkon.simulate import RangingMethod, anchors_in_range, simulate_path_fixes
+from yerkon.simulate import RangingMethod, select_anchors, simulate_path_fixes
 
 SEED = 42
 N_REPEATS = 300
 N_PATH_SAMPLES = 24
 ACCURACY_THRESHOLDS_M = [0.5, 1.0, 2.0, 5.0]
+
+#: How many anchors a receiver ranges to per fix, nearest first. Two-way
+#: ranging spends airtime per anchor, and the report describes the receiver
+#: as talking to "enough" broadcast units rather than to every audible one.
+#: Eight leaves redundancy over the four a 3D fix needs, and keeps the
+#: links short enough that most of them fall inside the range envelope the
+#: SX1280 error measurements cover.
+MAX_ANCHORS_PER_FIX = 8
 
 # Bulk (100-unit) component prices from the YERKON presentation's own BOM
 # table, in TL. Component cost only: no installation, certification,
@@ -188,7 +202,7 @@ def urban_grid_layout(
 
 def roadside_layout(
     length_m: float = 42000.0,
-    sign_spacing_m: float = 200.0,
+    sign_spacing_m: float = 500.0,
     road_half_width_m: float = 12.0,
     sign_height_m: float = 6.0,
     seed: int = SEED,
@@ -257,7 +271,7 @@ def mast_layout(
 
 def tunnel_layout(
     length_m: float = 50000.0,
-    spacing_m: float = 150.0,
+    spacing_m: float = 60.0,
     width_m: float = 20.0,
     seed: int = SEED,
 ) -> AnchorGroup:
@@ -299,37 +313,25 @@ def tunnel_layout(
 # Scenario definitions
 # ---------------------------------------------------------------------------
 
-URBAN_LINK_RANGE_M = 400.0
-RURAL_LINK_RANGE_M = 1500.0
-TUNNEL_LINK_RANGE_M = 400.0
+URBAN_LINK_RANGE_M = URBAN_LINK_RANGE.range_m
+RURAL_LINK_RANGE_M = RURAL_LINK_RANGE.range_m
+TUNNEL_LINK_RANGE_M = TUNNEL_LINK_RANGE.range_m
 
-_URBAN_RANGE_EVIDENCE = assumption(
-    "Urban link range of {:.0f} m".format(URBAN_LINK_RANGE_M),
-    "Assumed reliable ranging range for a 2.4 GHz SX1280 link in an urban "
-    "canyon with partial obstruction. Not measured and not stated by the "
-    "presentation; it sets the anchor spacing, so a shorter real range "
-    "would need a denser and more expensive grid.",
-)
-_RURAL_RANGE_EVIDENCE = assumption(
-    "Rural link range of {:.0f} m".format(RURAL_LINK_RANGE_M),
-    "Assumed reliable ranging range for the amplified E28-2G4M27S "
-    "(SX1280-based, 27 dBm) over open rural line of sight. Well inside the "
-    "multi-kilometre communication ranges the source blog reports, but far "
-    "beyond the 250 m envelope its ranging accuracy data covers.",
-)
+#: Tunnel node spacing follows from the DWM3000's real range rather than
+#: from the report's pilot figure. The report proposes 10-15 nodes per 2 km
+#: corridor, which is roughly 150 m apart; at a 150 m link range that
+#: leaves a receiver hearing one or two nodes, and a 3D fix needs four.
+#: minimum_spacing_for_fix gives 75 m as the ceiling, and 60 m is used to
+#: keep a fifth node in range as margin.
+TUNNEL_MAX_SPACING_FOR_FIX_M = minimum_spacing_for_fix(TUNNEL_LINK_RANGE_M)
+TUNNEL_NODE_SPACING_M = 60.0
+
 _NLOS_EVIDENCE = assumption(
     "NLOS probabilities and bias magnitudes per environment",
     "Fraction of links carrying an obstruction bias, and how large that "
     "bias is, are set per environment by this project. Neither the "
-    "presentation nor the ranging measurements distinguish line-of-sight "
+    "report nor the ranging measurements distinguish line-of-sight "
     "from obstructed links.",
-)
-_TUNNEL_RANGE_EVIDENCE = assumption(
-    "Tunnel link range of {:.0f} m".format(TUNNEL_LINK_RANGE_M),
-    "Assumed UWB range inside a tunnel, above the usual open-air DWM3000 "
-    "figure because a tunnel bore guides the signal rather than letting it "
-    "spread spherically. Chosen to be consistent with the presentation's "
-    "own node spacing, which would otherwise leave gaps.",
 )
 
 
@@ -366,7 +368,7 @@ def urban_scenario(calibrated: bool = True, seed: int = SEED) -> Scenario:
         area_km2=(side_m / 1000.0) ** 2,
         max_link_range_m=URBAN_LINK_RANGE_M,
         packet_loss_probability=0.02,
-        parameter_evidence=(_URBAN_RANGE_EVIDENCE, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
+        parameter_evidence=(URBAN_LINK_RANGE.evidence, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
         notes=(
             "35% of links carry a 1.5 m NLOS bias, representing urban canyon "
             "reflection off buildings.",
@@ -401,7 +403,7 @@ def rural_scenario(seed: int = SEED) -> Scenario:
         technology="Karasal PNT (E28-SX1280 TWR)",
         environment="Dış",
         groups=(
-            roadside_layout(length_m=length_m, sign_spacing_m=200.0, seed=seed),
+            roadside_layout(length_m=length_m, sign_spacing_m=500.0, seed=seed),
             mast_layout(length_m=length_m, spacing_m=2500.0, seed=seed),
         ),
         path=zigzag_path(
@@ -419,7 +421,7 @@ def rural_scenario(seed: int = SEED) -> Scenario:
         max_link_range_m=RURAL_LINK_RANGE_M,
         packet_loss_probability=0.01,
         corridor_length_km=length_m / 1000.0,
-        parameter_evidence=(_RURAL_RANGE_EVIDENCE, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
+        parameter_evidence=(RURAL_LINK_RANGE.evidence, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
         notes=(
             "Coverage is the {:.0f} m wide carriageway between the facing "
             "sign lines, over a {:.0f} km corridor. The test path weaves "
@@ -446,7 +448,12 @@ def critical_zone_scenario(seed: int = SEED) -> Scenario:
         display_name="YERKON (Kritik Bölge/Tünel)",
         technology="Karasal PNT (UWB/DWM3000 TWR)",
         environment="İç + dış",
-        groups=(tunnel_layout(length_m=length_m, spacing_m=150.0, width_m=width_m, seed=seed),),
+        groups=(tunnel_layout(
+                length_m=length_m,
+                spacing_m=TUNNEL_NODE_SPACING_M,
+                width_m=width_m,
+                seed=seed,
+            ),),
         path=straight_line_path(
             "tunnel-run",
             (320.0, 0.45 * width_m, 1.5),
@@ -459,7 +466,7 @@ def critical_zone_scenario(seed: int = SEED) -> Scenario:
         max_link_range_m=TUNNEL_LINK_RANGE_M,
         packet_loss_probability=0.03,
         corridor_length_km=length_m / 1000.0,
-        parameter_evidence=(_TUNNEL_RANGE_EVIDENCE, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
+        parameter_evidence=(TUNNEL_LINK_RANGE.evidence, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
         notes=(
             "A tunnel only reaches 1 km² of plan area after 50 km of running "
             "length at 20 m width, so cost per km² is dominated by that "
@@ -516,8 +523,9 @@ def profile_geometry(scenario: Scenario, minimum_anchors: int = 4) -> GeometryPr
     ranges: list[float] = []
 
     for point in scenario.path.points():
-        mask = anchors_in_range(point, anchors, scenario.max_link_range_m)
-        visible = anchors[mask]
+        visible = select_anchors(
+            point, anchors, scenario.max_link_range_m, MAX_ANCHORS_PER_FIX
+        )
         counts.append(int(len(visible)))
         if len(visible) == 0:
             continue
@@ -585,6 +593,7 @@ def run_scenario(
         seed=seed,
         delivery_probability=1.0 - scenario.packet_loss_probability,
         max_range_m=scenario.max_link_range_m,
+        max_anchors_per_fix=MAX_ANCHORS_PER_FIX,
         sigma_for_geometry_check_m=sigma,
     )
     capex = CostBreakdown(anchor_cost=scenario.capex_total_tl)

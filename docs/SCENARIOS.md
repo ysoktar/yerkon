@@ -1,159 +1,159 @@
 # Senaryo dökümü
 
 Dört senaryonun her parametresi, kaynağı ve sonucu. Kod:
-`yerkon/scenarios.py`.
+`yerkon/scenarios.py`, menzil değerleri `yerkon/link_budget.py`.
 
 Kaynak sütunundaki etiketler:
 
-- **Sunum**: YERKON sunumundan alınmış değer.
+- **Rapor**: YERKON raporundan alınmış değer.
+- **Üretici**: modül üreticisinin yayımladığı değer.
 - **Ölçüm**: yayımlanmış donanım ölçümünden geliyor.
-- **Varsayım**: bu projenin seçimi; sunum bu değeri vermiyor.
+- **Varsayım**: bu projenin seçimi; hiçbir kaynak bu değeri vermiyor.
+
+Ortak parametre: alıcı fix başına en yakın **8** anchor ile mesafe ölçümü
+yapar. TWR her anchor için hava süresi harcar ve rapor alıcıyı "yeterli
+sayıda yayın birimi ile konuşacak" diye tarif eder, menzildeki hepsiyle
+değil. Sekiz, 3B fix için gereken dördün üstünde yedek bırakır ve
+bağlantıları SX1280 ölçümlerinin kapsadığı mesafe aralığına yaklaştırır.
 
 ---
 
 ## 1-2. Şehir İçi (Kalibreli ve Ham)
 
 İki satır aynı kurulumdur. Tek fark menzil ofseti kalibrasyonunun
-uygulanıp uygulanmadığıdır; anchor sayısı, geometri ve maliyet birebir
+uygulanıp uygulanmadığıdır; birim sayısı, geometri ve maliyet birebir
 aynıdır.
 
 | Parametre | Değer | Kaynak |
 |---|---|---|
 | Kapsama alanı | 1 km × 1 km = 1,00 km² | Varsayım (≥ 1 km² koşulu) |
 | Anchor sayısı | 49 | Türetilmiş (ızgara) |
-| Izgara aralığı | 150 m | Varsayım |
-| Montaj yükseklikleri | 8 m direk, 20 m cephe, 35 m çatı (±0,75 m sapma) | Sunum (montaj sınıfları), Varsayım (dağılım) |
-| Bağlantı menzili | 400 m | Varsayım |
+| Izgara aralığı | 150 m | Varsayım (raporun "yüksek sayıda kısa menzilli" tarifi) |
+| Montaj yükseklikleri | 8 m direk, 20 m cephe, 35 m çatı (±0,75 m sapma) | Rapor (montaj sınıfları), Varsayım (dağılım) |
+| Bağlantı menzili | 400 m = 3,0 km referansın %13'ü | Üretici + Varsayım (derating) |
 | Menzil hata modeli | SX1280, Robinson bootstrap | Ölçüm |
-| Menzil hatası σ | 3,02 m | Türetilmiş |
+| Menzil hatası σ | 3,03 m | Türetilmiş |
 | NLOS oranı ve sapması | %35, 1,5 m | Varsayım |
 | Paket kaybı | %2 | Varsayım |
-| Birim fiyat | 1.366,07 TL | Sunum |
+| Birim fiyat | 1.366,07 TL | Rapor |
 | Test yörüngesi | Hücreyi çapraz kesen doğru, 24 nokta, z = 1,5 m | Varsayım |
 
-Montaj yükseklikleri komşu anchor'lar arasında değişir. Tek yükseklikte
-bir ızgara eş düzlemlidir ve dikey ekseni hiç çözemez; `coplanar()` bunu
-yakalar ve bir test bu durumu koruma altına alır.
+Raporun Grup 1 montaj listesi (baz istasyonları, trafik levhaları ve
+lambaları, reklam panoları, yol kenarı ışıklandırmaları) 150 m'lik bir
+ızgarayı destekler: şehir içi aydınlatma direkleri 25-40 m, kavşak
+sinyalizasyonu 100-200 m aralıkla zaten mevcuttur.
+
+Montaj yükseklikleri komşu anchor'lar arasında değişir. Tek yükseklikte bir
+ızgara eş düzlemlidir ve dikey ekseni hiç çözemez.
 
 ### Ölçülen geometri ve sonuç
 
 | | Kalibreli | Ham |
 |---|---|---|
-| Menzil içindeki anchor (medyan / en az) | 20 / 8 | 20 / 8 |
-| Medyan bağlantı mesafesi | 263 m | 263 m |
-| HDOP / VDOP (medyan) | 0,45 / 2,02 | 0,45 / 2,02 |
+| Fix başına kullanılan anchor | 8 | 8 |
+| Medyan / en uzun bağlantı | 171 m / 377 m | 171 m / 377 m |
+| 250 m'yi aşan bağlantı oranı | %6,3 | %6,3 |
+| HDOP / VDOP (medyan) | 0,73 / 2,37 | 0,73 / 2,37 |
 | En kötü VDOP | 6,54 | 6,54 |
-| Koşul sayısı (medyan) | 6,6 | 6,6 |
-| HPE P50 / P95 | 1,26 m / 3,00 m | 1,52 m / 5,08 m |
-| VPE P50 / P95 | 5,49 m / 30,89 m | 19,64 m / 50,68 m |
-| 3B hata P95 | 30,96 m | 50,74 m |
+| HPE P50 / P95 | 1,98 m / 4,05 m | 2,39 m / 5,63 m |
+| VPE P50 / P95 | 6,55 m / 35,98 m | 19,91 m / 50,11 m |
 | Kullanılabilirlik | %97,9 | %97,9 |
 | CAPEX | 66.937 TL/km² | 66.937 TL/km² |
 
-Kalibrasyon yatay hatayı yaklaşık %20, dikey hatayı %39 iyileştiriyor.
-Sabit sapma dikey eksende daha çok büyütülür, çünkü o eksenin DOP'u daha
-yüksektir.
+Kalibrasyon yatay hatayı %17, dikey hatayı %28 iyileştiriyor. Sabit sapma
+dikey eksende daha çok büyütülür, çünkü o eksenin DOP'u daha yüksektir.
 
 ### Izgara aralığı ne satın alıyor
 
-Aynı hücre, farklı ızgara aralıklarıyla (1 km kenar, 400 m menzil):
+Aynı hücre, farklı ızgara aralıklarıyla (400 m menzil, en yakın 8 anchor):
 
-| Aralık | Birim | Menzildeki anchor | HDOP | VDOP | CAPEX TL/km² |
+| Aralık | Birim | HDOP | VDOP | Medyan bağlantı | CAPEX TL/km² |
 |---|---|---|---|---|---|
-| 100 m | 121 | 38 | 0,33 | 1,29 | 165.294 |
-| 150 m | 49 | 16 | 0,52 | 2,00 | 66.937 |
-| 200 m | 36 | 10 | 0,65 | 2,80 | 49.179 |
-| 250 m | 25 | 8 | 0,76 | 3,98 | 34.152 |
-| 300 m | 16 | 4 | 1,02 | 5,58 | 21.857 |
+| 100 m | 121 | 0,75 | 1,57 | 112 m | 165.294 |
+| 150 m | 49 | 0,73 | 2,29 | 181 m | 66.937 |
+| 200 m | 36 | 0,73 | 3,03 | 225 m | 49.179 |
+| 250 m | 25 | 0,78 | 4,12 | 248 m | 34.152 |
+| 300 m | 16 | 1,02 | 5,58 | 241 m | 21.857 |
 
-Sıklaştırmak esas olarak dikey doğruluk satın alıyor. 300 m'den 100 m'ye
-inerken HDOP 3 kat, VDOP 4,3 kat iyileşiyor, maliyet 7,6 kat artıyor.
-150 m, dikey hatayı kullanılabilir aralıkta tutan en ucuz noktaya yakın
-olduğu için seçildi.
+Sıklaştırmak neredeyse yalnızca dikey doğruluk satın alıyor: HDOP 100 ile
+250 m arasında sabit kalırken VDOP 2,6 kat değişiyor. Sebebi, en yakın 8
+anchor kuralının yatay dağılımı zaten koruması, dikey açının ise doğrudan
+mesafeye bağlı olmasıdır.
 
 ---
 
 ## 3. Kırsal
 
+Rapor Grup 2 için "az sayıda yüksek kapsamalı nokta" istiyor ve montaj
+noktası olarak AUS/yol kenarı üniteleri ile baz istasyonu sahalarını
+sayıyor. Yerleşim buna göre kuruldu.
+
 | Parametre | Değer | Kaynak |
 |---|---|---|
 | Koridor uzunluğu | 42 km | Varsayım (≥ 1 km² koşulu) |
-| Kapsama | Levha hatları arası 24 m taşıt yolu = 1,01 km² | Varsayım |
-| Levha anchor'ı | 200 m'de bir, yolun iki yanında karşılıklı, 6 m (±0,5 m) | Varsayım |
-| Kule anchor'ı | 2,5 km'de bir, 35-45 m, yoldan 30 m açıkta | Varsayım |
-| Toplam anchor | 422 levha + 17 kule = 439 | Türetilmiş |
-| Bağlantı menzili | 1.500 m | Varsayım |
+| Kapsama | İki hat arası 24 m taşıt yolu = 1,01 km² | Varsayım |
+| Yol kenarı anchor'ı | 500 m'de bir, iki yanda karşılıklı, 6 m (±0,5 m) | Rapor (AUS/RSU noktaları), Varsayım (aralık) |
+| Kule anchor'ı | 2,5 km'de bir, 35-45 m, yoldan 30 m açıkta | Rapor (baz istasyonu sahaları), Varsayım (aralık) |
+| Toplam anchor | 170 yol kenarı + 17 kule = 187 | Türetilmiş |
+| Bağlantı menzili | 3.000 m = 8,0 km referansın %37,5'i | Üretici + Varsayım (derating) |
 | Menzil hata modeli | SX1280, Robinson bootstrap, kalibreli | Ölçüm |
-| Menzil hatası σ | 3,01 m | Türetilmiş |
+| Menzil hatası σ | 3,05 m | Türetilmiş |
 | NLOS oranı ve sapması | %15, 2,0 m | Varsayım |
 | Paket kaybı | %1 | Varsayım |
-| Birim fiyat | 1.082,68 TL | Sunum |
-| Test yörüngesi | Taşıt yolu üzerinde zikzak (±10,8 m), 24 nokta | Varsayım |
+| Birim fiyat | 1.082,68 TL | Rapor |
+| Test yörüngesi | Taşıt yolunda zikzak (±10,8 m), 24 nokta | Varsayım |
 
 E28-2G4M27S modülü BOM'a göre SX1280 tabanlıdır. Yükselteç link bütçesini
 değiştirir, menzil ölçüm hatası mekanizmasını değil; bu yüzden aynı hata
-modeli kullanıldı. Yine de bağlantıların %83'ü Robinson verisinin
-kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır ve
-JSON çıktısında `links_beyond_calibrated_envelope` alanında oran olarak
-raporlanır.
+modeli kullanıldı. Yine de bağlantıların %72'si Robinson verisinin
+kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır ve JSON
+çıktısında `links_beyond_calibrated_envelope` alanında raporlanır.
 
 ### Ölçülen geometri ve sonuç
 
 | | Değer |
 |---|---|
-| Menzil içindeki anchor (medyan / en az) | 31 / 20 |
-| Medyan / en uzun bağlantı | 735 m / 1.491 m |
-| HDOP / VDOP (medyan) | 2,70 / 6,28 |
-| En kötü VDOP | 10,74 |
-| Koşul sayısı (medyan) | 35,4 |
-| HPE P50 / P95 | 4,04 m / 14,15 m |
-| VPE P50 / P95 | 8,00 m / 24,18 m |
+| Fix başına kullanılan anchor | 8 (menzilde 26) |
+| Medyan / en uzun bağlantı | 458 m / 1.000 m |
+| 250 m'yi aşan bağlantı oranı | %72,4 |
+| HDOP / VDOP (medyan) | 5,84 / 11,56 |
+| En kötü VDOP | 28,30 |
+| HPE P50 / P95 | 7,02 m / 26,04 m |
+| VPE P50 / P95 | 7,11 m / 29,94 m |
 | Kullanılabilirlik | %98,8 |
-| CAPEX | 471.524 TL/km², 11.317 TL/km |
+| CAPEX | 200.854 TL/km², 4.821 TL/km |
 
-### Levha sıklığı ne satın alıyor
+### Nokta sıklığı ne satın alıyor
 
 42 km koridor, kuleler 2,5 km'de bir sabit:
 
-| Levha aralığı | Birim | HDOP | VDOP | TL/km | TL/km² |
-|---|---|---|---|---|---|
-| 500 m | 187 | 7,57 | 9,66 | 4.821 | 200.854 |
-| 300 m | 299 | 4,20 | 7,85 | 7.708 | 321.152 |
-| 200 m | 439 | 2,64 | 5,74 | 11.317 | 471.524 |
-| 150 m | 579 | 2,08 | 5,03 | 14.926 | 621.897 |
-| 100 m | 859 | 1,31 | 3,33 | 22.143 | 922.641 |
+| Yol kenarı aralığı | Birim | HDOP | VDOP | Medyan bağlantı | TL/km | TL/km² |
+|---|---|---|---|---|---|---|
+| 1000 m | 103 | 12,12 | 16,01 | 838 m | 2.655 | 110.631 |
+| **500 m (kullanılan)** | **187** | **5,84** | **11,56** | **458 m** | **4.821** | **200.854** |
+| 300 m | 299 | 4,68 | 9,48 | 274 m | 7.708 | 321.152 |
+| 200 m | 439 | 2,95 | 6,80 | 196 m | 11.317 | 471.524 |
 
-Kuleler bu tabloda görünmeyen bir iş yapıyor: levhalar arasında kalan
-bölgelerde tek dik açı kaynağı onlar. Kule aralığı 5 km olduğunda
-menzil dışında kaldıkları bölgelerde VDOP 15'in üstüne çıkıyordu; 2,5
-km'ye indirmek her noktada en az bir kuleyi menzilde tutuyor.
+Raporun "az sayıda nokta" tercihi burada ölçülebilir hale geliyor. 200 m
+aralık VDOP'u 6,80'e indiriyor ama km başına maliyeti 2,3 katına çıkarıyor.
+500 m, rapor metnine sadık kalan ve dört anchor'ı her noktada menzilde
+tutan seçim.
 
-### Yoldan uzaklaştıkça ne oluyor
+### Kuleler ne yapıyor
 
-200 m levha aralığı, koridor boyunca ölçülen değerler:
+Kuleler yol kenarı ünitelerinden 30-40 m daha yüksektir ve dikey geometriye
+tek anlamlı katkıyı onlar yapar. Ama en yakın 8 anchor kuralında kuleler
+çoğu zaman seçilmez: yol kenarı noktaları 500 m'de bir, kuleler 2,5 km'de
+birdir, yani en yakın kule medyan 600 m uzaktadır.
 
-| Yoldan uzaklık | Menzildeki anchor | HDOP | VDOP |
-|---|---|---|---|
-| 0 m (orta şerit) | 31 | 2,59 | 5,46 |
-| 3,7 m (iç şerit) | 31 | 2,64 | 5,74 |
-| 12 m (levha hattı) | 31 | 2,57 | 6,87 |
-| 25 m | 31 | 2,13 | 8,79 |
-| 50 m | 31 | 1,75 | 16,50 |
-| 100 m | 31 | 1,10 | 18,73 |
-| 250 m | 31 | 0,60 | 19,87 |
-| 500 m | 29 | 0,46 | 23,44 |
-| 1000 m | 23 | 0,54 | 36,69 |
+Sekiz yuvadan birini en yakın kuleye ayıran bir seçim kuralı denendi:
+VDOP 11,56'dan 10,50'ye iniyor, HDOP değişmiyor. %9'luk kazanç modeli
+karmaşıklaştırmayı hak etmedi, ama gerçek bir alıcı yazılımında geometriye
+duyarlı anchor seçimi bedelsiz bir iyileştirmedir.
 
-Yatay doğruluk yoldan uzaklaştıkça **iyileşiyor**, çünkü anchor'lar
-alıcının çevresine daha geniş bir açıyla yayılıyor. Dikey doğruluk ise
-6,7 kat kötüleşiyor: taşıt yolundayken alıcı karşılıklı levha çiftlerinin
-arasında kalır ve yakın anchor'lar dik açı sağlar; yoldan çıkınca tüm
-anchor'lar aynı tarafta ve aynı yükseklikte toplanır.
-
-Kapsama alanının taşıt yolu ile sınırlanmasının sebebi bu. Sistem 1 km
-uzakta da fix üretiyor, ama oradaki dikey hata taşıt yolundakinin
-katlarıdır ve ikisini tek bir P95'te ortalamak her ikisini de yanlış
-anlatır.
+Kazancın küçük kalmasının sebebi yine açı: 600 m mesafedeki 40 m'lik bir
+kule 3,67 derecelik bir bakış açısı verir, 250 m'deki 6 m'lik bir yol
+kenarı ünitesi 1,03 derece. İkisi de dik değildir.
 
 ---
 
@@ -164,49 +164,62 @@ anlatır.
 | Tünel uzunluğu | 50 km | Varsayım (≥ 1 km² koşulu) |
 | Tünel genişliği | 20 m | Varsayım |
 | Kapsama alanı | 50 km × 20 m = 1,00 km² | Türetilmiş |
-| Düğüm aralığı | 150 m | Sunum (2 km koridora 10-15 düğüm) |
-| Anchor sayısı | 334 | Türetilmiş |
+| Düğüm aralığı | 60 m | Türetilmiş (bağlantı menzilinden) |
+| Anchor sayısı | 834 | Türetilmiş |
 | Montaj | Duvar (1,2-1,3 m) ve tavan (4,3-4,4 m), dört adımlı döngü | Varsayım |
-| Bağlantı menzili | 400 m | Varsayım |
-| Menzil hata modeli | DWM3000, yapılandırılmış Gauss | Sunum hedefi |
-| Menzil hatası σ | 0,095 m (NLOS dahil) | Türetilmiş |
+| Bağlantı menzili | 150 m | Varsayım (yayımlanmış üst sınır yok) |
+| Menzil hata modeli | DWM3000, yapılandırılmış Gauss | Rapor hedefi |
+| Menzil hatası σ | 0,096 m (NLOS dahil) | Türetilmiş |
 | NLOS oranı ve sapması | %10, 0,3 m | Varsayım |
 | Paket kaybı | %3 | Varsayım |
-| Birim fiyat | 1.634,44 TL | Sunum |
+| Birim fiyat | 1.634,44 TL | Rapor |
 | Test yörüngesi | Tünel boyunca doğru, 24 nokta | Varsayım |
 
-Montaj deseni dört adımlıdır, iki değil. İki adımlı bir desen (bir duvar,
-bir tavan) tüm anchor'ları iki paralel doğru üzerine yerleştirir ve 3B'de
-iki paralel doğru her zaman eş düzlemlidir. Bu durumda dikey eksen kaç
-anchor eklenirse eklensin çözülemez. Bir test bunu koruma altına alıyor
-(`test_two_parallel_lines_of_anchors_are_coplanar`).
+### Düğüm aralığı neden raporun öngördüğünden küçük
 
-400 m bağlantı menzili, açık havadaki DWM3000 rakamlarının üstündedir.
-Gerekçe, tünel kesitinin sinyali dalga kılavuzu gibi taşıması ve küresel
-yayılıma göre daha az zayıflatmasıdır. Bu menzil olmadan sunumun kendi
-150 m'lik düğüm aralığı, bir fix için gereken dört anchor'ı menzilde
-tutmaya yetmezdi.
+Rapor pilot için 2 km koridora 10-15 düğüm öngörüyor, yani ~150 m aralık.
+Bir doğru boyunca S aralıklı düğümler ve R menzil ile alıcı yaklaşık `2R/S`
+düğüm duyar. 3B fix dört ölçüm ister, dolayısıyla `S ≤ 2R/4 = R/2`.
+R = 150 m için tavan 75 m'dir (`link_budget.minimum_spacing_for_fix`).
+
+| Düğüm aralığı | Menzildeki düğüm (en az) | HDOP | VDOP | TL/km | Toplam TL |
+|---|---|---|---|---|---|
+| 150 m | 2 | çözüm yok | çözüm yok | 10.885 | 544.269 |
+| 100 m | 2 | çözüm yok | çözüm yok | 16.344 | 817.220 |
+| 75 m | 4 | 3,83 | 15,02 | 21.771 | 1.088.537 |
+| **60 m (kullanılan)** | **5** | **3,10** | **14,14** | **27.230** | **1.361.489** |
+| 50 m | 5 | 2,61 | 11,04 | 32.689 | 1.634.440 |
+
+60 m, tavanın altında kalıp beşinci düğümü menzilde tutar. Bu, raporun
+pilot yoğunluğunu yaklaşık 2,5 katına çıkarır.
+
+Bu sonuç tek bir varsayıma, 150 m'lik bağlantı menziline dayanıyor. Gerçek
+menzil 300 m ise raporun 150 m aralığı çalışır; 75 m ise 30 m aralık
+gerekir. DWM3000 için üretici bir üst sınır yayımlamadığından bu belirsizlik
+giderilemedi ve sonuç bu koşula bağlı olarak okunmalıdır.
+
+### Montaj deseni
+
+Desen dört adımlıdır, iki değil. İki adımlı bir desen (bir duvar, bir tavan)
+tüm anchor'ları iki paralel doğru üzerine yerleştirir ve 3B'de iki paralel
+doğru her zaman eş düzlemlidir; dikey eksen kaç anchor eklenirse eklensin
+çözülemez. Bir test bunu koruma altına alıyor
+(`test_two_parallel_lines_of_anchors_are_coplanar`).
 
 ### Ölçülen geometri ve sonuç
 
 | | Değer |
 |---|---|
-| Menzil içindeki anchor (medyan / en az) | 5 / 5 |
-| Medyan / en uzun bağlantı | 200 m / 400 m |
-| HDOP / VDOP (medyan) | 7,90 / 31,85 |
-| En kötü VDOP | 55,40 |
-| Koşul sayısı (medyan) | 78,7 |
-| HPE P50 / P95 | 0,26 m / 1,89 m |
-| VPE P50 / P95 | 1,37 m / 5,55 m |
+| Fix başına kullanılan anchor | 5 |
+| Medyan / en uzun bağlantı | 75 m / 149 m |
+| HDOP / VDOP (medyan) | 3,16 / 13,49 |
+| En kötü VDOP | 21,84 |
+| HPE P50 / P95 | 0,11 m / 0,83 m |
+| VPE P50 / P95 | 0,51 m / 3,83 m |
 | Kullanılabilirlik | %97,0 |
-| CAPEX | 545.903 TL/km², 10.918 TL/km |
+| CAPEX | 1.363.123 TL/km², 27.230 TL/km |
 
-DOP değerleri dört senaryonun en kötüsü, sonuçlar ise en iyisi. Çelişki
-değil: UWB'nin menzil hatası σ = 0,095 m, SX1280'in 3,0 m'sinin
+DOP değerleri dört senaryonun ortasında, sonuçlar ise açık ara en iyisi.
+Çelişki değil: UWB'nin menzil hatası σ = 0,096 m, SX1280'in 3,03 m'sinin
 otuzda biri. Kötü geometri küçük bir hatayı büyütüyor ve yine de küçük
 kalıyor.
-
-Yüksek DOP'un sebebi tünelin doğrusal olması. Anchor'lar tünel ekseni
-boyunca dizildiği için eksen yönündeki çözünürlük zayıftır; bu, koridor
-tipi her kurulumun yapısal özelliğidir ve düğüm sıklaştırarak azaltılır
-ama yok edilemez.

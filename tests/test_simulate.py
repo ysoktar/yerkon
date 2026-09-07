@@ -146,3 +146,25 @@ def test_three_anchors_are_rejected_as_a_minimum_for_a_3d_fix():
 
 def test_only_two_way_ranging_methods_exist():
     assert {m.value for m in RangingMethod} == {"SS_TWR", "DS_TWR"}
+
+
+def test_a_receiver_ranges_to_the_nearest_anchors_not_to_every_audible_one():
+    from yerkon.simulate import select_anchors
+
+    anchors = np.array(
+        [[0.0, 0.0, 8.0], [10.0, 0.0, 9.0], [20.0, 0.0, 10.0],
+         [30.0, 0.0, 11.0], [400.0, 0.0, 12.0], [450.0, 0.0, 13.0]]
+    )
+    chosen = select_anchors(np.zeros(3), anchors, max_range_m=1000.0, max_anchors=4)
+    assert len(chosen) == 4
+    assert chosen[:, 0].max() == 30.0
+
+
+def test_the_anchor_cap_never_reaches_past_the_link_range():
+    from yerkon.simulate import select_anchors
+
+    anchors = np.array(
+        [[0.0, 0.0, 8.0], [10.0, 0.0, 9.0], [5000.0, 0.0, 10.0], [6000.0, 0.0, 11.0]]
+    )
+    chosen = select_anchors(np.zeros(3), anchors, max_range_m=100.0, max_anchors=4)
+    assert len(chosen) == 2

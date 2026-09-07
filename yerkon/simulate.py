@@ -136,6 +136,32 @@ class FixResult:
         return d
 
 
+def select_anchors(
+    position: np.ndarray,
+    anchors: np.ndarray,
+    max_range_m: Optional[float],
+    max_anchors: Optional[int] = None,
+) -> np.ndarray:
+    """The anchors a receiver actually ranges to, nearest first.
+
+    Two filters, in order. Link range decides what can be heard at all.
+    Then, because two-way ranging spends airtime on every anchor it talks
+    to, a receiver ranges to a working subset rather than to everything
+    audible; the report describes the receiver as talking to "enough"
+    broadcast units, not to all of them.
+
+    Taking the nearest ones costs a little geometry (fewer measurements to
+    average) and buys a lot of evidence: the near links are the ones inside
+    the range envelope the SX1280 error data actually covers.
+    """
+    mask = anchors_in_range(position, anchors, max_range_m)
+    visible = anchors[mask]
+    if max_anchors is None or len(visible) <= max_anchors:
+        return visible
+    distances = true_ranges(np.asarray(position, dtype=float), visible)
+    return visible[np.argsort(distances)[:max_anchors]]
+
+
 def anchors_in_range(
     position: np.ndarray, anchors: np.ndarray, max_range_m: Optional[float]
 ) -> np.ndarray:
@@ -164,6 +190,7 @@ def simulate_path_fixes(
     delivery_probability: float = 1.0,
     minimum_anchors: int = 4,
     max_range_m: Optional[float] = None,
+    max_anchors_per_fix: Optional[int] = None,
     sigma_for_geometry_check_m: float = 1.0,
 ) -> list[FixResult]:
     """Simulate repeated position fixes along a path.
@@ -187,8 +214,9 @@ def simulate_path_fixes(
 
     for idx in range(path.n_samples):
         true_p = np.array([path.x_m[idx], path.y_m[idx], path.z_m[idx]])
-        mask = anchors_in_range(true_p, anchors, max_range_m)
-        visible = anchors[mask]
+        visible = select_anchors(
+            true_p, anchors, max_range_m, max_anchors_per_fix
+        )
         n_visible = int(len(visible))
         solvable = n_visible >= minimum_anchors
 

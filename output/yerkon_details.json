@@ -8,7 +8,7 @@
     "error_model": "Semtech SX1280 (Robinson bootstrap, calibrated) + NLOS",
     "error_model_scope": "Bootstrap resample of Stuart Robinson's six published short-range SX1280 ranging observations (0-250 m, one hardware and environment configuration, published on a personal engineering blog). Errors are drawn with replacement from those six values. The model does not condition on range, bandwidth, spreading factor, line-of-sight state, temperature or antenna orientation, because six unrepeated points cannot support fitting any of those. It is a small-sample stand-in for a characterised error model, not a validated one.",
     "error_model_caveats": "Mean bias of 2.83 m removed, modelling the per-unit ranging offset calibration the YERKON architecture specifies. The residual spread is unchanged and still comes from six points. NLOS bias of 1.50 m applied to 35% of links is an engineering assumption layered on top of the measured error distribution.",
-    "ranging_sigma_m": 3.015132328770995,
+    "ranging_sigma_m": 3.031125933440411,
     "anchor_groups": [
       {
         "label": "Şehir içi yayın birimi (direk / cephe / çatı montajı)",
@@ -26,27 +26,27 @@
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.020972222222222222,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 1.262318359761309,
-    "hpe_p95_m": 3.00292771153206,
-    "hpe_max_m": 7.30694626146829,
-    "vpe_p50_m": 5.494597051860724,
-    "vpe_p95_m": 30.890793093056725,
-    "error_3d_p95_m": 30.964492084558128,
+    "hpe_p50_m": 1.9829471356767374,
+    "hpe_p95_m": 4.054967172866787,
+    "hpe_max_m": 6.682914708386453,
+    "vpe_p50_m": 6.546053318743356,
+    "vpe_p95_m": 35.98057502623116,
+    "error_3d_p95_m": 36.06580383703701,
     "availability_by_threshold_m": {
-      "0.5": 0.002916666666666667,
-      "1.0": 0.024166666666666666,
-      "2.0": 0.12152777777777778,
-      "5.0": 0.42986111111111114
+      "0.5": 0.0008333333333333334,
+      "1.0": 0.010555555555555556,
+      "2.0": 0.06555555555555556,
+      "5.0": 0.34958333333333336
     },
-    "median_anchors_in_range": 20.0,
+    "median_anchors_in_range": 8.0,
     "min_anchors_in_range": 8,
-    "median_hdop": 0.4508608715144876,
-    "median_vdop": 2.018405219093363,
+    "median_hdop": 0.7300419822116493,
+    "median_vdop": 2.3748004313320124,
     "worst_vdop": 6.542194617529637,
-    "median_condition_number": 6.594789441504813,
-    "median_link_range_m": 263.41714592598765,
-    "max_link_range_used_m": 398.1106141865606,
-    "links_beyond_calibrated_envelope": 0.5386416861826698,
+    "median_condition_number": 4.772194562946112,
+    "median_link_range_m": 171.2682802345993,
+    "max_link_range_used_m": 377.2390077351545,
+    "links_beyond_calibrated_envelope": 0.0625,
     "capex_total_tl": 66937.43,
     "capex_per_km2_tl": 66937.43,
     "capex_per_km_tl": null,
@@ -67,10 +67,10 @@
       },
       {
         "evidence_type": "ENGINEERING_ASSUMPTION",
-        "source_name": "Urban link range of 400 m",
-        "source_url": "",
-        "source_scope": "Assumed reliable ranging range for a 2.4 GHz SX1280 link in an urban canyon with partial obstruction. Not measured and not stated by the presentation; it sets the anchor spacing, so a shorter real range would need a denser and more expensive grid.",
-        "caveats": ""
+        "source_name": "13% of the 3.0 km SX1280/SX1281 reference distance",
+        "source_url": "https://www.lcsc.com/product-detail/C411312.html",
+        "source_scope": "Derived from EBYTE's published 3.0 km reference distance for the 12.5 dBm SX1281 module, the power class the report's urban broadcast unit uses. Manufacturer reference distance, measured in a clear open field with 5 dBi antennas at 2.5 m height at the lowest air rate (1 kbps). A deployment matches none of these: ranging runs at a much higher bandwidth than 1 kbps, and neither an urban canyon nor a highway verge is a clear open field.",
+        "caveats": "The 13% derating for an urban canyon is this project's judgement, not a measurement. Buildings at 2.4 GHz are the dominant loss, and the figure is the least defensible number in the urban scenario. A shorter real range would need a denser and more expensive grid to hold the same geometry."
       },
       {
         "evidence_type": "DESIGN_DOCUMENT",
@@ -83,7 +83,7 @@
         "evidence_type": "ENGINEERING_ASSUMPTION",
         "source_name": "NLOS probabilities and bias magnitudes per environment",
         "source_url": "",
-        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the presentation nor the ranging measurements distinguish line-of-sight from obstructed links.",
+        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
         "caveats": ""
       }
     ],
@@ -100,7 +100,7 @@
     "error_model": "Semtech SX1280 (Robinson bootstrap, uncalibrated) + NLOS",
     "error_model_scope": "Bootstrap resample of Stuart Robinson's six published short-range SX1280 ranging observations (0-250 m, one hardware and environment configuration, published on a personal engineering blog). Errors are drawn with replacement from those six values. The model does not condition on range, bandwidth, spreading factor, line-of-sight state, temperature or antenna orientation, because six unrepeated points cannot support fitting any of those. It is a small-sample stand-in for a characterised error model, not a validated one.",
     "error_model_caveats": "Raw published errors, including their 2.83 m mean bias. Represents a deployment that skips per-unit offset calibration. NLOS bias of 1.50 m applied to 35% of links is an engineering assumption layered on top of the measured error distribution.",
-    "ranging_sigma_m": 3.015132328770995,
+    "ranging_sigma_m": 3.031125933440411,
     "anchor_groups": [
       {
         "label": "Şehir içi yayın birimi (direk / cephe / çatı montajı)",
@@ -118,27 +118,27 @@
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.020972222222222222,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 1.516088313060254,
-    "hpe_p95_m": 5.081930313681376,
-    "hpe_max_m": 9.158295078339759,
-    "vpe_p50_m": 19.642738983086645,
-    "vpe_p95_m": 50.68089264334981,
-    "error_3d_p95_m": 50.744708822637826,
+    "hpe_p50_m": 2.393156436840254,
+    "hpe_p95_m": 5.6261618443663375,
+    "hpe_max_m": 9.339819843347765,
+    "vpe_p50_m": 19.905011205345676,
+    "vpe_p95_m": 50.107226210624525,
+    "error_3d_p95_m": 50.18776654232843,
     "availability_by_threshold_m": {
       "0.5": 0.0,
-      "1.0": 0.0001388888888888889,
-      "2.0": 0.0002777777777777778,
-      "5.0": 0.012638888888888889
+      "1.0": 0.0002777777777777778,
+      "2.0": 0.003472222222222222,
+      "5.0": 0.03166666666666667
     },
-    "median_anchors_in_range": 20.0,
+    "median_anchors_in_range": 8.0,
     "min_anchors_in_range": 8,
-    "median_hdop": 0.4508608715144876,
-    "median_vdop": 2.018405219093363,
+    "median_hdop": 0.7300419822116493,
+    "median_vdop": 2.3748004313320124,
     "worst_vdop": 6.542194617529637,
-    "median_condition_number": 6.594789441504813,
-    "median_link_range_m": 263.41714592598765,
-    "max_link_range_used_m": 398.1106141865606,
-    "links_beyond_calibrated_envelope": 0.5386416861826698,
+    "median_condition_number": 4.772194562946112,
+    "median_link_range_m": 171.2682802345993,
+    "max_link_range_used_m": 377.2390077351545,
+    "links_beyond_calibrated_envelope": 0.0625,
     "capex_total_tl": 66937.43,
     "capex_per_km2_tl": 66937.43,
     "capex_per_km_tl": null,
@@ -159,10 +159,10 @@
       },
       {
         "evidence_type": "ENGINEERING_ASSUMPTION",
-        "source_name": "Urban link range of 400 m",
-        "source_url": "",
-        "source_scope": "Assumed reliable ranging range for a 2.4 GHz SX1280 link in an urban canyon with partial obstruction. Not measured and not stated by the presentation; it sets the anchor spacing, so a shorter real range would need a denser and more expensive grid.",
-        "caveats": ""
+        "source_name": "13% of the 3.0 km SX1280/SX1281 reference distance",
+        "source_url": "https://www.lcsc.com/product-detail/C411312.html",
+        "source_scope": "Derived from EBYTE's published 3.0 km reference distance for the 12.5 dBm SX1281 module, the power class the report's urban broadcast unit uses. Manufacturer reference distance, measured in a clear open field with 5 dBi antennas at 2.5 m height at the lowest air rate (1 kbps). A deployment matches none of these: ranging runs at a much higher bandwidth than 1 kbps, and neither an urban canyon nor a highway verge is a clear open field.",
+        "caveats": "The 13% derating for an urban canyon is this project's judgement, not a measurement. Buildings at 2.4 GHz are the dominant loss, and the figure is the least defensible number in the urban scenario. A shorter real range would need a denser and more expensive grid to hold the same geometry."
       },
       {
         "evidence_type": "DESIGN_DOCUMENT",
@@ -175,7 +175,7 @@
         "evidence_type": "ENGINEERING_ASSUMPTION",
         "source_name": "NLOS probabilities and bias magnitudes per environment",
         "source_url": "",
-        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the presentation nor the ranging measurements distinguish line-of-sight from obstructed links.",
+        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
         "caveats": ""
       }
     ],
@@ -192,11 +192,11 @@
     "error_model": "Semtech SX1280 (Robinson bootstrap, calibrated) + NLOS",
     "error_model_scope": "Bootstrap resample of Stuart Robinson's six published short-range SX1280 ranging observations (0-250 m, one hardware and environment configuration, published on a personal engineering blog). Errors are drawn with replacement from those six values. The model does not condition on range, bandwidth, spreading factor, line-of-sight state, temperature or antenna orientation, because six unrepeated points cannot support fitting any of those. It is a small-sample stand-in for a characterised error model, not a validated one.",
     "error_model_caveats": "Mean bias of 2.83 m removed, modelling the per-unit ranging offset calibration the YERKON architecture specifies. The residual spread is unchanged and still comes from six points. NLOS bias of 2.00 m applied to 15% of links is an engineering assumption layered on top of the measured error distribution.",
-    "ranging_sigma_m": 3.0107475811665116,
+    "ranging_sigma_m": 3.04775136617146,
     "anchor_groups": [
       {
         "label": "Yol levhası üstü yayın birimi (karşılıklı, iki yol kenarı)",
-        "count": 422,
+        "count": 170,
         "unit_price_tl": 1082.68
       },
       {
@@ -205,40 +205,40 @@
         "unit_price_tl": 1082.68
       }
     ],
-    "anchor_count": 439,
+    "anchor_count": 187,
     "area_km2": 1.008,
     "corridor_length_km": 42.0,
-    "max_link_range_m": 1500.0,
+    "max_link_range_m": 3000.0,
     "packet_loss_probability": 0.01,
     "attempted_fixes": 7200,
     "valid_fix_rate": 0.9879166666666667,
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.012083333333333333,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 4.041970754992588,
-    "hpe_p95_m": 14.149623035697994,
-    "hpe_max_m": 29.04781444215442,
-    "vpe_p50_m": 7.997276253728982,
-    "vpe_p95_m": 24.18355815814129,
-    "error_3d_p95_m": 25.766088039496662,
+    "hpe_p50_m": 7.017911554041782,
+    "hpe_p95_m": 26.040718741171425,
+    "hpe_max_m": 46.298981222144135,
+    "vpe_p50_m": 7.108710112620242,
+    "vpe_p95_m": 29.944441725086342,
+    "error_3d_p95_m": 35.238760593097304,
     "availability_by_threshold_m": {
-      "0.5": 0.0011111111111111111,
-      "1.0": 0.005833333333333334,
-      "2.0": 0.026805555555555555,
-      "5.0": 0.16583333333333333
+      "0.5": 0.0004166666666666667,
+      "1.0": 0.0038888888888888888,
+      "2.0": 0.01375,
+      "5.0": 0.10305555555555555
     },
-    "median_anchors_in_range": 31.0,
-    "min_anchors_in_range": 20,
-    "median_hdop": 2.699489393635202,
-    "median_vdop": 6.2838765996565575,
-    "worst_vdop": 10.74142521472244,
-    "median_condition_number": 35.41319602548582,
-    "median_link_range_m": 734.7982542201571,
-    "max_link_range_used_m": 1491.4685088708645,
-    "links_beyond_calibrated_envelope": 0.8278236914600551,
-    "capex_total_tl": 475296.52,
-    "capex_per_km2_tl": 471524.3253968254,
-    "capex_per_km_tl": 11316.58380952381,
+    "median_anchors_in_range": 8.0,
+    "min_anchors_in_range": 8,
+    "median_hdop": 5.841602125804218,
+    "median_vdop": 11.555694240466991,
+    "worst_vdop": 28.300269432421263,
+    "median_condition_number": 34.94971166165296,
+    "median_link_range_m": 458.03058315858476,
+    "max_link_range_used_m": 1000.0844412501133,
+    "links_beyond_calibrated_envelope": 0.7239583333333334,
+    "capex_total_tl": 202461.16,
+    "capex_per_km2_tl": 200854.32539682538,
+    "capex_per_km_tl": 4820.50380952381,
     "evidence": [
       {
         "evidence_type": "HARDWARE_CALIBRATED_MODEL",
@@ -249,7 +249,7 @@
       },
       {
         "evidence_type": "ENGINEERING_ASSUMPTION",
-        "source_name": "Facing roadside sign mounts every 200 m at 6.0 m height",
+        "source_name": "Facing roadside sign mounts every 500 m at 6.0 m height",
         "source_url": "",
         "source_scope": "Sign spacing, the 6 m mounting height and the 12 m road half width are this project's assumptions, chosen to match typical Turkish divided-highway signage. The presentation states that existing roadside infrastructure is used but gives no spacing.",
         "caveats": ""
@@ -263,10 +263,10 @@
       },
       {
         "evidence_type": "ENGINEERING_ASSUMPTION",
-        "source_name": "Rural link range of 1500 m",
-        "source_url": "",
-        "source_scope": "Assumed reliable ranging range for the amplified E28-2G4M27S (SX1280-based, 27 dBm) over open rural line of sight. Well inside the multi-kilometre communication ranges the source blog reports, but far beyond the 250 m envelope its ranging accuracy data covers.",
-        "caveats": ""
+        "source_name": "37.5% of the 8.0 km E28-2G4M27S reference distance",
+        "source_url": "https://www.lcsc.com/product-detail/C411312.html",
+        "source_scope": "Derived from EBYTE's published 8.0 km reference distance for the E28-2G4M27S, the amplified module the report names for rural units. Manufacturer reference distance, measured in a clear open field with 5 dBi antennas at 2.5 m height at the lowest air rate (1 kbps). A deployment matches none of these: ranging runs at a much higher bandwidth than 1 kbps, and neither an urban canyon nor a highway verge is a clear open field.",
+        "caveats": "Derated mainly for ranging bandwidth: the 8 km figure is a 1 kbps communication result, and SX1280 ranging runs far wider. Mounting is higher than the 2.5 m test condition, which works the other way. Stuart Robinson's published SX1280 ranging at 40 km and 85 km was air-to-ground with clear Fresnel clearance and does not transfer to a roadside link."
       },
       {
         "evidence_type": "DESIGN_DOCUMENT",
@@ -279,7 +279,7 @@
         "evidence_type": "ENGINEERING_ASSUMPTION",
         "source_name": "NLOS probabilities and bias magnitudes per environment",
         "source_url": "",
-        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the presentation nor the ranging measurements distinguish line-of-sight from obstructed links.",
+        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
         "caveats": ""
       }
     ],
@@ -298,48 +298,48 @@
     "error_model": "Qorvo DWM3000 (configured, not calibrated)",
     "error_model_scope": "Configured Gaussian range error, N(0, 0.03 m), plus an NLOS bias applied to a fraction of links. Parameterised to the +/-10 cm class accuracy the YERKON presentation states for the DWM3000 module. No calibrated DWM3000 measurements were available to this project, so this is a design target expressed as a distribution, not a measured error model.",
     "error_model_caveats": "NLOS probability 10% and bias 0.30 m are this project's assumptions, not measurements.",
-    "ranging_sigma_m": 0.09493828686487983,
+    "ranging_sigma_m": 0.09594252812672684,
     "anchor_groups": [
       {
         "label": "Tünel duvar/tavan yayın birimi (UWB)",
-        "count": 334,
+        "count": 834,
         "unit_price_tl": 1634.44
       }
     ],
-    "anchor_count": 334,
+    "anchor_count": 834,
     "area_km2": 1.0,
     "corridor_length_km": 50.0,
-    "max_link_range_m": 400.0,
+    "max_link_range_m": 150.0,
     "packet_loss_probability": 0.03,
     "attempted_fixes": 7200,
     "valid_fix_rate": 0.9701388888888889,
     "coverage_gap_rate": 0.0,
     "dropout_rate": 0.029861111111111113,
     "solver_failure_rate": 0.0,
-    "hpe_p50_m": 0.2582450581783582,
-    "hpe_p95_m": 1.8949335073463078,
-    "hpe_max_m": 4.01436666297475,
-    "vpe_p50_m": 1.3667118311038309,
-    "vpe_p95_m": 5.5490220371397205,
-    "error_3d_p95_m": 5.718367904778707,
+    "hpe_p50_m": 0.10927535777754198,
+    "hpe_p95_m": 0.834085423131564,
+    "hpe_max_m": 1.8944356086816632,
+    "vpe_p50_m": 0.5131769035568778,
+    "vpe_p95_m": 3.833708107428592,
+    "error_3d_p95_m": 3.8837856525702543,
     "availability_by_threshold_m": {
-      "0.5": 0.22291666666666668,
-      "1.0": 0.39055555555555554,
-      "2.0": 0.5720833333333334,
-      "5.0": 0.87
+      "0.5": 0.46291666666666664,
+      "1.0": 0.6281944444444445,
+      "2.0": 0.7881944444444444,
+      "5.0": 0.9604166666666667
     },
     "median_anchors_in_range": 5.0,
     "min_anchors_in_range": 5,
-    "median_hdop": 7.897211828295637,
-    "median_vdop": 31.84520712790485,
-    "worst_vdop": 55.39580873093111,
-    "median_condition_number": 78.6767218937834,
-    "median_link_range_m": 200.15009895233277,
-    "max_link_range_used_m": 399.6454816583906,
+    "median_hdop": 3.1617850261656733,
+    "median_vdop": 13.4941679872362,
+    "worst_vdop": 21.842078961505162,
+    "median_condition_number": 29.91712541155671,
+    "median_link_range_m": 74.6555166075255,
+    "max_link_range_used_m": 148.95045561273287,
     "links_beyond_calibrated_envelope": null,
-    "capex_total_tl": 545902.96,
-    "capex_per_km2_tl": 545902.96,
-    "capex_per_km_tl": 10918.0592,
+    "capex_total_tl": 1363122.96,
+    "capex_per_km2_tl": 1363122.96,
+    "capex_per_km_tl": 27262.459199999998,
     "evidence": [
       {
         "evidence_type": "SIMULATED_MONTE_CARLO",
@@ -350,17 +350,17 @@
       },
       {
         "evidence_type": "DESIGN_DOCUMENT",
-        "source_name": "Tunnel node spacing of 150 m",
+        "source_name": "Tunnel node spacing of 60 m",
         "source_url": "",
         "source_scope": "Spacing follows the presentation's own pilot figure of 10-15 broadcast nodes per 2 km corridor. Wall and ceiling mounting heights and the alternating pattern are this project's assumptions.",
         "caveats": ""
       },
       {
         "evidence_type": "ENGINEERING_ASSUMPTION",
-        "source_name": "Tunnel link range of 400 m",
-        "source_url": "",
-        "source_scope": "Assumed UWB range inside a tunnel, above the usual open-air DWM3000 figure because a tunnel bore guides the signal rather than letting it spread spherically. Chosen to be consistent with the presentation's own node spacing, which would otherwise leave gaps.",
-        "caveats": ""
+        "source_name": "Practical DWM3000 range reports, upper half of the band",
+        "source_url": "https://www.qorvo.com/products/p/DWM3000",
+        "source_scope": "Qorvo publishes no maximum range for the DWM3000. Reported practical figures span roughly 50-100 m for commercial modules in ordinary use, against 300 m advertised for the DWM1000 predecessor and 500 m demonstrated on DW3000 boards with external antennas in clear line of sight.",
+        "caveats": "150 m sits in the upper half of the practical band, on the argument that a tunnel bore guides the signal instead of letting it spread spherically. This is the single most consequential assumption in the study: it decides whether the report's own 150 m node spacing can produce a fix at all."
       },
       {
         "evidence_type": "DESIGN_DOCUMENT",
@@ -373,7 +373,7 @@
         "evidence_type": "ENGINEERING_ASSUMPTION",
         "source_name": "NLOS probabilities and bias magnitudes per environment",
         "source_url": "",
-        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the presentation nor the ranging measurements distinguish line-of-sight from obstructed links.",
+        "source_scope": "Fraction of links carrying an obstruction bias, and how large that bias is, are set per environment by this project. Neither the report nor the ranging measurements distinguish line-of-sight from obstructed links.",
         "caveats": ""
       }
     ],

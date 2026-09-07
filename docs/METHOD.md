@@ -10,13 +10,14 @@ Bu belge, `output/yerkon_rows.csv` içindeki her hücrenin hangi kodun hangi
 senaryo tanımı            yerkon/scenarios.py
   anchor konumları    ->  yerkon/scenarios.py  (urban_grid_layout, roadside_layout,
                                                 mast_layout, tunnel_layout)
+  bağlantı menzili    ->  yerkon/link_budget.py (üretici referans mesafesi + derating)
   test yörüngesi      ->  yerkon/path.py
   menzil hata modeli  ->  yerkon/ranging_error.py
         |
         v
 Monte Carlo             yerkon/simulate.py     (simulate_path_fixes)
   her yörünge noktası için:
-    menzil içindeki anchor'ları seç
+    menzil içindeki anchor'lardan en yakın 8'ini seç
     her tekrar için:
       gerçek menzil + hata örneği -> ölçülen menzil
       teslim edildi mi (Bernoulli)
@@ -80,25 +81,24 @@ Doğruluk rakamının geçerli sayıldığı alan. Her senaryoda en az 1 km².
 - Tünel: 50 km tünel × 20 m genişlik = 1,00 km².
 
 Kırsalda kapsamanın taşıt yolu ile sınırlanması bilinçli bir seçim. Sistem
-yoldan 1 km uzakta da sinyal veriyor, ama orada dikey geometri çöküyor
-(VDOP 5,5'ten 37'ye çıkıyor). Geniş bir şeridi kapsama alanı ilan edip
+yoldan yüzlerce metre uzakta da sinyal veriyor, ama dikey geometri yoldan
+uzaklaştıkça hızla bozulur. Geniş bir şeridi kapsama alanı ilan edip
 doğruluğu onun üzerinden bildirmek, iyi ve kötü bölgeleri tek bir sayıda
-ortalayıp ikisini de yanlış anlatırdı. Düşüş eğrisi
-[SCENARIOS.md](SCENARIOS.md#yoldan-uzaklaştıkça-ne-oluyor) içinde.
+ortalayıp ikisini de yanlış anlatırdı.
 
 ### CAPEX [TL/km²]
 
 `(anchor sayısı × birim fiyat) / alan`.
 
-Birim fiyatlar sunumun kendi 100 adetlik toplu alım tablosundan:
+Birim fiyatlar raporun kendi 100 adetlik toplu alım tablosundan:
 şehir içi 1.366,07 TL, kırsal 1.082,68 TL, kritik bölge 1.634,44 TL.
 Yalnızca bileşen maliyeti; montaj, sertifikasyon, altyapı, enerji ve
 işçilik dahil değil.
 
 Koridor senaryolarında km başına maliyet de hesaplanır ve JSON çıktısında
 `capex_per_km_tl` alanında bulunur. İnce bir kurdele biçimindeki bir
-kurulumu km² üzerinden fiyatlamak yanıltıcıdır: tünel 545.903 TL/km²
-görünürken 10.918 TL/km'dir.
+kurulumu km² üzerinden fiyatlamak yanıltıcıdır: tünel 1.363.123 TL/km²
+görünürken 27.230 TL/km'dir.
 
 ### OPEX
 
@@ -123,13 +123,14 @@ anchor alıcıya göre neredeyse ufuk hizasındadır:
 
 | Bakış | Yükseklik farkı | Yatay mesafe | Bakış açısı |
 |---|---|---|---|
-| Yol levhası, 100 m | 4,5 m | 100 m | 2,58° |
-| Yol levhası, 250 m | 4,5 m | 250 m | 1,03° |
-| Kule, 750 m | 38,5 m | 750 m | 2,94° |
+| Yol kenarı ünitesi, 100 m | 4,5 m | 100 m | 2,58° |
+| Yol kenarı ünitesi, 250 m | 4,5 m | 250 m | 1,03° |
+| Yol kenarı ünitesi, 500 m | 4,5 m | 500 m | 0,52° |
+| Kule, 600 m | 38,5 m | 600 m | 3,67° |
 | Kule, 1500 m | 38,5 m | 1500 m | 1,47° |
 | Bina çatısı, 150 m | 33,5 m | 150 m | 12,59° |
 | Bina çatısı, 400 m | 33,5 m | 400 m | 4,79° |
-| Tünel tavanı, 100 m | 2,8 m | 100 m | 1,60° |
+| Tünel tavanı, 75 m | 2,8 m | 75 m | 2,14° |
 | GNSS uydusu | — | — | ≈ 45° |
 
 Bir uydu alıcının 45 derece üstünden bakar; menzil hatasının önemli bir
@@ -140,25 +141,58 @@ görünür:
 
 | Senaryo | HDOP | VDOP | VDOP/HDOP |
 |---|---|---|---|
-| Şehir içi (150 m ızgara) | 0,45 | 2,02 | 4,5× |
-| Kırsal (200 m levha aralığı) | 2,70 | 6,28 | 2,3× |
-| Tünel (150 m düğüm aralığı) | 7,90 | 31,85 | 4,0× |
+| Şehir içi (150 m ızgara) | 0,73 | 2,37 | 3,2× |
+| Kırsal (500 m nokta aralığı) | 5,84 | 11,56 | 2,0× |
+| Tünel (60 m düğüm aralığı) | 3,16 | 13,49 | 4,3× |
 
 Ölçülen dikey hatalar bu çarpanlarla tutarlı. Şehir içi kalibreli
-senaryoda menzil hatasının standart sapması 3,02 m, medyan VDOP 2,02;
-`2,02 × 3,02 ≈ 6,1 m` beklenir, ölçülen VPE P50 5,49 m.
+senaryoda menzil hatasının standart sapması 3,03 m, medyan VDOP 2,37;
+`2,37 × 3,03 ≈ 7,2 m` beklenir, ölçülen VPE P50 6,55 m.
 
 Bunu iyileştirmenin üç yolu var ve üçü de maliyetli:
 
 1. **Anchor'ları sıklaştırmak.** Yakın anchor daha dik açı demek. Şehir
-   içinde ızgarayı 250 m'den 150 m'ye sıkıştırmak VDOP'u 3,98'den 2,00'a
+   içinde ızgarayı 250 m'den 150 m'ye sıkıştırmak VDOP'u 4,12'den 2,29'a
    indiriyor, birim sayısını 25'ten 49'a çıkarıyor.
 2. **Daha yükseğe monte etmek.** 6 m'lik levha yerine 35 m'lik çatı,
    aynı mesafede beş kat dik açı verir.
 3. **Dikey serbestliği dışarıdan vermek.** Yol yüksekliği haritadan
-   biliniyorsa dikey eksen çözülmek zorunda değildir. Sunumun harita
+   biliniyorsa dikey eksen çözülmek zorunda değildir. Raporun harita
    kısıtlı füzyon mimarisi tam olarak bunu yapar. Bu simülasyon o katmanı
    modellemez ve çıplak geometrik sonucu raporlar.
+
+## Bağlantı menzili nereden geliyor
+
+Menzil değerleri `yerkon/link_budget.py` içinde, her biri raporun adıyla
+verdiği modülün yayımlanmış değerine bağlı olarak tutulur.
+
+| Senaryo | Modül | Yayımlanmış referans | Modellenen | Oran |
+|---|---|---|---|---|
+| Şehir içi | SX1280/SX1281 @ 12,5 dBm | 3,0 km | 400 m | %13 |
+| Kırsal | E28-2G4M27S @ 27 dBm | 8,0 km | 3.000 m | %37,5 |
+| Tünel | DWM3000 | yok | 150 m | — |
+
+Referans mesafeler açık arazide, 5 dBi anten, 2,5 m yükseklik ve 1 kbps
+hava hızında ölçülmüştür. Menzil ölçümü çok daha geniş bantta çalışır ve
+ne kentsel kanyon ne de yol kenarı açık arazidir; derating oranları bu
+farkı karşılar ve bu projenin yargısıdır.
+
+Menzil, düğüm aralığını da belirler. Bir doğru boyunca S aralıklı düğümler
+ve R menzil ile alıcı yaklaşık `2R/S` düğüm duyar; 3B fix dört ölçüm
+istediğinden `S ≤ R/2` olmalıdır (`link_budget.minimum_spacing_for_fix`).
+Tünelde bu, raporun öngördüğü 150 m aralığı eliyor ve 60 m'ye indiriyor.
+
+## Alıcı kaç anchor ile ölçüm yapıyor
+
+Fix başına en yakın 8 anchor. TWR her anchor için hava süresi harcar;
+rapor da alıcıyı "konum için yeterli sayıda Yayın Birimi ile konuşacak"
+diye tarif eder, menzildeki hepsiyle değil.
+
+Bunun bedeli ve kazancı ölçüldü. Şehir içinde menzildeki 20 anchor'ın
+hepsini kullanmak VDOP'u 2,37'den 2,02'ye indirir, ama bağlantıların
+%54'ünü SX1280 ölçümlerinin kapsadığı 250 m'nin dışına taşır. En yakın 8
+ile bu oran %6'ya düşer. Daha az ölçümle biraz daha kötü geometri, buna
+karşılık sonucun çok daha büyük bölümünün ölçülmüş veriye dayanması.
 
 ## Menzil kısıtı neden var
 
