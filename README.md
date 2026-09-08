@@ -17,8 +17,8 @@ python run.py
 |---|---|---|---|---|---|---|---|---|
 | YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,64 m | 3,40 m | 1,00 m | %100,0 | 1,00 km² | ≈ 49.179 TL/km² |
 | YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,15 m | 4,82 m | 1,04 m | %100,0 | 1,00 km² | ≈ 49.179 TL/km² |
-| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 7,81 m | 26,49 m | 1,03 m | %100,0 | 1,01 km² | ≈ 140.705 TL/km² |
-| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,43 m | 1,45 m | 0,69 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
+| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 2,55 m | 3,86 m | 1,00 m | %100,0 | 1,01 km² | ≈ 140.705 TL/km² |
+| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,43 m | 1,28 m | 0,70 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
 
 Doğruluk değerleri filtrelenmiş sonuçtan geliyor. Menzil ölçümleri BNO085
 IMU, tekerlek odometrisi ve harita kısıtıyla bir Kalman filtresinde
@@ -109,10 +109,10 @@ Kararı menzil hatası değil konum hatası veriyor. HPE P50 olarak:
 
 | Bant | Şehir içi (%35 engelli) | Kırsal (%15 engelli) |
 |---|---|---|
-| 203 kHz | 2,82 m | 21,46 m |
-| 406 kHz | **1,64 m** | 13,98 m |
-| 812 kHz | 2,35 m | **8,43 m** |
-| 1625 kHz | 5,01 m | 15,70 m |
+| 203 kHz | 2,82 m | 5,82 m |
+| 406 kHz | **1,64 m** | 3,22 m |
+| 812 kHz | 2,35 m | **2,55 m** |
+| 1625 kHz | 5,01 m | 3,54 m |
 
 İkisi de U biçimli, ve optimum ortam açıldıkça genişliyor. Tablo şehir
 içini 406 kHz, kırsalı 812 kHz ile üretiyor.
@@ -141,9 +141,9 @@ Kırsal levha aralığı:
 
 | Aralık | Düğüm | TL/km² | HPE P50 | HPE P95 |
 |---|---|---|---|---|
-| 500 m (eski) | 187 | 200.854 | 8,43 m | 35,80 m |
-| 750 m | 131 | **140.705** | **7,81 m** | **26,49 m** |
-| 1000 m | 103 | 110.631 | 9,33 m | 57,65 m |
+| 500 m (eski) | 187 | 200.854 | 2,88 m | 7,57 m |
+| 750 m | 131 | **140.705** | **2,55 m** | **3,86 m** |
+| 1000 m | 103 | 110.631 | 2,46 m | 11,07 m |
 
 İkisinde de yeni aralık hem ucuz hem doğru, yani ödünleşim yok. Şehir içi
 %27, kırsal %30 ucuzluyor. 225 m ve 1000 m daha da ucuz ama orada ödünleşim
@@ -157,6 +157,46 @@ seçtiğim 400 m, üstelin 3,8 olmasına denk geliyor, yani yoğun kanyonun ucu.
 Üstel 3,5 çıkarsa aralık 354 m'ye kadar açılabilir. Birkaç noktada RSSI
 ölçüp üsteli belirlemek, km² başına maliyetteki beş katlık belirsizliği
 kapatır.
+
+## Koridorda hata yolun karşısında, boyunca değil
+
+Kırsal satırın yatay hatası uzun süre 7,81 m'de takılı kaldı, dikey hata
+1,00 m iken. İki sütun aynı şeyi ölçmüyor, ve sebebi geometride.
+
+Bir koridor bütün anchor'ları tek bir çizgi üzerine diziyor. Kırsal
+düzende anchor'lar yol boyunca 42 km'ye yayılıyor ama yola dik yönde
+sadece 60 m'lik bir şerit içinde duruyor. Sonuç, menzil ölçümünün iki
+eksene duyarlılığında görünüyor. En yakın sekiz anchor için ortalama:
+
+| Eksen | Menzil duyarlılığı |
+|---|---|
+| Yol boyunca (x) | 0,875 |
+| Yola dik (y) | 0,097 |
+| Düşey (z) | 0,108 |
+
+Yani radyo, aracın yolun neresinde olduğunu iyi görüyor, hangi şeritte
+olduğunu neredeyse hiç görmüyor. Filtrelenmiş hatanın bileşenleri de bunu
+söylüyordu: yol boyunca P50 1,49 m, yola dik P50 7,40 m.
+
+Çözüm, dikeyi zaten kurtaran şeyin aynısı. Yol yüzeyinin yüksekliğini
+veren harita, taşıt yolunun nerede geçtiğini de veriyor. O kısıt filtreye
+bağlandığında:
+
+| Yanal harita kısıtı | HPE P50 | HPE P95 |
+|---|---|---|
+| Yok | 7,81 m | 26,49 m |
+| σ 3,0 m (kullanılan) | **2,55 m** | **3,86 m** |
+| σ 1,5 m | 1,66 m | 3,15 m |
+
+Kuyruk yedide birine iniyor ve maliyet değişmiyor. σ 3,0 m seçildi çünkü
+üç sigmada senaryonun modellediği 24 m'lik taşıt yolunu kapsıyor, yani
+"hangi taşıt yolunda" diyor, "hangi şeritte" demiyor. Daha dar bir değer
+şerit seviyesinde harita eşleştirme iddiası olurdu ve bunun için harita
+yetmez.
+
+Kısıt şehir içine uygulanmadı. Şehrin sokakları iki yöne birden gidiyor ve
+test yörüngesi dönüyor, dolayısıyla sabitlenecek tek bir "yola dik" eksen
+yok.
 
 ## Anchor konumları ne kadar iyi biliniyor
 
@@ -234,7 +274,7 @@ sistemde her anchor alıcıya göre neredeyse aynı yükseklikte durur. Alıcıd
 6 m'lik bir yol kenarı ünitesine 250 m mesafede bakış açısı 1,03 derece,
 500 m'de 0,52 derece. Aynı açı GNSS uydusunda 45 derece civarında. Harita
 kısıtı kaldırıldığında dikey P95 şehir içinde 1,00 m'den 14,29 m'ye,
-kırsalda 1,03 m'den 37,85 m'ye çıkıyor. Ayrıntısı
+kırsalda 1,00 m'den 40,82 m'ye çıkıyor. Ayrıntısı
 [docs/METHOD.md](docs/METHOD.md#dikey-hata-neden-yatay-hatadan-kötü)
 içinde.
 
@@ -244,10 +284,12 @@ harita kapatıldığında:
 | Senaryo | HPE P95 (tam / radyo) | VPE P95 (tam / radyo) |
 |---|---|---|
 | Şehir içi | 3,40 / 3,60 m | 1,00 / 14,97 m |
-| Kırsal | 26,49 / 31,82 m | 1,03 / 39,92 m |
-| Tünel | 1,45 / 2,55 m | 0,69 / 6,70 m |
+| Kırsal | 3,86 / 3,65 m | 1,00 / 34,43 m |
+| Tünel | 1,28 / 1,71 m | 0,70 / 5,69 m |
 
-Yatayda kazanç %6 ile %43 arası, dikeyde on beş ile kırk kat. Daha önce
+Dikeyde kazanç on beş ile otuz dört kat. Yatayda küçük ve kırsalda hafif
+negatif: radyo tek başına P95 3,65 m, tam yapılandırmada 3,86 m. Sebebi
+odometri, aşağıda. Daha önce
 tünel için "füzyon olmadan filtre ıraksıyor" diye bir bulgu raporlamıştım.
 O bir artefaktmış ve geri alındı, gerekçesi
 [docs/WAVEFORM.md](docs/WAVEFORM.md#geri-alınan-bir-bulgu) içinde.
@@ -255,9 +297,11 @@ O bir artefaktmış ve geri alındı, gerekçesi
 **Açık alanda odometri yatayda küçük bir zarar veriyor.** %2'lik tekerlek
 ölçek sapması 13,9 m/s'de 0,28 m/s'lik hız sapması demek. Şehir içinde
 radyo geometrisi zaten iyi olduğu için odometri bilgi yerine sapma ekliyor:
-odometri kapalıyken HPE P50 1,76 m yerine 1,64 m çıkıyor, yani odometri onu
-biraz kötüleştiriyor. Kırsalda tersi oluyor, geometri zayıf olduğu için
-fayda sağlıyor (P95 29,66 m yerine 26,49 m).
+odometri kapalıyken P50 1,76 m, açıkken 1,64 m, yani burada fayda sağlıyor.
+Kırsalda yanal harita kısıtı geometri boşluğunu zaten kapattığı için
+odometri artık bilgi eklemiyor: kapalıyken P50 2,10 m, açıkken 2,55 m.
+Kısıt eklenmeden önce tersiydi. Yardımcı sensörlerin faydası, kapattıkları
+boşluk başka bir şeyle kapanınca kayboluyor.
 
 **Kalibrasyon bedava ve fark yaratıyor.** Robinson'un yayımladığı SX1280
 verisinde 2,83 m sabit sapma var. Sabit sapma tüm anchor'lara aynı anda

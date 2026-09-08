@@ -228,9 +228,9 @@ konumlardan yapılıyor. Aradaki fark her fix'e aynı şekilde giriyor.
 
 | Senaryo | Ölçüm hatasız HPE P50 | Gerçek ölçümle | Fark |
 |---|---|---|---|
-| Şehir içi | 1,65 m | 1,64 m | %0,1 |
-| Kırsal | 8,41 m | 8,43 m | %0,3 |
-| Tünel | 0,43 m | 0,43 m | %0,7 |
+| Şehir içi | 1,646 m | 1,644 m | %0,1 |
+| Kırsal | 2,545 m | 2,545 m | %0,0 |
+| Tünel | 0,431 m | 0,432 m | %0,3 |
 
 Yani rapor yüksek hassasiyetli ölçüm için ayrı bütçe ayırmak zorunda değil.
 RTK ve normal bir tünel traversi yetiyor.

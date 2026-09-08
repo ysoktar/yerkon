@@ -133,3 +133,54 @@ def test_filter_reports_nothing_when_it_never_gets_a_first_fix():
     )
     assert result.error_3d_m.size == 0
     assert result.converged_after_s is None
+
+
+def test_a_corridor_needs_the_map_sideways_not_just_downwards():
+    """The rural row's error is across the road, not along it.
+
+    A corridor strings every anchor along one line. Range is then far more
+    sensitive to along-road position than across it, so the across-road
+    axis is the one the radio barely observes. Measured on the rural
+    layout, the eight nearest anchors give a mean |dR/dy| of about 0.10
+    against |dR/dx| of about 0.88.
+
+    The map that already supplies the surface elevation also says where
+    the carriageway runs, so it fixes that axis the same way it fixes the
+    vertical. Without it the rural tail is six times worse.
+    """
+    import dataclasses
+
+    from yerkon.scenarios import rural_scenario, run_fused
+
+    scenario = rural_scenario()
+    assert scenario.receiver.map_constraint.lateral_sigma_m is not None
+
+    receiver = scenario.receiver
+    without = dataclasses.replace(
+        scenario,
+        receiver=dataclasses.replace(
+            receiver,
+            map_constraint=dataclasses.replace(
+                receiver.map_constraint, lateral_sigma_m=None
+            ),
+        ),
+    )
+    constrained = run_fused(scenario, n_runs=6)
+    free = run_fused(without, n_runs=6)
+
+    assert constrained.hpe_p95_m < 0.5 * free.hpe_p95_m
+    # The vertical is set by the height constraint either way, so it must
+    # not move. That is what says the gain is lateral and not a side
+    # effect of a generally tighter filter.
+    assert constrained.vpe_p95_m == pytest.approx(free.vpe_p95_m, rel=0.15)
+
+
+def test_the_city_does_not_get_the_corridor_constraint():
+    """It only holds where the corridor direction is fixed.
+
+    City streets run both ways and the test track turns, so there is no
+    single across-road axis to constrain.
+    """
+    from yerkon.scenarios import urban_scenario
+
+    assert urban_scenario().receiver.map_constraint.lateral_sigma_m is None

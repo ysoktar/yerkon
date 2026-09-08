@@ -154,6 +154,21 @@ _MAP_EVIDENCE = assumption(
     "rather than about the radio.",
 )
 
+_CORRIDOR_MAP_EVIDENCE = assumption(
+    "Carriageway position known to 3.0 m (1 sigma) from a digital map, on a "
+    "corridor whose direction is known",
+    "The same surveyed centreline that carries a surface elevation also "
+    "carries where the carriageway runs. On a corridor that constrains the "
+    "across-road coordinate the way the elevation constrains the vertical, "
+    "and it matters for the same reason: a line of anchors along a corridor "
+    "hardly observes the across-road axis at all. Range is nine times more "
+    "sensitive to along-road position than across it in the rural layout. "
+    "3.0 m is this project's figure, chosen so the constraint says which "
+    "carriageway rather than which lane: at three sigma it spans roughly "
+    "the 24 m carriageway the scenario models. A tighter figure would be a "
+    "claim about lane-level map matching, which needs more than a map.",
+)
+
 _PEDESTRIAN_MAP_EVIDENCE = assumption(
     "Walking surface height known to 1.5 m (1 sigma)",
     "A pedestrian is not confined to a surveyed carriageway and may be on "
@@ -202,11 +217,18 @@ def measured_accel_noise_m_s2() -> tuple[float, EvidenceRecord]:
     )
 
 
-def vehicle_receiver() -> ReceiverProfile:
-    """The report's road vehicle unit: IMU, CAN wheel odometry, map."""
+def vehicle_receiver(lateral_sigma_m: Optional[float] = None) -> ReceiverProfile:
+    """The report's road vehicle unit: IMU, CAN wheel odometry, map.
+
+    ``lateral_sigma_m`` switches on the map's across-road constraint. Pass
+    it only where the corridor direction is known and fixed, which in this
+    project means the rural highway and the tunnel. The city grid has
+    streets running both ways and the test track turns, so there is no
+    single across-road axis to constrain and the argument does not apply.
+    """
     accel_noise, accel_evidence = measured_accel_noise_m_s2()
     return ReceiverProfile(
-        key="vehicle",
+        key="vehicle" if lateral_sigma_m is None else "vehicle-corridor",
         display_name="Kara aracı alıcısı (IMU + odometri + harita)",
         imu=ImuSpec(
             heading_error_deg=3.5,
@@ -221,8 +243,11 @@ def vehicle_receiver() -> ReceiverProfile:
         ),
         map_constraint=MapConstraintSpec(
             height_sigma_m=0.5,
-            lateral_sigma_m=None,
-            evidence=_MAP_EVIDENCE,
+            lateral_sigma_m=lateral_sigma_m,
+            evidence=(
+                _MAP_EVIDENCE if lateral_sigma_m is None
+                else _CORRIDOR_MAP_EVIDENCE
+            ),
         ),
         ranging_rate_hz=5.0,
         filter_rate_hz=10.0,

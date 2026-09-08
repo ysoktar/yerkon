@@ -71,12 +71,12 @@ bedava seçim.
 
 | Bant | HPE P50 | HPE P95 |
 |---|---|---|
-| 203 kHz | 21,46 m | 65,66 m |
-| 406 kHz | 13,98 m | 47,51 m |
-| 812 kHz | **8,43 m** | **35,80 m** |
-| 1625 kHz | 15,70 m | 50,45 m |
+| 203 kHz | 5,82 m | 12,07 m |
+| 406 kHz | 3,22 m | 5,96 m |
+| 812 kHz | **2,55 m** | **3,86 m** |
+| 1625 kHz | 3,54 m | 6,79 m |
 
-Maliyet bant genişliğiyle değişmiyor, hata %40 düşüyor. Optimum şehir
+Maliyet bant genişliğiyle değişmiyor, hata %21 düşüyor. Optimum şehir
 içindekinden bir katlama geniş, çünkü koridor daha açık: engellenen link
 oranı %35 değil %15. Çok yolluluk seçme hatası daha seyrek olduğu için
 zamanlama çözünürlüğü kazancı daha uzun sürüyor.
@@ -87,17 +87,18 @@ Bu bir konfigürasyon değişikliği, donanım değişikliği değil.
 
 | Levha aralığı | Düğüm | TL/km² | HPE P50 | HPE P95 | VPE P95 |
 |---|---|---|---|---|---|
-| 500 m (eski) | 187 | 200.854 | 8,43 m | 35,80 m | 0,98 m |
-| 750 m | **131** | **140.705** | **7,81 m** | **26,49 m** | 1,03 m |
-| 1000 m | 103 | 110.631 | 9,33 m | 57,65 m | 1,48 m |
-| 1500 m | 75 | 80.557 | 13,76 m | 63,30 m | 1,26 m |
+| 500 m (eski) | 187 | 200.854 | 2,88 m | 7,57 m | 0,98 m |
+| 750 m | **131** | **140.705** | **2,55 m** | **3,86 m** | 1,00 m |
+| 1000 m | 103 | 110.631 | 2,46 m | 11,07 m | 1,52 m |
+| 1500 m | 75 | 80.557 | 2,59 m | 7,39 m | 1,26 m |
 
 Şehir içindekiyle aynı etki. 750 m, 500 m'den %30 ucuz ve hem medyanda hem
 kuyrukta daha iyi, dolayısıyla bedava.
 
-750 m'den sonrası ödünleşime dönüyor ve kötü bir ödünleşim. 1000 m %21 daha
-tasarruf ediyor ama P95'i iki katına çıkarıyor. Kırsal satırın zaten en
-zayıf yanı kuyruğu, o yüzden orada durmadı.
+750 m'den sonrası ödünleşime dönüyor. 1000 m medyanda 9 cm kazandırıp
+kuyruğu üç katına çıkarıyor, 1500 m ise ikisinde de daha kötü. Medyan
+750 m'den sonra düz gidiyor çünkü onu yanal harita kısıtı belirliyor,
+kuyruk ise anchor seyrekleştikçe bozuluyor.
 
 ## Tünel
 
@@ -137,14 +138,19 @@ ve karar ona dayanıyor.
 |---|---|---|---|
 | Şehir içi | Izgara 150 m yerine 175 m | %27 ucuz, %16 daha doğru | bedava |
 | Şehir içi | Bant 406 kHz | zaten doğruymuş | doğrulama |
-| Kırsal | Bant 406 kHz yerine 812 kHz | %40 daha doğru, maliyet aynı | bedava |
-| Kırsal | Levha aralığı 500 m yerine 750 m | %30 ucuz, kuyruk %26 daha iyi | bedava |
+| Kırsal | Bant 406 kHz yerine 812 kHz | %21 daha doğru, maliyet aynı | bedava |
+| Kırsal | Levha aralığı 500 m yerine 750 m | %30 ucuz, kuyruk %49 daha iyi | bedava |
 | Tünel | Aralık 60 m | değişmedi | ödünleşim reddedildi |
 
 Üç bedava kazanç var ve üçü de konfigürasyon: iki aralık ve bir radyo
 ayarı. Ek donanım, ek düğüm, yeni parça yok. Şehir içi km² başına maliyet
 66.937 TL'den 49.179 TL'ye, kırsal 200.854 TL'den 140.705 TL'ye iniyor, ve
 her iki satır aynı anda daha doğru hale geliyor.
+
+Bunlara ek olarak kırsalda ve tünelde yanal harita kısıtı devreye alındı.
+O da ücretsiz, çünkü yüksekliği veren haritanın aynısı taşıt yolunun
+nerede geçtiğini de veriyor. Kırsal HPE P95'i 26,49 m'den 3,86 m'ye
+indiriyor, gerekçesi README'de.
 
 Bu seçimler üç varsayıma dayanıyor: engellenen link oranları (%35 ve %15),
 NLOS kanalının sertliği, şehir içi yol kaybı üsteli. Üçü de bu projenin

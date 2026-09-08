@@ -102,6 +102,14 @@ class FusionSettings:
     use_odometry: bool = True
     use_heading: bool = True
     use_map_height: bool = True
+    #: Apply the map's lateral constraint as well as its height.
+    #:
+    #: A road map that knows the surface elevation also knows where the
+    #: carriageway runs. On a straight corridor that pins the across-road
+    #: coordinate the same way the height constraint pins the vertical, and
+    #: it matters for the same reason: a line of anchors along a corridor
+    #: barely observes the across-road axis.
+    use_map_lateral: bool = True
 
 
 @dataclass(frozen=True)
@@ -110,6 +118,14 @@ class TrackResult:
 
     error_horizontal_m: np.ndarray
     error_vertical_m: np.ndarray
+    #: Horizontal error split along the two ground axes, signed.
+    #:
+    #: The magnitude alone hides the shape of the problem in a corridor.
+    #: Anchors strung along one line say a lot about how far the receiver
+    #: is from that line and little about where it is along it, so the two
+    #: axes behave differently and only the split shows it.
+    error_x_m: np.ndarray
+    error_y_m: np.ndarray
     error_3d_m: np.ndarray
     ranging_epochs: int
     gated_range_fraction: float
@@ -194,6 +210,10 @@ def run_filter(
     map_bias = 0.0
     if receiver.map_constraint is not None:
         map_bias = rng.normal(0.0, receiver.map_constraint.height_sigma_m)
+        lateral_sigma = receiver.map_constraint.lateral_sigma_m
+        lateral_bias = (
+            rng.normal(0.0, lateral_sigma) if lateral_sigma else 0.0
+        )
 
     ranging_period = max(int(round(receiver.filter_rate_hz / receiver.ranging_rate_hz)), 1)
 
@@ -206,6 +226,8 @@ def run_filter(
     accel_noise = receiver.imu.accel_noise_m_s2 if receiver.imu else 1.0
 
     errors_h: list[float] = []
+    errors_x: list[float] = []
+    errors_y: list[float] = []
     errors_v: list[float] = []
     errors_3d: list[float] = []
     epoch_times: list[float] = []
@@ -373,19 +395,54 @@ def run_filter(
                 state, covariance, jacobian, innovation, innovation_var
             )
 
+        # --- map: the carriageway the receiver is on ---
+        #
+        # Drawn once per pass like the height bias, because a map is wrong
+        # in a fixed way rather than a noisy one.
+        #
+        # The corridor here runs along x, so the across-road axis is y.
+        # This is a straight-corridor simplification: on a curving road the
+        # constraint acts along the local normal to the centreline, not
+        # along a fixed axis, and the filter would need the heading to
+        # rotate it. The rural track is straight, so the two coincide.
+        lateral_sigma = (
+            receiver.map_constraint.lateral_sigma_m
+            if receiver.map_constraint is not None
+            else None
+        )
+        if settings.use_map_lateral and lateral_sigma:
+            measured_lateral = (
+                truth_p[1] + lateral_bias + rng.normal(0.0, MAP_WHITE_NOISE_M)
+            )
+            jacobian = np.zeros(7)
+            jacobian[1] = 1.0
+            innovation = measured_lateral - state[1]
+            innovation_var = (
+                float(jacobian @ covariance @ jacobian)
+                + lateral_sigma**2
+                + MAP_WHITE_NOISE_M**2
+            )
+            state, covariance = _update(
+                state, covariance, jacobian, innovation, innovation_var
+            )
+
         error = state[:3] - truth_p
         errors_h.append(float(np.hypot(error[0], error[1])))
+        errors_x.append(float(error[0]))
+        errors_y.append(float(error[1]))
         errors_v.append(float(abs(error[2])))
         errors_3d.append(float(np.linalg.norm(error)))
         epoch_times.append(float(track.t_s[step]))
 
     if not errors_3d:
         empty = np.array([])
-        return TrackResult(empty, empty, empty, 0, 0.0, None)
+        return TrackResult(empty, empty, empty, empty, empty, 0, 0.0, None)
 
     return TrackResult(
         error_horizontal_m=np.array(errors_h),
         error_vertical_m=np.array(errors_v),
+        error_x_m=np.array(errors_x),
+        error_y_m=np.array(errors_y),
         error_3d_m=np.array(errors_3d),
         ranging_epochs=ranging_epochs,
         gated_range_fraction=(gated / offered) if offered else 0.0,

@@ -511,7 +511,7 @@ def rural_scenario(seed: int = SEED) -> Scenario:
             dt_s=0.1,
             lane_change_amplitude_m=3.0,
         ),
-        receiver=vehicle_receiver(),
+        receiver=vehicle_receiver(lateral_sigma_m=CORRIDOR_LATERAL_SIGMA_M),
         path=zigzag_path(
             "rural-corridor-sweep",
             x_start=500.0,
@@ -634,6 +634,23 @@ URBAN_GRID_SPACING_M = 175.0
 #: doubles P95 to save a further 21%, which is the wrong trade for a row
 #: whose weakest number is already its tail.
 RURAL_SIGN_SPACING_M = 750.0
+
+#: Across-road position uncertainty from the map, on a corridor, in metres.
+#:
+#: Applied to the rural highway and the tunnel, not to the city. A corridor
+#: strings every anchor along one line, and range is then about nine times
+#: more sensitive to along-road position than across it, so the across-road
+#: axis is the one the radio barely sees. The map that already supplies the
+#: surface elevation also says where the carriageway runs, and using it
+#: fixes that axis the same way the elevation fixes the vertical.
+#:
+#: Measured on the rural row: without it HPE P50 is 7,81 m and P95 26,49 m;
+#: with it 2,55 m and 3,86 m.
+#:
+#: 3,0 m says which carriageway, not which lane. The city is excluded
+#: because its streets run both ways and its test track turns, so there is
+#: no single across-road axis.
+CORRIDOR_LATERAL_SIGMA_M = 3.0
 
 SX1280_CARRIER_HZ = 2450e6
 UWB_CARRIER_HZ = 6489.6e6
@@ -830,7 +847,7 @@ def critical_zone_scenario(seed: int = SEED) -> Scenario:
             dt_s=0.1,
             lane_change_amplitude_m=1.5,
         ),
-        receiver=vehicle_receiver(),
+        receiver=vehicle_receiver(lateral_sigma_m=CORRIDOR_LATERAL_SIGMA_M),
         path=straight_line_path(
             "tunnel-run",
             (320.0, 0.45 * width_m, 1.5),

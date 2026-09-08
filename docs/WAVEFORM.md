@@ -127,10 +127,10 @@ Kararı menzil hatası değil konum hatası versin. Senaryoların kendisiyle
 
 | Bant | Şehir içi (%35 engelli) | Kırsal (%15 engelli) |
 |---|---|---|
-| 203 kHz | 2,82 m | 21,46 m |
-| 406 kHz | **1,64 m** | 13,98 m |
-| 812 kHz | 2,35 m | **8,43 m** |
-| 1625 kHz | 5,01 m | 15,70 m |
+| 203 kHz | 2,82 m | 5,82 m |
+| 406 kHz | **1,64 m** | 3,22 m |
+| 812 kHz | 2,35 m | **2,55 m** |
+| 1625 kHz | 5,01 m | 3,54 m |
 
 İkisi de U biçimli, ve optimum ortam açıldıkça genişliyor. Şehir içinde
 406 kHz, kırsalda 812 kHz. Tablo bu iki değerle üretiliyor.

@@ -90,8 +90,8 @@ dikey hata her senaryoda on kattan fazla artıyor. Karasal geometri yüksekliği
 bilinmesi.
 
 **Tünelde de esas katkı dikeyde.** Odometri, pusula ve harita
-kapatıldığında yatay P95 1,45 m'den 2,55 m'ye, dikey P95 ise 0,69 m'den
-6,70 m'ye çıkıyor. Burada daha önce "yardım olmadan filtre ıraksıyor,
+kapatıldığında yatay P95 1,28 m'den 1,71 m'ye, dikey P95 ise 0,70 m'den
+5,69 m'ye çıkıyor. Burada daha önce "yardım olmadan filtre ıraksıyor,
 yatay P95 295 m'ye çıkıyor" yazmıştım. O bir artefaktmış ve geri alındı,
 gerekçesi [WAVEFORM.md](WAVEFORM.md#geri-alınan-bir-bulgu) içinde.
 
@@ -99,8 +99,10 @@ gerekçesi [WAVEFORM.md](WAVEFORM.md#geri-alınan-bir-bulgu) içinde.
 odometresiz HPE P50 1,76 m, odometriyle 1,64 m. Sebebi %2'lik ölçek
 sapması: 13,9 m/s hızda 0,28 m/s'lik bir hız sapması demek ve şehir içinde
 radyo geometrisi zaten iyi olduğu için odometri bilgi eklemek yerine sapma
-ekliyor. Kırsalda tersi oluyor, geometri zayıf olduğu için odometri fayda
-sağlıyor: P95 odometresiz 29,66 m, odometriyle 26,49 m.
+ekliyor. Kırsalda yanal harita kısıtı geometri boşluğunu zaten kapattığı
+için odometri orada da bilgi eklemiyor: P50 odometresiz 2,10 m,
+odometriyle 2,55 m. Kısıt eklenmeden önce tersiydi, yani bir yardımcı
+sensörün faydası kapattığı boşluk başka bir şeyle kapanınca kayboluyor.
 
 Aynı sebeple harita kısıtı yatayda küçük bir bedel doğuruyor: yanlış
 sabitlenen bir yükseklik, menzilleri açıklamak için x-y'yi bir miktar

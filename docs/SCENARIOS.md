@@ -142,15 +142,19 @@ kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır 
 | En kötü VDOP | 40,21 |
 | Tek atım HPE P50 / P95 | 5,91 m / 35,24 m |
 | Tek atım VPE P50 / P95 | 6,56 m / 30,40 m |
-| Filtreli HPE P50 / P95 | **7,81 m / 26,49 m** |
-| Filtreli VPE P50 / P95 | **0,35 m / 1,03 m** |
+| Filtreli HPE P50 / P95 | **2,55 m / 3,86 m** |
+| Filtreli VPE P50 / P95 | **0,35 m / 1,00 m** |
 | Kullanılabilirlik | %100,0 |
 | CAPEX | 140.705 TL/km², 3.377 TL/km |
 
 Sürüş izi: 110 km/h'de koridor boyunca 180 saniye (5,5 km), ±3 m şerit
-değişimiyle. Kırsal, odometrinin en çok fayda verdiği senaryo: radyo
-geometrisi zayıf olduğu için tekerlek hızı gerçek bilgi ekliyor
-(filtreli HPE P95 odometresiz 25,54 m, odometriyle 21,65 m).
+değişimiyle.
+
+Kırsalın yatay hatası yol boyunca değil, yola dik yönde. Anchor'lar yol
+boyunca 42 km'ye yayılırken yola dik yönde 60 m'lik bir şeritte kalıyor,
+dolayısıyla menzil ölçümü yol boyunca konuma dik yöndekinden dokuz kat
+duyarlı. Yanal harita kısıtı bunu kapatıyor ve HPE P95'i 26,49 m'den
+3,86 m'ye indiriyor. Ayrıntısı README'de.
 
 ### Nokta sıklığı ne satın alıyor
 
