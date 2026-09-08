@@ -1,10 +1,10 @@
 function yerkon_env_check()
 %YERKON_ENV_CHECK Report what this MATLAB install can run.
 %
-%   Run this first and send the output back. The ranging simulation is
-%   written in base MATLAB on purpose and needs no toolbox, but knowing
-%   what is available decides whether the IMU and channel models can be
-%   taken from MathWorks' own implementations instead of hand-rolled ones.
+%   Run this first. The ranging simulation is written in base MATLAB on
+%   purpose and needs no toolbox, but knowing what is available decides
+%   whether the IMU and channel models can be taken from MathWorks' own
+%   implementations instead of hand-rolled ones.
 %
 %   Usage:
 %       cd matlab
