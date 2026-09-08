@@ -65,7 +65,7 @@ import numpy as np
 
 from yerkon.path import Track
 from yerkon.receiver import ReceiverProfile
-from yerkon.simulate import select_anchors, solve_position_3d
+from yerkon.simulate import select_anchor_indices, solve_position_3d
 
 #: Share of the ranging error variance treated as a fixed per-anchor
 #: offset rather than as noise that averages away. The published SX1280
@@ -140,11 +140,18 @@ def run_filter(
     seed: int,
     settings: FusionSettings = FusionSettings(),
     minimum_anchors: int = 4,
+    solver_anchors: Optional[np.ndarray] = None,
 ) -> TrackResult:
     """Run one filtered pass along a track and return its per-epoch errors."""
     rng = np.random.default_rng(seed)
     dt = track.dt_s
     n_anchors = len(anchors)
+    # Ranges are measured against the true anchor positions; the filter
+    # solves and updates against the surveyed ones. Passing the same array
+    # for both is the perfect-survey case.
+    if solver_anchors is None:
+        solver_anchors = anchors
+    solver_anchors = np.asarray(solver_anchors, dtype=float)
 
     sigma_bias, sigma_white = _range_error_split(
         sigma_range_m, settings.bias_variance_fraction
@@ -216,23 +223,18 @@ def run_filter(
         nlos_active = np.where(flips, redraw, nlos_active)
 
         do_ranging = (step % ranging_period) == 0
-        visible = (
-            select_anchors(truth_p, anchors, max_range_m, max_anchors_per_fix)
-            if do_ranging
-            else np.empty((0, 3))
-        )
+        visible = np.empty((0, 3))
+        visible_surveyed = np.empty((0, 3))
         visible_index = None
-        if do_ranging and len(visible):
-            # Recover which anchors were chosen so their fixed offsets follow them.
-            distances = np.linalg.norm(anchors - truth_p[None, :], axis=1)
-            in_range = (
-                distances <= max_range_m if max_range_m is not None
-                else np.ones(n_anchors, dtype=bool)
+        if do_ranging:
+            visible_index = select_anchor_indices(
+                truth_p, anchors, max_range_m, max_anchors_per_fix
             )
-            candidates = np.flatnonzero(in_range)
-            order = candidates[np.argsort(distances[candidates])]
-            visible_index = order[: len(visible)]
-            visible = anchors[visible_index]
+            if len(visible_index):
+                visible = anchors[visible_index]
+                visible_surveyed = solver_anchors[visible_index]
+            else:
+                visible_index = None
 
         # --- initialisation: a receiver starts from a single-epoch fix ---
         if state is None:
@@ -242,7 +244,7 @@ def run_filter(
                 truth_p, visible, visible_index, anchor_bias, nlos_active,
                 nlos_bias_m, sigma_white, rng,
             )
-            estimate, ok = solve_position_3d(visible, measured)
+            estimate, ok = solve_position_3d(visible_surveyed, measured)
             if not ok:
                 continue
             state = np.concatenate(
@@ -289,7 +291,9 @@ def run_filter(
             # The filter is told the total spread, including the part it
             # cannot average away, or it would be overconfident.
             r_range = sigma_white**2 + sigma_bias**2 + common_bias_m**2
-            for anchor, measurement in zip(visible[delivered], measured[delivered]):
+            for anchor, measurement in zip(
+                visible_surveyed[delivered], measured[delivered]
+            ):
                 offered += 1
                 offset = state[:3] - anchor
                 predicted = float(np.linalg.norm(offset))

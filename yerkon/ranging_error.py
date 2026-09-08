@@ -79,11 +79,33 @@ class RangingErrorModel:
     #: waveform simulation through a channel does. Layering a separate NLOS
     #: bias on top of such a model counts the same physics twice.
     includes_multipath: bool = False
+    #: How to rebuild this model with a different random seed.
+    #:
+    #: ``sample`` closes over a generator, so it carries state: calling it
+    #: twice gives different draws. That is correct for one run and wrong
+    #: for comparing two, because the second scenario in a process would
+    #: silently draw from a different point in the stream. Any code that
+    #: runs more than one scenario has to reseed first, and needs a way to
+    #: do it that does not know how the model was built.
+    respawn: Optional[Callable[[int], "RangingErrorModel"]] = field(
+        default=None, repr=False
+    )
     #: Link distances the model's evidence actually covers, in metres.
     #: ``None`` means the model makes no distance-dependent claim, so there
     #: is nothing to extrapolate beyond. Reporting a link as outside the
     #: envelope only means something when the model has one.
     valid_range_m: Optional[tuple[float, float]] = None
+
+    def reseed(self, seed: int) -> "RangingErrorModel":
+        """An identical model whose sampler starts from ``seed``.
+
+        Returns self where the model does not know how to rebuild itself,
+        which keeps this safe to call on any model but means the caller
+        should set ``respawn`` on models it intends to compare.
+        """
+        if self.respawn is None:
+            return self
+        return self.respawn(seed)
 
     def sigma_m(self, n: int = 4000) -> float:
         """Standard deviation of the sampled error, estimated by sampling.
@@ -141,6 +163,7 @@ def build_sx1280_model(seed: int = 0, calibrated: bool = True) -> RangingErrorMo
         population_errors_m=tuple(float(v) for v in population),
         mean_bias_m=0.0 if calibrated else bias,
         valid_range_m=ROBINSON_VALID_RANGE_M,
+        respawn=lambda s: build_sx1280_model(seed=s, calibrated=calibrated),
     )
 
 
@@ -175,6 +198,12 @@ def build_dwm3000_model(
             ).format(nlos_probability, nlos_bias_m),
         ),
         sample=sample,
+        respawn=lambda s: build_dwm3000_model(
+            seed=s,
+            sigma_m=sigma_m,
+            nlos_probability=nlos_probability,
+            nlos_bias_m=nlos_bias_m,
+        ),
     )
 
 
@@ -221,4 +250,7 @@ def add_nlos(
         population_errors_m=model.population_errors_m,
         mean_bias_m=model.mean_bias_m,
         valid_range_m=model.valid_range_m,
+        respawn=lambda s: add_nlos(
+            model.reseed(s), s, nlos_probability, nlos_bias_m
+        ),
     )

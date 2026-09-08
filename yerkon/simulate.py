@@ -156,12 +156,28 @@ def select_anchors(
     average) and buys a lot of evidence: the near links are the ones inside
     the range envelope the SX1280 error data actually covers.
     """
+    return anchors[select_anchor_indices(position, anchors, max_range_m, max_anchors)]
+
+
+def select_anchor_indices(
+    position: np.ndarray,
+    anchors: np.ndarray,
+    max_range_m: Optional[float],
+    max_anchors: Optional[int] = None,
+) -> np.ndarray:
+    """Indices of the selected anchors, for callers that need to pair them.
+
+    A caller that models survey error needs the true position of an anchor
+    to generate the range and the surveyed position of the same anchor to
+    solve with. Selecting by index keeps those two aligned; selecting by
+    position would return copies with no way back to the row they came from.
+    """
     mask = anchors_in_range(position, anchors, max_range_m)
-    visible = anchors[mask]
-    if max_anchors is None or len(visible) <= max_anchors:
-        return visible
-    distances = true_ranges(np.asarray(position, dtype=float), visible)
-    return visible[np.argsort(distances)[:max_anchors]]
+    indices = np.flatnonzero(mask)
+    if max_anchors is None or len(indices) <= max_anchors:
+        return indices
+    distances = true_ranges(np.asarray(position, dtype=float), anchors[indices])
+    return indices[np.argsort(distances)[:max_anchors]]
 
 
 def anchors_in_range(
@@ -194,6 +210,7 @@ def simulate_path_fixes(
     max_range_m: Optional[float] = None,
     max_anchors_per_fix: Optional[int] = None,
     sigma_for_geometry_check_m: float = 1.0,
+    solver_anchors: Optional[np.ndarray] = None,
 ) -> list[FixResult]:
     """Simulate repeated position fixes along a path.
 
@@ -218,6 +235,14 @@ def simulate_path_fixes(
     anchors = np.asarray(anchors, dtype=float)
     if anchors.ndim != 2 or anchors.shape[1] != 3:
         raise ValueError("anchors must be an (N, 3) array")
+    # The ranges come from where the anchors really are; the solver works
+    # from where the survey says they are. Passing the same array for both
+    # is the perfect-survey case.
+    if solver_anchors is None:
+        solver_anchors = anchors
+    solver_anchors = np.asarray(solver_anchors, dtype=float)
+    if solver_anchors.shape != anchors.shape:
+        raise ValueError("solver_anchors must have the same shape as anchors")
     RangingMethod(method)
     rng = np.random.default_rng(seed)
     results: list[FixResult] = []
@@ -225,9 +250,11 @@ def simulate_path_fixes(
     for idx in range(path.n_samples):
         true_p = np.array([path.x_m[idx], path.y_m[idx], path.z_m[idx]])
         reachable = int(anchors_in_range(true_p, anchors, max_range_m).sum())
-        visible = select_anchors(
+        chosen = select_anchor_indices(
             true_p, anchors, max_range_m, max_anchors_per_fix
         )
+        visible = anchors[chosen]
+        visible_surveyed = solver_anchors[chosen]
         n_visible = int(len(visible))
         solvable = n_visible >= minimum_anchors
 
@@ -283,11 +310,15 @@ def simulate_path_fixes(
                 )
                 continue
 
-            arrived = visible[delivered]
-            measured = true_ranges(true_p, arrived) + np.asarray(
+            # Measure against the true positions, solve against the
+            # surveyed ones. The gap between them is the survey error, and
+            # it enters every fix the same way rather than averaging out.
+            measured = true_ranges(true_p, visible[delivered]) + np.asarray(
                 error_sampler(n_delivered), dtype=float
             )
-            estimate, solved = solve_position_3d(arrived, measured)
+            estimate, solved = solve_position_3d(
+                visible_surveyed[delivered], measured
+            )
 
             if not solved:
                 results.append(

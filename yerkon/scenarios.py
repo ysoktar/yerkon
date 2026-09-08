@@ -17,6 +17,7 @@ how each table column is computed.
 """
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -61,6 +62,12 @@ from yerkon.ranging_error import (
     build_sx1280_model,
 )
 from yerkon.link_snr import LinkBudget, PATH_LOSS_EXPONENTS
+from yerkon.survey import (
+    SURVEY_BY_ENVIRONMENT,
+    SurveySpec,
+    rms_offset_m,
+    surveyed_positions,
+)
 from yerkon.matlab_import import build_model_from_cases, load_trials
 from yerkon.simulate import (
     RangingMethod,
@@ -150,6 +157,14 @@ class Scenario:
     corridor_length_km: Optional[float] = None
     parameter_evidence: tuple[EvidenceRecord, ...] = field(default_factory=tuple)
     notes: tuple[str, ...] = field(default_factory=tuple)
+    #: How well this deployment knows where its own anchors are. The solver
+    #: works from the surveyed positions while the ranges come from the true
+    #: ones, so the residual survey error enters every fix as a fixed
+    #: offset. Leave it ``None`` to assume a perfect survey.
+    survey: Optional[SurveySpec] = None
+    #: Coordinate index that measures distance from the survey origin, for a
+    #: traverse whose error grows along a route. Only the tunnel needs it.
+    survey_traverse_axis: Optional[int] = None
 
     @property
     def evidence_records(self) -> tuple[EvidenceRecord, ...]:
@@ -164,7 +179,33 @@ class Scenario:
 
     @property
     def anchors(self) -> np.ndarray:
+        """Where the anchors really are."""
         return np.vstack([g.positions for g in self.groups])
+
+    @property
+    def surveyed_anchors(self) -> np.ndarray:
+        """Where the survey says they are, which is what the solver gets.
+
+        Drawn once per scenario from a fixed seed, because an installation
+        is surveyed once. Redrawing it per fix would let the filter average
+        the error away, and a survey error is exactly the kind that does
+        not average away.
+        """
+        if self.survey is None:
+            return self.anchors
+        return surveyed_positions(
+            self.anchors,
+            self.survey,
+            seed=SEED + 4001,
+            traverse_axis=self.survey_traverse_axis,
+        )
+
+    @property
+    def survey_rms_offset_m(self) -> float:
+        """How far the surveyed positions sit from the true ones, RMS."""
+        if self.survey is None:
+            return 0.0
+        return rms_offset_m(self.anchors, self.surveyed_anchors)
 
     @property
     def anchor_count(self) -> int:
@@ -415,6 +456,7 @@ def urban_scenario(calibrated: bool = True, seed: int = SEED) -> Scenario:
         area_km2=(side_m / 1000.0) ** 2,
         max_link_range_m=URBAN_LINK_RANGE_M,
         packet_loss_probability=0.02,
+        survey=SURVEY_BY_ENVIRONMENT["urban"],
         parameter_evidence=(URBAN_LINK_RANGE.evidence, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
         notes=(
             "35% of links are modelled as hard NLOS: the simulated channel "
@@ -482,6 +524,7 @@ def rural_scenario(seed: int = SEED) -> Scenario:
         area_km2=(length_m / 1000.0) * (2 * half_width_m / 1000.0),
         max_link_range_m=RURAL_LINK_RANGE_M,
         packet_loss_probability=0.01,
+        survey=SURVEY_BY_ENVIRONMENT["rural"],
         corridor_length_km=length_m / 1000.0,
         parameter_evidence=(RURAL_LINK_RANGE.evidence, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
         notes=(
@@ -694,6 +737,7 @@ def _with_hardware_offset(model: RangingErrorModel) -> RangingErrorModel:
             ).format(offset),
         ),
         sample=lambda n: base(n) + offset,
+        respawn=lambda s: _with_hardware_offset(model.reseed(s)),
         population_errors_m=(
             tuple(v + offset for v in model.population_errors_m)
             if model.population_errors_m
@@ -777,6 +821,9 @@ def critical_zone_scenario(seed: int = SEED) -> Scenario:
         area_km2=(length_m / 1000.0) * (width_m / 1000.0),
         max_link_range_m=TUNNEL_LINK_RANGE_M,
         packet_loss_probability=0.03,
+        survey=SURVEY_BY_ENVIRONMENT["tunnel"],
+        # The tunnel runs along x, so distance from the portal is x.
+        survey_traverse_axis=0,
         corridor_length_km=length_m / 1000.0,
         parameter_evidence=(TUNNEL_LINK_RANGE.evidence, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
         notes=(
@@ -935,6 +982,9 @@ def run_fused(
     pass, so a single pass would report one draw of them rather than their
     spread.
     """
+    scenario = dataclasses.replace(
+        scenario, error_model=scenario.error_model.reseed(seed)
+    )
     sigma = scenario.error_model.sigma_m()
     nlos_probability, nlos_bias_m = _nlos_terms(scenario)
 
@@ -944,11 +994,16 @@ def run_fused(
     convergences: list[float] = []
     gated: list[float] = []
     warmup_steps = int(FILTER_WARMUP_S / scenario.track.dt_s)
+    # Surveyed once, then reused for every pass. An installation is
+    # surveyed once, so redrawing it per pass would let the spread over
+    # passes hide the error instead of showing it.
+    surveyed = scenario.surveyed_anchors
 
     for run in range(n_runs):
         result = run_filter(
             track=scenario.track,
             anchors=scenario.anchors,
+            solver_anchors=surveyed,
             receiver=scenario.receiver,
             sigma_range_m=sigma,
             common_bias_m=scenario.error_model.mean_bias_m,
@@ -1033,6 +1088,13 @@ def run_scenario(
     n_track_runs: int = N_TRACK_RUNS,
 ) -> ScenarioResult:
     """Simulate one scenario end to end and collect every reported metric."""
+    # Reseed first. The error model's sampler carries generator state, so
+    # running a second scenario in the same process would otherwise start
+    # from wherever the first one stopped, and two runs of the same
+    # scenario would disagree. Every comparison in docs/ depends on this.
+    scenario = dataclasses.replace(
+        scenario, error_model=scenario.error_model.reseed(seed)
+    )
     sigma = scenario.error_model.sigma_m()
     fixes = simulate_path_fixes(
         scenario_id=scenario.key,
@@ -1047,6 +1109,7 @@ def run_scenario(
         max_range_m=scenario.max_link_range_m,
         max_anchors_per_fix=MAX_ANCHORS_PER_FIX,
         sigma_for_geometry_check_m=sigma,
+        solver_anchors=scenario.surveyed_anchors,
     )
     capex = CostBreakdown(anchor_cost=scenario.capex_total_tl)
     return ScenarioResult(

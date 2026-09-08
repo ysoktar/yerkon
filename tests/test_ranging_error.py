@@ -83,3 +83,34 @@ def test_evidence_without_a_scope_is_refused():
             source_name="something",
             source_scope="",
         )
+
+
+def test_a_model_can_be_reseeded_so_two_runs_agree():
+    """The sampler closes over a generator, so it carries state.
+
+    Without reseeding, the second scenario in a process draws from
+    wherever the first one stopped, and two runs of the same scenario
+    disagree. Every swept comparison in docs/ depends on this holding.
+    """
+    model = build_sx1280_model(seed=3, calibrated=True)
+    first = model.sample(500)
+    drifted = model.sample(500)
+    assert not np.allclose(first, drifted), "sampler must be stateful"
+
+    again = model.reseed(3).sample(500)
+    assert np.allclose(first, again)
+
+
+def test_reseeding_survives_the_nlos_wrapper():
+    base = build_sx1280_model(seed=5, calibrated=True)
+    layered = add_nlos(base, seed=11, nlos_probability=0.4, nlos_bias_m=2.0)
+    assert layered.respawn is not None, "the wrapper must know how to rebuild"
+
+    # Reseeding rebuilds the whole chain from one seed, so it does not
+    # reproduce a model whose two layers were seeded separately. What
+    # run_scenario needs is weaker and is what this checks: reseeding to
+    # the same value twice gives the same draws, whatever state the
+    # sampler was left in.
+    first = layered.reseed(7).sample(4000)
+    layered.sample(4000)
+    assert np.allclose(layered.reseed(7).sample(4000), first)

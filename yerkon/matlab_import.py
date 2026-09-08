@@ -206,6 +206,7 @@ def build_model_from_cases(
     if not cases:
         raise ValueError("build_model_from_cases needs at least one case")
 
+    original_cases = tuple(cases)
     if budget is not None:
         cases = [realistic_trials(c, budget, max_range_m) for c in cases]
 
@@ -275,6 +276,15 @@ def build_model_from_cases(
         sample=lambda n: rng.choice(population, size=n, replace=True),
         population_errors_m=tuple(float(v) for v in population),
         mean_bias_m=0.0 if calibrated else bias,
+        respawn=lambda s: build_model_from_cases(
+            original_cases,
+            name=name,
+            seed=s,
+            calibrated=calibrated,
+            budget=budget,
+            max_range_m=max_range_m,
+            condition_weights=condition_weights,
+        ),
         # The channel is already in these errors, so the scenario must not
         # add its own NLOS term on top.
         includes_multipath=True,
