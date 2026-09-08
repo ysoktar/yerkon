@@ -151,6 +151,21 @@ E28_COMPLIANCE = ComplianceFinding(
     ),
 )
 
+#: What to do about the finding above, and why it is cheap.
+#:
+#: Turning the transmitter down to the legal 12.1 dBm does not cost the
+#: rural row anything. At SF10 the link still reaches roughly 5 km, and the
+#: scenario only asks for 3000 m, so the node spacing and the CAPEX are
+#: unchanged. What the report should not do is keep quoting the 8 km
+#: reference distance, which is a 27 dBm figure and is not available under
+#: licence-exempt operation.
+E28_REMEDY = (
+    "Run the module at the legal power. The rural corridor needs 3000 m "
+    "and the licence-exempt configuration reaches about 5 km at SF10, so "
+    "nothing about the layout changes. Only the quoted 8 km reference "
+    "distance has to go."
+)
+
 #: How far the rural link reaches once the power is brought inside the
 #: licence-exempt cap, expressed as the exponent-dependent shrink factor.
 #: Free space is n=2; a highway verge with vegetation and terrain sits
@@ -162,9 +177,16 @@ def range_scale_for_power_cut(excess_db: float, exponent: float) -> float:
     """Fraction of the original range left after giving up ``excess_db``.
 
     Range goes as ``10 ** (-excess / (10 * n))`` for path loss exponent
-    ``n``. At n=2.7 and 14.9 dB of excess this is 0.28, so a reference
-    distance quoted at 27 dBm covers about a quarter of that once the
-    transmitter is legal at 12.1 dBm.
+    ``n``. At n=2.7 and 14.9 dB of excess this is 0.28.
+
+    Read this as a ratio and nothing more. It says what fraction of a
+    reference distance survives a power cut; it does not say whether the
+    deployment needs that distance. For the rural corridor it does not:
+    ``link_snr`` shows the legal 12.1 dBm still reaching about 5 km at
+    SF10, comfortably past the 3000 m the scenario models. The first
+    version of this analysis used this ratio on its own and concluded the
+    rural row needed four times the nodes. That was wrong, because it
+    left out the spreading gain.
     """
     if exponent <= 0:
         raise ValueError("exponent must be positive")

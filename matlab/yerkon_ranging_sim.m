@@ -185,7 +185,7 @@ function cases = buildCases()
 
 cases = struct('name', {}, 'radio', {}, 'condition', {}, 'bandwidthHz', {}, ...
     'carrierHz', {}, 'waveform', {}, 'estimator', {}, 'snrDb', {}, ...
-    'trueRangeM', {}, 'channel', {}, 'trialScale', {});
+    'trueRangeM', {}, 'channel', {}, 'trialScale', {}, 'spreadingFactor', {});
 
 % Distances each radio is simulated over. These have to cover the link
 % ranges the scenarios actually use, or the Python side ends up applying
@@ -195,10 +195,21 @@ cases = struct('name', {}, 'radio', {}, 'condition', {}, 'bandwidthHz', {}, ...
 sxRanges  = [50 250 400 1000 3000];
 uwbRanges = [10 50 100 150];
 
-% SNR sweep. The low end matters more than it looks: a 3000 m rural link
-% arrives far weaker than a 250 m urban one, and 5 dB is where a long link
-% at the legal 12.1 dBm actually sits.
-snrSweep = [5 10 15 20 25];
+% SNR sweeps, per radio, stated as the raw waveform SNR before any
+% correlation gain. The two radios need different sweeps because they earn
+% their gain differently.
+%
+% The SX1280 spreads over 2^10 chips, so it works far below the noise
+% floor: a 3000 m rural link arrives around -14 dB raw and still resolves,
+% because SF10 is worth 30 dB. Simulating it only at positive SNR would
+% miss the entire regime the long links live in.
+%
+% The UWB case here is a single pulse with no spreading, so its useful
+% range is the positive one. A real DW-series preamble accumulates over
+% many pulses and would sit lower; that is a limit of this model, and the
+% short links it is used for (150 m in the tunnel) keep it out of trouble.
+sxSnrSweep  = [-20 -12 -6 0 6 12 18 25];
+uwbSnrSweep = [5 10 15 20 25];
 
 % UWB uses leading-edge detection, which is what a DW-series chip does and
 % what makes multipath rejection possible at all. The narrowband SX1280
@@ -207,43 +218,45 @@ snrSweep = [5 10 15 20 25];
 % than the first arrival. Peak detection with a calibrated offset is what
 % that part actually does, and it is what Robinson's 2.83 m offset is.
 cases(end+1) = mkCase('uwb_los',  'DWM3000', 'LOS',  499.2e6, 6489.6e6, 'pulse', 'leading', ...
-    snrSweep, uwbRanges, svParams('industrial_los'), 1);
+    uwbSnrSweep, uwbRanges, svParams('industrial_los'), 1);
 cases(end+1) = mkCase('uwb_nlos', 'DWM3000', 'NLOS', 499.2e6, 6489.6e6, 'pulse', 'leading', ...
-    snrSweep, uwbRanges, svParams('industrial_nlos'), 4);
+    uwbSnrSweep, uwbRanges, svParams('industrial_nlos'), 4);
 % The tunnel case sets the tunnel row of the comparison table on its own,
 % and it is the slowest-converging case in the sweep, so it gets the most.
 cases(end+1) = mkCase('uwb_tunnel', 'DWM3000', 'TUNNEL', 499.2e6, 6489.6e6, 'pulse', 'leading', ...
-    snrSweep, [30 75 150], svParams('tunnel'), 10);
+    uwbSnrSweep, [30 75 150], svParams('tunnel'), 10);
 
 % All four SX1280 LoRa bandwidths, LOS and NLOS. 406 kHz is the setting
 % Robinson's published ranging sketches use, so that pair is the one with a
 % hardware measurement to check against; 1625 kHz is the widest the part
 % offers.
 cases(end+1) = mkCase('sx1280_203k_los',   'SX1280', 'LOS',  203e3,  2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('outdoor_los'), 1);
+    sxSnrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_203k_nlos',  'SX1280', 'NLOS', 203e3,  2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('urban_nlos'), 6);
+    sxSnrSweep, sxRanges, svParams('urban_nlos'), 4);
 cases(end+1) = mkCase('sx1280_406k_los',   'SX1280', 'LOS',  406e3,  2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('outdoor_los'), 1);
+    sxSnrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_406k_nlos',  'SX1280', 'NLOS', 406e3,  2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('urban_nlos'), 6);
+    sxSnrSweep, sxRanges, svParams('urban_nlos'), 4);
 cases(end+1) = mkCase('sx1280_812k_los',   'SX1280', 'LOS',  812e3,  2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('outdoor_los'), 1);
+    sxSnrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_812k_nlos',  'SX1280', 'NLOS', 812e3,  2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('urban_nlos'), 6);
+    sxSnrSweep, sxRanges, svParams('urban_nlos'), 4);
 cases(end+1) = mkCase('sx1280_1600k_los',  'SX1280', 'LOS',  1625e3, 2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('outdoor_los'), 1);
+    sxSnrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_1600k_nlos', 'SX1280', 'NLOS', 1625e3, 2450e6, 'chirp', 'peak', ...
-    snrSweep, sxRanges, svParams('urban_nlos'), 6);
+    sxSnrSweep, sxRanges, svParams('urban_nlos'), 4);
 end
 
-function c = mkCase(name, radio, condition, bw, fc, waveform, estimator, snrDb, ranges, channel, trialScale)
+function c = mkCase(name, radio, condition, bw, fc, waveform, estimator, snrDb, ranges, channel, trialScale, sf)
 %MKCASE One simulated configuration. TRIALSCALE multiplies the base trial
-%count for cases whose spread needs more samples to settle.
+%count for cases whose spread needs more samples to settle. SF is the LoRa
+%spreading factor, ignored by the UWB pulse waveform.
+if nargin < 12; sf = 10; end
 c = struct('name', name, 'radio', radio, 'condition', condition, ...
     'bandwidthHz', bw, 'carrierHz', fc, 'waveform', waveform, ...
     'estimator', estimator, 'snrDb', snrDb, 'trueRangeM', ranges, ...
-    'channel', channel, 'trialScale', trialScale);
+    'channel', channel, 'trialScale', trialScale, 'spreadingFactor', sf);
 end
 
 function p = svParams(kind)
@@ -352,9 +365,18 @@ switch cs.waveform
         w = exp(-(t.^2) / (2 * (tp / 2.5)^2));
         w = w(:) / norm(w);
     case 'chirp'
-        % SX1280 ranging uses a LoRa chirp. Sweep the full bandwidth over
-        % one symbol; a longer symbol buys processing gain, not resolution.
-        symbolTime = 64 / cs.bandwidthHz;
+        % SX1280 ranging uses a LoRa chirp: sweep the full bandwidth over
+        % one symbol of 2^SF chips. Bandwidth sets the timing resolution;
+        % the symbol length sets the processing gain, 10*log10(2^SF), which
+        % is what lets the link work far below thermal SNR.
+        %
+        % SF is a case parameter rather than a constant because it was
+        % wrong before. The first version hardcoded 64 chips, which is SF6.
+        % Semtech's ranging mode and Robinson's published measurements both
+        % run SF10, so the simulation was giving away 12 dB of processing
+        % gain that the real part has.
+        chips = 2^cs.spreadingFactor;
+        symbolTime = chips / cs.bandwidthHz;
         t = (0:1/fs:symbolTime).';
         k = cs.bandwidthHz / symbolTime;
         w = exp(1j * pi * (k * t.^2 - cs.bandwidthHz * t));
