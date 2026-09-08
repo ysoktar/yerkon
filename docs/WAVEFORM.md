@@ -23,6 +23,31 @@ mesafe × 300 deneme = vaka başına 3.600 denemeden geliyor (R2026a, 2026-09-07
 | MATLAB UWB tünel | −0,38 m | **0,45 m** | hedefin 4,5 katı |
 | MATLAB UWB NLOS | +0,97 m | 1,64 m | |
 
+## Aynı koşuyu tekrarlayınca ne kadar oynuyor
+
+Aynı vaka kümesi iki kez çalıştırıldı: bir kez seri, bir kez `parfor` ile.
+İşçiler kendi rastgele sayılarını çektiği için ikinci koşu birinciyi
+bit düzeyinde tekrarlamaz, dolayısıyla bu ikisi bağımsız iki örneklem.
+Aradaki fark, tek bir koşunun sayısına ne kadar güvenilebileceğini söylüyor:
+
+| Vaka | σ (seri) | σ (parfor) | Fark |
+|---|---|---|---|
+| uwb_los | 0,155 m | 0,155 m | %0,1 |
+| sx1280_1600k_los | 0,681 m | 0,668 m | %1,9 |
+| uwb_nlos | 1,639 m | 1,608 m | %1,8 |
+| sx1280_406k_nlos | 2,731 m | 2,667 m | %2,3 |
+| sx1280_406k_los | 2,682 m | 2,590 m | %3,4 |
+| sx1280_1600k_nlos | 16,613 m | 15,265 m | %8,1 |
+| **uwb_tunnel** | **0,452 m** | **0,384 m** | **%15,1** |
+
+Açık görüş hattı vakaları %3'ün altında oynuyor, yani bu sayılar üçüncü
+haneye kadar okunabilir. Ağır kuyruklu vakalar oynuyor: tünel σ'sı iki koşu
+arasında %15 fark ediyor, çünkü σ'yı birkaç büyük aykırı değer belirliyor ve
+3.600 deneme onları istikrarlı örneklemeye yetmiyor.
+
+Bunun pratik sonucu: **tünel satırının menzil hatası ±%15 belirsizlikle
+okunmalı.** Şehir içi ve kırsal satırlar için böyle bir uyarı gerekmiyor.
+
 ## Robinson'ın verisi 406 kHz'e oturuyor
 
 Robinson'ın ölçtüğü saçılma (2,94 m) ile 406 kHz simülasyonu (2,68 m)
