@@ -389,7 +389,7 @@ def urban_scenario(calibrated: bool = True, seed: int = SEED) -> Scenario:
         display_name="YERKON (Şehir İçi - {})".format(suffix),
         technology="Karasal PNT (SX1280/LoRa TWR)",
         environment="Dış",
-        groups=(urban_grid_layout(side_m=side_m, spacing_m=150.0, seed=seed),),
+        groups=(urban_grid_layout(side_m=side_m, spacing_m=URBAN_GRID_SPACING_M, seed=seed),),
         path=straight_line_path(
             "urban-diagonal",
             (60.0, 90.0, 1.5),
@@ -548,6 +548,28 @@ RANGING_BANDWIDTH_HZ = {
 #: the same fraction of links, and the resulting spread is much wider.
 URBAN_NLOS_FRACTION = 0.35
 RURAL_NLOS_FRACTION = 0.15
+
+#: Urban grid spacing, in metres.
+#:
+#: 175 m, not the 150 m an earlier version used, because 150 m is on the
+#: wrong side of a trade that has no downside. A fix uses at most
+#: MAX_ANCHORS_PER_FIX anchors, so once the receiver hears more than eight
+#: the extra ones are never used - packing the grid tighter then only
+#: shrinks the baseline the nearest eight span, which is worse geometry
+#: bought with more hardware. Measured over the spacing sweep, in HPE P50
+#: against CAPEX per km2:
+#:
+#:     125 m  81 nodes  110652 TL  2.14 m
+#:     150 m  49 nodes   66937 TL  1.93 m
+#:     175 m  36 nodes   49179 TL  1.60 m   <- both cheaper and better
+#:     225 m  25 nodes   34152 TL  1.93 m   <- same accuracy, half the cost
+#:
+#: 175 m beats 150 m on both axes at once, so nothing is being traded away
+#: here. 225 m halves the cost again at the accuracy 150 m gave, but it
+#: leaves only four anchors reachable at the worst point on the path,
+#: which is the bare minimum for a 3D fix and no margin for a lost packet.
+#: 175 m keeps five.
+URBAN_GRID_SPACING_M = 175.0
 
 SX1280_CARRIER_HZ = 2450e6
 UWB_CARRIER_HZ = 6489.6e6
