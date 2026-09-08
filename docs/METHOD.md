@@ -41,7 +41,7 @@ Tablodaki doğruluk değerleri filtre çıktısından gelir. Tek-atım zinciri
 geometriyi ve radyonun tek başına ne yapabildiğini ölçmek için korunur ve
 JSON çıktısında ayrıca raporlanır.
 
-Her senaryoda 24 yörünge noktası × 300 tekrar = 7.200 konum denemesi
+Her senaryoda 24 yörünge noktası × 300 tekrar = 7200 konum denemesi
 yapılır. Seed sabittir (42), yani aynı komut her zaman aynı sayıları verir.
 
 ## Sütun sütun
@@ -98,7 +98,7 @@ düştüğünde başarısız olur.
 
 Bu ayrım yalnızca anchor sayısının sınıra yakın olduğu yerde önemlidir.
 Şehir içi ve kırsalda alıcı sekiz ölçüm alır ve dördünü birden
-kaybetmediği sürece konum üretir; ikisinde de 7.200 denemenin tamamı
+kaybetmediği sürece konum üretir; ikisinde de 7200 denemenin tamamı
 başarılı. Tünelde beş ölçüm vardır ve ikisinin kaybı fix'i bitirir, bu da
 kullanılabilirliği %99,3'e indirir.
 
@@ -131,14 +131,14 @@ ortalayıp ikisini de yanlış anlatırdı.
 `(anchor sayısı × birim fiyat) / alan`.
 
 Birim fiyatlar raporun kendi 100 adetlik toplu alım tablosundan:
-şehir içi 1.366,07 TL, kırsal 1.082,68 TL, kritik bölge 1.634,44 TL.
+şehir içi 1366,07 TL, kırsal 1082,68 TL, kritik bölge 1634,44 TL.
 Yalnızca bileşen maliyeti; montaj, sertifikasyon, altyapı, enerji ve
 işçilik dahil değil.
 
 Koridor senaryolarında km başına maliyet de hesaplanır ve JSON çıktısında
 `capex_per_km_tl` alanında bulunur. İnce bir kurdele biçimindeki bir
-kurulumu km² üzerinden fiyatlamak yanıltıcıdır: tünel 1.363.123 TL/km²
-görünürken 27.230 TL/km'dir.
+kurulumu km² üzerinden fiyatlamak yanıltıcıdır: tünel 1363123 TL/km²
+görünürken 27230 TL/km'dir.
 
 ### OPEX
 
@@ -209,7 +209,7 @@ verdiği modülün yayımlanmış değerine bağlı olarak tutulur.
 | Senaryo | Modül | Yayımlanmış referans | Modellenen | Oran |
 |---|---|---|---|---|
 | Şehir içi | SX1280/SX1281 @ 12,5 dBm | 3,0 km | 400 m | %13 |
-| Kırsal | E28-2G4M27S @ 27 dBm | 8,0 km | 3.000 m | %37,5 |
+| Kırsal | E28-2G4M27S @ 27 dBm | 8,0 km | 3000 m | %37,5 |
 | Tünel | DWM3000 | yok | 150 m | yok |
 
 Referans mesafeler açık arazide, 5 dBi anten, 2,5 m yükseklik ve 1 kbps

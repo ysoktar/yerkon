@@ -2,23 +2,22 @@
 
 Bu depo tek bir iş yapar: YERKON raporunda tarif edilen şehir içi, kırsal
 ve kritik bölge kurulumlarını simüle eder ve karşılaştırma tablosuna
-girecek dört satırı üretir. Sayılar varsayılmaz, hesaplanır; her girdinin
+girecek üç satırı üretir. Sayılar varsayılmaz, hesaplanır; her girdinin
 nereden geldiği çıktıya iliştirilir.
 
 ```bash
 python run.py
 ```
 
-Çıktı `output/yerkon_rows.csv`: sadece dört satır.
+Çıktı `output/yerkon_rows.csv`: sadece üç satır.
 
 ## Üretilen satırlar
 
 | Sistem | Teknoloji | Ortam | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX |
 |---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir İçi - Kalibreli)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,64 m | 3,40 m | 1,00 m | %100,0 | 1,00 km² | ≈ 49.179 TL/km² |
-| YERKON (Şehir İçi - Ham)² | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,15 m | 4,82 m | 1,04 m | %100,0 | 1,00 km² | ≈ 49.179 TL/km² |
-| YERKON (Kırsal)³ | Karasal PNT (E28-SX1280 TWR) | Dış | 2,55 m | 3,86 m | 1,00 m | %100,0 | 1,01 km² | ≈ 140.705 TL/km² |
-| YERKON (Kritik Bölge/Tünel)⁴ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,43 m | 1,28 m | 0,70 m | ≈ %99,3 | 1,00 km² | ≈ 1.363.123 TL/km² |
+| YERKON (Şehir İçi)¹ | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,64 m | 3,40 m | 1,00 m | %100,0 | 1,00 km² | ≈ 49179 TL/km² |
+| YERKON (Kırsal)² | Karasal PNT (E28-SX1280 TWR) | Dış | 2,55 m | 3,86 m | 1,00 m | %100,0 | 1,01 km² | ≈ 140705 TL/km² |
+| YERKON (Kritik Bölge/Tünel)³ | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,43 m | 1,28 m | 0,70 m | ≈ %99,3 | 1,00 km² | ≈ 1363123 TL/km² |
 
 Doğruluk değerleri filtrelenmiş sonuçtan geliyor. Menzil ölçümleri BNO085
 IMU, tekerlek odometrisi ve harita kısıtıyla bir Kalman filtresinde
@@ -36,14 +35,12 @@ Dipnotlar:
 
 1. 1 km × 1 km şehir hücresi, 175 m aralıklı 36 yayın birimi (8, 20 ve
    35 m montaj yüksekliği), 406 kHz menzil bandı. Modül başına menzil
-   ofseti kalibrasyonu uygulanmış.
-2. Aynı kurulum, kalibrasyon adımı atlanmış. Tek fark bu. Birim sayısı,
-   geometri ve maliyet birebir aynı.
-3. 42 km karayolu koridoru, 812 kHz menzil bandı. 750 m'de bir, yolun iki
+   ofseti kalibrasyonu uygulanmış; atlanırsa ne olduğu aşağıda.
+2. 42 km karayolu koridoru, 812 kHz menzil bandı. 750 m'de bir, yolun iki
    tarafında karşılıklı yol kenarı noktası (6 m) ve 2,5 km'de bir kule
    (35 ile 45 m arası), toplam 131 birim. Kapsanan alan, iki hat arasındaki
    24 m genişliğindeki taşıt yolu.
-4. 50 km tünel ağı, 60 m aralıklı 834 UWB düğümü. Raporun öngördüğü 150 m
+3. 50 km tünel ağı, 60 m aralıklı 834 UWB düğümü. Raporun öngördüğü 150 m
    aralık DWM3000'in gerçek menziliyle konum çözümü üretmiyor, aşağıya
    bakınız.
 
@@ -56,8 +53,8 @@ OPEX her satırda "-". Rapor yıllık işletme maliyeti vermiyor, ve
 karşılaştırma tablosu yayımlanmış işletme maliyeti olmayan diğer sistemler
 için zaten "-" kullanıyor.
 
-Şehir içi ve kırsalda kullanılabilirlik yuvarlama sonucu değil. 7.200
-denemenin 7.200'ünde konum çözümü üretildi. Bu yalnızca modellenen kayıp
+Şehir içi ve kırsalda kullanılabilirlik yuvarlama sonucu değil. 7200
+denemenin 7200'ünde konum çözümü üretildi. Bu yalnızca modellenen kayıp
 altındaki radyo bağlantısı kullanılabilirliğidir. Kanal doluluğu, girişim,
 düğüm arızası ve alıcı açılış süresi modellenmedi, dolayısıyla gerçek
 hizmet kullanılabilirliği bunlardan dolayı daha düşük olacak. GNSS
@@ -132,18 +129,18 @@ sekizinin yaydığı tabanı daraltıyor. Daha çok donanımla daha kötü geome
 
 | Aralık | Düğüm | TL/km² | HPE P50 | HPE P95 |
 |---|---|---|---|---|
-| 125 m | 81 | 110.652 | 2,17 m | 4,44 m |
-| 150 m (eski) | 49 | 66.937 | 1,95 m | 3,99 m |
-| 175 m | 36 | **49.179** | **1,64 m** | **3,40 m** |
-| 225 m | 25 | 34.152 | 1,97 m | 4,76 m |
+| 125 m | 81 | 110652 | 2,17 m | 4,44 m |
+| 150 m (eski) | 49 | 66937 | 1,95 m | 3,99 m |
+| 175 m | 36 | **49179** | **1,64 m** | **3,40 m** |
+| 225 m | 25 | 34152 | 1,97 m | 4,76 m |
 
 Kırsal levha aralığı:
 
 | Aralık | Düğüm | TL/km² | HPE P50 | HPE P95 |
 |---|---|---|---|---|
-| 500 m (eski) | 187 | 200.854 | 2,88 m | 7,57 m |
-| 750 m | 131 | **140.705** | **2,55 m** | **3,86 m** |
-| 1000 m | 103 | 110.631 | 2,46 m | 11,07 m |
+| 500 m (eski) | 187 | 200854 | 2,88 m | 7,57 m |
+| 750 m | 131 | **140705** | **2,55 m** | **3,86 m** |
+| 1000 m | 103 | 110631 | 2,46 m | 11,07 m |
 
 İkisinde de yeni aralık hem ucuz hem doğru, yani ödünleşim yok. Şehir içi
 %27, kırsal %30 ucuzluyor. 225 m ve 1000 m daha da ucuz ama orada ödünleşim
@@ -226,7 +223,7 @@ yazılı olarak kaydedilir (`yerkon/link_budget.py`).
 | Senaryo | Modül | Yayımlanmış referans mesafe | Modellenen menzil | Oran |
 |---|---|---|---|---|
 | Şehir içi | SX1280/SX1281 @ 12,5 dBm | 3,0 km | 400 m | %13 |
-| Kırsal | E28-2G4M27S @ 27 dBm | 8,0 km | 3.000 m | %37,5 |
+| Kırsal | E28-2G4M27S @ 27 dBm | 8,0 km | 3000 m | %37,5 |
 | Tünel | DWM3000 | yayımlanmış üst sınır yok | 150 m | yok |
 
 Üretici referans mesafeleri **açık arazide, 5 dBi anten, 2,5 m yükseklik
@@ -249,16 +246,16 @@ koridorda bu ~150 m aralık demek. DWM3000'in gerçekçi menzilinde bu aralık
 
 | Düğüm aralığı | Menzildeki düğüm (en az) | HDOP | VDOP | TL/km |
 |---|---|---|---|---|
-| 150 m (raporun öngördüğü) | 2 | çözüm yok | çözüm yok | 10.885 |
-| 100 m | 2 | çözüm yok | çözüm yok | 16.344 |
-| 75 m (teorik tavan) | 4 | 3,83 | 15,02 | 21.771 |
-| 60 m (kullanılan) | **5** | **3,10** | **14,14** | **27.262** |
-| 50 m | 5 | 2,61 | 11,04 | 32.689 |
+| 150 m (raporun öngördüğü) | 2 | çözüm yok | çözüm yok | 10885 |
+| 100 m | 2 | çözüm yok | çözüm yok | 16344 |
+| 75 m (teorik tavan) | 4 | 3,83 | 15,02 | 21771 |
+| 60 m (kullanılan) | **5** | **3,10** | **14,14** | **27262** |
+| 50 m | 5 | 2,61 | 11,04 | 32689 |
 
 3B konum çözümü en az dört mesafe ölçümü ister. 150 m aralıkta alıcı bir
 veya iki düğüm duyar. Tavan `2R/4 = 75 m`; 60 m, beşinci düğümü menzilde
 tutmak için pay bırakır. Bedeli, tünel CAPEX'inin 2,5 katına çıkması, yani
-km başına 10.885 TL yerine 27.262 TL.
+km başına 10885 TL yerine 27262 TL.
 
 Bu, simülasyonun rapora geri verdiği en somut tasarım düzeltmesi. Diğer
 ikisi, şehir içi ve kırsal aralıklarının ters yönde değişmesi: onlar
@@ -306,13 +303,19 @@ boşluk başka bir şeyle kapanınca kayboluyor.
 **Kalibrasyon bedava ve fark yaratıyor.** Robinson'un yayımladığı SX1280
 verisinde 2,83 m sabit sapma var. Sabit sapma tüm anchor'lara aynı anda
 bindiği için ne geometri ne filtreleme onu kaldırabiliyor. Modül başına
-ofset kalibrasyonu yatay P50'yi 2,15 m'den 1,64 m'ye düşürüyor. Dikeyde
-fark kapanıyor, çünkü orada belirleyici olan harita kısıtı. Raporun
-mimarisi bu adımı zaten öngörüyor.
+ofset kalibrasyonu yatay P50'yi 2,15 m'den 1,64 m'ye, P95'i 4,82 m'den
+3,40 m'ye düşürüyor. Dikeyde fark kapanıyor, çünkü orada belirleyici olan
+harita kısıtı. Raporun mimarisi bu adımı zaten öngörüyor.
+
+Kalibrasyonsuz kurulum tabloda ayrı bir satır değil. Karşılaştırma
+tablosundaki diğer sistemlerin hiçbiri kendisinin kasten kalibre
+edilmemiş bir sürümünü satır olarak vermiyor, dolayısıyla o satır
+sistemleri değil bir kurulum hatasını karşılaştırırdı.
+`urban_scenario(calibrated=False)` onu hâlâ üretiyor.
 
 **CAPEX/km² koridor kurulumlarını haksız gösteriyor.** Bir tünel ya da yol
 şeridi ince bir kurdele. Koridorlar için km başına maliyet daha anlamlı:
-kırsal 3.377 TL/km, tünel 27.262 TL/km.
+kırsal 3377 TL/km, tünel 27262 TL/km.
 
 ## Kurulum ve çalıştırma
 

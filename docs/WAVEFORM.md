@@ -8,15 +8,15 @@ hakkında varsayımdı.
 `matlab/yerkon_ranging_sim.m` bunu doğrudan türetiyor: dalga formunu
 üretiyor, kümelenmiş çok yolluluk kanalından geçiriyor, gürültü ekliyor,
 varış zamanı kestirimi yapıyor. Aşağıdaki sonuçlar 7 vaka × 4 SNR × 3
-mesafe × 300 deneme = vaka başına 3.600 denemeden geliyor (R2026a, 2026-09-07).
+mesafe × 300 deneme = vaka başına 3600 denemeden geliyor (R2026a, 2026-09-07).
 
 ## Ne çıktı
 
 | Kaynak | Sapma | σ | Not |
 |---|---|---|---|
 | **Robinson SX1280** (gerçek donanım) | +2,83 m | **2,94 m** | 6 nokta, 0-250 m, tek kurulum |
-| MATLAB SX1280 406 kHz LOS | +0,41 m | **2,68 m** | 3.600 deneme |
-| MATLAB SX1280 1,6 MHz LOS | +0,01 m | **0,68 m** | 3.600 deneme |
+| MATLAB SX1280 406 kHz LOS | +0,41 m | **2,68 m** | 3600 deneme |
+| MATLAB SX1280 1,6 MHz LOS | +0,01 m | **0,68 m** | 3600 deneme |
 | MATLAB SX1280 1,6 MHz NLOS | +2,31 m | 16,59 m | ağır kuyruk |
 | **Rapor hedefi DWM3000** | 0 m | **0,10 m** | tasarım hedefi, ölçüm değil |
 | MATLAB UWB LOS | −0,45 m | **0,15 m** | hedefe yakın |
@@ -43,7 +43,7 @@ Aradaki fark, tek bir koşunun sayısına ne kadar güvenilebileceğini söylüy
 Açık görüş hattı vakaları %3'ün altında oynuyor, yani bu sayılar üçüncü
 haneye kadar okunabilir. Ağır kuyruklu vakalar oynuyor: tünel σ'sı iki koşu
 arasında %15 fark ediyor, çünkü σ'yı birkaç büyük aykırı değer belirliyor ve
-3.600 deneme onları istikrarlı örneklemeye yetmiyor.
+3600 deneme onları istikrarlı örneklemeye yetmiyor.
 
 Bunun pratik sonucu: **tünel satırının menzil hatası ±%15 belirsizlikle
 okunmalı.** Şehir içi ve kırsal satırlar için böyle bir uyarı gerekmiyor.

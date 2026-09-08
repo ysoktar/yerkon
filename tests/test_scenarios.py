@@ -22,12 +22,21 @@ def test_every_scenario_covers_at_least_one_square_kilometre():
         assert scenario.area_km2 >= 1.0, scenario.key
 
 
-def test_the_four_rows_are_two_outdoor_urban_one_rural_and_one_indoor_outdoor():
+def test_the_three_rows_are_two_outdoor_and_one_indoor_outdoor():
     scenarios = all_scenarios()
-    assert [s.environment for s in scenarios] == ["Dış", "Dış", "Dış", "İç + dış"]
-    assert [s.key for s in scenarios] == [
-        "urban_calibrated", "urban_uncalibrated", "rural", "critical",
-    ]
+    assert [s.environment for s in scenarios] == ["Dış", "Dış", "İç + dış"]
+    assert [s.key for s in scenarios] == ["urban_calibrated", "rural", "critical"]
+
+
+def test_the_uncalibrated_variant_exists_but_is_not_a_row():
+    """It answers what skipping calibration costs, which is a different
+    question from how this system compares with other ones."""
+    from yerkon.scenarios import urban_scenario
+
+    raw = urban_scenario(calibrated=False)
+    assert raw.key == "urban_uncalibrated"
+    assert raw.error_model.mean_bias_m > 0
+    assert raw.key not in {s.key for s in all_scenarios()}
 
 
 def test_roadside_units_come_in_facing_pairs_across_the_carriageway():

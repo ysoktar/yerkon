@@ -23,11 +23,20 @@ def results():
     return [run_scenario(s, n_repeats=3, n_track_runs=1) for s in all_scenarios()]
 
 
-def test_numbers_are_formatted_turkish_style():
+def test_numbers_use_a_comma_decimal_and_no_thousands_separator():
+    """A dot would be ambiguous next to a comma decimal mark."""
     assert fmt_metres(1.937) == "1,94"
     assert fmt_percent(0.9772) == "≈ %97,7"
-    assert fmt_lira(471523.8) == "≈ 471.524"
+    assert fmt_lira(471523.8) == "≈ 471524"
     assert fmt_area(1.008) == "1,01"
+
+
+def test_no_formatted_number_ever_contains_a_dot():
+    for value in (0.5, 1.937, 232.78, 49178.52, 1363122.96):
+        assert "." not in fmt_metres(value), value
+        assert "." not in fmt_lira(value), value
+    assert "." not in fmt_area(1.008)
+    assert "." not in fmt_percent(0.993)
 
 
 def test_large_distances_are_rounded_rather_than_given_false_precision():
@@ -40,15 +49,15 @@ def test_a_missing_value_is_a_dash_not_a_zero():
     assert fmt_lira(None) == "-"
 
 
-def test_four_rows_come_out_with_one_cell_per_column(results):
+def test_three_rows_come_out_with_one_cell_per_column(results):
     rows = build_rows(results)
-    assert len(rows) == 4
+    assert len(rows) == 3
     assert all(len(row) == len(COLUMNS) for row in rows)
 
 
 def test_every_row_carries_a_footnote_marker(results):
     markers = [row[0][-1] for row in build_rows(results)]
-    assert markers == ["¹", "²", "³", "⁴"]
+    assert markers == ["¹", "²", "³"]
 
 
 def test_opex_is_left_blank_rather_than_guessed(results):
@@ -62,7 +71,7 @@ def test_csv_round_trips_with_the_header(tmp_path, results):
     with open(path, encoding="utf-8-sig") as handle:
         read_back = list(csv.reader(handle))
     assert tuple(read_back[0]) == COLUMNS
-    assert len(read_back) == 5
+    assert len(read_back) == 4
     assert read_back[1][0].startswith("YERKON")
 
 
@@ -83,7 +92,7 @@ def test_wrapping_for_the_image_changes_layout_but_not_content(results):
 
 def test_details_expose_the_geometry_behind_each_row(results):
     records = detail_records(results)
-    assert len(records) == 4
+    assert len(records) == 3
     for record in records:
         assert record["median_vdop"] is not None
         assert record["evidence_type"]

@@ -1,11 +1,13 @@
-"""Turning simulation results into the four comparison-table rows.
+"""Turning simulation results into the comparison-table rows.
 
 Formatting lives here rather than in the renderer so that the CSV and the
 image can never disagree: both call :func:`build_rows`, and neither holds
 a hand-copied number.
 
-Numbers are formatted Turkish-style, with a comma for the decimal mark and
-a dot for thousands, to match the table this output is meant to slot into.
+Numbers use a comma for the decimal mark and no thousands separator at
+all. A dot would be ambiguous next to a comma decimal mark, and the
+figures here are read by people and by spreadsheets that disagree about
+which is which.
 """
 from __future__ import annotations
 
@@ -29,14 +31,14 @@ COLUMNS = (
 
 #: Footnote markers, in the order the rows are produced. The footnote text
 #: itself lives in README.md, next to the table it annotates.
-FOOTNOTES = ("¹", "²", "³", "⁴")
+FOOTNOTES = ("¹", "²", "³")
 
 
 def fmt_metres(value: Optional[float], decimals: int = 2) -> str:
     if value is None:
         return "-"
     if value >= 100:
-        return "≈ {:,.0f}".format(value).replace(",", ".")
+        return "≈ {:.0f}".format(value)
     return "{:.{d}f}".format(value, d=decimals).replace(".", ",")
 
 
@@ -49,7 +51,7 @@ def fmt_percent(fraction: Optional[float]) -> str:
 def fmt_lira(value: Optional[float]) -> str:
     if value is None:
         return "-"
-    return "≈ {:,.0f}".format(value).replace(",", ".")
+    return "≈ {:.0f}".format(value)
 
 
 def fmt_area(value: float) -> str:

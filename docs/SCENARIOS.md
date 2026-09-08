@@ -21,11 +21,18 @@ bağlantıları SX1280 ölçümlerinin kapsadığı mesafe aralığına yaklaşt
 
 ---
 
-## 1-2. Şehir İçi (Kalibreli ve Ham)
+## 1. Şehir içi
 
-İki satır aynı kurulumdur. Tek fark menzil ofseti kalibrasyonunun
-uygulanıp uygulanmadığıdır; birim sayısı, geometri ve maliyet birebir
-aynıdır.
+Tabloda bir satır var, kalibreli olan. Aşağıdaki sütunlardan ikincisi aynı
+kurulumun menzil ofseti kalibrasyonu atlanmış hâli. Birim sayısı, geometri
+ve maliyet birebir aynı, tek fark o adım.
+
+Kalibrasyonsuz kurulum tabloya ayrı bir satır olarak konmadı.
+Karşılaştırma tablosundaki diğer sistemlerin hiçbiri kendisinin kasten
+kalibre edilmemiş bir sürümünü satır olarak vermiyor, dolayısıyla o satır
+sistemleri değil bir kurulum hatasını karşılaştırırdı. Buradaki
+karşılaştırma o adımın ne kazandırdığını gösteriyor ve tabloyu
+şişirmiyor.
 
 | Parametre | Değer | Kaynak |
 |---|---|---|
@@ -39,7 +46,7 @@ aynıdır.
 | Menzil hatası σ | 2,40 m | Türetilmiş |
 | Engellenen link oranı | %35 (sert NLOS) | Varsayım |
 | Paket kaybı | %2 | Varsayım |
-| Birim fiyat | 1.366,07 TL | Rapor |
+| Birim fiyat | 1366,07 TL | Rapor |
 | Test yörüngesi | Hücreyi çapraz kesen doğru, 24 nokta, z = 1,5 m | Varsayım |
 
 Raporun Grup 1 montaj listesi (baz istasyonları, trafik levhaları ve
@@ -52,7 +59,7 @@ Montaj yükseklikleri komşu anchor'lar arasında değişir. Tek yükseklikte bi
 
 ### Ölçülen geometri ve sonuç
 
-| | Kalibreli | Ham |
+| | Kalibreli (tablo satırı) | Kalibrasyonsuz |
 |---|---|---|
 | Düğüm sayısı, aralık | 36, 175 m | 36, 175 m |
 | Menzil bant genişliği | 406 kHz | 406 kHz |
@@ -67,7 +74,7 @@ Montaj yükseklikleri komşu anchor'lar arasında değişir. Tek yükseklikte bi
 | Filtreli HPE P50 / P95 | **1,64 m / 3,40 m** | **2,15 m / 4,82 m** |
 | Filtreli VPE P50 / P95 | **0,44 m / 1,00 m** | **0,43 m / 1,04 m** |
 | Kullanılabilirlik | %100,0 | %100,0 |
-| CAPEX | 49.179 TL/km² | 49.179 TL/km² |
+| CAPEX | 49179 TL/km² | 49179 TL/km² |
 
 Sürüş izi: 50 km/h'de, 2,5 derece/s dönüşle hücre içinde kalan bir
 yay üzerinde 180 saniye, ±1,2 m şerit değişimiyle. Dönüş kasıtlı: hep düz
@@ -87,12 +94,12 @@ Aynı hücre, farklı ızgara aralıklarıyla (400 m menzil, en yakın 8 anchor)
 
 | Aralık | Birim | HDOP | VDOP | Medyan bağlantı | CAPEX TL/km² |
 |---|---|---|---|---|---|
-| 100 m | 121 | 0,75 | 1,57 | 112 m | 165.294 |
-| 150 m | 49 | 0,73 | 2,29 | 181 m | 66.937 |
-| 175 m (kullanılan) | **36** | **0,73** | **2,79** | **202 m** | **49.179** |
-| 200 m | 36 | 0,73 | 3,03 | 225 m | 49.179 |
-| 250 m | 25 | 0,78 | 4,12 | 248 m | 34.152 |
-| 300 m | 16 | 1,02 | 5,58 | 241 m | 21.857 |
+| 100 m | 121 | 0,75 | 1,57 | 112 m | 165294 |
+| 150 m | 49 | 0,73 | 2,29 | 181 m | 66937 |
+| 175 m (kullanılan) | **36** | **0,73** | **2,79** | **202 m** | **49179** |
+| 200 m | 36 | 0,73 | 3,03 | 225 m | 49179 |
+| 250 m | 25 | 0,78 | 4,12 | 248 m | 34152 |
+| 300 m | 16 | 1,02 | 5,58 | 241 m | 21857 |
 
 Sıklaştırmak neredeyse yalnızca dikey doğruluk satın alıyor: HDOP 100 ile
 250 m arasında sabit kalırken VDOP 2,6 kat değişiyor. Sebebi, en yakın 8
@@ -101,7 +108,7 @@ mesafeye bağlı olmasıdır.
 
 ---
 
-## 3. Kırsal
+## 2. Kırsal
 
 Rapor Grup 2 için "az sayıda yüksek kapsamalı nokta" istiyor ve montaj
 noktası olarak AUS/yol kenarı üniteleri ile baz istasyonu sahalarını
@@ -114,12 +121,12 @@ sayıyor. Yerleşim buna göre kuruldu.
 | Yol kenarı anchor'ı | 500 m'de bir, iki yanda karşılıklı, 6 m (±0,5 m) | Rapor (AUS/RSU noktaları), Varsayım (aralık) |
 | Kule anchor'ı | 2,5 km'de bir, 35-45 m, yoldan 30 m açıkta | Rapor (baz istasyonu sahaları), Varsayım (aralık) |
 | Toplam anchor | 170 yol kenarı + 17 kule = 187 | Türetilmiş |
-| Bağlantı menzili | 3.000 m = 8,0 km referansın %37,5'i | Üretici + Varsayım (derating) |
+| Bağlantı menzili | 3000 m = 8,0 km referansın %37,5'i | Üretici + Varsayım (derating) |
 | Menzil hata modeli | SX1280, Robinson bootstrap, kalibreli | Ölçüm |
 | Menzil hatası σ | 3,05 m | Türetilmiş |
 | NLOS oranı ve sapması | %15, 2,0 m | Varsayım |
 | Paket kaybı | %1 | Varsayım |
-| Birim fiyat | 1.082,68 TL | Rapor |
+| Birim fiyat | 1082,68 TL | Rapor |
 | Test yörüngesi | Taşıt yolunda zikzak (±10,8 m), 24 nokta | Varsayım |
 
 E28-2G4M27S modülü BOM'a göre SX1280 tabanlıdır. Yükselteç link bütçesini
@@ -136,7 +143,7 @@ kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır 
 | Menzil bant genişliği | 812 kHz |
 | Menzil hatası σ | 3,98 m |
 | Menzilde duyulan / kullanılan (en az) | 18 / 8 (8) |
-| Medyan / en uzun bağlantı | 620 m / 1.750 m |
+| Medyan / en uzun bağlantı | 620 m / 1750 m |
 | Kanıt zarfı dışındaki bağlantı | %0,0 |
 | HDOP / VDOP (medyan) | 8,54 / 15,29 |
 | En kötü VDOP | 40,21 |
@@ -145,7 +152,7 @@ kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır 
 | Filtreli HPE P50 / P95 | **2,55 m / 3,86 m** |
 | Filtreli VPE P50 / P95 | **0,35 m / 1,00 m** |
 | Kullanılabilirlik | %100,0 |
-| CAPEX | 140.705 TL/km², 3.377 TL/km |
+| CAPEX | 140705 TL/km², 3377 TL/km |
 
 Sürüş izi: 110 km/h'de koridor boyunca 180 saniye (5,5 km), ±3 m şerit
 değişimiyle.
@@ -162,11 +169,11 @@ duyarlı. Yanal harita kısıtı bunu kapatıyor ve HPE P95'i 26,49 m'den
 
 | Yol kenarı aralığı | Birim | HDOP | VDOP | Medyan bağlantı | TL/km | TL/km² |
 |---|---|---|---|---|---|---|
-| 1000 m | 103 | 12,12 | 16,01 | 838 m | 2.655 | 110.631 |
-| 750 m (kullanılan) | **131** | **8,54** | **15,29** | **620 m** | **3.377** | **140.705** |
-| 500 m | 187 | 5,84 | 11,56 | 458 m | 4.821 | 200.854 |
-| 300 m | 299 | 4,68 | 9,48 | 274 m | 7.708 | 321.152 |
-| 200 m | 439 | 2,95 | 6,80 | 196 m | 11.317 | 471.524 |
+| 1000 m | 103 | 12,12 | 16,01 | 838 m | 2655 | 110631 |
+| 750 m (kullanılan) | **131** | **8,54** | **15,29** | **620 m** | **3377** | **140705** |
+| 500 m | 187 | 5,84 | 11,56 | 458 m | 4821 | 200854 |
+| 300 m | 299 | 4,68 | 9,48 | 274 m | 7708 | 321152 |
+| 200 m | 439 | 2,95 | 6,80 | 196 m | 11317 | 471524 |
 
 Raporun "az sayıda nokta" tercihi burada ölçülebilir hale geliyor. 200 m
 aralık VDOP'u 6,80'e indiriyor ama km başına maliyeti 3,4 katına çıkarıyor.
@@ -191,7 +198,7 @@ kenarı ünitesi 1,03 derece. İkisi de dik değildir.
 
 ---
 
-## 4. Kritik Bölge (Tünel)
+## 3. Kritik bölge (tünel)
 
 | Parametre | Değer | Kaynak |
 |---|---|---|
@@ -205,7 +212,7 @@ kenarı ünitesi 1,03 derece. İkisi de dik değildir.
 | Menzil hata modeli | DWM3000, MATLAB dalga formu simülasyonu | Simülasyon |
 | Menzil hatası σ | 0,35 m | Türetilmiş |
 | Paket kaybı | %3 | Varsayım |
-| Birim fiyat | 1.634,44 TL | Rapor |
+| Birim fiyat | 1634,44 TL | Rapor |
 | Test yörüngesi | Tünel boyunca doğru, 24 nokta | Varsayım |
 
 ### Düğüm aralığı neden raporun öngördüğünden küçük
@@ -217,11 +224,11 @@ R = 150 m için tavan 75 m'dir (`link_budget.minimum_spacing_for_fix`).
 
 | Düğüm aralığı | Menzildeki düğüm (en az) | HDOP | VDOP | TL/km | Toplam TL |
 |---|---|---|---|---|---|
-| 150 m | 2 | çözüm yok | çözüm yok | 10.885 | 544.269 |
-| 100 m | 2 | çözüm yok | çözüm yok | 16.344 | 817.220 |
-| 75 m | 4 | 3,83 | 15,02 | 21.771 | 1.088.537 |
-| **60 m (kullanılan)** | **5** | **3,10** | **14,14** | **27.230** | **1.361.489** |
-| 50 m | 5 | 2,61 | 11,04 | 32.689 | 1.634.440 |
+| 150 m | 2 | çözüm yok | çözüm yok | 10885 | 544269 |
+| 100 m | 2 | çözüm yok | çözüm yok | 16344 | 817220 |
+| 75 m | 4 | 3,83 | 15,02 | 21771 | 1088537 |
+| **60 m (kullanılan)** | **5** | **3,10** | **14,14** | **27230** | **1361489** |
+| 50 m | 5 | 2,61 | 11,04 | 32689 | 1634440 |
 
 60 m, tavanın altında kalıp beşinci düğümü menzilde tutar. Bu, raporun
 pilot yoğunluğunu yaklaşık 2,5 katına çıkarır.
@@ -254,7 +261,7 @@ doğru her zaman eş düzlemlidir; dikey eksen kaç anchor eklenirse eklensin
 | Filtreli HPE P50 / P95 | **0,43 m / 1,45 m** |
 | Filtreli VPE P50 / P95 | **0,25 m / 0,69 m** |
 | Kullanılabilirlik | %99,3 |
-| CAPEX | 1.363.123 TL/km², 27.262 TL/km |
+| CAPEX | 1363123 TL/km², 27262 TL/km |
 
 Sürüş izi: 80 km/h'de tünel boyunca 180 saniye (4 km), ±1,5 m şerit
 değişimiyle.
@@ -297,9 +304,9 @@ konum üretir; beş ölçümü olan bir alıcı ikisini kaybettiğinde üretemez
 Tünelde beş anchor'ın hepsinin kullanılmasının sebebi menzilde daha
 fazlasının olmaması. Bu, düğüm aralığını 60 m'nin altına indirmek için ek
 bir gerekçedir: 50 m aralıkta alıcı yedi anchor duyar ve iki kayba
-dayanabilir, ama tünel CAPEX'i 32.689 TL/km'ye çıkar.
+dayanabilir, ama tünel CAPEX'i 32689 TL/km'ye çıkar.
 
-Şehir içi ve kırsalda %100,0 değeri 7.200 denemenin tamamında çözüm
+Şehir içi ve kırsalda %100,0 değeri 7200 denemenin tamamında çözüm
 üretildiği anlamına gelir. Yalnızca modellenen paket kaybı altındaki
 radyo bağlantısı kullanılabilirliğidir; kanal doluluğu, girişim, düğüm
 arızası ve alıcı açılış süresi modellenmedi.

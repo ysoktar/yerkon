@@ -48,7 +48,7 @@ menzil bağımlılığı iddiasını taşıyabilir.
 
 ### Bu modelin taşımadıkları
 
-- **Menzil bağımlılığı.** Hata 50 m'de ve 1.000 m'de aynı dağılımdan
+- **Menzil bağımlılığı.** Hata 50 m'de ve 1000 m'de aynı dağılımdan
   çekiliyor. Gerçekte uzak bağlantılar daha kötü olacaktır.
 - **0-250 m dışı geçerlilik.** Kaynağın kapsadığı aralık bu. Kırsal
   senaryodaki bağlantıların %72'si, şehir içindekilerin %6'sı bu aralığın
@@ -82,9 +82,9 @@ edilmiş halidir. Tünel satırının sonuçları "bu hedef tutarsa şu geometri
 
 | Değer | Kullanım |
 |---|---|
-| Şehir içi yayın birimi: 1.366,07 TL | Şehir içi CAPEX |
-| Kırsal yayın birimi (E28-2G4M27S): 1.082,68 TL | Kırsal CAPEX |
-| Kritik bölge yayın birimi (DWM3000): 1.634,44 TL | Tünel CAPEX |
+| Şehir içi yayın birimi: 1366,07 TL | Şehir içi CAPEX |
+| Kırsal yayın birimi (E28-2G4M27S): 1082,68 TL | Kırsal CAPEX |
+| Kritik bölge yayın birimi (DWM3000): 1634,44 TL | Tünel CAPEX |
 | 2 km koridora 10-15 yayın düğümü | Tünel düğüm aralığı için başlangıç noktası; bkz. aşağıdaki not |
 | DWM3000 için ±10 cm sınıfı hedef | UWB hata modeli σ |
 | Montaj sınıfları (direk, cephe, çatı) | Şehir içi montaj yükseklikleri |
@@ -112,7 +112,7 @@ doğrudan etkiliyor.
 | Varsayım | Değer | Etkisi |
 |---|---|---|
 | Şehir içi menzil derating | 3,0 km referansın %13'ü = 400 m | Izgara aralığını belirler |
-| Kırsal menzil derating | 8,0 km referansın %37,5'i = 3.000 m | Kaç anchor'ın duyulduğunu belirler |
+| Kırsal menzil derating | 8,0 km referansın %37,5'i = 3000 m | Kaç anchor'ın duyulduğunu belirler |
 | Tünel bağlantı menzili | 150 m (yayımlanmış üst sınır yok) | Düğüm aralığını ve tünel CAPEX'ini belirler |
 | Fix başına anchor sayısı | 8 (en yakınlar) | DOP ile çıkarsama oranı arasındaki dengeyi belirler |
 | Şehir içi ızgara aralığı | 150 m | VDOP ve CAPEX'i belirler |

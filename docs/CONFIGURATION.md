@@ -1,6 +1,6 @@
 # Üç senaryonun yapılandırması nasıl seçildi
 
-Tablodaki dört satırın her biri bir yapılandırmanın çıktısı: menzil bant
+Tablodaki üç satırın her biri bir yapılandırmanın çıktısı: menzil bant
 genişliği, düğüm aralığı, radyo. Bu belge o seçimlerin nasıl yapıldığını
 yazıyor.
 
@@ -39,13 +39,13 @@ Sonuç raporun lehine. 406 kHz zaten parçanın ranging varsayılanı, yani
 
 | Aralık | Düğüm | TL/km² | HPE P50 | HPE P95 | En az anchor |
 |---|---|---|---|---|---|
-| 125 m | 81 | 110.652 | 2,17 m | 4,44 m | 8 |
-| 150 m (eski) | 49 | 66.937 | 1,95 m | 3,99 m | 8 |
-| 175 m | **36** | **49.179** | **1,64 m** | **3,40 m** | 5 |
-| 200 m | 36 | 49.179 | 1,69 m | 3,23 m | 8 |
-| 225 m | 25 | 34.152 | 1,97 m | 4,76 m | 4 |
-| 250 m | 25 | 34.152 | 2,06 m | 4,68 m | 4 |
-| 275 m | 16 | 21.857 | 2,29 m | 4,86 m | 4 |
+| 125 m | 81 | 110652 | 2,17 m | 4,44 m | 8 |
+| 150 m (eski) | 49 | 66937 | 1,95 m | 3,99 m | 8 |
+| 175 m | **36** | **49179** | **1,64 m** | **3,40 m** | 5 |
+| 200 m | 36 | 49179 | 1,69 m | 3,23 m | 8 |
+| 225 m | 25 | 34152 | 1,97 m | 4,76 m | 4 |
+| 250 m | 25 | 34152 | 2,06 m | 4,68 m | 4 |
+| 275 m | 16 | 21857 | 2,29 m | 4,86 m | 4 |
 
 Bu bedava bir seçim. 175 m, 150 m'yi hem %27 ucuzlukta hem doğrulukta
 yeniyor.
@@ -87,10 +87,10 @@ Bu bir konfigürasyon değişikliği, donanım değişikliği değil.
 
 | Levha aralığı | Düğüm | TL/km² | HPE P50 | HPE P95 | VPE P95 |
 |---|---|---|---|---|---|
-| 500 m (eski) | 187 | 200.854 | 2,88 m | 7,57 m | 0,98 m |
-| 750 m | **131** | **140.705** | **2,55 m** | **3,86 m** | 1,00 m |
-| 1000 m | 103 | 110.631 | 2,46 m | 11,07 m | 1,52 m |
-| 1500 m | 75 | 80.557 | 2,59 m | 7,39 m | 1,26 m |
+| 500 m (eski) | 187 | 200854 | 2,88 m | 7,57 m | 0,98 m |
+| 750 m | **131** | **140705** | **2,55 m** | **3,86 m** | 1,00 m |
+| 1000 m | 103 | 110631 | 2,46 m | 11,07 m | 1,52 m |
+| 1500 m | 75 | 80557 | 2,59 m | 7,39 m | 1,26 m |
 
 Şehir içindekiyle aynı etki. 750 m, 500 m'den %30 ucuz ve hem medyanda hem
 kuyrukta daha iyi, dolayısıyla bedava.
@@ -106,11 +106,11 @@ Seçilen yapılandırma 60 m düğüm aralığı, yani değişiklik yok.
 
 | Aralık | Düğüm | TL/km² | HPE P50 | HPE P95 | VPE P95 | En az anchor |
 |---|---|---|---|---|---|---|
-| 40 m | 1250 | 2.043.050 | 0,36 m | 0,96 m | 1,04 m | 7 |
-| 50 m | 1000 | 1.634.440 | 0,39 m | 1,02 m | 1,26 m | 6 |
-| 60 m | 834 | **1.363.123** | **0,43 m** | 1,45 m | **0,69 m** | 5 |
-| 70 m | 715 | 1.168.625 | 0,55 m | 1,34 m | 0,87 m | 4 |
-| 75 m | 667 | 1.090.171 | 0,43 m | 1,02 m | 1,72 m | 4 |
+| 40 m | 1250 | 2043050 | 0,36 m | 0,96 m | 1,04 m | 7 |
+| 50 m | 1000 | 1634440 | 0,39 m | 1,02 m | 1,26 m | 6 |
+| 60 m | 834 | **1363123** | **0,43 m** | 1,45 m | **0,69 m** | 5 |
+| 70 m | 715 | 1168625 | 0,55 m | 1,34 m | 0,87 m | 4 |
+| 75 m | 667 | 1090171 | 0,43 m | 1,02 m | 1,72 m | 4 |
 
 Burada Pareto tamamen ödünleşim. Hiçbir yapılandırma bir diğerini iki
 eksende birden yenmiyor.
@@ -144,7 +144,7 @@ ve karar ona dayanıyor.
 
 Üç bedava kazanç var ve üçü de konfigürasyon: iki aralık ve bir radyo
 ayarı. Ek donanım, ek düğüm, yeni parça yok. Şehir içi km² başına maliyet
-66.937 TL'den 49.179 TL'ye, kırsal 200.854 TL'den 140.705 TL'ye iniyor, ve
+66937 TL'den 49179 TL'ye, kırsal 200854 TL'den 140705 TL'ye iniyor, ve
 her iki satır aynı anda daha doğru hale geliyor.
 
 Bunlara ek olarak kırsalda ve tünelde yanal harita kısıtı devreye alındı.

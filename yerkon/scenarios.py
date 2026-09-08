@@ -424,10 +424,12 @@ def urban_scenario(calibrated: bool = True, seed: int = SEED) -> Scenario:
         model = add_nlos(
             model, seed=seed + 10, nlos_probability=nlos_fraction, nlos_bias_m=1.5
         )
-    suffix = "Kalibreli" if calibrated else "Ham"
     return Scenario(
         key="urban_calibrated" if calibrated else "urban_uncalibrated",
-        display_name="YERKON (Şehir İçi - {})".format(suffix),
+        display_name=(
+            "YERKON (Şehir İçi)" if calibrated
+            else "YERKON (Şehir İçi - kalibrasyonsuz)"
+        ),
         technology="Karasal PNT (SX1280/LoRa TWR)",
         environment="Dış",
         groups=(urban_grid_layout(side_m=side_m, spacing_m=URBAN_GRID_SPACING_M, seed=seed),),
@@ -874,10 +876,17 @@ def critical_zone_scenario(seed: int = SEED) -> Scenario:
 
 
 def all_scenarios(seed: int = SEED) -> list[Scenario]:
-    """The four table rows, in the order they appear in the output."""
+    """The three table rows, in the order they appear in the output.
+
+    The uncalibrated urban variant is not a row. It answers a different
+    question, what skipping per-unit ranging calibration costs, and the
+    answer belongs in the text rather than in a comparison against other
+    positioning systems, none of which lists a deliberately miscalibrated
+    variant of itself. ``urban_scenario(calibrated=False)`` still builds
+    it, and docs/SCENARIOS.md reports the comparison.
+    """
     return [
         urban_scenario(calibrated=True, seed=seed),
-        urban_scenario(calibrated=False, seed=seed),
         rural_scenario(seed=seed),
         critical_zone_scenario(seed=seed),
     ]
