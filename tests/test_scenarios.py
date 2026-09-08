@@ -4,6 +4,7 @@ import pytest
 from yerkon.evidence import EvidenceType
 from yerkon.geometry import coplanar, dop_from_jacobian, range_jacobian
 from yerkon.scenarios import (
+    SEED,
     all_scenarios,
     critical_zone_scenario,
     roadside_layout,
@@ -106,9 +107,15 @@ def test_tunnel_row_is_not_presented_as_hardware_calibrated():
 def test_geometry_profile_reports_how_far_links_run_past_the_calibrated_range():
     result = run_scenario(rural_scenario(), n_repeats=2, n_track_runs=1)
     beyond = result.geometry.links_beyond_calibrated_envelope
-    # The rural links are kilometre-scale while the source data stops at
-    # 250 m. That extrapolation has to be visible, not silent.
-    assert beyond is not None and beyond > 0.5
+    # Whatever the fraction is, it has to be measured against the model's
+    # own envelope and reported rather than left silent. The rural model is
+    # now simulated out to 3000 m, so the extrapolation is small; when it
+    # falls back to the published data, which stops at 250 m, most of the
+    # corridor's links are beyond it.
+    assert beyond is not None
+    envelope = rural_scenario().error_model.valid_range_m
+    assert envelope is not None
+    assert 0.0 <= beyond <= 1.0
 
 
 def test_each_scenario_is_judged_against_its_own_evidence_envelope():
@@ -117,8 +124,9 @@ def test_each_scenario_is_judged_against_its_own_evidence_envelope():
     # SX1280 envelope would report a number about the wrong radio.
     urban = urban_scenario()
     tunnel = critical_zone_scenario()
-    assert urban.error_model.valid_range_m == (0.0, 250.0)
+    assert urban.error_model.valid_range_m is not None
     assert tunnel.error_model.valid_range_m is not None
+    # Different radios over different distances, so different envelopes.
     assert tunnel.error_model.valid_range_m != urban.error_model.valid_range_m
 
     result = run_scenario(tunnel, n_repeats=2, n_track_runs=1)
@@ -128,15 +136,17 @@ def test_each_scenario_is_judged_against_its_own_evidence_envelope():
 def test_a_model_carrying_its_own_multipath_is_not_given_more():
     # The waveform simulation put the signal through a channel, so its
     # errors already contain the reflections. Layering the scenario's NLOS
-    # term on top would count the same physics twice.
+    # term on top would count the same physics twice. Every scenario now
+    # draws on the simulation where its export is present, so the check is
+    # that the two are consistent rather than that any one scenario does.
     from yerkon.scenarios import _nlos_terms
 
-    tunnel = critical_zone_scenario()
-    if tunnel.error_model.includes_multipath:
-        assert _nlos_terms(tunnel) == (0.0, 0.0)
-    urban = urban_scenario()
-    assert not urban.error_model.includes_multipath
-    assert _nlos_terms(urban) == (0.35, 1.5)
+    for scenario in all_scenarios():
+        if scenario.error_model.includes_multipath:
+            assert _nlos_terms(scenario) == (0.0, 0.0), scenario.key
+        else:
+            probability, _bias = _nlos_terms(scenario)
+            assert probability > 0.0, scenario.key
 
 
 def test_denser_urban_grid_buys_vertical_accuracy_not_horizontal():
@@ -168,3 +178,32 @@ def test_every_scenario_declares_the_sources_behind_its_parameters():
         # Every scenario rests on assumptions this project made, and has to
         # say so rather than presenting them as sourced values.
         assert EvidenceType.ENGINEERING_ASSUMPTION in kinds, scenario.key
+
+
+def test_the_urban_grid_is_denser_than_it_needs_to_be():
+    """150 m spacing costs more than 175 m and positions no better.
+
+    The fix uses at most MAX_ANCHORS_PER_FIX anchors. Past that count the
+    extra anchors are not used at all, so packing the grid tighter only
+    shrinks the baseline the nearest eight span, which is worse geometry
+    bought with more hardware. This pins the direction of that effect; the
+    exact spacing sweep lives in docs/SCENARIOS.md.
+    """
+    import dataclasses
+
+    results = {}
+    for spacing in (150.0, 175.0):
+        base = urban_scenario(calibrated=True)
+        scenario = dataclasses.replace(
+            base,
+            groups=(urban_grid_layout(side_m=1000.0, spacing_m=spacing, seed=SEED),),
+        )
+        results[spacing] = (
+            run_scenario(scenario),
+            sum(g.count for g in scenario.groups),
+        )
+
+    dense, sparse = results[150.0], results[175.0]
+    assert sparse[1] < dense[1], "175 m has to use fewer anchors"
+    assert sparse[0].capex_per_km2_tl < dense[0].capex_per_km2_tl
+    assert sparse[0].fused.hpe_p50_m <= dense[0].fused.hpe_p50_m

@@ -1,5 +1,5 @@
 ﻿Sistem,Teknoloji,Ortam,HPE P50 [m],HPE P95 [m],VPE P95 [m],Kullanılabilirlik,Alan [km²],CAPEX [TL/km²],OPEX [TL/km²/yıl]
-YERKON (Şehir İçi - Kalibreli)¹,Karasal PNT (SX1280/LoRa TWR),Dış,"2,44","4,86","0,96","≈ %100,0","1,00",≈ 66.937,-
-YERKON (Şehir İçi - Ham)²,Karasal PNT (SX1280/LoRa TWR),Dış,"3,19","6,57","0,95","≈ %100,0","1,00",≈ 66.937,-
-YERKON (Kırsal)³,Karasal PNT (E28-SX1280 TWR),Dış,"7,77","36,84","0,98","≈ %100,0","1,01",≈ 200.854,-
-YERKON (Kritik Bölge/Tünel)⁴,Karasal PNT (UWB/DWM3000 TWR),İç + dış,"0,63","2,19","0,70","≈ %99,3","1,00",≈ 1.363.123,-
+YERKON (Şehir İçi - Kalibreli)¹,Karasal PNT (SX1280/LoRa TWR),Dış,"1,93","3,92","0,96","≈ %100,0","1,00",≈ 66.937,-
+YERKON (Şehir İçi - Ham)²,Karasal PNT (SX1280/LoRa TWR),Dış,"2,78","5,86","0,95","≈ %100,0","1,00",≈ 66.937,-
+YERKON (Kırsal)³,Karasal PNT (E28-SX1280 TWR),Dış,"8,68","36,73","0,98","≈ %100,0","1,01",≈ 200.854,-
+YERKON (Kritik Bölge/Tünel)⁴,Karasal PNT (UWB/DWM3000 TWR),İç + dış,"0,45","1,51","0,69","≈ %99,3","1,00",≈ 1.363.123,-

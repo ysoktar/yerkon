@@ -86,36 +86,62 @@ götürür. Şehir içi ve kırsalda sekiz ölçümden birini kaybetmek fix'i
 etkilemez. Tünelde beş ölçümden ikisini kaybetmek fix'i bitirir, ve
 kullanılabilirliğin %99,3'te kalmasının sebebi budur.
 
-## En etkili tek bulgu: menzil bant genişliği
+## Menzil bant genişliği: optimum ortada
 
-**Bu bölüm tablonun içinde değil.** Yukarıdaki tablo Robinson'ın gerçek
-donanımda ölçtüğü hatalarla üretiliyor ve öyle kalıyor. Aşağıdaki, aynı
-senaryonun yalnızca menzil hata modeli değiştirilerek tekrar çalıştırılmış
-hâli: "SX1280 daha geniş menzil bandında çalıştırılsaydı ne olurdu"
-sorusunun cevabı.
+**Daha önce "en geniş bandı seç" diye yazmıştım; ölçünce yanlış çıktı.**
 
-MATLAB'da dalga formu seviyesinde yapılan simülasyon
-([docs/WAVEFORM.md](docs/WAVEFORM.md)), SX1280'in menzil bant genişliğinin
-her şeyi belirlediğini gösteriyor. Rapor bu parametreyi belirtmiyor.
+Geniş bant temiz kanalda menzil hatasını gerçekten yarıya indiriyor ve
+menzilden hiçbir şey götürmüyor (yasal güç, yoğunluk sınırı yüzünden bant
+genişliğiyle birlikte artıyor). Ama çok yolluluğu da ayırıyor: yollar ayrı
+tepeler olarak çözülünce tepe dedektörü en güçlüsünü seçiyor, engelli bir
+kanalda bu bir yansıma oluyor. 1625 kHz'de medyan hata 0,00 m ama
+hataların %28'i 10 m'yi aşıyor.
 
-| Menzil hata modeli | σ | Şehir içi HPE P50 | Kırsal HPE P50 |
+Bunun bilinen çözümü ön kenar kestirimi, ve SX1280 kullanamıyor: geriye
+arama korelasyon ana lobunun yarısı kadar erken tetikleniyor, bu da UWB'de
+0,3 m, SX1280'de **90 m**. Ölçtüm, −96 m ofset veriyor.
+
+Karar menzil hatasına değil konum hatasına göre (HPE P50):
+
+| Bant | Şehir içi (%35 engelli) | Kırsal (%15 engelli) |
+|---|---|---|
+| 203 kHz | 3,52 m | 21,36 m |
+| **406 kHz** | **1,93 m** | 13,83 m |
+| **812 kHz** | 3,44 m | **8,68 m** |
+| 1625 kHz | 6,00 m | 14,06 m |
+
+İkisi de U biçimli, optimum ortam açıldıkça geniyor. Tablo şehir içini
+406 kHz, kırsalı 812 kHz ile üretiyor.
+
+**Rapor için iyi haber:** 406 kHz zaten Semtech'in ranging modunun ve
+Robinson'ın ölçümlerinin ayarı, yani şehir içi tercihi doğru.
+Değiştirilmesi gereken tek şey kırsalda bir katlama. Ayrıntı:
+[docs/WAVEFORM.md](docs/WAVEFORM.md).
+
+## Maliyet: şebeke gereğinden sık
+
+Şehir içi ızgara 150 m aralıkla kuruluyor. Fix en fazla 8 anchor
+kullandığı için bundan sıkı ızgara fazladan anchor'ları kullanmıyor,
+sadece en yakın sekizinin yayıldığı tabanı daraltıyor — daha çok donanımla
+daha kötü geometri:
+
+| Aralık | Düğüm | TL/km² | HPE P50 |
 |---|---|---|---|
-| Robinson (mevcut, gerçek donanım) — **tablodaki satır** | 3,04 m | **2,44 m** | **7,77 m** |
-| MATLAB 406 kHz | 2,69 m | 2,12 m | 6,15 m |
-| MATLAB 1,6 MHz | 0,71 m | 0,52 m | 1,67 m |
+| 125 m | 81 | 110.652 | 2,14 m |
+| **150 m (mevcut)** | 49 | **66.937** | **1,93 m** |
+| **175 m** | 36 | **49.179** | **1,60 m** |
+| 200 m | 36 | 49.179 | 1,67 m |
+| 250 m | 25 | 34.152 | 1,99 m |
 
-Ek donanım veya ek düğüm olmadan, sadece konfigürasyon seçimiyle şehir içi
-yatay hata 2,44 m'den 0,52 m'ye, kırsal 7,77 m'den 1,67 m'ye inebilirdi.
-Tabloya taşımadım, çünkü SX1280'in hangi bantta çalıştırılacağı bir tasarım
-kararı ve rapor bunu söylemiyor; ölçüme dayanan tek sayı Robinson'ınki.
+175 m aralık hem **%27 ucuz** hem daha doğru. 250 m aralık **%49 ucuz** ve
+mevcutla aynı doğrulukta. Tabloda 150 m bırakıldı çünkü raporun tasarımı
+o; ama bu, bedelsiz alınabilecek bir tasarruf.
 
-Bedeli daha kısa menzil olur (geniş bant, düşük hassasiyet), ve bu
-ödünleşim ölçülmedi. **Rapora öneri: menzil bant genişliği açıkça
-belirtilsin.**
-
-Ayrıca Robinson'ın ölçtüğü saçılma (2,94 m) 406 kHz simülasyonuyla (2,68 m)
-neredeyse birebir örtüşüyor; bu, onun dar bantta ölçmüş olabileceğini
-düşündürüyor.
+Daha büyük kaldıraç yol kaybı üstelinde: 4 anchor duyulması şartı
+`aralık ≤ menzil/2` demek, ve menzil üstele çok duyarlı. Şehir içi için
+seçtiğim 400 m, n≈3,8'e denk geliyor (yoğun kanyonun ucu). n=3,5 çıkarsa
+aralık 354 m'ye kadar açılabilir. **Birkaç noktada RSSI ölçüp üsteli
+belirlemek, km² başına maliyetteki 5×'lik belirsizliği kapatır.**
 
 ## Menzil değerleri nereden geliyor
 

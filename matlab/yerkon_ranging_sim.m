@@ -246,6 +246,31 @@ cases(end+1) = mkCase('sx1280_1600k_los',  'SX1280', 'LOS',  1625e3, 2450e6, 'ch
     sxSnrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_1600k_nlos', 'SX1280', 'NLOS', 1625e3, 2450e6, 'chirp', 'peak', ...
     sxSnrSweep, sxRanges, svParams('urban_nlos'), 4);
+
+% The same two configurations with leading-edge detection instead of peak.
+%
+% This pair exists because the peak results said something that cannot be
+% true: at 1625 kHz the NLOS spread came out eight times worse than at
+% 406 kHz, when four times the bandwidth cannot make ranging worse. The
+% distribution explains it. The median is 0.00 m and half the errors are
+% under a metre, but a quarter of them exceed 10 m. Wide bandwidth
+% resolves the multipath into separate peaks instead of merging them into
+% one broad blur, and a peak detector then picks the strongest, which in a
+% blocked channel is a reflection at a genuinely longer delay. Narrowband
+% cannot make that mistake because it cannot resolve the paths in the
+% first place; its error is a bounded weighted average.
+%
+% So the bandwidth is only worth having if the detector uses it. That is
+% what leading-edge detection is for, and it is what the DW-series parts
+% do. These cases measure whether the SX1280 would get the same benefit.
+cases(end+1) = mkCase('sx1280_1600k_los_le',  'SX1280', 'LOS',  1625e3, 2450e6, 'chirp', 'leading', ...
+    sxSnrSweep, sxRanges, svParams('outdoor_los'), 1);
+cases(end+1) = mkCase('sx1280_1600k_nlos_le', 'SX1280', 'NLOS', 1625e3, 2450e6, 'chirp', 'leading', ...
+    sxSnrSweep, sxRanges, svParams('urban_nlos'), 4);
+cases(end+1) = mkCase('sx1280_812k_los_le',   'SX1280', 'LOS',  812e3,  2450e6, 'chirp', 'leading', ...
+    sxSnrSweep, sxRanges, svParams('outdoor_los'), 1);
+cases(end+1) = mkCase('sx1280_812k_nlos_le',  'SX1280', 'NLOS', 812e3,  2450e6, 'chirp', 'leading', ...
+    sxSnrSweep, sxRanges, svParams('urban_nlos'), 4);
 end
 
 function c = mkCase(name, radio, condition, bw, fc, waveform, estimator, snrDb, ranges, channel, trialScale, sf)

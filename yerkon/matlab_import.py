@@ -27,6 +27,7 @@ from typing import Optional, Sequence
 import numpy as np
 
 from yerkon.evidence import EvidenceRecord, EvidenceType
+from yerkon.link_snr import LinkBudget, nearest_simulated_snr
 from yerkon.ranging_error import RangingErrorModel
 
 #: Where the MATLAB script writes, relative to the repository root.
@@ -53,6 +54,19 @@ class WaveformCase:
     bandwidth_hz: float
     errors_m: np.ndarray
     true_ranges_m: np.ndarray
+    snr_db: np.ndarray
+
+    def restricted_to(self, keep: np.ndarray) -> "WaveformCase":
+        """The same case over a subset of its trials."""
+        return WaveformCase(
+            case=self.case,
+            radio=self.radio,
+            condition=self.condition,
+            bandwidth_hz=self.bandwidth_hz,
+            errors_m=self.errors_m[keep],
+            true_ranges_m=self.true_ranges_m[keep],
+            snr_db=self.snr_db[keep],
+        )
 
     @property
     def mean_bias_m(self) -> float:
@@ -87,6 +101,7 @@ def load_trials(path: Optional[str] = None) -> dict[str, WaveformCase]:
 
     grouped: dict[str, list[float]] = {}
     ranges: dict[str, list[float]] = {}
+    snrs: dict[str, list[float]] = {}
     meta: dict[str, tuple[str, str, float]] = {}
     with open(path, newline="", encoding="utf-8-sig") as handle:
         reader = csv.DictReader(handle)
@@ -100,6 +115,7 @@ def load_trials(path: Optional[str] = None) -> dict[str, WaveformCase]:
             case = row["case"]
             grouped.setdefault(case, []).append(float(row["range_error_m"]))
             ranges.setdefault(case, []).append(float(row["true_range_m"]))
+            snrs.setdefault(case, []).append(float(row["snr_db"]))
             meta.setdefault(
                 case,
                 (row["radio"], row["condition"], float(row["bandwidth_hz"])),
@@ -118,8 +134,46 @@ def load_trials(path: Optional[str] = None) -> dict[str, WaveformCase]:
             bandwidth_hz=bandwidth,
             errors_m=np.array(errors, dtype=float),
             true_ranges_m=np.array(ranges[case], dtype=float),
+            snr_db=np.array(snrs[case], dtype=float),
         )
     return cases
+
+
+def realistic_trials(
+    case: WaveformCase,
+    budget: LinkBudget,
+    max_range_m: Optional[float] = None,
+) -> WaveformCase:
+    """Keep only the trials a real link of that length would produce.
+
+    The simulation sweeps distance and SNR independently, which is right
+    for the simulation: it models the receiver, not the path. But pooling
+    that grid uniformly says a 3000 m link is as likely to arrive at 25 dB
+    as at -20 dB, and it is not - a long link arrives weak, which is what
+    makes it long.
+
+    So for each simulated distance this keeps the SNR row the link budget
+    says that distance actually delivers, and drops the rest. Without it
+    the pooled spread is an average over conditions that never co-occur,
+    and it comes out several times too wide.
+
+    ``max_range_m`` additionally drops distances past the deployment's
+    link range, so a model used for 400 m links is not widened by 3000 m
+    trials that the deployment would never attempt.
+    """
+    available = sorted(set(float(v) for v in case.snr_db))
+    keep = np.zeros(case.errors_m.shape, dtype=bool)
+    for distance in sorted(set(float(v) for v in case.true_ranges_m)):
+        if max_range_m is not None and distance > max_range_m:
+            continue
+        wanted = nearest_simulated_snr(budget, distance, available)
+        keep |= (case.true_ranges_m == distance) & (case.snr_db == wanted)
+    if not keep.any():
+        raise ValueError(
+            "no trials left for {} after link-budget selection; the "
+            "simulated grid does not reach this configuration".format(case.case)
+        )
+    return case.restricted_to(keep)
 
 
 def build_model_from_cases(
@@ -127,6 +181,9 @@ def build_model_from_cases(
     name: str,
     seed: int = 0,
     calibrated: bool = True,
+    budget: Optional[LinkBudget] = None,
+    max_range_m: Optional[float] = None,
+    condition_weights: Optional[dict[str, float]] = None,
 ) -> RangingErrorModel:
     """Bootstrap an error model over the simulated trials.
 
@@ -134,11 +191,48 @@ def build_model_from_cases(
     including the heavy tail a narrowband receiver gets when it locks to a
     reflection. Fitting a Gaussian would throw that away, and the tail is
     the interesting part.
+
+    Passing ``budget`` restricts the trials to the distance and SNR pairs a
+    real link produces, via :func:`realistic_trials`. Without it every
+    simulated SNR is weighted equally at every distance, which inflates the
+    spread severalfold.
+
+    ``condition_weights`` maps a case condition (``LOS``, ``NLOS``) to how
+    much of the deployment's links are in it. It matters as much as the
+    budget does: an urban cell where 35% of links are obstructed is not the
+    50/50 mix that pooling one LOS case with one NLOS case would give, and
+    the NLOS tail is heavy enough that the difference is several metres.
     """
     if not cases:
         raise ValueError("build_model_from_cases needs at least one case")
 
-    pooled = np.concatenate([c.errors_m for c in cases])
+    if budget is not None:
+        cases = [realistic_trials(c, budget, max_range_m) for c in cases]
+
+    if condition_weights:
+        missing = {c.condition for c in cases} - set(condition_weights)
+        if missing:
+            raise ValueError(
+                "condition_weights is missing {}; every case condition needs "
+                "a weight or the mix is silently wrong".format(sorted(missing))
+            )
+        # Resample each condition to a share of a common pool proportional
+        # to its weight, so the bootstrap draws the deployment's mix rather
+        # than the simulation's case count.
+        total = float(sum(condition_weights[c.condition] for c in cases))
+        if total <= 0:
+            raise ValueError("condition_weights must sum to something positive")
+        target = max(c.errors_m.size for c in cases)
+        mix_rng = np.random.default_rng(seed + 977)
+        parts = []
+        for case in cases:
+            share = condition_weights[case.condition] / total
+            take = int(round(share * target))
+            if take > 0:
+                parts.append(mix_rng.choice(case.errors_m, size=take, replace=True))
+        pooled = np.concatenate(parts)
+    else:
+        pooled = np.concatenate([c.errors_m for c in cases])
     bias = float(np.mean(pooled))
     population = pooled - bias if calibrated else pooled
     rng = np.random.default_rng(seed)

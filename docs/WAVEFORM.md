@@ -67,39 +67,84 @@ iyi.
 Hangisi doğru olursa olsun sonuç aynı yere çıkıyor: **menzil bant
 genişliği, raporun belirtmediği ama her şeyi belirleyen parametre.**
 
-## Bant genişliği seçiminin sonuca etkisi
+## Bant genişliği: en geniş en iyi değil
 
-Bu bir **karşı-olgusal denemedir, tabloya girmez.** Aynı senaryo, tablonun
-kendi ayarlarıyla (füzyonlu, 16 koşu, seed 42), yalnızca menzil hata modeli
-değiştirilerek tekrar çalıştırıldı. İlk satır tablodaki satırın kendisidir,
-yani karşılaştırmanın referansı tabloyla birebir aynı sayıdır:
+**Önceki sürümde "mümkün olan en geniş bant seçilsin" diye yazmıştım.
+Bu yanlıştı.** Ölçünce optimum ortada çıkıyor.
 
-| Senaryo | Menzil hata modeli | σ | HPE P50 | HPE P95 |
-|---|---|---|---|---|
-| Şehir içi | **Robinson (tablodaki satır)** | 3,04 m | **2,44 m** | **4,86 m** |
-| Şehir içi | MATLAB 406 kHz | 2,69 m | 2,12 m | 4,31 m |
-| Şehir içi | MATLAB 1,6 MHz | 0,71 m | 0,52 m | 1,07 m |
-| Kırsal | **Robinson (tablodaki satır)** | 3,01 m | **7,77 m** | **36,84 m** |
-| Kırsal | MATLAB 406 kHz | 2,68 m | 6,15 m | 30,92 m |
-| Kırsal | MATLAB 1,6 MHz | 0,69 m | 1,67 m | 13,10 m |
+Link bütçesi tarafı doğru: yoğunluk sınırı yasal gücü bant genişliğiyle
+birlikte artırdığı için geniş bant menzilden hiçbir şey götürmüyor
+([regulatory.py](../yerkon/regulatory.py)). Ve temiz kanalda bant
+genişliğini iki katına çıkarmak menzil hatasını gerçekten yarıya
+indiriyor:
 
-1,6 MHz'e geçilseydi şehir içi yatay hata 2,44 m'den 0,52 m'ye, kırsal
-7,77 m'den 1,67 m'ye inerdi. **Ek donanım yok, ek düğüm yok, sadece bir
-konfigürasyon seçimi.**
+| Bant | LOS σ | NLOS σ | NLOS'ta \|hata\|>10 m |
+|---|---|---|---|
+| 203 kHz | 4,59 m | 4,45 m | %5 |
+| 406 kHz | 2,46 m | 2,32 m | %0 |
+| 812 kHz | 1,21 m | 7,21 m | %5 |
+| 1625 kHz | **0,59 m** | **18,02 m** | **%28** |
 
-Tablo yine de Robinson satırını kullanıyor. Sebebi: 1,6 MHz satırı bir
-simülasyonun çıktısı, Robinson satırı ise açılmış bir donanımın ölçümü.
-Rapor SX1280'i hangi menzil bandında çalıştıracağını söylemediği sürece,
-tabloda duracak olan ölçülmüş sayıdır. Rapor bandı belirtirse tablo o
-satıra geçebilir.
+LOS sütunu beklendiği gibi: her katlamada yarıya iniyor. NLOS sütunu
+tersine dönüyor, ve sebebi bir hata değil, fizik.
 
-Bedeli var: daha geniş bant daha düşük alıcı hassasiyeti, yani daha kısa
-menzil demek. Kırsalda bu, düğüm aralığını sıklaştırmayı gerektirebilir. Bu
-ödünleşim bu projede ölçülmedi, çünkü menzil-bant genişliği ilişkisi için
-elde kalibreli bir link bütçesi yok.
+**Geniş bant çok yolluluğu ayırıyor.** Dar bantta yansımalar tek bir geniş
+korelasyon tepesinde birleşiyor; tepe noktası ağırlıklı bir ortalama, yani
+hata sapmalı ama sınırlı. Geniş bantta yollar ayrı ayrı tepeler olarak
+çözülüyor ve tepe dedektörü en güçlüsünü seçiyor — doğrudan yolun
+zayıfladığı bir kanalda bu bir yansıma oluyor. Hata artık ortalama değil,
+o yansımanın gerçek fazla gecikmesi. Dağılım da bunu söylüyor: 1625 kHz'de
+medyan hata 0,00 m ve hataların yarısı 1 m'nin altında, ama %28'i 10 m'yi
+aşıyor. İki modlu.
 
-**Rapora öneri:** menzil bant genişliği açıkça belirtilsin ve mümkün olan en
-geniş bant seçilsin.
+## Ön kenar kestirimi bu parçada kullanılamıyor
+
+Bunun bilinen çözümü ön kenar (leading-edge) kestirimi: tepeden geriye
+doğru arayıp ilk varışı bulmak. DW serisi parçaların yaptığı bu. SX1280
+için denedim, çalışmıyor:
+
+| Yapılandırma | Sabit ofset | Kalibrasyon sonrası σ |
+|---|---|---|
+| 1625 kHz, tepe | +0,00 m | 18,02 m |
+| 1625 kHz, ön kenar | **−96 m** | 29,60 m |
+| 812 kHz, ön kenar | **−296 m** | 57,10 m |
+
+Sebep ölçülebilir bir büyüklük: geriye arama, korelasyon ana lobunun
+yaklaşık yarısı kadar erken tetikleniyor. Ana lob genişliği 1/B, yani
+
+- UWB, 499,2 MHz → yarım lob ≈ 0,3 m, önemsiz
+- SX1280, 1,625 MHz → yarım lob ≈ **90 m**
+
+Ölçülen −96 m tam olarak bu. Sabit kısmı kalibrasyonla gider ama geriye
+kalan saçılma tepe dedektöründen kötü, çünkü geri arama mesafesi SNR ve
+kanalla değişiyor. **UWB'nin çok yolluluk bağışıklığı bant genişliğinden
+değil, bant genişliğinin ön kenar kestirimini mümkün kılmasından
+geliyor.** SX1280 o eşiğin çok altında.
+
+## O zaman hangi bant?
+
+Menzil hatası değil, konum hatası karar versin. Senaryoların kendisiyle
+ölçüldüğünde (HPE P50):
+
+| Bant | Şehir içi (%35 engelli) | Kırsal (%15 engelli) |
+|---|---|---|
+| 203 kHz | 3,52 m | 21,36 m |
+| **406 kHz** | **1,93 m** | 13,83 m |
+| **812 kHz** | 3,44 m | **8,68 m** |
+| 1625 kHz | 6,00 m | 14,06 m |
+
+İkisi de U biçimli, ve optimum ortam açıldıkça genişliyor: şehir içinde
+**406 kHz**, kırsalda **812 kHz**. Tablo bu iki değerle üretiliyor.
+
+Bunun rapor açısından anlamı, beklediğimden iyi: **406 kHz zaten
+Semtech'in ranging modunun ve Robinson'ın ölçümlerinin kullandığı ayar.**
+Yani şehir içi için raporun örtük tercihi doğru. Değiştirilmesi gereken
+tek şey kırsal, ve orada da bir katlama.
+
+Bu sonucun dayandığı varsayım şudur: engelli link oranları (%35 ve %15) ve
+NLOS kanalının sertliği bu projenin seçimleri. Optimum bant genişliği bu
+iki sayıya bağlı, o yüzden saha ölçümü varsa bu tablo yeniden
+çalıştırılmalı.
 
 ## Tünel: rapor hedefi tutmuyor
 

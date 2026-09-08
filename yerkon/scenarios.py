@@ -53,11 +53,14 @@ from yerkon.path import (
 )
 from yerkon.receiver import ReceiverProfile, vehicle_receiver
 from yerkon.ranging_error import (
+    ROBINSON_URL,
+    robinson_errors_m,
     RangingErrorModel,
     add_nlos,
     build_dwm3000_model,
     build_sx1280_model,
 )
+from yerkon.link_snr import LinkBudget, PATH_LOSS_EXPONENTS
 from yerkon.matlab_import import build_model_from_cases, load_trials
 from yerkon.simulate import (
     RangingMethod,
@@ -372,12 +375,14 @@ def urban_scenario(calibrated: bool = True, seed: int = SEED) -> Scenario:
     moves. docs/SCENARIOS.md tabulates the trade.
     """
     side_m = 1000.0
-    model = add_nlos(
-        build_sx1280_model(seed=seed, calibrated=calibrated),
-        seed=seed + 10,
-        nlos_probability=0.35,
-        nlos_bias_m=1.5,
+    nlos_fraction = URBAN_NLOS_FRACTION
+    model, from_simulation = sx1280_error_model(
+        "urban", URBAN_LINK_RANGE_M, nlos_fraction, seed=seed, calibrated=calibrated
     )
+    if not from_simulation:
+        model = add_nlos(
+            model, seed=seed + 10, nlos_probability=nlos_fraction, nlos_bias_m=1.5
+        )
     suffix = "Kalibreli" if calibrated else "Ham"
     return Scenario(
         key="urban_calibrated" if calibrated else "urban_uncalibrated",
@@ -412,8 +417,11 @@ def urban_scenario(calibrated: bool = True, seed: int = SEED) -> Scenario:
         packet_loss_probability=0.02,
         parameter_evidence=(URBAN_LINK_RANGE.evidence, _PRICE_EVIDENCE, _NLOS_EVIDENCE),
         notes=(
-            "35% of links carry a 1.5 m NLOS bias, representing urban canyon "
-            "reflection off buildings.",
+            "35% of links are modelled as hard NLOS: the simulated channel "
+            "attenuates the direct path, so the peak detector can lock to a "
+            "reflection. At 406 kHz that produces a bounded error; at "
+            "1625 kHz it becomes bimodal, which is why the wider bandwidth "
+            "is not used here.",
         ),
     )
 
@@ -433,12 +441,14 @@ def rural_scenario(seed: int = SEED) -> Scenario:
     """
     length_m = 42000.0
     half_width_m = 12.0
-    model = add_nlos(
-        build_sx1280_model(seed=seed, calibrated=True),
-        seed=seed + 11,
-        nlos_probability=0.15,
-        nlos_bias_m=2.0,
+    nlos_fraction = RURAL_NLOS_FRACTION
+    model, from_simulation = sx1280_error_model(
+        "rural", RURAL_LINK_RANGE_M, nlos_fraction, seed=seed, calibrated=True
     )
+    if not from_simulation:
+        model = add_nlos(
+            model, seed=seed + 11, nlos_probability=nlos_fraction, nlos_bias_m=2.0
+        )
     return Scenario(
         key="rural",
         display_name="YERKON (Kırsal)",
@@ -482,9 +492,194 @@ def rural_scenario(seed: int = SEED) -> Scenario:
             ),
             "Vertical accuracy degrades sharply outside the sign lines: VDOP "
             "is near 2 on the carriageway and above 25 at 50 m off-road.",
-            "15% of links carry a 2.0 m NLOS bias, representing terrain and "
-            "vegetation obstruction.",
+            "15% of links are modelled as hard NLOS, representing terrain "
+            "and vegetation blocking the direct path. The corridor is open "
+            "enough that the wider 812 kHz ranging bandwidth wins here, "
+            "where in the city 406 kHz does.",
         ),
+    )
+
+
+#: The SX1280 ranging bandwidth each environment is simulated at, in Hz.
+#:
+#: The part offers four and the report names none. Widening it is free in
+#: link-budget terms - ``regulatory`` shows the band's density cap raises
+#: the legal transmit power by exactly what the wider bandwidth adds to
+#: thermal noise, so the range is unchanged - and in a clear channel the
+#: ranging error halves with every doubling.
+#:
+#: It does not follow that the widest is best, and measuring it says
+#: otherwise. Wide bandwidth resolves multipath into separate correlation
+#: peaks instead of merging them into one broad blur. A peak detector then
+#: picks the strongest, which in a blocked channel is a reflection at a
+#: genuinely longer delay, so the error stops being a bounded average and
+#: becomes bimodal: at 1625 kHz the median urban NLOS error is 0.00 m but
+#: 28% of errors exceed 10 m.
+#:
+#: The usual escape is leading-edge detection, and this part cannot use
+#: it. Back-searching lands about half a correlation lobe early, which is
+#: 0.3 m for UWB at 499 MHz and about 90 m for the SX1280 at 1.6 MHz.
+#: Measured: leading edge at 1625 kHz gives a -96 m offset and a wider
+#: spread than peak detection even after that offset is calibrated out.
+#:
+#: So the best bandwidth is the one that balances timing resolution
+#: against multipath picking, and it depends on how obstructed the
+#: environment is. Measured on the scenarios themselves, in HPE P50:
+#:
+#:     urban (35% blocked)   203 kHz 3.52  406 kHz 1.93  812 kHz 3.44  1625 kHz 6.00
+#:     rural (15% blocked)   203 kHz 21.4  406 kHz 13.8  812 kHz 8.68  1625 kHz 14.1
+#:
+#: Both are U-shaped with the optimum in the middle, and it moves wider as
+#: the environment opens up. 406 kHz is also what Semtech's ranging mode
+#: and Robinson's published measurements use, so the urban answer is that
+#: the part's existing default is already right.
+RANGING_BANDWIDTH_HZ = {
+    "urban": 406e3,
+    "rural": 812e3,
+}
+
+#: Fraction of links whose direct path is blocked, per environment.
+#:
+#: These weight the simulation's LOS and NLOS cases into the mix a
+#: deployment sees. Read them as hard obstruction - the simulated NLOS
+#: channel attenuates the direct path and drops the Rician K factor
+#: negative, so the peak detector can lock to a reflection outright. That
+#: is a stronger claim than the 1.5 m bias an earlier version layered on
+#: the same fraction of links, and the resulting spread is much wider.
+URBAN_NLOS_FRACTION = 0.35
+RURAL_NLOS_FRACTION = 0.15
+
+SX1280_CARRIER_HZ = 2450e6
+UWB_CARRIER_HZ = 6489.6e6
+
+
+def _waveform_model(
+    case_names: tuple[str, ...],
+    name: str,
+    exponent_key: str,
+    max_range_m: float,
+    carrier_hz: float,
+    bandwidth_hz: float,
+    seed: int,
+    calibrated: bool = True,
+    nlos_fraction: Optional[float] = None,
+) -> Optional[RangingErrorModel]:
+    """Build an error model from the MATLAB run, or None if it is absent.
+
+    The link budget is passed in so the trials are restricted to the
+    distance and SNR pairs this deployment actually produces. Skipping that
+    step pools every simulated SNR at every distance and comes out several
+    times too wide; see ``matlab_import.realistic_trials``.
+    """
+    try:
+        available = load_trials()
+    except (FileNotFoundError, ValueError):
+        return None
+    selected = [c for c in available.values() if c.case in case_names]
+    if len(selected) != len(case_names):
+        return None
+    budget = LinkBudget(
+        bandwidth_hz=bandwidth_hz,
+        frequency_hz=carrier_hz,
+        exponent=PATH_LOSS_EXPONENTS[exponent_key],
+    )
+    weights = None
+    if nlos_fraction is not None:
+        weights = {"LOS": 1.0 - nlos_fraction, "NLOS": nlos_fraction}
+    return build_model_from_cases(
+        selected,
+        name=name,
+        seed=seed,
+        calibrated=calibrated,
+        budget=budget,
+        max_range_m=max_range_m,
+        condition_weights=weights,
+    )
+
+
+def sx1280_error_model(
+    environment: str,
+    max_range_m: float,
+    nlos_fraction: float,
+    seed: int = SEED,
+    calibrated: bool = True,
+    bandwidth_hz: Optional[float] = None,
+) -> tuple[RangingErrorModel, bool]:
+    """The SX1280 error model, preferring the waveform simulation.
+
+    Returns the model and whether it came from the simulation. The
+    fallback is the bootstrap over Robinson's six published measurements,
+    which is the only hardware number in the project but covers one
+    unstated bandwidth over 0-250 m. Where the MATLAB export is present the
+    simulation supersedes it, because it knows its own bandwidth.
+    """
+    if bandwidth_hz is None:
+        bandwidth_hz = RANGING_BANDWIDTH_HZ[environment]
+    tag = "{:.0f}k".format(bandwidth_hz / 1e3)
+    prefix = "sx1280_1600k" if bandwidth_hz == 1625e3 else "sx1280_" + tag
+    model = _waveform_model(
+        (prefix + "_los", prefix + "_nlos"),
+        name="Semtech SX1280 at {:.0f} kHz (MATLAB waveform simulation, {})".format(
+            bandwidth_hz / 1e3, "calibrated" if calibrated else "uncalibrated"
+        ),
+        exponent_key=environment,
+        max_range_m=max_range_m,
+        carrier_hz=SX1280_CARRIER_HZ,
+        bandwidth_hz=bandwidth_hz,
+        seed=seed,
+        calibrated=calibrated,
+        nlos_fraction=nlos_fraction,
+    )
+    if model is not None:
+        if not calibrated:
+            model = _with_hardware_offset(model)
+        return model, True
+    return build_sx1280_model(seed=seed, calibrated=calibrated), False
+
+
+def _with_hardware_offset(model: RangingErrorModel) -> RangingErrorModel:
+    """Add the constant offset only hardware has, to a simulated model.
+
+    The uncalibrated row exists to show what skipping per-unit ranging
+    calibration costs. The waveform simulation cannot show it: its own
+    constant offset is 0.01 m, because it models the waveform and the
+    channel but not the antenna phase centre or the chip's group delay,
+    which is where a real per-unit offset comes from. Robinson's six
+    measurements are the only place in this project where one was
+    observed, at +2.83 m.
+
+    So the two halves come from where each is actually known: the spread
+    from the simulation, which knows its own bandwidth, and the constant
+    offset from the hardware, which is the only thing that ever measured
+    one. Leaving the row on the simulation alone would have made it
+    identical to the calibrated row and quietly said per-unit calibration
+    buys nothing.
+    """
+    offset = float(np.mean(robinson_errors_m()))
+    base = model.sample
+    return RangingErrorModel(
+        name=model.name + " + measured per-unit offset",
+        evidence=EvidenceRecord(
+            evidence_type=model.evidence.evidence_type,
+            source_name=model.evidence.source_name,
+            source_url=ROBINSON_URL,
+            source_scope=model.evidence.source_scope,
+            caveats=(
+                model.evidence.caveats
+                + " The {:+.2f} m constant offset is Robinson's measured "
+                "SX1280 offset, not a simulated one: the simulation has no "
+                "antenna or chip group delay to produce one."
+            ).format(offset),
+        ),
+        sample=lambda n: base(n) + offset,
+        population_errors_m=(
+            tuple(v + offset for v in model.population_errors_m)
+            if model.population_errors_m
+            else None
+        ),
+        mean_bias_m=offset,
+        includes_multipath=model.includes_multipath,
+        valid_range_m=model.valid_range_m,
     )
 
 
@@ -514,6 +709,12 @@ def tunnel_error_model(seed: int = SEED) -> RangingErrorModel:
         name="Qorvo DWM3000 (MATLAB waveform simulation, tunnel channel)",
         seed=seed,
         calibrated=True,
+        budget=LinkBudget(
+            bandwidth_hz=499.2e6,
+            frequency_hz=UWB_CARRIER_HZ,
+            exponent=PATH_LOSS_EXPONENTS["tunnel"],
+        ),
+        max_range_m=TUNNEL_LINK_RANGE_M,
     )
 
 
