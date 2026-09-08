@@ -497,7 +497,9 @@ def rural_scenario(seed: int = SEED) -> Scenario:
         technology="Karasal PNT (E28-SX1280 TWR)",
         environment="Dış",
         groups=(
-            roadside_layout(length_m=length_m, sign_spacing_m=500.0, seed=seed),
+            roadside_layout(
+                length_m=length_m, sign_spacing_m=RURAL_SIGN_SPACING_M, seed=seed
+            ),
             mast_layout(length_m=length_m, spacing_m=2500.0, seed=seed),
         ),
         track=driving_track(
@@ -613,6 +615,25 @@ RURAL_NLOS_FRACTION = 0.15
 #: which is the bare minimum for a 3D fix and no margin for a lost packet.
 #: 175 m keeps five.
 URBAN_GRID_SPACING_M = 175.0
+
+#: Spacing between facing roadside sign mounts on the rural corridor, in
+#: metres.
+#:
+#: 750 m rather than the 500 m an earlier version used, for the same
+#: reason the urban grid opened up: a fix uses at most
+#: MAX_ANCHORS_PER_FIX anchors, so past that point closer spacing only
+#: shortens the baseline they span. Measured, at 812 kHz:
+#:
+#:      500 m  187 nodes  200854 TL  P50 8.43  P95 35.80
+#:      750 m  131 nodes  140705 TL  P50 7.81  P95 26.49
+#:     1000 m  103 nodes  110631 TL  P50 9.33  P95 57.65
+#:     1500 m   75 nodes   80557 TL  P50 13.76 P95 63.30
+#:
+#: 750 m is 30% cheaper than 500 m and better on both the median and the
+#: tail, so nothing is traded away. Past 750 m the tail runs away: 1000 m
+#: doubles P95 to save a further 21%, which is the wrong trade for a row
+#: whose weakest number is already its tail.
+RURAL_SIGN_SPACING_M = 750.0
 
 SX1280_CARRIER_HZ = 2450e6
 UWB_CARRIER_HZ = 6489.6e6

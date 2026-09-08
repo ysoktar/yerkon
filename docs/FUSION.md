@@ -89,17 +89,18 @@ dikey hata her senaryoda on kattan fazla artıyor. Karasal geometri yüksekliği
 çözemiyor; çözen şey aracın ölçülmüş bir yüzeyin üstünde olduğunun
 bilinmesi.
 
-**Tünelde yardım olmadan filtre ıraksıyor.** Koridor geometrisi eksen
-boyunca neredeyse hiçbir bilgi vermiyor; odometri ve pusula olmadan filtre
-sürükleniyor ve yatay P95 295 m'ye çıkıyor. Tünelde sensör füzyonu bir
-iyileştirme değil, çalışma şartı.
+**Tünelde de esas katkı dikeyde.** Odometri, pusula ve harita
+kapatıldığında yatay P95 1,45 m'den 2,55 m'ye, dikey P95 ise 0,69 m'den
+6,70 m'ye çıkıyor. Burada daha önce "yardım olmadan filtre ıraksıyor,
+yatay P95 295 m'ye çıkıyor" yazmıştım. O bir artefaktmış ve geri alındı,
+gerekçesi [WAVEFORM.md](WAVEFORM.md#geri-alınan-bir-bulgu) içinde.
 
 **Açık alanda odometri yatayda küçük bir zarar veriyor.** Şehir içinde
-odometresiz HPE P50 1,76 m, odometriyle 2,19 m. Sebebi %2'lik ölçek
+odometresiz HPE P50 1,76 m, odometriyle 1,64 m. Sebebi %2'lik ölçek
 sapması: 13,9 m/s hızda 0,28 m/s'lik bir hız sapması demek ve şehir içinde
 radyo geometrisi zaten iyi olduğu için odometri bilgi eklemek yerine sapma
-ekliyor. Kırsalda tersi: geometri zayıf olduğu için odometri fayda sağlıyor
-(P95 25,54 → 21,65).
+ekliyor. Kırsalda tersi oluyor, geometri zayıf olduğu için odometri fayda
+sağlıyor: P95 odometresiz 29,66 m, odometriyle 26,49 m.
 
 Aynı sebeple harita kısıtı yatayda küçük bir bedel doğuruyor: yanlış
 sabitlenen bir yükseklik, menzilleri açıklamak için x-y'yi bir miktar
@@ -125,7 +126,7 @@ kurulum ofseti olduğu. 0 = hepsi ortalanabilir gürültü, 1 = hiçbiri.
 gürültüyü ayıramıyor. 0,5 varsayılan olarak seçildi ve etkisi burada
 gösteriliyor.
 
-Tünel neredeyse etkilenmiyor, çünkü UWB'nin menzil hatası zaten 0,096 m.
+Tünel neredeyse etkilenmiyor, çünkü UWB'nin menzil hatası zaten 0,35 m.
 
 ## Harita doğruluğu doğrudan dikey sonuca geçiyor
 
@@ -133,14 +134,14 @@ Tünel neredeyse etkilenmiyor, çünkü UWB'nin menzil hatası zaten 0,096 m.
 
 | Harita σ | VPE P50 | VPE P95 | HPE P50 |
 |---|---|---|---|
-| 0,2 m | 0,11 m | 0,45 m | 2,19 m |
-| **0,5 m (kullanılan)** | **0,26 m** | **1,12 m** | **2,21 m** |
-| 1,0 m | 0,52 m | 2,22 m | 2,21 m |
-| 2,0 m | 1,10 m | 4,36 m | 2,17 m |
+| 0,2 m | 0,17 m | 0,41 m | 1,64 m |
+| 0,5 m (kullanılan) | **0,44 m** | **1,00 m** | **1,64 m** |
+| 1,0 m | 0,87 m | 1,91 m | 1,65 m |
+| 2,0 m | 1,63 m | 3,42 m | 1,66 m |
 
-VPE, harita σ'sıyla doğrusal ölçekleniyor ve HPE hiç değişmiyor. Bu,
-tablodaki VPE sütununun ne ölçtüğünü açıkça söylüyor: **haritayı, radyoyu
-değil.** Rapora bu satır yazılırken bunun belirtilmesi gerekir.
+VPE harita σ'sıyla doğrusal ölçekleniyor ve HPE hiç değişmiyor. Bu,
+tablodaki VPE sütununun ne ölçtüğünü açıkça söylüyor: haritayı, radyoyu
+değil. Rapora bu satır yazılırken belirtilmeli.
 
 ## Alıcı tipi
 

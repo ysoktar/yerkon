@@ -30,13 +30,14 @@ aynıdır.
 | Parametre | Değer | Kaynak |
 |---|---|---|
 | Kapsama alanı | 1 km × 1 km = 1,00 km² | Varsayım (≥ 1 km² koşulu) |
-| Anchor sayısı | 49 | Türetilmiş (ızgara) |
-| Izgara aralığı | 150 m | Varsayım (raporun "yüksek sayıda kısa menzilli" tarifi) |
+| Anchor sayısı | 36 | Türetilmiş (ızgara) |
+| Izgara aralığı | 175 m | Süpürmeyle seçildi ([CONFIGURATION.md](CONFIGURATION.md)) |
 | Montaj yükseklikleri | 8 m direk, 20 m cephe, 35 m çatı (±0,75 m sapma) | Rapor (montaj sınıfları), Varsayım (dağılım) |
 | Bağlantı menzili | 400 m = 3,0 km referansın %13'ü | Üretici + Varsayım (derating) |
-| Menzil hata modeli | SX1280, Robinson bootstrap | Ölçüm |
-| Menzil hatası σ | 3,03 m | Türetilmiş |
-| NLOS oranı ve sapması | %35, 1,5 m | Varsayım |
+| Menzil bant genişliği | 406 kHz | Süpürmeyle seçildi |
+| Menzil hata modeli | SX1280, MATLAB dalga formu simülasyonu | Simülasyon |
+| Menzil hatası σ | 2,40 m | Türetilmiş |
+| Engellenen link oranı | %35 (sert NLOS) | Varsayım |
 | Paket kaybı | %2 | Varsayım |
 | Birim fiyat | 1.366,07 TL | Rapor |
 | Test yörüngesi | Hücreyi çapraz kesen doğru, 24 nokta, z = 1,5 m | Varsayım |
@@ -53,17 +54,20 @@ Montaj yükseklikleri komşu anchor'lar arasında değişir. Tek yükseklikte bi
 
 | | Kalibreli | Ham |
 |---|---|---|
-| Menzilde duyulan / fix'te kullanılan | 20 / 8 | 20 / 8 |
-| Medyan / en uzun bağlantı | 171 m / 377 m | 171 m / 377 m |
-| 250 m'yi aşan bağlantı oranı | %6,3 | %6,3 |
-| HDOP / VDOP (medyan) | 0,73 / 2,37 | 0,73 / 2,37 |
-| En kötü VDOP | 6,54 | 6,54 |
-| Tek-atım HPE P50 / P95 | 2,00 m / 4,13 m | 2,44 m / 5,74 m |
-| Tek-atım VPE P50 / P95 | 6,50 m / 35,56 m | 19,75 m / 49,85 m |
-| **Filtreli HPE P50 / P95** | **2,31 m / 4,82 m** | **3,02 m / 6,34 m** |
-| **Filtreli VPE P50 / P95** | **0,26 m / 1,07 m** | **0,27 m / 1,05 m** |
+| Düğüm sayısı, aralık | 36, 175 m | 36, 175 m |
+| Menzil bant genişliği | 406 kHz | 406 kHz |
+| Menzil hatası σ | 2,40 m | 2,40 m |
+| Menzilde duyulan / kullanılan (en az) | 15 / 8 (5) | 15 / 8 (5) |
+| Medyan / en uzun bağlantı | 202 m / 392 m | 202 m / 392 m |
+| Kanıt zarfı dışındaki bağlantı | %0,0 | %0,0 |
+| HDOP / VDOP (medyan) | 0,73 / 2,79 | 0,73 / 2,79 |
+| En kötü VDOP | 10,53 | 10,53 |
+| Tek atım HPE P50 / P95 | 1,44 m / 3,69 m | 2,04 m / 4,98 m |
+| Tek atım VPE P50 / P95 | 4,56 m / 29,82 m | 18,38 m / 48,56 m |
+| Filtreli HPE P50 / P95 | **1,64 m / 3,40 m** | **2,15 m / 4,82 m** |
+| Filtreli VPE P50 / P95 | **0,44 m / 1,00 m** | **0,43 m / 1,04 m** |
 | Kullanılabilirlik | %100,0 | %100,0 |
-| CAPEX | 66.937 TL/km² | 66.937 TL/km² |
+| CAPEX | 49.179 TL/km² | 49.179 TL/km² |
 
 Sürüş izi: 50 km/h'de, 2,5 derece/s dönüşle hücre içinde kalan bir
 yay üzerinde 180 saniye, ±1,2 m şerit değişimiyle. Dönüş kasıtlı: hep düz
@@ -85,6 +89,7 @@ Aynı hücre, farklı ızgara aralıklarıyla (400 m menzil, en yakın 8 anchor)
 |---|---|---|---|---|---|
 | 100 m | 121 | 0,75 | 1,57 | 112 m | 165.294 |
 | 150 m | 49 | 0,73 | 2,29 | 181 m | 66.937 |
+| 175 m (kullanılan) | **36** | **0,73** | **2,79** | **202 m** | **49.179** |
 | 200 m | 36 | 0,73 | 3,03 | 225 m | 49.179 |
 | 250 m | 25 | 0,78 | 4,12 | 248 m | 34.152 |
 | 300 m | 16 | 1,02 | 5,58 | 241 m | 21.857 |
@@ -127,17 +132,20 @@ kapsadığı 0-250 m aralığının dışında kalıyor. Bu bir çıkarsamadır 
 
 | | Değer |
 |---|---|
-| Menzilde duyulan / fix'te kullanılan | 26 / 8 |
-| Medyan / en uzun bağlantı | 458 m / 1.000 m |
-| 250 m'yi aşan bağlantı oranı | %72,4 |
-| HDOP / VDOP (medyan) | 5,84 / 11,56 |
-| En kötü VDOP | 28,30 |
-| Tek-atım HPE P50 / P95 | 7,15 m / 26,82 m |
-| Tek-atım VPE P50 / P95 | 7,08 m / 29,72 m |
-| **Filtreli HPE P50 / P95** | **5,45 m / 25,47 m** |
-| **Filtreli VPE P50 / P95** | **0,37 m / 0,98 m** |
+| Düğüm sayısı, levha aralığı | 131, 750 m |
+| Menzil bant genişliği | 812 kHz |
+| Menzil hatası σ | 3,98 m |
+| Menzilde duyulan / kullanılan (en az) | 18 / 8 (8) |
+| Medyan / en uzun bağlantı | 620 m / 1.750 m |
+| Kanıt zarfı dışındaki bağlantı | %0,0 |
+| HDOP / VDOP (medyan) | 8,54 / 15,29 |
+| En kötü VDOP | 40,21 |
+| Tek atım HPE P50 / P95 | 5,91 m / 35,24 m |
+| Tek atım VPE P50 / P95 | 6,56 m / 30,40 m |
+| Filtreli HPE P50 / P95 | **7,81 m / 26,49 m** |
+| Filtreli VPE P50 / P95 | **0,35 m / 1,03 m** |
 | Kullanılabilirlik | %100,0 |
-| CAPEX | 200.854 TL/km², 4.821 TL/km |
+| CAPEX | 140.705 TL/km², 3.377 TL/km |
 
 Sürüş izi: 110 km/h'de koridor boyunca 180 saniye (5,5 km), ±3 m şerit
 değişimiyle. Kırsal, odometrinin en çok fayda verdiği senaryo: radyo
@@ -151,13 +159,14 @@ geometrisi zayıf olduğu için tekerlek hızı gerçek bilgi ekliyor
 | Yol kenarı aralığı | Birim | HDOP | VDOP | Medyan bağlantı | TL/km | TL/km² |
 |---|---|---|---|---|---|---|
 | 1000 m | 103 | 12,12 | 16,01 | 838 m | 2.655 | 110.631 |
-| **500 m (kullanılan)** | **187** | **5,84** | **11,56** | **458 m** | **4.821** | **200.854** |
+| 750 m (kullanılan) | **131** | **8,54** | **15,29** | **620 m** | **3.377** | **140.705** |
+| 500 m | 187 | 5,84 | 11,56 | 458 m | 4.821 | 200.854 |
 | 300 m | 299 | 4,68 | 9,48 | 274 m | 7.708 | 321.152 |
 | 200 m | 439 | 2,95 | 6,80 | 196 m | 11.317 | 471.524 |
 
 Raporun "az sayıda nokta" tercihi burada ölçülebilir hale geliyor. 200 m
-aralık VDOP'u 6,80'e indiriyor ama km başına maliyeti 2,3 katına çıkarıyor.
-500 m, rapor metnine sadık kalan ve dört anchor'ı her noktada menzilde
+aralık VDOP'u 6,80'e indiriyor ama km başına maliyeti 3,4 katına çıkarıyor.
+Seçilen 750 m, rapor metnine sadık kalan ve dört anchor'ı her noktada menzilde
 tutan seçim.
 
 ### Kuleler ne yapıyor
@@ -189,9 +198,8 @@ kenarı ünitesi 1,03 derece. İkisi de dik değildir.
 | Anchor sayısı | 834 | Türetilmiş |
 | Montaj | Duvar (1,2-1,3 m) ve tavan (4,3-4,4 m), dört adımlı döngü | Varsayım |
 | Bağlantı menzili | 150 m | Varsayım (yayımlanmış üst sınır yok) |
-| Menzil hata modeli | DWM3000, yapılandırılmış Gauss | Rapor hedefi |
-| Menzil hatası σ | 0,096 m (NLOS dahil) | Türetilmiş |
-| NLOS oranı ve sapması | %10, 0,3 m | Varsayım |
+| Menzil hata modeli | DWM3000, MATLAB dalga formu simülasyonu | Simülasyon |
+| Menzil hatası σ | 0,35 m | Türetilmiş |
 | Paket kaybı | %3 | Varsayım |
 | Birim fiyat | 1.634,44 TL | Rapor |
 | Test yörüngesi | Tünel boyunca doğru, 24 nokta | Varsayım |
@@ -231,29 +239,37 @@ doğru her zaman eş düzlemlidir; dikey eksen kaç anchor eklenirse eklensin
 
 | | Değer |
 |---|---|
-| Menzilde duyulan / fix'te kullanılan | 5 / 5 |
+| Düğüm sayısı, aralık | 834, 60 m |
+| Menzil hatası σ | 0,35 m |
+| Menzilde duyulan / kullanılan (en az) | 5 / 5 (5) |
 | Medyan / en uzun bağlantı | 75 m / 149 m |
 | HDOP / VDOP (medyan) | 3,16 / 13,49 |
 | En kötü VDOP | 21,84 |
-| Tek-atım HPE P50 / P95 | 0,11 m / 0,86 m |
-| Tek-atım VPE P50 / P95 | 0,54 m / 4,21 m |
-| **Filtreli HPE P50 / P95** | **0,15 m / 0,56 m** |
-| **Filtreli VPE P50 / P95** | **0,25 m / 0,63 m** |
+| Tek atım HPE P50 / P95 | 0,24 m / 2,70 m |
+| Tek atım VPE P50 / P95 | 1,04 m / 5,46 m |
+| Filtreli HPE P50 / P95 | **0,43 m / 1,45 m** |
+| Filtreli VPE P50 / P95 | **0,25 m / 0,69 m** |
 | Kullanılabilirlik | %99,3 |
-| CAPEX | 1.363.123 TL/km², 27.230 TL/km |
+| CAPEX | 1.363.123 TL/km², 27.262 TL/km |
 
 Sürüş izi: 80 km/h'de tünel boyunca 180 saniye (4 km), ±1,5 m şerit
 değişimiyle.
 
-Tünel, sensör füzyonunun zorunlu olduğu tek senaryo. Odometri ve pusula
-kapatıldığında filtre koridor ekseni boyunca sürükleniyor ve yatay P95
-0,56 m'den 295 m'ye çıkıyor. Koridor geometrisi eksen yönünde neredeyse
-hiçbir bilgi vermediği için, o yönü tutan şey tekerlek ve pusula.
+Yardımcı sensörler tünelde de en çok dikeyde işe yarıyor. Odometri, pusula
+ve harita kapatıldığında yatay P95 1,45 m'den 2,55 m'ye, dikey P95 ise
+0,69 m'den 6,70 m'ye çıkıyor.
+
+Burada daha önce "tünel, sensör füzyonunun zorunlu olduğu tek senaryo,
+onlarsız yatay P95 295 m'ye çıkıyor" diye bir bulgu yazmıştım. O bir
+artefaktmış ve geri alındı. Sebebi
+[WAVEFORM.md](WAVEFORM.md#geri-alınan-bir-bulgu) içinde: menzil hatası
+raporun hedefine göre alındığı için aykırı değer kapısı fazla dar
+kalıyordu, ve NLOS iki kez sayılıyordu.
 
 DOP değerleri dört senaryonun ortasında, sonuçlar ise açık ara en iyisi.
-Çelişki değil: UWB'nin menzil hatası σ = 0,096 m, SX1280'in 3,03 m'sinin
-otuzda biri. Kötü geometri küçük bir hatayı büyütüyor ve yine de küçük
-kalıyor.
+Bu bir çelişki değil. UWB'nin menzil hatası σ = 0,35 m, SX1280'in 2,40
+m'sinin yedide biri. Kötü geometri küçük bir hatayı büyütüyor ve yine de
+küçük kalıyor.
 
 
 ---

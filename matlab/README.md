@@ -100,7 +100,7 @@ matlab/export/yerkon_imu_params.csv
 Bu, füzyon filtresindeki en zayıf varsayımlardan birini düzeltiyor. Şu an
 IMU ivme gürültüsü ve sapması benim seçtiğim sayılar (0,08 ve 0,03 m/s²) ve
 menzil ölçümü gelmediği anlarda kestirimin ne kadar sürükleneceğini bunlar
-belirliyor — tünelde sonucun tamamı bu. `imuSensor` gerçek bir MEMS
+belirliyor, ve tünelde sonucun tamamı bu. `imuSensor` gerçek bir MEMS
 biriminin stokastik terimlerini taşıyor, sapma kararsızlığını benim
 modelimdeki sabit ofset yerine rastgele yürüyüş olarak veriyor. Çıktı, aynen
 filtrenin ihtiyaç duyduğu büyüklük: **kesinti süresine göre serbest ataletsel
@@ -153,7 +153,7 @@ UWB'nin 500 MHz bandında yollar ayrışabilir, bu yüzden **ön kenar** aramas�
 yapılır (DW serisi yongaların yaptığı da budur) ve yansımaya kilitlenmek
 önlenir. SX1280'in 1,6 MHz bandında korelasyon tepesi yüzlerce metre
 geniştir; yollar zaten ayrışmaz, aranacak daha erken bir varış yoktur.
-Geriye sabit bir ofset kalır — Robinson'un verisindeki 2,83 m'lik sapmanın
+Geriye sabit bir ofset kalır. Robinson'un verisindeki 2,83 m'lik sapmanın
 kaynağı da budur ve modül başına kalibrasyonun sildiği şey odur.
 
 ## Sonuçlar ne olacak

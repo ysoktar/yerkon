@@ -171,7 +171,7 @@ anchor alıcıya göre neredeyse ufuk hizasındadır:
 | Bina çatısı, 150 m | 33,5 m | 150 m | 12,59° |
 | Bina çatısı, 400 m | 33,5 m | 400 m | 4,79° |
 | Tünel tavanı, 75 m | 2,8 m | 75 m | 2,14° |
-| GNSS uydusu | — | — | ≈ 45° |
+| GNSS uydusu | yok | yok | ≈ 45° |
 
 Bir uydu alıcının 45 derece üstünden bakar; menzil hatasının önemli bir
 bileşeni doğrudan dikey eksene düşer. Bir yol levhası 1 dereceden bakar;
@@ -182,12 +182,12 @@ görünür:
 | Senaryo | HDOP | VDOP | VDOP/HDOP |
 |---|---|---|---|
 | Şehir içi (150 m ızgara) | 0,73 | 2,37 | 3,2× |
-| Kırsal (500 m nokta aralığı) | 5,84 | 11,56 | 2,0× |
+| Kırsal (750 m nokta aralığı) | 8,54 | 15,29 | 1,8× |
 | Tünel (60 m düğüm aralığı) | 3,16 | 13,49 | 4,3× |
 
 Ölçülen dikey hatalar bu çarpanlarla tutarlı. Şehir içi kalibreli
-senaryoda menzil hatasının standart sapması 3,03 m, medyan VDOP 2,37;
-`2,37 × 3,03 ≈ 7,2 m` beklenir, ölçülen VPE P50 6,50 m.
+senaryoda menzil hatasının standart sapması 2,40 m ve medyan VDOP 2,79,
+yani `2,79 × 2,40 ≈ 6,7 m` beklenir. Ölçülen tek atım VPE P50 4,56 m.
 
 Bunu iyileştirmenin üç yolu var ve üçü de maliyetli:
 
@@ -210,7 +210,7 @@ verdiği modülün yayımlanmış değerine bağlı olarak tutulur.
 |---|---|---|---|---|
 | Şehir içi | SX1280/SX1281 @ 12,5 dBm | 3,0 km | 400 m | %13 |
 | Kırsal | E28-2G4M27S @ 27 dBm | 8,0 km | 3.000 m | %37,5 |
-| Tünel | DWM3000 | yok | 150 m | — |
+| Tünel | DWM3000 | yok | 150 m | yok |
 
 Referans mesafeler açık arazide, 5 dBi anten, 2,5 m yükseklik ve 1 kbps
 hava hızında ölçülmüştür. Menzil ölçümü çok daha geniş bantta çalışır ve

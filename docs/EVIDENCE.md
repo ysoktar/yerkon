@@ -195,3 +195,49 @@ Buna karşılık aşağıdakiler de modellenmedi ve gerçek sistemin aleyhine
 - **Saat sürüklenmesi ve sıcaklık etkisi.**
 - **Kanal doluluğu ve çakışma.** Paket kaybı sabit bir olasılık olarak
   modellendi, trafik yüküne bağlı değil.
+
+## Anchor konumları ne kadar biliniyor
+
+Menzil hatası kadar önemli ama ayrı davranan bir hata daha var. Her montaj
+noktası ölçülür, ve o ölçümden kalan hata çözüme doğrudan girer.
+
+Menzil hatasından ayrı tutulması gerekiyor çünkü ortalamaya tepkisi farklı.
+Menzil hatası her ölçümde yeniden çekilir, dolayısıyla bir iz boyunca
+ortalanınca küçülür. Ölçüm hatası kurulum boyunca sabittir. Filtre onu
+ortalayamaz, anchor eklemek seyreltmez, daha uzun gözlem yardım etmez. Bir
+taban oluşturur.
+
+`yerkon/survey.py` üç yöntemi ayırıyor:
+
+| Senaryo | Yöntem | Yatay σ | Düşey σ | RMS kayma |
+|---|---|---|---|---|
+| Şehir içi | RTK, engelli gökyüzü | 0,08 m | 0,12 m | 0,160 m |
+| Kırsal | RTK, açık gökyüzü | 0,03 m | 0,05 m | 0,066 m |
+| Tünel | Portalden travers | 0,005 m + büyüme | aynı | 0,128 m |
+
+Tünel tek istisna. Gökyüzü olmadığı için hiçbir uydu yöntemi montaj
+noktalarına ulaşmıyor, konum portalden bir alet kurulumları zinciriyle
+taşınıyor. Her kurulum küçük ve bağımsız bir hata ekliyor, dolayısıyla
+toplam hata portalden uzaklığın kareköküyle büyüyor. 50 km sonunda 11 cm
+oluyor.
+
+Simülasyonda menziller gerçek konumlardan üretiliyor, çözüm ise ölçülen
+konumlardan yapılıyor. Aradaki fark her fix'e aynı şekilde giriyor.
+
+### Ölçülen sonuç: bu kalitede ölçüm hiçbir satırı belirlemiyor
+
+| Senaryo | Ölçüm hatasız HPE P50 | Gerçek ölçümle | Fark |
+|---|---|---|---|
+| Şehir içi | 1,65 m | 1,64 m | %0,1 |
+| Kırsal | 8,41 m | 8,43 m | %0,3 |
+| Tünel | 0,43 m | 0,43 m | %0,7 |
+
+Yani rapor yüksek hassasiyetli ölçüm için ayrı bütçe ayırmak zorunda değil.
+RTK ve normal bir tünel traversi yetiyor.
+
+Bu sonuç modelin tepkisiz olmasından gelmiyor. 2 m'lik bir ölçüm hatası
+verildiğinde tünel satırı 0,43 m'den 78 m'ye çıkıyor
+(`tests/test_survey.py`). Model tepki veriyor, gerçek ölçüm hatası küçük.
+
+Üç σ değeri de bu projenin varsayımı. Bu proje için yapılmış bir ölçüm
+raporu yok.
