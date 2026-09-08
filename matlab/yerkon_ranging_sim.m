@@ -24,6 +24,20 @@ function yerkon_ranging_sim(varargin)
 %       yerkon_ranging_sim('Cases', {'uwb_los'})
 %       yerkon_ranging_sim('Trials', 300, 'Parallel', true)
 %
+%   'Trials' is the base count. Each case multiplies it by its own
+%   trialScale, because the heavy-tailed cases need far more samples to
+%   settle than the clean ones: an NLOS or tunnel spread is set by a
+%   handful of large outliers. At the default the run is about five
+%   minutes with 'Parallel' on, and the UWB cases account for nearly all
+%   of it - one UWB trial costs about 40 narrowband trials, because its
+%   bandwidth is a thousand times wider and the waveform is sampled at
+%   8 x 499.2 MHz.
+%
+%   'Bootstrap' sets the resample count behind the confidence interval on
+%   each standard deviation (default 600, 0 disables). That interval is
+%   how a reader checks the trial count instead of trusting it: a wide
+%   interval means the number has not settled.
+%
 %   'Parallel' uses parfor across trials, which needs Parallel Computing
 %   Toolbox and is worth it for the long run. It is off by default because
 %   the workers draw their own random numbers: results stay statistically
@@ -31,7 +45,12 @@ function yerkon_ranging_sim(varargin)
 %
 %   Output:
 %       export/yerkon_ranging_errors.csv   one row per trial
-%       export/yerkon_ranging_summary.csv  one row per case
+%       export/yerkon_ranging_summary.csv  one row per grid point, with a
+%                                          bootstrap CI on the standard
+%                                          deviation and that deviation
+%                                          recomputed at a quarter and a
+%                                          half of the trials, so the
+%                                          convergence is visible
 %
 %   The Python side reads these and replaces the assumed error models,
 %   tagged as waveform simulation rather than as measurement.
@@ -62,7 +81,8 @@ fprintf(fidTrial, 'case,radio,condition,bandwidth_hz,snr_db,true_range_m,trial,r
 
 fidSummary = fopen(summaryPath, 'w');
 fprintf(fidSummary, ['case,radio,condition,bandwidth_hz,snr_db,true_range_m,trials,'...
-    'mean_error_m,median_error_m,std_error_m,p95_abs_error_m,max_abs_error_m\n']);
+    'mean_error_m,median_error_m,std_error_m,p95_abs_error_m,max_abs_error_m,'...
+    'std_ci_lo_m,std_ci_hi_m,std_at_quarter_m,std_at_half_m\n']);
 
 fprintf('YERKON ranging simulation\n');
 fprintf('  trials per point : %d\n', opts.Trials);
@@ -81,29 +101,50 @@ for c = 1:numel(cases)
         snr = cs.snrDb(s);
         for r = 1:numel(cs.trueRangeM)
             trueRange = cs.trueRangeM(r);
+            % Heavy-tailed cases get more trials than clean ones. The
+            % spread of an NLOS or tunnel case is set by a handful of large
+            % outliers, so its estimate settles far more slowly than a
+            % line-of-sight case at the same trial count; measured across
+            % two independent runs, LOS sigma repeated to 3% while tunnel
+            % sigma moved 15%. Scaling here rather than raising the base
+            % count for everything keeps the cheap cases cheap.
+            nTrials = opts.Trials * cs.trialScale;
+
             % Trials first, file second: parfor cannot write to a shared
             % file handle, and the write is cheap next to the simulation.
-            errors = zeros(1, opts.Trials);
+            errors = zeros(1, nTrials);
             if opts.Parallel
-                parfor t = 1:opts.Trials
+                parfor t = 1:nTrials
                     errors(t) = oneTrial(cs, snr, trueRange);
                 end
             else
-                for t = 1:opts.Trials
+                for t = 1:nTrials
                     errors(t) = oneTrial(cs, snr, trueRange);
                 end
             end
-            for t = 1:opts.Trials
+            for t = 1:nTrials
                 fprintf(fidTrial, '%s,%s,%s,%.0f,%.1f,%.1f,%d,%.6f\n', ...
                     cs.name, cs.radio, cs.condition, cs.bandwidthHz, snr, ...
                     trueRange, t, errors(t));
             end
-            fprintf(fidSummary, '%s,%s,%s,%.0f,%.1f,%.1f,%d,%.6f,%.6f,%.6f,%.6f,%.6f\n', ...
+
+            % Every sigma now carries its own uncertainty, so a reader can
+            % see which numbers are settled without rerunning anything.
+            sd = std(errors);
+            [ciLo, ciHi] = bootstrapStdCi(errors, opts.Bootstrap);
+            sdQuarter = std(errors(1:max(2, floor(nTrials / 4))));
+            sdHalf    = std(errors(1:max(2, floor(nTrials / 2))));
+
+            fprintf(fidSummary, ...
+                '%s,%s,%s,%.0f,%.1f,%.1f,%d,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n', ...
                 cs.name, cs.radio, cs.condition, cs.bandwidthHz, snr, trueRange, ...
-                opts.Trials, mean(errors), median(errors), std(errors), ...
-                prctileSimple(abs(errors), 95), max(abs(errors)));
-            fprintf('   SNR %5.1f dB, range %6.1f m -> mean %+7.3f m, std %6.3f m, p95|e| %6.3f m\n', ...
-                snr, trueRange, mean(errors), std(errors), prctileSimple(abs(errors), 95));
+                nTrials, mean(errors), median(errors), sd, ...
+                prctileSimple(abs(errors), 95), max(abs(errors)), ...
+                ciLo, ciHi, sdQuarter, sdHalf);
+            fprintf(['   SNR %5.1f dB, range %6.1f m -> mean %+7.3f m, '...
+                'std %6.3f m [%.3f %.3f], p95|e| %6.3f m\n'], ...
+                snr, trueRange, mean(errors), sd, ciLo, ciHi, ...
+                prctileSimple(abs(errors), 95));
         end
     end
 end
@@ -144,7 +185,20 @@ function cases = buildCases()
 
 cases = struct('name', {}, 'radio', {}, 'condition', {}, 'bandwidthHz', {}, ...
     'carrierHz', {}, 'waveform', {}, 'estimator', {}, 'snrDb', {}, ...
-    'trueRangeM', {}, 'channel', {});
+    'trueRangeM', {}, 'channel', {}, 'trialScale', {});
+
+% Distances each radio is simulated over. These have to cover the link
+% ranges the scenarios actually use, or the Python side ends up applying
+% an error model outside the distances it was derived at and reporting
+% those links as extrapolation. The rural corridor runs links out to
+% 3000 m, so the SX1280 grid runs out to 3000 m.
+sxRanges  = [50 250 400 1000 3000];
+uwbRanges = [10 50 100 150];
+
+% SNR sweep. The low end matters more than it looks: a 3000 m rural link
+% arrives far weaker than a 250 m urban one, and 5 dB is where a long link
+% at the legal 12.1 dBm actually sits.
+snrSweep = [5 10 15 20 25];
 
 % UWB uses leading-edge detection, which is what a DW-series chip does and
 % what makes multipath rejection possible at all. The narrowband SX1280
@@ -153,38 +207,43 @@ cases = struct('name', {}, 'radio', {}, 'condition', {}, 'bandwidthHz', {}, ...
 % than the first arrival. Peak detection with a calibrated offset is what
 % that part actually does, and it is what Robinson's 2.83 m offset is.
 cases(end+1) = mkCase('uwb_los',  'DWM3000', 'LOS',  499.2e6, 6489.6e6, 'pulse', 'leading', ...
-    [10 15 20 25], [10 50 100], svParams('industrial_los'));
+    snrSweep, uwbRanges, svParams('industrial_los'), 1);
 cases(end+1) = mkCase('uwb_nlos', 'DWM3000', 'NLOS', 499.2e6, 6489.6e6, 'pulse', 'leading', ...
-    [10 15 20 25], [10 50 100], svParams('industrial_nlos'));
+    snrSweep, uwbRanges, svParams('industrial_nlos'), 4);
+% The tunnel case sets the tunnel row of the comparison table on its own,
+% and it is the slowest-converging case in the sweep, so it gets the most.
 cases(end+1) = mkCase('uwb_tunnel', 'DWM3000', 'TUNNEL', 499.2e6, 6489.6e6, 'pulse', 'leading', ...
-    [10 15 20 25], [30 75 150], svParams('tunnel'));
+    snrSweep, [30 75 150], svParams('tunnel'), 10);
 
 % All four SX1280 LoRa bandwidths, LOS and NLOS. 406 kHz is the setting
 % Robinson's published ranging sketches use, so that pair is the one with a
 % hardware measurement to check against; 1625 kHz is the widest the part
 % offers.
 cases(end+1) = mkCase('sx1280_203k_los',   'SX1280', 'LOS',  203e3,  2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('outdoor_los'));
+    snrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_203k_nlos',  'SX1280', 'NLOS', 203e3,  2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('urban_nlos'));
+    snrSweep, sxRanges, svParams('urban_nlos'), 6);
 cases(end+1) = mkCase('sx1280_406k_los',   'SX1280', 'LOS',  406e3,  2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('outdoor_los'));
+    snrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_406k_nlos',  'SX1280', 'NLOS', 406e3,  2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('urban_nlos'));
+    snrSweep, sxRanges, svParams('urban_nlos'), 6);
 cases(end+1) = mkCase('sx1280_812k_los',   'SX1280', 'LOS',  812e3,  2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('outdoor_los'));
+    snrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_812k_nlos',  'SX1280', 'NLOS', 812e3,  2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('urban_nlos'));
+    snrSweep, sxRanges, svParams('urban_nlos'), 6);
 cases(end+1) = mkCase('sx1280_1600k_los',  'SX1280', 'LOS',  1625e3, 2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('outdoor_los'));
+    snrSweep, sxRanges, svParams('outdoor_los'), 1);
 cases(end+1) = mkCase('sx1280_1600k_nlos', 'SX1280', 'NLOS', 1625e3, 2450e6, 'chirp', 'peak', ...
-    [10 15 20 25], [50 150 250], svParams('urban_nlos'));
+    snrSweep, sxRanges, svParams('urban_nlos'), 6);
 end
 
-function c = mkCase(name, radio, condition, bw, fc, waveform, estimator, snrDb, ranges, channel)
+function c = mkCase(name, radio, condition, bw, fc, waveform, estimator, snrDb, ranges, channel, trialScale)
+%MKCASE One simulated configuration. TRIALSCALE multiplies the base trial
+%count for cases whose spread needs more samples to settle.
 c = struct('name', name, 'radio', radio, 'condition', condition, ...
     'bandwidthHz', bw, 'carrierHz', fc, 'waveform', waveform, ...
-    'estimator', estimator, 'snrDb', snrDb, 'trueRangeM', ranges, 'channel', channel);
+    'estimator', estimator, 'snrDb', snrDb, 'trueRangeM', ranges, ...
+    'channel', channel, 'trialScale', trialScale);
 end
 
 function p = svParams(kind)
@@ -471,6 +530,32 @@ function x = exprnd_(mu)
 x = -mu * log(rand);
 end
 
+function [lo, hi] = bootstrapStdCi(errors, nResamples)
+%BOOTSTRAPSTDCI 95% confidence interval on the standard deviation.
+%
+%   Resamples the trial errors with replacement and takes the 2.5th and
+%   97.5th percentiles of the resampled standard deviations. No
+%   distributional assumption, which matters here: the NLOS and tunnel
+%   error distributions are heavy-tailed, so the textbook chi-square
+%   interval for a standard deviation would be far too narrow for exactly
+%   the cases that need an interval most.
+%
+%   The interval is what makes the trial count checkable. If it is wide,
+%   the number is not settled and the case needs a larger trialScale.
+
+if nResamples <= 0 || numel(errors) < 2
+    lo = NaN; hi = NaN; return;
+end
+n = numel(errors);
+sds = zeros(1, nResamples);
+for b = 1:nResamples
+    sds(b) = std(errors(randi(n, 1, n)));
+end
+sds = sort(sds);
+lo = sds(max(1, floor(0.025 * nResamples)));
+hi = sds(min(nResamples, ceil(0.975 * nResamples)));
+end
+
 function v = prctileSimple(x, p)
 x = sort(x(:));
 if isempty(x); v = NaN; return; end
@@ -488,7 +573,8 @@ end
 end
 
 function opts = parseOptions(varargin)
-opts = struct('Trials', 200, 'Seed', 42, 'Cases', {{}}, 'Parallel', false);
+opts = struct('Trials', 300, 'Seed', 42, 'Cases', {{}}, 'Parallel', false, ...
+    'Bootstrap', 600);
 for k = 1:2:numel(varargin)
     name = varargin{k};
     value = varargin{k+1};
@@ -497,6 +583,7 @@ for k = 1:2:numel(varargin)
         case 'seed';   opts.Seed = value;
         case 'cases';  opts.Cases = value;
         case 'parallel'; opts.Parallel = logical(value);
+        case 'bootstrap'; opts.Bootstrap = value;
         otherwise
             error('yerkon:badOption', 'Unknown option %s', name);
     end
