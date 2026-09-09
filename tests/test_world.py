@@ -148,3 +148,31 @@ def test_clutter_accumulates_with_distance():
 def test_terrain_cannot_add_signal():
     with pytest.raises(ValueError):
         flat_terrain(clutter_loss_db_per_km=-1.0)
+
+
+def test_terrain_helps_a_long_link_until_it_starts_blocking_it():
+    """Flat ground is not the best case, and rugged ground is not either.
+
+    Perfectly flat ground is the worst case for reflection: it returns a
+    clean cancelling ray. Gentle relief scatters that ray and lifts the
+    mast above the reflecting surface, and both help. Rugged relief then
+    starts putting hills in the path, and diffraction costs more than the
+    reflection ever did.
+    """
+    from yerkon.hardware import E28_2G4M27S, SX1280, W24P_U
+    from yerkon.rf import Terminal, evaluate_link, ranging_sigma_m
+
+    def sigma_over(terrain):
+        anchor = Anchor("m", (0.0, 0.0), TALL_MAST, terrain)
+        receiver_z = terrain.height_at(10_000.0, 0.0) + 2.0
+        tx = Terminal(E28_2G4M27S, W24P_U, anchor.position_m)
+        rx = Terminal(SX1280, W24P_U, (10_000.0, 0.0, receiver_z))
+        obstruction = terrain.obstruction_between(tx.position_m, rx.position_m, 200)
+        return ranging_sigma_m(evaluate_link(tx, rx, obstruction=obstruction), E28_2G4M27S)
+
+    flat = sigma_over(flat_terrain())
+    gentle = sigma_over(rolling_terrain(10.0, 2000.0, seed=3))
+    rugged = sigma_over(rolling_terrain(80.0, 2000.0, seed=11))
+
+    assert gentle < flat, "gentle relief beats flat ground"
+    assert rugged > flat * 2.0, "rugged relief is far worse than either"

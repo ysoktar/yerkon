@@ -17,6 +17,8 @@ from yerkon.rf import (
     free_space_path_loss_db,
     ranging_sigma_m,
     regulatory_eirp_limit_dbm,
+    specular_fraction,
+    two_ray_path_loss_db,
     usable_range_m,
 )
 
@@ -239,3 +241,44 @@ def test_a_dead_link_has_no_precision_to_report():
 def test_a_link_needs_a_positive_distance(bad):
     with pytest.raises(ValueError):
         free_space_path_loss_db(bad, 2450e6)
+
+
+# --- Ground reflection over real ground -----------------------------------
+
+
+def test_a_shallow_grazing_angle_stays_specular_however_lumpy_the_ground():
+    """Why rough terrain does not rescue a long link.
+
+    A surface is smooth relative to the angle that strikes it. At 10 km
+    the grazing angle is under a tenth of a degree, so ground that looks
+    thoroughly broken from standing height still returns a coherent ray.
+    It takes metres of scatter to break it, and by 2 km a metre is enough.
+    """
+    near = specular_fraction(2_000.0, 25.0, 2.0, roughness_m=1.0, frequency_hz=2450e6)
+    far = specular_fraction(10_000.0, 25.0, 2.0, roughness_m=1.0, frequency_hz=2450e6)
+
+    assert near < 0.5, "a metre of scatter breaks the 2 km reflection"
+    assert far > 0.9, "the same metre barely touches the 10 km one"
+
+
+def test_roughness_moves_the_model_between_its_two_extremes():
+    smooth = two_ray_path_loss_db(10_000.0, 25.0, 2.0, 2450e6, roughness_m=0.0)
+    broken = two_ray_path_loss_db(10_000.0, 25.0, 2.0, 2450e6, roughness_m=50.0)
+    free = free_space_path_loss_db(10_000.0, 2450e6)
+
+    assert smooth > free + 10.0
+    assert broken == pytest.approx(free, abs=0.5)
+
+
+def test_height_is_measured_above_the_reflecting_surface():
+    """Why a mast on a ridge behaves like a much taller mast.
+
+    The same 25 m structure over a valley floor 40 m below it reflects as
+    though it were 65 m up, and the breakpoint moves out with it.
+    """
+    on_the_flat = evaluate_link(mast(25.0), vehicle(8_000.0))
+    on_a_ridge = evaluate_link(
+        mast(25.0), vehicle(8_000.0),
+        obstruction=Obstruction(reflection_surface_m=-40.0),
+    )
+    assert on_a_ridge.path_loss_db < on_the_flat.path_loss_db - 5.0

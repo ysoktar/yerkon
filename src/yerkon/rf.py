@@ -66,20 +66,40 @@ class Terminal:
 class Obstruction:
     """What the ground does to a link between two terminals.
 
-    ``peak_terrain_m`` is the highest ground elevation between the two
-    ends. ``clutter_loss_db`` is everything the terrain model does not
-    carry as geometry: buildings, vegetation, vehicles.
+    Three separate things, and keeping them apart is the point.
+
+    ``peak_terrain_m`` is the ground that comes closest to blocking the
+    path, and it drives diffraction.
+
+    ``reflection_surface_m`` is the ground elevation where the link's
+    specular reflection lands, which is somewhere else entirely. Antenna
+    heights for the two-ray model are measured above this, not above sea
+    level and not above the obstacle. It is what makes a mast on a ridge
+    behave like a much taller mast.
+
+    ``surface_roughness_m`` is the root-mean-square height deviation of
+    that reflecting patch. Rough ground scatters the reflection instead of
+    returning it, which weakens the cancellation. The effect is strong at
+    steep grazing angles and weak at shallow ones, so it matters at 2 km
+    and barely at 10 km.
+
+    ``clutter_loss_db`` is everything the elevation model does not carry:
+    buildings, vegetation, traffic.
     """
 
     peak_terrain_m: float = 0.0
     peak_at_fraction: float = 0.5
     clutter_loss_db: float = 0.0
+    reflection_surface_m: float = 0.0
+    surface_roughness_m: float = 0.0
 
     def __post_init__(self) -> None:
         if not 0.0 < self.peak_at_fraction < 1.0:
             raise ValueError("peak_at_fraction must lie strictly inside the path")
         if self.clutter_loss_db < 0.0:
             raise ValueError("clutter cannot add signal")
+        if self.surface_roughness_m < 0.0:
+            raise ValueError("roughness is a magnitude")
 
 
 @dataclass(frozen=True)
@@ -139,11 +159,40 @@ def breakpoint_distance_m(
     return 4.0 * tx_height_m * rx_height_m / wavelength_m
 
 
+def specular_fraction(
+    distance_m: float,
+    tx_height_m: float,
+    rx_height_m: float,
+    roughness_m: float,
+    frequency_hz: float,
+) -> float:
+    """How much of the reflection survives as a coherent ray, 0 to 1.
+
+    The Ament factor, ``exp(-2 * (2 * pi * sigma * sin(psi) / lambda)^2)``,
+    with ``psi`` the grazing angle. A surface is smooth relative to a very
+    shallow angle however lumpy it looks from standing height, which is
+    why this saves a 2 km link and not a 10 km one: at 10 km the grazing
+    angle is under a tenth of a degree and it takes 10 m of roughness to
+    scatter the reflection away.
+
+    Returning a fraction rather than a yes or no lets the model sit
+    between the two-ray and free-space extremes, which is where real
+    ground sits.
+    """
+    if roughness_m <= 0.0:
+        return 1.0
+    grazing = (tx_height_m + rx_height_m) / distance_m
+    wavelength_m = SPEED_OF_LIGHT_M_S / frequency_hz
+    g = 2.0 * math.pi * roughness_m * grazing / wavelength_m
+    return math.exp(-2.0 * g * g)
+
+
 def two_ray_path_loss_db(
     distance_m: float,
     tx_height_m: float,
     rx_height_m: float,
     frequency_hz: float,
+    roughness_m: float = 0.0,
 ) -> float:
     """Loss over reflecting ground, in dB.
 
@@ -160,9 +209,17 @@ def two_ray_path_loss_db(
     breakpoint_m = breakpoint_distance_m(tx_height_m, rx_height_m, frequency_hz)
     if distance_m <= breakpoint_m:
         return free_space
-    return free_space_path_loss_db(breakpoint_m, frequency_hz) + 40.0 * math.log10(
+
+    smooth = free_space_path_loss_db(breakpoint_m, frequency_hz) + 40.0 * math.log10(
         distance_m / breakpoint_m
     )
+    rho = specular_fraction(
+        distance_m, tx_height_m, rx_height_m, roughness_m, frequency_hz
+    )
+    # Scattered ground returns no coherent ray to cancel with, so the
+    # excess over free space is only paid for the part that stays
+    # specular.
+    return free_space + rho * (smooth - free_space)
 
 
 def free_space_path_loss_db(distance_m: float, frequency_hz: float) -> float:
@@ -285,12 +342,16 @@ def evaluate_link(
     # even over perfectly flat ground, because the reflected ray cancels
     # the direct one. Diffraction acts when something rises into the path.
     # A flat site has the first and not the second.
-    ground_reference_m = obstruction.peak_terrain_m
+    # Heights for the reflection are measured above the surface the
+    # reflection actually lands on, which is why a mast on a ridge over a
+    # valley behaves like a far taller mast on the flat.
+    surface_m = obstruction.reflection_surface_m
     spread_db = two_ray_path_loss_db(
         distance_m,
-        max(tx[2] - ground_reference_m, 0.1),
-        max(rx[2] - ground_reference_m, 0.1),
+        max(tx[2] - surface_m, 0.1),
+        max(rx[2] - surface_m, 0.1),
         frequency_hz,
+        roughness_m=obstruction.surface_roughness_m,
     )
     path_loss_db = spread_db + diffraction_db + obstruction.clutter_loss_db
 

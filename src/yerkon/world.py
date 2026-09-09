@@ -31,19 +31,28 @@ Metres = float
 class Terrain:
     """Ground elevation over the site, and what sits on top of it.
 
-    ``elevation_m`` is the bare earth. ``clutter_loss_db_per_km`` is
-    everything the elevation does not describe: vegetation, buildings,
-    traffic. Keeping them apart matters because height clears the first
-    and does not clear the second.
+    ``elevation_m`` is the bare earth, the shape a survey would give.
+
+    ``micro_roughness_m`` is the height scatter the elevation model is too
+    coarse to carry: furrows, verge vegetation, kerbs, parked vehicles. It
+    does not change where the ground is, but it decides how much of a
+    grazing reflection comes back as a coherent ray, so it belongs to the
+    surface rather than to the clutter budget.
+
+    ``clutter_loss_db_per_km`` is absorption by things standing on the
+    ground, which height does not clear.
     """
 
     elevation_m: Callable[[float, float], float] = field(repr=False)
     clutter_loss_db_per_km: float = 0.0
+    micro_roughness_m: float = 0.0
     description: str = "flat"
 
     def __post_init__(self) -> None:
         if self.clutter_loss_db_per_km < 0.0:
             raise ValueError("clutter cannot add signal")
+        if self.micro_roughness_m < 0.0:
+            raise ValueError("roughness is a magnitude")
 
     def height_at(self, x: float, y: float) -> float:
         return float(self.elevation_m(x, y))
@@ -91,11 +100,13 @@ class Terrain:
         """
         distance_m = math.dist(a, b)
         frequency_hz = 2450e6
+        profile = self.profile_between(a, b, samples)
+
         worst_fraction = 0.5
         worst_ratio = math.inf
         worst_ground = a[2]
 
-        for fraction, ground_m in self.profile_between(a, b, samples):
+        for fraction, ground_m in profile:
             if fraction <= 0.0 or fraction >= 1.0:
                 continue
             sight_m = a[2] + (b[2] - a[2]) * fraction
@@ -104,17 +115,78 @@ class Terrain:
             if ratio < worst_ratio:
                 worst_ratio, worst_fraction, worst_ground = ratio, fraction, ground_m
 
+        surface_m, roughness_m = self._reflection_surface(a, b, profile)
+
         return Obstruction(
             peak_terrain_m=worst_ground,
             peak_at_fraction=worst_fraction,
             clutter_loss_db=self.clutter_loss_db_per_km * distance_m / 1000.0,
+            reflection_surface_m=surface_m,
+            surface_roughness_m=roughness_m,
         )
 
+    def _reflection_surface(
+        self,
+        a: tuple[float, float, float],
+        b: tuple[float, float, float],
+        profile: Sequence[tuple[float, float]],
+    ) -> tuple[float, float]:
+        """Where the specular reflection lands, and how rough it is there.
 
-def flat_terrain(elevation_m: float = 0.0, clutter_loss_db_per_km: float = 0.0) -> Terrain:
+        Over a flat plane the reflection point sits at the fraction
+        ``h1 / (h1 + h2)`` along the path. Over real ground the heights
+        that decide that fraction are themselves heights above the
+        reflecting surface, so this iterates: guess the surface, find the
+        point, re-read the surface, repeat. It settles in a few rounds.
+
+        Roughness is the scatter of the ground around the reflecting
+        patch, added to the terrain's own micro-roughness. A patch on a
+        smooth valley floor returns a clean ray; one straddling a ridge
+        does not.
+        """
+        heights = [h for _, h in profile]
+        surface_m = sum(heights) / len(heights)
+
+        for _ in range(4):
+            h1 = max(a[2] - surface_m, 0.1)
+            h2 = max(b[2] - surface_m, 0.1)
+            fraction = min(max(h1 / (h1 + h2), 0.02), 0.98)
+            surface_m = self._interpolate(profile, fraction)
+
+        # Scatter over the patch the reflection illuminates, taken as the
+        # middle fifth of the path around the reflection point.
+        h1 = max(a[2] - surface_m, 0.1)
+        h2 = max(b[2] - surface_m, 0.1)
+        centre = min(max(h1 / (h1 + h2), 0.02), 0.98)
+        window = [
+            h for f, h in profile if abs(f - centre) <= 0.1
+        ] or [surface_m]
+        mean = sum(window) / len(window)
+        spread = math.sqrt(sum((h - mean) ** 2 for h in window) / len(window))
+
+        return surface_m, math.hypot(spread, self.micro_roughness_m)
+
+    @staticmethod
+    def _interpolate(profile: Sequence[tuple[float, float]], fraction: float) -> float:
+        for (f0, h0), (f1, h1) in zip(profile, profile[1:]):
+            if f0 <= fraction <= f1:
+                if f1 == f0:
+                    return h0
+                t = (fraction - f0) / (f1 - f0)
+                return h0 + (h1 - h0) * t
+        return profile[-1][1]
+
+
+def flat_terrain(
+    elevation_m: float = 0.0,
+    clutter_loss_db_per_km: float = 0.0,
+    micro_roughness_m: float = 0.0,
+) -> Terrain:
+    """Perfectly level ground. The worst case for ground reflection."""
     return Terrain(
         elevation_m=lambda x, y: elevation_m,
         clutter_loss_db_per_km=clutter_loss_db_per_km,
+        micro_roughness_m=micro_roughness_m,
         description="flat at {:.0f} m".format(elevation_m),
     )
 
@@ -123,6 +195,7 @@ def rolling_terrain(
     amplitude_m: float,
     wavelength_m: float,
     clutter_loss_db_per_km: float = 0.0,
+    micro_roughness_m: float = 0.0,
     seed: int = 0,
 ) -> Terrain:
     """Smooth hills. Deterministic given the seed.
@@ -144,6 +217,7 @@ def rolling_terrain(
     return Terrain(
         elevation_m=elevation,
         clutter_loss_db_per_km=clutter_loss_db_per_km,
+        micro_roughness_m=micro_roughness_m,
         description="rolling, {:.0f} m over {:.0f} m".format(amplitude_m, wavelength_m),
     )
 
