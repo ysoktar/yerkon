@@ -344,3 +344,111 @@ def test_a_failed_fetch_says_which_source_refused_and_why():
 
     with pytest.raises(Unreachable, match="--spacing 200"):
         build_site(ANKARA, elevation_sources=(Chatty(),))
+
+
+# --- Degrading rather than crashing --------------------------------------
+
+
+def test_a_missing_raster_falls_through_to_the_next_source():
+    """A wrong path must not end the fetch with a traceback.
+
+    The whole point of listing sources in order is that a failure moves
+    to the next one. A rasterio exception is not Unreachable, so before
+    this it escaped the handler and crashed.
+    """
+    site = build_site(
+        ANKARA,
+        elevation_sources=(GeoTiffElevation("nowhere/missing.tif"), FakeElevation(3.0)),
+    )
+    assert site.elevation_grid_m[0, 0] == pytest.approx(3.0)
+    assert any("No file at" in note for note in site.manifest.notes)
+
+
+def test_an_unreadable_file_is_reported_as_such(tmp_path):
+    """Present but not a raster is a different failure from absent."""
+    not_a_raster = tmp_path / "notes.tif"
+    not_a_raster.write_text("this is text", encoding="utf-8")
+
+    with pytest.raises(Unreachable, match="could not be read as a raster"):
+        GeoTiffElevation(str(not_a_raster)).grid_for(ANKARA, spacing_m=200.0)
+
+
+# --- Rate limiting --------------------------------------------------------
+
+
+class FakeResponse:
+    def __init__(self, status_code, payload=None, headers=None):
+        self.status_code = status_code
+        self._payload = payload or {}
+        self.headers = headers or {}
+
+    @property
+    def ok(self):
+        return self.status_code < 400
+
+    def json(self):
+        return self._payload
+
+
+class FakeRequests:
+    """Stands in for the requests module, counting what was asked."""
+
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.calls = 0
+
+    def get(self, url, params=None, timeout=None):
+        self.calls += 1
+        return self.responses.pop(0)
+
+
+def test_a_rate_limited_request_is_waited_out_rather_than_abandoned(monkeypatch):
+    """429 asks for patience. It is not a refusal.
+
+    The first real run fired as fast as the network allowed and was
+    rejected on its first batch.
+    """
+    monkeypatch.setattr("yerkon.site.fetch.time.sleep", lambda seconds: None)
+
+    service = ServiceElevation()
+    fake = FakeRequests([
+        FakeResponse(429, headers={"Retry-After": "1"}),
+        FakeResponse(429),
+        FakeResponse(200, {"results": [{"elevation": 900.0}]}),
+    ])
+
+    payload = service._call(fake, "39.9,32.8", index=1, total=1)
+    assert payload["results"][0]["elevation"] == 900.0
+    assert fake.calls == 3
+
+
+def test_a_service_that_never_lets_up_says_to_use_a_raster(monkeypatch):
+    monkeypatch.setattr("yerkon.site.fetch.time.sleep", lambda seconds: None)
+
+    service = ServiceElevation(retries_on_rate_limit=2)
+    fake = FakeRequests([FakeResponse(429)] * 3)
+
+    with pytest.raises(Unreachable, match="--geotiff"):
+        service._call(fake, "39.9,32.8", index=1, total=1)
+
+
+def test_a_failure_does_not_quote_the_hundred_coordinates_it_sent():
+    """The query is a hundred coordinates and burying the reason in them
+    helps nobody. The first real run printed all of them."""
+    service = ServiceElevation()
+    fake = FakeRequests([FakeResponse(500)])
+
+    with pytest.raises(Unreachable) as raised:
+        service._call(fake, "39.9,32.8|39.9,32.9", index=2, total=7)
+
+    message = str(raised.value)
+    assert "request 2 of 7" in message
+    assert "39.9" not in message
+
+
+def test_requests_are_spaced_to_respect_the_stated_limit(monkeypatch):
+    slept = []
+    monkeypatch.setattr("yerkon.site.fetch.time.sleep", slept.append)
+
+    service = ServiceElevation(seconds_between_requests=1.1)
+    assert service.seconds_between_requests == pytest.approx(1.1)

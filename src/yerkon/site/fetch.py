@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import datetime
 import math
+import pathlib
+import time
 from dataclasses import dataclass
 from typing import Optional, Protocol
 
@@ -75,6 +77,13 @@ class GeoTiffElevation:
                 "`pip install rasterio`."
             ) from error
 
+        if not pathlib.Path(self.path).exists():
+            raise Unreachable(
+                "No file at {}. Check the path; on Windows the shell does "
+                "not expand ~ and the extension may be .tiff rather than "
+                ".tif.".format(self.path)
+            )
+
         per_lat, per_lon = bounds.metres_per_degree()
         columns = max(int((bounds.east - bounds.west) * per_lon / spacing_m), 2)
         rows = max(int((bounds.north - bounds.south) * per_lat / spacing_m), 2)
@@ -86,7 +95,14 @@ class GeoTiffElevation:
 
         mesh_lon, mesh_lat = np.meshgrid(longitudes, latitudes)
 
-        with rasterio.open(self.path) as raster:
+        try:
+            raster = rasterio.open(self.path)
+        except Exception as error:
+            raise Unreachable(
+                "{} could not be read as a raster: {}".format(self.path, error)
+            ) from error
+
+        with raster:
             flat_lon = mesh_lon.ravel().tolist()
             flat_lat = mesh_lat.ravel().tolist()
             if raster.crs and raster.crs.to_epsg() != 4326:
@@ -139,6 +155,14 @@ class ServiceElevation:
     name: str = "OpenTopoData SRTM 30 m"
     batch: int = 100
     nominal_resolution_m: float = 30.0
+    #: Seconds between requests.
+    #:
+    #: The public service allows one a second and answers 429 to anything
+    #: faster. Firing as fast as the network allows gets the first batch
+    #: rejected, which is what happened the first time this ran.
+    seconds_between_requests: float = 1.1
+    #: How many times to wait and retry when the service says 429.
+    retries_on_rate_limit: int = 4
     #: Most requests this fetcher will issue before refusing.
     #:
     #: The public service allows a thousand calls a day at one a second.
@@ -191,20 +215,19 @@ class ServiceElevation:
         points = list(zip(mesh_lat.ravel(), mesh_lon.ravel()))
 
         heights: list[float] = []
-        for start in range(0, len(points), self.batch):
+        total_batches = (len(points) + self.batch - 1) // self.batch
+        last_call_at = 0.0
+
+        for index, start in enumerate(range(0, len(points), self.batch)):
             chunk = points[start:start + self.batch]
             locations = "|".join("{:.6f},{:.6f}".format(la, lo) for la, lo in chunk)
-            try:
-                response = requests.get(
-                    self.endpoint, params={"locations": locations},
-                    timeout=DEFAULT_TIMEOUT_S,
-                )
-                response.raise_for_status()
-                payload = response.json()
-            except Exception as error:
-                raise Unreachable(
-                    "{} did not answer: {}".format(self.name, error)
-                ) from error
+
+            wait = self.seconds_between_requests - (time.monotonic() - last_call_at)
+            if wait > 0.0:
+                time.sleep(wait)
+
+            payload = self._call(requests, locations, index + 1, total_batches)
+            last_call_at = time.monotonic()
 
             for result in payload.get("results", []):
                 value = result.get("elevation")
@@ -226,6 +249,61 @@ class ServiceElevation:
             values_m=grid, spacing_m=spacing_m, source=self.name,
             resolution_m=self.nominal_resolution_m,
         )
+
+    def _call(self, requests, locations: str, index: int, total: int) -> dict:
+        """One request, waiting out a rate limit rather than giving up.
+
+        A 429 means the service is asking for patience, not refusing, so
+        it is worth waiting for. Anything else is a real failure and is
+        reported without the query attached, because a rejected URL
+        carries a hundred coordinates and burying the reason in them
+        helps nobody.
+        """
+        delay = self.seconds_between_requests
+        for attempt in range(self.retries_on_rate_limit + 1):
+            try:
+                response = requests.get(
+                    self.endpoint, params={"locations": locations},
+                    timeout=DEFAULT_TIMEOUT_S,
+                )
+            except Exception as error:
+                raise Unreachable(
+                    "{} unreachable on request {} of {}: {}".format(
+                        self.name, index, total, error
+                    )
+                ) from error
+
+            if response.status_code == 429:
+                if attempt == self.retries_on_rate_limit:
+                    raise Unreachable(
+                        "{} is rate limiting this fetch and did not let up "
+                        "after {} attempts. Its public quota is a thousand "
+                        "calls a day; this run needs {}. Use a raster with "
+                        "--geotiff instead.".format(
+                            self.name, attempt + 1, total
+                        )
+                    )
+                retry_after = response.headers.get("Retry-After")
+                pause = float(retry_after) if retry_after else delay
+                time.sleep(pause)
+                delay *= 2.0
+                continue
+
+            if not response.ok:
+                raise Unreachable(
+                    "{} answered {} on request {} of {}".format(
+                        self.name, response.status_code, index, total
+                    )
+                )
+
+            try:
+                return response.json()
+            except ValueError as error:
+                raise Unreachable(
+                    "{} sent something that is not JSON".format(self.name)
+                ) from error
+
+        raise Unreachable("{} did not answer".format(self.name))
 
 
 # --- Buildings ------------------------------------------------------------

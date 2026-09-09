@@ -71,6 +71,14 @@ def fetch(argv: list[str] | None = None) -> int:
     if not args.no_buildings:
         print("  features: OpenStreetMap")
 
+    service = next((s for s in sources if isinstance(s, ServiceElevation)), None)
+    if service is not None and not args.geotiff:
+        points = service.points_required(bounds, args.spacing)
+        calls = (points + service.batch - 1) // service.batch
+        minutes = calls * service.seconds_between_requests / 60.0
+        print("  {:,} points, {:,} calls, about {:.0f} minutes at the "
+              "service's rate limit".format(points, calls, minutes))
+
     try:
         site = build_site(
             bounds,
