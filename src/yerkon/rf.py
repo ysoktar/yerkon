@@ -118,6 +118,53 @@ class LinkBudget:
         return self.clearance_m >= self.required_clearance_m
 
 
+def breakpoint_distance_m(
+    tx_height_m: float, rx_height_m: float, frequency_hz: float
+) -> float:
+    """Where ground reflection starts to dominate, in metres.
+
+    Below this the direct and ground-reflected rays add roughly in phase
+    and the link behaves like free space. Beyond it they arrive in
+    opposition and cancel, and loss grows with the fourth power of
+    distance instead of the second.
+
+    The breakpoint is ``4 * h1 * h2 / wavelength``, so it moves with
+    antenna height. A unit on a 3 m sign talking to a 2 m vehicle antenna
+    is already past it at 200 m; a 25 m mast holds free space out to
+    1,6 km.
+    """
+    if tx_height_m <= 0.0 or rx_height_m <= 0.0:
+        raise ValueError("both antennas must be above the ground")
+    wavelength_m = SPEED_OF_LIGHT_M_S / frequency_hz
+    return 4.0 * tx_height_m * rx_height_m / wavelength_m
+
+
+def two_ray_path_loss_db(
+    distance_m: float,
+    tx_height_m: float,
+    rx_height_m: float,
+    frequency_hz: float,
+) -> float:
+    """Loss over reflecting ground, in dB.
+
+    A dual-slope model: free space up to the breakpoint, then 40 dB per
+    decade beyond it. This is the standard engineering form of the two-ray
+    result and it is what makes low mounting expensive.
+
+    Leaving it out was the largest error in this module's first version.
+    Free space understates the loss of a 3 m roadside mount at 10 km by
+    34 dB, which is the difference between a design that works and one
+    that does not.
+    """
+    free_space = free_space_path_loss_db(distance_m, frequency_hz)
+    breakpoint_m = breakpoint_distance_m(tx_height_m, rx_height_m, frequency_hz)
+    if distance_m <= breakpoint_m:
+        return free_space
+    return free_space_path_loss_db(breakpoint_m, frequency_hz) + 40.0 * math.log10(
+        distance_m / breakpoint_m
+    )
+
+
 def free_space_path_loss_db(distance_m: float, frequency_hz: float) -> float:
     if distance_m <= 0.0:
         raise ValueError("distance_m must be positive")
@@ -233,11 +280,19 @@ def evaluate_link(
     required_m = FRESNEL_CLEARANCE_FRACTION * fresnel_m
 
     diffraction_db = diffraction_loss_db(clearance_m, fresnel_m)
-    path_loss_db = (
-        free_space_path_loss_db(distance_m, frequency_hz)
-        + diffraction_db
-        + obstruction.clutter_loss_db
+
+    # Two effects, and they are not the same one. Ground reflection acts
+    # even over perfectly flat ground, because the reflected ray cancels
+    # the direct one. Diffraction acts when something rises into the path.
+    # A flat site has the first and not the second.
+    ground_reference_m = obstruction.peak_terrain_m
+    spread_db = two_ray_path_loss_db(
+        distance_m,
+        max(tx[2] - ground_reference_m, 0.1),
+        max(rx[2] - ground_reference_m, 0.1),
+        frequency_hz,
     )
+    path_loss_db = spread_db + diffraction_db + obstruction.clutter_loss_db
 
     received_dbm = eirp_dbm + rx_gain - path_loss_db
     noise_dbm = (
@@ -277,6 +332,57 @@ def cramer_rao_sigma_m(budget: LinkBudget, radio: Radio) -> float:
         2.0 * math.pi * radio.rms_bandwidth_hz * math.sqrt(2.0 * snr_linear)
     )
     return sigma_tau_s * SPEED_OF_LIGHT_M_S
+
+
+def usable_range_m(
+    transmitter: Terminal,
+    receiver_prototype: Terminal,
+    radio: Radio,
+    target_sigma_m: float,
+    frequency_hz: float = 2450e6,
+    obstruction: Optional[Obstruction] = None,
+    search_limit_m: float = 60_000.0,
+) -> float:
+    """Farthest distance whose ranging precision still meets a target.
+
+    This is the number siting needs, and it is not the distance at which
+    the link closes. A spread-spectrum link keeps demodulating far past
+    the point where its timing precision has become useless: a 25 m mast
+    still closes at 15 km with 28 dB to spare while ranging to 30 m, which
+    would put a position solution tens of metres out.
+
+    Answers "how far can this anchor usefully range", by bisection on the
+    ranging sigma. Returns zero when the target is not met even at 10 m.
+    """
+    if target_sigma_m <= 0.0:
+        raise ValueError("target_sigma_m must be positive")
+
+    def sigma_at(distance_m: float) -> float:
+        x, y, z = receiver_prototype.position_m
+        moved = Terminal(
+            receiver_prototype.radio,
+            receiver_prototype.antenna,
+            (transmitter.position_m[0] + distance_m, y, z),
+        )
+        budget = evaluate_link(
+            transmitter, moved, frequency_hz, obstruction=obstruction
+        )
+        if not budget.closes:
+            return math.inf
+        return ranging_sigma_m(budget, radio)
+
+    low, high = 10.0, search_limit_m
+    if sigma_at(low) > target_sigma_m:
+        return 0.0
+    if sigma_at(high) <= target_sigma_m:
+        return high
+    for _ in range(60):
+        mid = 0.5 * (low + high)
+        if sigma_at(mid) <= target_sigma_m:
+            low = mid
+        else:
+            high = mid
+    return low
 
 
 def ranging_sigma_m(budget: LinkBudget, radio: Radio) -> float:

@@ -10,12 +10,14 @@ from yerkon.rf import (
     Terminal,
     diffraction_loss_db,
     earth_bulge_m,
+    breakpoint_distance_m,
     cramer_rao_sigma_m,
     evaluate_link,
     first_fresnel_radius_m,
     free_space_path_loss_db,
     ranging_sigma_m,
     regulatory_eirp_limit_dbm,
+    usable_range_m,
 )
 
 
@@ -86,20 +88,40 @@ def test_the_stock_hardware_reaches_ten_kilometres():
     assert budget.margin_db > 20.0
 
 
-def test_fifteen_kilometres_is_limited_by_mast_height_not_by_power():
-    """Which constraint actually binds at the far end of the range.
+def test_height_buys_range_because_of_ground_reflection():
+    """Which constraint actually binds, measured rather than assumed.
 
-    The radio has tens of decibels to spare at 15 km. What it does not
-    automatically have is a clear Fresnel zone, because the earth's own
-    bulge is 13 m by then. Raising the mast fixes it; more power does not.
+    Over flat ground the reflected ray cancels the direct one beyond the
+    breakpoint, and loss then grows with the fourth power of distance.
+    The breakpoint moves with antenna height, so height is worth far more
+    than power: a 6 m mount is past it at 400 m, a 45 m mast at 2,9 km.
     """
     low = evaluate_link(mast(6.0), vehicle(15_000.0))
     high = evaluate_link(mast(45.0), vehicle(15_000.0))
 
-    assert low.margin_db > 20.0, "power was never the problem"
-    assert not low.has_fresnel_clearance
-    assert high.has_fresnel_clearance
-    assert low.diffraction_loss_db > high.diffraction_loss_db
+    assert low.path_loss_db > high.path_loss_db + 15.0
+
+    # The breakpoint is linear in height, so the ratio is the height ratio.
+    tall = breakpoint_distance_m(45.0, 2.0, 2450e6)
+    short = breakpoint_distance_m(6.0, 2.0, 2450e6)
+    assert tall / short == pytest.approx(45.0 / 6.0)
+    assert tall == pytest.approx(2942.0, rel=0.01)
+
+
+def test_a_link_that_closes_is_not_a_link_that_ranges():
+    """The distinction the siting problem turns on.
+
+    A spread link keeps demodulating long after its timing precision has
+    gone. Reporting the closure distance as the range would overstate what
+    an anchor covers by a factor of several.
+    """
+    far = evaluate_link(mast(25.0), vehicle(15_000.0))
+    assert far.closes
+    assert far.margin_db > 20.0
+    assert ranging_sigma_m(far, E28_2G4M27S) > 20.0
+
+    useful = usable_range_m(mast(25.0), vehicle(1.0), E28_2G4M27S, target_sigma_m=5.0)
+    assert 3_000.0 < useful < far.distance_m
 
 
 def test_the_density_cap_binds_at_every_sx1280_bandwidth():
@@ -151,11 +173,17 @@ def test_clutter_reduces_received_power_decibel_for_decibel():
 
 
 def test_the_waveform_bound_worsens_with_distance():
-    """Halving the signal-to-noise ratio costs a factor of root two."""
+    """Beyond the breakpoint, doubling the distance costs a factor of four.
+
+    Loss grows at 40 dB per decade there rather than 20, and the bound
+    goes as the square root of the signal-to-noise ratio, so the sigma
+    quadruples. Below the breakpoint it would only double.
+    """
     near = evaluate_link(mast(35.0), vehicle(5_000.0))
     far = evaluate_link(mast(35.0), vehicle(10_000.0))
+    assert near.distance_m > breakpoint_distance_m(35.0, 2.0, 2450e6)
     assert cramer_rao_sigma_m(far, E28_2G4M27S) == pytest.approx(
-        2.0 * cramer_rao_sigma_m(near, E28_2G4M27S), rel=0.02
+        4.0 * cramer_rao_sigma_m(near, E28_2G4M27S), rel=0.03
     )
 
 
