@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional, Sequence
+from typing import Callable, Optional, Sequence
 
 import numpy as np
 
@@ -360,14 +360,16 @@ def measure(
 
 def round_robin(
     anchors: Sequence[tuple[str, Terminal]],
-    receiver_at: "callable",
+    receiver_at: Callable[[float], Terminal],
     start_s: float,
     rng: np.random.Generator,
     radio: Radio,
     clock: Clock = CRYSTAL,
     scheme: Scheme = DOUBLE_SIDED,
     duty_cycle: float = 1.0,
-    obstruction: Optional[Obstruction] = None,
+    obstruction_between: Optional[
+        Callable[[Terminal, Terminal], Obstruction]
+    ] = None,
     region: SpectrumRule = TURKEY,
 ) -> tuple[RangeObservation, ...]:
     """Range against each anchor in turn, one after another.
@@ -382,20 +384,29 @@ def round_robin(
     Anchors whose link does not close are simply absent from the result;
     they cost their slot either way, because the receiver waited for a
     reply that never came.
+
+    ``obstruction_between`` is asked what the ground does to each pair,
+    because it does something different to each. One obstruction shared
+    across a round would give the anchor behind a hill the same clearance
+    as the one in plain sight.
     """
     slot_s = exchange_duration_s(radio, scheme) / max(duty_cycle, 1e-9)
     observations = []
     for index, (anchor_id, anchor) in enumerate(anchors):
         at_s = start_s + index * slot_s
+        receiver = receiver_at(at_s)
         observation = measure(
             anchor,
-            receiver_at(at_s),
+            receiver,
             at_s,
             rng,
             anchor_id=anchor_id,
             clock=clock,
             scheme=scheme,
-            obstruction=obstruction,
+            obstruction=(
+                None if obstruction_between is None
+                else obstruction_between(anchor, receiver)
+            ),
             region=region,
         )
         if observation is not None:

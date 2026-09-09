@@ -32,11 +32,13 @@ Built and tested:
   nothing, which is what makes ADR-0003 enforceable rather than hoped for.
 - `estimator.py`, ranges into positions: a damped least-squares first fix
   and a constant-velocity filter that takes each range at its own instant.
+- `evaluate.py`, where the parts meet: journeys along a graded road,
+  per-fix error samples, availability, and swept service area.
 - `ranging.py`, the two-way exchange: clocks, schemes, air time.
 - `design.py` and `proposal.py`, the settings a person chooses and the
   panel that shows every consequence of an edit before applying it.
 
-Not built yet: evaluation, cost, the table,
+Not built yet: cost, the table,
 the viewer. `docs/HANDOFF.md` has the plan and the open questions.
 
 ## Running
@@ -92,6 +94,27 @@ Apply all of that? [y/N]
 
 The consequences are computed by the same link budget the simulation runs
 on, not by a list of rules kept alongside it, and a test enforces that.
+
+## What a deployment actually delivers
+
+A 24 km corridor over rolling ground, anchors staggered either side on
+25 m masts, a vehicle at 100 km/h, no height constraint:
+
+| Anchor spacing | Anchors | HPE p50 | HPE p95 | Availability | Reached | Served |
+|---|---|---|---|---|---|---|
+| 1500 m | 17 | 2,64 m | 9,58 m | 1,000 | 445,2 km² | 75,2 km² |
+| 2000 m | 13 | 3,11 m | 10,46 m | 0,984 | 447,2 km² | 57,2 km² |
+| 3000 m | 9 | 4,69 m | 17,05 m | 0,981 | 409,0 km² | 15,2 km² |
+| 4000 m | 7 | 5,22 m | 22,82 m | 0,972 | 392,5 km² | 15,2 km² |
+
+Reached is ground where a packet arrives. Served is ground where four
+anchors are in reach at once, which is what a position needs. They differ
+by a factor of twenty-six at 4 km spacing, and quoting the first as
+coverage would understate cost per km² by the same factor (ADR-0012).
+
+So spacing is a geometry question, not a range question. Four kilometres
+is well inside a mast's 5,5 km usable range and still leaves a receiver
+one anchor short of a fix for most of the corridor.
 
 ## What the link budget already says
 

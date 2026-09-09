@@ -67,6 +67,22 @@ def test_ranging_produces_observations_and_not_verdicts():
     assert "yerkon.estimator" not in names
 
 
+def test_only_the_world_and_the_evaluation_may_read_truth():
+    """Truth is a receiver's real position. Two modules are allowed it.
+
+    The world holds it because it is the world. The evaluation reads it
+    because comparing an estimate against it is the whole job. Anything
+    else importing the world is a path by which the answer could reach
+    the estimator, which is how the previous codebase went wrong.
+    """
+    allowed = {"evaluate", "world", "design", "site"}
+    for path in sorted(SRC.glob("*.py")):
+        module = path.stem
+        if module in allowed or module == "__init__":
+            continue
+        assert "yerkon.world" not in imports_of(module), module
+
+
 def test_the_link_budget_does_not_depend_on_the_world():
     """Physics should not know about the scenario it is used in.
 

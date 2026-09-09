@@ -42,10 +42,16 @@ have grade, so a receiver's height varies along them. Nothing in this
 codebase fixes a road to a constant elevation. See ADR-0004.
 
 **Service area**: the ground area over which a deployment is claimed to
-work, in km². For this project it is the union of the areas the anchors
-actually reach, not the corridor strip. This makes the km² denominator mean
-the same thing it means in the GNSS rows of the comparison table. Cost per
-route kilometre is reported alongside it for corridor deployments.
+work, in km². It is the ground on which *enough anchors are reachable to
+produce a position*, swept over the real terrain rather than drawn as a
+corridor strip. This makes the km² denominator mean what it means in the
+GNSS rows of the comparison table.
+
+The ground merely *reached* by at least one anchor is a different and much
+larger number, and it is reported alongside so the two are never confused:
+with anchors every 4 km on 25 m masts, one anchor reaches 392,5 km² and
+four reach 15,2 km². See ADR-0012. Cost per route kilometre is reported
+alongside as well, for corridor deployments.
 
 **Scenario**: a Deployment plus a set of receiver journeys plus the
 evaluation settings. One scenario produces one table row.
