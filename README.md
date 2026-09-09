@@ -28,10 +28,13 @@ Built and tested:
 - `world.py`, terrain, a graded road alignment, and the structures an
   anchor can be mounted on.
 - `site/`, real ground and real buildings, fetched once and cached.
+- `observation.py`, the one type the estimator may see. It imports
+  nothing, which is what makes ADR-0003 enforceable rather than hoped for.
+- `ranging.py`, the two-way exchange: clocks, schemes, air time.
 - `design.py` and `proposal.py`, the settings a person chooses and the
   panel that shows every consequence of an edit before applying it.
 
-Not built yet: ranging protocol, estimator, evaluation, cost, the table,
+Not built yet: estimator, evaluation, cost, the table,
 the viewer. `docs/HANDOFF.md` has the plan and the open questions.
 
 ## Running
@@ -136,3 +139,41 @@ instead, the same amplifier is worth about 18 dB.
 A narrowband radio does not deliver centimetres at short range. The
 waveform bound says 2 cm at 100 m; the part measures about 3 m. The model
 reports the larger of the two.
+
+## What the exchange adds on top
+
+A range is not read off a link budget. Two radios trade frames, and at
+SF10 a frame lasts 15,8 ms. In single-sided ranging the difference
+between the two clocks multiplies that whole reply delay:
+
+| Clock offset | Single-sided error | Double-sided error |
+|---|---|---|
+| 10 ppm, uncorrected | 24,1 m | 0,3 mm |
+| 0,5 ppm, after frequency correction | 1,20 m | 0,02 mm |
+
+Twenty-four metres is eight times the largest error ever measured on the
+part, so the published measurements are themselves evidence that the
+frequency-offset estimate every receiver already makes is doing the
+ranging work too. Without it, ranging on this radio does not function.
+
+With it, the scheme to choose is a per-radio answer. On the SX1280 at
+kilometres the waveform bound is metres and the clock term is one metre,
+so single-sided ranging costs nothing and saves a third of the air time.
+On the impulse radio at 100 m the floor is 10 cm and the single-sided
+clock term is also 10 cm, so double-sided earns its extra frame.
+
+Air time is now a quantity the study can spend, and it buys less than it
+looks:
+
+| | SX1280 at SF10 | DWM3000 |
+|---|---|---|
+| Ranging frame | 15,75 ms | 1,06 ms |
+| Double-sided exchange | 47,86 ms | 3,77 ms |
+| Ranges per second | 20,9 | 265,1 |
+
+A round against six anchors on the SX1280 therefore takes 239 ms, during
+which a vehicle at 100 km/h travels 6,7 m — more than twice the 2,94 m
+ranging error beside it. The ranges in one round are not simultaneous and
+cannot be solved as though they were. That is a conclusion about the
+estimator, reached before the estimator was written, and it is why the
+receiver uses a filter rather than a snapshot trilateration.

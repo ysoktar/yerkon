@@ -63,6 +63,19 @@ class Radio:
     #: Lowest signal-to-noise ratio, after processing gain, at which the
     #: receiver still demodulates.
     demodulation_threshold_db: Sourced
+    #: Duration of one waveform symbol, in seconds.
+    #:
+    #: For a spread waveform this is the chip sequence; for an impulse
+    #: radio it is one preamble symbol. Either way it is what a frame's
+    #: length is counted in, and a ranging exchange's duration decides
+    #: both how often a receiver can be updated and how much clock offset
+    #: accumulates while it waits for a reply.
+    symbol_duration_s: Sourced
+    #: Symbols in the ranging frame's preamble.
+    #:
+    #: The same number the processing gain comes from. Keeping them apart
+    #: would let a change to one silently contradict the other.
+    preamble_symbols: Sourced
     #: Best ranging precision the part reaches in practice, one sigma, in
     #: metres, however good the signal gets.
     #:
@@ -140,6 +153,19 @@ def _sx1280_family(part: str, max_output_dbm: float, output_source: str) -> Radi
             -20.0, "dB", Provenance.DATASHEET,
             "SX1280 datasheet, SF10 demodulation floor relative to noise",
         ),
+        symbol_duration_s=Sourced(
+            2 ** 10 / 1625e3, "s", Provenance.DERIVED,
+            "2^SF / bandwidth at SF10 and 1625 kHz",
+            note=(
+                "630 microseconds. Three orders of magnitude longer than "
+                "the impulse radio's symbol, which is why the two parts "
+                "behave nothing alike once a reply delay is involved."
+            ),
+        ),
+        preamble_symbols=Sourced(
+            12.0, "symbols", Provenance.DATASHEET,
+            "SX1280 datasheet, default LoRa preamble length",
+        ),
         implementation_floor_m=Sourced(
             2.94, "m", Provenance.MEASUREMENT,
             "Stuart Robinson, SX1280 ranging trials over 0-250 m",
@@ -192,6 +218,19 @@ DWM3000 = Radio(
             "its margin below the thermal floor comes from. Without this "
             "term the budget says a 100 m UWB link cannot close, which "
             "contradicts every deployed system."
+        ),
+    ),
+    symbol_duration_s=Sourced(
+        1017.63e-9, "s", Provenance.STANDARD,
+        "IEEE 802.15.4z HRP preamble symbol at 64 MHz pulse repetition",
+    ),
+    preamble_symbols=Sourced(
+        1024.0, "symbols", Provenance.DATASHEET,
+        "Qorvo DW3000, long ranging preamble",
+        note=(
+            "The same 1024 symbols the processing gain is taken over. A "
+            "millisecond of preamble is what buys 30 dB, and it is also "
+            "what makes the frame long."
         ),
     ),
     demodulation_threshold_db=Sourced(

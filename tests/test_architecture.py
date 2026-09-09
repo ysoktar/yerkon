@@ -39,6 +39,34 @@ def test_the_estimator_cannot_reach_the_world():
     assert not (imports_of("estimator") & forbidden)
 
 
+def test_the_estimator_cannot_reach_the_ranging_module_either():
+    """Observations are the seam. ADR-0003.
+
+    ranging imports the world and the link budget, so an estimator that
+    imported ranging would inherit a path to the receiver's true
+    position. It may import observation, which imports nothing.
+    """
+    names = imports_of("estimator")
+    assert "yerkon.ranging" not in names
+    assert "yerkon.rf" not in names
+
+
+def test_the_observation_type_is_reachable_from_nothing_else():
+    """It is the one type the estimator shares with the simulation.
+
+    If it grew an import of its own, whatever it imported would come
+    along with it into the estimator.
+    """
+    assert not {n for n in imports_of("observation") if n.startswith("yerkon")}
+
+
+def test_ranging_produces_observations_and_not_verdicts():
+    """It measures. It does not decide where anything is."""
+    names = imports_of("ranging")
+    assert "yerkon.observation" in names
+    assert "yerkon.estimator" not in names
+
+
 def test_the_link_budget_does_not_depend_on_the_world():
     """Physics should not know about the scenario it is used in.
 

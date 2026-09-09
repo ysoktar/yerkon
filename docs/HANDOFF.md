@@ -47,6 +47,8 @@ later (ADR-0006).
 | `rf.py` | the link budget |
 | `world.py` | terrain, graded road alignments, mounting structures |
 | `site/` | real ground and buildings, fetched once into a cache |
+| `observation.py` | the one type the estimator may see, importing nothing |
+| `ranging.py` | the two-way exchange, its clocks, and what it costs in air time |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
 | `numbers.py` | comma decimal mark, no thousands separator |
@@ -69,22 +71,20 @@ though it were coverage is wrong.
 
 ## Next, in dependency order
 
-1. **`ranging`** — real two-way ranging: timestamp exchanges, clock
-   offset and drift, reply turnaround, and the scheduling that decides
-   how many anchors a receiver can range against per second. Produces
-   `Observation`s and nothing else.
-2. **`estimator`** — fusion without a height constraint. May import
-   `ranging`'s observation type. May not import `world`; the architecture
-   test enforces this.
-3. **`evaluate`** — journeys, per-fix error samples, percentiles.
+1. **`estimator`** — fusion without a height constraint. May import
+   `observation` and nothing else from this project; the architecture
+   test enforces it. It cannot treat a round of ranges as simultaneous,
+   because they are a quarter of a second apart (ADR-0010).
+2. **`evaluate`** — journeys, per-fix error samples, percentiles.
    Deterministic: every run reseeds, because a previous version of this
    project silently carried one scenario's random state into the next and
    invalidated every swept comparison in its docs.
-4. **`cost`** — CAPEX from the bill of materials, OPEX from the inventory
+3. **`cost`** — CAPEX from the bill of materials, OPEX from the inventory
    in ADR-0006.
-5. **`report`** — the four rows. The weighted row combines the raw
+4. **`report`** — the four rows. The weighted row combines the raw
    samples, never the percentiles (ADR-0005).
-6. **The 3D viewer** — live, and everything configurable.
+5. **The 3D viewer** — live, and everything configurable, rendering the
+   same confirmation panel the command line does.
 
 Deferred by explicit instruction until the above is done: the algorithm
 that sites anchors for a target accuracy at least cost.
@@ -94,9 +94,14 @@ that sites anchors for a target accuracy at least cost.
 - **OPEX rates.** Energy, connectivity, service life, maintenance visit
   frequency, central operation. Each needs a source or an explicit
   assumption marker.
+- **The residual clock offset after frequency correction**, half a part
+  per million, is the least supported number in the ranging model. It
+  decides whether single-sided ranging is usable on the slow radio, and
+  it is the first thing worth measuring.
 - **The multipath channel and the implementation floor** want calibrating
-  against MATLAB once `ranging` exists. The floor is currently one
-  published measurement per radio.
+  against MATLAB. The floor is currently one published measurement per
+  radio, and the model now says most of it is clock rather than timing
+  resolution, which the same measurement could confirm or refute.
 
 ## What this project has already got wrong
 
