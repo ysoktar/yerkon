@@ -139,8 +139,43 @@ class ServiceElevation:
     name: str = "OpenTopoData SRTM 30 m"
     batch: int = 100
     nominal_resolution_m: float = 30.0
+    #: Most requests this fetcher will issue before refusing.
+    #:
+    #: The public service allows a thousand calls a day at one a second.
+    #: A grid is easy to ask for and expensive to serve: a 35 by 14 km box
+    #: at 30 m spacing is 479,000 points, which is 4,791 calls and about
+    #: an hour and a half of somebody else's server. Refusing up front is
+    #: better than discovering it after four hundred requests.
+    request_budget: int = 400
+
+    def points_required(self, bounds: BoundingBox, spacing_m: float) -> int:
+        per_lat, per_lon = bounds.metres_per_degree()
+        columns = max(int((bounds.east - bounds.west) * per_lon / spacing_m), 2)
+        rows = max(int((bounds.north - bounds.south) * per_lat / spacing_m), 2)
+        return rows * columns
+
+    def _refuse_if_too_large(self, bounds: BoundingBox, spacing_m: float) -> None:
+        points = self.points_required(bounds, spacing_m)
+        requests_needed = (points + self.batch - 1) // self.batch
+        if requests_needed <= self.request_budget:
+            return
+
+        affordable = self.request_budget * self.batch
+        coarser = spacing_m * math.sqrt(points / affordable)
+        raise Unreachable(
+            "This area needs {points:,} points, which is {calls:,} calls to "
+            "{name}. Its public limit is a thousand a day at one a second, "
+            "so the fetch would fail part way through. Either use "
+            "--spacing {coarser:.0f} or coarser, or download a raster for "
+            "this area and pass --geotiff, which needs no network and is "
+            "higher resolution.".format(
+                points=points, calls=requests_needed, name=self.name,
+                coarser=math.ceil(coarser / 10.0) * 10.0,
+            )
+        )
 
     def grid_for(self, bounds: BoundingBox, spacing_m: float) -> ElevationGrid:
+        self._refuse_if_too_large(bounds, spacing_m)
         try:
             import requests
         except ImportError as error:
@@ -327,19 +362,22 @@ def build_site(
     notes: list[str] = []
 
     grid: Optional[ElevationGrid] = None
+    refusals: list[str] = []
     for source in elevation_sources:
         try:
             grid = source.grid_for(bounds, spacing_m)
             break
         except Unreachable as error:
-            notes.append("{} unavailable: {}".format(getattr(source, "name", source), error))
+            reason = "{}: {}".format(getattr(source, "name", source), error)
+            refusals.append(reason)
+            notes.append(reason)
 
     if grid is None:
-        raise Unreachable(
-            "No elevation source answered. Tried: {}".format(
-                ", ".join(getattr(s, "name", str(s)) for s in elevation_sources) or "none"
-            )
-        )
+        # Carry each source's own reason forward. A caller told only that
+        # nothing answered cannot tell a network failure from an area too
+        # large to ask for, and those need opposite responses.
+        detail = "\n  ".join(refusals) if refusals else "no sources were given"
+        raise Unreachable("No elevation source answered.\n  " + detail)
 
     buildings: Optional[Buildings] = None
     feature_source: Optional[str] = None

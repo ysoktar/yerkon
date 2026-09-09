@@ -206,7 +206,7 @@ def test_the_first_source_that_answers_wins():
 
 def test_a_source_that_failed_is_recorded_not_hidden():
     site = build_site(ANKARA, elevation_sources=(DeadSource(), FakeElevation()))
-    assert any("dead unavailable" in note for note in site.manifest.notes)
+    assert any("dead: no route to host" in note for note in site.manifest.notes)
 
 
 def test_no_ground_at_all_is_the_one_fatal_case():
@@ -242,7 +242,7 @@ def test_a_geotiff_on_disk_is_read_and_resampled(tmp_path):
     the mistake this reader is most likely to make.
     """
     rasterio = pytest.importorskip("rasterio")
-    from rasterio.transform import from_origin
+    from affine import Affine
 
     path = tmp_path / "ground.tif"
     rows, columns = 60, 80
@@ -251,7 +251,10 @@ def test_a_geotiff_on_disk_is_read_and_resampled(tmp_path):
     with rasterio.open(
         path, "w", driver="GTiff", height=rows, width=columns, count=1,
         dtype="float32", crs="EPSG:4326",
-        transform=from_origin(32.80, 39.95, 0.001, 0.001),
+        # Built directly rather than through rasterio's from_origin, which
+        # multiplies two Affines with * and trips a deprecation warning
+        # inside the library.
+        transform=Affine(0.001, 0.0, 32.80, 0.0, -0.001, 39.95),
     ) as raster:
         raster.write(values, 1)
 
@@ -295,3 +298,49 @@ def test_a_path_over_a_building_has_to_clear_its_roof():
 
     obstruction = terrain.obstruction_between((0.0, 0.0, 25.0), (600.0, 0.0, 2.0), 200)
     assert obstruction.peak_terrain_m == pytest.approx(60.0)
+
+
+def test_an_area_too_large_for_the_service_is_refused_before_asking():
+    """Say so up front rather than after four hundred requests.
+
+    The public service allows a thousand calls a day. A 35 by 14 km box
+    at 30 m spacing is 479,000 points, which is 4,791 calls, so the fetch
+    cannot succeed and should not start.
+    """
+    service = ServiceElevation()
+    wide = BoundingBox(south=39.85, west=32.70, north=39.98, east=33.05)
+
+    assert service.points_required(wide, 30.0) > 400_000
+
+    with pytest.raises(Unreachable, match="--spacing"):
+        service.grid_for(wide, spacing_m=30.0)
+
+    with pytest.raises(Unreachable, match="--geotiff"):
+        service.grid_for(wide, spacing_m=30.0)
+
+
+def test_the_refusal_suggests_a_spacing_that_would_fit():
+    service = ServiceElevation()
+    wide = BoundingBox(south=39.85, west=32.70, north=39.98, east=33.05)
+    try:
+        service.grid_for(wide, spacing_m=30.0)
+    except Unreachable as error:
+        message = str(error)
+    suggested = float(message.split("--spacing ")[1].split()[0])
+    assert service.points_required(wide, suggested) <= 400 * service.batch
+
+
+def test_a_failed_fetch_says_which_source_refused_and_why():
+    """A network failure and an oversized request need opposite responses.
+
+    Reporting only that nothing answered leaves the caller unable to tell
+    them apart, which is what happened the first time this ran.
+    """
+    class Chatty:
+        name = "chatty"
+
+        def grid_for(self, bounds, spacing_m):
+            raise Unreachable("try --spacing 200 instead")
+
+    with pytest.raises(Unreachable, match="--spacing 200"):
+        build_site(ANKARA, elevation_sources=(Chatty(),))
