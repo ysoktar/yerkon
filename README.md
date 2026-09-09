@@ -67,17 +67,29 @@ the road, each anchor and the ring it ranges within tolerance; the swept
 coverage painted on the ground in two colours, one for ground a packet
 reaches and one for ground where four anchors are in reach at once.
 
-Everything is live. Drag an anchor to move it, shift-click to remove it,
-move any slider and the scene and the numbers follow. Terrain relief,
-hill spacing, surface roughness, clutter, anchor spacing and offset,
-corridor length, region, module, mounting, exchange scheme, ranging
-tolerance, receiver speed and antenna height are all settings.
+Four modes: the report's urban, rural and tunnel rows, and a **mixed
+corridor** that runs out of a town, across open country and through a
+bore, carrying all three anchor modules at once. None of the report's
+three rows measures that arrangement; this one does.
+
+Anchors are edited as *runs* — a stretch of corridor carrying one module
+on one mounting at one spacing — and a corridor may hold as many as it
+needs, each drawn in its own colour with its own reach ring. Units are
+edited the same way: as many as you like, each with its own speed, start,
+antenna height and set of modules, drawn on the route it takes.
+
+Everything is live. Drag an anchor, shift-click to remove it, add or drop
+a run or a unit, move any slider, and the scene and the numbers follow.
 
 Changes that force other changes — region, module, mounting, tolerance,
-roughness, receiver height — raise the confirmation panel first, listing
-every value that would move with its old and new figure and why it
-follows, answered once for the whole batch (ADR-0009). Dragging an anchor
-forces nothing, so it applies immediately.
+roughness — raise the confirmation panel first, listing every value that
+would move with its old and new figure and why it follows, answered once
+for the whole batch (ADR-0009). The panel is grouped by anchor run and
+says which it means, because a shared setting does not move every run the
+same way: switching to the American rules raises the ceiling for the
+spread runs and moves nothing for the impulse one. Dragging an anchor,
+adding a unit or changing the terrain forces nothing, so it applies
+immediately.
 
 The page holds no physics. Every number on it was computed by the modules
 that build the table, so the picture and the report cannot disagree. It
@@ -93,10 +105,13 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 3,35 | 10,40 | 30,70 | %97,83 | 5,34 | 13082 | 6061 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 2,69 | 10,33 | 113,21 | %99,22 | 58,00 | 21424 | 888 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,19 | 0,66 | 6,63 | %96,02 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,72 | 10,21 | 86,76 | %98,42 | 25,87 | 460453 | 88337 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 5,06 | 15,47 | 33,07 | %98,85 | 5,34 | 13082 | 6061 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 4,02 | 14,48 | 122,22 | %99,43 | 58,00 | 21424 | 888 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,29 | 0,99 | 6,38 | %98,01 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 3,96 | 14,01 | 81,91 | %99,10 | 25,87 | 460453 | 88337 |
+
+Each row now carries two units sharing the air, which is why the errors
+are larger than a single-vehicle model would report. See below.
 
 The OPEX column is the one the report leaves empty for all four rows. It
 comes from an inventory of named recurring items rather than a percentage
@@ -260,6 +275,32 @@ instead, the same amplifier is worth about 18 dB.
 A narrowband radio does not deliver centimetres at short range. The
 waveform bound says 2 cm at 100 m; the part measures about 3 m. The model
 reports the larger of the two.
+
+## What sharing the air costs
+
+A deployment serves traffic, not one vehicle, and the units queue at the
+same anchors. A round is every unit's exchanges laid end to end, so a
+second unit does not halve the work — it doubles the wait:
+
+| | One unit | Two units |
+|---|---|---|
+| Round, 16 urban anchors | 509 ms | 1018 ms |
+| Fixes per unit per second | 1,96 | 0,98 |
+| Rounds attempted over a journey | 179 | 178 |
+
+The last row is the finding. The total number of fixes the network
+produces barely moves, because the air was already fully spent; what
+changes is how it is divided. Urban HPE at the median went from 3,35 m
+with one unit to 5,06 m with two, since each filter now coasts twice as
+long between updates. The earlier figure described a network with one
+customer.
+
+Both receivers in the bill of materials carry an SX1280 *and* a DWM3000,
+which is what lets one unit range against town anchors on the road and
+tunnel anchors inside a bore without changing. A unit ranges against
+every anchor it shares a waveform with and ignores the rest — so a unit
+carrying only the spread module simply does not see the tunnel anchors.
+ADR-0014 records all of this.
 
 ## What the exchange adds on top
 

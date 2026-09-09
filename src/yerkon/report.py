@@ -253,6 +253,22 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
                 "%{}".format(decimal_comma(100.0 * row.assumed_share, 0))
             )
         )
+        deployment = result.deployed.scenario.deployment
+        lines.append(
+            "    {} units share the air: a round takes {} ms, so each is "
+            "fixed {} times a second and a second unit halves that rather "
+            "than adding to it.".format(
+                len(deployment.receivers),
+                decimal_comma(deployment.round_duration_s() * 1000.0, 0),
+                decimal_comma(1.0 / max(deployment.round_duration_s(), 1e-9), 2),
+            )
+        )
+        modules = sorted({a.radio.part for a in deployment.anchors})
+        if len(modules) > 1:
+            lines.append(
+                "    Anchor modules: {}. A unit ranges only against the "
+                "ones it shares a waveform with.".format(", ".join(modules))
+            )
 
     lines.append(
         "  Weights for the last row: {}. It combines the three scenarios' "

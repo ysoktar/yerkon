@@ -18,6 +18,7 @@ from typing import Optional
 import numpy as np
 
 from yerkon.cost import (
+    PEDESTRIAN_RECEIVER,
     RURAL_ANCHOR,
     TUNNEL_ANCHOR,
     URBAN_ANCHOR,
@@ -26,8 +27,8 @@ from yerkon.cost import (
     Inventory,
     Product,
 )
-from yerkon.evaluate import Deployment, Journey, Scenario, coverage
-from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280, Radio
+from yerkon.evaluate import Deployment, Journey, Receiver, Scenario, coverage
+from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280, Radio, W24P_U
 from yerkon.ranging import DOUBLE_SIDED, SINGLE_SIDED, Scheme
 from yerkon.regulatory import TURKEY
 from yerkon.world import (
@@ -67,6 +68,7 @@ class Deployed:
     #: What the report calls the environment: inside, outside, or both.
     environment: str
     technology: str
+    #: Units of each kind the deployment is priced with.
     receivers: int = 100
     #: How far beyond the anchors the coverage sweep looks, in metres.
     coverage_margin_m: float = 8000.0
@@ -88,21 +90,41 @@ class Deployed:
         return self.route_km * self.confined_width_m / 1000.0
 
     def inventory(self, service_area_km2: float) -> Inventory:
+        units: dict = {}
+        for unit in self.scenario.deployment.receivers:
+            product = RECEIVER_PRODUCTS.get(unit.product, VEHICLE_RECEIVER)
+            units[product] = units.get(product, 0) + self.receivers
         return Inventory(
             anchors=tuple(
                 AnchorSite(
                     product=self.product,
-                    structure=self.mounting.kind,
-                    site_cost_tl=self.mounting.site_cost_tl,
-                    has_power=self.mounting.has_power,
-                    has_backhaul=self.mounting.has_backhaul,
+                    structure=anchor.mounting.kind,
+                    site_cost_tl=anchor.mounting.site_cost_tl,
+                    has_power=anchor.mounting.has_power,
+                    has_backhaul=anchor.mounting.has_backhaul,
                 )
-                for _ in self.scenario.deployment.anchors
+                for anchor in self.scenario.deployment.anchors
             ),
-            receivers=((VEHICLE_RECEIVER, self.receivers),),
+            receivers=tuple(units.items()),
             service_area_km2=service_area_km2,
             route_km=self.route_km,
         )
+
+
+#: Which line of the bill of materials a unit is.
+RECEIVER_PRODUCTS = {
+    "vehicle": VEHICLE_RECEIVER,
+    "pedestrian": PEDESTRIAN_RECEIVER,
+}
+
+
+#: What both receivers in the bill of materials actually contain.
+#:
+#: "Yaya alıcısı: SX1280, DWM3000, ESP32-S3..." and "Kara aracı alıcısı:
+#: SX1280, DWM3000, STM32...". Two radios in each, which is what lets one
+#: unit work against town anchors on the road and against tunnel anchors
+#: inside a bore without anything about the unit changing.
+BOTH_MODULES = (SX1280, DWM3000)
 
 
 def _straight_road(length_m: float, terrain: Terrain, step_m: float = 500.0) -> Road:
@@ -120,17 +142,34 @@ def _anchors_along(
     offset_m: float,
     mounting: MountingOption,
     terrain: Terrain,
+    radio: Radio = SX1280,
+    prefix: str = "N",
 ):
     from yerkon.world import Anchor
 
     return tuple(
         Anchor(
-            "N{}".format(index),
+            "{}{}".format(prefix, index),
             (float(x), offset_m if index % 2 == 0 else -offset_m),
             mounting,
             terrain,
+            radio=radio,
         )
         for index, x in enumerate(np.arange(0.0, length_m + 1.0, spacing_m))
+    )
+
+
+def _unit(identifier, road, speed_m_s, duration_s, start_m=0.0,
+          antenna_height_m=1.5, product="vehicle"):
+    return Receiver(
+        identifier=identifier,
+        journey=Journey(
+            road=road, speed_m_s=speed_m_s, duration_s=duration_s,
+            start_m=start_m, antenna_height_m=antenna_height_m,
+        ),
+        radios=BOTH_MODULES,
+        antenna=W24P_U,
+        product=product,
     )
 
 
@@ -144,39 +183,29 @@ def _anchors_along(
 #: single number that decides how far an urban anchor reaches.
 URBAN_CLUTTER_DB_PER_KM = 30.0
 
+URBAN_TERRAIN = flat_terrain(
+    clutter_loss_db_per_km=URBAN_CLUTTER_DB_PER_KM,
+    micro_roughness_m=0.5,
+)
+
+URBAN_ROAD = _straight_road(6000.0, URBAN_TERRAIN, step_m=200.0)
+
 URBAN = Deployed(
     scenario=Scenario(
         name="Şehir içi",
-        terrain=flat_terrain(
-            clutter_loss_db_per_km=URBAN_CLUTTER_DB_PER_KM,
-            micro_roughness_m=0.5,
-        ),
+        terrain=URBAN_TERRAIN,
         deployment=Deployment(
             anchors=_anchors_along(
-                6000.0, 400.0, 25.0, LIGHTING_COLUMN,
-                flat_terrain(
-                    clutter_loss_db_per_km=URBAN_CLUTTER_DB_PER_KM,
-                    micro_roughness_m=0.5,
-                ),
+                6000.0, 400.0, 25.0, LIGHTING_COLUMN, URBAN_TERRAIN,
+                radio=SX1280,
             ),
-            anchor_radio=SX1280,
-            receiver_radio=SX1280,
+            receivers=(
+                _unit("araç", URBAN_ROAD, 13.9, 400.0),
+                _unit("yaya", URBAN_ROAD, 1.4, 400.0, start_m=2000.0,
+                      antenna_height_m=1.6, product="pedestrian"),
+            ),
             scheme=SINGLE_SIDED,
             region=TURKEY,
-        ),
-        journeys=(
-            Journey(
-                road=_straight_road(
-                    6000.0,
-                    flat_terrain(
-                        clutter_loss_db_per_km=URBAN_CLUTTER_DB_PER_KM,
-                        micro_roughness_m=0.5,
-                    ),
-                    step_m=200.0,
-                ),
-                speed_m_s=13.9,
-                duration_s=400.0,
-            ),
         ),
         seed=101,
         accept_sigma_m=15.0,
@@ -198,23 +227,23 @@ RURAL_TERRAIN = rolling_terrain(
     amplitude_m=40.0, wavelength_m=3000.0, micro_roughness_m=0.2
 )
 
+RURAL_ROAD = _straight_road(24_000.0, RURAL_TERRAIN)
+
 RURAL = Deployed(
     scenario=Scenario(
         name="Kırsal",
         terrain=RURAL_TERRAIN,
         deployment=Deployment(
-            anchors=_anchors_along(24_000.0, 2000.0, 400.0, TALL_MAST, RURAL_TERRAIN),
-            anchor_radio=E28_2G4M27S,
-            receiver_radio=SX1280,
+            anchors=_anchors_along(
+                24_000.0, 2000.0, 400.0, TALL_MAST, RURAL_TERRAIN,
+                radio=E28_2G4M27S,
+            ),
+            receivers=(
+                _unit("araç", RURAL_ROAD, 27.8, 800.0),
+                _unit("kamyon", RURAL_ROAD, 22.2, 800.0, start_m=6000.0),
+            ),
             scheme=SINGLE_SIDED,
             region=TURKEY,
-        ),
-        journeys=(
-            Journey(
-                road=_straight_road(24_000.0, RURAL_TERRAIN),
-                speed_m_s=27.8,
-                duration_s=800.0,
-            ),
         ),
         seed=202,
         accept_sigma_m=30.0,
@@ -240,25 +269,24 @@ RURAL = Deployed(
 #: need a waveguide term to claim otherwise.
 TUNNEL_TERRAIN = flat_terrain(micro_roughness_m=0.05)
 
+TUNNEL_ROAD = _straight_road(2000.0, TUNNEL_TERRAIN, step_m=100.0)
+
 TUNNEL = Deployed(
     scenario=Scenario(
         name="Tünel",
         terrain=TUNNEL_TERRAIN,
         deployment=Deployment(
             anchors=_anchors_along(
-                2000.0, 150.0, 4.0, TUNNEL_BRACKET, TUNNEL_TERRAIN
+                2000.0, 150.0, 4.0, TUNNEL_BRACKET, TUNNEL_TERRAIN,
+                radio=DWM3000,
             ),
-            anchor_radio=DWM3000,
-            receiver_radio=DWM3000,
+            receivers=(
+                _unit("araç", TUNNEL_ROAD, 22.2, 85.0),
+                _unit("yaya", TUNNEL_ROAD, 1.4, 85.0, start_m=600.0,
+                      antenna_height_m=1.6, product="pedestrian"),
+            ),
             scheme=DOUBLE_SIDED,
             region=TURKEY,
-        ),
-        journeys=(
-            Journey(
-                road=_straight_road(2000.0, TUNNEL_TERRAIN, step_m=100.0),
-                speed_m_s=22.2,
-                duration_s=85.0,
-            ),
         ),
         seed=303,
         accept_sigma_m=2.0,

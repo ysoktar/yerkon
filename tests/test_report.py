@@ -158,9 +158,36 @@ def test_the_tunnel_serves_a_bore_and_not_a_plane():
 def test_the_three_scenarios_use_the_three_modules_the_report_assigns():
     from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
 
-    assert URBAN.scenario.deployment.anchor_radio is SX1280
-    assert RURAL.scenario.deployment.anchor_radio is E28_2G4M27S
-    assert TUNNEL.scenario.deployment.anchor_radio is DWM3000
+    def radios(deployed):
+        return {a.radio for a in deployed.scenario.deployment.anchors}
+
+    assert radios(URBAN) == {SX1280}
+    assert radios(RURAL) == {E28_2G4M27S}
+    assert radios(TUNNEL) == {DWM3000}
+
+
+def test_every_unit_carries_both_modules_as_the_bill_of_materials_says():
+    """Both receivers list an SX1280 and a DWM3000. That is what lets one
+    unit work on the road and in a bore without changing."""
+    from yerkon.hardware import DWM3000, SX1280
+
+    for deployed in ALL:
+        for unit in deployed.scenario.deployment.receivers:
+            assert SX1280 in unit.radios
+            assert DWM3000 in unit.radios
+
+
+def test_every_scenario_carries_more_than_one_unit():
+    """A deployment serves traffic, not one vehicle, and the air they
+    share is what decides how often each is fixed."""
+    for deployed in ALL:
+        assert len(deployed.scenario.deployment.receivers) >= 2
+
+
+def test_a_scenario_prices_the_units_it_actually_carries():
+    inventory = URBAN.inventory(5.0)
+    names = {product.name for product, _ in inventory.receivers}
+    assert names == {"Kara aracı alıcısı", "Yaya alıcısı"}
 
 
 def test_every_scenario_carries_a_weight_and_they_are_not_all_equal():

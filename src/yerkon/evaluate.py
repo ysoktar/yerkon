@@ -24,15 +24,17 @@ from typing import Optional, Sequence
 import numpy as np
 
 from yerkon.estimator import DEFAULT_MANOEUVRE_M_S2, TrackingFilter, trilaterate
-from yerkon.hardware import Antenna, Radio, SX1280, W24P_U
+from yerkon.hardware import Antenna, DWM3000, Radio, SX1280, W24P_U
 from yerkon.observation import RangeObservation
 from yerkon.ranging import (
     CRYSTAL,
     DOUBLE_SIDED,
     Clock,
     Scheme,
+    audible,
     exchange_duration_s,
-    round_robin,
+    measure,
+    share_a_waveform,
 )
 from yerkon.regulatory import TURKEY, SpectrumRule
 from yerkon.rf import Terminal, evaluate_link, ranging_sigma_m
@@ -72,12 +74,43 @@ class Journey:
 
 
 @dataclass(frozen=True)
+class Receiver:
+    """One moving unit, its journey, and the modules it carries.
+
+    Both receivers in the report's bill of materials carry two radios: a
+    spread module and an impulse one. That is not decoration. It is what
+    lets one unit range against town anchors on the open road and against
+    tunnel anchors inside a bore, without changing anything about the
+    unit. A receiver therefore ranges against every anchor it shares a
+    waveform with, and quietly ignores the rest.
+    """
+
+    identifier: str
+    journey: Journey
+    radios: tuple[Radio, ...] = (SX1280,)
+    antenna: Antenna = W24P_U
+    #: Which product in the bill of materials this is, for costing.
+    product: str = "vehicle"
+
+    def __post_init__(self) -> None:
+        if not self.radios:
+            raise ValueError("a receiver with no radio hears nothing")
+
+    def terminal(self, radio: Radio, at_s: float) -> Terminal:
+        return Terminal(radio, self.antenna, self.journey.position_at(at_s))
+
+
+@dataclass(frozen=True)
 class Deployment:
-    """Anchors on the ground, and the radios at both ends of the link."""
+    """Anchors on the ground and receivers moving among them.
+
+    Neither is required to be of one kind. A corridor that runs from a
+    town through open country into a tunnel carries all three anchor
+    modules, and the units driving along it carry two.
+    """
 
     anchors: tuple[Anchor, ...]
-    anchor_radio: Radio = SX1280
-    receiver_radio: Radio = SX1280
+    receivers: tuple[Receiver, ...] = ()
     antenna: Antenna = W24P_U
     scheme: Scheme = DOUBLE_SIDED
     clock: Clock = CRYSTAL
@@ -88,39 +121,76 @@ class Deployment:
     def __post_init__(self) -> None:
         if not self.anchors:
             raise ValueError("a deployment needs anchors")
-        identifiers = [a.identifier for a in self.anchors]
-        if len(set(identifiers)) != len(identifiers):
-            raise ValueError("two anchors share an identifier")
+        for group, what in ((self.anchors, "anchors"), (self.receivers, "receivers")):
+            identifiers = [item.identifier for item in group]
+            if len(set(identifiers)) != len(identifiers):
+                raise ValueError("two {} share an identifier".format(what))
 
     def terminals(self) -> tuple[tuple[str, Terminal], ...]:
         return tuple(
             (
                 anchor.identifier,
-                Terminal(self.anchor_radio, self.antenna, anchor.position_m),
+                Terminal(anchor.radio, self.antenna, anchor.position_m),
             )
             for anchor in self.anchors
         )
 
-    @property
-    def round_duration_s(self) -> float:
-        return (
-            len(self.anchors)
-            * exchange_duration_s(self.anchor_radio, self.scheme)
-            / self.duty_cycle
+    def radios(self) -> tuple[Radio, ...]:
+        """Every distinct waveform in the deployment, anchors and units."""
+        seen: list[Radio] = []
+        for radio in [a.radio for a in self.anchors] + [
+            r for receiver in self.receivers for r in receiver.radios
+        ]:
+            if not any(share_a_waveform(radio, known) for known in seen):
+                seen.append(radio)
+        return tuple(seen)
+
+    def anchors_heard_by(self, receiver: Receiver) -> tuple[tuple[str, Terminal, Radio], ...]:
+        """The anchors this unit could range against, and with which module."""
+        return tuple(
+            (identifier, terminal, radio)
+            for identifier, terminal in self.terminals()
+            for radio in [audible(terminal, receiver.radios)]
+            if radio is not None
         )
+
+    def round_duration_s(self) -> float:
+        """How long between one unit's fixes, in seconds.
+
+        The medium is shared. Every unit that can hear an anchor waits
+        its turn at it, so a second unit does not halve the work, it
+        doubles the wait. Anchors on a different waveform are on a
+        different medium and cost nothing here, which is why a mixed
+        corridor updates faster than its anchor count suggests.
+        """
+        if not self.receivers:
+            # Nothing is driving yet, so price a single unit carrying
+            # every waveform present. That is the deployment's own
+            # worst case and the number a coverage map implies.
+            demand_s = sum(
+                exchange_duration_s(anchor.radio, self.scheme)
+                for anchor in self.anchors
+            )
+            return demand_s / self.duty_cycle
+
+        demand_s = sum(
+            exchange_duration_s(anchor_radio, self.scheme)
+            for unit in self.receivers
+            for _, _, anchor_radio in self.anchors_heard_by(unit)
+        )
+        return demand_s / self.duty_cycle
 
 
 @dataclass(frozen=True)
 class Scenario:
-    """One row of the report: a deployment, a site, and some journeys."""
+    """One row of the report: a deployment, a site, and the units on it."""
 
     name: str
     terrain: Terrain
     deployment: Deployment
-    journeys: tuple[Journey, ...]
     seed: int = 0
     manoeuvre_m_s2: float = DEFAULT_MANOEUVRE_M_S2
-    #: Ranging error a link may have and still be attempted, in metres.
+    #: Ranging error a link may have and still be used, in metres.
     #:
     #: Beyond this the measurement is worse than useless: it drags a fix
     #: rather than improving it. Real receivers gate on signal quality
@@ -128,8 +198,8 @@ class Scenario:
     accept_sigma_m: float = 30.0
 
     def __post_init__(self) -> None:
-        if not self.journeys:
-            raise ValueError("a scenario needs at least one journey")
+        if not self.deployment.receivers:
+            raise ValueError("a scenario needs at least one receiver")
 
 
 @dataclass(frozen=True)
@@ -225,12 +295,17 @@ def combine(weighted: Sequence[tuple[Samples, float]], name: str) -> Samples:
 
 
 def run_scenario(scenario: Scenario) -> Samples:
-    """Drive every journey, fix as often as the ranging allows, count errors."""
+    """Drive every unit, fix as often as the medium allows, count errors.
+
+    Units share the anchors, so a round takes as long as all of them
+    together need, and every unit is fixed once per round. Errors from
+    all of them land in one sample set: the table's rows are about a
+    deployment, not about one vehicle.
+    """
     rng = np.random.default_rng(scenario.seed)
 
     deployment = scenario.deployment
-    anchors = deployment.terminals()
-    round_s = deployment.round_duration_s
+    round_s = deployment.round_duration_s()
 
     horizontal: list[float] = []
     vertical: list[float] = []
@@ -238,58 +313,65 @@ def run_scenario(scenario: Scenario) -> Samples:
     attempted_links = 0
     lost_links = 0
 
-    for journey in scenario.journeys:
-        def receiver_at(at_s: float, journey=journey) -> Terminal:
-            return Terminal(
-                deployment.receiver_radio,
-                deployment.antenna,
-                journey.position_at(at_s),
-            )
+    trackers: dict[str, Optional[TrackingFilter]] = {
+        unit.identifier: None for unit in deployment.receivers
+    }
+    longest_s = max(
+        unit.journey.duration_s for unit in deployment.receivers
+    )
 
-        def obstruction_between(anchor: Terminal, receiver: Terminal):
-            return scenario.terrain.obstruction_between(
-                anchor.position_m, receiver.position_m
-            )
-
-        tracker: Optional[TrackingFilter] = None
-        at_s = 0.0
-        while at_s + round_s <= journey.duration_s:
+    at_s = 0.0
+    while at_s + round_s <= longest_s:
+        # One slot per exchange, laid end to end across every unit, so
+        # nothing is measured at the same instant as anything else. That
+        # is the whole reason the estimator is a filter (ADR-0010).
+        slot_at_s = at_s
+        for unit in deployment.receivers:
+            if at_s + round_s > unit.journey.duration_s:
+                continue
             attempted += 1
-            attempted_links += len(anchors)
+            observations = []
+            for identifier, anchor, radio in deployment.anchors_heard_by(unit):
+                attempted_links += 1
+                receiver = unit.terminal(radio, slot_at_s)
+                observation = measure(
+                    anchor,
+                    receiver,
+                    slot_at_s,
+                    rng,
+                    anchor_id=identifier,
+                    clock=deployment.clock,
+                    scheme=deployment.scheme,
+                    obstruction=scenario.terrain.obstruction_between(
+                        anchor.position_m, receiver.position_m
+                    ),
+                    region=deployment.region,
+                )
+                slot_at_s += exchange_duration_s(
+                    anchor.radio, deployment.scheme
+                ) / deployment.duty_cycle
+                if observation is None:
+                    lost_links += 1
+                elif observation.sigma_m <= scenario.accept_sigma_m:
+                    observations.append(observation)
 
-            observations = round_robin(
-                anchors,
-                receiver_at,
-                at_s,
-                rng,
-                deployment.anchor_radio,
-                clock=deployment.clock,
-                scheme=deployment.scheme,
-                duty_cycle=deployment.duty_cycle,
-                obstruction_between=obstruction_between,
-                region=deployment.region,
+            fix = _fix_from(
+                observations, trackers[unit.identifier], scenario.manoeuvre_m_s2
             )
-            lost_links += len(anchors) - len(observations)
-
-            usable = tuple(
-                o for o in observations
-                if o.sigma_m <= scenario.accept_sigma_m
-            )
-
-            fix = _fix_from(usable, tracker, scenario.manoeuvre_m_s2)
             if fix is None:
                 # A round that produced no position is an outage, and the
                 # filter is not carried across it: a receiver that lost
                 # the network does not know where it drifted to.
-                tracker = None
-                at_s += round_s
+                trackers[unit.identifier] = None
                 continue
 
             tracker, position = fix
-            truth = journey.position_at(tracker.at_s)
+            trackers[unit.identifier] = tracker
+            truth = unit.journey.position_at(tracker.at_s)
             horizontal.append(math.dist(position[:2], truth[:2]))
             vertical.append(abs(position[2] - truth[2]))
-            at_s += round_s
+
+        at_s += round_s
 
     return Samples(
         name=scenario.name,
@@ -306,7 +388,7 @@ def _fix_from(
     tracker: Optional[TrackingFilter],
     manoeuvre_m_s2: float,
 ):
-    """Fold one round into the filter, starting it if it is not running."""
+    """Fold one round into a unit's filter, starting it if it is not running."""
     if tracker is None:
         start = trilaterate(observations)
         if start is None:
@@ -389,6 +471,11 @@ def coverage_grid(
     )
 
     anchors = deployment.terminals()
+    # Ground is served for a unit carrying whatever the deployment's
+    # units carry. A sweep against one waveform would call a tunnel
+    # anchor unreachable from a road unit that in fact carries the
+    # matching module.
+    radios = _sweep_radios(deployment)
     counts = np.zeros((ys.size, xs.size), dtype=int)
 
     for row, y in enumerate(ys):
@@ -397,10 +484,12 @@ def coverage_grid(
                 float(x), float(y),
                 terrain.height_at(float(x), float(y)) + receiver_height_m,
             )
-            receiver = Terminal(deployment.receiver_radio, deployment.antenna, here)
-
             reached = 0
             for _, anchor in anchors:
+                radio = audible(anchor, radios)
+                if radio is None:
+                    continue
+                receiver = Terminal(radio, deployment.antenna, here)
                 if math.dist(anchor.position_m, here) < 1.0:
                     reached += 1
                 elif _reaches(
@@ -414,6 +503,17 @@ def coverage_grid(
     return CoverageGrid(counts=counts, xs=xs, ys=ys, resolution_m=resolution_m)
 
 
+def _sweep_radios(deployment: Deployment) -> tuple[Radio, ...]:
+    if deployment.receivers:
+        seen = []
+        for unit in deployment.receivers:
+            for radio in unit.radios:
+                if not any(share_a_waveform(radio, known) for known in seen):
+                    seen.append(radio)
+        return tuple(seen)
+    return deployment.radios()
+
+
 def _reaches(anchor, receiver, terrain, deployment, target_sigma_m) -> bool:
     budget = evaluate_link(
         anchor,
@@ -424,7 +524,7 @@ def _reaches(anchor, receiver, terrain, deployment, target_sigma_m) -> bool:
         region=deployment.region,
     )
     return budget.closes and (
-        ranging_sigma_m(budget, deployment.anchor_radio) <= target_sigma_m
+        ranging_sigma_m(budget, anchor.radio) <= target_sigma_m
     )
 
 

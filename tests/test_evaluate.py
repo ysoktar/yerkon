@@ -9,6 +9,7 @@ from yerkon.evaluate import (
     Coverage,
     Deployment,
     Journey,
+    Receiver,
     Samples,
     Scenario,
     combine,
@@ -37,25 +38,53 @@ def a_road(terrain=ROLLING):
     )
 
 
-def anchors_every(spacing_m, terrain=ROLLING, mounting=TALL_MAST, length_m=12_000.0):
+def anchors_every(spacing_m, terrain=ROLLING, mounting=TALL_MAST,
+                  length_m=12_000.0, radio=None):
+    from yerkon.hardware import SX1280
+
     return tuple(
         Anchor(
             "M{}".format(index),
             (float(x), 400.0 if index % 2 == 0 else -400.0),
             mounting,
             terrain,
+            radio=radio or SX1280,
         )
         for index, x in enumerate(np.arange(0.0, length_m + 1.0, spacing_m))
     )
 
 
-def a_scenario(spacing_m=2000.0, duration_s=60.0, seed=1, terrain=ROLLING, **kwargs):
+def a_unit(identifier="araç", terrain=ROLLING, speed_m_s=27.8, duration_s=60.0,
+           radios=None, **journey):
+    from yerkon.hardware import DWM3000, SX1280
+
+    return Receiver(
+        identifier=identifier,
+        journey=Journey(road=a_road(terrain), speed_m_s=speed_m_s,
+                        duration_s=duration_s, **journey),
+        radios=radios or (SX1280, DWM3000),
+    )
+
+
+def a_deployment(spacing_m=2000.0, terrain=ROLLING, mounting=TALL_MAST,
+                 units=None, **kwargs):
+    return Deployment(
+        anchors=anchors_every(spacing_m, terrain, mounting),
+        receivers=units if units is not None else (a_unit(terrain=terrain),),
+        **kwargs,
+    )
+
+
+def a_scenario(spacing_m=2000.0, duration_s=60.0, seed=1, terrain=ROLLING,
+               units=None, mounting=TALL_MAST, **kwargs):
     return Scenario(
         name="test",
         terrain=terrain,
-        deployment=Deployment(anchors=anchors_every(spacing_m, terrain)),
-        journeys=(Journey(road=a_road(terrain), speed_m_s=27.8,
-                          duration_s=duration_s),),
+        deployment=Deployment(
+            anchors=anchors_every(spacing_m, terrain, mounting),
+            receivers=units if units is not None
+            else (a_unit(terrain=terrain, duration_s=duration_s),),
+        ),
         seed=seed,
         **kwargs,
     )
@@ -117,15 +146,74 @@ def test_two_anchors_cannot_share_an_identifier():
 
 
 def test_a_round_takes_longer_with_more_anchors():
-    few = Deployment(anchors=anchors_every(6000.0))
-    many = Deployment(anchors=anchors_every(1500.0))
-    assert many.round_duration_s > few.round_duration_s
+    few = a_deployment(6000.0)
+    many = a_deployment(1500.0)
+    assert many.round_duration_s() > few.round_duration_s()
 
 
 def test_a_duty_limit_stretches_the_round():
-    full = Deployment(anchors=anchors_every(4000.0))
-    limited = Deployment(anchors=anchors_every(4000.0), duty_cycle=0.5)
-    assert limited.round_duration_s == pytest.approx(2.0 * full.round_duration_s)
+    full = a_deployment(4000.0)
+    limited = a_deployment(4000.0, duty_cycle=0.5)
+    assert limited.round_duration_s() == pytest.approx(
+        2.0 * full.round_duration_s()
+    )
+
+
+def test_a_second_unit_doubles_the_wait_rather_than_halving_the_work():
+    """The medium is shared. Every unit queues at the same anchors."""
+    one = a_deployment(2000.0, units=(a_unit("a"),))
+    two = a_deployment(2000.0, units=(a_unit("a"), a_unit("b")))
+    assert two.round_duration_s() == pytest.approx(2.0 * one.round_duration_s())
+
+
+def test_a_unit_only_hears_anchors_it_shares_a_waveform_with():
+    """A road unit carrying one module cannot range against a tunnel anchor."""
+    from yerkon.hardware import DWM3000, SX1280
+
+    mixed = anchors_every(4000.0) + tuple(
+        Anchor("T{}".format(i), (float(i) * 200.0, 6.0), TALL_MAST, ROLLING,
+               radio=DWM3000)
+        for i in range(5)
+    )
+    spread_only = a_unit("spread", radios=(SX1280,))
+    both = a_unit("both", radios=(SX1280, DWM3000))
+    deployment = Deployment(anchors=mixed, receivers=(spread_only, both))
+
+    assert len(deployment.anchors_heard_by(spread_only)) == len(
+        anchors_every(4000.0)
+    )
+    assert len(deployment.anchors_heard_by(both)) == len(mixed)
+
+
+def test_a_deployment_reports_the_waveforms_it_carries():
+    """Two parts on the same silicon are one waveform, not two."""
+    from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
+
+    spread = anchors_every(4000.0, radio=E28_2G4M27S)
+    impulse = tuple(
+        Anchor("T{}".format(i), (float(i) * 200.0, 6.0), TALL_MAST, ROLLING,
+               radio=DWM3000)
+        for i in range(3)
+    )
+    deployment = Deployment(
+        anchors=spread + impulse, receivers=(a_unit(radios=(SX1280,)),)
+    )
+    assert len(deployment.radios()) == 2
+
+
+def test_two_receivers_cannot_share_an_identifier():
+    with pytest.raises(ValueError, match="two receivers share an identifier"):
+        Deployment(anchors=anchors_every(4000.0),
+                   receivers=(a_unit("a"), a_unit("a")))
+
+
+def test_a_receiver_with_no_radio_hears_nothing_and_is_refused():
+    with pytest.raises(ValueError, match="hears nothing"):
+        Receiver(
+            identifier="deaf",
+            journey=Journey(road=a_road(), speed_m_s=10.0, duration_s=10.0),
+            radios=(),
+        )
 
 
 # --- Running --------------------------------------------------------------
@@ -185,23 +273,28 @@ def test_a_measurement_too_poor_to_help_is_not_used():
 
 def test_anchors_on_signs_serve_worse_than_anchors_on_masts():
     """Three metres of mounting height against twenty-five."""
-    def scenario(mounting):
-        return Scenario(
-            name=mounting.kind,
-            terrain=ROLLING,
-            deployment=Deployment(anchors=anchors_every(4000.0, mounting=mounting)),
-            journeys=(Journey(road=a_road(), speed_m_s=27.8, duration_s=60.0),),
-            seed=2,
-        )
-
-    masts = run_scenario(scenario(TALL_MAST))
-    signs = run_scenario(scenario(ROADSIDE_SIGN))
+    masts = run_scenario(a_scenario(spacing_m=4000.0, mounting=TALL_MAST, seed=2))
+    signs = run_scenario(a_scenario(spacing_m=4000.0, mounting=ROADSIDE_SIGN, seed=2))
     assert signs.availability < masts.availability
 
 
-def test_a_scenario_needs_a_journey():
-    with pytest.raises(ValueError, match="at least one journey"):
-        Scenario("empty", ROLLING, Deployment(anchors=anchors_every(4000.0)), ())
+def test_a_second_unit_splits_the_fixes_rather_than_adding_any():
+    """The air is the constraint, not the number of vehicles.
+
+    A second unit doubles the round, so half as many rounds fit in the
+    same journey and each unit is fixed half as often. The deployment's
+    total fix rate barely moves: it was already spending all its air.
+    """
+    one = run_scenario(a_scenario(units=(a_unit("a"),)))
+    two = run_scenario(a_scenario(units=(a_unit("a"), a_unit("b"))))
+
+    assert two.attempted == pytest.approx(one.attempted, rel=0.1)
+    assert two.attempted_links == pytest.approx(one.attempted_links, rel=0.1)
+
+
+def test_a_scenario_needs_a_receiver():
+    with pytest.raises(ValueError, match="at least one receiver"):
+        Scenario("empty", ROLLING, Deployment(anchors=anchors_every(4000.0)))
 
 
 # --- Combining ------------------------------------------------------------
@@ -285,7 +378,7 @@ def test_ground_a_packet_reaches_is_not_ground_a_receiver_can_be_placed_on():
     and quoting the first as coverage overstates it several times over.
     """
     result = coverage(
-        Deployment(anchors=anchors_every(4000.0)),
+        a_deployment(4000.0),
         ROLLING,
         resolution_m=1000.0,
         margin_m=6000.0,
@@ -296,11 +389,11 @@ def test_ground_a_packet_reaches_is_not_ground_a_receiver_can_be_placed_on():
 
 def test_more_anchors_serve_more_ground():
     dense = coverage(
-        Deployment(anchors=anchors_every(1500.0)), ROLLING,
+        a_deployment(1500.0), ROLLING,
         resolution_m=1000.0, margin_m=6000.0,
     )
     sparse = coverage(
-        Deployment(anchors=anchors_every(4000.0)), ROLLING,
+        a_deployment(4000.0), ROLLING,
         resolution_m=1000.0, margin_m=6000.0,
     )
     assert dense.fixable_km2 > sparse.fixable_km2
@@ -308,7 +401,4 @@ def test_more_anchors_serve_more_ground():
 
 def test_a_position_needs_four_ranges():
     with pytest.raises(ValueError, match="fewer than four"):
-        coverage(
-            Deployment(anchors=anchors_every(4000.0)), ROLLING,
-            anchors_required=3,
-        )
+        coverage(a_deployment(4000.0), ROLLING, anchors_required=3)

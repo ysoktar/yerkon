@@ -27,7 +27,13 @@ from typing import Optional
 from yerkon.design import Design
 from yerkon.proposal import propose
 from yerkon.viewer.scene import design_of, scene, simulate, sweep
-from yerkon.viewer.state import CASCADING, ViewState
+from yerkon.viewer.state import (
+    CASCADING,
+    CASCADING_RUN,
+    MODES,
+    ViewState,
+    from_scenario,
+)
 
 STATIC = pathlib.Path(__file__).parent / "static"
 
@@ -60,35 +66,49 @@ def cascades(state: ViewState, changes: dict) -> Optional[dict]:
     Only settings the link budget reads can cascade. A terrain slider
     changes the world rather than the radio, and the panel would have
     nothing to say about it.
+
+    A corridor carries more than one kind of anchor, so a change to one
+    run is proposed against that run alone and the panel says which. A
+    change to a setting the whole deployment shares — the region, the
+    tolerance, the ground roughness — is proposed against every run,
+    because it moves all of them and a person should see all of it.
     """
-    radio_edits = {
-        CASCADING[name]: getattr(state.merged({name: value}), name)
-        for name, value in changes.items()
-        if name in CASCADING
-    }
-    if not radio_edits:
+    if not any(name in CASCADING or name == "runs" for name in changes):
         return None
 
-    current = design_of(state)
-    proposal = propose(current, **_as_design_values(state, changes))
-    if not proposal.changes_anything or not proposal.follows:
+    proposed = state.merged(changes)
+    groups = []
+
+    shared = {name: value for name, value in changes.items() if name in CASCADING}
+    for index, run in enumerate(state.runs):
+        after_run = proposed.runs[index] if index < len(proposed.runs) else run
+        edits = {}
+        if shared or after_run != run:
+            before = design_of(state, run)
+            after = design_of(proposed, after_run)
+            edits = {
+                field: getattr(after, field)
+                for field in Design.__dataclass_fields__
+                if getattr(after, field) != getattr(before, field)
+            }
+        if not edits:
+            continue
+        proposal = propose(design_of(state, run), **edits)
+        if proposal.follows:
+            groups.append({
+                "run": run.identifier,
+                "asked": [_change(c) for c in proposal.asked],
+                "follows": [_change(c) for c in proposal.follows],
+                "panel": proposal.describe(),
+            })
+
+    if not groups:
         return None
     return {
-        "panel": proposal.describe(),
-        "asked": [_change(c) for c in proposal.asked],
-        "follows": [_change(c) for c in proposal.follows],
-    }
-
-
-def _as_design_values(state: ViewState, changes: dict) -> dict:
-    proposed = state.merged(
-        {name: value for name, value in changes.items() if name in CASCADING}
-    )
-    after = design_of(proposed)
-    return {
-        field: getattr(after, field)
-        for name, field in CASCADING.items()
-        if name in changes
+        "groups": groups,
+        "panel": "\n\n".join(
+            "[{}]\n{}".format(group["run"], group["panel"]) for group in groups
+        ),
     }
 
 
@@ -144,6 +164,8 @@ class Handler(BaseHTTPRequestHandler):
             )
         if path == "/api/apply":
             return self._json(lambda: self._apply(body.get("changes", {})))
+        if path == "/api/mode":
+            return self._json(lambda: self._mode(body.get("mode", "rural")))
         if path == "/api/reset":
             return self._json(
                 lambda: {"state": self.session.write(ViewState()).as_json()}
@@ -159,6 +181,20 @@ class Handler(BaseHTTPRequestHandler):
         state.merged(changes)
         found = cascades(state, changes)
         return {"cascades": found} if found else {"cascades": None}
+
+    def _mode(self, name: str) -> dict:
+        """Load one of the report's modes, discarding the current one.
+
+        Not an edit, so it does not go through the panel: nothing is
+        being changed into anything, the whole arrangement is replaced.
+        """
+        if name not in MODES:
+            raise ValueError(
+                "no mode called {!r}. Choose from: {}".format(
+                    name, ", ".join(MODES)
+                )
+            )
+        return {"state": self.session.write(from_scenario(name)).as_json()}
 
     def _apply(self, changes: dict) -> dict:
         state = self.session.read()

@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional, Sequence
 
 from yerkon.evidence import Provenance, Sourced
+from yerkon.hardware import Radio, SX1280
 from yerkon.rf import Obstruction, first_fresnel_radius_m
 
 Metres = float
@@ -393,12 +394,22 @@ these avoids building anything, which is why the owner wants them used."""
 
 @dataclass(frozen=True)
 class Anchor:
-    """One transmitter, where it is, and what it is bolted to."""
+    """One transmitter, where it is, what it is bolted to, and what is in it.
+
+    The radio belongs to the anchor rather than to the deployment,
+    because a real corridor does not carry one kind. The report names
+    three: a spread module for towns, the same silicon behind an
+    amplifier for open country, and an impulse radio for tunnels and
+    other confined places. A deployment that runs through all three
+    carries all three, and a receiver ranges only against the ones it
+    shares a waveform with.
+    """
 
     identifier: str
     ground_position_m: tuple[float, float]
     mounting: MountingOption
     terrain: Terrain = field(repr=False)
+    radio: Radio = SX1280
 
     @property
     def position_m(self) -> tuple[float, float, float]:

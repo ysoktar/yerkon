@@ -14,12 +14,23 @@ const VERTICAL = 6;          // ground relief is exaggerated, or hills vanish
 const CHOICES = {
   region: [["TR", "Türkiye"], ["EU", "Avrupa"], ["US", "Amerika"],
            ["US-PTP", "Amerika (noktadan noktaya)"], ["LICENSED", "Lisanslı"]],
-  radio: [["sx1280", "SX1280"], ["e28", "E28-2G4M27S"], ["dwm3000", "DWM3000 UWB"]],
-  mounting: [["sign", "Levha (3 m)"], ["gantry", "Portal (6 m)"],
-             ["billboard", "Pano (10 m)"], ["column", "Aydınlatma direği (12 m)"],
-             ["mast", "Direk (25 m)"]],
   scheme: [["single", "Tek yönlü TWR"], ["double", "Çift yönlü TWR"]],
 };
+
+const RADIOS = [["sx1280", "SX1280 (şehir içi)"], ["e28", "E28-2G4M27S (kırsal)"],
+                ["dwm3000", "DWM3000 UWB (tünel)"]];
+const MOUNTINGS = [["sign", "Levha (3 m)"], ["gantry", "Portal (6 m)"],
+                   ["billboard", "Pano (10 m)"],
+                   ["column", "Aydınlatma direği (12 m)"], ["mast", "Direk (25 m)"]];
+const KINDS = [["vehicle", "Kara aracı alıcısı"], ["pedestrian", "Yaya alıcısı"]];
+
+/* One colour per anchor group, so a run in the panel and its masts in
+ * the scene are recognisably the same thing. */
+export const RUN_COLOURS = [
+  [58, 70, 82], [31, 111, 235], [47, 158, 87], [180, 85, 29], [122, 63, 158],
+];
+const runColour = index => RUN_COLOURS[index % RUN_COLOURS.length];
+const cssColour = rgb => `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
 
 let state = null;
 let latest = null;
@@ -115,6 +126,7 @@ function showConfirm(changes, cascades) {
   pendingChanges = changes;
   const body = document.getElementById("confirm-body");
   body.innerHTML = "";
+
   const block = (items, heading) => {
     if (!items.length) return;
     const h = document.createElement("h2");
@@ -134,8 +146,22 @@ function showConfirm(changes, cascades) {
       body.appendChild(row);
     }
   };
-  block(cascades.asked, "İstediğin değişiklik");
-  block(cascades.follows, "Bunlar da değişiyor");
+
+  // A corridor carries several groups of anchors and a change can move
+  // more than one of them, so the sheet is grouped the way the engine
+  // grouped it and each group says which anchors it is about.
+  const groups = cascades.groups || [];
+  const several = groups.length > 1;
+  for (const group of groups) {
+    if (several || groups.length === 0) {
+      const heading = document.createElement("h2");
+      heading.textContent = `${group.run} grubu`;
+      heading.style.color = "var(--accent)";
+      body.appendChild(heading);
+    }
+    block(group.asked, "İstediğin değişiklik");
+    block(group.follows, "Bunlar da değişiyor");
+  }
   document.getElementById("confirm").hidden = false;
 }
 
@@ -157,26 +183,189 @@ document.getElementById("confirm-no").onclick = () => {
 
 const UNITS = {
   corridor_m: v => `${(v / 1000).toFixed(1).replace(".", ",")} km`,
-  spacing_m: v => `${v} m`,
-  offset_m: v => `${v} m`,
   relief_m: v => (v > 0 ? `${v} m` : "düz"),
   hill_spacing_m: v => `${v} m`,
   roughness_m: v => `${Number(v).toFixed(2).replace(".", ",")} m`,
   clutter_db_per_km: v => `${v} dB/km`,
   tolerance_m: v => `${Number(v).toFixed(1).replace(".", ",")} m`,
-  speed_km_h: v => `${v} km/sa`,
-  receiver_height_m: v => `${Number(v).toFixed(1).replace(".", ",")} m`,
   journey_s: v => `${v} s`,
   sweep_m: v => `${v} m`,
 };
 
 const OUTPUTS = {
-  corridor_m: "corridor-out", spacing_m: "spacing-out", offset_m: "offset-out",
+  corridor_m: "corridor-out",
   relief_m: "relief-out", hill_spacing_m: "hill-out", roughness_m: "rough-out",
   clutter_db_per_km: "clutter-out", tolerance_m: "tol-out",
-  speed_km_h: "speed-out", receiver_height_m: "rxh-out",
   journey_s: "journey-out", sweep_m: "sweep-out",
 };
+
+/* Anchor groups and units are lists, not sliders, so they get their own
+ * cards. Editing one rebuilds the whole list and posts it: the engine
+ * holds the state, and the page never keeps a second copy of it.
+ */
+
+function options(list, selected) {
+  return list.map(([value, label]) =>
+    `<option value="${value}"${value === selected ? " selected" : ""}>${label}</option>`
+  ).join("");
+}
+
+function number(label, value, step, onChange) {
+  const wrap = document.createElement("label");
+  wrap.textContent = label;
+  const input = document.createElement("input");
+  input.type = "number";
+  input.step = step;
+  input.value = value;
+  input.onchange = () => onChange(Number(input.value));
+  wrap.appendChild(input);
+  return wrap;
+}
+
+function drawRuns() {
+  const host = document.getElementById("runs");
+  host.innerHTML = "";
+  state.runs.forEach((run, index) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const head = document.createElement("header");
+    head.innerHTML =
+      `<span class="swatch" style="background:${cssColour(runColour(index))}"></span>` +
+      `<b>${run.identifier}</b>` +
+      `<button class="drop" title="Grubu kaldır">✕</button>`;
+    head.querySelector(".drop").onclick = () => {
+      const runs = state.runs.filter((_, i) => i !== index);
+      if (!runs.length) { say("En az bir direk grubu gerekli.", true); return; }
+      edit({ runs }, false).catch(e => say(e.message, true));
+    };
+    card.appendChild(head);
+
+    const change = patch => {
+      const runs = state.runs.map((r, i) =>
+        i === index ? Object.assign({}, r, patch) : r);
+      // A module or a mounting moves the link budget, so it has to be
+      // confirmed. A position or a spacing does not.
+      const cascading = "radio" in patch || "mounting" in patch;
+      edit({ runs }, cascading).catch(e => say(e.message, true));
+    };
+
+    for (const [key, list] of [["radio", RADIOS], ["mounting", MOUNTINGS]]) {
+      const wrap = document.createElement("label");
+      wrap.textContent = key === "radio" ? "Modül" : "Montaj";
+      const select = document.createElement("select");
+      select.innerHTML = options(list, run[key]);
+      select.onchange = () => change({ [key]: select.value });
+      wrap.appendChild(select);
+      card.appendChild(wrap);
+    }
+
+    const pair = document.createElement("div");
+    pair.className = "pair";
+    pair.appendChild(number("Başlangıç (m)", run.from_m, 100,
+      v => change({ from_m: v })));
+    pair.appendChild(number("Bitiş (m)", run.to_m, 100, v => change({ to_m: v })));
+    pair.appendChild(number("Aralık (m)", run.spacing_m, 50,
+      v => change({ spacing_m: v })));
+    pair.appendChild(number("Yoldan (m)", run.offset_m, 10,
+      v => change({ offset_m: v })));
+    card.appendChild(pair);
+
+    const found = (latest && latest.runs || []).find(
+      r => r.identifier === run.identifier);
+    if (found) {
+      const note = document.createElement("p");
+      note.className = "hint";
+      note.style.margin = "4px 0 0";
+      note.textContent =
+        `${found.count} direk · menzil ${tr(found.reach_m / 1000)} km`;
+      card.appendChild(note);
+    }
+    host.appendChild(card);
+  });
+}
+
+function drawUnits() {
+  const host = document.getElementById("units");
+  host.innerHTML = "";
+  state.units.forEach((unit, index) => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const head = document.createElement("header");
+    head.innerHTML =
+      `<span class="swatch" style="background:#b4551d;border-radius:50%"></span>` +
+      `<b>${unit.identifier}</b>` +
+      `<button class="drop" title="Alıcıyı kaldır">✕</button>`;
+    head.querySelector(".drop").onclick = () => {
+      const units = state.units.filter((_, i) => i !== index);
+      if (!units.length) { say("En az bir alıcı gerekli.", true); return; }
+      edit({ units }, false).catch(e => say(e.message, true));
+    };
+    card.appendChild(head);
+
+    const change = patch => {
+      const units = state.units.map((u, i) =>
+        i === index ? Object.assign({}, u, patch) : u);
+      edit({ units }, false).catch(e => say(e.message, true));
+    };
+
+    const wrap = document.createElement("label");
+    wrap.textContent = "Tür";
+    const select = document.createElement("select");
+    select.innerHTML = options(KINDS, unit.kind);
+    select.onchange = () => change({ kind: select.value });
+    wrap.appendChild(select);
+    card.appendChild(wrap);
+
+    const pair = document.createElement("div");
+    pair.className = "pair";
+    pair.appendChild(number("Hız (km/sa)", unit.speed_km_h, 5,
+      v => change({ speed_km_h: v })));
+    pair.appendChild(number("Başlangıç (m)", unit.start_m, 100,
+      v => change({ start_m: v })));
+    pair.appendChild(number("Anten (m)", unit.antenna_height_m, 0.1,
+      v => change({ antenna_height_m: v })));
+    card.appendChild(pair);
+
+    const modules = document.createElement("div");
+    modules.className = "hint";
+    modules.style.margin = "4px 0 0";
+    RADIOS.forEach(([value, label]) => {
+      const box = document.createElement("label");
+      box.style.display = "inline-block";
+      box.style.marginRight = "8px";
+      const tick = document.createElement("input");
+      tick.type = "checkbox";
+      tick.checked = unit.radios.includes(value);
+      tick.onchange = () => {
+        const radios = tick.checked
+          ? unit.radios.concat([value])
+          : unit.radios.filter(r => r !== value);
+        if (!radios.length) {
+          say("Alıcıda en az bir modül olmalı.", true);
+          tick.checked = true;
+          return;
+        }
+        change({ radios });
+      };
+      box.appendChild(tick);
+      box.appendChild(document.createTextNode(" " + label.split(" ")[0]));
+      modules.appendChild(box);
+    });
+    card.appendChild(modules);
+
+    const heard = (latest && latest.units || []).find(u => u.id === unit.identifier);
+    if (heard) {
+      const note = document.createElement("p");
+      note.className = "hint";
+      note.style.margin = "4px 0 0";
+      note.textContent = `${heard.hears} direği duyuyor`;
+      card.appendChild(note);
+    }
+    host.appendChild(card);
+  });
+}
 
 function fillControls() {
   for (const [name, id] of Object.entries(OUTPUTS)) {
@@ -188,6 +377,9 @@ function fillControls() {
   for (const name of Object.keys(CHOICES)) {
     document.getElementById(name).value = state[name];
   }
+  document.getElementById("mode").value = state.scenario;
+  drawRuns();
+  drawUnits();
 }
 
 function wireControls() {
@@ -215,6 +407,44 @@ function wireControls() {
            input.hasAttribute("data-cascades"))
         .catch(e => say(e.message, true));
   }
+
+  document.getElementById("mode").onchange = async event => {
+    try {
+      const { state: loaded } = await ask("/api/mode", { mode: event.target.value });
+      state = loaded;
+      framed = false;
+      fillControls();
+      await refreshScene();
+      scheduleSweep();
+    } catch (error) { say(error.message, true); }
+  };
+
+  document.getElementById("add-run").onclick = () => {
+    const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    const used = new Set(state.runs.map(r => r.identifier));
+    const identifier = [...letters].find(l => !used.has(l)) || "Z";
+    const last = state.runs[state.runs.length - 1];
+    edit({ runs: state.runs.concat([{
+      identifier,
+      radio: last ? last.radio : "sx1280",
+      mounting: last ? last.mounting : "mast",
+      from_m: last ? last.to_m + 500 : 0,
+      to_m: last ? last.to_m + 3000 : 3000,
+      spacing_m: last ? last.spacing_m : 1000,
+      offset_m: last ? last.offset_m : 100,
+    }]) }, false).catch(e => say(e.message, true));
+  };
+
+  document.getElementById("add-unit").onclick = () => {
+    const used = new Set(state.units.map(u => u.identifier));
+    let identifier = "alıcı";
+    let n = 2;
+    while (used.has(identifier)) identifier = `alıcı ${n++}`;
+    edit({ units: state.units.concat([{
+      identifier, kind: "vehicle", speed_km_h: 80, start_m: 0,
+      antenna_height_m: 1.5, radios: ["sx1280", "dwm3000"],
+    }]) }, false).catch(e => say(e.message, true));
+  };
 
   document.getElementById("run").onclick = runSimulation;
   document.getElementById("reset").onclick = async () => {
@@ -270,10 +500,16 @@ function render() {
   const view = draw.camera(orbit, width, height);
   const light = [-0.4, -0.5, 0.77];
 
+  const colourIndex = {};
+  (latest.runs || []).forEach((run, index) => {
+    colourIndex[run.identifier] = cssColour(runColour(index));
+  });
+  const colourOf = id => colourIndex[id] || "#3a4652";
+
   const items = [
     ...draw.groundFaces(view, latest.terrain, light),
     ...draw.cellFaces(view, sweepData, groundAt),
-    ...draw.masts(view, latest.anchors),
+    ...draw.masts(view, latest.anchors, colourOf),
     ...draw.polyline(
       view,
       latest.road.map(p => [p.x, p.y, p.z * draw.VERTICAL + 10]),
@@ -281,14 +517,27 @@ function render() {
     ),
   ];
 
+  // Each group's reach, in its own colour. A UWB bracket and a mast on
+  // one corridor cover nothing like the same ground, and one ring size
+  // for all of them would say they did.
   for (const anchor of latest.anchors) {
+    if (!anchor.reach_m) continue;
     items.push(...draw.ring(
       view,
       [anchor.x, anchor.y, anchor.ground_z * draw.VERTICAL + 6],
-      latest.reach_m,
-      "rgba(31,111,235,0.55)",
+      anchor.reach_m,
+      colourOf(anchor.run).replace("rgb(", "rgba(").replace(")", ",0.45)"),
     ));
   }
+
+  for (const unit of latest.units || []) {
+    items.push(...draw.polyline(
+      view,
+      unit.trail.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 20]),
+      "rgba(180,85,29,0.55)", 1.5,
+    ));
+  }
+  items.push(...draw.units(view, latest.units || []));
 
   markers = items.filter(item => item.kind === "mast");
   draw.paint(context, width, height, items);
@@ -373,19 +622,28 @@ canvas.addEventListener("wheel", event => {
 const tr = (value, places = 2) =>
   Number(value).toFixed(places).replace(".", ",");
 
-function showNumbers(scene, result) {
+function showNumbers(drawn, result) {
   const list = document.getElementById("numbers");
-  const rows = [
-    ["Direk sayısı", scene.anchors.length],
-    ["Kullanılabilir menzil", `${tr(scene.reach_m / 1000)} km`],
-    ["Bağlantının koptuğu mesafe", `${tr(scene.closure_m / 1000)} km`],
-  ];
+  const rows = [];
+
+  rows.push(["Direk sayısı", drawn.anchors.length]);
+  // Per group, because a UWB bracket and a mast on one corridor do not
+  // cover remotely the same ground and one number for both would say
+  // they did.
+  for (const run of drawn.runs || []) {
+    rows.push([`${run.identifier}: menzil`, `${tr(run.reach_m / 1000)} km`]);
+    rows.push([`${run.identifier}: kopma`, `${tr(run.closure_m / 1000)} km`]);
+  }
+
+  rows.push(["Alıcı sayısı", (drawn.units || []).length]);
+  rows.push(["Tur süresi", `${tr(drawn.round_s * 1000, 0)} ms`]);
+  rows.push(["Konum sıklığı", `${tr(1 / Math.max(drawn.round_s, 1e-9))} /s`]);
+
   if (sweepData) {
     rows.push(["Hizmet alanı", `${tr(sweepData.served_km2)} km²`]);
     rows.push(["Paketin ulaştığı alan", `${tr(sweepData.reached_km2)} km²`]);
   }
   if (result) {
-    rows.push(["Tur süresi", `${tr(result.round_s * 1000, 0)} ms`]);
     rows.push(["HPE P50", `${tr(result.hpe_p50_m)} m`]);
     rows.push(["HPE P95", `${tr(result.hpe_p95_m)} m`]);
     rows.push(["VPE P95", `${tr(result.vpe_p95_m)} m`]);
@@ -397,6 +655,7 @@ function showNumbers(scene, result) {
     rows.push(["Varsayıma dayanan pay",
                `%${tr(result.assumed_share * 100, 0)}`]);
   }
+
   list.innerHTML = rows.map(([name, value]) =>
     `<dt>${name}</dt><dd${
       name === "Varsayıma dayanan pay" ? ' class="warn"' : ""

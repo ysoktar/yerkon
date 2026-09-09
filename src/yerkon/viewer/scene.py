@@ -42,28 +42,79 @@ def sweep_margin_m(state: ViewState) -> float:
     return max(state.spacing_m * 3.0, 4000.0)
 
 
-def design_of(state: ViewState) -> Design:
-    """The state's radio settings as the confirmation panel understands them."""
+def design_of(state: ViewState, run=None) -> Design:
+    """One anchor run's settings, as the confirmation panel understands them.
+
+    The panel talks about a radio on a mounting at a tolerance, and a
+    corridor now carries more than one of those, so it is asked about one
+    run at a time and the panel says which.
+    """
+    run = run or (state.runs[0] if state.runs else None)
     return Design(
         region=chosen(REGION_CHOICES, state.region, "region"),
-        anchor_radio=chosen(RADIO_CHOICES, state.radio, "radio"),
-        mounting=chosen(MOUNTING_CHOICES, state.mounting, "mounting"),
-        receiver_height_m=state.receiver_height_m,
+        anchor_radio=chosen(RADIO_CHOICES, run.radio if run else "sx1280", "radio"),
+        mounting=chosen(
+            MOUNTING_CHOICES, run.mounting if run else "mast", "mounting"
+        ),
+        receiver_height_m=_lowest_unit(state),
         surface_roughness_m=state.roughness_m,
         target_ranging_sigma_m=state.tolerance_m,
     )
 
 
+def _lowest_unit(state: ViewState) -> float:
+    """The worst case among the units, which is the one range is quoted for."""
+    if not state.units:
+        return 1.5
+    return min(unit.antenna_height_m for unit in state.units)
+
+
+def reach_of(state: ViewState, run) -> float:
+    """How far one run's anchors range within tolerance, over open ground.
+
+    A flat-ground figure, drawn as a ring. Real terrain moves it either
+    way and the sweep is what actually decides coverage; the ring is an
+    intuition, not a claim.
+    """
+    design = design_of(state, run)
+    anchor = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m)
+    )
+    receiver = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.receiver_height_m)
+    )
+    return usable_range_m(
+        anchor, receiver, design.anchor_radio,
+        target_sigma_m=state.tolerance_m, region=design.region,
+    )
+
+
+def closure_of(state: ViewState, run) -> float:
+    design = design_of(state, run)
+    anchor = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m)
+    )
+    receiver = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.receiver_height_m)
+    )
+    return closure_range_m(anchor, receiver, region=design.region)
+
+
+def sweep_margin_m(state: ViewState) -> float:
+    """How far past the anchors both the sweep and the mesh reach.
+
+    One function, because a mesh smaller than the sweep paints coverage
+    cells over nothing and a mesh larger than it wastes the frame.
+    """
+    widest = max((run.spacing_m for run in state.runs), default=2000.0)
+    return max(widest * 3.0, 4000.0)
+
+
 def scene(state: ViewState) -> dict:
-    """Ground, road and anchors. Cheap enough to recompute on every drag."""
+    """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
     deployment = state.deployment(terrain)
-    design = design_of(state)
 
-    # Measured from the anchors with the same margin the sweep uses, so
-    # no coverage cell is ever painted over ground the mesh does not
-    # cover. Centring the mesh on the road instead would leave the far
-    # side short by the anchors' own offset.
     margin = sweep_margin_m(state)
     positions = [a.position_m for a in deployment.anchors]
     xs = np.linspace(
@@ -78,31 +129,56 @@ def scene(state: ViewState) -> dict:
     )
     heights = [[terrain.height_at(float(x), float(y)) for x in xs] for y in ys]
 
-    reach_m = _reach(state, design)
+    # One reach per run, because a UWB bracket and a mast on the same
+    # corridor do not cover remotely the same ground.
+    reach = {run.identifier: reach_of(state, run) for run in state.runs}
+    closure = {run.identifier: closure_of(state, run) for run in state.runs}
+    run_of = {}
+    for run in state.runs:
+        for identifier, _, _, _ in run.anchors(terrain):
+            run_of[identifier] = run.identifier
 
     anchors = []
     for anchor in deployment.anchors:
         x, y = anchor.ground_position_m
+        run_id = run_of.get(anchor.identifier, "")
         anchors.append({
             "id": anchor.identifier,
+            "run": run_id,
             "x": float(x),
             "y": float(y),
             "ground_z": terrain.height_at(x, y),
             "z": anchor.position_m[2],
             "mounting": anchor.mounting.kind,
+            "radio": anchor.radio.part,
             "height_m": float(anchor.mounting.height_m.value),
             "moved": anchor.identifier in state.moved,
-            "reach_m": reach_m,
+            "reach_m": reach.get(run_id, 0.0),
         })
 
     road = [
         {
             "x": float(x),
             "y": 0.0,
-            "z": terrain.height_at(float(x), 0.0) + state.receiver_height_m,
+            "z": terrain.height_at(float(x), 0.0),
         }
         for x in np.linspace(0.0, state.corridor_m, 120)
     ]
+
+    units = []
+    for unit in deployment.receivers:
+        trail = [
+            unit.journey.position_at(at_s)
+            for at_s in np.linspace(0.0, unit.journey.duration_s, 40)
+        ]
+        units.append({
+            "id": unit.identifier,
+            "kind": unit.product,
+            "hears": len(deployment.anchors_heard_by(unit)),
+            "radios": [radio.part for radio in unit.radios],
+            "at": list(unit.journey.position_at(0.0)),
+            "trail": [list(point) for point in trail],
+        })
 
     return {
         "terrain": {
@@ -113,36 +189,21 @@ def scene(state: ViewState) -> dict:
         },
         "road": road,
         "anchors": anchors,
-        "reach_m": reach_m,
-        "closure_m": _closure(state, design),
+        "units": units,
+        "runs": [
+            {
+                **run.as_json(),
+                "reach_m": reach[run.identifier],
+                "closure_m": closure[run.identifier],
+                "count": sum(
+                    1 for a in anchors if a["run"] == run.identifier
+                ),
+            }
+            for run in state.runs
+        ],
+        "round_s": deployment.round_duration_s(),
         "state": state.as_json(),
     }
-
-
-def _reach(state: ViewState, design: Design) -> float:
-    """How far one anchor ranges within tolerance, over flat open ground.
-
-    A single number for the whole chain, drawn as a ring on the ground.
-    It is the flat-ground figure, so real terrain moves it either way and
-    the sweep is what actually decides coverage; the ring is an intuition,
-    not a claim.
-    """
-    anchor = Terminal(design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m))
-    receiver = Terminal(
-        design.anchor_radio, design.antenna, (0.0, 0.0, state.receiver_height_m)
-    )
-    return usable_range_m(
-        anchor, receiver, design.anchor_radio,
-        target_sigma_m=state.tolerance_m, region=design.region,
-    )
-
-
-def _closure(state: ViewState, design: Design) -> float:
-    anchor = Terminal(design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m))
-    receiver = Terminal(
-        design.anchor_radio, design.antenna, (0.0, 0.0, state.receiver_height_m)
-    )
-    return closure_range_m(anchor, receiver, region=design.region)
 
 
 def sweep(state: ViewState) -> dict:
@@ -153,7 +214,7 @@ def sweep(state: ViewState) -> dict:
     grid = coverage_grid(
         deployment,
         terrain,
-        receiver_height_m=state.receiver_height_m,
+        receiver_height_m=_lowest_unit(state),
         target_sigma_m=state.tolerance_m,
         resolution_m=state.sweep_m,
         margin_m=sweep_margin_m(state),
@@ -177,7 +238,7 @@ def simulate(state: ViewState) -> dict:
     terrain = state.terrain()
     grid = coverage_grid(
         state.deployment(terrain), terrain,
-        receiver_height_m=state.receiver_height_m,
+        receiver_height_m=_lowest_unit(state),
         target_sigma_m=state.tolerance_m,
         resolution_m=state.sweep_m,
         margin_m=sweep_margin_m(state),
@@ -206,5 +267,6 @@ def simulate(state: ViewState) -> dict:
         "opex_tl_per_km2_year": costing.opex_tl_per_km2_year,
         "capex_tl_per_route_km": costing.capex_tl_per_route_km,
         "assumed_share": costing.assumed_share,
-        "round_s": deployed.scenario.deployment.round_duration_s,
+        "round_s": deployed.scenario.deployment.round_duration_s(),
+        "units": len(deployed.scenario.deployment.receivers),
     }

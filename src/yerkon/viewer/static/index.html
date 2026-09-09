@@ -15,13 +15,27 @@
   <p class="sub" id="terrain-note">—</p>
 
   <section>
-    <h2>Yerleşim</h2>
+    <h2>Mod</h2>
+    <label><select id="mode">
+      <option value="rural">Kırsal</option>
+      <option value="urban">Şehir içi</option>
+      <option value="tunnel">Tünel</option>
+      <option value="mixed">Karışık koridor</option>
+    </select></label>
     <label>Koridor <output id="corridor-out"></output>
-      <input type="range" id="corridor_m" min="2000" max="40000" step="1000"></label>
-    <label>Direk aralığı <output id="spacing-out"></output>
-      <input type="range" id="spacing_m" min="200" max="6000" step="100"></label>
-    <label>Yoldan uzaklık <output id="offset-out"></output>
-      <input type="range" id="offset_m" min="0" max="2000" step="50"></label>
+      <input type="range" id="corridor_m" min="500" max="40000" step="500"></label>
+  </section>
+
+  <section>
+    <h2>Direk grupları</h2>
+    <div id="runs"></div>
+    <div class="row"><button id="add-run" class="quiet">Grup ekle</button></div>
+  </section>
+
+  <section>
+    <h2>Alıcılar</h2>
+    <div id="units"></div>
+    <div class="row"><button id="add-unit" class="quiet">Alıcı ekle</button></div>
   </section>
 
   <section>
@@ -37,21 +51,11 @@
   </section>
 
   <section>
-    <h2>Donanım ve mevzuat</h2>
+    <h2>Mevzuat ve ölçüm</h2>
     <label>Bölge <select id="region" data-cascades></select></label>
-    <label>Modül <select id="radio" data-cascades></select></label>
-    <label>Montaj <select id="mounting" data-cascades></select></label>
     <label>Ölçüm şeması <select id="scheme"></select></label>
     <label>Menzil toleransı <output id="tol-out"></output>
-      <input type="range" id="tolerance_m" min="0.5" max="30" step="0.5" data-cascades></label>
-  </section>
-
-  <section>
-    <h2>Alıcı</h2>
-    <label>Hız <output id="speed-out"></output>
-      <input type="range" id="speed_km_h" min="0" max="160" step="5"></label>
-    <label>Anten yüksekliği <output id="rxh-out"></output>
-      <input type="range" id="receiver_height_m" min="0.5" max="4" step="0.1" data-cascades></label>
+      <input type="range" id="tolerance_m" min="0.1" max="30" step="0.1" data-cascades></label>
     <label>Yolculuk süresi <output id="journey-out"></output>
       <input type="range" id="journey_s" min="30" max="900" step="30"></label>
   </section>
@@ -59,7 +63,7 @@
   <section>
     <h2>Tarama</h2>
     <label>Hücre boyu <output id="sweep-out"></output>
-      <input type="range" id="sweep_m" min="100" max="1000" step="50"></label>
+      <input type="range" id="sweep_m" min="50" max="1000" step="50"></label>
     <div class="row">
       <button id="run">Simülasyonu çalıştır</button>
       <button id="reset" class="quiet">Sıfırla</button>
@@ -71,7 +75,9 @@
     <dl id="numbers"></dl>
   </section>
 
-  <p class="hint">Direği sürükleyerek taşı. Shift ile tıklayarak kaldır.</p>
+  <p class="hint">Direği sürükleyerek taşı, Shift ile tıklayarak kaldır.
+  Her grup kendi modülünü ve montajını taşır; her alıcı hangi modülleri
+  taşıyorsa o direkleri duyar.</p>
 </aside>
 
 <div id="confirm" hidden>
@@ -88,7 +94,8 @@
 <div id="legend">
   <span><i class="served"></i>Konum alınabilen alan (≥4 direk)</span>
   <span><i class="reached"></i>Paketin ulaştığı alan (≥1 direk)</span>
-  <span><i class="reach"></i>Tek direğin kullanılabilir menzili</span>
+  <span><i class="reach"></i>Grubun kullanılabilir menzili</span>
+  <span><i class="unit"></i>Alıcı ve izlediği yol</span>
 </div>
 
 <div id="status"></div>

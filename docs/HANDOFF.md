@@ -31,6 +31,9 @@ later (ADR-0006).
   strip.
 - **Mounting is mixed**: existing roadside furniture (signs, gantries,
   billboards) alongside purpose-built masts.
+- **A corridor carries more than one of everything**: several anchor
+  modules on several mountings, and several units of different kinds
+  sharing the air (ADR-0014).
 - **Numbers use a comma decimal mark and no thousands separator.**
 - **Changing one thing that forces another needs confirmation**, shown as
   a panel listing every value that would change, answered with a single

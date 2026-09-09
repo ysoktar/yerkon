@@ -60,3 +60,18 @@ dd.warn { color: var(--warn); }
 #legend i.reached { background: rgba(216,178,74,0.6); }
 #legend i.reach { background: none; border: 1.5px solid rgba(31,111,235,0.7);
   border-radius: 50%; }
+
+.card { border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px;
+  margin-bottom: 8px; background: #fff; }
+.card header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.card header b { flex: 1; font-size: 12px; }
+.card header .swatch { width: 10px; height: 10px; border-radius: 2px; }
+.card .drop { border: none; background: none; color: #8a97a3; cursor: pointer;
+  padding: 0 2px; flex: 0; font-size: 15px; line-height: 1; }
+.card .drop:hover { color: var(--warn); }
+.card label { margin-bottom: 6px; font-size: 11px; }
+.card select { font-size: 12px; padding: 3px; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pair input[type=number] { width: 100%; padding: 3px 5px; border: 1px solid var(--line);
+  border-radius: 4px; font: inherit; font-size: 12px; }
+#legend i.unit { background: #b4551d; border-radius: 50%; }

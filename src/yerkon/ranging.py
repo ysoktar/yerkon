@@ -320,15 +320,7 @@ def measure(
     The observation carries the anchor's surveyed position, which the
     receiver knows, and no part of the receiver's own.
     """
-    # Two radios can only range against each other if they speak the same
-    # waveform. The urban and rural anchors are different parts on the
-    # same silicon and do; an impulse radio and a spread one do not, and
-    # pairing them would produce a confident number from an exchange that
-    # cannot physically happen.
-    if (
-        float(anchor.radio.ranging_bandwidth_hz.value)
-        != float(receiver.radio.ranging_bandwidth_hz.value)
-    ):
+    if not share_a_waveform(anchor.radio, receiver.radio):
         raise ValueError(
             "{} and {} do not share a ranging waveform".format(
                 anchor.radio.part, receiver.radio.part
@@ -353,6 +345,31 @@ def measure(
         variance_m2=sigma_m * sigma_m,
         anchor_id=anchor_id,
     )
+
+
+def share_a_waveform(one: Radio, other: Radio) -> bool:
+    """Whether two radios can range against each other at all.
+
+    The urban and rural anchors are different parts on the same silicon
+    and can. An impulse radio and a spread one cannot, and pairing them
+    would produce a confident number from an exchange that is not
+    physically possible.
+
+    A receiver carrying both modules is not one radio, so a caller asks
+    this per module rather than per unit.
+    """
+    return (
+        float(one.ranging_bandwidth_hz.value)
+        == float(other.ranging_bandwidth_hz.value)
+    )
+
+
+def audible(anchor: Terminal, radios: Sequence[Radio]) -> Optional[Radio]:
+    """Which of a receiver's modules, if any, can hear this anchor."""
+    for radio in radios:
+        if share_a_waveform(anchor.radio, radio):
+            return radio
+    return None
 
 
 # --- A round of them ------------------------------------------------------

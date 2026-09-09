@@ -134,25 +134,43 @@ export function cellFaces(view, sweep, groundAt) {
   return out;
 }
 
-export function masts(view, anchors) {
+export function masts(view, anchors, colourOf) {
   /* Drawn in screen space, not world space.
    *
    * A twenty-five metre mast beside a twenty-four kilometre corridor is
    * a thousandth of the scene and projects to less than a pixel. Painted
    * to scale it would be invisible, which would make the one control
    * that matters most impossible to see or to grab. So the mast is drawn
-   * at a legible length on screen and its height is reported in the
-   * panel as a number, where it can be read without being guessed at.
+   * at a legible length on screen, in its group's colour, and its height
+   * is reported in the panel as a number.
    */
   const out = [];
   for (const anchor of anchors) {
     const base = view.project([anchor.x, anchor.y, anchor.ground_z * VERTICAL]);
     if (!base) continue;
     const scaled = view.project([anchor.x, anchor.y, anchor.z * VERTICAL]);
-    const drawn = Math.max(18, scaled ? base[1] - scaled[1] : 0);
+    // Mounting height still shows through, so a three metre sign reads as
+    // shorter than a twenty-five metre mast without either vanishing.
+    const drawn = Math.max(12, Math.min(46,
+      (scaled ? base[1] - scaled[1] : 0) + 10 + anchor.height_m * 0.5));
     out.push({
       kind: "mast", id: anchor.id, moved: anchor.moved,
+      colour: anchor.moved ? "#b4551d" : colourOf(anchor.run),
       base, top: [base[0], base[1] - drawn], depth: base[2],
+    });
+  }
+  return out;
+}
+
+export function units(view, moving) {
+  /* Each unit as a dot at its start with its route behind it. */
+  const out = [];
+  for (const unit of moving) {
+    const at = view.project([unit.at[0], unit.at[1], unit.at[2] * VERTICAL]);
+    if (!at) continue;
+    out.push({
+      kind: "unit", id: unit.id, label: unit.id,
+      at, depth: at[2], pedestrian: unit.kind === "pedestrian",
     });
   }
   return out;
@@ -191,15 +209,30 @@ export function paint(context, width, height, items) {
   context.clearRect(0, 0, width, height);
   items.sort((a, b) => b.depth - a.depth);
   for (const item of items) {
+    if (item.kind === "unit") {
+      context.globalAlpha = 1;
+      context.fillStyle = "#b4551d";
+      context.beginPath();
+      if (item.pedestrian) {
+        context.arc(item.at[0], item.at[1], 5, 0, Math.PI * 2);
+      } else {
+        context.rect(item.at[0] - 6, item.at[1] - 4, 12, 8);
+      }
+      context.fill();
+      context.fillStyle = "#22282e";
+      context.font = "11px system-ui, sans-serif";
+      context.fillText(item.label, item.at[0] + 9, item.at[1] + 4);
+      continue;
+    }
     if (item.kind === "mast") {
       context.globalAlpha = 1;
-      context.strokeStyle = item.moved ? "#b4551d" : "#3a4652";
+      context.strokeStyle = item.colour || "#3a4652";
       context.lineWidth = 3;
       context.beginPath();
       context.moveTo(item.base[0], item.base[1]);
       context.lineTo(item.top[0], item.top[1]);
       context.stroke();
-      context.fillStyle = item.moved ? "#b4551d" : "#22282e";
+      context.fillStyle = item.colour || "#22282e";
       context.beginPath();
       context.arc(item.top[0], item.top[1], 4.5, 0, Math.PI * 2);
       context.fill();

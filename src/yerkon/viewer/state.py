@@ -20,10 +20,75 @@ from yerkon.design import (
     REGION_CHOICES,
     chosen,
 )
-from yerkon.evaluate import Deployment, Journey, Scenario
+from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.ranging import SCHEMES
 from yerkon.scenarios import CHOICES, Deployed, _straight_road
 from yerkon.world import Anchor, Terrain, flat_terrain, rolling_terrain
+
+
+#: A group of anchors of one kind, laid along part of the corridor.
+#:
+#: A corridor does not carry one kind of anchor, so the viewer does not
+#: model one. Each run is a chain of these, and they may overlap: town
+#: columns for the first few kilometres, masts across open country, UWB
+#: brackets through a bore.
+@dataclass(frozen=True)
+class AnchorRun:
+    identifier: str = "A"
+    radio: str = "e28"
+    mounting: str = "mast"
+    from_m: float = 0.0
+    to_m: float = 24_000.0
+    spacing_m: float = 2000.0
+    offset_m: float = 400.0
+
+    def anchors(self, terrain: Terrain) -> list:
+        mounting = chosen(MOUNTING_CHOICES, self.mounting, "mounting")
+        radio = chosen(RADIO_CHOICES, self.radio, "radio")
+        spacing = max(self.spacing_m, 25.0)
+        out = []
+        for index, x in enumerate(
+            np.arange(self.from_m, max(self.to_m, self.from_m) + 1.0, spacing)
+        ):
+            side = self.offset_m if index % 2 == 0 else -self.offset_m
+            out.append((
+                "{}{}".format(self.identifier, index),
+                (float(x), side),
+                mounting,
+                radio,
+            ))
+        return out
+
+    def as_json(self) -> dict:
+        return {name: getattr(self, name) for name in AnchorRun.__dataclass_fields__}
+
+
+#: One moving unit: where it starts, how fast, and what it carries.
+@dataclass(frozen=True)
+class UnitPlan:
+    identifier: str = "araç"
+    kind: str = "vehicle"
+    speed_km_h: float = 100.0
+    start_m: float = 0.0
+    antenna_height_m: float = 1.5
+    #: Which modules it carries. Both, for either receiver in the bill.
+    radios: tuple = ("sx1280", "dwm3000")
+
+    def as_json(self) -> dict:
+        return {
+            name: (list(getattr(self, name)) if name == "radios"
+                   else getattr(self, name))
+            for name in UnitPlan.__dataclass_fields__
+        }
+
+
+DEFAULT_RUNS = (
+    AnchorRun("M", "e28", "mast", 0.0, 24_000.0, 2000.0, 400.0),
+)
+
+DEFAULT_UNITS = (
+    UnitPlan("araç", "vehicle", 100.0, 0.0, 1.5),
+)
 
 
 @dataclass(frozen=True)
@@ -36,13 +101,14 @@ class ViewState:
 
     scenario: str = "rural"
     region: str = "TR"
-    radio: str = "e28"
-    mounting: str = "mast"
     scheme: str = "single"
 
     corridor_m: float = 24_000.0
-    spacing_m: float = 2000.0
-    offset_m: float = 400.0
+
+    #: Anchors, as one or more runs of a single kind.
+    runs: tuple = DEFAULT_RUNS
+    #: The units driving through them.
+    units: tuple = DEFAULT_UNITS
 
     #: Height of the rolling ground, peak to trough. Zero is flat.
     relief_m: float = 40.0
@@ -54,24 +120,18 @@ class ViewState:
     clutter_db_per_km: float = 0.0
 
     tolerance_m: float = 5.0
-    speed_km_h: float = 100.0
-    receiver_height_m: float = 1.5
     journey_s: float = 240.0
     seed: int = 1
 
     #: Anchors moved by hand, as identifier -> (x, y) in metres.
-    #:
-    #: Kept apart from the spacing so that regenerating the chain does not
-    #: silently discard somebody's dragging, and so the page can show
-    #: which anchors were placed rather than computed.
     moved: dict = field(default_factory=dict)
     #: Anchors deleted by hand.
     removed: tuple = ()
 
-    #: Cell size of the coverage sweep, in metres. The sweep is the
-    #: slowest thing in the project, so the viewer runs it coarse while a
-    #: slider is moving and fine when asked.
+    #: Cell size of the coverage sweep, in metres.
     sweep_m: float = 500.0
+
+    # -- the world --------------------------------------------------------
 
     def terrain(self) -> Terrain:
         if self.relief_m <= 0.0:
@@ -88,61 +148,55 @@ class ViewState:
         )
 
     def anchors(self, terrain: Terrain) -> tuple[Anchor, ...]:
-        """The chain, with anything dragged or deleted taken into account."""
-        mounting = chosen(MOUNTING_CHOICES, self.mounting, "mounting")
-        spacing = max(self.spacing_m, 50.0)
+        """Every run's anchors, with anything dragged or deleted applied."""
         placed = []
-        for index, x in enumerate(
-            np.arange(0.0, self.corridor_m + 1.0, spacing)
-        ):
-            identifier = "N{}".format(index)
-            if identifier in self.removed:
-                continue
-            ground = self.moved.get(
-                identifier,
-                (float(x), self.offset_m if index % 2 == 0 else -self.offset_m),
-            )
-            placed.append(
-                Anchor(
-                    identifier,
-                    (float(ground[0]), float(ground[1])),
-                    mounting,
-                    terrain,
+        for run in self.runs:
+            for identifier, ground, mounting, radio in run.anchors(terrain):
+                if identifier in self.removed:
+                    continue
+                x, y = self.moved.get(identifier, ground)
+                placed.append(
+                    Anchor(identifier, (float(x), float(y)), mounting,
+                           terrain, radio=radio)
                 )
-            )
         if not placed:
             raise ValueError("every anchor has been removed")
         return tuple(placed)
 
+    def receivers(self, terrain: Terrain) -> tuple[Receiver, ...]:
+        road = _straight_road(self.corridor_m, terrain)
+        return tuple(
+            Receiver(
+                identifier=unit.identifier,
+                journey=Journey(
+                    road=road,
+                    speed_m_s=unit.speed_km_h / 3.6,
+                    duration_s=max(self.journey_s, 5.0),
+                    start_m=unit.start_m,
+                    antenna_height_m=unit.antenna_height_m,
+                ),
+                radios=tuple(
+                    chosen(RADIO_CHOICES, name, "radio") for name in unit.radios
+                ),
+                product=unit.kind,
+            )
+            for unit in self.units
+        )
+
     def deployment(self, terrain: Terrain) -> Deployment:
-        radio = chosen(RADIO_CHOICES, self.radio, "radio")
         return Deployment(
             anchors=self.anchors(terrain),
-            anchor_radio=radio,
-            # The receiver carries whichever module can hear the anchor.
-            # Pairing a spread radio with an impulse one is refused
-            # downstream, so it is not offered here.
-            receiver_radio=radio,
+            receivers=self.receivers(terrain),
             scheme=SCHEMES[self.scheme],
             region=chosen(REGION_CHOICES, self.region, "region"),
         )
 
     def scenario_object(self) -> Scenario:
         terrain = self.terrain()
-        deployment = self.deployment(terrain)
-        road = _straight_road(self.corridor_m, terrain)
         return Scenario(
             name=self.scenario,
             terrain=terrain,
-            deployment=deployment,
-            journeys=(
-                Journey(
-                    road=road,
-                    speed_m_s=self.speed_km_h / 3.6,
-                    duration_s=max(self.journey_s, 5.0),
-                    antenna_height_m=self.receiver_height_m,
-                ),
-            ),
+            deployment=self.deployment(terrain),
             seed=self.seed,
             accept_sigma_m=max(self.tolerance_m * 4.0, 5.0),
         )
@@ -153,11 +207,16 @@ class ViewState:
         return replace(
             template,
             scenario=self.scenario_object(),
-            mounting=chosen(MOUNTING_CHOICES, self.mounting, "mounting"),
+            mounting=chosen(
+                MOUNTING_CHOICES, self.runs[0].mounting if self.runs else "mast",
+                "mounting",
+            ),
             route_km=self.corridor_m / 1000.0,
             coverage_resolution_m=self.sweep_m,
             confined_width_m=template.confined_width_m,
         )
+
+    # -- editing ----------------------------------------------------------
 
     def merged(self, changes: dict) -> "ViewState":
         """A copy with some fields replaced, refusing names it does not have."""
@@ -175,27 +234,106 @@ class ViewState:
             }
         if "removed" in cleaned:
             cleaned["removed"] = tuple(str(v) for v in cleaned["removed"])
+        if "runs" in cleaned:
+            cleaned["runs"] = tuple(
+                run if isinstance(run, AnchorRun) else AnchorRun(**run)
+                for run in cleaned["runs"]
+            )
+        if "units" in cleaned:
+            cleaned["units"] = tuple(
+                unit if isinstance(unit, UnitPlan)
+                else UnitPlan(**{**unit, "radios": tuple(unit.get("radios", ()))})
+                for unit in cleaned["units"]
+            )
         return replace(self, **cleaned)
 
     def as_json(self) -> dict:
-        return {
-            name: (
-                dict(self.moved) if name == "moved"
-                else list(self.removed) if name == "removed"
-                else getattr(self, name)
-            )
-            for name in ViewState.__dataclass_fields__
-        }
+        out = {}
+        for name in ViewState.__dataclass_fields__:
+            value = getattr(self, name)
+            if name == "runs":
+                out[name] = [run.as_json() for run in value]
+            elif name == "units":
+                out[name] = [unit.as_json() for unit in value]
+            elif name == "moved":
+                out[name] = dict(value)
+            elif name == "removed":
+                out[name] = list(value)
+            else:
+                out[name] = value
+        return out
 
 
 #: Which ViewState fields are Design settings, so an edit to one has to
 #: go through the confirmation panel (ADR-0009). Everything else — moving
 #: an anchor, changing the terrain, dragging a slider — applies at once.
+def from_scenario(name: str) -> ViewState:
+    """The viewer's own state for one of the report's three modes.
+
+    Rebuilt here rather than lifted from `scenarios`, because the viewer
+    edits a corridor of runs and units and the report's scenarios are
+    frozen arrangements. What is shared is the thing that matters: the
+    module, the mounting and the spacing each mode uses.
+    """
+    if name == "urban":
+        return ViewState(
+            scenario="urban", corridor_m=6000.0, relief_m=0.0,
+            clutter_db_per_km=30.0, roughness_m=0.5, tolerance_m=5.0,
+            sweep_m=200.0, journey_s=240.0,
+            runs=(AnchorRun("C", "sx1280", "column", 0.0, 6000.0, 400.0, 25.0),),
+            units=(
+                UnitPlan("araç", "vehicle", 50.0, 0.0, 1.5),
+                UnitPlan("yaya", "pedestrian", 5.0, 2000.0, 1.6),
+            ),
+        )
+    if name == "tunnel":
+        return ViewState(
+            scenario="tunnel", corridor_m=2000.0, relief_m=0.0,
+            clutter_db_per_km=0.0, roughness_m=0.05, tolerance_m=1.0,
+            sweep_m=100.0, journey_s=85.0, scheme="double",
+            runs=(AnchorRun("T", "dwm3000", "sign", 0.0, 2000.0, 150.0, 4.0),),
+            units=(
+                UnitPlan("araç", "vehicle", 80.0, 0.0, 1.5),
+                UnitPlan("yaya", "pedestrian", 5.0, 600.0, 1.6),
+            ),
+        )
+    if name == "mixed":
+        # A corridor that runs out of a town, across open country and
+        # through a bore, carrying all three modules at once. This is the
+        # arrangement the report describes and none of its three rows
+        # measures on its own.
+        return ViewState(
+            scenario="mixed", corridor_m=20_000.0, relief_m=30.0,
+            hill_spacing_m=3000.0, roughness_m=0.2, tolerance_m=5.0,
+            sweep_m=400.0, journey_s=600.0,
+            runs=(
+                AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 400.0, 25.0),
+                AnchorRun("M", "e28", "mast", 3500.0, 15_000.0, 2000.0, 400.0),
+                AnchorRun("T", "dwm3000", "sign", 15_500.0, 17_500.0, 150.0, 4.0),
+            ),
+            units=(
+                UnitPlan("araç", "vehicle", 100.0, 0.0, 1.5),
+                UnitPlan("kamyon", "vehicle", 80.0, 5000.0, 2.8),
+                UnitPlan("yaya", "pedestrian", 5.0, 16_000.0, 1.6),
+            ),
+        )
+    return ViewState()
+
+
+MODES = ("rural", "urban", "tunnel", "mixed")
+
+
 CASCADING = {
     "region": "region",
-    "radio": "anchor_radio",
-    "mounting": "mounting",
     "tolerance_m": "target_ranging_sigma_m",
     "roughness_m": "surface_roughness_m",
-    "receiver_height_m": "receiver_height_m",
+}
+
+#: Fields of an anchor run that cascade when they change.
+#:
+#: Kept apart because they belong to one run rather than to the whole
+#: state, and the panel has to say which run it is talking about.
+CASCADING_RUN = {
+    "radio": "anchor_radio",
+    "mounting": "mounting",
 }
