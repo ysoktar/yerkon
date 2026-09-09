@@ -7,6 +7,9 @@ they are separate.
 ``table`` runs the three scenarios and prints the four rows of the
 report's comparison table.
 
+``view`` starts a local web app: the same engine, drawn in three
+dimensions, with every setting live.
+
 ``design`` shows what a set of settings implies, and asks once before
 changing them. The panel it prints is built in ``proposal`` and rendered
 unchanged by the application too, so both front ends ask the same
@@ -277,6 +280,15 @@ def table(argv: list[str] | None = None) -> int:
         "--no-notes", action="store_true",
         help="print the table alone, without what it rests on",
     )
+    parser.add_argument(
+        "--weight", action="append", metavar="NAME=SHARE",
+        help=(
+            "journey mix for the weighted row, for example --weight "
+            "urban=0.6 --weight rural=0.3 --weight tunnel=0.1. Nobody "
+            "supplied one, so the default is a starting point rather "
+            "than a finding."
+        ),
+    )
     args = parser.parse_args(argv)
 
     chosen = (
@@ -288,11 +300,67 @@ def table(argv: list[str] | None = None) -> int:
         len(chosen), "" if len(chosen) == 1 else "s"
     ), file=sys.stderr)
 
-    results, rows = build(chosen)
+    try:
+        weights = _weights(args.weight)
+        results, rows = build(chosen, weights=weights)
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
     print(as_markdown(rows) if args.markdown else as_text(rows))
     if not args.no_notes:
         print()
         print(footnotes(results, rows))
+    return 0
+
+
+def _weights(pairs: list[str] | None) -> dict[str, float] | None:
+    """Parse --weight NAME=SHARE, saying what went wrong rather than raising."""
+    if not pairs:
+        return None
+    weights = {}
+    for pair in pairs:
+        name, _, share = pair.partition("=")
+        if not share:
+            raise ValueError(
+                "--weight wants NAME=SHARE, for example urban=0.5; got {!r}".format(
+                    pair
+                )
+            )
+        try:
+            weights[name.strip().lower()] = float(share)
+        except ValueError:
+            raise ValueError("{!r} is not a share".format(share)) from None
+    return weights
+
+
+def view(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon view",
+        description=(
+            "Open the live 3D viewer in a browser. Everything is "
+            "configurable and every number comes from the same engine "
+            "that builds the table."
+        ),
+    )
+    parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument(
+        "--no-browser", action="store_true",
+        help="print the address instead of opening it",
+    )
+    args = parser.parse_args(argv)
+
+    from yerkon.viewer import serve
+
+    try:
+        serve(host=args.host, port=args.port, open_browser=not args.no_browser)
+    except OSError as error:
+        print(
+            "Could not listen on {}:{} ({}). Another viewer may already be "
+            "running; try --port 8766.".format(args.host, args.port, error),
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 
@@ -304,6 +372,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon fetch  --south .. --west .. --north .. --east .. --into DIR")
         print("  yerkon design [--region TR] [--mounting mast] [--tolerance 5]")
         print("  yerkon table  [--markdown] [--only rural]")
+        print("  yerkon view   [--port 8765]")
         return 0
     verb, rest = argv[0], argv[1:]
     if verb == "fetch":
@@ -312,6 +381,8 @@ def main(argv: list[str] | None = None) -> int:
         return design(rest)
     if verb == "table":
         return table(rest)
+    if verb == "view":
+        return view(rest)
     print("Unknown command: {}".format(verb), file=sys.stderr)
     return 2
 

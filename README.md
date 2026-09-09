@@ -39,6 +39,9 @@ Built and tested:
 - `scenarios.py`, the three deployments the table describes, as
   configuration rather than as code.
 - `report.py`, the four rows and what they rest on.
+- `viewer/`, a local web app over the same engine: the corridor in three
+  dimensions, every setting live, and the confirmation panel in front of
+  any change that forces another.
 - `ranging.py`, the two-way exchange: clocks, schemes, air time.
 - `design.py` and `proposal.py`, the settings a person chooses and the
   panel that shows every consequence of an edit before applying it.
@@ -52,6 +55,35 @@ the viewer. `docs/HANDOFF.md` has the plan and the open questions.
 pip install -e ".[dev]"
 pytest
 ```
+
+## The viewer
+
+```bash
+yerkon view
+```
+
+Opens a local web app. The corridor in three dimensions, with the ground,
+the road, each anchor and the ring it ranges within tolerance; the swept
+coverage painted on the ground in two colours, one for ground a packet
+reaches and one for ground where four anchors are in reach at once.
+
+Everything is live. Drag an anchor to move it, shift-click to remove it,
+move any slider and the scene and the numbers follow. Terrain relief,
+hill spacing, surface roughness, clutter, anchor spacing and offset,
+corridor length, region, module, mounting, exchange scheme, ranging
+tolerance, receiver speed and antenna height are all settings.
+
+Changes that force other changes — region, module, mounting, tolerance,
+roughness, receiver height — raise the confirmation panel first, listing
+every value that would move with its old and new figure and why it
+follows, answered once for the whole batch (ADR-0009). Dragging an anchor
+forces nothing, so it applies immediately.
+
+The page holds no physics. Every number on it was computed by the modules
+that build the table, so the picture and the report cannot disagree. It
+draws its own three dimensions rather than loading a library from a
+content delivery network, so it works with the machine offline
+(ADR-0013).
 
 ## The table
 

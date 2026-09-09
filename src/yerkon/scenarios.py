@@ -57,8 +57,12 @@ class Deployed:
     product: Product
     mounting: MountingOption
     route_km: float
-    #: How much of a receiver's travel happens in this environment.
-    #: Used only for the weighted row, and configuration (ADR-0005).
+    #: Default share of a receiver's travel spent in this environment.
+    #:
+    #: Used only for the weighted row. Nobody supplied a journey mix, so
+    #: this is a starting point rather than a finding: it is overridden
+    #: per run from the command line or the viewer, and the row prints
+    #: the weights it used.
     weight: float
     #: What the report calls the environment: inside, outside, or both.
     environment: str
@@ -272,3 +276,44 @@ TUNNEL = Deployed(
 ALL = (URBAN, RURAL, TUNNEL)
 
 CHOICES = {"urban": URBAN, "rural": RURAL, "tunnel": TUNNEL}
+
+
+#: The default journey mix for the weighted row, by scenario key.
+#:
+#: Half a receiver's travel in town, most of the rest between towns, a
+#: tenth in tunnels and other confined stretches. Nobody supplied these
+#: and no result should rest on them, so they are configuration: pass
+#: --weight to the command line or move the sliders in the viewer.
+DEFAULT_WEIGHTS = {name: deployed.weight for name, deployed in CHOICES.items()}
+
+
+def reweighted(
+    deployments: "tuple[Deployed, ...]", weights: "Optional[dict[str, float]]"
+) -> "tuple[Deployed, ...]":
+    """The same deployments under a different journey mix.
+
+    Keyed by the same short names the command line and the viewer use, so
+    a weight can travel from a slider to a table row without anything in
+    between having to know what a scenario is.
+    """
+    if not weights:
+        return deployments
+    unknown = set(weights) - set(CHOICES)
+    if unknown:
+        raise ValueError(
+            "no scenario called {}. Choose from: {}".format(
+                ", ".join(sorted(unknown)), ", ".join(sorted(CHOICES))
+            )
+        )
+    if any(value < 0.0 for value in weights.values()):
+        raise ValueError("a share of a journey is not negative")
+    if sum(weights.values()) <= 0.0:
+        raise ValueError("the weights must add to something positive")
+
+    by_name = {
+        deployed.scenario.name: name for name, deployed in CHOICES.items()
+    }
+    return tuple(
+        replace(d, weight=weights.get(by_name.get(d.scenario.name, ""), d.weight))
+        for d in deployments
+    )

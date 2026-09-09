@@ -23,7 +23,7 @@ from typing import Optional, Sequence
 from yerkon.cost import DEFAULT_RATES, Costing, Inventory, OperatingRates, price
 from yerkon.evaluate import Samples, combine, coverage, run_scenario
 from yerkon.numbers import decimal_comma
-from yerkon.scenarios import ALL, Deployed
+from yerkon.scenarios import ALL, Deployed, reweighted
 
 COLUMNS = (
     "Sistem",
@@ -166,8 +166,15 @@ def weighted(results: Sequence[Result]) -> Row:
 def build(
     deployments: Sequence[Deployed] = ALL,
     rates: OperatingRates = DEFAULT_RATES,
+    weights: Optional[dict] = None,
 ) -> tuple[tuple[Result, ...], tuple[Row, ...]]:
-    """Every row of the block, and the results behind them."""
+    """Every row of the block, and the results behind them.
+
+    ``weights`` is the journey mix the last row is computed under, keyed
+    by scenario name. Nobody supplied one, so it is configuration and the
+    notes print whatever was used.
+    """
+    deployments = reweighted(tuple(deployments), weights)
     results = tuple(run(d, rates) for d in deployments)
     rows = tuple(r.row() for r in results) + (weighted(results),)
     return results, rows

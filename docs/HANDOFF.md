@@ -54,6 +54,7 @@ later (ADR-0006).
 | `cost.py` | CAPEX from the bill of materials, OPEX from an inventory |
 | `scenarios.py` | the three deployments the table describes, as configuration |
 | `report.py` | the four rows, the ten columns, and the notes under them |
+| `viewer/` | the local web app: state, scene, server, and its own renderer |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
 | `numbers.py` | comma decimal mark, no thousands separator |
@@ -76,11 +77,12 @@ though it were coverage is wrong.
 
 ## Next, in dependency order
 
-1. **The 3D viewer** — live, and everything configurable, rendering the
-   same confirmation panel the command line does.
-
-Deferred by explicit instruction until the above is done: the algorithm
-that sites anchors for a target accuracy at least cost.
+Next, and the last thing on the list: the algorithm that sites anchors
+for a target accuracy at least cost. It was deferred until everything
+else was built, and everything else is now built. The cost module says
+why it matters more than any other remaining work: the radios are one
+percent of a mast-based deployment's capital cost, so where the anchors
+go and what they are bolted to is the whole of the money.
 
 ## Open questions
 

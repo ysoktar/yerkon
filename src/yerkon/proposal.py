@@ -22,8 +22,15 @@ from yerkon.rf import DEFAULT_SEARCH_LIMIT_M
 
 @dataclass(frozen=True)
 class Change:
-    """One value that would move, written the way a person reads it."""
+    """One value that would move, written the way a person reads it.
 
+    ``key`` is the field's own name and never changes. A front end in
+    another language looks its wording up by that rather than by matching
+    on the English label, so the engine stays in one language and the
+    translation stays out of the physics.
+    """
+
+    key: str
     label: str
     before: str
     after: str
@@ -102,6 +109,7 @@ def propose(current: Design, **edits) -> Proposal:
 
     asked = [
         Change(
+            key=name,
             label=SETTING_LABELS.get(name, name),
             before=_setting(getattr(current, name)),
             after=_setting(getattr(proposed, name)),
@@ -113,6 +121,7 @@ def propose(current: Design, **edits) -> Proposal:
     before, after = derive(current), derive(proposed)
     follows = [
         Change(
+            key=name,
             label=OUTCOME_LABELS[name],
             before=shown_before,
             after=shown_after,

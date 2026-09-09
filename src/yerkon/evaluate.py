@@ -324,6 +324,30 @@ def _fix_from(
 
 
 @dataclass(frozen=True)
+class CoverageGrid:
+    """How many anchors reach each cell of a swept grid.
+
+    The count rather than a yes or no, because one anchor and four
+    anchors mean entirely different things and a boolean would throw
+    away the distinction ADR-0012 exists to make.
+    """
+
+    #: Anchors in reach at each cell, indexed [row, column].
+    counts: np.ndarray
+    #: Cell centres, in metres.
+    xs: np.ndarray
+    ys: np.ndarray
+    resolution_m: float
+
+    @property
+    def cell_km2(self) -> float:
+        return (self.resolution_m / 1000.0) ** 2
+
+    def area_reached_by(self, anchors: int) -> float:
+        return float(np.count_nonzero(self.counts >= anchors)) * self.cell_km2
+
+
+@dataclass(frozen=True)
 class Coverage:
     """How much ground a deployment serves, by two different readings."""
 
@@ -335,6 +359,73 @@ class Coverage:
     resolution_m: float
     #: Anchors a position needs.
     anchors_required: int
+
+
+def coverage_grid(
+    deployment: Deployment,
+    terrain: Terrain,
+    receiver_height_m: float = 1.5,
+    target_sigma_m: float = 5.0,
+    resolution_m: float = 250.0,
+    margin_m: float = 12_000.0,
+    count_up_to: int = 8,
+) -> CoverageGrid:
+    """Sweep a grid and count reachable anchors at every cell.
+
+    ``count_up_to`` stops counting once a cell has that many anchors in
+    reach, because nothing downstream distinguishes eight from nine and
+    the sweep is the slowest thing in the project.
+    """
+    positions = [anchor.position_m for anchor in deployment.anchors]
+    xs = np.arange(
+        min(p[0] for p in positions) - margin_m,
+        max(p[0] for p in positions) + margin_m,
+        resolution_m,
+    )
+    ys = np.arange(
+        min(p[1] for p in positions) - margin_m,
+        max(p[1] for p in positions) + margin_m,
+        resolution_m,
+    )
+
+    anchors = deployment.terminals()
+    counts = np.zeros((ys.size, xs.size), dtype=int)
+
+    for row, y in enumerate(ys):
+        for column, x in enumerate(xs):
+            here = (
+                float(x), float(y),
+                terrain.height_at(float(x), float(y)) + receiver_height_m,
+            )
+            receiver = Terminal(deployment.receiver_radio, deployment.antenna, here)
+
+            reached = 0
+            for _, anchor in anchors:
+                if math.dist(anchor.position_m, here) < 1.0:
+                    reached += 1
+                elif _reaches(
+                    anchor, receiver, terrain, deployment, target_sigma_m
+                ):
+                    reached += 1
+                if reached >= count_up_to:
+                    break
+            counts[row, column] = reached
+
+    return CoverageGrid(counts=counts, xs=xs, ys=ys, resolution_m=resolution_m)
+
+
+def _reaches(anchor, receiver, terrain, deployment, target_sigma_m) -> bool:
+    budget = evaluate_link(
+        anchor,
+        receiver,
+        obstruction=terrain.obstruction_between(
+            anchor.position_m, receiver.position_m
+        ),
+        region=deployment.region,
+    )
+    return budget.closes and (
+        ranging_sigma_m(budget, deployment.anchor_radio) <= target_sigma_m
+    )
 
 
 def coverage(
@@ -361,51 +452,19 @@ def coverage(
     if anchors_required < 4:
         raise ValueError("fewer than four ranges cannot place a point")
 
-    positions = [anchor.position_m for anchor in deployment.anchors]
-    xs = [p[0] for p in positions]
-    ys = [p[1] for p in positions]
-
-    grid_x = np.arange(min(xs) - margin_m, max(xs) + margin_m, resolution_m)
-    grid_y = np.arange(min(ys) - margin_m, max(ys) + margin_m, resolution_m)
-
-    anchors = deployment.terminals()
-    cell_km2 = (resolution_m / 1000.0) ** 2
-    reached = fixable = 0
-
-    for x in grid_x:
-        for y in grid_y:
-            here = (float(x), float(y), terrain.height_at(float(x), float(y))
-                    + receiver_height_m)
-            receiver = Terminal(deployment.receiver_radio, deployment.antenna, here)
-
-            count = 0
-            for _, anchor in anchors:
-                if math.dist(anchor.position_m, here) < 1.0:
-                    count += 1
-                    continue
-                budget = evaluate_link(
-                    anchor,
-                    receiver,
-                    obstruction=terrain.obstruction_between(
-                        anchor.position_m, here
-                    ),
-                    region=deployment.region,
-                )
-                if budget.closes and ranging_sigma_m(
-                    budget, deployment.anchor_radio
-                ) <= target_sigma_m:
-                    count += 1
-                    if count >= anchors_required:
-                        break
-
-            if count >= 1:
-                reached += 1
-            if count >= anchors_required:
-                fixable += 1
+    grid = coverage_grid(
+        deployment,
+        terrain,
+        receiver_height_m=receiver_height_m,
+        target_sigma_m=target_sigma_m,
+        resolution_m=resolution_m,
+        margin_m=margin_m,
+        count_up_to=anchors_required,
+    )
 
     return Coverage(
-        reached_km2=reached * cell_km2,
-        fixable_km2=fixable * cell_km2,
+        reached_km2=grid.area_reached_by(1),
+        fixable_km2=grid.area_reached_by(anchors_required),
         resolution_m=resolution_m,
         anchors_required=anchors_required,
     )
