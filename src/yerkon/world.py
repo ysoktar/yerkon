@@ -191,6 +191,41 @@ def flat_terrain(
     )
 
 
+def terrain_from_site(site: "Site", clutter_loss_db_per_km: float = 0.0) -> Terrain:
+    """Turn fetched ground into terrain the link budget can use.
+
+    Roughness comes from the site's own detrended scatter rather than
+    being chosen, so real ground brings its own reflection behaviour with
+    it. Where the site has buildings, a point inside a footprint reports
+    the roof rather than the ground, because that is the surface a path
+    over it has to clear.
+
+    Folding buildings into the elevation rather than handling them
+    separately keeps one answer to "how high is the obstacle here", which
+    is the only question the link budget asks.
+    """
+    buildings = site.buildings
+    have_buildings = buildings is not None and not buildings.is_empty
+
+    def elevation(x: float, y: float) -> float:
+        ground = site.height_at(x, y)
+        if not have_buildings:
+            return ground
+        inside = (
+            (x - buildings.centre_x_m) ** 2 + (y - buildings.centre_y_m) ** 2
+        ) <= buildings.radius_m**2
+        if not inside.any():
+            return ground
+        return ground + float(buildings.height_m[inside].max())
+
+    return Terrain(
+        elevation_m=elevation,
+        clutter_loss_db_per_km=clutter_loss_db_per_km,
+        micro_roughness_m=site.roughness_m(),
+        description=site.manifest.describe(),
+    )
+
+
 def rolling_terrain(
     amplitude_m: float,
     wavelength_m: float,
