@@ -238,3 +238,39 @@ def test_the_default_rates_are_all_marked_as_assumptions():
     for name in OperatingRates.__dataclass_fields__:
         rate = getattr(DEFAULT_RATES, name)
         assert rate.provenance is Provenance.ASSUMPTION, name
+
+
+# --- Pricing a mixed corridor ---------------------------------------------
+
+
+def test_each_module_is_priced_as_its_own_line_of_the_bill():
+    from yerkon.cost import TUNNEL_ANCHOR, anchor_product
+    from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
+
+    assert anchor_product(SX1280.part) is URBAN_ANCHOR
+    assert anchor_product(E28_2G4M27S.part) is RURAL_ANCHOR
+    assert anchor_product(DWM3000.part) is TUNNEL_ANCHOR
+
+
+def test_a_module_the_report_does_not_name_is_refused_with_the_list():
+    from yerkon.cost import anchor_product
+
+    with pytest.raises(ValueError, match="bill of materials names"):
+        anchor_product("Some Other Radio")
+
+
+def test_a_corridor_of_three_modules_is_priced_as_three_products():
+    """Pricing it as one puts hundreds of lira per anchor in the wrong place."""
+    from yerkon.viewer.state import from_scenario
+
+    inventory = from_scenario("mixed").deployed().inventory(100.0)
+    products = {site.product.name for site in inventory.anchors}
+    assert len(products) == 3
+
+    one_product = sum(
+        float(URBAN_ANCHOR.unit_price_tl.value) for _ in inventory.anchors
+    )
+    truthful = sum(
+        float(site.product.unit_price_tl.value) for site in inventory.anchors
+    )
+    assert truthful != pytest.approx(one_product)

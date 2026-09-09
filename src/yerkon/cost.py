@@ -60,6 +60,29 @@ PRODUCTS = {
     "vehicle": VEHICLE_RECEIVER,
 }
 
+#: Which line of the bill of materials a module is sold as.
+#:
+#: Keyed by part name rather than by the object, so this module still
+#: needs to know nothing about radios. A corridor carrying three modules
+#: is three different products, and pricing it as one would put a
+#: thousand lira of difference per anchor in the wrong place.
+ANCHOR_PRODUCT_BY_PART = {
+    "Semtech SX1280 (RF Solutions LAMBDA80-24S)": URBAN_ANCHOR,
+    "EBYTE E28-2G4M27S": RURAL_ANCHOR,
+    "Qorvo DWM3000": TUNNEL_ANCHOR,
+}
+
+
+def anchor_product(part: str) -> Product:
+    """The bill-of-materials line for a module, by its part name."""
+    try:
+        return ANCHOR_PRODUCT_BY_PART[part]
+    except KeyError:
+        raise ValueError(
+            "no anchor product for {!r}. The bill of materials names: "
+            "{}".format(part, ", ".join(sorted(ANCHOR_PRODUCT_BY_PART)))
+        ) from None
+
 
 @dataclass(frozen=True)
 class AnchorSite:

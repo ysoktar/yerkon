@@ -19,6 +19,7 @@ import numpy as np
 
 from yerkon.cost import (
     PEDESTRIAN_RECEIVER,
+    anchor_product,
     RURAL_ANCHOR,
     TUNNEL_ANCHOR,
     URBAN_ANCHOR,
@@ -97,7 +98,11 @@ class Deployed:
         return Inventory(
             anchors=tuple(
                 AnchorSite(
-                    product=self.product,
+                    # Each anchor is priced as the module inside it. A
+                    # corridor carrying three modules is three products,
+                    # and pricing it as one puts hundreds of lira per
+                    # anchor in the wrong place.
+                    product=anchor_product(anchor.radio.part),
                     structure=anchor.mounting.kind,
                     site_cost_tl=anchor.mounting.site_cost_tl,
                     has_power=anchor.mounting.has_power,

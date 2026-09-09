@@ -57,6 +57,7 @@ later (ADR-0006).
 | `cost.py` | CAPEX from the bill of materials, OPEX from an inventory |
 | `scenarios.py` | the three deployments the table describes, as configuration |
 | `report.py` | the four rows, the ten columns, and the notes under them |
+| `siting.py` | the search for the cheapest deployment that meets a target |
 | `viewer/` | the local web app: state, scene, server, and its own renderer |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
@@ -78,14 +79,26 @@ ranging.** A link at 15 km still has 29 dB in hand and still measures
 distance to twenty-six metres. Anything that reports link closure as
 though it were coverage is wrong.
 
-## Next, in dependency order
+## What is left
 
-Next, and the last thing on the list: the algorithm that sites anchors
-for a target accuracy at least cost. It was deferred until everything
-else was built, and everything else is now built. The cost module says
-why it matters more than any other remaining work: the radios are one
-percent of a mast-based deployment's capital cost, so where the anchors
-go and what they are bolted to is the whole of the money.
+Everything on the original list is built. What remains is measurement,
+not code.
+
+1. **The rates.** Every cost figure rests between 79 and 99 percent on
+   numbers nobody supplied. The mast figure of 85000 TL is the most
+   consequential: the siting search says existing signs beat masts by
+   five and a half times, and that conclusion is only as good as the two
+   costs it compares.
+2. **The residual clock offset after frequency correction**, half a part
+   per million. It decides whether single-sided ranging is usable on the
+   slow radio, and it is the least supported number in the physics.
+3. **The multipath channel and the implementation floor**, against
+   MATLAB. The floor is one published measurement per radio, and the
+   model now claims most of it is clock rather than timing resolution,
+   which the same measurement could confirm or refute.
+4. **What structures actually stand where.** The siting search's answer
+   moves with the survey, and the defaults are an assumption about a
+   typical stretch of Turkish highway.
 
 ## Open questions
 

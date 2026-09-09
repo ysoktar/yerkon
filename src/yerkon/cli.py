@@ -10,6 +10,8 @@ report's comparison table.
 ``view`` starts a local web app: the same engine, drawn in three
 dimensions, with every setting live.
 
+``site`` searches for the cheapest deployment that meets a target.
+
 ``design`` shows what a set of settings implies, and asks once before
 changing them. The panel it prints is built in ``proposal`` and rendered
 unchanged by the application too, so both front ends ask the same
@@ -364,6 +366,109 @@ def view(argv: list[str] | None = None) -> int:
     return 0
 
 
+def site(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon site",
+        description=(
+            "Find the least expensive way to meet an accuracy target over "
+            "a corridor, using the structures that already stand beside it "
+            "and building only where none does."
+        ),
+    )
+    parser.add_argument("--corridor", type=float, default=12_000.0,
+                        help="length in metres (default: %(default)s)")
+    parser.add_argument("--tolerance", type=float, default=5.0,
+                        help="ranging error a link may have, in metres")
+    parser.add_argument("--covered", type=float, default=0.95,
+                        help="share of the corridor that must have a position")
+    parser.add_argument("--relief", type=float, default=40.0,
+                        help="height of the rolling ground, in metres")
+    parser.add_argument("--radio", default="e28",
+                        help="anchor module: {}".format(
+                            ", ".join(sorted(RADIO_CHOICES))))
+    parser.add_argument("--region", default="TR")
+    parser.add_argument("--all", action="store_true",
+                        help="list every candidate, not only those that meet")
+    args = parser.parse_args(argv)
+
+    from yerkon.evaluate import Journey, Receiver
+    from yerkon.hardware import DWM3000, SX1280
+    from yerkon.siting import Requirement, cheapest
+    from yerkon.world import Road, graded_alignment, rolling_terrain, flat_terrain
+
+    try:
+        radio = chosen(RADIO_CHOICES, args.radio, "radio")
+        region = chosen(REGION_CHOICES, args.region, "region")
+        requirement = Requirement(
+            target_sigma_m=args.tolerance, corridor_covered=args.covered
+        )
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    terrain = (
+        flat_terrain() if args.relief <= 0.0
+        else rolling_terrain(amplitude_m=args.relief, wavelength_m=3000.0,
+                             micro_roughness_m=0.2)
+    )
+    centreline = [
+        (float(x), 0.0)
+        for x in range(0, int(args.corridor) + 1, 500)
+    ]
+    road = Road(centreline_m=centreline, terrain=terrain,
+                surface_m=graded_alignment(centreline, terrain))
+    units = (
+        Receiver("araç", Journey(road=road, speed_m_s=27.8, duration_s=300.0),
+                 radios=(SX1280, DWM3000)),
+    )
+
+    print("Searching {:.1f} km at a {:.1f} m tolerance, {:.0f}% covered."
+          .format(args.corridor / 1000.0, args.tolerance, args.covered * 100),
+          file=sys.stderr)
+
+    winner, everything = cheapest(
+        terrain, args.corridor, units, radio=radio,
+        requirement=requirement, region=region,
+    )
+
+    shown = everything if args.all else tuple(c for c in everything if c.meets)
+    print("{:<34}{:>8}{:>15}{:>10}".format(
+        "candidate", "anchors", "CAPEX [TL]", "covered"))
+    print("-" * 67)
+    for candidate in shown:
+        print("{:<34}{:>8}{:>15}{:>10}  {}".format(
+            candidate.label,
+            len(candidate.anchors),
+            decimal_comma(candidate.costing.capex_tl, 0),
+            "%" + decimal_comma(100.0 * candidate.corridor_covered, 1),
+            "" if candidate.meets else "(short)",
+        ))
+
+    if winner is None:
+        print("\nNothing on offer meets that. Loosen the tolerance, accept "
+              "less of the corridor, or allow taller structures.",
+              file=sys.stderr)
+        return 1
+
+    counted: dict = {}
+    for anchor in winner.anchors:
+        counted[anchor.mounting.kind] = counted.get(anchor.mounting.kind, 0) + 1
+
+    print("\nCheapest that meets it: {}".format(winner.label))
+    for kind, count in sorted(counted.items()):
+        print("  {} x {}".format(count, kind))
+    print("  {} TL to build, {} TL a year to run".format(
+        decimal_comma(winner.costing.capex_tl, 0),
+        decimal_comma(winner.costing.opex_tl_per_year, 0)))
+    print("  {} km² served, {} TL per km², {} TL per route kilometre".format(
+        decimal_comma(winner.served_km2, 2),
+        decimal_comma(winner.costing.capex_tl_per_km2, 0),
+        decimal_comma(winner.costing.capex_tl_per_route_km, 0)))
+    print("  {} of that rests on rates nobody supplied.".format(
+        "%" + decimal_comma(100.0 * winner.costing.assumed_share, 0)))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not argv or argv[0] in {"-h", "--help"}:
@@ -373,6 +478,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon design [--region TR] [--mounting mast] [--tolerance 5]")
         print("  yerkon table  [--markdown] [--only rural]")
         print("  yerkon view   [--port 8765]")
+        print("  yerkon site   [--corridor 12000] [--tolerance 5]")
         return 0
     verb, rest = argv[0], argv[1:]
     if verb == "fetch":
@@ -383,6 +489,8 @@ def main(argv: list[str] | None = None) -> int:
         return table(rest)
     if verb == "view":
         return view(rest)
+    if verb == "site":
+        return site(rest)
     print("Unknown command: {}".format(verb), file=sys.stderr)
     return 2
 

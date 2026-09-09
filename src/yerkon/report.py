@@ -207,6 +207,20 @@ def as_text(rows: Sequence[Row]) -> str:
     return "\n".join(out)
 
 
+def _anchor_mix(deployment) -> str:
+    """What the deployment is actually made of, counted by mounting.
+
+    A corridor carries more than one kind, so naming a single mounting
+    would describe a deployment nobody built.
+    """
+    counted: dict = {}
+    for anchor in deployment.anchors:
+        counted[anchor.mounting.kind] = counted.get(anchor.mounting.kind, 0) + 1
+    return ", ".join(
+        "{} on {}".format(count, kind) for kind, count in sorted(counted.items())
+    )
+
+
 def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
     """What the table rests on, printed with it rather than beside it."""
     lines = ["Notes:"]
@@ -239,10 +253,9 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
                 )
             )
         lines.append(
-            "    {} anchors on {}: {} TL to build, {} TL a year to run, "
-            "{} TL per route kilometre.".format(
-                len(result.deployed.scenario.deployment.anchors),
-                result.deployed.mounting.kind,
+            "    {}: {} TL to build, {} TL a year to run, {} TL per route "
+            "kilometre.".format(
+                _anchor_mix(result.deployed.scenario.deployment),
                 decimal_comma(result.costing.capex_tl, 0),
                 decimal_comma(result.costing.opex_tl_per_year, 0),
                 decimal_comma(result.costing.capex_tl_per_route_km, 0),
@@ -266,7 +279,8 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
         modules = sorted({a.radio.part for a in deployment.anchors})
         if len(modules) > 1:
             lines.append(
-                "    Anchor modules: {}. A unit ranges only against the "
+                "    Anchor modules: {}. Each is priced as its own line of "
+                "the bill of materials, and a unit ranges only against the "
                 "ones it shares a waveform with.".format(", ".join(modules))
             )
 

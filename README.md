@@ -39,6 +39,7 @@ Built and tested:
 - `scenarios.py`, the three deployments the table describes, as
   configuration rather than as code.
 - `report.py`, the four rows and what they rest on.
+- `siting.py`, the search for the cheapest deployment that meets a target.
 - `viewer/`, a local web app over the same engine: the corridor in three
   dimensions, every setting live, and the confirmation panel in front of
   any change that forces another.
@@ -96,6 +97,42 @@ that build the table, so the picture and the report cannot disagree. It
 draws its own three dimensions rather than loading a library from a
 content delivery network, so it works with the machine offline
 (ADR-0013).
+
+## Siting
+
+```bash
+yerkon site --corridor 12000 --tolerance 5
+```
+
+Searches for the least expensive deployment that meets a target, using
+the structures the corridor already carries and building only where none
+stands. Every candidate is a deployment somebody could build, scored by
+the same link budget and priced by the same bill of materials the table
+uses.
+
+Over 8 km of rolling ground at a 5 m ranging tolerance, with signs
+standing every 250 m:
+
+| Deployment | Anchors | CAPEX | Corridor covered |
+|---|---|---|---|
+| Existing roadside signs every 600 m | 21 | 274736 TL | %96,7 |
+| Existing roadside signs every 500 m | 25 | 327067 TL | %96,7 |
+| Purpose-built 25 m masts every 800 m | 16 | 1529323 TL | %96,7 |
+
+**The signs win by five and a half times**, despite reaching 1,66 km
+against a mast's 5,52 km. Height buys range, and range is not what is
+scarce — money is, and a sign that already stands costs a thirty-fourth
+of a mast that does not. That is the mixed-mounting strategy arrived at
+by search rather than by assertion, and it inverts the intuition the
+range figures give (ADR-0015).
+
+The search refuses, too. A tolerance under the radio's own ~2,94 m
+measurement floor is not a siting problem, and no arrangement of anchors
+meets it, so nothing is returned rather than the best of a bad set.
+
+What it cannot do is invent a survey. Which structures stand where is
+configuration, and the defaults are an assumption about a typical stretch
+of Turkish highway.
 
 ## The table
 
