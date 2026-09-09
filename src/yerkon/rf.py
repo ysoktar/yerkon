@@ -26,6 +26,7 @@ from typing import Optional
 
 from yerkon.evidence import Provenance, Sourced
 from yerkon.hardware import SPEED_OF_LIGHT_M_S, Antenna, Radio
+from yerkon.regulatory import TURKEY, SpectrumRule
 
 BOLTZMANN_NOISE_DBM_PER_HZ = -174.0
 """Thermal noise density at room temperature."""
@@ -39,14 +40,13 @@ FRESNEL_CLEARANCE_FRACTION = 0.6
 """Fraction of the first Fresnel zone that must be clear for the link to
 behave as free space. Below this, diffraction loss sets in."""
 
-REGULATORY_MAX_EIRP_DBM = Sourced(
-    20.0, "dBm", Provenance.STANDARD,
-    "ETSI EN 300 328 V2.2.2, as adopted by the Turkish KET regulation",
-)
-REGULATORY_MAX_EIRP_DENSITY_DBM_PER_MHZ = Sourced(
-    10.0, "dBm/MHz", Provenance.STANDARD,
-    "ETSI EN 300 328 V2.2.2, non-FHSS wideband modulation",
-)
+DEFAULT_REGION = TURKEY
+"""Which rulebook applies when a caller does not say.
+
+Turkey, because that is where the deployment is. Every range figure this
+module produces is a statement about a region, and the region has to be
+visible rather than assumed; see ``SpectrumRule``.
+"""
 
 
 @dataclass(frozen=True)
@@ -270,20 +270,22 @@ def diffraction_loss_db(clearance_m: float, fresnel_radius_m: float) -> float:
     return 6.9 + 20.0 * math.log10(math.sqrt((v - 0.1) ** 2 + 1.0) + v - 0.1)
 
 
-def regulatory_eirp_limit_dbm(bandwidth_hz: float) -> float:
-    """Highest legal radiated power at a given occupied bandwidth.
+def regulatory_eirp_limit_dbm(
+    bandwidth_hz: float,
+    antenna_gain_dbi: float = 0.0,
+    radio_max_dbm: float = 99.0,
+    region: SpectrumRule = DEFAULT_REGION,
+) -> float:
+    """Highest legal radiated power for this configuration, in dBm.
 
-    Two caps apply and the lower wins. Across every SX1280 bandwidth the
-    density cap binds, so legal power rises with bandwidth. Thermal noise
-    rises by the same factor, which is why widening the ranging bandwidth
-    costs no range.
+    Delegates to the region's rule. Under the Turkish and European rules
+    the density cap binds at every SX1280 bandwidth, so legal power rises
+    with bandwidth; thermal noise rises with it by the same factor, which
+    is why widening the ranging bandwidth costs no range. Under the
+    American rule the ceiling is on conducted power instead and does not
+    move with bandwidth at all.
     """
-    if bandwidth_hz <= 0.0:
-        raise ValueError("bandwidth_hz must be positive")
-    density_limited = float(
-        REGULATORY_MAX_EIRP_DENSITY_DBM_PER_MHZ.value
-    ) + 10.0 * math.log10(bandwidth_hz / 1e6)
-    return min(float(REGULATORY_MAX_EIRP_DBM.value), density_limited)
+    return region.permitted_eirp_dbm(bandwidth_hz, antenna_gain_dbi, radio_max_dbm)
 
 
 def _elevation_deg(
@@ -301,8 +303,14 @@ def evaluate_link(
     frequency_hz: float = 2450e6,
     obstruction: Optional[Obstruction] = None,
     respect_regulatory_limit: bool = True,
+    region: SpectrumRule = DEFAULT_REGION,
 ) -> LinkBudget:
-    """The whole chain, for one pair of terminals at one instant."""
+    """The whole chain, for one pair of terminals at one instant.
+
+    ``region`` decides how much the transmitter may radiate, and it moves
+    the answer by more than twenty decibels between jurisdictions. Pass it
+    explicitly wherever the result is reported.
+    """
     obstruction = obstruction or Obstruction()
     tx, rx = transmitter.position_m, receiver.position_m
     distance_m = math.dist(tx, rx)
@@ -316,13 +324,17 @@ def evaluate_link(
 
     eirp_dbm = output_dbm + tx_gain
     if respect_regulatory_limit:
-        # The ultra-wideband rating is already an emission limit rather
-        # than a conducted power, so antenna gain cannot be added on top
-        # of it. Capping against the same limit expresses that without a
-        # special case: the cap simply binds immediately.
         eirp_dbm = min(
             eirp_dbm,
-            regulatory_eirp_limit_dbm(float(radio.ranging_bandwidth_hz.value)),
+            regulatory_eirp_limit_dbm(
+                float(radio.ranging_bandwidth_hz.value),
+                antenna_gain_dbi=tx_gain,
+                radio_max_dbm=output_dbm,
+                region=region,
+            ),
+            # An ultra-wideband rating is already an emission limit rather
+            # than a conducted power, so antenna gain cannot be added on
+            # top of it.
             output_dbm if radio.max_output_dbm.unit.endswith("/MHz") else eirp_dbm,
         )
 
