@@ -30,11 +30,13 @@ Built and tested:
 - `site/`, real ground and real buildings, fetched once and cached.
 - `observation.py`, the one type the estimator may see. It imports
   nothing, which is what makes ADR-0003 enforceable rather than hoped for.
+- `estimator.py`, ranges into positions: a damped least-squares first fix
+  and a constant-velocity filter that takes each range at its own instant.
 - `ranging.py`, the two-way exchange: clocks, schemes, air time.
 - `design.py` and `proposal.py`, the settings a person chooses and the
   panel that shows every consequence of an edit before applying it.
 
-Not built yet: estimator, evaluation, cost, the table,
+Not built yet: evaluation, cost, the table,
 the viewer. `docs/HANDOFF.md` has the plan and the open questions.
 
 ## Running
@@ -177,3 +179,26 @@ ranging error beside it. The ranges in one round are not simultaneous and
 cannot be solved as though they were. That is a conclusion about the
 estimator, reached before the estimator was written, and it is why the
 receiver uses a filter rather than a snapshot trilateration.
+
+## What the estimator gets
+
+A receiver driving past six anchors at 100 km/h, ranged round after round
+over 17 s, with no height constraint:
+
+| | Snapshot per round | Filter |
+|---|---|---|
+| HPE p50 | 5,20 m | 1,46 m |
+| HPE p95 | 6,42 m | 2,55 m |
+| VPE p50 | 51,90 m | 23,41 m |
+
+The snapshot is worse because it blames eight metres of vehicle motion on
+the ranges. The filter knows the measurements happened 48 ms apart and
+does not.
+
+The vertical is bad for a different reason, and no amount of filtering
+fixes it. Twenty-two metres of mounting-height spread against four
+kilometres of baseline is no spread at all, so every range is very nearly
+horizontal and the height barely enters the arithmetic. Mixing signs at
+3 m with masts at 25 m makes no measurable difference. VPE in the tens of
+metres is the true answer for a network of roadside anchors, and ADR-0011
+records why it is reported rather than constrained away.

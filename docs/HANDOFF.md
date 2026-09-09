@@ -49,6 +49,7 @@ later (ADR-0006).
 | `site/` | real ground and buildings, fetched once into a cache |
 | `observation.py` | the one type the estimator may see, importing nothing |
 | `ranging.py` | the two-way exchange, its clocks, and what it costs in air time |
+| `estimator.py` | ranges into positions, seeing nothing else |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
 | `numbers.py` | comma decimal mark, no thousands separator |
@@ -71,19 +72,15 @@ though it were coverage is wrong.
 
 ## Next, in dependency order
 
-1. **`estimator`** — fusion without a height constraint. May import
-   `observation` and nothing else from this project; the architecture
-   test enforces it. It cannot treat a round of ranges as simultaneous,
-   because they are a quarter of a second apart (ADR-0010).
-2. **`evaluate`** — journeys, per-fix error samples, percentiles.
+1. **`evaluate`** — journeys, per-fix error samples, percentiles.
    Deterministic: every run reseeds, because a previous version of this
    project silently carried one scenario's random state into the next and
    invalidated every swept comparison in its docs.
-3. **`cost`** — CAPEX from the bill of materials, OPEX from the inventory
+2. **`cost`** — CAPEX from the bill of materials, OPEX from the inventory
    in ADR-0006.
-4. **`report`** — the four rows. The weighted row combines the raw
+3. **`report`** — the four rows. The weighted row combines the raw
    samples, never the percentiles (ADR-0005).
-5. **The 3D viewer** — live, and everything configurable, rendering the
+4. **The 3D viewer** — live, and everything configurable, rendering the
    same confirmation panel the command line does.
 
 Deferred by explicit instruction until the above is done: the algorithm
