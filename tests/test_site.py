@@ -452,3 +452,28 @@ def test_requests_are_spaced_to_respect_the_stated_limit(monkeypatch):
 
     service = ServiceElevation(seconds_between_requests=1.1)
     assert service.seconds_between_requests == pytest.approx(1.1)
+
+
+def test_a_connection_failure_reports_the_cause_not_the_query():
+    """requests embeds the whole URL in its exceptions.
+
+    The URL here is a hundred coordinates, so formatting the exception
+    drags them into the message even when the message does not mention
+    them. The first two attempts at this test still leaked them.
+    """
+    class Exploding:
+        def get(self, url, params=None, timeout=None):
+            raise OSError(
+                "HTTPSConnectionPool(host='api.opentopodata.org', port=443): "
+                "Max retries exceeded with url: /v1/srtm30m?locations="
+                "39.900000%2C32.850000%7C39.900901%2C32.851170 "
+                "(Caused by ProxyError('Tunnel connection failed: 403'))"
+            )
+
+    with pytest.raises(Unreachable) as raised:
+        ServiceElevation()._call(Exploding(), "39.9,32.8", index=1, total=6)
+
+    message = str(raised.value)
+    assert "39.900000" not in message
+    assert "locations=" not in message
+    assert "403" in message, "the actual reason has to survive"

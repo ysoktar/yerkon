@@ -250,6 +250,29 @@ class ServiceElevation:
             resolution_m=self.nominal_resolution_m,
         )
 
+    @staticmethod
+    def _cause(error: Exception) -> str:
+        """The reason a request failed, without the query it carried.
+
+        A requests exception embeds the whole URL, which here is a
+        hundred coordinates. Formatting the exception drags them back
+        into the message even when the message itself does not mention
+        them, so the URL is cut out explicitly.
+        """
+        text = str(error)
+
+        # The real reason sits after the URL, so look for it first.
+        # Stripping the URL before that throws the reason away with it,
+        # which is what the first attempt at this did.
+        marker = "(Caused by "
+        if marker in text:
+            text = text[text.index(marker) + len(marker):].rstrip(")")
+        elif "url:" in text:
+            text = text.split("url:")[0]
+
+        text = " ".join(text.split())
+        return text[:200] if text else type(error).__name__
+
     def _call(self, requests, locations: str, index: int, total: int) -> dict:
         """One request, waiting out a rate limit rather than giving up.
 
@@ -269,7 +292,7 @@ class ServiceElevation:
             except Exception as error:
                 raise Unreachable(
                     "{} unreachable on request {} of {}: {}".format(
-                        self.name, index, total, error
+                        self.name, index, total, self._cause(error)
                     )
                 ) from error
 
