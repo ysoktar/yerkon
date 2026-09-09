@@ -4,6 +4,9 @@
 and everything else reads that cache and runs offline. ADR-0008 is why
 they are separate.
 
+``table`` runs the three scenarios and prints the four rows of the
+report's comparison table.
+
 ``design`` shows what a set of settings implies, and asks once before
 changing them. The panel it prints is built in ``proposal`` and rendered
 unchanged by the application too, so both front ends ask the same
@@ -34,6 +37,8 @@ from yerkon.design import (
     derive,
 )
 from yerkon.numbers import decimal_comma
+from yerkon.report import as_markdown, as_text, build, footnotes
+from yerkon.scenarios import ALL as ALL_SCENARIOS, CHOICES as SCENARIO_CHOICES
 from yerkon.proposal import OUTCOME_LABELS, confirm, show_outcome
 from yerkon.site.model import BoundingBox
 
@@ -252,6 +257,45 @@ def describe_outcome(design_: Design) -> str:
     return "\n".join(lines)
 
 
+def table(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon table",
+        description=(
+            "Run the three scenarios and print the four YERKON rows of the "
+            "comparison table, with what they rest on."
+        ),
+    )
+    parser.add_argument(
+        "--markdown", action="store_true",
+        help="print the table as markdown rather than aligned text",
+    )
+    parser.add_argument(
+        "--only", action="append", choices=sorted(SCENARIO_CHOICES),
+        help="run only these scenarios; repeat the flag for several",
+    )
+    parser.add_argument(
+        "--no-notes", action="store_true",
+        help="print the table alone, without what it rests on",
+    )
+    args = parser.parse_args(argv)
+
+    chosen = (
+        tuple(SCENARIO_CHOICES[name] for name in args.only)
+        if args.only else ALL_SCENARIOS
+    )
+
+    print("Running {} scenario{}. This takes a minute.".format(
+        len(chosen), "" if len(chosen) == 1 else "s"
+    ), file=sys.stderr)
+
+    results, rows = build(chosen)
+    print(as_markdown(rows) if args.markdown else as_text(rows))
+    if not args.no_notes:
+        print()
+        print(footnotes(results, rows))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not argv or argv[0] in {"-h", "--help"}:
@@ -259,12 +303,15 @@ def main(argv: list[str] | None = None) -> int:
         print("\nUsage:")
         print("  yerkon fetch  --south .. --west .. --north .. --east .. --into DIR")
         print("  yerkon design [--region TR] [--mounting mast] [--tolerance 5]")
+        print("  yerkon table  [--markdown] [--only rural]")
         return 0
     verb, rest = argv[0], argv[1:]
     if verb == "fetch":
         return fetch(rest)
     if verb == "design":
         return design(rest)
+    if verb == "table":
+        return table(rest)
     print("Unknown command: {}".format(verb), file=sys.stderr)
     return 2
 

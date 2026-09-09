@@ -52,6 +52,8 @@ later (ADR-0006).
 | `estimator.py` | ranges into positions, seeing nothing else |
 | `evaluate.py` | journeys, per-fix error samples, availability, served area |
 | `cost.py` | CAPEX from the bill of materials, OPEX from an inventory |
+| `scenarios.py` | the three deployments the table describes, as configuration |
+| `report.py` | the four rows, the ten columns, and the notes under them |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
 | `numbers.py` | comma decimal mark, no thousands separator |
@@ -74,9 +76,7 @@ though it were coverage is wrong.
 
 ## Next, in dependency order
 
-1. **`report`** — the four rows. The weighted row combines the raw
-   samples, never the percentiles (ADR-0005).
-2. **The 3D viewer** — live, and everything configurable, rendering the
+1. **The 3D viewer** — live, and everything configurable, rendering the
    same confirmation panel the command line does.
 
 Deferred by explicit instruction until the above is done: the algorithm

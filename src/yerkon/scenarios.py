@@ -1,0 +1,274 @@
+"""The three deployments the report's table describes, as configuration.
+
+Urban, rural and tunnel. Each is a site, a set of anchors on structures
+that suit it, the module the bill of materials assigns to it, and a
+journey through it. Nothing here computes anything; it is the arrangement
+the rest of the project is pointed at, kept in one place so that changing
+what is being studied does not mean editing the study.
+
+Every number in this file is a choice somebody could disagree with. The
+physics is elsewhere.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, replace
+from typing import Optional
+
+import numpy as np
+
+from yerkon.cost import (
+    RURAL_ANCHOR,
+    TUNNEL_ANCHOR,
+    URBAN_ANCHOR,
+    VEHICLE_RECEIVER,
+    AnchorSite,
+    Inventory,
+    Product,
+)
+from yerkon.evaluate import Deployment, Journey, Scenario, coverage
+from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280, Radio
+from yerkon.ranging import DOUBLE_SIDED, SINGLE_SIDED, Scheme
+from yerkon.regulatory import TURKEY
+from yerkon.world import (
+    BILLBOARD,
+    LIGHTING_COLUMN,
+    MountingOption,
+    Road,
+    TALL_MAST,
+    TUNNEL_BRACKET,
+    Terrain,
+    flat_terrain,
+    graded_alignment,
+    rolling_terrain,
+)
+
+
+@dataclass(frozen=True)
+class Deployed:
+    """A scenario and the bill it comes with, kept together.
+
+    Splitting them invites a table whose accuracy column and cost column
+    describe different deployments, which is a mistake that would not
+    announce itself.
+    """
+
+    scenario: Scenario
+    product: Product
+    mounting: MountingOption
+    route_km: float
+    #: How much of a receiver's travel happens in this environment.
+    #: Used only for the weighted row, and configuration (ADR-0005).
+    weight: float
+    #: What the report calls the environment: inside, outside, or both.
+    environment: str
+    technology: str
+    receivers: int = 100
+    #: How far beyond the anchors the coverage sweep looks, in metres.
+    coverage_margin_m: float = 8000.0
+    #: Cell size of that sweep, in metres.
+    coverage_resolution_m: float = 250.0
+    #: Width of the bore, for a deployment that serves a confined space.
+    #:
+    #: A tunnel is not a plane. Sweeping a grid around one would measure
+    #: ground the deployment cannot serve and this model does not
+    #: represent, so where this is set the served area is the carriageway
+    #: itself: its length times its width. It is a smaller number than a
+    #: sweep would give, and the true one.
+    confined_width_m: Optional[float] = None
+
+    def served_km2(self) -> Optional[float]:
+        """Area served, where it follows from the geometry rather than a sweep."""
+        if self.confined_width_m is None:
+            return None
+        return self.route_km * self.confined_width_m / 1000.0
+
+    def inventory(self, service_area_km2: float) -> Inventory:
+        return Inventory(
+            anchors=tuple(
+                AnchorSite(
+                    product=self.product,
+                    structure=self.mounting.kind,
+                    site_cost_tl=self.mounting.site_cost_tl,
+                    has_power=self.mounting.has_power,
+                    has_backhaul=self.mounting.has_backhaul,
+                )
+                for _ in self.scenario.deployment.anchors
+            ),
+            receivers=((VEHICLE_RECEIVER, self.receivers),),
+            service_area_km2=service_area_km2,
+            route_km=self.route_km,
+        )
+
+
+def _straight_road(length_m: float, terrain: Terrain, step_m: float = 500.0) -> Road:
+    centreline = [(float(x), 0.0) for x in np.arange(0.0, length_m + 1.0, step_m)]
+    return Road(
+        centreline_m=centreline,
+        terrain=terrain,
+        surface_m=graded_alignment(centreline, terrain),
+    )
+
+
+def _anchors_along(
+    length_m: float,
+    spacing_m: float,
+    offset_m: float,
+    mounting: MountingOption,
+    terrain: Terrain,
+):
+    from yerkon.world import Anchor
+
+    return tuple(
+        Anchor(
+            "N{}".format(index),
+            (float(x), offset_m if index % 2 == 0 else -offset_m),
+            mounting,
+            terrain,
+        )
+        for index, x in enumerate(np.arange(0.0, length_m + 1.0, spacing_m))
+    )
+
+
+# --- Urban ----------------------------------------------------------------
+
+#: Absorption by buildings, vegetation and traffic that height does not
+#: clear, in decibels per kilometre at 2,4 GHz.
+#:
+#: Nothing in the report measures this. Thirty is the middle of the range
+#: published for dense built-up areas at this frequency, and it is the
+#: single number that decides how far an urban anchor reaches.
+URBAN_CLUTTER_DB_PER_KM = 30.0
+
+URBAN = Deployed(
+    scenario=Scenario(
+        name="Şehir içi",
+        terrain=flat_terrain(
+            clutter_loss_db_per_km=URBAN_CLUTTER_DB_PER_KM,
+            micro_roughness_m=0.5,
+        ),
+        deployment=Deployment(
+            anchors=_anchors_along(
+                6000.0, 400.0, 25.0, LIGHTING_COLUMN,
+                flat_terrain(
+                    clutter_loss_db_per_km=URBAN_CLUTTER_DB_PER_KM,
+                    micro_roughness_m=0.5,
+                ),
+            ),
+            anchor_radio=SX1280,
+            receiver_radio=SX1280,
+            scheme=SINGLE_SIDED,
+            region=TURKEY,
+        ),
+        journeys=(
+            Journey(
+                road=_straight_road(
+                    6000.0,
+                    flat_terrain(
+                        clutter_loss_db_per_km=URBAN_CLUTTER_DB_PER_KM,
+                        micro_roughness_m=0.5,
+                    ),
+                    step_m=200.0,
+                ),
+                speed_m_s=13.9,
+                duration_s=400.0,
+            ),
+        ),
+        seed=101,
+        accept_sigma_m=15.0,
+    ),
+    product=URBAN_ANCHOR,
+    mounting=LIGHTING_COLUMN,
+    route_km=6.0,
+    weight=0.5,
+    environment="Dış",
+    technology="Karasal PNT (SX1280/LoRa TWR)",
+    coverage_margin_m=2000.0,
+    coverage_resolution_m=100.0,
+)
+
+
+# --- Rural ----------------------------------------------------------------
+
+RURAL_TERRAIN = rolling_terrain(
+    amplitude_m=40.0, wavelength_m=3000.0, micro_roughness_m=0.2
+)
+
+RURAL = Deployed(
+    scenario=Scenario(
+        name="Kırsal",
+        terrain=RURAL_TERRAIN,
+        deployment=Deployment(
+            anchors=_anchors_along(24_000.0, 2000.0, 400.0, TALL_MAST, RURAL_TERRAIN),
+            anchor_radio=E28_2G4M27S,
+            receiver_radio=SX1280,
+            scheme=SINGLE_SIDED,
+            region=TURKEY,
+        ),
+        journeys=(
+            Journey(
+                road=_straight_road(24_000.0, RURAL_TERRAIN),
+                speed_m_s=27.8,
+                duration_s=800.0,
+            ),
+        ),
+        seed=202,
+        accept_sigma_m=30.0,
+    ),
+    product=RURAL_ANCHOR,
+    mounting=TALL_MAST,
+    route_km=24.0,
+    weight=0.4,
+    environment="Dış",
+    technology="Karasal PNT (E28-SX1280 TWR)",
+    coverage_margin_m=8000.0,
+    coverage_resolution_m=250.0,
+)
+
+
+# --- Tunnel ---------------------------------------------------------------
+
+#: A tunnel is a waveguide, and a waveguide loses less than open ground.
+#:
+#: This project models the bore as level ground with no obstruction, which
+#: understates what a real tunnel delivers rather than overstating it. The
+#: numbers that come out are therefore conservative, and the model would
+#: need a waveguide term to claim otherwise.
+TUNNEL_TERRAIN = flat_terrain(micro_roughness_m=0.05)
+
+TUNNEL = Deployed(
+    scenario=Scenario(
+        name="Tünel",
+        terrain=TUNNEL_TERRAIN,
+        deployment=Deployment(
+            anchors=_anchors_along(
+                2000.0, 150.0, 4.0, TUNNEL_BRACKET, TUNNEL_TERRAIN
+            ),
+            anchor_radio=DWM3000,
+            receiver_radio=DWM3000,
+            scheme=DOUBLE_SIDED,
+            region=TURKEY,
+        ),
+        journeys=(
+            Journey(
+                road=_straight_road(2000.0, TUNNEL_TERRAIN, step_m=100.0),
+                speed_m_s=22.2,
+                duration_s=85.0,
+            ),
+        ),
+        seed=303,
+        accept_sigma_m=2.0,
+    ),
+    product=TUNNEL_ANCHOR,
+    mounting=TUNNEL_BRACKET,
+    route_km=2.0,
+    weight=0.1,
+    environment="İç + dış",
+    technology="Karasal PNT (UWB/DWM3000 TWR)",
+    confined_width_m=12.0,
+)
+
+
+ALL = (URBAN, RURAL, TUNNEL)
+
+CHOICES = {"urban": URBAN, "rural": RURAL, "tunnel": TUNNEL}

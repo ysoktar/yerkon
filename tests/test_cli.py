@@ -61,3 +61,34 @@ def test_the_outcome_description_uses_the_panel_wording():
     printed = describe_outcome(Design())
     assert "legal radiated power" in printed
     assert "12,1 dBm" in printed
+
+
+# --- The table verb --------------------------------------------------------
+
+
+def test_the_help_lists_the_table_verb(capsys):
+    from yerkon.cli import main
+
+    main([])
+    assert "yerkon table" in capsys.readouterr().out
+
+
+@pytest.mark.slow
+def test_the_table_verb_prints_the_columns_the_report_has(capsys):
+    from yerkon.cli import table
+
+    assert table(["--only", "tunnel"]) == 0
+    printed = capsys.readouterr().out
+    assert "Sistem" in printed
+    assert "OPEX [TL/km²/yıl]" in printed
+    assert "Notes:" in printed
+
+
+@pytest.mark.slow
+def test_the_table_verb_can_leave_the_notes_out(capsys):
+    from yerkon.cli import table
+
+    assert table(["--only", "tunnel", "--no-notes", "--markdown"]) == 0
+    printed = capsys.readouterr().out
+    assert printed.startswith("| Sistem")
+    assert "Notes:" not in printed

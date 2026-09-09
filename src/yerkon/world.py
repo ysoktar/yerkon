@@ -367,6 +367,22 @@ TALL_MAST = MountingOption(
     has_backhaul=False,
 )
 
+TUNNEL_BRACKET = MountingOption(
+    kind="tunnel bracket",
+    height_m=_assumed(4.5, "m", "the height a unit is bracketed at in a tunnel"),
+    site_cost_tl=_assumed(
+        6000.0, "TL", "bracketing a unit to a tunnel lining"
+    ),
+    # A tunnel already has power and a communications spine along its
+    # length, for lighting, ventilation and its own systems. That is most
+    # of why a tunnel deployment costs less per anchor to run than an
+    # open-road one, despite needing far more anchors.
+    has_power=True,
+    has_backhaul=True,
+)
+"""Inside a tunnel, where power and backhaul already run the length of it."""
+
+
 EXISTING_STRUCTURES = (ROADSIDE_SIGN, SIGN_GANTRY, BILLBOARD, LIGHTING_COLUMN)
 """Structures already beside a Turkish highway. Fitting a unit to one of
 these avoids building anything, which is why the owner wants them used."""

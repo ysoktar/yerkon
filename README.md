@@ -36,6 +36,9 @@ Built and tested:
   per-fix error samples, availability, and swept service area.
 - `cost.py`, CAPEX from the bill of materials and OPEX from an inventory
   of named recurring items, each carrying its own provenance.
+- `scenarios.py`, the three deployments the table describes, as
+  configuration rather than as code.
+- `report.py`, the four rows and what they rest on.
 - `ranging.py`, the two-way exchange: clocks, schemes, air time.
 - `design.py` and `proposal.py`, the settings a person chooses and the
   panel that shows every consequence of an edit before applying it.
@@ -49,6 +52,40 @@ the viewer. `docs/HANDOFF.md` has the plan and the open questions.
 pip install -e ".[dev]"
 pytest
 ```
+
+## The table
+
+```bash
+yerkon table
+```
+
+| Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
+|---|---|---|---|---|---|---|---|---|---|
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 3,35 | 10,40 | 30,70 | %97,83 | 5,34 | 13082 | 6061 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 2,69 | 10,33 | 113,21 | %99,22 | 58,00 | 21424 | 888 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,19 | 0,66 | 6,63 | %96,02 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,72 | 10,21 | 86,76 | %98,42 | 25,87 | 460453 | 88337 |
+
+The OPEX column is the one the report leaves empty for all four rows. It
+comes from an inventory of named recurring items rather than a percentage
+of capital (ADR-0006), and like every cost figure here it rests mostly on
+rates nobody supplied — the command prints that share alongside.
+
+Three things the table will not do without saying so:
+
+**The tunnel's cost per km² is not comparable to the other rows.** A bore
+12 m wide over 2 km is 0,024 km², so dividing by it produces a large
+number by arithmetic rather than by judgement. On cost per route
+kilometre the tunnel is 53441 TL and the rural corridor 51774 TL, which
+is the comparison that means something.
+
+**The service area is where a position is available**, not where a packet
+arrives. For the rural corridor those are 58,00 and 445,44 km², a factor
+of 7,7, and the notes print both every time (ADR-0012).
+
+**VPE is what roadside geometry supports**, with no height constraint
+anywhere. Tens of metres on the open road, six in the tunnel where the
+anchors surround the receiver rather than lining up beside it (ADR-0011).
 
 ## Fetching a site
 

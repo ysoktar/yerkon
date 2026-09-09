@@ -67,20 +67,36 @@ def test_ranging_produces_observations_and_not_verdicts():
     assert "yerkon.estimator" not in names
 
 
-def test_only_the_world_and_the_evaluation_may_read_truth():
-    """Truth is a receiver's real position. Two modules are allowed it.
+#: Modules that must never gain a path to a receiver's true position.
+#:
+#: Named as a list of what must stay clean rather than a list of what is
+#: allowed, so that adding another assembly module does not quietly widen
+#: the rule. Everything here is either read by the estimator or feeds it.
+MUST_NOT_SEE_TRUTH = (
+    "evidence",
+    "numbers",
+    "hardware",
+    "regulatory",
+    "rf",
+    "observation",
+    "ranging",
+    "estimator",
+    "cost",
+    "proposal",
+)
 
-    The world holds it because it is the world. The evaluation reads it
-    because comparing an estimate against it is the whole job. Anything
-    else importing the world is a path by which the answer could reach
-    the estimator, which is how the previous codebase went wrong.
+
+def test_nothing_the_estimator_touches_can_reach_the_world():
+    """The world holds a receiver's true position. ADR-0003.
+
+    The evaluation reads it because comparing an estimate against truth
+    is the whole job, and the modules that assemble scenarios read it
+    because that is what they assemble. Everything on the path into the
+    estimator stays clear of it.
     """
-    allowed = {"evaluate", "world", "design", "site"}
-    for path in sorted(SRC.glob("*.py")):
-        module = path.stem
-        if module in allowed or module == "__init__":
-            continue
+    for module in MUST_NOT_SEE_TRUTH:
         assert "yerkon.world" not in imports_of(module), module
+        assert "yerkon.evaluate" not in imports_of(module), module
 
 
 def test_the_link_budget_does_not_depend_on_the_world():

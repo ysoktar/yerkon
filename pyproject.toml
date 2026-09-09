@@ -22,3 +22,6 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+markers = [
+    "slow: runs a full scenario end to end; seconds rather than milliseconds",
+]
