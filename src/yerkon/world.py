@@ -290,11 +290,21 @@ class MountingOption:
 
 
 def _assumed(value: float, unit: str, what: str) -> Sourced:
+    """A placeholder cost, marked as one.
+
+    The report supplied no costing for any of this, and a zero would not
+    be neutral: it would say a twenty-five metre mast and a bracket on an
+    existing sign cost the same, which is the one comparison the mixed
+    deployment turns on. These are order-of-magnitude figures carrying
+    their own provenance, and the report prints the assumptions a costing
+    rests on alongside the costing.
+    """
     return Sourced(
         value, unit, Provenance.ASSUMPTION, "this project",
         note=(
-            "No costing for {} was supplied. The value is configuration: "
-            "change it in the scenario rather than here.".format(what)
+            "No costing for {} was supplied. This is an order-of-magnitude "
+            "placeholder and it is configuration: change it in the "
+            "scenario rather than here.".format(what)
         ),
     )
 
@@ -305,7 +315,7 @@ ROADSIDE_SIGN = MountingOption(
         3.0, "m", Provenance.ASSUMPTION, "this project",
         note="Typical mounting height of a verge-mounted road sign.",
     ),
-    site_cost_tl=_assumed(0.0, "TL", "fitting a unit to an existing sign"),
+    site_cost_tl=_assumed(2500.0, "TL", "fitting a unit to an existing sign"),
     has_power=False,
     has_backhaul=False,
 )
@@ -316,7 +326,7 @@ SIGN_GANTRY = MountingOption(
         6.0, "m", Provenance.ASSUMPTION, "this project",
         note="Clearance height of a highway sign portal over the carriageway.",
     ),
-    site_cost_tl=_assumed(0.0, "TL", "fitting a unit to an existing gantry"),
+    site_cost_tl=_assumed(4000.0, "TL", "fitting a unit to an existing gantry"),
     has_power=True,
     has_backhaul=False,
 )
@@ -327,7 +337,7 @@ BILLBOARD = MountingOption(
         10.0, "m", Provenance.ASSUMPTION, "this project",
         note="Top of a roadside advertising hoarding.",
     ),
-    site_cost_tl=_assumed(0.0, "TL", "fitting a unit to an existing billboard"),
+    site_cost_tl=_assumed(3500.0, "TL", "fitting a unit to an existing billboard"),
     has_power=True,
     has_backhaul=False,
 )
@@ -338,7 +348,7 @@ LIGHTING_COLUMN = MountingOption(
         12.0, "m", Provenance.ASSUMPTION, "this project",
         note="Highway lighting column.",
     ),
-    site_cost_tl=_assumed(0.0, "TL", "fitting a unit to an existing column"),
+    site_cost_tl=_assumed(3000.0, "TL", "fitting a unit to an existing column"),
     has_power=True,
     has_backhaul=False,
 )
@@ -352,7 +362,7 @@ TALL_MAST = MountingOption(
             "against a 2 m vehicle antenna over flat ground."
         ),
     ),
-    site_cost_tl=_assumed(0.0, "TL", "a new mast, its foundation and its supply"),
+    site_cost_tl=_assumed(85000.0, "TL", "a new mast, its foundation and its supply"),
     has_power=False,
     has_backhaul=False,
 )

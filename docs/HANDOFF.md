@@ -50,6 +50,8 @@ later (ADR-0006).
 | `observation.py` | the one type the estimator may see, importing nothing |
 | `ranging.py` | the two-way exchange, its clocks, and what it costs in air time |
 | `estimator.py` | ranges into positions, seeing nothing else |
+| `evaluate.py` | journeys, per-fix error samples, availability, served area |
+| `cost.py` | CAPEX from the bill of materials, OPEX from an inventory |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
 | `numbers.py` | comma decimal mark, no thousands separator |
@@ -72,15 +74,9 @@ though it were coverage is wrong.
 
 ## Next, in dependency order
 
-1. **`evaluate`** — journeys, per-fix error samples, percentiles.
-   Deterministic: every run reseeds, because a previous version of this
-   project silently carried one scenario's random state into the next and
-   invalidated every swept comparison in its docs.
-2. **`cost`** — CAPEX from the bill of materials, OPEX from the inventory
-   in ADR-0006.
-3. **`report`** — the four rows. The weighted row combines the raw
+1. **`report`** — the four rows. The weighted row combines the raw
    samples, never the percentiles (ADR-0005).
-4. **The 3D viewer** — live, and everything configurable, rendering the
+2. **The 3D viewer** — live, and everything configurable, rendering the
    same confirmation panel the command line does.
 
 Deferred by explicit instruction until the above is done: the algorithm
@@ -88,9 +84,12 @@ that sites anchors for a target accuracy at least cost.
 
 ## Open questions
 
-- **OPEX rates.** Energy, connectivity, service life, maintenance visit
-  frequency, central operation. Each needs a source or an explicit
-  assumption marker.
+- **OPEX rates and site costs.** Every one is an order-of-magnitude
+  placeholder marked `ASSUMPTION`, and together they are 99 % of a
+  costing. The mast figure of 85000 TL is the most consequential: it
+  decides whether purpose-built masts or existing roadside furniture
+  win, and that decision is worth more than everything the radio
+  choice affects.
 - **The residual clock offset after frequency correction**, half a part
   per million, is the least supported number in the ranging model. It
   decides whether single-sided ranging is usable on the slow radio, and

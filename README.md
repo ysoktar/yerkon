@@ -34,11 +34,13 @@ Built and tested:
   and a constant-velocity filter that takes each range at its own instant.
 - `evaluate.py`, where the parts meet: journeys along a graded road,
   per-fix error samples, availability, and swept service area.
+- `cost.py`, CAPEX from the bill of materials and OPEX from an inventory
+  of named recurring items, each carrying its own provenance.
 - `ranging.py`, the two-way exchange: clocks, schemes, air time.
 - `design.py` and `proposal.py`, the settings a person chooses and the
   panel that shows every consequence of an edit before applying it.
 
-Not built yet: cost, the table,
+Not built yet: the table,
 the viewer. `docs/HANDOFF.md` has the plan and the open questions.
 
 ## Running
@@ -115,6 +117,31 @@ coverage would understate cost per km² by the same factor (ADR-0012).
 So spacing is a geometry question, not a range question. Four kilometres
 is well inside a mast's 5,5 km usable range and still leaves a receiver
 one anchor short of a fix for most of the corridor.
+
+## What it costs, and what that rests on
+
+Thirteen anchors over 24 km, on a service area of 57,2 km²:
+
+| | 13 masts (25 m) | 13 lighting columns (12 m) |
+|---|---|---|
+| Anchor units | 14074,84 TL | 14074,84 TL |
+| Structures and installation | 1105000,00 TL | 39000,00 TL |
+| Standalone power | 123500,00 TL | 0,00 TL |
+| **Capital** | **1242574,84 TL** | **53074,84 TL** |
+| Operating, per year | 51516,85 TL | 25834,84 TL |
+| Radios as a share of capital | 1,1 % | 26,5 % |
+
+The bill of materials — the only sourced part of any of this — is about
+one percent of the cost of a mast-based network. What a deployment costs
+is decided by what the anchors are bolted to and whether mains power
+reaches them, not by which radio is inside.
+
+That is why the deployment mixes structures, and why every costing prints
+the share of itself that rests on figures nobody supplied. For the table
+above that share is 99 %: the site costs and every operating rate are
+order-of-magnitude placeholders carrying `ASSUMPTION` provenance and a
+note saying so (ADR-0006). They are configuration, and the numbers move
+when they are sourced.
 
 ## What the link budget already says
 
