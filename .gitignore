@@ -1,11 +1,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-*.egg-info/
-.venv/
-venv/
-build/
-dist/
-
-# Çalıştırınca yeniden üretilen çıktılar. Referans kopya docs/reference_output/ içinde.
 output/
+node_modules/
+dist/
