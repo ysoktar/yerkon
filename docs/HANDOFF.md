@@ -33,8 +33,9 @@ later (ADR-0006).
   billboards) alongside purpose-built masts.
 - **Numbers use a comma decimal mark and no thousands separator.**
 - **Changing one thing that forces another needs confirmation**, shown as
-  a panel listing every value that would change, answered y/n. Both the
-  CLI and the app use the same panel.
+  a panel listing every value that would change, answered with a single
+  y/n for the whole batch. Both the CLI and the app render the same panel
+  (ADR-0009). Built.
 
 ## Built
 
@@ -46,7 +47,10 @@ later (ADR-0006).
 | `rf.py` | the link budget |
 | `world.py` | terrain, graded road alignments, mounting structures |
 | `site/` | real ground and buildings, fetched once into a cache |
-| `cli.py` | the `fetch` verb |
+| `design.py` | the settings a person chooses, and what they imply |
+| `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
+| `numbers.py` | comma decimal mark, no thousands separator |
+| `cli.py` | the `fetch` and `design` verbs |
 
 `tests/test_architecture.py` inspects imports so the estimator cannot
 reach the truth. It is a test, not a convention, on purpose.
@@ -87,9 +91,6 @@ that sites anchors for a target accuracy at least cost.
 
 ## Open questions
 
-- **Approval panel granularity.** When one change forces another, does
-  the panel confirm each single parameter change, or batch several into
-  one confirmation? Asked, not yet answered.
 - **OPEX rates.** Energy, connectivity, service life, maintenance visit
   frequency, central operation. Each needs a source or an explicit
   assumption marker.

@@ -28,6 +28,8 @@ Built and tested:
 - `world.py`, terrain, a graded road alignment, and the structures an
   anchor can be mounted on.
 - `site/`, real ground and real buildings, fetched once and cached.
+- `design.py` and `proposal.py`, the settings a person chooses and the
+  panel that shows every consequence of an edit before applying it.
 
 Not built yet: ranging protocol, estimator, evaluation, cost, the table,
 the viewer. `docs/HANDOFF.md` has the plan and the open questions.
@@ -61,6 +63,30 @@ Three sources are tried in turn and the first that answers wins:
 
 Buildings come from OpenStreetMap alongside. If they cannot be fetched
 the site records that nobody looked, rather than implying open ground.
+
+## Changing a setting
+
+Settings are not independent, so an edit shows what it drags with it and
+asks once (ADR-0009):
+
+```console
+$ yerkon design --mounting sign
+You asked to change:
+  mounting  tall mast -> roadside sign
+
+Which also changes:
+  anchor height                         25,0 m -> 3,0 m
+    because the mounting structure sets how high the anchor stands
+  usable range                         5,52 km -> 1,66 km
+    because range is whatever the link budget allows at the target precision
+  range where the link still decodes  38,93 km -> 15,54 km
+    because the same budget decides where the link stops decoding
+
+Apply all of that? [y/N]
+```
+
+The consequences are computed by the same link budget the simulation runs
+on, not by a list of rules kept alongside it, and a test enforces that.
 
 ## What the link budget already says
 

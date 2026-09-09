@@ -407,6 +407,54 @@ def cramer_rao_sigma_m(budget: LinkBudget, radio: Radio) -> float:
     return sigma_tau_s * SPEED_OF_LIGHT_M_S
 
 
+#: How far the range searches look before giving up.
+#:
+#: A result sitting exactly on this is a search that ran out of room, not
+#: a link that stopped there, and anything reporting one should say so.
+DEFAULT_SEARCH_LIMIT_M = 60_000.0
+
+
+def closure_range_m(
+    transmitter: Terminal,
+    receiver_prototype: Terminal,
+    frequency_hz: float = 2450e6,
+    obstruction: Optional[Obstruction] = None,
+    search_limit_m: float = DEFAULT_SEARCH_LIMIT_M,
+    region: SpectrumRule = TURKEY,
+) -> float:
+    """Farthest distance at which the link still demodulates at all.
+
+    Always at least ``usable_range_m`` and usually far beyond it. The gap
+    between the two is the whole of ADR-0007: a link that still carries
+    packets has long since stopped carrying a useful measurement, and
+    quoting the closure distance as coverage is the error this pair of
+    functions exists to make impossible to hide.
+    """
+    def closes_at(distance_m: float) -> bool:
+        _, y, z = receiver_prototype.position_m
+        moved = Terminal(
+            receiver_prototype.radio,
+            receiver_prototype.antenna,
+            (transmitter.position_m[0] + distance_m, y, z),
+        )
+        return evaluate_link(
+            transmitter, moved, frequency_hz, obstruction=obstruction, region=region
+        ).closes
+
+    low, high = 10.0, search_limit_m
+    if not closes_at(low):
+        return 0.0
+    if closes_at(high):
+        return high
+    for _ in range(60):
+        mid = 0.5 * (low + high)
+        if closes_at(mid):
+            low = mid
+        else:
+            high = mid
+    return low
+
+
 def usable_range_m(
     transmitter: Terminal,
     receiver_prototype: Terminal,
@@ -414,7 +462,8 @@ def usable_range_m(
     target_sigma_m: float,
     frequency_hz: float = 2450e6,
     obstruction: Optional[Obstruction] = None,
-    search_limit_m: float = 60_000.0,
+    search_limit_m: float = DEFAULT_SEARCH_LIMIT_M,
+    region: SpectrumRule = TURKEY,
 ) -> float:
     """Farthest distance whose ranging precision still meets a target.
 
@@ -438,7 +487,7 @@ def usable_range_m(
             (transmitter.position_m[0] + distance_m, y, z),
         )
         budget = evaluate_link(
-            transmitter, moved, frequency_hz, obstruction=obstruction
+            transmitter, moved, frequency_hz, obstruction=obstruction, region=region
         )
         if not budget.closes:
             return math.inf

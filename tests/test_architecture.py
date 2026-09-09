@@ -64,3 +64,31 @@ def test_every_module_states_what_it_is_for():
         assert len(docstring.split()) >= 12, (
             "{}'s docstring says too little to be worth reading".format(path.name)
         )
+
+
+def test_the_model_does_not_know_about_its_front_ends():
+    """design is what the app and the command line both configure.
+
+    If it could import the confirmation panel, the panel's wording would
+    start deciding what the model does.
+    """
+    assert "yerkon.proposal" not in imports_of("design")
+
+
+def test_the_panel_does_not_do_its_own_physics():
+    """ADR-0009. The consequences shown must be the ones the model runs on.
+
+    The panel may ask design.derive what follows from an edit. The moment
+    it works a link budget out for itself, the numbers a person confirms
+    and the numbers the simulation uses can drift apart, and nothing
+    would catch it.
+    """
+    names = imports_of("proposal")
+    assert "yerkon.design" in names
+    assert "yerkon.world" not in names
+
+    text = (SRC / "proposal.py").read_text(encoding="utf-8")
+    for physics in ("evaluate_link", "usable_range_m(", "two_ray"):
+        assert physics not in text, (
+            "proposal.py calls {} directly instead of asking design".format(physics)
+        )
