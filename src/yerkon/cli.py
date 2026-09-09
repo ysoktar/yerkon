@@ -12,6 +12,7 @@ import sys
 
 from yerkon.site.cache import SiteCache
 from yerkon.site.fetch import (
+    CopernicusElevation,
     GeoTiffElevation,
     OpenStreetMapBuildings,
     ServiceElevation,
@@ -52,6 +53,14 @@ def fetch(argv: list[str] | None = None) -> int:
         "--no-buildings", action="store_true",
         help="skip OpenStreetMap; the site records that nobody looked",
     )
+    parser.add_argument(
+        "--no-copernicus", action="store_true",
+        help="skip the Copernicus tiles, leaving only the query service",
+    )
+    parser.add_argument(
+        "--tile-cache", default="sites/_tiles",
+        help="where Copernicus tiles are kept (default: %(default)s)",
+    )
     args = parser.parse_args(argv)
 
     bounds = BoundingBox(
@@ -61,18 +70,25 @@ def fetch(argv: list[str] | None = None) -> int:
     sources = []
     if args.geotiff:
         sources.append(GeoTiffElevation(args.geotiff))
+    if not args.no_copernicus:
+        sources.append(CopernicusElevation(cache_directory=args.tile_cache))
     sources.append(ServiceElevation())
 
     print("Fetching {:.4f},{:.4f} to {:.4f},{:.4f} at {:.0f} m".format(
         bounds.south, bounds.west, bounds.north, bounds.east, args.spacing
     ))
-    for source in sources:
-        print("  elevation source: {}".format(source.name))
+    print("  ground: {} (each tried in turn until one answers)".format(
+        ", then ".join(source.name for source in sources)
+    ))
     if not args.no_buildings:
         print("  features: OpenStreetMap")
 
-    service = next((s for s in sources if isinstance(s, ServiceElevation)), None)
-    if service is not None and not args.geotiff:
+    # What the query service would cost, and only when it is the source
+    # that will actually be asked. A GeoTIFF or a Copernicus tile answers
+    # first and makes no calls at all, so quoting a rate limit ahead of
+    # them describes a fetch that is not going to happen.
+    if isinstance(sources[0], ServiceElevation):
+        service = sources[0]
         points = service.points_required(bounds, args.spacing)
         calls = (points + service.batch - 1) // service.batch
         minutes = calls * service.seconds_between_requests / 60.0

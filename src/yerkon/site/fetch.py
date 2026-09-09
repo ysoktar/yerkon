@@ -66,6 +66,14 @@ class GeoTiffElevation:
 
     path: str
     name: str = "GeoTIFF"
+    #: Replace points the raster does not cover with the median of those
+    #: it does.
+    #:
+    #: On for a single file, because a run needs a number everywhere and
+    #: a plausible one beats a crash. Off when several tiles are being
+    #: mosaicked, where a gap in one tile is ground in the next and
+    #: filling it first would hide the real value behind an invention.
+    fill_gaps: bool = True
 
     def grid_for(self, bounds: BoundingBox, spacing_m: float) -> ElevationGrid:
         try:
@@ -117,14 +125,20 @@ class GeoTiffElevation:
                 dtype=float,
             )
             nodata = raster.nodata
+            # Points beyond the raster's own extent, marked before the
+            # nodata check because a file that tags no nodata value hands
+            # back a plausible-looking number out there rather than
+            # admitting it has nothing.
+            outside = _outside(np.array(flat_x), np.array(flat_y), raster.bounds)
             resolution_m = float(abs(raster.transform.a))
             if raster.crs and raster.crs.to_epsg() == 4326:
                 resolution_m *= per_lon
 
+        sampled = np.where(outside, np.nan, sampled)
         grid = sampled.reshape(rows, columns)
         if nodata is not None:
             grid = np.where(grid == nodata, np.nan, grid)
-        if np.isnan(grid).any():
+        if self.fill_gaps and np.isnan(grid).any():
             filled = float(np.nanmedian(grid)) if not np.isnan(grid).all() else 0.0
             grid = np.where(np.isnan(grid), filled, grid)
 
@@ -133,6 +147,164 @@ class GeoTiffElevation:
             source="{} ({})".format(self.name, self.path),
             resolution_m=resolution_m,
         )
+
+
+def _outside(xs: np.ndarray, ys: np.ndarray, extent) -> np.ndarray:
+    """Which sample points the raster does not cover."""
+    return (
+        (xs < extent.left) | (xs > extent.right)
+        | (ys < extent.bottom) | (ys > extent.top)
+    )
+
+
+# --- Copernicus DEM, straight from public object storage ------------------
+
+
+COPERNICUS_BUCKET = "https://copernicus-dem-30m.s3.amazonaws.com"
+
+
+def copernicus_tile_name(latitude: int, longitude: int) -> str:
+    """The tile covering the degree square whose corner this is.
+
+    Tiles are one degree on a side and named by their south-west corner,
+    so a box spanning two degrees needs two tiles.
+    """
+    ns = "N" if latitude >= 0 else "S"
+    ew = "E" if longitude >= 0 else "W"
+    return "Copernicus_DSM_COG_10_{}{:02d}_00_{}{:03d}_00_DEM".format(
+        ns, abs(latitude), ew, abs(longitude)
+    )
+
+
+@dataclass
+class CopernicusElevation:
+    """Ground from the Copernicus 30 m model in public object storage.
+
+    The best of the three sources and the one to reach for first. It needs
+    no key, imposes no rate limit, serves whole one-degree tiles in a few
+    seconds, and is the same data the download portals hand out. A tile
+    for central Turkey is 3600 by 3600 samples covering 651 to 1863 m.
+
+    Tiles are cached on disk, so a second site in the same degree square
+    costs nothing.
+    """
+
+    cache_directory: str = "sites/_tiles"
+    name: str = "Copernicus DEM 30 m"
+    nominal_resolution_m: float = 30.0
+    bucket: str = COPERNICUS_BUCKET
+
+    def tiles_covering(self, bounds: BoundingBox) -> list[tuple[int, int]]:
+        south, north = math.floor(bounds.south), math.ceil(bounds.north)
+        west, east = math.floor(bounds.west), math.ceil(bounds.east)
+        return [
+            (lat, lon)
+            for lat in range(south, north)
+            for lon in range(west, east)
+        ]
+
+    def _tile_path(self, latitude: int, longitude: int) -> pathlib.Path:
+        directory = pathlib.Path(self.cache_directory)
+        directory.mkdir(parents=True, exist_ok=True)
+        return directory / "{}.tif".format(copernicus_tile_name(latitude, longitude))
+
+    def ensure_tile(self, latitude: int, longitude: int, http=None) -> pathlib.Path:
+        """Fetch one tile unless it is already on disk.
+
+        ``http`` stands in for the requests module so this can be
+        exercised without a network.
+        """
+        path = self._tile_path(latitude, longitude)
+        if path.exists() and path.stat().st_size > 0:
+            return path
+
+        if http is None:
+            try:
+                import requests as http
+            except ImportError as error:
+                raise Unreachable("Fetching a tile needs requests.") from error
+
+        name = copernicus_tile_name(latitude, longitude)
+        url = "{}/{}/{}.tif".format(self.bucket, name, name)
+        try:
+            with http.get(url, stream=True, timeout=DEFAULT_TIMEOUT_S * 10) as response:
+                if response.status_code == 404:
+                    raise Unreachable(
+                        "No Copernicus tile for {}; the square is probably "
+                        "all sea.".format(name)
+                    )
+                response.raise_for_status()
+                # Written beside the tile and renamed only once the whole
+                # transfer arrived. A tile is a hundred megabytes and a
+                # cut connection would otherwise leave a truncated file
+                # that every later run would read as cached.
+                partial = path.with_suffix(".partial")
+                try:
+                    with open(partial, "wb") as handle:
+                        for block in response.iter_content(chunk_size=1 << 20):
+                            handle.write(block)
+                    partial.replace(path)
+                finally:
+                    partial.unlink(missing_ok=True)
+        except Unreachable:
+            raise
+        except Exception as error:
+            raise Unreachable(
+                "{} unreachable: {}".format(self.name, ServiceElevation._cause(error))
+            ) from error
+        return path
+
+    def grid_for(self, bounds: BoundingBox, spacing_m: float) -> ElevationGrid:
+        tiles = self.tiles_covering(bounds)
+        if not tiles:
+            raise Unreachable("That box covers no Copernicus tile.")
+
+        paths = [str(self.ensure_tile(lat, lon)) for lat, lon in tiles]
+
+        # One tile is the common case and reads directly. Several are
+        # mosaicked, which needs the whole set open at once.
+        if len(paths) == 1:
+            grid = GeoTiffElevation(paths[0], name=self.name).grid_for(bounds, spacing_m)
+        else:
+            grid = _mosaic_grid(paths, bounds, spacing_m, self.name)
+
+        return ElevationGrid(
+            values_m=grid.values_m, spacing_m=grid.spacing_m,
+            source="{} ({} tile{})".format(
+                self.name, len(paths), "" if len(paths) == 1 else "s"
+            ),
+            resolution_m=self.nominal_resolution_m,
+        )
+
+
+def _mosaic_grid(
+    paths: list[str], bounds: BoundingBox, spacing_m: float, name: str
+) -> ElevationGrid:
+    """Sample several tiles into one grid, taking whichever covers a point.
+
+    Each tile is read without gap filling, so a point it does not cover
+    stays absent instead of becoming that tile's median. The tiles are
+    then laid over one another and the first real value at each point
+    wins; where they overlap they are the same data, so which one wins
+    does not matter.
+    """
+    grids = [
+        GeoTiffElevation(path, name=name, fill_gaps=False).grid_for(bounds, spacing_m)
+        for path in paths
+    ]
+
+    combined = grids[0].values_m.copy()
+    for grid in grids[1:]:
+        combined = np.where(np.isnan(combined), grid.values_m, combined)
+
+    if np.isnan(combined).any():
+        filled = float(np.nanmedian(combined)) if not np.isnan(combined).all() else 0.0
+        combined = np.where(np.isnan(combined), filled, combined)
+
+    return ElevationGrid(
+        values_m=combined, spacing_m=spacing_m,
+        source=name, resolution_m=grids[0].resolution_m,
+    )
 
 
 # --- Elevation service ----------------------------------------------------

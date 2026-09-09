@@ -4,3 +4,5 @@ __pycache__/
 output/
 node_modules/
 dist/
+*.egg-info/
+sites/_tiles/

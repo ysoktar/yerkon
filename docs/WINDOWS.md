@@ -76,12 +76,23 @@ yerkon fetch --south 39.85 --west 32.70 `
 python -m yerkon.cli fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 --into sites/ankara-o20
 ```
 
-İndirilmiş bir yükseklik rasterin varsa onu öne koy. Ağ gerekmez ve
-çözünürlük daha iyi:
+Elle bir şey indirmen gerekmiyor. Komut yüksekliği Copernicus 30 m
+karolarından kendi çekiyor: anahtar istemiyor, hız sınırı yok, bir
+derecelik kare tek dosyada geliyor. Karolar `sites\_tiles` altında
+saklanıyor, aynı karedeki ikinci saha bedava.
+
+Zaten indirilmiş bir rasterin varsa onu öne koyabilirsin. Ağ hiç
+gerekmez:
 
 ```powershell
 yerkon fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 --into sites/ankara-o20 --geotiff C:\Users\yavuz\Downloads\N39E032.tif
 ```
+
+Karo önbelleğini başka yere koymak istersen `--tile-cache`, Copernicus'u
+tamamen atlamak istersen `--no-copernicus` var. `--no-copernicus`
+sorgu servisine düşürür; o servis günde bin çağrıyla sınırlı, 30 m
+aralıkla Ankara boyunda bir kutu 4791 çağrı eder ve komut bunu baştan
+reddeder.
 
 ## MATLAB
 

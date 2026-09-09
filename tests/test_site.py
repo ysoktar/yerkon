@@ -8,6 +8,7 @@ import pytest
 
 from yerkon.site.cache import SiteCache
 from yerkon.site.fetch import (
+    CopernicusElevation,
     GeoTiffElevation,
     OpenStreetMapBuildings,
     ServiceElevation,
@@ -15,6 +16,7 @@ from yerkon.site.fetch import (
     build_site,
     _assumed_footprint_radius_m,
     _parse_height,
+    copernicus_tile_name,
 )
 from yerkon.site.model import BoundingBox, Buildings, Site, SiteManifest
 
@@ -477,3 +479,170 @@ def test_a_connection_failure_reports_the_cause_not_the_query():
     assert "39.900000" not in message
     assert "locations=" not in message
     assert "403" in message, "the actual reason has to survive"
+
+
+# --- Copernicus tiles -----------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "latitude, longitude, expected",
+    [
+        (39, 32, "Copernicus_DSM_COG_10_N39_00_E032_00_DEM"),
+        (0, 0, "Copernicus_DSM_COG_10_N00_00_E000_00_DEM"),
+        (-34, -59, "Copernicus_DSM_COG_10_S34_00_W059_00_DEM"),
+        (7, 5, "Copernicus_DSM_COG_10_N07_00_E005_00_DEM"),
+    ],
+)
+def test_a_tile_is_named_after_the_corner_of_its_degree_square(
+    latitude, longitude, expected
+):
+    """The name is the whole address. Get the padding wrong and the
+    bucket answers 404 for a square that is plainly land."""
+    assert copernicus_tile_name(latitude, longitude) == expected
+
+
+def test_a_box_inside_one_degree_square_needs_one_tile():
+    assert CopernicusElevation().tiles_covering(ANKARA) == [(39, 32)]
+
+
+def test_a_box_that_straddles_a_meridian_needs_a_tile_on_each_side():
+    """The user's own area runs from 32.70 to 33.05 and needs two."""
+    straddling = BoundingBox(south=39.85, west=32.70, north=39.98, east=33.05)
+    assert CopernicusElevation().tiles_covering(straddling) == [(39, 32), (39, 33)]
+
+
+class FakeStream:
+    """A streamed response, as a context manager like requests returns."""
+
+    def __init__(self, status_code, body=b"", chunks=None):
+        self.status_code = status_code
+        self._body = body
+        self._chunks = chunks
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exception):
+        return False
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            raise OSError("{} Server Error".format(self.status_code))
+
+    def iter_content(self, chunk_size=None):
+        if self._chunks is not None:
+            return iter(self._chunks)
+        return iter([self._body])
+
+
+class FakeBucket:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.urls = []
+
+    def get(self, url, stream=None, timeout=None):
+        self.urls.append(url)
+        return self.responses.pop(0)
+
+
+def test_a_tile_is_downloaded_once_and_read_from_disk_after(tmp_path):
+    """A second site in the same degree square must cost nothing."""
+    copernicus = CopernicusElevation(cache_directory=str(tmp_path))
+    bucket = FakeBucket([FakeStream(200, b"raster bytes")])
+
+    first = copernicus.ensure_tile(39, 32, http=bucket)
+    second = copernicus.ensure_tile(39, 32, http=bucket)
+
+    assert first == second
+    assert first.read_bytes() == b"raster bytes"
+    assert len(bucket.urls) == 1, "the second call must not go to the network"
+    assert "Copernicus_DSM_COG_10_N39_00_E032_00_DEM" in bucket.urls[0]
+
+
+def test_a_square_with_no_tile_says_it_is_probably_sea(tmp_path):
+    """404 here is not a failure of the fetcher. The bucket holds land."""
+    copernicus = CopernicusElevation(cache_directory=str(tmp_path))
+    bucket = FakeBucket([FakeStream(404)])
+
+    with pytest.raises(Unreachable, match="all sea"):
+        copernicus.ensure_tile(40, 20, http=bucket)
+
+
+def test_a_cut_transfer_leaves_no_file_a_later_run_would_trust(tmp_path):
+    """A tile is a hundred megabytes. Half of one on disk under the real
+    name would be read as cached for good."""
+
+    def explode():
+        yield b"the first megabyte"
+        raise OSError("connection reset by peer")
+
+    copernicus = CopernicusElevation(cache_directory=str(tmp_path))
+    bucket = FakeBucket([FakeStream(200, chunks=explode())])
+
+    with pytest.raises(Unreachable, match="unreachable"):
+        copernicus.ensure_tile(39, 32, http=bucket)
+
+    assert not list(tmp_path.glob("*.tif"))
+    assert not list(tmp_path.glob("*.partial")), "nor the half of it that arrived"
+
+
+def write_tile(directory, latitude, longitude, value):
+    """A one-degree raster in the bucket's own naming, of constant height."""
+    rasterio = pytest.importorskip("rasterio")
+    from affine import Affine
+
+    path = directory / "{}.tif".format(copernicus_tile_name(latitude, longitude))
+    samples = 120
+    step = 1.0 / samples
+    with rasterio.open(
+        path, "w", driver="GTiff", height=samples, width=samples, count=1,
+        dtype="float32", crs="EPSG:4326",
+        transform=Affine(step, 0.0, float(longitude), 0.0, -step, float(latitude + 1)),
+    ) as raster:
+        raster.write(np.full((samples, samples), value, dtype="float32"), 1)
+    return path
+
+
+def test_a_cached_tile_is_read_without_touching_the_network(tmp_path):
+    write_tile(tmp_path, 39, 32, 900.0)
+    copernicus = CopernicusElevation(cache_directory=str(tmp_path))
+
+    grid = copernicus.grid_for(ANKARA, spacing_m=500.0)
+
+    assert np.allclose(grid.values_m, 900.0)
+    assert grid.resolution_m == pytest.approx(30.0)
+    assert "1 tile" in grid.source
+
+
+def test_two_tiles_are_joined_along_the_meridian_they_share(tmp_path):
+    """The half of the box in each tile must carry that tile's ground.
+
+    Reading each tile with its gaps already filled would put the median
+    of the western tile over the eastern half, which is why the mosaic
+    reads them unfilled.
+    """
+    write_tile(tmp_path, 39, 32, 900.0)
+    write_tile(tmp_path, 39, 33, 300.0)
+    copernicus = CopernicusElevation(cache_directory=str(tmp_path))
+
+    straddling = BoundingBox(south=39.85, west=32.70, north=39.98, east=33.05)
+    grid = copernicus.grid_for(straddling, spacing_m=500.0)
+
+    assert "2 tiles" in grid.source
+    assert grid.values_m[0, 0] == pytest.approx(900.0), "west of the meridian"
+    assert grid.values_m[0, -1] == pytest.approx(300.0), "east of it"
+    assert set(np.unique(grid.values_m)) == {900.0, 300.0}
+
+
+def test_a_raster_reports_nothing_where_it_covers_nothing(tmp_path):
+    """Sampling beyond a raster's edge returns a number, not an error.
+
+    Taking that number for ground is how a mosaic ends up with one
+    tile's median spread across the next tile's half of the box.
+    """
+    pytest.importorskip("rasterio")
+    path = write_tile(tmp_path, 39, 33, 300.0)
+
+    grid = GeoTiffElevation(str(path), fill_gaps=False).grid_for(ANKARA, spacing_m=500.0)
+
+    assert np.isnan(grid.values_m).all(), "ANKARA lies a whole degree west"
