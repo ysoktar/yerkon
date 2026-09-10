@@ -114,7 +114,7 @@ yerkon defaults --full
 
 ```
 Still assumed in src/yerkon/defaults.toml
-32 of 33 figures are still assumptions (%97).
+35 of 36 figures are still assumptions (%97).
 
 mounting.tall_mast.site_cost_tl                  85000,00 TL
                                           affects: CAPEX of every anchor on a
@@ -202,10 +202,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 4,96 | 15,15 | 35,23 | %98,85 | 5,34 | 13082 | 6061 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,96 | 15,72 | 122,11 | %99,38 | 58,00 | 21424 | 888 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,24 | 0,72 | 6,47 | %98,01 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 3,88 | 14,44 | 89,56 | %98,98 | 25,87 | 460453 | 88337 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 5,31 | 16,92 | 36,27 | %98,72 | 5,34 | 13082 | 6061 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 4,22 | 14,85 | 107,00 | %99,28 | 58,00 | 21424 | 888 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,76 | 2,77 | 7,95 | %98,01 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 4,32 | 15,61 | 88,80 | %98,89 | 25,87 | 460453 | 88337 |
 
 Each row now carries two units sharing the air, which is why the errors
 are larger than a single-vehicle model would report. See below.
@@ -462,6 +462,46 @@ ranging error beside it. The ranges in one round are not simultaneous and
 cannot be solved as though they were. That is a conclusion about the
 estimator, reached before the estimator was written, and it is why the
 receiver uses a filter rather than a snapshot trilateration.
+
+## Three errors that are not noise
+
+A filter given enough noisy ranges converges on the truth. Real systems
+do not behave that way, because their worst errors are not noise
+(ADR-0019).
+
+**A blocked path measures long.** The signal goes over the obstacle and
+the range times that detour: `h²/2 · (1/d₁ + 1/d₂)`, which is centimetres
+for a gentle rise on a long link and ten metres for a ridge across a
+short one. Always positive, so it never averages away.
+
+**A survey error is a property of an installation**, drawn once per
+anchor and held. The estimator is told the surveyed position and treats
+it as exact.
+
+**A lost packet produces nothing** — interference in a shared band, a
+collision, a fade. 2,4 GHz is the same band as wireless networking, which
+is why the town figure is 15 % against 5 % on the open road and 0 in a
+bore.
+
+The survey error is the one that changed an answer:
+
+| Anchor survey error | Tunnel HPE P50 |
+|---|---|
+| 0,00 m | 0,24 m |
+| 0,05 m | 0,68 m |
+| 0,15 m | 1,76 m |
+| 0,30 m | 3,14 m |
+
+**You cannot position better than you surveyed the anchors**, and on a
+corridor you cannot get within ten times as well — the geometry that
+leaves the vertical unobservable amplifies a survey error by about the
+same factor. The tunnel's sub-metre figure had been resting on perfectly
+known anchors.
+
+The road rows barely moved, which is the same finding from the other
+side: a spread radio ranges to about 3 m and 15 cm of survey error
+vanishes underneath it. The floor is in every deployment and binds only
+where everything else is better than it.
 
 ## What the estimator gets
 

@@ -190,6 +190,16 @@ class Scenario:
     deployment: Deployment
     seed: int = 0
     manoeuvre_m_s2: float = DEFAULT_MANOEUVRE_M_S2
+    #: How well each anchor's own position is known, one sigma in metres.
+    #:
+    #: Drawn once per anchor at the top of a run and held for the whole
+    #: of it, because a survey error is a property of an installation and
+    #: not of a measurement. It therefore does not average out, and it
+    #: puts a floor under the horizontal error that no amount of ranging
+    #: removes (ADR-0019).
+    anchor_survey_sigma_m: float = 0.0
+    #: Share of exchanges lost to everything the link budget omits.
+    packet_loss: float = 0.0
     #: Ranging error a link may have and still be used, in metres.
     #:
     #: Beyond this the measurement is worse than useless: it drags a fix
@@ -307,6 +317,17 @@ def run_scenario(scenario: Scenario) -> Samples:
     deployment = scenario.deployment
     round_s = deployment.round_duration_s()
 
+    # One survey error per anchor, drawn now and held. Three components,
+    # because an anchor is wrong in three dimensions and the estimator is
+    # told all three as though they were exact.
+    survey = {
+        anchor.identifier: rng.normal(
+            0.0, scenario.anchor_survey_sigma_m, size=3
+        )
+        if scenario.anchor_survey_sigma_m > 0.0 else np.zeros(3)
+        for anchor in deployment.anchors
+    }
+
     horizontal: list[float] = []
     vertical: list[float] = []
     attempted = 0
@@ -334,6 +355,18 @@ def run_scenario(scenario: Scenario) -> Samples:
             for identifier, anchor, radio in deployment.anchors_heard_by(unit):
                 attempted_links += 1
                 receiver = unit.terminal(radio, slot_at_s)
+                # The survey error is an error in the anchor's position,
+                # so what it does to a range is its component along the
+                # line to the receiver.
+                offset = np.array(receiver.position_m) - np.array(
+                    anchor.position_m
+                )
+                span = float(np.linalg.norm(offset))
+                along = (
+                    float(np.dot(survey[identifier], offset / span))
+                    if span > 0.0 else 0.0
+                )
+
                 observation = measure(
                     anchor,
                     receiver,
@@ -346,6 +379,8 @@ def run_scenario(scenario: Scenario) -> Samples:
                         anchor.position_m, receiver.position_m
                     ),
                     region=deployment.region,
+                    survey_error_m=along,
+                    packet_loss=scenario.packet_loss,
                 )
                 slot_at_s += exchange_duration_s(
                     anchor.radio, deployment.scheme

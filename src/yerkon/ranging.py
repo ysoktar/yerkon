@@ -297,6 +297,8 @@ def measure(
     obstruction: Optional[Obstruction] = None,
     region: SpectrumRule = TURKEY,
     frequency_hz: float = 2450e6,
+    survey_error_m: float = 0.0,
+    packet_loss: float = 0.0,
 ) -> Optional[RangeObservation]:
     """One exchange. Returns nothing when the link does not close.
 
@@ -322,8 +324,30 @@ def measure(
     if not budget.closes:
         return None
 
+    # Everything the link budget does not model: interference from the
+    # rest of a shared band, a collision with traffic this study does not
+    # simulate, a fade the two-ray average smooths over. An exchange that
+    # fails this way produces nothing, exactly like one that never closed.
+    if packet_loss > 0.0 and float(rng.random()) < packet_loss:
+        return None
+
     sigma_m = measurement_sigma_m(budget, anchor.radio, clock, scheme, corrected)
-    measured = budget.distance_m + float(rng.normal(0.0, sigma_m))
+
+    # Two errors that are not noise and must not be drawn as noise.
+    #
+    # The excess path is what the signal actually travelled when
+    # something stood in the way, so it is added rather than sampled and
+    # it is always positive. The survey error is a property of the
+    # anchor, fixed for the life of the installation, and it is passed in
+    # already drawn for that reason. Neither averages out over repeated
+    # measurements, which is what makes them worse than their size
+    # suggests (ADR-0019).
+    measured = (
+        budget.distance_m
+        + budget.excess_path_m
+        + survey_error_m
+        + float(rng.normal(0.0, sigma_m))
+    )
 
     return RangeObservation(
         at_s=at_s,
@@ -331,6 +355,10 @@ def measure(
         # A range is a magnitude. A draw large enough to go negative is a
         # useless measurement, not a negative distance.
         measured_range_m=max(measured, 0.0),
+        # What the receiver believes about its own measurement, which is
+        # the noise it knows about and not the biases it does not. A
+        # variance inflated to cover a bias would be a receiver that
+        # knows it is being lied to, and it does not.
         variance_m2=sigma_m * sigma_m,
         anchor_id=anchor_id,
     )

@@ -331,3 +331,71 @@ def test_an_anchor_out_of_reach_is_absent_rather_than_wrong():
         reachable + out_of_reach, moving_receiver(0.0), 0.0, rng, SX1280
     )
     assert [o.anchor_id for o in observations] == ["A0", "A1"]
+
+
+# --- Errors that are not noise --------------------------------------------
+
+
+def test_a_blocked_link_measures_long_and_stays_long():
+    """A detour is a bias. Averaging more measurements does not remove it,
+    which is why obstruction hurts positioning more than its loss says."""
+    from yerkon.rf import Obstruction
+
+    rng = np.random.default_rng(4)
+    anchor = Terminal(SX1280, W24P_U, (0.0, 0.0, 25.0))
+    receiver = Terminal(SX1280, W24P_U, (3000.0, 0.0, 1.5))
+    truth = 3000.0
+
+    def mean_over(obstruction):
+        draws = [
+            measure(anchor, receiver, 0.0, rng, obstruction=obstruction)
+            for _ in range(3000)
+        ]
+        return float(np.mean([d.measured_range_m for d in draws if d]))
+
+    clear = mean_over(None)
+    blocked = mean_over(Obstruction(peak_terrain_m=25.0))
+
+    assert clear == pytest.approx(truth, abs=0.2)
+    assert blocked > clear
+
+
+def test_a_survey_error_is_carried_rather_than_drawn():
+    """It is a property of an installation, fixed for its life, so it is
+    passed in already drawn. Drawing it per measurement would let it
+    average away, which a survey error does not do."""
+    rng = np.random.default_rng(5)
+    anchor = Terminal(SX1280, W24P_U, (0.0, 0.0, 25.0))
+    receiver = Terminal(SX1280, W24P_U, (3000.0, 0.0, 1.5))
+
+    draws = [
+        measure(anchor, receiver, 0.0, rng, survey_error_m=2.0).measured_range_m
+        for _ in range(2000)
+    ]
+    assert float(np.mean(draws)) == pytest.approx(3002.0, abs=0.2)
+
+
+def test_a_lost_packet_produces_nothing_just_like_a_dead_link():
+    """Interference, a collision, a fade. The receiver does not get a
+    range, and it does not get a bad one either."""
+    rng = np.random.default_rng(6)
+    anchor = Terminal(SX1280, W24P_U, (0.0, 0.0, 25.0))
+    receiver = Terminal(SX1280, W24P_U, (2000.0, 0.0, 1.5))
+
+    lost = sum(
+        measure(anchor, receiver, 0.0, rng, packet_loss=0.2) is None
+        for _ in range(4000)
+    )
+    assert 0.17 < lost / 4000 < 0.23
+
+
+def test_none_of_the_biases_change_what_the_receiver_believes():
+    """A receiver does not know it is being lied to. Inflating the
+    variance to cover a bias would model one that did."""
+    rng = np.random.default_rng(7)
+    anchor = Terminal(SX1280, W24P_U, (0.0, 0.0, 25.0))
+    receiver = Terminal(SX1280, W24P_U, (3000.0, 0.0, 1.5))
+
+    plain = measure(anchor, receiver, 0.0, rng)
+    biased = measure(anchor, receiver, 0.0, rng, survey_error_m=5.0)
+    assert biased.variance_m2 == pytest.approx(plain.variance_m2)

@@ -344,6 +344,41 @@ clear. Thirty is the middle of the published range for dense built-up areas \
 at 2,4 GHz."""
 affects = "how far an urban anchor reaches, and therefore the urban row entirely"
 
+[values."ranging.anchor_survey_sigma_m"]
+value = 0.15
+unit = "m"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """How well an anchor's own position is known. The estimator is given \
+the surveyed position and treats it as exact, so whatever is wrong with it goes \
+straight into every fix that anchor contributes to. Fixed per anchor rather than \
+drawn per measurement: a survey error does not change between exchanges and does \
+not average out. Fifteen centimetres is what a careful GNSS survey of a roadside \
+structure achieves."""
+affects = "a floor under HPE that no amount of ranging removes"
+
+[values."ranging.packet_loss"]
+value = 0.05
+unit = "fraction"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Share of exchanges that fail for reasons the link budget does not \
+model: interference from the rest of a shared band, collisions with traffic this \
+study does not simulate, and fades the two-ray model averages over. 2,4 GHz is \
+the same band as wireless networking and a town is full of it. Five percent is a \
+lightly loaded band; a busy one is worse and a tunnel is better."""
+affects = "availability, and the number of ranges a fix is built from"
+
+[values."site.urban_packet_loss"]
+value = 0.15
+unit = "fraction"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """The same, in town, where the band is congested. Nothing measures this \
+and it is the difference between an urban availability that reads like a rural \
+one and an urban availability that reads like a town."""
+affects = "the urban row's availability"
+
 [values."estimator.manoeuvre_m_s2"]
 value = 1.5
 unit = "m/s^2"

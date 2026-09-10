@@ -342,3 +342,61 @@ def test_a_link_never_closes_far_below_the_part_it_is_made_of():
             break
         edge = budget
     assert edge.received_dbm > float(E28_2G4M27S.sensitivity_dbm.value)
+
+
+# --- What a blocked path does to a measurement ----------------------------
+
+
+def test_a_clear_path_adds_no_distance():
+    """The direct ray arrives first and a receiver times that."""
+    from yerkon.rf import excess_path_m
+
+    assert excess_path_m(clearance_m=12.0, distance_m=5000.0,
+                         peak_at_fraction=0.5) == 0.0
+
+
+def test_a_blocked_path_is_longer_than_the_straight_line():
+    """The signal goes over the obstacle, and the range measures that.
+
+    Always positive, which is what makes obstruction worse for
+    positioning than the loss alone suggests: noise averages out over
+    repeated measurements and a detour does not (ADR-0019).
+    """
+    from yerkon.rf import excess_path_m
+
+    excess = excess_path_m(
+        clearance_m=-100.0, distance_m=2000.0, peak_at_fraction=0.5
+    )
+    assert excess == pytest.approx(10.0, rel=0.01)
+
+
+def test_a_taller_obstacle_makes_a_longer_detour():
+    from yerkon.rf import excess_path_m
+
+    low = excess_path_m(-10.0, 5000.0, 0.5)
+    high = excess_path_m(-50.0, 5000.0, 0.5)
+    assert high > low
+    # The detour goes as the square of the intrusion, so five times the
+    # height is twenty-five times the delay.
+    assert high == pytest.approx(25.0 * low, rel=0.01)
+
+
+def test_an_obstacle_near_one_end_costs_less_than_one_in_the_middle():
+    """The same as the Fresnel zone, and for the same reason."""
+    from yerkon.rf import excess_path_m
+
+    middle = excess_path_m(-20.0, 4000.0, 0.5)
+    near_end = excess_path_m(-20.0, 4000.0, 0.05)
+    assert near_end > middle, "a detour near an end is sharper, not gentler"
+
+
+def test_the_link_budget_reports_the_detour_it_implies():
+    from yerkon.rf import Obstruction
+
+    clear = evaluate_link(mast(25.0), vehicle(5000.0))
+    blocked = evaluate_link(
+        mast(25.0), vehicle(5000.0),
+        obstruction=Obstruction(peak_terrain_m=50.0),
+    )
+    assert clear.excess_path_m == 0.0
+    assert blocked.excess_path_m > 0.0

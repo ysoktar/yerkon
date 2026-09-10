@@ -234,6 +234,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             ),
             seed=101,
             accept_sigma_m=15.0,
+            anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
+            # A town's share of the band is spoken for, so more exchanges
+            # are lost here than anywhere else in the study.
+            packet_loss=settings.number("site.urban_packet_loss"),
         ),
         product=URBAN_ANCHOR,
         mounting=mounting["lighting_column"],
@@ -272,6 +276,8 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             ),
             seed=202,
             accept_sigma_m=30.0,
+            anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
+            packet_loss=settings.number("ranging.packet_loss"),
         ),
         product=RURAL_ANCHOR,
         mounting=mounting["tall_mast"],
@@ -322,6 +328,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             ),
             seed=303,
             accept_sigma_m=2.0,
+            anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
+            # A bore is a shielded box: nothing outside it is competing
+            # for the band, and ultra-wideband does not share one anyway.
+            packet_loss=0.0,
         ),
         product=TUNNEL_ANCHOR,
         mounting=mounting["tunnel_bracket"],

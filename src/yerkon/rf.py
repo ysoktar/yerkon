@@ -115,6 +115,16 @@ class LinkBudget:
     clearance_m: float
     required_clearance_m: float
     diffraction_loss_db: float
+    #: How much further than the straight line the signal actually
+    #: travelled, in metres.
+    #:
+    #: Zero when the direct ray is clear. When something stands in the
+    #: way the signal goes over it, and a range measurement times that
+    #: longer path. It is a bias and it is always positive, which is what
+    #: makes obstruction so much worse for positioning than the loss
+    #: alone suggests: noise averages out over repeated measurements and
+    #: this does not. See ADR-0019.
+    excess_path_m: float = 0.0
 
     @property
     def effective_snr_db(self) -> float:
@@ -269,6 +279,30 @@ def earth_bulge_m(distance_m: float, at_fraction: float = 0.5) -> float:
     return (d1 * d2) / (2.0 * FOUR_THIRDS_EARTH * EARTH_RADIUS_M)
 
 
+def excess_path_m(
+    clearance_m: float, distance_m: float, peak_at_fraction: float
+) -> float:
+    """How much further the signal goes when something is in the way.
+
+    A knife edge standing ``h`` metres above the line of sight forces the
+    ray over the top, and the detour is ``h^2/2 * (1/d1 + 1/d2)`` for the
+    two leg lengths. Small for a gentle rise on a long link, and metres
+    for a ridge across a short one.
+
+    Zero when the path is clear. Partial Fresnel obstruction attenuates
+    without lengthening: the direct ray still arrives first and a
+    receiver times that, so only a blocked path is delayed.
+    """
+    if clearance_m >= 0.0 or distance_m <= 0.0:
+        return 0.0
+    first = distance_m * peak_at_fraction
+    second = distance_m - first
+    if first <= 0.0 or second <= 0.0:
+        return 0.0
+    height = -clearance_m
+    return height * height / 2.0 * (1.0 / first + 1.0 / second)
+
+
 def diffraction_loss_db(clearance_m: float, fresnel_radius_m: float) -> float:
     """Loss from an obstacle intruding into the Fresnel zone.
 
@@ -399,6 +433,7 @@ def evaluate_link(
         clearance_m=clearance_m,
         required_clearance_m=required_m,
         diffraction_loss_db=diffraction_db,
+        excess_path_m=excess_path_m(clearance_m, distance_m, fraction),
         _processing_gain_db=float(radio.processing_gain_db.value),
         _threshold_db=float(radio.demodulation_threshold_db.value),
         _threshold_is_in_band=radio.threshold_is_in_band,

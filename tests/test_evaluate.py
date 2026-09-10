@@ -402,3 +402,94 @@ def test_more_anchors_serve_more_ground():
 def test_a_position_needs_four_ranges():
     with pytest.raises(ValueError, match="fewer than four"):
         coverage(a_deployment(4000.0), ROLLING, anchors_required=3)
+
+
+# --- Errors that do not average out ---------------------------------------
+
+
+def precise_scenario(survey_sigma_m, seed=3):
+    """A deployment whose ranging is good enough to see a survey error.
+
+    An impulse radio ranges to a tenth of a metre, so what the anchors'
+    own positions are worth stops being a rounding error and starts
+    being the answer.
+    """
+    from yerkon.hardware import DWM3000
+
+    terrain = flat_terrain(micro_roughness_m=0.05)
+    centreline = [(float(x), 0.0) for x in range(0, 2001, 100)]
+    road = Road(centreline_m=centreline, terrain=terrain)
+    anchors = tuple(
+        Anchor("T{}".format(index), (float(x), 4.0 if index % 2 else -4.0),
+               TALL_MAST, terrain, radio=DWM3000)
+        for index, x in enumerate(range(0, 2001, 150))
+    )
+    return Scenario(
+        name="precise",
+        terrain=terrain,
+        deployment=Deployment(
+            anchors=anchors,
+            receivers=(
+                Receiver(
+                    "araç",
+                    Journey(road=road, speed_m_s=15.0, duration_s=60.0),
+                    radios=(DWM3000,),
+                ),
+            ),
+        ),
+        seed=seed,
+        accept_sigma_m=2.0,
+        anchor_survey_sigma_m=survey_sigma_m,
+    )
+
+
+def test_a_survey_error_puts_a_floor_under_the_horizontal_error():
+    """You cannot position better than you surveyed the anchors.
+
+    And the geometry amplifies it. Anchors lining a bore turn a tenth of
+    a metre of survey error into metres of position error, for the same
+    reason they leave the vertical unobservable (ADR-0019).
+    """
+    perfect = run_scenario(precise_scenario(0.0))
+    surveyed = run_scenario(precise_scenario(0.30))
+    assert surveyed.percentile(50)[0] > 3.0 * perfect.percentile(50)[0]
+
+
+def test_the_floor_rises_with_the_survey_error_rather_than_saturating():
+    """A bias is not something a filter averages away, however many
+    measurements it takes."""
+    small = run_scenario(precise_scenario(0.05)).percentile(50)[0]
+    large = run_scenario(precise_scenario(0.40)).percentile(50)[0]
+    assert large > small * 2.0
+
+
+def test_a_survey_error_hides_under_a_noisier_radio():
+    """Which is why it was invisible until the tunnel row got good.
+
+    A spread radio ranges to about three metres, and a tenth of a metre
+    of survey error disappears underneath that. The floor is real
+    everywhere and only binding where the rest is better than it.
+    """
+    quiet = run_scenario(a_scenario(anchor_survey_sigma_m=0.0, seed=3))
+    surveyed = run_scenario(a_scenario(anchor_survey_sigma_m=0.3, seed=3))
+    assert surveyed.percentile(50)[0] == pytest.approx(
+        quiet.percentile(50)[0], rel=0.5
+    )
+
+
+def test_lost_packets_cost_availability():
+    """Interference and collisions are not in the link budget and are in
+    the band, so they are counted here instead."""
+    quiet = run_scenario(a_scenario(packet_loss=0.0))
+    busy = run_scenario(a_scenario(packet_loss=0.4))
+    assert busy.availability < quiet.availability
+    assert busy.lost_links > quiet.lost_links
+
+
+def test_a_survey_error_is_the_same_for_every_measurement_to_one_anchor():
+    """Fixed at installation. If it were redrawn per exchange the filter
+    would average it away and the floor would vanish, which is the whole
+    error this models."""
+    once = run_scenario(precise_scenario(0.4, seed=11))
+    again = run_scenario(precise_scenario(0.4, seed=11))
+    assert np.array_equal(once.horizontal_error_m, again.horizontal_error_m)
