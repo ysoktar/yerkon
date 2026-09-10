@@ -40,6 +40,8 @@ Built and tested:
   configuration rather than as code.
 - `report.py`, the four rows and what they rest on.
 - `siting.py`, the search for the cheapest deployment that meets a target.
+- `settings.py` and `assumptions.toml`, every figure nobody supplied, in
+  one file that nothing else may add to.
 - `viewer/`, a local web app over the same engine: the corridor in three
   dimensions, every setting live, and the confirmation panel in front of
   any change that forces another.
@@ -97,6 +99,52 @@ that build the table, so the picture and the report cannot disagree. It
 draws its own three dimensions rather than loading a library from a
 content delivery network, so it works with the machine offline
 (ADR-0013).
+
+## The assumptions
+
+The report gave a bill of materials and nothing else. Every other figure
+this project needs is a placeholder somebody wrote, and all of them live
+in one file:
+
+```bash
+yerkon assumptions --full
+```
+
+```
+Still assumed in src/yerkon/assumptions.toml
+33 of 33 figures are still assumptions (%100).
+
+mounting.tall_mast.site_cost_tl                  85000,00 TL
+                                          affects: CAPEX of every anchor on a
+                                          mast; 88,9 % of the rural row's capital
+                                          sensitivity: masts beat signs only
+                                          below 6588 TL, so 13 times cheaper
+```
+
+Nothing in `src/` may construct an assumption of its own — a test walks
+the syntax tree of every module and fails the build if one tries, so the
+file is the whole list (ADR-0016). Costs, mounting heights, the two
+unpublished radio figures, the clocks, the urban clutter figure and the
+filter's manoeuvre allowance are all on it.
+
+Replacing one is three edits in one place: the value, the source, and
+`provenance` from `ASSUMPTION` to what it now is. Then:
+
+```bash
+yerkon table --assumptions my-figures.toml
+yerkon site  --assumptions my-figures.toml
+yerkon view  --assumptions my-figures.toml
+```
+
+Everything is rebuilt from it — scenarios, mounting catalogue, radios,
+clocks, rates — and the share each result reports as resting on guesses
+falls. Sourcing the mast cost alone takes the siting answer from %94
+assumed to %69.
+
+It moves the answers, too. At a mast cost of 8500 TL existing signs still
+win; at 5000 TL masts take over at 17 anchors for 264906 TL. The
+break-even the costing predicts at 6588 TL is something you can walk up
+to from either side by editing one line.
 
 ## Siting
 

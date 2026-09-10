@@ -11,6 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from yerkon.evidence import Provenance, Sourced
+from yerkon.settings import DEFAULTS, Settings
 
 SPEED_OF_LIGHT_M_S = 299792458.0
 
@@ -121,7 +122,10 @@ W24P_U = Antenna(
 
 # --- Radios ---------------------------------------------------------------
 
-def _sx1280_family(part: str, max_output_dbm: float, output_source: str) -> Radio:
+def _sx1280_family(
+    part: str, max_output_dbm: float, output_source: str,
+    settings: Settings = DEFAULTS,
+) -> Radio:
     """Both SX1280 variants in the bill differ only in output power."""
     return Radio(
         part=part,
@@ -132,15 +136,7 @@ def _sx1280_family(part: str, max_output_dbm: float, output_source: str) -> Radi
             -132.0, "dBm", Provenance.DATASHEET,
             "RF Solutions LAMBDA80 datasheet, best-case LoRa sensitivity",
         ),
-        noise_figure_db=Sourced(
-            6.0, "dB", Provenance.ASSUMPTION, "this project",
-            note=(
-                "Semtech does not publish a noise figure for the SX1280. "
-                "6 dB is the optimistic end for an integrated 2.4 GHz "
-                "front end, chosen so the budget does not manufacture a "
-                "pessimistic range by accident."
-            ),
-        ),
+        noise_figure_db=settings.sourced("radio.sx1280.noise_figure_db"),
         ranging_bandwidth_hz=Sourced(
             1625e3, "Hz", Provenance.DATASHEET,
             "SX1280 datasheet, widest of the four LoRa bandwidths",
@@ -177,6 +173,35 @@ def _sx1280_family(part: str, max_output_dbm: float, output_source: str) -> Radi
     )
 
 
+def radios(settings: Settings = DEFAULTS) -> dict:
+    """The three modules the bill of materials names, from a settings file.
+
+    The published figures are written here because they are published.
+    The two that are not — a noise figure and a demodulation threshold —
+    come from the settings file like every other figure nobody supplied.
+    """
+    urban = _sx1280_family(
+        "Semtech SX1280 (RF Solutions LAMBDA80-24S)", 12.5,
+        "RF Solutions LAMBDA80-24S datasheet, maximum output power",
+        settings,
+    )
+    rural = _sx1280_family(
+        "EBYTE E28-2G4M27S", 27.0,
+        "EBYTE E28-2G4M27S product page, rated output power",
+        settings,
+    )
+    from dataclasses import replace as _replace
+
+    tunnel = _replace(
+        DWM3000,
+        noise_figure_db=settings.sourced("radio.dwm3000.noise_figure_db"),
+        demodulation_threshold_db=settings.sourced(
+            "radio.dwm3000.demodulation_threshold_db"
+        ),
+    )
+    return {"sx1280": urban, "e28": rural, "dwm3000": tunnel}
+
+
 SX1280 = _sx1280_family(
     "Semtech SX1280 (RF Solutions LAMBDA80-24S)",
     12.5,
@@ -201,10 +226,7 @@ DWM3000 = Radio(
         -93.0, "dBm", Provenance.DATASHEET,
         "Qorvo DW3000 datasheet, channel 5 at 6.8 Mbps",
     ),
-    noise_figure_db=Sourced(
-        6.0, "dB", Provenance.ASSUMPTION, "this project",
-        note="Qorvo publishes no noise figure; matched to the SX1280 figure.",
-    ),
+    noise_figure_db=DEFAULTS.sourced("radio.dwm3000.noise_figure_db"),
     ranging_bandwidth_hz=Sourced(
         499.2e6, "Hz", Provenance.DATASHEET,
         "IEEE 802.15.4z HRP channel 5 bandwidth",
@@ -233,12 +255,8 @@ DWM3000 = Radio(
             "what makes the frame long."
         ),
     ),
-    demodulation_threshold_db=Sourced(
-        4.0, "dB", Provenance.ASSUMPTION, "this project",
-        note=(
-            "Qorvo publishes sensitivity rather than a threshold. 4 dB is "
-            "a coherent receiver's usual working point."
-        ),
+    demodulation_threshold_db=DEFAULTS.sourced(
+        "radio.dwm3000.demodulation_threshold_db"
     ),
     implementation_floor_m=Sourced(
         0.10, "m", Provenance.DATASHEET,

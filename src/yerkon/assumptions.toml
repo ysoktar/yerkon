@@ -1,0 +1,344 @@
+# Every number in this project that nobody supplied.
+#
+# The report gave a bill of materials and nothing else. Each figure below
+# is a placeholder standing in for a measurement or a quotation, and each
+# one is here rather than in the code so that sourcing it is an edit to a
+# file rather than a change to a program.
+#
+# When you find the real figure: replace `value`, put where it came from
+# in `source`, and change `provenance` from ASSUMPTION to DATASHEET,
+# MEASUREMENT or STANDARD. Everything downstream stops counting it as an
+# assumption at that moment, and the share each result reports as resting
+# on guesses falls.
+#
+# `affects` says what moves when the number does. `sensitivity` is
+# measured, not guessed: it is what doubling the value does to the figure
+# named in `affects`.
+#
+# Nothing in src/ may construct an assumption of its own. A test enforces
+# that, so this file is the whole list.
+
+# --------------------------------------------------------------------------
+# What a mounting structure is, and what using one costs
+# --------------------------------------------------------------------------
+# Heights decide range, and range decides how many anchors a corridor
+# needs. Costs decide which structure wins, and the siting search says
+# that decision is worth more than every other choice in the project.
+
+[values."mounting.roadside_sign.height_m"]
+value = 3.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Typical mounting height of a verge-mounted road sign."
+affects = "usable range from a sign: 1,66 km at a 5 m tolerance"
+
+[values."mounting.roadside_sign.site_cost_tl"]
+value = 2500.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Bracket, enclosure and the labour to fit a unit to a sign that \
+already stands. Not a fact about signs."""
+affects = "CAPEX of every anchor on a sign"
+sensitivity = "signs stop beating masts only above 62242 TL, so 25 times this"
+
+[values."mounting.sign_gantry.height_m"]
+value = 6.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Clearance height of a highway sign portal over the carriageway."
+affects = "usable range from a gantry"
+
+[values."mounting.sign_gantry.site_cost_tl"]
+value = 4000.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "As a sign, plus the traffic management a gantry over live lanes needs."
+affects = "CAPEX of every anchor on a gantry"
+
+[values."mounting.billboard.height_m"]
+value = 10.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Top of a roadside advertising hoarding."
+affects = "usable range from a billboard"
+
+[values."mounting.billboard.site_cost_tl"]
+value = 3500.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "As a sign, plus access equipment and the owner's consent."
+affects = "CAPEX of every anchor on a billboard"
+
+[values."mounting.lighting_column.height_m"]
+value = 12.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Highway lighting column."
+affects = "usable range from a column: 3,83 km at a 5 m tolerance"
+
+[values."mounting.lighting_column.site_cost_tl"]
+value = 3000.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "As a sign, plus a tap into the column's supply."
+affects = "CAPEX of every anchor on a column"
+
+[values."mounting.tall_mast.height_m"]
+value = 25.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Purpose-built mast. 25 m is the height a 10 km link needs against \
+a 2 m vehicle antenna over flat ground."""
+affects = "usable range from a mast: 5,52 km at a 5 m tolerance"
+
+[values."mounting.tall_mast.site_cost_tl"]
+value = 85000.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """A twenty-five metre mast, its foundation, its installation and its \
+access. Two orders of magnitude above a bracket on an existing structure, \
+which is the whole reason the deployment mixes the two."""
+affects = "CAPEX of every anchor on a mast; 88,9 % of the rural row's capital"
+sensitivity = "masts beat signs only below 6588 TL, so 13 times cheaper than this"
+
+[values."mounting.tunnel_bracket.height_m"]
+value = 4.5
+unit = "m"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "The height a unit is bracketed at in a tunnel."
+affects = "usable range inside a bore"
+
+[values."mounting.tunnel_bracket.site_cost_tl"]
+value = 6000.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Bracketing a unit to a tunnel lining."
+affects = "78,6 % of the tunnel row's capital"
+
+# --------------------------------------------------------------------------
+# What it costs to keep running
+# --------------------------------------------------------------------------
+# Maintenance is roughly half of operating cost in every scenario, so the
+# visit cost and the visit frequency are the two worth sourcing first.
+
+[values."operating.electricity_tl_per_kwh"]
+value = 3.20
+unit = "TL/kWh"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "The tariff an anchor draws on."
+affects = "OPEX of anchors on structures that carry mains"
+sensitivity = "no effect on a mast deployment: masts have no mains"
+
+[values."operating.anchor_kwh_per_year"]
+value = 35.0
+unit = "kWh/year"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "One anchor's annual consumption."
+affects = "OPEX of anchors on structures that carry mains"
+sensitivity = "no effect on a mast deployment: masts have no mains"
+
+[values."operating.connectivity_tl_per_year"]
+value = 600.0
+unit = "TL/year"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "A cellular data plan per anchor that has no backhaul of its own."
+affects = "OPEX; 15,1 % of the rural row"
+sensitivity = "doubling it raises rural OPEX by 15,1 %"
+
+[values."operating.off_grid_supply_tl"]
+value = 9500.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """A solar panel, battery and regulator, for an anchor on a structure \
+with no mains. Charged once, to capital."""
+affects = "CAPEX and OPEX; 72,6 % of the cheapest deployment the siting search finds"
+sensitivity = "doubling it raises rural OPEX by 30,0 % and CAPEX by 9,9 %"
+
+[values."operating.service_life_years"]
+value = 8.0
+unit = "years"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "How long an outdoor unit lasts before it is replaced."
+affects = "OPEX; 33,4 % of the rural row"
+sensitivity = "doubling it lowers rural OPEX by 16,7 %"
+
+[values."operating.maintenance_visits_per_year"]
+value = 0.5
+unit = "visits/year"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Scheduled attendance at an anchor: one visit every two years."
+affects = "OPEX; part of the 45,4 % maintenance takes of the rural row"
+sensitivity = "doubling it raises rural OPEX by 22,7 %"
+
+[values."operating.extra_off_grid_visits_per_year"]
+value = 0.5
+unit = "visits/year"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "The extra attendance an off-grid site needs: batteries age, panels foul."
+affects = "OPEX of anchors on structures with no mains"
+sensitivity = "doubling it raises rural OPEX by 22,7 %"
+
+[values."operating.maintenance_tl_per_visit"]
+value = 1800.0
+unit = "TL/visit"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "A crew, a vehicle and traffic management."
+affects = "OPEX; the single largest line in every scenario"
+sensitivity = "doubling it raises rural OPEX by 45,4 %"
+
+[values."operating.central_operation_tl_per_year"]
+value = 240000.0
+unit = "TL/year"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Running the central management system."
+affects = "OPEX; 6,1 % of the rural row"
+sensitivity = "doubling it raises rural OPEX by 6,1 %"
+
+[values."operating.anchors_sharing_central_operation"]
+value = 1000.0
+unit = "anchors"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """How wide the central system is amortised. A national network spreads \
+it far wider than one corridor does, which is why this is a rate and not a \
+constant added to every deployment."""
+affects = "OPEX; 6,1 % of the rural row"
+sensitivity = "doubling it lowers rural OPEX by 3,0 %"
+
+# --------------------------------------------------------------------------
+# What the radios do that nobody published
+# --------------------------------------------------------------------------
+
+[values."radio.sx1280.noise_figure_db"]
+value = 6.0
+unit = "dB"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Semtech does not publish a noise figure for the SX1280. 6 dB is the \
+optimistic end for an integrated 2,4 GHz front end, chosen so the budget does \
+not manufacture a pessimistic range by accident."""
+affects = "every link budget: range, availability, and therefore anchor count"
+
+[values."radio.dwm3000.noise_figure_db"]
+value = 6.0
+unit = "dB"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Qorvo publishes no noise figure; matched to the SX1280 figure."
+affects = "the tunnel row's range and availability"
+
+[values."radio.dwm3000.demodulation_threshold_db"]
+value = 4.0
+unit = "dB"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Qorvo publishes sensitivity rather than a threshold. 4 dB is a \
+coherent receiver's usual working point."""
+affects = "where the tunnel link stops closing: a hard wall at about 375 m"
+
+# --------------------------------------------------------------------------
+# What the clocks do
+# --------------------------------------------------------------------------
+
+[values."clock.crystal.tolerance_ppm"]
+value = 10.0
+unit = "ppm"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Neither module publishes a crystal tolerance. Ten parts per million \
+is the usual grade for an uncompensated crystal of this size once temperature \
+and ageing are counted."""
+affects = "single-sided ranging error without frequency correction: 24,1 m"
+
+[values."clock.crystal.residual_ppm"]
+value = 0.5
+unit = "ppm"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """What a carrier frequency offset estimate leaves behind. Half a part \
+per million at 2,4 GHz is a 1,2 kHz residual, which is unremarkable for a \
+receiver that has already had to lock to the signal. The least supported \
+number in the ranging model and the first worth measuring."""
+affects = "whether single-sided ranging is usable at all on the slow radio"
+sensitivity = "at six times this the clock term exceeds the measured 2,94 m floor"
+
+[values."clock.tcxo.tolerance_ppm"]
+value = 2.0
+unit = "ppm"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "A common temperature-compensated grade, for asking what one would buy."
+affects = "nothing unless a scenario chooses it"
+
+[values."clock.tcxo.residual_ppm"]
+value = 0.1
+unit = "ppm"
+provenance = "ASSUMPTION"
+source = "this project"
+note = "Correction over a part that barely drifts."
+affects = "nothing unless a scenario chooses it"
+
+# --------------------------------------------------------------------------
+# The exchange and the sites
+# --------------------------------------------------------------------------
+
+[values."ranging.turnaround_s"]
+value = 0.0003
+unit = "s"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Time a radio needs between receiving a frame and answering it: \
+transceiver turnaround plus whatever the host does. Short next to an SF10 \
+frame and not next to a UWB one."""
+affects = "single-sided clock error and the round duration"
+
+[values."ranging.payload_bytes"]
+value = 16.0
+unit = "bytes"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Addresses, a sequence number, and the timestamps a double-sided \
+exchange carries in its last frame. The preamble dominates either way."""
+affects = "air time, and therefore how often each unit is fixed"
+
+[values."site.urban_clutter_db_per_km"]
+value = 30.0
+unit = "dB/km"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Absorption by buildings, vegetation and traffic that height does not \
+clear. Thirty is the middle of the published range for dense built-up areas \
+at 2,4 GHz."""
+affects = "how far an urban anchor reaches, and therefore the urban row entirely"
+
+[values."estimator.manoeuvre_m_s2"]
+value = 1.5
+unit = "m/s^2"
+provenance = "ASSUMPTION"
+source = "this project"
+note = """Unmodelled acceleration the filter expects between measurements. A \
+vehicle braking hard is about 6; ordinary driving is well under 1. Too small \
+and the filter stops believing new measurements; too large and it stops \
+smoothing."""
+affects = "HPE, through how much the filter smooths"

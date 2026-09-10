@@ -131,8 +131,10 @@ def test_an_off_grid_anchor_pays_no_electricity_bill():
 
 
 def test_a_longer_service_life_costs_less_a_year():
+    from dataclasses import replace
+
     def replacement(years):
-        rates = OperatingRates(service_life_years=_rate_of(years))
+        rates = replace(DEFAULT_RATES, service_life_years=_rate_of(years))
         costing = price(an_inventory(), rates)
         return next(
             item.tl for item in costing.operating if item.label == "replacement"
@@ -150,8 +152,11 @@ def _rate_of(value, unit="years"):
 def test_a_central_system_shared_wider_costs_each_deployment_less():
     """Which is why it is a rate and not a constant added to every row."""
     def central(sharing):
-        rates = OperatingRates(
-            anchors_sharing_central_operation=_rate_of(sharing, "anchors")
+        from dataclasses import replace
+
+        rates = replace(
+            DEFAULT_RATES,
+            anchors_sharing_central_operation=_rate_of(sharing, "anchors"),
         )
         costing = price(an_inventory(), rates)
         return next(

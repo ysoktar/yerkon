@@ -20,10 +20,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from yerkon.cost import DEFAULT_RATES, Costing, Inventory, OperatingRates, price
+from yerkon.cost import (
+    DEFAULT_RATES,
+    Costing,
+    Inventory,
+    OperatingRates,
+    operating_rates,
+    price,
+)
 from yerkon.evaluate import Samples, combine, coverage, run_scenario
 from yerkon.numbers import decimal_comma
-from yerkon.scenarios import ALL, Deployed, reweighted
+from yerkon.scenarios import ALL, Deployed, catalogue, reweighted
+from yerkon.settings import Settings
 
 COLUMNS = (
     "Sistem",
@@ -106,9 +114,10 @@ class Result:
 
 
 def run(
-    deployed: Deployed, rates: OperatingRates = DEFAULT_RATES
+    deployed: Deployed, rates: Optional[OperatingRates] = None
 ) -> Result:
     """Simulate one scenario and price what it took to build it."""
+    rates = DEFAULT_RATES if rates is None else rates
     samples = run_scenario(deployed.scenario)
 
     confined_km2 = deployed.served_km2()
@@ -164,16 +173,33 @@ def weighted(results: Sequence[Result]) -> Row:
 
 
 def build(
-    deployments: Sequence[Deployed] = ALL,
-    rates: OperatingRates = DEFAULT_RATES,
+    deployments: Optional[Sequence[Deployed]] = None,
+    rates: Optional[OperatingRates] = None,
     weights: Optional[dict] = None,
+    settings: Optional[Settings] = None,
+    only: Optional[Sequence[str]] = None,
 ) -> tuple[tuple[Result, ...], tuple[Row, ...]]:
     """Every row of the block, and the results behind them.
 
     ``weights`` is the journey mix the last row is computed under, keyed
     by scenario name. Nobody supplied one, so it is configuration and the
     notes print whatever was used.
+
+    ``settings`` is a file of the figures nobody supplied. Pass one and
+    the scenarios, the mounting costs, the unpublished radio figures and
+    the operating rates are all rebuilt from it, so a table run against
+    real numbers is real all the way down (ADR-0016).
     """
+    if settings is not None:
+        catalogued = catalogue(settings)
+        deployments = deployments or tuple(catalogued.values())
+        if only:
+            deployments = tuple(catalogued[name] for name in only)
+        rates = rates or operating_rates(settings)
+    else:
+        deployments = deployments or ALL
+        rates = rates or DEFAULT_RATES
+
     deployments = reweighted(tuple(deployments), weights)
     results = tuple(run(d, rates) for d in deployments)
     rows = tuple(r.row() for r in results) + (weighted(results),)

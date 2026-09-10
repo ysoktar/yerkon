@@ -30,6 +30,7 @@ from yerkon.evidence import Provenance, Sourced
 from yerkon.hardware import SPEED_OF_LIGHT_M_S, Radio
 from yerkon.observation import RangeObservation
 from yerkon.regulatory import TURKEY, SpectrumRule
+from yerkon.settings import DEFAULTS, Settings
 from yerkon.rf import (
     Obstruction,
     Terminal,
@@ -78,42 +79,35 @@ class Clock:
         )
 
 
-CRYSTAL = Clock(
-    part="52 MHz crystal, frequency-offset corrected",
-    tolerance_ppm=Sourced(
-        10.0, "ppm", Provenance.ASSUMPTION, "this project",
-        note=(
-            "Neither module publishes a crystal tolerance. Ten parts per "
-            "million is the usual grade for an uncompensated crystal of "
-            "this size once temperature and ageing are counted. It is "
-            "configuration: change it in the scenario rather than here."
+def clocks(settings: Settings = DEFAULTS) -> dict:
+    """The oscillators, from a settings file.
+
+    Neither module publishes a crystal tolerance and nobody publishes
+    what a frequency-offset estimate leaves behind, so both come from the
+    settings file. The residual is the least supported number in the
+    whole ranging model and it decides whether single-sided ranging works
+    at all on the slow radio.
+    """
+    return {
+        "crystal": Clock(
+            part="52 MHz crystal, frequency-offset corrected",
+            tolerance_ppm=settings.sourced("clock.crystal.tolerance_ppm"),
+            residual_ppm=settings.sourced("clock.crystal.residual_ppm"),
         ),
-    ),
-    residual_ppm=Sourced(
-        0.5, "ppm", Provenance.ASSUMPTION, "this project",
-        note=(
-            "What a carrier frequency offset estimate leaves behind. Half "
-            "a part per million at 2,4 GHz is a 1,2 kHz residual, which is "
-            "an unremarkable accuracy for a receiver that has already had "
-            "to lock to the signal. This is the single least supported "
-            "number in the ranging model and the first one worth "
-            "measuring."
+        "tcxo": Clock(
+            part="temperature-compensated oscillator",
+            tolerance_ppm=settings.sourced("clock.tcxo.tolerance_ppm"),
+            residual_ppm=settings.sourced("clock.tcxo.residual_ppm"),
         ),
-    ),
-)
+    }
+
+
+CLOCKS = clocks()
+
+CRYSTAL = CLOCKS["crystal"]
 """The clock assumed in both modules until a measurement replaces it."""
 
-TCXO = Clock(
-    part="temperature-compensated oscillator",
-    tolerance_ppm=Sourced(
-        2.0, "ppm", Provenance.ASSUMPTION, "this project",
-        note="A common TCXO grade, for asking what one would buy.",
-    ),
-    residual_ppm=Sourced(
-        0.1, "ppm", Provenance.ASSUMPTION, "this project",
-        note="Correction over a part that barely drifts.",
-    ),
-)
+TCXO = CLOCKS["tcxo"]
 """What an anchor could be fitted with, for asking whether it is worth it."""
 
 
@@ -178,18 +172,13 @@ SCHEMES = {"single": SINGLE_SIDED, "double": DOUBLE_SIDED}
 
 # --- How long it all takes ------------------------------------------------
 
-#: Bytes in a ranging frame's payload.
+#: Bytes in a ranging frame's payload, and the turnaround before a reply.
 #:
-#: Addresses, a sequence number, and the timestamps a double-sided
-#: exchange carries in its last frame. Small, and the preamble dominates
-#: either way.
-RANGING_PAYLOAD_BYTES = 16
+#: Both come from the settings file, like every other figure nobody
+#: supplied. See `yerkon.settings`.
+RANGING_PAYLOAD_BYTES = int(DEFAULTS.number("ranging.payload_bytes"))
 
-#: Seconds a radio needs between receiving a frame and answering it.
-#:
-#: Turnaround in the transceiver plus whatever the host does. Short next
-#: to an SF10 frame and not next to a UWB one.
-DEFAULT_TURNAROUND_S = 300e-6
+DEFAULT_TURNAROUND_S = DEFAULTS.number("ranging.turnaround_s")
 
 
 def frame_duration_s(radio: Radio, payload_bytes: int = RANGING_PAYLOAD_BYTES) -> float:

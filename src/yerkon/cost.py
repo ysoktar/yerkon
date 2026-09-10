@@ -21,6 +21,7 @@ from typing import Optional, Sequence
 
 from yerkon.evidence import Provenance, Sourced
 from yerkon.numbers import decimal_comma
+from yerkon.settings import DEFAULTS, Settings
 
 
 @dataclass(frozen=True)
@@ -136,17 +137,6 @@ class Inventory:
 # --- The recurring items --------------------------------------------------
 
 
-def _rate(value: float, unit: str, what: str) -> Sourced:
-    return Sourced(
-        value, unit, Provenance.ASSUMPTION, "this project",
-        note=(
-            "No figure for {} was supplied. It is configuration: set it in "
-            "the scenario. Until it is sourced, any total containing it is "
-            "an order of magnitude, not a price.".format(what)
-        ),
-    )
-
-
 @dataclass(frozen=True)
 class OperatingRates:
     """What each recurring item costs, per the thing it attaches to.
@@ -154,27 +144,41 @@ class OperatingRates:
     Every field is a rate somebody could look up, argue with, or replace.
     That is the point of ADR-0006: a percentage of capital could be none
     of those things.
+
+    None of them is written here. They come from the settings file, so
+    replacing one is an edit to a file rather than a change to a program
+    (ADR-0016).
     """
 
-    electricity_tl_per_kwh: Sourced = _rate(3.20, "TL/kWh", "the tariff an anchor draws on")
-    anchor_kwh_per_year: Sourced = _rate(35.0, "kWh/year", "an anchor's annual consumption")
-    connectivity_tl_per_year: Sourced = _rate(600.0, "TL/year", "a cellular data plan per anchor")
+    electricity_tl_per_kwh: Sourced
+    anchor_kwh_per_year: Sourced
+    connectivity_tl_per_year: Sourced
     #: A standalone supply for an anchor on a structure with no mains.
-    off_grid_supply_tl: Sourced = _rate(9500.0, "TL", "a solar panel, battery and regulator")
+    off_grid_supply_tl: Sourced
     #: How long a unit lasts before it is replaced.
-    service_life_years: Sourced = _rate(8.0, "years", "the service life of an outdoor unit")
-    maintenance_visits_per_year: Sourced = _rate(0.5, "visits/year", "scheduled attendance at an anchor")
+    service_life_years: Sourced
+    maintenance_visits_per_year: Sourced
     #: Off-grid sites need more attendance: batteries age and panels foul.
-    extra_off_grid_visits_per_year: Sourced = _rate(0.5, "visits/year", "the extra attendance an off-grid site needs")
-    maintenance_tl_per_visit: Sourced = _rate(1800.0, "TL/visit", "a crew, a vehicle and traffic management")
-    central_operation_tl_per_year: Sourced = _rate(240_000.0, "TL/year", "running the central system")
+    extra_off_grid_visits_per_year: Sourced
+    maintenance_tl_per_visit: Sourced
+    central_operation_tl_per_year: Sourced
     #: Anchors the central system is shared across. A national network
     #: amortises it far wider than one corridor does, which is why this
     #: is a rate rather than a constant added to every deployment.
-    anchors_sharing_central_operation: Sourced = _rate(1000.0, "anchors", "the network the central system serves")
+    anchors_sharing_central_operation: Sourced
 
 
-DEFAULT_RATES = OperatingRates()
+def operating_rates(settings: Settings = DEFAULTS) -> OperatingRates:
+    """The recurring rates, from a settings file."""
+    return OperatingRates(
+        **{
+            name: settings.sourced("operating.{}".format(name))
+            for name in OperatingRates.__dataclass_fields__
+        }
+    )
+
+
+DEFAULT_RATES = operating_rates()
 
 
 # --- A costing ------------------------------------------------------------

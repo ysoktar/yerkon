@@ -92,3 +92,65 @@ def test_the_table_verb_can_leave_the_notes_out(capsys):
     printed = capsys.readouterr().out
     assert printed.startswith("| Sistem")
     assert "Notes:" not in printed
+
+
+# --- The assumptions verb --------------------------------------------------
+
+
+def test_the_assumptions_verb_lists_every_figure_nobody_supplied(capsys):
+    from yerkon.cli import assumptions
+
+    assert assumptions([]) == 0
+    printed = capsys.readouterr().out
+    assert "still assumptions" in printed
+    assert "mounting.tall_mast.site_cost_tl" in printed
+    assert "affects:" in printed
+
+
+def test_the_assumptions_verb_says_how_to_replace_one(capsys):
+    from yerkon.cli import assumptions
+
+    assumptions([])
+    printed = capsys.readouterr().out
+    assert "change provenance from ASSUMPTION" in printed
+    assert "--assumptions" in printed
+
+
+def test_the_assumptions_verb_can_list_what_has_been_sourced(capsys, tmp_path):
+    import pathlib
+
+    from yerkon.cli import assumptions
+    from yerkon.settings import DEFAULT_FILE
+
+    text = pathlib.Path(DEFAULT_FILE).read_text(encoding="utf-8").replace(
+        '''[values."mounting.tall_mast.site_cost_tl"]
+value = 85000.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = "this project"''',
+        '''[values."mounting.tall_mast.site_cost_tl"]
+value = 5000.0
+unit = "TL"
+provenance = "MEASUREMENT"
+source = "a quotation"''',
+    )
+    path = tmp_path / "sourced.toml"
+    path.write_text(text, encoding="utf-8")
+
+    assert assumptions(["--file", str(path), "--sourced"]) == 0
+    printed = capsys.readouterr().out
+    assert "mounting.tall_mast.site_cost_tl" in printed
+
+
+def test_a_missing_assumptions_file_is_refused_with_a_message(capsys):
+    from yerkon.cli import assumptions
+
+    assert assumptions(["--file", "/nowhere/at/all.toml"]) == 2
+    assert "Copy" in capsys.readouterr().err
+
+
+def test_the_help_lists_the_assumptions_verb(capsys):
+    from yerkon.cli import main
+
+    main([])
+    assert "yerkon assumptions" in capsys.readouterr().out

@@ -20,6 +20,7 @@ from typing import Callable, Optional, Sequence
 
 from yerkon.evidence import Provenance, Sourced
 from yerkon.hardware import Radio, SX1280
+from yerkon.settings import DEFAULTS, Settings
 from yerkon.rf import Obstruction, first_fresnel_radius_m
 
 Metres = float
@@ -290,97 +291,44 @@ class MountingOption:
             raise ValueError("a site cannot pay you to use it")
 
 
-def _assumed(value: float, unit: str, what: str) -> Sourced:
-    """A placeholder cost, marked as one.
+def mountings(settings: Settings = DEFAULTS) -> dict:
+    """The catalogue, built from a settings file.
 
-    The report supplied no costing for any of this, and a zero would not
-    be neutral: it would say a twenty-five metre mast and a bracket on an
-    existing sign cost the same, which is the one comparison the mixed
-    deployment turns on. These are order-of-magnitude figures carrying
-    their own provenance, and the report prints the assumptions a costing
-    rests on alongside the costing.
+    Heights and costs are figures nobody supplied, so they are not
+    written here. A run that has real ones loads its own file and builds
+    its own catalogue from it; see `yerkon.settings`.
     """
-    return Sourced(
-        value, unit, Provenance.ASSUMPTION, "this project",
-        note=(
-            "No costing for {} was supplied. This is an order-of-magnitude "
-            "placeholder and it is configuration: change it in the "
-            "scenario rather than here.".format(what)
-        ),
-    )
+    def option(key: str, kind: str, has_power: bool, has_backhaul: bool):
+        return MountingOption(
+            kind=kind,
+            height_m=settings.sourced("mounting.{}.height_m".format(key)),
+            site_cost_tl=settings.sourced("mounting.{}.site_cost_tl".format(key)),
+            has_power=has_power,
+            has_backhaul=has_backhaul,
+        )
+
+    return {
+        "roadside_sign": option("roadside_sign", "roadside sign", False, False),
+        "sign_gantry": option("sign_gantry", "sign gantry", True, False),
+        "billboard": option("billboard", "billboard", True, False),
+        "lighting_column": option("lighting_column", "lighting column", True, False),
+        "tall_mast": option("tall_mast", "tall mast", False, False),
+        # A tunnel already has power and a communications spine along its
+        # length, for lighting, ventilation and its own systems. That is
+        # most of why a tunnel deployment costs less per anchor to run
+        # than an open-road one, despite needing far more anchors.
+        "tunnel_bracket": option("tunnel_bracket", "tunnel bracket", True, True),
+    }
 
 
-ROADSIDE_SIGN = MountingOption(
-    kind="roadside sign",
-    height_m=Sourced(
-        3.0, "m", Provenance.ASSUMPTION, "this project",
-        note="Typical mounting height of a verge-mounted road sign.",
-    ),
-    site_cost_tl=_assumed(2500.0, "TL", "fitting a unit to an existing sign"),
-    has_power=False,
-    has_backhaul=False,
-)
+MOUNTINGS = mountings()
 
-SIGN_GANTRY = MountingOption(
-    kind="sign gantry",
-    height_m=Sourced(
-        6.0, "m", Provenance.ASSUMPTION, "this project",
-        note="Clearance height of a highway sign portal over the carriageway.",
-    ),
-    site_cost_tl=_assumed(4000.0, "TL", "fitting a unit to an existing gantry"),
-    has_power=True,
-    has_backhaul=False,
-)
-
-BILLBOARD = MountingOption(
-    kind="billboard",
-    height_m=Sourced(
-        10.0, "m", Provenance.ASSUMPTION, "this project",
-        note="Top of a roadside advertising hoarding.",
-    ),
-    site_cost_tl=_assumed(3500.0, "TL", "fitting a unit to an existing billboard"),
-    has_power=True,
-    has_backhaul=False,
-)
-
-LIGHTING_COLUMN = MountingOption(
-    kind="lighting column",
-    height_m=Sourced(
-        12.0, "m", Provenance.ASSUMPTION, "this project",
-        note="Highway lighting column.",
-    ),
-    site_cost_tl=_assumed(3000.0, "TL", "fitting a unit to an existing column"),
-    has_power=True,
-    has_backhaul=False,
-)
-
-TALL_MAST = MountingOption(
-    kind="tall mast",
-    height_m=Sourced(
-        25.0, "m", Provenance.ASSUMPTION, "this project",
-        note=(
-            "Purpose-built mast. 25 m is the height a 10 km link needs "
-            "against a 2 m vehicle antenna over flat ground."
-        ),
-    ),
-    site_cost_tl=_assumed(85000.0, "TL", "a new mast, its foundation and its supply"),
-    has_power=False,
-    has_backhaul=False,
-)
-
-TUNNEL_BRACKET = MountingOption(
-    kind="tunnel bracket",
-    height_m=_assumed(4.5, "m", "the height a unit is bracketed at in a tunnel"),
-    site_cost_tl=_assumed(
-        6000.0, "TL", "bracketing a unit to a tunnel lining"
-    ),
-    # A tunnel already has power and a communications spine along its
-    # length, for lighting, ventilation and its own systems. That is most
-    # of why a tunnel deployment costs less per anchor to run than an
-    # open-road one, despite needing far more anchors.
-    has_power=True,
-    has_backhaul=True,
-)
+ROADSIDE_SIGN = MOUNTINGS["roadside_sign"]
+SIGN_GANTRY = MOUNTINGS["sign_gantry"]
+BILLBOARD = MOUNTINGS["billboard"]
+LIGHTING_COLUMN = MOUNTINGS["lighting_column"]
+TALL_MAST = MOUNTINGS["tall_mast"]
+TUNNEL_BRACKET = MOUNTINGS["tunnel_bracket"]
 """Inside a tunnel, where power and backhaul already run the length of it."""
 
 

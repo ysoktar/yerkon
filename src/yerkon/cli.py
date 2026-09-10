@@ -10,6 +10,9 @@ report's comparison table.
 ``view`` starts a local web app: the same engine, drawn in three
 dimensions, with every setting live.
 
+``assumptions`` lists every figure nobody supplied, what it affects and
+what replacing it would move.
+
 ``site`` searches for the cheapest deployment that meets a target.
 
 ``design`` shows what a set of settings implies, and asks once before
@@ -262,6 +265,24 @@ def describe_outcome(design_: Design) -> str:
     return "\n".join(lines)
 
 
+def _add_assumptions_flag(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--assumptions", metavar="FILE",
+        help=(
+            "a settings file of the figures nobody supplied. Everything "
+            "is rebuilt from it: mounting costs and heights, the "
+            "unpublished radio figures, the clocks, and the operating "
+            "rates. See `yerkon assumptions`."
+        ),
+    )
+
+
+def _settings_from(args):
+    from yerkon.settings import load
+
+    return load(args.assumptions) if args.assumptions else None
+
+
 def table(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon table",
@@ -282,6 +303,7 @@ def table(argv: list[str] | None = None) -> int:
         "--no-notes", action="store_true",
         help="print the table alone, without what it rests on",
     )
+    _add_assumptions_flag(parser)
     parser.add_argument(
         "--weight", action="append", metavar="NAME=SHARE",
         help=(
@@ -293,18 +315,28 @@ def table(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    try:
+        settings = _settings_from(args)
+    except (FileNotFoundError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    from yerkon.scenarios import catalogue
+
+    available = catalogue(settings) if settings else SCENARIO_CHOICES
     chosen = (
-        tuple(SCENARIO_CHOICES[name] for name in args.only)
-        if args.only else ALL_SCENARIOS
+        tuple(available[name] for name in args.only)
+        if args.only else tuple(available.values())
     )
 
-    print("Running {} scenario{}. This takes a minute.".format(
-        len(chosen), "" if len(chosen) == 1 else "s"
+    print("Running {} scenario{}{}. This takes a minute.".format(
+        len(chosen), "" if len(chosen) == 1 else "s",
+        " against {}".format(settings.path) if settings else "",
     ), file=sys.stderr)
 
     try:
         weights = _weights(args.weight)
-        results, rows = build(chosen, weights=weights)
+        results, rows = build(chosen, weights=weights, settings=settings)
     except ValueError as error:
         print(error, file=sys.stderr)
         return 2
@@ -350,7 +382,16 @@ def view(argv: list[str] | None = None) -> int:
         "--no-browser", action="store_true",
         help="print the address instead of opening it",
     )
+    _add_assumptions_flag(parser)
     args = parser.parse_args(argv)
+
+    try:
+        settings = _settings_from(args)
+    except (FileNotFoundError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 2
+    if settings is not None:
+        print("Reading figures from {}.".format(settings.path))
 
     from yerkon.viewer import serve
 
@@ -389,6 +430,7 @@ def site(argv: list[str] | None = None) -> int:
     parser.add_argument("--region", default="TR")
     parser.add_argument("--all", action="store_true",
                         help="list every candidate, not only those that meet")
+    _add_assumptions_flag(parser)
     args = parser.parse_args(argv)
 
     from yerkon.evaluate import Journey, Receiver
@@ -396,13 +438,21 @@ def site(argv: list[str] | None = None) -> int:
     from yerkon.siting import Requirement, cheapest
     from yerkon.world import Road, graded_alignment, rolling_terrain, flat_terrain
 
+    from yerkon.cost import operating_rates
+    from yerkon.hardware import radios as radio_catalogue
+    from yerkon.world import mountings
+
     try:
-        radio = chosen(RADIO_CHOICES, args.radio, "radio")
+        settings = _settings_from(args)
+        catalogue_of_radios = (
+            radio_catalogue(settings) if settings else RADIO_CHOICES
+        )
+        radio = chosen(catalogue_of_radios, args.radio, "radio")
         region = chosen(REGION_CHOICES, args.region, "region")
         requirement = Requirement(
             target_sigma_m=args.tolerance, corridor_covered=args.covered
         )
-    except ValueError as error:
+    except (FileNotFoundError, ValueError) as error:
         print(error, file=sys.stderr)
         return 2
 
@@ -426,9 +476,30 @@ def site(argv: list[str] | None = None) -> int:
           .format(args.corridor / 1000.0, args.tolerance, args.covered * 100),
           file=sys.stderr)
 
+    from yerkon.siting import Availability, TYPICAL_ROADSIDE
+
+    if settings:
+        # Rebuild what stands beside the road from the same file, so a
+        # run against real site costs searches over real structures.
+        rebuilt = mountings(settings)
+        by_kind = {option.kind: option for option in rebuilt.values()}
+        available = tuple(
+            Availability(
+                by_kind.get(entry.mounting.kind, entry.mounting),
+                entry.every_m, entry.from_m, entry.to_m,
+            )
+            for entry in TYPICAL_ROADSIDE
+        )
+        rates = operating_rates(settings)
+    else:
+        available = TYPICAL_ROADSIDE
+        rates = None
+
     winner, everything = cheapest(
         terrain, args.corridor, units, radio=radio,
         requirement=requirement, region=region,
+        available=available,
+        **({"rates": rates} if rates else {}),
     )
 
     shown = everything if args.all else tuple(c for c in everything if c.meets)
@@ -469,6 +540,72 @@ def site(argv: list[str] | None = None) -> int:
     return 0
 
 
+def assumptions(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon assumptions",
+        description=(
+            "Every figure this project needs that nobody supplied, in one "
+            "list, with what each affects. Replacing one is an edit to "
+            "assumptions.toml, not a change to the code."
+        ),
+    )
+    parser.add_argument(
+        "--file", help="a settings file to read instead of the shipped one"
+    )
+    parser.add_argument(
+        "--sourced", action="store_true",
+        help="list the figures that have been sourced instead",
+    )
+    parser.add_argument(
+        "--full", action="store_true",
+        help="print each figure's note and sensitivity too",
+    )
+    args = parser.parse_args(argv)
+
+    from yerkon.settings import DEFAULT_FILE, load
+
+    try:
+        settings = load(args.file)
+    except (FileNotFoundError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    listed = settings.sourced_entries if args.sourced else settings.assumed
+    heading = "Sourced" if args.sourced else "Still assumed"
+
+    print("{} in {}".format(heading, settings.path))
+    print("{} of {} figures are still assumptions ({}).".format(
+        len(settings.assumed), len(settings.entries),
+        "%" + decimal_comma(100.0 * settings.assumed_share, 0),
+    ))
+    print()
+
+    if not listed:
+        print("  none.")
+        return 0
+
+    width = max(len(entry.key) for entry in listed)
+    for entry in listed:
+        print("{key:<{width}}  {value:>12} {unit}".format(
+            key=entry.key, width=width,
+            value=decimal_comma(float(entry.sourced.value), 2),
+            unit=entry.sourced.unit,
+        ))
+        print("{:<{width}}  affects: {}".format("", entry.affects, width=width))
+        if args.full:
+            print("{:<{width}}  {}".format("", entry.sourced.note, width=width))
+            if entry.sensitivity:
+                print("{:<{width}}  sensitivity: {}".format(
+                    "", entry.sensitivity, width=width))
+        print()
+
+    if not args.sourced:
+        print("To replace one: copy {}, edit the value and the source, and "
+              "change provenance from ASSUMPTION.".format(DEFAULT_FILE))
+        print("Then pass --assumptions with your copy to any other command.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not argv or argv[0] in {"-h", "--help"}:
@@ -479,6 +616,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon table  [--markdown] [--only rural]")
         print("  yerkon view   [--port 8765]")
         print("  yerkon site   [--corridor 12000] [--tolerance 5]")
+        print("  yerkon assumptions [--full]")
         return 0
     verb, rest = argv[0], argv[1:]
     if verb == "fetch":
@@ -491,6 +629,8 @@ def main(argv: list[str] | None = None) -> int:
         return view(rest)
     if verb == "site":
         return site(rest)
+    if verb == "assumptions":
+        return assumptions(rest)
     print("Unknown command: {}".format(verb), file=sys.stderr)
     return 2
 

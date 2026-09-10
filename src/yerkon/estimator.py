@@ -28,14 +28,13 @@ from typing import Iterable, Optional, Sequence
 import numpy as np
 
 from yerkon.observation import RangeObservation
+from yerkon.settings import DEFAULTS
 
 #: Metres per second squared of unmodelled acceleration.
 #:
-#: What the filter expects a receiver to do between measurements that its
-#: constant-velocity model does not predict. A vehicle braking hard is
-#: about 6; ordinary driving is well under 1. Too small and the filter
-#: stops believing new measurements; too large and it stops smoothing.
-DEFAULT_MANOEUVRE_M_S2 = 1.5
+#: A figure nobody supplied, so it comes from the settings file like the
+#: rest of them. See `yerkon.settings`.
+DEFAULT_MANOEUVRE_M_S2 = DEFAULTS.number("estimator.manoeuvre_m_s2")
 
 #: How far a first fix may sit from the anchors before it is rejected.
 #:

@@ -110,8 +110,67 @@ def test_the_link_budget_does_not_depend_on_the_world():
 
 
 def test_hardware_is_data_and_depends_on_nothing_but_evidence():
+    """And on the file the figures nobody published come from."""
     internal = {name for name in imports_of("hardware") if name.startswith("yerkon")}
-    assert internal <= {"yerkon.evidence"}
+    assert internal <= {"yerkon.evidence", "yerkon.settings"}
+
+
+ALLOWED_TO_ASSUME = {"settings", "evidence"}
+
+
+def _constructs_an_assumption(tree: ast.AST) -> bool:
+    """Whether the module builds a Sourced value marked ASSUMPTION.
+
+    Looks for the construction rather than the word, because comparing
+    against ASSUMPTION is exactly what a costing has to do to report how
+    much of itself rests on one.
+    """
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        name = getattr(node.func, "id", None) or getattr(node.func, "attr", None)
+        if name != "Sourced":
+            continue
+        for argument in list(node.args) + [kw.value for kw in node.keywords]:
+            if (
+                isinstance(argument, ast.Attribute)
+                and argument.attr == "ASSUMPTION"
+            ):
+                return True
+    return False
+
+
+def test_no_module_writes_an_assumption_of_its_own():
+    """ADR-0016. The settings file is the whole list, or it is no list.
+
+    A placeholder buried in a function is a placeholder nobody will ever
+    find, and this project's costings rest almost entirely on
+    placeholders. `settings.py` builds them from the file; `evidence.py`
+    defines the word. Everywhere else, an assumption written in code
+    would be a figure that never appears on the list somebody is working
+    through.
+    """
+    offenders = []
+    for path in sorted(SRC.rglob("*.py")):
+        if path.stem in ALLOWED_TO_ASSUME or path.name == "__init__.py":
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        if _constructs_an_assumption(tree):
+            offenders.append(str(path.relative_to(SRC)))
+    assert not offenders, (
+        "these construct an assumption instead of reading one from "
+        "assumptions.toml: {}".format(", ".join(offenders))
+    )
+
+
+def test_every_figure_the_settings_file_holds_says_what_it_affects():
+    """A number nobody can act on is a number nobody will replace."""
+    from yerkon.settings import DEFAULTS
+
+    for key, entry in DEFAULTS.entries.items():
+        assert entry.affects.strip(), key
+        assert entry.sourced.note.strip(), key
+        assert entry.sourced.unit.strip(), key
 
 
 def test_every_module_states_what_it_is_for():
