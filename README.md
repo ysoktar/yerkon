@@ -114,7 +114,7 @@ yerkon defaults --full
 
 ```
 Still assumed in src/yerkon/defaults.toml
-33 of 33 figures are still assumptions (%100).
+32 of 33 figures are still assumptions (%97).
 
 mounting.tall_mast.site_cost_tl                  85000,00 TL
                                           affects: CAPEX of every anchor on a
@@ -202,10 +202,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 5,06 | 15,47 | 33,07 | %98,85 | 5,34 | 13082 | 6061 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 4,02 | 14,48 | 122,22 | %99,43 | 58,00 | 21424 | 888 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,29 | 0,99 | 6,38 | %98,01 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 3,96 | 14,01 | 81,91 | %99,10 | 25,87 | 460453 | 88337 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 4,96 | 15,15 | 35,23 | %98,85 | 5,34 | 13082 | 6061 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,96 | 15,72 | 122,11 | %99,38 | 58,00 | 21424 | 888 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 0,24 | 0,72 | 6,47 | %98,01 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 3,88 | 14,44 | 89,56 | %98,98 | 25,87 | 460453 | 88337 |
 
 Each row now carries two units sharing the air, which is why the errors
 are larger than a single-vehicle model would report. See below.
@@ -416,25 +416,36 @@ between the two clocks multiplies that whole reply delay:
 | Clock offset | Single-sided error | Double-sided error |
 |---|---|---|
 | 10 ppm, uncorrected | 24,1 m | 0,3 mm |
-| 0,5 ppm, after frequency correction | 1,20 m | 0,02 mm |
+| 0,0793 ppm, measured after correction | 0,19 m | 0,003 mm |
 
 Twenty-four metres is eight times the largest error ever measured on the
 part, so the published measurements are themselves evidence that the
 frequency-offset estimate every receiver already makes is doing the
 ranging work too. Without it, ranging on this radio does not function.
 
-`matlab/yerkon_clock_residual.m` measures that estimate rather than
-assuming it. Under additive noise it leaves **0,02 to 0,04 ppm**, which
-is ten times better than the 0,5 ppm default and puts the clock's
-contribution at under a tenth of a metre. It models no phase noise, no
-multipath and no drift during the exchange, so read it as a floor.
+**That residual has been measured**, and it is the one figure in this
+project that is no longer a guess. `matlab/yerkon_clock_residual.m` puts
+it at **0,0793 ppm** — six times better than the 0,5 that stood in for
+it (ADR-0018).
 
-With correction, the scheme to choose is a per-radio answer. On the
-SX1280 at kilometres the waveform bound is metres and the clock term is
-one metre, so single-sided ranging costs nothing and saves a third of the
-air time. On the impulse radio at 100 m the floor is 10 cm and the
-single-sided clock term is also 10 cm, so double-sided earns its extra
-frame.
+The measurement also says what limits it, which the guess could not. The
+residual barely improves with signal: 30 dB more buys a factor of two,
+where noise-limited would buy thirty. Run with no noise at all the same
+estimator gives 0,0164–0,0643 ppm depending only on where the peak falls
+between FFT bins, matching the measured plateau to four decimals. **The
+floor is the peak interpolator, not the channel** — which means it does
+not average down over repeated exchanges, and a finer interpolator would
+lower it.
+
+One design decision changed with it. At 0,5 ppm the impulse radio's
+single-sided clock term was 10 cm against a 10 cm floor, so double-sided
+ranging earned its third frame. Measured, that term is 1,6 cm and the
+floor swallows it. **The tunnel deployment is single-sided now**: a third
+less air time, 0,72 m at P95 instead of 1,00, and half again as many
+fixes.
+
+It models no phase noise, no multipath and no drift during the exchange,
+so read it as a floor.
 
 Air time is now a quantity the study can spend, and it buys less than it
 looks:

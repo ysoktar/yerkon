@@ -5,6 +5,7 @@ import math
 import numpy as np
 import pytest
 
+from yerkon.evidence import Provenance
 from yerkon.hardware import DWM3000, SPEED_OF_LIGHT_M_S, SX1280, W24P_U
 from yerkon.observation import RangeObservation
 from yerkon.ranging import (
@@ -39,8 +40,10 @@ def test_correcting_a_clock_cannot_leave_it_worse_than_it_started():
 
 
 def test_an_uncorrected_clock_is_the_one_the_crystal_specifies():
+    """The corrected figure is measured now and the raw one is not."""
     assert CRYSTAL.offset_ppm(corrected=False) == 10.0
-    assert CRYSTAL.offset_ppm(corrected=True) == 0.5
+    assert CRYSTAL.offset_ppm(corrected=True) < 1.0
+    assert CRYSTAL.residual_ppm.provenance is not Provenance.ASSUMPTION
 
 
 # --- What the clocks do to a range ---------------------------------------
@@ -108,11 +111,49 @@ def test_a_better_clock_is_worth_nothing_on_the_long_links():
     assert tcxo == pytest.approx(crystal, rel=1e-6)
 
 
-def test_the_impulse_radio_does_care_which_scheme_it_uses():
-    """Its floor is a tenth of a metre, so a tenth of a metre matters."""
+def test_the_measured_residual_makes_double_sided_ranging_pointless():
+    """It was not, at the assumed 0,5 ppm.
+
+    The impulse radio's floor is a tenth of a metre and a 0,5 ppm
+    residual across its 1,4 ms reply was also a tenth of a metre, so the
+    extra frame earned its place. Measured, the residual is 0,0793 ppm
+    and that term is 1,6 cm, which the floor swallows whole. Neither
+    radio now has a reason to spend the third frame.
+    """
+    for radio, height_m, distance_m in (
+        (DWM3000, 6.0, 100.0), (SX1280, 25.0, 3000.0)
+    ):
+        budget = budget_at(distance_m, radio, anchor_height_m=height_m)
+        single = measurement_sigma_m(budget, radio, scheme=SINGLE_SIDED)
+        double = measurement_sigma_m(budget, radio, scheme=DOUBLE_SIDED)
+        assert single == pytest.approx(double, rel=1e-6), radio.part
+
+
+def test_the_clock_term_would_still_matter_if_the_residual_were_assumed():
+    """The measurement is what settles it, not the model's shape.
+
+    Held at the 0,5 ppm this project assumed for a fortnight, the
+    impulse radio's single-sided term is a tenth of a metre and does
+    reach its floor. The conclusion changed because a number did.
+    """
+    from dataclasses import replace
+
+    from yerkon.evidence import Provenance, Sourced
+
+    assumed = replace(
+        CRYSTAL,
+        residual_ppm=Sourced(
+            0.5, "ppm", Provenance.ASSUMPTION, "the earlier default",
+            note="what this project assumed before it was measured",
+        ),
+    )
     budget = budget_at(100.0, DWM3000, anchor_height_m=6.0)
-    single = measurement_sigma_m(budget, DWM3000, scheme=SINGLE_SIDED)
-    double = measurement_sigma_m(budget, DWM3000, scheme=DOUBLE_SIDED)
+    single = measurement_sigma_m(
+        budget, DWM3000, clock=assumed, scheme=SINGLE_SIDED
+    )
+    double = measurement_sigma_m(
+        budget, DWM3000, clock=assumed, scheme=DOUBLE_SIDED
+    )
     assert single > double
 
 

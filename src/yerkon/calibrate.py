@@ -45,13 +45,26 @@ class Measured:
         return "\n".join(lines)
 
 
+#: How little a residual has to improve across the signal-to-noise range
+#: before it is bias rather than noise.
+#:
+#: A noise-limited estimator improves as the square root of the ratio, so
+#: thirty decibels should be a factor of thirty. Anything that flattens
+#: out is limited by something systematic instead, and a systematic error
+#: does not average down however many exchanges are made.
+BIAS_LIMITED_BELOW = 3.0
+
+
 def clock_residual(path: str) -> Measured:
     """Read `clock_residual.csv` and take the figure to use.
 
     The worst residual over the signal-to-noise range where links
     actually close, not the best and not the mean. A default that holds
-    only at the strong end of the link is a default that fails where it
-    matters, which is the far end.
+    only at the strong end of the link fails where it matters, which is
+    the far end.
+
+    Also says whether that figure is noise or bias, because the two
+    behave differently and only one of them averages away.
     """
     rows = _rows(path, {"offset_ppm", "snr_db", "residual_ppm_rms"})
 
@@ -67,6 +80,21 @@ def clock_residual(path: str) -> Measured:
 
     worst = max(float(row["residual_ppm_rms"]) for row in usable)
     offsets = sorted({float(row["offset_ppm"]) for row in usable})
+    weakest = min(float(row["snr_db"]) for row in usable)
+    strongest = max(float(row["snr_db"]) for row in usable)
+
+    note = (
+        "Worst root-mean-square residual over {} to {} dB after "
+        "correlation, for crystal offsets of {} ppm."
+    ).format(
+        readable(weakest), readable(strongest),
+        " and ".join(readable(o) for o in offsets),
+    )
+    note += " " + _what_limits_it(usable, weakest, strongest)
+    note += (
+        " Additive noise only: no phase noise, no multipath and no drift "
+        "during the exchange, so a real part will be worse than this."
+    )
 
     return Measured(
         key="clock.crystal.residual_ppm",
@@ -75,19 +103,43 @@ def clock_residual(path: str) -> Measured:
         source="matlab/yerkon_clock_residual.m, {}".format(
             pathlib.Path(path).name
         ),
-        note=(
-            "Worst root-mean-square residual over {} to {} dB after "
-            "correlation, for crystal offsets of {} ppm. Additive noise "
-            "only: no phase noise, no multipath and no drift during the "
-            "exchange, so a real part will be worse than this."
-        ).format(
-            readable(min(float(r["snr_db"]) for r in usable)),
-            readable(max(float(r["snr_db"]) for r in usable)),
-            " and ".join(readable(o) for o in offsets),
-        ),
+        note=note,
     )
 
 
+def _what_limits_it(usable: Sequence, weakest: float, strongest: float) -> str:
+    """Whether the residual is noise-limited or stuck on something systematic.
+
+    Measured rather than assumed: compare the residual at the strong end
+    against the weak end for the same crystal offset. Noise falls with
+    the square root of the ratio; a bias does not fall at all.
+    """
+    improvements = []
+    for offset in {float(row["offset_ppm"]) for row in usable}:
+        same = [row for row in usable if float(row["offset_ppm"]) == offset]
+        at_weak = min(same, key=lambda r: float(r["snr_db"]))
+        at_strong = max(same, key=lambda r: float(r["snr_db"]))
+        best = float(at_strong["residual_ppm_rms"])
+        if best > 0.0:
+            improvements.append(float(at_weak["residual_ppm_rms"]) / best)
+
+    if not improvements:
+        return ""
+
+    typical = sorted(improvements)[len(improvements) // 2]
+    if typical >= BIAS_LIMITED_BELOW:
+        return (
+            "Noise-limited: {} dB more signal improves it {} times, so it "
+            "falls further on a stronger link.".format(
+                readable(strongest - weakest), readable(typical)
+            )
+        )
+    return (
+        "Bias-limited, not noise-limited: {} dB more signal improves it "
+        "only {} times, so the floor is the peak interpolator rather than "
+        "the channel. A systematic error does not average down over "
+        "repeated exchanges, and a finer interpolator would lower it."
+    ).format(readable(strongest - weakest), readable(typical))
 def _rows(path: str, required: set) -> list:
     where = pathlib.Path(path)
     if not where.exists():

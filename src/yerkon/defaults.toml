@@ -276,20 +276,24 @@ and ageing are counted."""
 affects = "single-sided ranging error without frequency correction: 24,1 m"
 
 [values."clock.crystal.residual_ppm"]
-value = 0.5
+value = 0.0793
 unit = "ppm"
-provenance = "ASSUMPTION"
-source = "this project"
-note = """What a carrier frequency offset estimate leaves behind. Half a part \
-per million at 2,4 GHz is a 1,2 kHz residual, which is unremarkable for a \
-receiver that has already had to lock to the signal. The least supported \
-number in the ranging model and the first worth measuring."""
+provenance = "MEASUREMENT"
+source = "matlab/yerkon_clock_residual.m, run 2026-09-10"
+note = """What a carrier frequency offset estimate leaves behind. Worst \
+root-mean-square residual over +10 to +40 dB after correlation, for crystal \
+offsets of 2, 5, 10 and 20 ppm. Bias-limited rather than noise-limited: thirty \
+decibels more signal improves it only twice, because the floor is the parabolic \
+peak interpolator and not the channel. With no noise at all the same estimator \
+gives 0,0164 to 0,0643 ppm depending only on where the peak falls between bins, \
+which matches the measured plateau to four decimals. A systematic error does not \
+average down over repeated exchanges. Additive noise only: no phase noise, no \
+multipath and no drift during the exchange, so a real part will be worse."""
 affects = "whether single-sided ranging is usable at all on the slow radio"
-sensitivity = """at six times this the clock term exceeds the measured 2,94 m \
-floor. Simulated under additive noise only, matlab/yerkon_clock_residual.m puts \
-the residual at 0,02 to 0,04 ppm, so this default is conservative by more than \
-an order of magnitude and the remaining risk is phase noise and drift, which \
-that simulation does not model."""
+sensitivity = """At this value the single-sided clock term is 0,19 m, against a \
+2,94 m measured floor, so it contributes nothing. It would have to rise \
+fifteen-fold before it mattered. The 0,5 ppm this replaced was conservative by \
+six times."""
 
 [values."clock.tcxo.tolerance_ppm"]
 value = 2.0

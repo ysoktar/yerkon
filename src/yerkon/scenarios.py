@@ -310,7 +310,14 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     _unit("yaya", TUNNEL_ROAD, 1.4, 85.0, start_m=600.0,
                           antenna_height_m=1.6, product="pedestrian"),
                 ),
-                scheme=DOUBLE_SIDED,
+                # Single-sided, on the strength of a measurement rather
+                # than a preference. At the residual offset this project
+                # assumed, the third frame earned its place on this radio.
+                # Measured, the clock term is 1,6 cm against a 10 cm
+                # floor, so the frame buys nothing and costs a third of
+                # the air: 0,72 m at the ninety-fifth percentile instead
+                # of 1,00, and half again as many fixes. See ADR-0010.
+                scheme=SINGLE_SIDED,
                 region=TURKEY,
             ),
             seed=303,

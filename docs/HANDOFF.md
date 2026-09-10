@@ -91,12 +91,11 @@ not code.
    does. Run `yerkon defaults --full` for the work list. The mast cost
    is the most consequential: the siting search says existing signs beat
    masts by five and a half times, and the break-even is 6588 TL.
-2. **The residual clock offset after frequency correction**, half a part
-   per million. `matlab/yerkon_clock_residual.m` measures it; run it and
-   bring the CSV back to `yerkon calibrate`. Simulated under additive
-   noise it comes out at 0,02 to 0,04 ppm, so the default is
-   conservative by more than ten times and the remaining risk is phase
-   noise and drift, which the simulation does not model.
+2. ~~**The residual clock offset after frequency correction.**~~ Done:
+   measured at 0,0793 ppm on 2026-09-10 (ADR-0018), and it is the one
+   figure in the file that is not a guess. What is left of it is a
+   bench: the simulation covers additive noise and not phase noise,
+   multipath or drift during the exchange.
 3. **The implementation floor**, 2,94 m, needs a bench and not a
    simulation. One chip at 1625 kHz is 184 m of flight, so a waveform
    simulation says 18 m and contradicts a measurement for a reason

@@ -74,11 +74,20 @@ def test_a_figure_the_code_asks_for_and_the_file_lacks_is_an_error(tmp_path):
 # --- Sourcing one ---------------------------------------------------------
 
 
-def test_the_shipped_figures_are_all_still_assumptions():
-    """If this ever fails, somebody sourced one, which is the point."""
-    assert DEFAULTS.assumed_share > 0.0
+def test_the_list_separates_what_is_measured_from_what_is_guessed():
+    """One figure is measured now. The rest are the work still to do."""
+    assert 0.0 < DEFAULTS.assumed_share < 1.0
     for entry in DEFAULTS.assumed:
         assert entry.sourced.provenance is Provenance.ASSUMPTION
+    for entry in DEFAULTS.sourced_entries:
+        assert entry.sourced.provenance is not Provenance.ASSUMPTION
+        assert entry.sourced.source != "this project"
+
+
+def test_the_clock_residual_is_the_one_that_has_been_measured():
+    entry = DEFAULTS.entry("clock.crystal.residual_ppm")
+    assert not entry.is_assumed
+    assert "yerkon_clock_residual" in entry.sourced.source
 
 
 def test_sourcing_a_figure_stops_it_counting_as_an_assumption(tmp_path):
@@ -144,7 +153,7 @@ def test_the_clocks_take_theirs_from_the_file(tmp_path):
 
     text = pathlib.Path(DEFAULT_FILE).read_text(encoding="utf-8").replace(
         '''[values."clock.crystal.residual_ppm"]
-value = 0.5''',
+value = 0.0793''',
         '''[values."clock.crystal.residual_ppm"]
 value = 3.0''',
     )

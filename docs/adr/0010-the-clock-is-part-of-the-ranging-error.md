@@ -36,12 +36,19 @@ processing gain is taken over, so a radio cannot be given a cheap frame
 and a generous gain at once.
 
 ## Consequences
-Which scheme to use is a per-radio answer rather than a policy. On the
-SX1280 at kilometres, the waveform bound is metres and the corrected
-clock term is one metre, so single-sided ranging costs nothing and saves
-a third of the airtime. On the impulse radio at a hundred metres the
-floor is ten centimetres and the single-sided clock term is ten
-centimetres, so double-sided earns its extra frame.
+Which scheme to use was a per-radio answer while the residual offset was
+assumed, and became one answer once it was measured.
+
+Assumed at half a part per million, the SX1280's single-sided clock term
+was one metre against a waveform bound of metres, so single-sided cost
+nothing there; the impulse radio's was ten centimetres against a ten
+centimetre floor, so double-sided earned its extra frame.
+
+Measured, the residual is 0,0793 ppm (ADR-0018). The impulse radio's
+single-sided term falls to 1,6 cm, which its floor swallows whole, and
+the extra frame buys nothing on either radio. Both are single-sided now.
+On the tunnel row that is a third less air time, 0,72 m at the
+ninety-fifth percentile instead of 1,00, and half again as many fixes.
 
 A frequency-offset estimate is not optional on the slow radio. The model
 can be asked what happens without one, and the answer is that ranging
