@@ -49,25 +49,62 @@ STATIC = pathlib.Path(__file__).parent / "static"
 
 
 class Session:
-    """The one state the page is looking at.
+    """Three prepared deployments, and which one the page is showing.
+
+    One per row of the table, held at once. A dropdown that replaced the
+    arrangement on every switch meant an afternoon spent on the rural row
+    was gone the moment somebody looked at the tunnel, so nothing could
+    be prepared and compared. Tabs keep all three, and a run takes either
+    the one showing or all of them and the weighted row they make
+    (ADR-0028).
 
     A lock rather than a queue: the sweep takes seconds and a person can
     move a slider in that time, so two requests really do overlap. What
-    they must not do is interleave a read of the state with a write to it.
+    they must not do is interleave a read with a write.
     """
 
-    def __init__(self, state: Optional[ViewState] = None) -> None:
-        self.state = state or ViewState()
+    def __init__(self, showing: str = "urban") -> None:
+        self.states = {name: from_scenario(name) for name in MODES}
+        self.showing = showing if showing in MODES else MODES[0]
         self._lock = threading.Lock()
 
-    def read(self) -> ViewState:
+    def read(self, name: Optional[str] = None) -> ViewState:
         with self._lock:
-            return self.state
+            return self.states[name or self.showing]
 
-    def write(self, state: ViewState) -> ViewState:
+    def write(self, state: ViewState, name: Optional[str] = None) -> ViewState:
         with self._lock:
-            self.state = state
-            return self.state
+            self.states[name or self.showing] = state
+            return state
+
+    def show(self, name: str) -> ViewState:
+        if name not in MODES:
+            raise ValueError(
+                "no row called {!r}. There are: {}".format(
+                    name, ", ".join(MODES)
+                )
+            )
+        with self._lock:
+            self.showing = name
+            return self.states[name]
+
+    def prepared(self, only=None) -> tuple:
+        """The rows a run should cover, as (name, state), in table order."""
+        with self._lock:
+            wanted = list(only) if only else list(MODES)
+            unknown = [name for name in wanted if name not in self.states]
+            if unknown:
+                raise ValueError(
+                    "no row called {}".format(", ".join(unknown))
+                )
+            return tuple((name, self.states[name]) for name in wanted)
+
+    def reset(self, name: Optional[str] = None) -> ViewState:
+        """Put one row back as it ships. The others keep their edits."""
+        with self._lock:
+            which = name or self.showing
+            self.states[which] = from_scenario(which)
+            return self.states[which]
 
 
 def cascades(state: ViewState, changes: dict) -> Optional[dict]:
@@ -199,7 +236,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(lambda: self._mode(body.get("mode", "rural")))
         if path == "/api/reset":
             return self._json(
-                lambda: {"state": self.session.write(ViewState()).as_json()}
+                lambda: {"state": self.session.reset().as_json()}
             )
         if path == "/api/option":
             return self._json(lambda: self._option(body.get("name", "")))
@@ -218,18 +255,13 @@ class Handler(BaseHTTPRequestHandler):
         return {"cascades": found} if found else {"cascades": None}
 
     def _mode(self, name: str) -> dict:
-        """Load one of the report's modes, discarding the current one.
+        """Show one of the three rows, keeping what the others hold.
 
         Not an edit, so it does not go through the panel: nothing is
-        being changed into anything, the whole arrangement is replaced.
+        changed into anything, the page just looks somewhere else
+        (ADR-0028).
         """
-        if name not in MODES:
-            raise ValueError(
-                "no mode called {!r}. Choose from: {}".format(
-                    name, ", ".join(MODES)
-                )
-            )
-        return {"state": self.session.write(from_scenario(name)).as_json()}
+        return {"state": self.session.show(name).as_json(), "showing": name}
 
     def _option(self, name: str) -> dict:
         """Apply a named deployment option to what the page is showing.
@@ -259,14 +291,17 @@ class Handler(BaseHTTPRequestHandler):
         kind = body.get("kind", "")
         state = self.session.read()
         only = body.get("only") or None
+        # A run covers the rows as they have been prepared in their tabs,
+        # not the shipped catalogue: what you set up is what you run.
+        rows = self.session.prepared(only)
 
         if kind == "table":
-            work = table_task(state, only)
+            work = table_task(rows)
         elif kind == "budget":
-            work = budget_task(state, only, body.get("sources") or None)
+            work = budget_task(rows, body.get("sources") or None)
         elif kind == "deliver":
             work = deliver_task(
-                state, body.get("into", ""), only,
+                rows, body.get("into", ""),
                 with_budget=bool(body.get("with_budget", True)),
             )
         elif kind == "fetch":

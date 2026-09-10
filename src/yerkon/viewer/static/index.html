@@ -14,14 +14,16 @@
   <h1>YERKON</h1>
   <p class="sub" id="terrain-note">—</p>
 
+  <nav id="tabs"></nav>
+
   <section>
-    <h2>Mod</h2>
-    <label><select id="mode">
-      <option value="rural">Kırsal</option>
-      <option value="urban">Şehir içi</option>
-      <option value="tunnel">Tünel</option>
-      <option value="mixed">Karışık koridor</option>
-    </select></label>
+    <h2>Satır</h2>
+    <p class="hint" style="margin-top:0">
+      Üç satırın üçü de hazır durur. Sekmeler arasında geçmek yaptığın
+      düzenlemeyi silmez; her sekme kendi yerleşimini tutar. Çalıştırırken
+      ya yalnız bu satırı ya da üçünü birden — o zaman ağırlıklı satır da
+      çıkar.
+    </p>
     <label>Boy <output id="corridor-out"></output>
       <input type="range" id="corridor_m" min="500" max="40000" step="500"></label>
     <label>En <output id="width-out"></output>

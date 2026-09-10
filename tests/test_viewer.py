@@ -16,6 +16,34 @@ from yerkon.viewer.state import (
 )
 
 
+def a_mixed_corridor():
+    """A corridor carrying all three modules, and three units on it.
+
+    This was a preset until the modes became three tabs, one per row of
+    the table (ADR-0028). Nothing was lost in kind — any tab can still
+    hold several anchor runs of different modules, which is what made it
+    a mixed corridor — so the tests that check that capability build it
+    here instead of asking for a mode that no longer exists.
+    """
+    from yerkon.viewer.state import AnchorRun, UnitPlan, ViewState
+
+    return ViewState(
+        scenario="rural", corridor_m=20_000.0, width_m=0.0,
+        relief_m=250.0, hill_spacing_m=6000.0, roughness_m=0.2,
+        tolerance_m=5.0, sweep_m=400.0, journey_s=600.0,
+        runs=(
+            AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 400.0, 25.0),
+            AnchorRun("M", "e28", "mast", 3500.0, 15_000.0, 2000.0, 400.0),
+            AnchorRun("T", "dwm3000", "tunnel", 15_500.0, 17_500.0, 150.0, 4.0),
+        ),
+        units=(
+            UnitPlan("araç", "vehicle", 100.0, 0.0, 1.5),
+            UnitPlan("kamyon", "vehicle", 80.0, 5000.0, 2.8),
+            UnitPlan("yaya", "pedestrian", 5.0, 16_000.0, 1.6),
+        ),
+    )
+
+
 def a_state(**changes):
     return ViewState(**changes) if changes else ViewState()
 
@@ -48,14 +76,14 @@ def test_closer_spacing_puts_more_anchors_along_the_same_corridor():
 def test_a_corridor_can_carry_more_than_one_kind_of_anchor():
     """Which is the arrangement the report describes and none of its
     three rows measures on its own."""
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     deployment = state.deployment(state.terrain())
     assert len({anchor.radio.part for anchor in deployment.anchors}) == 3
     assert len(state.runs) == 3
 
 
 def test_a_corridor_can_carry_more_than_one_unit_of_different_kinds():
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     units = state.deployment(state.terrain()).receivers
     assert len(units) == 3
     assert {unit.product for unit in units} == {"vehicle", "pedestrian"}
@@ -69,7 +97,7 @@ def test_each_mode_the_report_names_can_be_loaded():
 
 
 def test_a_unit_carrying_one_module_hears_fewer_anchors_than_one_carrying_both():
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     state = state.merged({
         "units": [
             {**state.units[0].as_json(), "identifier": "tek",
@@ -163,7 +191,7 @@ def test_removing_every_anchor_is_refused_rather_than_crashing_later():
 
 def test_a_state_survives_a_round_trip_through_json():
     """It travels to the browser and back on every edit."""
-    state = from_scenario("mixed").merged(
+    state = a_mixed_corridor().merged(
         {"moved": {"M1": (10.0, 20.0)}, "removed": ("M3",)}
     )
     again = ViewState().merged(json.loads(json.dumps(state.as_json())))
@@ -193,7 +221,7 @@ def test_changing_a_runs_mounting_has_to_be_confirmed():
 def test_a_change_to_one_run_says_which_run_it_is():
     """A corridor carries several, and a panel that did not say which
     would be describing an unnamed part of the deployment."""
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     runs = [run.as_json() for run in state.runs]
     runs[1]["mounting"] = "sign"
     found = cascades(state, {"runs": runs})
@@ -209,7 +237,7 @@ def test_a_shared_setting_is_proposed_against_every_run_it_moves():
     stays quiet about the one that does not, which is the true answer
     rather than a tidier one.
     """
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     found = cascades(state, {"region": "US"})
     moved = {group["run"] for group in found["groups"]}
     assert moved == {"C", "M"}
@@ -233,7 +261,7 @@ def test_moving_the_terrain_does_not_have_to_be_confirmed():
 
 
 def test_moving_an_anchor_or_adding_a_unit_does_not_have_to_be_confirmed():
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     units = [unit.as_json() for unit in state.units]
     units.append({**units[0], "identifier": "yeni"})
     assert cascades(state, {"units": units}) is None
@@ -280,14 +308,14 @@ def test_the_scene_carries_ground_road_anchors_and_units():
 def test_each_anchor_says_which_run_it_belongs_to_and_how_far_it_reaches():
     """A UWB bracket and a mast on one corridor cover nothing like the
     same ground, so one reach for the whole scene would be a lie."""
-    drawn = scene(from_scenario("mixed"))
+    drawn = scene(a_mixed_corridor())
     reaches = {anchor["run"]: anchor["reach_m"] for anchor in drawn["anchors"]}
     assert len(reaches) == 3
     assert len(set(reaches.values())) == 3
 
 
 def test_the_scene_carries_each_unit_and_the_route_it_takes():
-    drawn = scene(from_scenario("mixed"))
+    drawn = scene(a_mixed_corridor())
     assert len(drawn["units"]) == 3
     for unit in drawn["units"]:
         assert unit["trail"] and unit["hears"] >= 0
@@ -301,7 +329,7 @@ def test_the_scene_is_json_and_nothing_but_json():
 
 def test_the_ground_mesh_covers_everything_the_sweep_will_cover():
     """Or coverage cells are painted beside the terrain rather than on it."""
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     drawn = scene(state)
     swept = sweep(state)
     assert min(drawn["terrain"]["xs"]) <= min(swept["xs"])
@@ -331,7 +359,7 @@ def test_the_scene_reports_where_the_link_stops_decoding_beside_where_it_ranges(
 def test_the_scene_reports_how_long_a_round_takes():
     """Which is what a person needs to see when they add a second unit."""
     one = scene(a_state())["round_s"]
-    state = from_scenario("mixed")
+    state = a_mixed_corridor()
     assert scene(state)["round_s"] > one
 
 
@@ -349,11 +377,49 @@ def test_simulating_from_the_viewer_gives_what_the_table_gives():
 # --- The session ----------------------------------------------------------
 
 
-def test_a_session_holds_one_state_and_hands_it_back():
+def test_a_session_holds_all_three_rows_at_once():
+    """ADR-0028. Switching rows must not throw away what a row holds.
+
+    A dropdown that rebuilt the arrangement on every switch meant an
+    afternoon on the rural row was gone the moment somebody looked at the
+    tunnel, so nothing could be prepared and compared.
+    """
+    from yerkon.viewer.state import MODES
+
     session = Session()
-    assert session.read().corridor_m == 24_000.0
-    session.write(session.read().merged({"corridor_m": 9000.0}))
+    assert set(session.states) == set(MODES)
+
+    session.write(session.read("urban").merged({"corridor_m": 9000.0}), "urban")
+    session.show("tunnel")
+    assert session.read().scenario == "tunnel"
+    assert session.read("urban").corridor_m == 9000.0, "the tab was discarded"
+
+    session.show("urban")
     assert session.read().corridor_m == 9000.0
+
+
+def test_a_run_covers_the_rows_as_prepared_and_says_so_when_asked_for_one():
+    session = Session()
+    assert [name for name, _ in session.prepared()] == list(
+        __import__("yerkon.viewer.state", fromlist=["MODES"]).MODES)
+    assert [name for name, _ in session.prepared(["rural"])] == ["rural"]
+    with pytest.raises(ValueError, match="no row called"):
+        session.prepared(["atlantis"])
+
+
+def test_resetting_one_row_leaves_the_others_alone():
+    session = Session()
+    session.write(session.read("rural").merged({"seed": 77}), "rural")
+    session.write(session.read("urban").merged({"seed": 88}), "urban")
+    session.show("rural")
+    session.reset()
+    assert session.read("rural").seed != 77
+    assert session.read("urban").seed == 88
+
+
+def test_showing_a_row_that_does_not_exist_says_which_do():
+    with pytest.raises(ValueError, match="no row called"):
+        Session().show("mixed")
 
 
 # --- The browser half -----------------------------------------------------
@@ -594,7 +660,7 @@ def test_a_staggered_row_is_offset_and_an_unstaggered_one_is_not():
     assert len(staggered) == 2 * len(square)
 
 
-def test_only_the_bore_and_the_mixed_corridor_are_lines():
+def test_only_the_bore_is_a_line():
     """The report's town and open country are areas. ADR-0014's addendum.
 
     A mode list where every mode was a corridor is what put a factor of
@@ -603,9 +669,24 @@ def test_only_the_bore_and_the_mixed_corridor_are_lines():
     from yerkon.viewer.state import MODES, from_scenario
 
     shapes = {name: from_scenario(name).width_m > 0.0 for name in MODES}
-    assert shapes == {
-        "urban": True, "rural": True, "tunnel": False, "mixed": False
-    }
+    assert shapes == {"urban": True, "rural": True, "tunnel": False}
+
+
+def test_there_are_three_rows_and_each_opens_on_its_own_ground():
+    """ADR-0028. Three tabs, and each one matching the row it prepares.
+
+    The rural tab opened on the Gölbaşı hills while the rural row of the
+    table stood on the Polatlı plain, so the picture and the published
+    figure described different places.
+    """
+    from yerkon.settings import DEFAULTS
+    from yerkon.viewer.state import MODES, from_scenario
+
+    assert len(MODES) == 3
+    for name in MODES:
+        assert from_scenario(name).site == DEFAULTS.text(
+            "{}.site".format(name)
+        ), name
 
 
 def test_the_reach_drawn_is_the_reach_the_ground_gives():
@@ -681,31 +762,38 @@ def test_a_task_the_server_does_not_have_says_what_it_does_have():
     assert callable(budget(a_state()))
 
 
-def test_a_task_runs_against_the_settings_the_page_is_showing():
-    """Not against the shipped defaults.
+def test_a_run_uses_the_arrangement_the_tab_holds():
+    """Not the shipped catalogue, and not only the figures. ADR-0028.
 
-    Somebody who has spent an afternoon moving figures has to be able to
-    ask what their arrangement costs, without writing it to a file first.
+    A tab holds an arrangement somebody built — anchors dragged, a mast
+    raised, a spacing narrowed — and a run that quietly rebuilt it from
+    the catalogue would report a deployment nobody was looking at.
     """
+    from yerkon.viewer.state import from_scenario
     from yerkon.viewer.tasks import deployments_of
 
-    denser = a_state().merged({
-        "overrides": {"urban.anchor_spacing_m": 250.0,
-                      "urban.anchor_stagger_m": 125.0}
+    prepared = from_scenario("urban")
+    denser = prepared.merged({
+        "runs": tuple(
+            {**run.as_json(), "spacing_m": 250.0} for run in prepared.runs
+        )
     })
-    standard = deployments_of(a_state(), ["urban"])[0]
-    edited = deployments_of(denser, ["urban"])[0]
+    standard = deployments_of([("urban", prepared)])[0]
+    edited = deployments_of([("urban", denser)])[0]
     assert (
         len(edited.scenario.deployment.anchors)
         > len(standard.scenario.deployment.anchors)
     )
 
 
-def test_asking_for_a_scenario_that_does_not_exist_says_so():
+def test_a_run_with_no_rows_says_so():
     from yerkon.viewer.tasks import deployments_of
 
-    with pytest.raises(ValueError, match="no scenario called"):
-        deployments_of(a_state(), ["atlantis"])
+    with pytest.raises(ValueError, match="no rows to run"):
+        deployments_of([])
+
+
+
 
 
 def test_a_blank_target_field_is_not_a_bar_of_zero():
@@ -848,9 +936,29 @@ def test_the_camera_is_framed_once_and_then_left_alone():
     application = read_app_js()
     framing = application[application.index("terrainData = latest.terrain;"):]
     framing = framing[: framing.index("scheduleSweep")]
-    target = framing.index("orbit.target = [state.corridor_m")
+    assert "frameEverything()" in framing
     guard = framing.index("if (!framed)")
-    assert guard < target, "the camera target is set outside the framing guard"
+    assert guard < framing.index("frameEverything()"), (
+        "the camera is framed outside the guard, so an edit re-centres it"
+    )
+
+
+def test_framing_aims_at_the_ground_rather_than_at_sea_level():
+    """ADR-0029. Ankara is 700 to 1900 m up and the relief is drawn five
+    times over, so a camera aimed at z = 0 looks at a point nearly six
+    thousand units below everything there is.
+
+    That is a blank screen, and it was one, on every mode standing on
+    fetched ground. Modelled terrain averages zero and hid it completely
+    until the scenarios moved onto real Ankara.
+    """
+    application = read_app_js()
+    body = application[application.index("function frameEverything"):]
+    body = body[: body.index("\n}")]
+    assert "ground_z" in body, "the framing ignores how high the ground is"
+    assert "draw.VERTICAL" in body, (
+        "the framing ignores the vertical exaggeration it is drawn with"
+    )
 
 
 def test_zoom_follows_the_wheel_rather_than_stepping():
@@ -968,3 +1076,20 @@ def test_every_figure_in_the_file_has_a_heading_to_be_drawn_under():
         1 for figure in listed["figures"] if figure["group"] in headings
     )
     assert drawn == listed["total"]
+
+
+def test_asking_for_a_row_that_does_not_exist_refuses_rather_than_defaulting():
+    """A silent fallback is how a typo becomes the wrong deployment.
+
+    `from_scenario` used to return a plain ViewState for any name it did
+    not know, so asking for a mode that had been removed gave a single
+    rural corridor and every figure that followed described it — a costing
+    test found three anchor products where there was one, which is the
+    only reason anybody noticed.
+    """
+    from yerkon.viewer.state import from_scenario
+
+    with pytest.raises(ValueError, match="no row called"):
+        from_scenario("mixed")
+    with pytest.raises(ValueError, match="no row called"):
+        from_scenario("")

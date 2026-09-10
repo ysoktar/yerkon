@@ -25,6 +25,7 @@ from yerkon.rf import (
     usable_range_m,
 )
 from yerkon.world import (
+    TUNNEL_BRACKET,
     BILLBOARD,
     LIGHTING_COLUMN,
     MountingOption,
@@ -170,6 +171,12 @@ MOUNTING_CHOICES = {
     "billboard": BILLBOARD,
     "column": LIGHTING_COLUMN,
     "mast": TALL_MAST,
+    # The tunnel row's own bracket. Missing here for a long time, while
+    # the viewer's catalogue had it, so the two disagreed: asking this
+    # one for a tunnel bracket raised, and the page's hardcoded dropdown
+    # did not offer it at all — the tunnel mode quietly ran on a roadside
+    # sign instead.
+    "tunnel": TUNNEL_BRACKET,
 }
 
 #: The stock antenna. One entry today, and a dictionary anyway, because

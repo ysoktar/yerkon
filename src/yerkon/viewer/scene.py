@@ -18,7 +18,12 @@ from yerkon.cost import DEFAULT_RATES, price
 from yerkon.design import Design, REGION_CHOICES, chosen
 from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
-from yerkon.viewer.state import ViewState, fetched_sites
+from yerkon.viewer.state import (
+    MODES,
+    MODE_LABELS,
+    ViewState,
+    fetched_sites,
+)
 
 #: Samples across the scene for the ground mesh.
 #:
@@ -109,6 +114,7 @@ def scene(state: ViewState) -> dict:
     """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
     deployment = state.deployment(terrain)
+    mounting_of, radio_of = state.catalogues()
 
     margin = sweep_margin_m(state)
     positions = [a.position_m for a in deployment.anchors]
@@ -128,9 +134,15 @@ def scene(state: ViewState) -> dict:
     # corridor do not cover remotely the same ground.
     reach = {run.identifier: reach_of(state, run) for run in state.runs}
     closure = {run.identifier: closure_of(state, run) for run in state.runs}
+    # Asked with the site's width, or a run over an area reports the
+    # handful of anchors a line would have held: the rest come back with
+    # no run, so they are drawn in no colour, given no reach ring, and
+    # counted on no card. Thirty of thirty-six, in the rural mode.
     run_of = {}
     for run in state.runs:
-        for identifier, _, _, _ in run.anchors(terrain):
+        for identifier, _, _, _ in run.anchors(
+            terrain, (mounting_of, radio_of), state.width_m
+        ):
             run_of[identifier] = run.identifier
 
     anchors = []
@@ -151,13 +163,18 @@ def scene(state: ViewState) -> dict:
             "reach_m": reach.get(run_id, 0.0),
         })
 
+    # The route the units actually take, not a line drawn along x. Over
+    # an area that is a circuit round the edge and across the middle, and
+    # drawing a straight line instead showed a deployment nobody was
+    # simulating — the picture and the run disagreeing with nothing on
+    # screen to say which was real.
+    driven = state.road(terrain)
     road = [
-        {
-            "x": float(x),
-            "y": 0.0,
-            "z": terrain.height_at(float(x), 0.0),
-        }
-        for x in np.linspace(0.0, state.corridor_m, 120)
+        {"x": float(x), "y": float(y), "z": float(z)}
+        for x, y, z in (
+            driven.point_at(along)
+            for along in np.linspace(0.0, driven.length_m, 160)
+        )
     ]
 
     units = []
@@ -184,6 +201,23 @@ def scene(state: ViewState) -> dict:
             # What ground is on hand, found rather than listed, so a
             # fourth `yerkon fetch` appears in the menu on its own.
             "sites": list(fetched_sites()),
+        },
+        # What the model actually offers. Hardcoded in the page before,
+        # and it had drifted: the tunnel bracket was missing entirely, so
+        # the one mounting the tunnel row uses could not be chosen and
+        # its dropdown silently showed a roadside sign instead.
+        "choices": {
+            "mountings": [
+                [key, "{} ({:.0f} m)".format(
+                    option.kind.title(), float(option.height_m.value))]
+                for key, option in sorted(
+                    mounting_of.items(),
+                    key=lambda pair: float(pair[1].height_m.value))
+            ],
+            "radios": [
+                [key, radio.part] for key, radio in sorted(radio_of.items())
+            ],
+            "modes": [[name, MODE_LABELS[name]] for name in MODES],
         },
         "road": road,
         "anchors": anchors,

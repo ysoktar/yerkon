@@ -17,11 +17,13 @@ const CHOICES = {
   scheme: [["single", "Tek yönlü TWR"], ["double", "Çift yönlü TWR"]],
 };
 
-const RADIOS = [["sx1280", "SX1280 (şehir içi)"], ["e28", "E28-2G4M27S (kırsal)"],
-                ["dwm3000", "DWM3000 UWB (tünel)"]];
-const MOUNTINGS = [["sign", "Levha (3 m)"], ["gantry", "Portal (6 m)"],
-                   ["billboard", "Pano (10 m)"],
-                   ["column", "Aydınlatma direği (12 m)"], ["mast", "Direk (25 m)"]];
+/* Served by the engine rather than written here. The hardcoded version
+ * drifted: it never listed the tunnel bracket, so the one mounting the
+ * tunnel row uses could not be chosen and its dropdown quietly showed a
+ * roadside sign instead. */
+let RADIOS = [];
+let MOUNTINGS = [];
+let TABS = [];
 const KINDS = [["vehicle", "Kara aracı alıcısı"], ["pedestrian", "Yaya alıcısı"]];
 
 /* What ground is on hand. The server finds it rather than listing it, so
@@ -231,6 +233,33 @@ function number(label, value, step, onChange) {
   input.onchange = () => onChange(Number(input.value));
   wrap.appendChild(input);
   return wrap;
+}
+
+/* The three rows. Switching keeps what each one holds (ADR-0028). */
+function drawTabs() {
+  const host = document.getElementById("tabs");
+  if (!host || !TABS.length) return;
+  host.innerHTML = "";
+  for (const [name, label] of TABS) {
+    const tab = document.createElement("button");
+    tab.textContent = label;
+    if (name === state.scenario) tab.classList.add("on");
+    tab.onclick = () => showRow(name);
+    host.appendChild(tab);
+  }
+}
+
+async function showRow(name) {
+  if (name === state.scenario) return;
+  try {
+    const { state: loaded } = await ask("/api/mode", { mode: name });
+    state = loaded;
+    framed = false;
+    await refreshScene();
+    fillControls();
+    await loadFigures();
+    scheduleSweep();
+  } catch (error) { say(error.message, true); }
 }
 
 function drawSites() {
@@ -510,7 +539,6 @@ function fillControls() {
   for (const name of Object.keys(CHOICES)) {
     document.getElementById(name).value = state[name];
   }
-  document.getElementById("mode").value = state.scenario;
   drawSites();
   drawRuns();
   drawUnits();
@@ -541,18 +569,6 @@ function wireControls() {
            input.hasAttribute("data-cascades"))
         .catch(e => say(e.message, true));
   }
-
-  document.getElementById("mode").onchange = async event => {
-    try {
-      const { state: loaded } = await ask("/api/mode", { mode: event.target.value });
-      state = loaded;
-      framed = false;
-      await refreshScene();
-      fillControls();
-      await loadFigures();
-      scheduleSweep();
-    } catch (error) { say(error.message, true); }
-  };
 
   document.getElementById("add-run").onclick = () => {
     const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -945,16 +961,26 @@ window.addEventListener("keydown", event => {
 
 /* Put the whole deployment back on screen. The one gesture a person
  * needs after getting lost, and getting lost is the price of being able
- * to go anywhere. */
+ * to go anywhere.
+ *
+ * The height matters as much as the middle. Ground in Ankara is 700 to
+ * 1900 m above sea level and the relief is drawn five times over, so a
+ * camera aimed at z = 0 looks at a point nearly six thousand units below
+ * everything there is — which is a blank screen, and was one. Modelled
+ * terrain averages zero and hid this until the scenarios moved onto real
+ * ground.
+ */
 function frameEverything() {
   if (!latest || !latest.anchors.length) return;
   const xs = latest.anchors.map(a => a.x);
   const ys = latest.anchors.map(a => a.y);
+  const zs = latest.anchors.map(a => a.ground_z);
   const span = Math.max(
     Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), 1000);
   frameOn(
     [(Math.min(...xs) + Math.max(...xs)) / 2,
-     (Math.min(...ys) + Math.max(...ys)) / 2, 0],
+     (Math.min(...ys) + Math.max(...ys)) / 2,
+     (zs.reduce((total, z) => total + z, 0) / zs.length) * draw.VERTICAL],
     span * 1.6,
   );
 }
@@ -1192,9 +1218,11 @@ function drawSolveScenarios() {
   // before, which meant the mixed corridor — not one of the report's
   // rows — quietly expanded to all three and took twelve minutes.
   const rows = document.getElementById("task-only");
-  rows.innerHTML = '<option value="">hepsi</option>' + names
-    .map(name => `<option value="${name}">${name}</option>`).join("");
-  if (names.includes(state.scenario)) rows.value = state.scenario;
+  rows.innerHTML =
+    `<option value="">üçü birden (+ ağırlıklı satır)</option>` +
+    TABS.map(([name, label]) =>
+      `<option value="${name}">yalnız ${label}</option>`).join("");
+  rows.value = state.scenario;
 }
 
 /* What the search may move, and what is worth trying.
@@ -1405,6 +1433,12 @@ async function refreshScene() {
   // its own list, so a place fetched while this is running turns up on
   // the next refresh.
   SITES = latest.terrain.sites || [];
+  if (latest.choices) {
+    MOUNTINGS = latest.choices.mountings;
+    RADIOS = latest.choices.radios;
+    TABS = latest.choices.modes;
+  }
+  drawTabs();
   drawSites();
   document.getElementById("terrain-note").textContent =
     `${latest.terrain.description} · ${latest.anchors.length} direk`;
@@ -1413,9 +1447,7 @@ async function refreshScene() {
     // Frame everything the first time, then leave the camera exactly
     // where the person put it. Re-centring on every refresh is what made
     // panning pointless: any slide was undone by the next edit.
-    orbit.target = [state.corridor_m / 2, state.width_m / 2, 0];
-    orbit.distance = Math.max(
-      6000, Math.max(state.corridor_m, state.width_m) * 1.5);
+    frameEverything();
     framed = true;
   }
   render();

@@ -360,3 +360,61 @@ def test_a_settings_file_survives_a_name_being_written_out_and_read_back(tmp_pat
         encoding="utf-8",
     )
     assert load(str(path)).text("rural.site") == "golbasi"
+
+
+# --- Does the solver's answer survive being run independently? ------------
+
+
+@pytest.mark.slow
+def test_the_solver_reports_what_an_ordinary_run_of_its_answer_gives():
+    """Otherwise the search and the report describe different deployments.
+
+    Every candidate is a full simulation, so this should agree exactly
+    rather than approximately. If it ever stops, the solver has grown a
+    model of its own and its recommendations cannot be checked against
+    the table (ADR-0023).
+    """
+    from yerkon.evaluate import run_scenario
+    from yerkon.solve import Target, search
+
+    found = search(
+        "tunnel", Target(availability=0.99, hpe_p50_m=1.0),
+        over={"tunnel.anchor_spacing_m": (150.0, 120.0)},
+    )
+    best = found.best
+    assert best is not None
+
+    independent = run_scenario(
+        catalogue(DEFAULTS.with_values(best.values))["tunnel"].scenario
+    )
+    assert independent.percentile(50)[0] == pytest.approx(
+        best.hpe_p50_m, rel=1e-12
+    )
+    assert independent.availability == pytest.approx(
+        best.availability, rel=1e-12
+    )
+
+
+@pytest.mark.slow
+def test_more_anchors_are_not_always_better_which_is_why_cheapest_wins():
+    """A hundred metre spacing is worse than a hundred and twenty.
+
+    Not noise: closer anchors shorten every link and the geometry that
+    results is not monotonic in density. A search that maximised
+    accuracy would still have returned the densest grid it was offered
+    and been wrong about it; cheapest-that-meets returns the one that
+    actually met (ADR-0015).
+    """
+    from yerkon.solve import Target, search
+
+    found = search(
+        "tunnel", Target(availability=0.99, hpe_p50_m=1.0),
+        over={"tunnel.anchor_spacing_m": (120.0, 100.0)},
+    )
+    by_spacing = {
+        o.values["tunnel.anchor_spacing_m"]: o for o in found.tried
+    }
+    assert by_spacing[100.0].anchors > by_spacing[120.0].anchors
+    assert by_spacing[100.0].hpe_p50_m > by_spacing[120.0].hpe_p50_m
+
+    assert found.best is by_spacing[120.0], "the cheapest that met"

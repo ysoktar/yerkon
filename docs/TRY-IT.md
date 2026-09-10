@@ -64,12 +64,20 @@ report row can then stand on it (see `rural.site` below). *This is the
 one part I could not verify: the sandbox I work in blocks OpenStreetMap.
 The elevation half is the same path the four Ankara sites came through.*
 
-### Modes and shape
+### Three tabs, all held at once
 
-Four modes. **En** (width) decides whether the site is a line or an area:
-at zero, anchors line a road and units drive straight; above zero they
-spread over a staggered grid and units drive a circuit. Urban and rural
-open as areas; the tunnel and the mixed corridor as lines.
+**Şehir içi · Kırsal · Tünel.** Each tab holds a prepared deployment;
+switching between them does not throw away what you set up. Under
+**Çalıştır → Hangi satırlar** you run either the tab you are on (one row)
+or all three, which produces the three plus the weighted row.
+
+A run uses **the arrangement in the tab**, not the shipped catalogue —
+drag an anchor and the table you run reflects it.
+
+**En** (width) decides whether the site is a line or an area: at zero,
+anchors line a road and units drive straight; above zero they spread over
+a staggered grid and units drive a circuit. Urban and rural open as
+areas, the tunnel as a line.
 
 ### Every number, live
 

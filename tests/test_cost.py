@@ -266,9 +266,21 @@ def test_a_module_the_report_does_not_name_is_refused_with_the_list():
 
 def test_a_corridor_of_three_modules_is_priced_as_three_products():
     """Pricing it as one puts hundreds of lira per anchor in the wrong place."""
-    from yerkon.viewer.state import from_scenario
+    from yerkon.viewer.state import AnchorRun, from_scenario
 
-    inventory = from_scenario("mixed").deployed().inventory(100.0)
+    # A corridor carrying all three modules. Built here rather than asked
+    # for as a mode: the modes are the table's three rows now, and any one
+    # of them can hold runs of several modules, which is all a mixed
+    # corridor ever was (ADR-0028).
+    mixed = from_scenario("rural").merged({
+        "width_m": 0.0,
+        "runs": (
+            AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 400.0, 25.0),
+            AnchorRun("M", "e28", "mast", 3500.0, 15_000.0, 2000.0, 400.0),
+            AnchorRun("T", "dwm3000", "tunnel", 15_500.0, 17_500.0, 150.0, 4.0),
+        ),
+    })
+    inventory = mixed.deployed().inventory(100.0)
     products = {site.product.name for site in inventory.anchors}
     assert len(products) == 3
 

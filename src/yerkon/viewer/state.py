@@ -342,7 +342,9 @@ class ViewState:
     def scenario_object(self) -> Scenario:
         terrain = self.terrain()
         return Scenario(
-            name=self.scenario,
+            # The row's own name, so a table run from the page prints the
+            # same heading the report does rather than the tab's key.
+            name=MODE_LABELS.get(self.scenario, self.scenario),
             terrain=terrain,
             deployment=self.deployment(terrain),
             seed=self.seed,
@@ -452,7 +454,7 @@ def from_scenario(name: str) -> ViewState:
             site="kizilcahamam", bore=True,
             clutter_db_per_km=0.0, roughness_m=0.05, tolerance_m=1.0,
             sweep_m=100.0, journey_s=85.0, scheme="double",
-            runs=(AnchorRun("T", "dwm3000", "sign", 0.0, 2000.0, 150.0, 4.0),),
+            runs=(AnchorRun("T", "dwm3000", "tunnel", 0.0, 2000.0, 150.0, 4.0),),
             units=(
                 UnitPlan("araç", "vehicle", 80.0, 0.0, 1.5),
                 UnitPlan("yaya", "pedestrian", 5.0, 600.0, 1.6),
@@ -461,7 +463,7 @@ def from_scenario(name: str) -> ViewState:
     if name == "rural":
         return ViewState(
             scenario="rural", corridor_m=20_000.0, width_m=20_000.0,
-            site="golbasi", roughness_m=0.2,
+            site="polatli", roughness_m=0.2,
             tolerance_m=5.0, sweep_m=500.0, journey_s=2400.0,
             runs=(
                 AnchorRun("M", "e28", "mast", 0.0, 20_000.0, 4000.0, 0.0,
@@ -472,35 +474,27 @@ def from_scenario(name: str) -> ViewState:
                 UnitPlan("kamyon", "vehicle", 80.0, 20_000.0, 2.8),
             ),
         )
-    if name == "mixed":
-        # A corridor that runs out of a town, across open country and
-        # through a bore, carrying all three modules at once. This is the
-        # arrangement the report describes and none of its three rows
-        # measures on its own, and it is the one mode besides the tunnel
-        # that really is a line: width stays at zero.
-        return ViewState(
-            # Modelled rather than fetched, because no single fetched
-            # place is a town, open country and a bore in a line. This is
-            # the one mode whose ground is a construction, and it is
-            # still not a flat one.
-            scenario="mixed", corridor_m=20_000.0, relief_m=250.0,
-            hill_spacing_m=6000.0, roughness_m=0.2, tolerance_m=5.0,
-            sweep_m=400.0, journey_s=600.0,
-            runs=(
-                AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 400.0, 25.0),
-                AnchorRun("M", "e28", "mast", 3500.0, 15_000.0, 2000.0, 400.0),
-                AnchorRun("T", "dwm3000", "sign", 15_500.0, 17_500.0, 150.0, 4.0),
-            ),
-            units=(
-                UnitPlan("araç", "vehicle", 100.0, 0.0, 1.5),
-                UnitPlan("kamyon", "vehicle", 80.0, 5000.0, 2.8),
-                UnitPlan("yaya", "pedestrian", 5.0, 16_000.0, 1.6),
-            ),
-        )
-    return ViewState()
+    raise ValueError(
+        "no row called {!r}. There are: {}".format(name, ", ".join(MODES))
+    )
 
 
-MODES = ("rural", "urban", "tunnel", "mixed")
+#: The three rows of the table, in the order the report prints them.
+#:
+#: Three, always. They are tabs rather than a menu: each holds a prepared
+#: deployment and a run takes either the one showing or all of them and
+#: the weighted row they make (ADR-0028). The mixed corridor that used to
+#: sit alongside them is gone as a preset — nothing is lost in kind,
+#: because any tab can still carry several anchor runs of different
+#: modules, which is what made it a mixed corridor.
+MODES = ("urban", "rural", "tunnel")
+
+#: What each row is called on its tab.
+MODE_LABELS = {
+    "urban": "Şehir içi",
+    "rural": "Kırsal",
+    "tunnel": "Tünel",
+}
 
 
 CASCADING = {

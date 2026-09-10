@@ -25,7 +25,7 @@ from yerkon.numbers import decimal_comma
 from yerkon.options import available, read, write
 from yerkon.parallel import workers
 from yerkon.report import build
-from yerkon.scenarios import SITES, catalogue
+from yerkon.scenarios import SITES
 from yerkon.settings import Settings
 from yerkon.solve import SEARCHABLE, AlreadyMet, Target, search
 from yerkon.terms import LABELS, NAMES, REMEDIES
@@ -34,29 +34,40 @@ from yerkon.viewer.state import ViewState
 Say = Callable[[str], None]
 
 
-def deployments_of(state: ViewState, only: Optional[list] = None):
-    """The report's rows, built from the settings the page is showing."""
-    rows = catalogue(state.settings())
-    names = only or sorted(rows)
-    unknown = set(names) - set(rows)
-    if unknown:
-        raise ValueError(
-            "no scenario called {}".format(", ".join(sorted(unknown)))
-        )
-    return tuple(rows[name] for name in names)
+def deployments_of(rows) -> tuple:
+    """The rows as they were prepared, each from its own tab.
+
+    Not from the shipped catalogue. A tab holds an arrangement somebody
+    built — anchors dragged, a mast raised, a figure corrected — and a
+    run that quietly used the catalogue instead would report a
+    deployment nobody was looking at (ADR-0028).
+    """
+    if not rows:
+        raise ValueError("no rows to run")
+    return tuple(state.deployed() for _, state in rows)
+
+
+def settings_of(rows) -> Settings:
+    """The figures a run reports against: the first row's.
+
+    The rows share one figure list in practice — the panel edits apply to
+    whichever tab is showing and a person moves between them — so this
+    takes the first rather than pretending to merge three.
+    """
+    return rows[0][1].settings()
 
 
 # --- The table ------------------------------------------------------------
 
 
-def table(state: ViewState, only: Optional[list] = None) -> Callable:
-    """The four rows, run against whatever the page currently holds."""
+def table(rows) -> Callable:
+    """The rows as prepared, plus the weighted row when all three run."""
 
     def work(say: Say) -> dict:
-        chosen = deployments_of(state, only)
-        say("Running {} scenario{} on {} processes.".format(
+        chosen = deployments_of(rows)
+        say("Running {} row{} on {} processes.".format(
             len(chosen), "" if len(chosen) == 1 else "s", workers()))
-        results, rows = build(chosen, settings=state.settings())
+        results, table_rows = build(chosen, settings=settings_of(rows))
         say("Done.")
         return {
             "columns": [
@@ -76,7 +87,7 @@ def table(state: ViewState, only: Optional[list] = None) -> Callable:
                         decimal_comma(row.opex_tl_per_km2_year, 0),
                     ],
                 }
-                for row in rows
+                for row in table_rows
             ],
         }
 
@@ -86,12 +97,11 @@ def table(state: ViewState, only: Optional[list] = None) -> Callable:
 # --- Where the error came from --------------------------------------------
 
 
-def budget(state: ViewState, only: Optional[list] = None,
-           sources: Optional[list] = None) -> Callable:
+def budget(rows, sources: Optional[list] = None) -> Callable:
     """Each row's error taken apart, one source at a time (ADR-0020)."""
 
     def work(say: Say) -> dict:
-        chosen = deployments_of(state, only)
+        chosen = deployments_of(rows)
         wanted = tuple(sources) if sources else NAMES
         say("Running {} simulations: {} scenario{} against {} sources, "
             "on {} processes.".format(
@@ -249,14 +259,13 @@ def target_from(payload: dict) -> Target:
 # --- Writing the study out ------------------------------------------------
 
 
-def deliver(state: ViewState, into: str, only: Optional[list] = None,
-            with_budget: bool = True) -> Callable:
-    """Write the whole study out as Markdown, from the page's own figures."""
+def deliver(rows, into: str, with_budget: bool = True) -> Callable:
+    """Write the study out as Markdown, from the rows as prepared."""
 
     def work(say: Say) -> dict:
-        chosen = deployments_of(state, only)
+        chosen = deployments_of(rows)
         written = write_study(
-            into or "docs/teslim", chosen, state.settings(),
+            into or "docs/teslim", chosen, settings_of(rows),
             with_budget=with_budget, say=say,
         )
         return {
@@ -315,10 +324,14 @@ def fetch(state: ViewState, payload: dict) -> Callable:
 
         site = build_site(
             bounds,
-            elevation=(CopernicusElevation(cache=str(SITES / "_tiles")),
-                       ServiceElevation()),
-            features=OpenStreetMapBuildings() if want_buildings else None,
             spacing_m=spacing,
+            elevation_sources=(
+                CopernicusElevation(cache_directory=str(SITES / "_tiles")),
+                ServiceElevation(),
+            ),
+            buildings_source=(
+                OpenStreetMapBuildings() if want_buildings else None
+            ),
         )
         SiteCache(SITES / name).save(site)
 
@@ -344,6 +357,18 @@ def fetch(state: ViewState, payload: dict) -> Callable:
 # --- Named options --------------------------------------------------------
 
 
+def _shown(value) -> str:
+    """A figure as the page reads it. Not every one is a quantity.
+
+    Which ground a row stands on is a name (ADR-0027), and asking
+    `decimal_comma` for one took the whole options panel down with a 400
+    — so the page showed no options at all rather than one bad row.
+    """
+    if isinstance(value, str):
+        return value or "—"
+    return decimal_comma(value, 2)
+
+
 def listed(settings: Settings) -> dict:
     """Every option on hand, and what each would move from where it is now."""
     out = []
@@ -357,8 +382,8 @@ def listed(settings: Settings) -> dict:
             "moves": [
                 {
                     "key": key,
-                    "from": decimal_comma(was, 2),
-                    "to": decimal_comma(now, 2),
+                    "from": _shown(was),
+                    "to": _shown(now),
                 }
                 for key, was, now in option.differences(settings)
             ],

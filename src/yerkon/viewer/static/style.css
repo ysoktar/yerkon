@@ -214,3 +214,35 @@ label.tick input { width: auto; }
   font-weight: 600;
   color: #22282e;
 }
+
+
+/* The three rows, as tabs. Each keeps its own prepared deployment. */
+
+#tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 12px;
+  border-bottom: 1px solid #dfe4e9;
+}
+
+#tabs button {
+  flex: 1;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  background: none;
+  color: #6b7681;
+  font-size: 12px;
+  padding: 7px 4px;
+  cursor: pointer;
+}
+
+#tabs button:hover { color: #22282e; }
+
+#tabs button.on {
+  background: #fff;
+  border-color: #dfe4e9;
+  color: #22282e;
+  font-weight: 600;
+  margin-bottom: -1px;
+}

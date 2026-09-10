@@ -1,0 +1,17 @@
+{
+  "bounds": {
+    "south": 39.9,
+    "west": 32.8,
+    "north": 39.91,
+    "east": 32.81
+  },
+  "grid_spacing_m": 30.0,
+  "manifest": {
+    "elevation_source": "fake",
+    "elevation_resolution_m": 30.0,
+    "fetched_at": "now",
+    "feature_source": "OSM",
+    "building_count": 7,
+    "notes": []
+  }
+}
