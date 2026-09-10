@@ -57,3 +57,41 @@ stays quiet about the one that does not.
 Swapping the urban module for the rural one changes nothing at all under
 the Turkish rule, so the panel does not appear. That was already known
 from the link budget; it is now visible where somebody would try it.
+
+## Addendum, 2026-09-10: only the tunnel is a corridor
+
+The three scenarios were all built as corridors — a line of anchors down
+one axis and a receiver driving east along it — because the first one
+written was a highway and the other two were copied from it. That was
+wrong for two of them, and the error was not small.
+
+A town is an area. A stretch of open country is an area. Their anchors
+stand on a rough grid of streets or on masts spread over ground, and a
+vehicle in either one turns. Modelling them as lines gave every anchor a
+receiver could hear nearly the same bearing, which is the geometry that
+makes a corridor's cross-track direction barely observable, and the
+horizontal error inherited that amplification for no reason but the
+shape of the file.
+
+Urban is now a town three kilometres on a side, forty-six anchors on
+lighting columns at a five hundred metre grid with alternate rows
+staggered. Rural is twenty kilometres on a side, thirty-three masts at a
+four kilometre grid. Both are driven on a circuit that runs round the
+edge and across the middle, so the cross-track geometry changes as the
+unit turns. The tunnel is unchanged, because a bore really is a line.
+
+What it moved: urban HPE at the fiftieth percentile from 5,31 m to
+1,24 m, rural from 4,22 m to 2,14 m, and the rural service area from
+58 km² to 372,50 km², which took its capital cost per square kilometre
+from 21424 TL to 8468 TL. A factor of four in accuracy and a factor of
+two and a half in cost, none of it from a change to the physics.
+
+Two consequences follow. A receiver over an area can hear far more
+anchors than it has time to range against, so `Deployment` grew
+`max_anchors_per_round`: it ranges against the nearest eight and ignores
+the rest, which is what real systems do and what keeps a round from
+taking two seconds. And `Deployed.serves_a_corridor` now decides whether
+cost per route kilometre is printed at all — for an area those route
+kilometres are the length of a test journey, not a dimension of the
+service, and reporting one as the other is what invited this in the
+first place.

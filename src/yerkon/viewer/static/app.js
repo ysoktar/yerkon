@@ -187,6 +187,7 @@ document.getElementById("confirm-no").onclick = () => {
 
 const UNITS = {
   corridor_m: v => `${(v / 1000).toFixed(1).replace(".", ",")} km`,
+  width_m: v => (v > 0 ? `${(v / 1000).toFixed(1).replace(".", ",")} km` : "koridor"),
   relief_m: v => (v > 0 ? `${v} m` : "düz"),
   hill_spacing_m: v => `${v} m`,
   roughness_m: v => `${Number(v).toFixed(2).replace(".", ",")} m`,
@@ -197,7 +198,7 @@ const UNITS = {
 };
 
 const OUTPUTS = {
-  corridor_m: "corridor-out",
+  corridor_m: "corridor-out", width_m: "width-out",
   relief_m: "relief-out", hill_spacing_m: "hill-out", roughness_m: "rough-out",
   clutter_db_per_km: "clutter-out", tolerance_m: "tol-out",
   journey_s: "journey-out", sweep_m: "sweep-out",
@@ -273,6 +274,12 @@ function drawRuns() {
       v => change({ spacing_m: v })));
     pair.appendChild(number("Yoldan (m)", run.offset_m, 10,
       v => change({ offset_m: v })));
+    if (state.width_m > 0) {
+      // Only over an area. A staggered row means nothing along a line,
+      // and offering it there would suggest it did.
+      pair.appendChild(number("Kaydırma (m)", run.stagger_m, 25,
+        v => change({ stagger_m: v })));
+    }
     card.appendChild(pair);
 
     const found = (latest && latest.runs || []).find(
@@ -512,6 +519,7 @@ function wireControls() {
       identifier,
       radio: last ? last.radio : "sx1280",
       mounting: last ? last.mounting : "mast",
+      stagger_m: last ? last.stagger_m : 0,
       from_m: last ? last.to_m + 500 : 0,
       to_m: last ? last.to_m + 3000 : 3000,
       spacing_m: last ? last.spacing_m : 1000,
@@ -763,11 +771,12 @@ async function refreshScene() {
   document.getElementById("terrain-note").textContent =
     `${latest.terrain.description} · ${latest.anchors.length} direk`;
   terrainData = latest.terrain;
-  orbit.target = [state.corridor_m / 2, 0, 0];
+  orbit.target = [state.corridor_m / 2, state.width_m / 2, 0];
   if (!framed) {
     // Frame the whole corridor the first time, then leave the camera
     // where the person put it.
-    orbit.distance = Math.max(6000, state.corridor_m * 1.5);
+    orbit.distance = Math.max(
+      6000, Math.max(state.corridor_m, state.width_m) * 1.5);
     framed = true;
   }
   render();

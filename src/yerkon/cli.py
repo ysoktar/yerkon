@@ -13,6 +13,9 @@ dimensions, with every setting live.
 ``defaults`` lists every figure the model needs that nobody supplied,
 what it affects, and what replacing it would move.
 
+``budget`` takes each scenario's error apart, one source at a time, and
+says which one is worth spending money on.
+
 ``calibrate`` reads what a MATLAB run measured and says what to put in
 the defaults file.
 
@@ -48,9 +51,10 @@ from yerkon.design import (
     derive,
 )
 from yerkon.numbers import decimal_comma, readable
-from yerkon.report import as_markdown, as_text, build, footnotes
+from yerkon.report import as_breakdown, as_markdown, as_text, build, footnotes
 from yerkon.scenarios import ALL as ALL_SCENARIOS, CHOICES as SCENARIO_CHOICES
 from yerkon.proposal import OUTCOME_LABELS, confirm, show_outcome
+from yerkon.terms import NAMES as SOURCE_NAMES
 from yerkon.site.model import BoundingBox
 
 
@@ -609,6 +613,60 @@ def defaults(argv: list[str] | None = None) -> int:
     return 0
 
 
+def budget(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon budget",
+        description=(
+            "Take each scenario's position error apart, one source at a "
+            "time, and say which source is worth removing. Every line is "
+            "the same simulation the table uses, re-run with one error "
+            "silenced, so this is slow: a couple of minutes per scenario."
+        ),
+    )
+    parser.add_argument(
+        "--only", action="append", choices=sorted(SCENARIO_CHOICES),
+        help="dissect only these scenarios; repeat the flag for several",
+    )
+    parser.add_argument(
+        "--source", action="append", choices=list(SOURCE_NAMES),
+        help=(
+            "dissect only these error sources; repeat the flag for "
+            "several. The default is all of them."
+        ),
+    )
+    _add_defaults_flag(parser)
+    args = parser.parse_args(argv)
+
+    try:
+        settings = _settings_from(args)
+    except (FileNotFoundError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    from yerkon.budget import dissect_all
+    from yerkon.scenarios import catalogue
+
+    available = catalogue(settings) if settings else SCENARIO_CHOICES
+    chosen = (
+        tuple(available[name] for name in args.only)
+        if args.only else tuple(available.values())
+    )
+    sources = tuple(args.source) if args.source else SOURCE_NAMES
+
+    runs = len(chosen) * (2 * len(sources) + 2)
+    print(
+        "Running {} simulations: {} scenario{} against {} error "
+        "source{}. This takes a few minutes.".format(
+            runs, len(chosen), "" if len(chosen) == 1 else "s",
+            len(sources), "" if len(sources) == 1 else "s",
+        ),
+        file=sys.stderr,
+    )
+
+    print(as_breakdown(dissect_all(chosen, sources)))
+    return 0
+
+
 def calibrate(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon calibrate",
@@ -665,6 +723,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon table  [--markdown] [--only rural]")
         print("  yerkon view   [--port 8765]")
         print("  yerkon site   [--corridor 12000] [--tolerance 5]")
+        print("  yerkon budget [--only tunnel] [--source survey]")
         print("  yerkon defaults [--full]")
         print("  yerkon calibrate out/clock_residual.csv")
         return 0
@@ -679,6 +738,8 @@ def main(argv: list[str] | None = None) -> int:
         return view(rest)
     if verb == "site":
         return site(rest)
+    if verb == "budget":
+        return budget(rest)
     if verb == "defaults":
         return defaults(rest)
     if verb == "calibrate":

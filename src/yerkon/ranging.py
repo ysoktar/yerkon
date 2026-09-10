@@ -31,6 +31,7 @@ from yerkon.hardware import SPEED_OF_LIGHT_M_S, Radio
 from yerkon.observation import RangeObservation
 from yerkon.regulatory import TURKEY, SpectrumRule
 from yerkon.settings import DEFAULTS, Settings
+from yerkon.terms import ALL as ALL_TERMS, Terms
 from yerkon.rf import (
     Obstruction,
     Terminal,
@@ -251,28 +252,28 @@ def ranges_per_second(
 # --- One measurement ------------------------------------------------------
 
 
-def measurement_sigma_m(
+def sigma_terms_m(
     budget,
     radio: Radio,
     clock: Clock = CRYSTAL,
     scheme: Scheme = DOUBLE_SIDED,
     corrected: bool = True,
     turnaround_s: float = DEFAULT_TURNAROUND_S,
-) -> float:
-    """One sigma on a single range, in metres.
-
-    Three terms, and which one binds says what to fix.
+) -> dict:
+    """One sigma on a single range, split into the three things that make it.
 
     The waveform bound falls with signal strength and rises with
     distance. The clock term comes from the exchange and mostly does not
-    care about distance at all. Those two add in quadrature because they
-    are independent.
+    care about distance at all. Those two are independent, so they add in
+    quadrature.
 
-    The part's measured floor is then applied underneath, because a model
-    that predicts better than the only measurement anyone has taken of
-    the part is predicting its own assumptions. If the physics terms come
-    out above the floor, they win; the floor never makes a bad
-    configuration look good.
+    The part's measured floor is not a fourth independent error; it is a
+    statement that the model must not predict better than the only
+    measurement anybody has taken of the part. It enters here as whatever
+    has to be added in quadrature to reach that floor, and it is zero
+    wherever the physics already sits above it. Summed, the three
+    reproduce `max(hypot(waveform, clock), floor)` exactly, so nothing
+    about the total changed when it was split.
     """
     waveform_m = cramer_rao_sigma_m(budget, radio)
     clock_s = scheme.clock_error_s(
@@ -281,8 +282,39 @@ def measurement_sigma_m(
         clock.offset_ppm(corrected),
     )
     clock_m = clock_s * SPEED_OF_LIGHT_M_S
-    modelled_m = math.hypot(waveform_m, clock_m)
-    return max(modelled_m, float(radio.implementation_floor_m.value))
+    floor_m = float(radio.implementation_floor_m.value)
+    return {
+        "waveform": waveform_m,
+        "clock": clock_m,
+        "floor": math.sqrt(
+            max(floor_m * floor_m - waveform_m * waveform_m - clock_m * clock_m, 0.0)
+        ),
+    }
+
+
+def _quadrature(terms: dict, live: "Terms" = ALL_TERMS) -> float:
+    """The sigma of whichever terms are switched on, in metres."""
+    return math.sqrt(
+        sum(
+            value * value
+            for name, value in terms.items()
+            if getattr(live, name)
+        )
+    )
+
+
+def measurement_sigma_m(
+    budget,
+    radio: Radio,
+    clock: Clock = CRYSTAL,
+    scheme: Scheme = DOUBLE_SIDED,
+    corrected: bool = True,
+    turnaround_s: float = DEFAULT_TURNAROUND_S,
+) -> float:
+    """One sigma on a single range, in metres. Which term binds says what to fix."""
+    return _quadrature(
+        sigma_terms_m(budget, radio, clock, scheme, corrected, turnaround_s)
+    )
 
 
 def measure(
@@ -299,6 +331,7 @@ def measure(
     frequency_hz: float = 2450e6,
     survey_error_m: float = 0.0,
     packet_loss: float = 0.0,
+    terms: "Terms" = ALL_TERMS,
 ) -> Optional[RangeObservation]:
     """One exchange. Returns nothing when the link does not close.
 
@@ -328,10 +361,18 @@ def measure(
     # rest of a shared band, a collision with traffic this study does not
     # simulate, a fade the two-ray average smooths over. An exchange that
     # fails this way produces nothing, exactly like one that never closed.
-    if packet_loss > 0.0 and float(rng.random()) < packet_loss:
+    if terms.packet_loss and packet_loss > 0.0 and float(rng.random()) < packet_loss:
         return None
 
-    sigma_m = measurement_sigma_m(budget, anchor.radio, clock, scheme, corrected)
+    parts = sigma_terms_m(budget, anchor.radio, clock, scheme, corrected)
+    sigma_m = _quadrature(parts)
+    # What is actually drawn, which is only the terms this run leaves
+    # live. The variance reported below stays whole either way: the
+    # receiver's own belief about its measurement does not change because
+    # an experiment silenced one source, and holding it fixed is what
+    # makes two runs comparable. A filter reweighted between them would
+    # be measuring its own gains rather than the error under study.
+    noise_m = _quadrature(parts, terms)
 
     # Two errors that are not noise and must not be drawn as noise.
     #
@@ -344,9 +385,9 @@ def measure(
     # suggests (ADR-0019).
     measured = (
         budget.distance_m
-        + budget.excess_path_m
-        + survey_error_m
-        + float(rng.normal(0.0, sigma_m))
+        + (budget.excess_path_m if terms.excess_path else 0.0)
+        + (survey_error_m if terms.survey else 0.0)
+        + (float(rng.normal(0.0, noise_m)) if noise_m > 0.0 else 0.0)
     )
 
     return RangeObservation(

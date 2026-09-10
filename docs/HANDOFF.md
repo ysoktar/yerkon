@@ -57,6 +57,8 @@ later (ADR-0006).
 | `cost.py` | CAPEX from the bill of materials, OPEX from an inventory |
 | `scenarios.py` | the three deployments the table describes, as configuration |
 | `report.py` | the four rows, the ten columns, and the notes under them |
+| `terms.py` | the seven named error sources, so each can be switched off |
+| `budget.py` | the dissection: what each source was worth, by re-running |
 | `siting.py` | the search for the cheapest deployment that meets a target |
 | `settings.py` | every figure the report did not supply, from `defaults.toml` |
 | `calibrate.py` | a MATLAB measurement read back as a default |
@@ -64,7 +66,7 @@ later (ADR-0006).
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
 | `numbers.py` | comma decimal mark, no thousands separator |
-| `cli.py` | the `fetch` and `design` verbs |
+| `cli.py` | the `fetch`, `design`, `table`, `view`, `site`, `budget`, `defaults` and `calibrate` verbs |
 
 `tests/test_architecture.py` inspects imports so the estimator cannot
 reach the truth. It is a test, not a convention, on purpose.
@@ -105,6 +107,13 @@ not code.
 4. **What structures actually stand where.** The siting search's answer
    moves with the survey, and the defaults are an assumption about a
    typical stretch of Turkish highway.
+5. **How well the anchors can actually be surveyed.** `yerkon budget`
+   makes this the single most consequential figure for the tunnel row:
+   at the assumed 0,15 m it is worth 1,84 m of position error there,
+   against 0,17 m for everything else combined, because the bore's
+   geometry multiplies one range's sigma by eighteen and a survey error
+   never averages out. In town it is worth 0,09 m and does not matter.
+   One number, two opposite answers, and only a real survey settles it.
 
 ## Open questions
 
@@ -121,7 +130,11 @@ not code.
 - **The multipath channel and the implementation floor** want calibrating
   against MATLAB. The floor is currently one published measurement per
   radio, and the model now says most of it is clock rather than timing
-  resolution, which the same measurement could confirm or refute.
+  resolution, which the same measurement could confirm or refute. The
+  dissection raises the stakes: the SX1280's 2,94 m floor is the largest
+  single contributor to both the urban row (1,04 m of 1,24 m) and the
+  weighted row, so what that number really is decides what the whole
+  table says about the open road.
 
 ## What this project has already got wrong
 

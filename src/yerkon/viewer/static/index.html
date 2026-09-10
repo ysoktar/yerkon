@@ -22,8 +22,15 @@
       <option value="tunnel">Tünel</option>
       <option value="mixed">Karışık koridor</option>
     </select></label>
-    <label>Koridor <output id="corridor-out"></output>
+    <label>Boy <output id="corridor-out"></output>
       <input type="range" id="corridor_m" min="500" max="40000" step="500"></label>
+    <label>En <output id="width-out"></output>
+      <input type="range" id="width_m" min="0" max="40000" step="500"></label>
+    <p class="hint">En sıfırken saha bir koridordur: direkler yolun iki
+      yanına dizilir ve birimler düz gider. Sıfırdan büyükken saha bir
+      alandır: direkler kaydırmalı bir ızgaraya yayılır, birimler alanın
+      çevresini ve ortasını dolaşır. Geometri ikisinde tamamen
+      farklıdır.</p>
   </section>
 
   <section>

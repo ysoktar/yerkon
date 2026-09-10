@@ -197,13 +197,52 @@ def test_every_scenario_carries_a_weight_and_they_are_not_all_equal():
 
 
 @pytest.mark.slow
-def test_the_tunnel_row_beats_the_road_rows_on_accuracy():
-    """An impulse radio at a hundred and fifty metres against a spread
-    one at kilometres. If this ever inverts, something is wrong."""
-    tunnel = run(TUNNEL).row()
-    urban = run(URBAN).row()
-    assert tunnel.hpe_p95_m < urban.hpe_p95_m / 3.0
-    assert tunnel.vpe_p95_m < urban.vpe_p95_m
+def test_the_tunnel_measures_a_range_far_better_than_the_town_does():
+    """An impulse radio against a spread one. If this inverts, something broke.
+
+    This is a claim about ranging and only about ranging. It used to be
+    written as a claim about position — that the tunnel row must beat the
+    urban row by three times — and the area rewrite falsified it: the
+    tunnel now ranges twenty-nine times better and positions no better at
+    all. That was not a regression, and a test that called it one would
+    have argued for undoing the fix.
+    """
+    tunnel = run(TUNNEL)
+    urban = run(URBAN)
+    assert tunnel.samples.median_range_sigma_m < (
+        urban.samples.median_range_sigma_m / 10.0
+    )
+
+
+@pytest.mark.slow
+def test_a_bore_turns_its_ranging_advantage_into_no_advantage_at_all():
+    """ADR-0020. The geometry, not the radio, is what the tunnel row is about.
+
+    Every anchor in a bore stands within a few metres of one line, so the
+    arrangement multiplies a range error instead of averaging it down,
+    and a town full of anchors on a grid does the opposite. Twenty-nine
+    times better ranging therefore arrives as no better a position, and
+    the number that says so is the ratio of position error to range
+    error: far above one in the bore, below one in the town.
+    """
+    tunnel, urban = run(TUNNEL), run(URBAN)
+
+    def amplification(result):
+        return result.row().hpe_p50_m / result.samples.median_range_sigma_m
+
+    assert amplification(tunnel) > 5.0
+    assert amplification(urban) < 1.0
+
+
+@pytest.mark.slow
+def test_the_tunnel_still_supports_the_height_the_open_road_cannot():
+    """Anchors that surround a receiver make the vertical observable.
+
+    Anchors beside it do not, whatever shape the site is (ADR-0011), and
+    this is the one comparison between the rows that the area rewrite
+    left standing.
+    """
+    assert run(TUNNEL).row().vpe_p95_m < run(URBAN).row().vpe_p95_m
 
 
 @pytest.mark.slow

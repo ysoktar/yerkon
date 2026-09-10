@@ -39,18 +39,20 @@ Built and tested:
 - `scenarios.py`, the three deployments the table describes, as
   configuration rather than as code.
 - `report.py`, the four rows and what they rest on.
+- `terms.py` and `budget.py`, the seven named error sources and the
+  dissection that re-runs each scenario with one of them silenced, so the
+  table's accuracy figures come with the reason they are what they are.
 - `siting.py`, the search for the cheapest deployment that meets a target.
 - `settings.py` and `defaults.toml`, every figure nobody supplied, in
   one file that nothing else may add to.
-- `viewer/`, a local web app over the same engine: the corridor in three
+- `viewer/`, a local web app over the same engine: the site in three
   dimensions, every setting live, and the confirmation panel in front of
   any change that forces another.
 - `ranging.py`, the two-way exchange: clocks, schemes, air time.
 - `design.py` and `proposal.py`, the settings a person chooses and the
   panel that shows every consequence of an edit before applying it.
 
-Not built yet: the table,
-the viewer. `docs/HANDOFF.md` has the plan and the open questions.
+`docs/HANDOFF.md` has the open questions and what is still a placeholder.
 
 ## Running
 
@@ -65,8 +67,8 @@ pytest
 yerkon view
 ```
 
-Opens a local web app. The corridor in three dimensions, with the ground,
-the road, each anchor and the ring it ranges within tolerance; the swept
+Opens a local web app. The site in three dimensions, with the ground, the
+route, each anchor and the ring it ranges within tolerance; the swept
 coverage painted on the ground in two colours, one for ground a packet
 reaches and one for ground where four anchors are in reach at once.
 
@@ -75,11 +77,19 @@ corridor** that runs out of a town, across open country and through a
 bore, carrying all three anchor modules at once. None of the report's
 three rows measures that arrangement; this one does.
 
-Anchors are edited as *runs* — a stretch of corridor carrying one module
-on one mounting at one spacing — and a corridor may hold as many as it
-needs, each drawn in its own colour with its own reach ring. Units are
-edited the same way: as many as you like, each with its own speed, start,
-antenna height and set of modules, drawn on the route it takes.
+**En** — the site's width — is the knob that decides the shape of
+everything. At zero the site is a corridor: anchors line the road either
+side and units drive straight. Above zero it is an area: anchors spread
+over a staggered grid and units drive a circuit round the edge and across
+the middle. The geometry a receiver gets from the two is not comparable,
+which is why both are shown rather than one assumed. Urban and rural open
+as areas; the tunnel and the mixed corridor open as lines.
+
+Anchors are edited as *runs* — a group carrying one module on one
+mounting at one spacing — and a site may hold as many as it needs, each
+drawn in its own colour with its own reach ring. Units are edited the
+same way: as many as you like, each with its own speed, start, antenna
+height and set of modules, drawn on the route it takes.
 
 Everything is live. Drag an anchor, shift-click to remove it, add or drop
 a run or a unit, move any slider, and the scene and the numbers follow.
@@ -202,13 +212,16 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 5,31 | 16,92 | 36,27 | %98,72 | 5,34 | 13082 | 6061 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 4,22 | 14,85 | 107,00 | %99,28 | 58,00 | 21424 | 888 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,76 | 2,77 | 7,95 | %98,01 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 4,32 | 15,61 | 88,80 | %98,89 | 25,87 | 460453 | 88337 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,24 | 2,69 | 32,85 | %100,00 | 12,63 | 15902 | 7367 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 2,14 | 5,97 | 122,07 | %100,00 | 372,50 | 8468 | 351 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,81 | 2,67 | 6,64 | %98,02 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 1,54 | 4,37 | 88,90 | %99,84 | 155,32 | 456680 | 88775 |
 
-Each row now carries two units sharing the air, which is why the errors
-are larger than a single-vehicle model would report. See below.
+Each row carries two units sharing the air, which is why the update rate
+is half what one unit would see. Urban is a town three kilometres on a
+side and rural is open country twenty kilometres on a side; only the
+tunnel is a corridor, and the addendum to ADR-0014 is what that change
+cost the earlier figures.
 
 The OPEX column is the one the report leaves empty for all four rows. It
 comes from an inventory of named recurring items rather than a percentage
@@ -220,16 +233,63 @@ Three things the table will not do without saying so:
 **The tunnel's cost per km² is not comparable to the other rows.** A bore
 12 m wide over 2 km is 0,024 km², so dividing by it produces a large
 number by arithmetic rather than by judgement. On cost per route
-kilometre the tunnel is 53441 TL and the rural corridor 51774 TL, which
-is the comparison that means something.
+kilometre the tunnel is 53441 TL. The other two rows serve areas rather
+than lines, so their route kilometres are the length of a test journey
+and no cost per kilometre is quoted for them at all.
 
 **The service area is where a position is available**, not where a packet
-arrives. For the rural corridor those are 58,00 and 445,44 km², a factor
-of 7,7, and the notes print both every time (ADR-0012).
+arrives. For the rural region those are 372,50 and 853,75 km², a factor
+of 2,3, and the notes print both every time (ADR-0012).
 
-**VPE is what roadside geometry supports**, with no height constraint
-anywhere. Tens of metres on the open road, six in the tunnel where the
+**VPE is what the geometry supports**, with no height constraint
+anywhere. Tens of metres in the open, under seven in the tunnel where the
 anchors surround the receiver rather than lining up beside it (ADR-0011).
+
+## Where the error came from
+
+```bash
+yerkon budget
+```
+
+An accuracy figure nobody can act on is half a result. This re-runs each
+scenario with one error source silenced at a time — seven sources,
+sixteen runs each — and reports what every one of them was worth
+(ADR-0020). It is the same engine the table uses, so it cannot disagree
+with it.
+
+```
+Tünel — HPE P50 1,81 m, P95 2,67 m; bir menzilin σ'sı 0,10 m, geometri çarpanı ×18,1
+
+  Hata kaynağı           Tek başına  Kalkarsa  Kazanç  Çare
+  ---------------------  ----------  --------  ------  -----------------------------------
+  Direk konum ölçümü           1,84      0,17    1,63  direkleri GNSS ile daha iyi ölçmek
+  Donanım ölçüm tabanı         0,17      1,84   -0,03  daha iyi bir modül
+  Dalga formu gürültüsü        0,07      1,81    0,00  daha yüksek güç, daha yakın direk
+  Saat kayması                 0,03      1,81    0,00  TCXO ya da çift taraflı TWR
+  Tur içi hareket              0,00      1,78    0,03  daha kısa tur
+  Fazladan yol (engel)         0,00      1,81    0,00  direği yükseltmek
+  Kaybolan alışveriş           0,00      1,81    0,00  daha temiz kanal
+  Model artığı                 0,00                    hiçbir kaynak açık değilken kalan
+```
+
+Two columns, because they answer different questions. **Tek başına** is
+the error if that source were the only one. **Kalkarsa** is what the
+whole error falls to if it goes away and every other stays — always the
+smaller saving, because errors add in quadrature, and the only one of the
+two that is a purchase decision.
+
+The tunnel is the most accurate deployment in the study by every hardware
+measure and comes out the least accurate of the three. The dissection
+says why: its bore multiplies one range's sigma by eighteen, and what it
+multiplies hardest is the anchor survey error, the one term that never
+averages out. Buying a better radio for it buys nothing; surveying its
+brackets properly takes it from 1,81 m to 0,17 m.
+
+In town the ranking inverts — the module's own measurement floor is worth
+1,04 m and the survey error 0,09 m — and the geometry multiplier is 0,42,
+*below one*. An area with a filter running across it comes out better
+than a single range. That number is the quantitative form of what the
+corridor framing had been hiding.
 
 ## Fetching a site
 
@@ -280,8 +340,9 @@ on, not by a list of rules kept alongside it, and a test enforces that.
 
 ## What a deployment actually delivers
 
-A 24 km corridor over rolling ground, anchors staggered either side on
-25 m masts, a vehicle at 100 km/h, no height constraint:
+A corridor study — not one of the table's rows, two of which are areas.
+24 km over rolling ground, anchors staggered either side on 25 m masts, a
+vehicle at 100 km/h, no height constraint:
 
 | Anchor spacing | Anchors | HPE p50 | HPE p95 | Availability | Reached | Served |
 |---|---|---|---|---|---|---|

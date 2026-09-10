@@ -38,6 +38,7 @@ from yerkon.ranging import (
 )
 from yerkon.regulatory import TURKEY, SpectrumRule
 from yerkon.rf import Terminal, evaluate_link, ranging_sigma_m
+from yerkon.terms import ALL as ALL_TERMS, Terms
 from yerkon.world import Anchor, Road, Terrain
 
 
@@ -117,6 +118,15 @@ class Deployment:
     region: SpectrumRule = TURKEY
     #: Share of the second this deployment's ranging may occupy.
     duty_cycle: float = 1.0
+    #: Most anchors a unit will range against in one round.
+    #:
+    #: A receiver over an area can hear far more anchors than it has time
+    #: to range against: sixty-four of them at thirty milliseconds each is
+    #: a round every two seconds, by which point a vehicle has moved
+    #: thirty metres. Real systems range against the nearest few and
+    #: ignore the rest, so this does too. Eight is more than enough for a
+    #: position and cheap enough to repeat.
+    max_anchors_per_round: int = 8
 
     def __post_init__(self) -> None:
         if not self.anchors:
@@ -154,6 +164,23 @@ class Deployment:
             if radio is not None
         )
 
+    def nearest_to(
+        self, receiver: Receiver, at_m: tuple[float, float, float]
+    ) -> tuple[tuple[str, Terminal, Radio], ...]:
+        """The anchors a unit will actually range against this round.
+
+        The closest it can hear, up to the round's limit. Distance is the
+        right ordering because a nearer anchor gives both a stronger link
+        and, on a corridor, better geometry than a distant one strung out
+        along the same line.
+        """
+        heard = self.anchors_heard_by(receiver)
+        if len(heard) <= self.max_anchors_per_round:
+            return heard
+        return tuple(
+            sorted(heard, key=lambda item: math.dist(item[1].position_m, at_m))
+        )[: self.max_anchors_per_round]
+
     def round_duration_s(self) -> float:
         """How long between one unit's fixes, in seconds.
 
@@ -173,11 +200,14 @@ class Deployment:
             )
             return demand_s / self.duty_cycle
 
-        demand_s = sum(
-            exchange_duration_s(anchor_radio, self.scheme)
-            for unit in self.receivers
-            for _, _, anchor_radio in self.anchors_heard_by(unit)
-        )
+        demand_s = 0.0
+        for unit in self.receivers:
+            heard = self.anchors_heard_by(unit)
+            # Only the ones a round has room for. Which they are depends
+            # on where the unit is; how many there are does not, and the
+            # duration only needs the count.
+            for _, _, anchor_radio in heard[: self.max_anchors_per_round]:
+                demand_s += exchange_duration_s(anchor_radio, self.scheme)
         return demand_s / self.duty_cycle
 
 
@@ -229,6 +259,12 @@ class Samples:
     lost_links: int = 0
     #: Ranging exchanges attempted.
     attempted_links: int = 0
+    #: Median sigma the receiver believed its own ranges had, in metres.
+    #:
+    #: What one measurement was worth, before geometry and the filter had
+    #: their say. Carried so a dissection can report how much the
+    #: arrangement of the anchors multiplies it (ADR-0020).
+    median_range_sigma_m: float = 0.0
 
     @property
     def produced(self) -> int:
@@ -301,16 +337,25 @@ def combine(weighted: Sequence[tuple[Samples, float]], name: str) -> Samples:
         attempted=int(round(combined_h.size * attempted / max(produced_weight, 1e-9))),
         lost_links=sum(s.lost_links for s, _ in weighted),
         attempted_links=sum(s.attempted_links for s, _ in weighted),
+        median_range_sigma_m=sum(
+            (weight / total) * s.median_range_sigma_m for s, weight in weighted
+        ),
     )
 
 
-def run_scenario(scenario: Scenario) -> Samples:
+def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
     """Drive every unit, fix as often as the medium allows, count errors.
 
     Units share the anchors, so a round takes as long as all of them
     together need, and every unit is fixed once per round. Errors from
     all of them land in one sample set: the table's rows are about a
     deployment, not about one vehicle.
+
+    ``terms`` says which error sources are live. Everything is, unless a
+    caller is dissecting the result; see `yerkon.budget`. Silencing a
+    source changes what the world does to the measurements and nothing
+    about how the deployment is arranged or how the estimator weighs
+    them, which is what makes two such runs comparable.
     """
     rng = np.random.default_rng(scenario.seed)
 
@@ -330,6 +375,7 @@ def run_scenario(scenario: Scenario) -> Samples:
 
     horizontal: list[float] = []
     vertical: list[float] = []
+    sigmas: list[float] = []
     attempted = 0
     attempted_links = 0
     lost_links = 0
@@ -352,9 +398,15 @@ def run_scenario(scenario: Scenario) -> Samples:
                 continue
             attempted += 1
             observations = []
-            for identifier, anchor, radio in deployment.anchors_heard_by(unit):
+            # Where the unit is when the round begins. With motion
+            # silenced the whole round happens here: every range in it is
+            # measured from one place at one instant, which is the
+            # snapshot a round only approximates.
+            here = unit.journey.position_at(slot_at_s)
+            for identifier, anchor, radio in deployment.nearest_to(unit, here):
                 attempted_links += 1
-                receiver = unit.terminal(radio, slot_at_s)
+                measured_at_s = slot_at_s if terms.motion else at_s
+                receiver = unit.terminal(radio, measured_at_s)
                 # The survey error is an error in the anchor's position,
                 # so what it does to a range is its component along the
                 # line to the receiver.
@@ -370,7 +422,7 @@ def run_scenario(scenario: Scenario) -> Samples:
                 observation = measure(
                     anchor,
                     receiver,
-                    slot_at_s,
+                    measured_at_s,
                     rng,
                     anchor_id=identifier,
                     clock=deployment.clock,
@@ -381,6 +433,7 @@ def run_scenario(scenario: Scenario) -> Samples:
                     region=deployment.region,
                     survey_error_m=along,
                     packet_loss=scenario.packet_loss,
+                    terms=terms,
                 )
                 slot_at_s += exchange_duration_s(
                     anchor.radio, deployment.scheme
@@ -389,6 +442,7 @@ def run_scenario(scenario: Scenario) -> Samples:
                     lost_links += 1
                 elif observation.sigma_m <= scenario.accept_sigma_m:
                     observations.append(observation)
+                    sigmas.append(observation.sigma_m)
 
             fix = _fix_from(
                 observations, trackers[unit.identifier], scenario.manoeuvre_m_s2
@@ -415,6 +469,7 @@ def run_scenario(scenario: Scenario) -> Samples:
         attempted=attempted,
         lost_links=lost_links,
         attempted_links=attempted_links,
+        median_range_sigma_m=float(np.median(sigmas)) if sigmas else 0.0,
     )
 
 

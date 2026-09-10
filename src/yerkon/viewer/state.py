@@ -23,10 +23,11 @@ from yerkon.design import (
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import radios
 from yerkon.ranging import SCHEMES
-from yerkon.scenarios import CHOICES, Deployed, _straight_road, catalogue
+from yerkon.scenarios import CHOICES, Deployed, _circuit, _straight_road, catalogue
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.world import (
     Anchor,
+    Road,
     Terrain,
     flat_terrain,
     mountings,
@@ -34,11 +35,11 @@ from yerkon.world import (
 )
 
 
-#: A group of anchors of one kind, laid along part of the corridor.
+#: A group of anchors of one kind, laid over part of the site.
 #:
-#: A corridor does not carry one kind of anchor, so the viewer does not
-#: model one. Each run is a chain of these, and they may overlap: town
-#: columns for the first few kilometres, masts across open country, UWB
+#: A site does not carry one kind of anchor, so the viewer does not model
+#: one. Each run is a group of these, and they may overlap: town columns
+#: over the first few square kilometres, masts across open country, UWB
 #: brackets through a bore.
 @dataclass(frozen=True)
 class AnchorRun:
@@ -49,23 +50,49 @@ class AnchorRun:
     to_m: float = 24_000.0
     spacing_m: float = 2000.0
     offset_m: float = 400.0
+    #: How far alternate rows are shifted along, in metres.
+    #:
+    #: Only used over an area. A perfect grid puts every anchor a
+    #: receiver can see on one of two lines through it, which is a worse
+    #: arrangement than anything anybody would build.
+    stagger_m: float = 0.0
 
-    def anchors(self, terrain: Terrain, catalogues=None) -> list:
+    def anchors(self, terrain: Terrain, catalogues=None, width_m: float = 0.0) -> list:
+        """Where this run's anchors stand.
+
+        Along a line when the site has no width, and over a staggered
+        grid when it has. The two produce entirely different geometry
+        for a receiver — a line leaves the cross-track direction barely
+        observable and an area does not — which is why the viewer can
+        show both rather than assuming one (ADR-0014).
+        """
         mounting_of, radio_of = catalogues or (MOUNTING_CHOICES, RADIO_CHOICES)
         mounting = chosen(mounting_of, self.mounting, "mounting")
         radio = chosen(radio_of, self.radio, "radio")
         spacing = max(self.spacing_m, 25.0)
+        along = np.arange(self.from_m, max(self.to_m, self.from_m) + 1.0, spacing)
+
+        if width_m <= 0.0:
+            return [
+                (
+                    "{}{}".format(self.identifier, index),
+                    (float(x), self.offset_m if index % 2 == 0 else -self.offset_m),
+                    mounting,
+                    radio,
+                )
+                for index, x in enumerate(along)
+            ]
+
         out = []
-        for index, x in enumerate(
-            np.arange(self.from_m, max(self.to_m, self.from_m) + 1.0, spacing)
-        ):
-            side = self.offset_m if index % 2 == 0 else -self.offset_m
-            out.append((
-                "{}{}".format(self.identifier, index),
-                (float(x), side),
-                mounting,
-                radio,
-            ))
+        for row, y in enumerate(np.arange(0.0, width_m + 1.0, spacing)):
+            shift = self.stagger_m if row % 2 else 0.0
+            for x in along:
+                out.append((
+                    "{}{}".format(self.identifier, len(out)),
+                    (float(x) + shift, float(y) + self.offset_m),
+                    mounting,
+                    radio,
+                ))
         return out
 
     def as_json(self) -> dict:
@@ -113,6 +140,15 @@ class ViewState:
     scheme: str = "single"
 
     corridor_m: float = 24_000.0
+
+    #: How far the site extends across, in metres. Zero is a corridor.
+    #:
+    #: The single knob that decides whether this is a line or an area,
+    #: because it decides both at once: anchors go on a grid rather than
+    #: down one side, and a unit drives a circuit rather than east. Two
+    #: separate knobs could disagree, and a scene showing gridded anchors
+    #: driven past in a straight line would be neither arrangement.
+    width_m: float = 0.0
 
     #: Anchors, as one or more runs of a single kind.
     runs: tuple = DEFAULT_RUNS
@@ -191,7 +227,7 @@ class ViewState:
         placed = []
         for run in self.runs:
             for identifier, ground, mounting, radio in run.anchors(
-                terrain, catalogues
+                terrain, catalogues, self.width_m
             ):
                 if identifier in self.removed:
                     continue
@@ -204,8 +240,18 @@ class ViewState:
             raise ValueError("every anchor has been removed")
         return tuple(placed)
 
+    def road(self, terrain: Terrain) -> Road:
+        """The route the units take: a line down a corridor, a circuit over an area."""
+        if self.width_m <= 0.0:
+            return _straight_road(self.corridor_m, terrain)
+        return _circuit(
+            self.corridor_m, self.width_m, terrain,
+            inset_m=min(self.corridor_m, self.width_m) * 0.1,
+            step_m=max(min(self.corridor_m, self.width_m) / 20.0, 50.0),
+        )
+
     def receivers(self, terrain: Terrain) -> tuple[Receiver, ...]:
-        road = _straight_road(self.corridor_m, terrain)
+        road = self.road(terrain)
         _, radio_of = self.catalogues()
         return tuple(
             Receiver(
@@ -256,7 +302,7 @@ class ViewState:
                 mounting_of, self.runs[0].mounting if self.runs else "mast",
                 "mounting",
             ),
-            route_km=self.corridor_m / 1000.0,
+            route_km=self.road(self.terrain()).length_m / 1000.0,
             coverage_resolution_m=self.sweep_m,
             confined_width_m=template.confined_width_m,
         )
@@ -317,19 +363,23 @@ class ViewState:
 #: go through the confirmation panel (ADR-0009). Everything else — moving
 #: an anchor, changing the terrain, dragging a slider — applies at once.
 def from_scenario(name: str) -> ViewState:
-    """The viewer's own state for one of the report's three modes.
+    """The viewer's own state for one of the report's modes.
 
     Rebuilt here rather than lifted from `scenarios`, because the viewer
-    edits a corridor of runs and units and the report's scenarios are
-    frozen arrangements. What is shared is the thing that matters: the
-    module, the mounting and the spacing each mode uses.
+    edits a site of runs and units and the report's scenarios are frozen
+    arrangements. What is shared is the thing that matters: the module,
+    the mounting, the spacing and the shape each mode uses — a town and a
+    stretch of open country are areas, and only a bore is a line.
     """
     if name == "urban":
         return ViewState(
-            scenario="urban", corridor_m=6000.0, relief_m=0.0,
+            scenario="urban", corridor_m=3000.0, width_m=3000.0, relief_m=0.0,
             clutter_db_per_km=30.0, roughness_m=0.5, tolerance_m=5.0,
             sweep_m=200.0, journey_s=240.0,
-            runs=(AnchorRun("C", "sx1280", "column", 0.0, 6000.0, 400.0, 25.0),),
+            runs=(
+                AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 500.0, 0.0,
+                          stagger_m=250.0),
+            ),
             units=(
                 UnitPlan("araç", "vehicle", 50.0, 0.0, 1.5),
                 UnitPlan("yaya", "pedestrian", 5.0, 2000.0, 1.6),
@@ -346,11 +396,26 @@ def from_scenario(name: str) -> ViewState:
                 UnitPlan("yaya", "pedestrian", 5.0, 600.0, 1.6),
             ),
         )
+    if name == "rural":
+        return ViewState(
+            scenario="rural", corridor_m=20_000.0, width_m=20_000.0,
+            relief_m=40.0, hill_spacing_m=3000.0, roughness_m=0.2,
+            tolerance_m=5.0, sweep_m=500.0, journey_s=2400.0,
+            runs=(
+                AnchorRun("M", "e28", "mast", 0.0, 20_000.0, 4000.0, 0.0,
+                          stagger_m=2000.0),
+            ),
+            units=(
+                UnitPlan("araç", "vehicle", 100.0, 0.0, 1.5),
+                UnitPlan("kamyon", "vehicle", 80.0, 20_000.0, 2.8),
+            ),
+        )
     if name == "mixed":
         # A corridor that runs out of a town, across open country and
         # through a bore, carrying all three modules at once. This is the
         # arrangement the report describes and none of its three rows
-        # measures on its own.
+        # measures on its own, and it is the one mode besides the tunnel
+        # that really is a line: width stays at zero.
         return ViewState(
             scenario="mixed", corridor_m=20_000.0, relief_m=30.0,
             hill_spacing_m=3000.0, roughness_m=0.2, tolerance_m=5.0,

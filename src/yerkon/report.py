@@ -17,6 +17,7 @@ ninety-fifth percentile of anything (ADR-0005).
 
 from __future__ import annotations
 
+import textwrap
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
@@ -28,6 +29,7 @@ from yerkon.cost import (
     operating_rates,
     price,
 )
+from yerkon.budget import Dissection
 from yerkon.evaluate import Samples, combine, coverage, run_scenario
 from yerkon.numbers import decimal_comma
 from yerkon.scenarios import ALL, Deployed, catalogue, reweighted
@@ -263,6 +265,11 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
                     decimal_comma(row.reached_km2 / max(row.area_km2, 1e-9), 1),
                 )
             )
+            lines.append(
+                "    Its route kilometres are a test journey through the "
+                "area, not a dimension of the service, so cost is quoted "
+                "per square kilometre and not per kilometre of road."
+            )
         else:
             lines.append(
                 "  {}: the deployment serves a bore {} m wide over {} km, "
@@ -278,21 +285,45 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
                     decimal_comma(result.deployed.route_km, 1),
                 )
             )
-        lines.append(
-            "    {}: {} TL to build, {} TL a year to run, {} TL per route "
-            "kilometre.".format(
-                _anchor_mix(result.deployed.scenario.deployment),
-                decimal_comma(result.costing.capex_tl, 0),
-                decimal_comma(result.costing.opex_tl_per_year, 0),
-                decimal_comma(result.costing.capex_tl_per_route_km, 0),
-            )
+        built = "    {}: {} TL to build, {} TL a year to run".format(
+            _anchor_mix(result.deployed.scenario.deployment),
+            decimal_comma(result.costing.capex_tl, 0),
+            decimal_comma(result.costing.opex_tl_per_year, 0),
         )
+        if result.deployed.serves_a_corridor:
+            # Only a bore has route kilometres worth quoting. Over an
+            # area they are the length of a test journey rather than a
+            # dimension of the service.
+            built += ", {} TL per route kilometre".format(
+                decimal_comma(result.costing.capex_tl_per_route_km, 0)
+            )
+        lines.append(built + ".")
         lines.append(
             "    {} of that rests on rates nobody supplied.".format(
                 "%{}".format(decimal_comma(100.0 * row.assumed_share, 0))
             )
         )
         deployment = result.deployed.scenario.deployment
+        if result.samples.attempted_links:
+            lost = result.samples.lost_links / result.samples.attempted_links
+            if lost > 0.01:
+                lines.append(
+                    "    {} of exchanges were lost and every round still "
+                    "produced a position, because a round attempts {} "
+                    "ranges and a position needs four. Density absorbs "
+                    "loss.".format(
+                        "%" + decimal_comma(100.0 * lost, 1),
+                        min(
+                            deployment.max_anchors_per_round,
+                            len(deployment.anchors),
+                        ),
+                    )
+                    if row.availability > 0.999 else
+                    "    {} of exchanges were lost, which is what the "
+                    "availability column is mostly counting.".format(
+                        "%" + decimal_comma(100.0 * lost, 1)
+                    )
+                )
         lines.append(
             "    {} units share the air: a round takes {} ms, so each is "
             "fixed {} times a second and a second unit halves that rather "
@@ -332,3 +363,136 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
         "actually supports (ADR-0011)."
     )
     return "\n".join(lines)
+
+
+# --- Where the error came from --------------------------------------------
+
+BREAKDOWN_COLUMNS = ("Hata kaynağı", "Tek başına", "Kalkarsa", "Kazanç", "Çare")
+
+
+def _signed(metres: float) -> str:
+    """Metres saved, without printing a negative zero.
+
+    A source worth less than the run's own seed noise comes out slightly
+    negative, and "-0,00" reads as a finding rather than as the rounding
+    it is.
+    """
+    return decimal_comma(0.0 if abs(metres) < 0.005 else metres, 2)
+
+
+def _wrapped(text: str, width: int = 78, indent: str = "") -> str:
+    """Fill each paragraph to a terminal width, keeping the breaks between them."""
+    return "\n".join(
+        textwrap.fill(paragraph, width=width, initial_indent=indent,
+                      subsequent_indent=indent)
+        for paragraph in text.split("\n")
+    )
+
+
+def as_breakdown(dissections: Sequence[Dissection]) -> str:
+    """Each scenario's error taken apart, aligned for a terminal.
+
+    Three numbers per source and then the thing to buy. "Tek başına" is
+    the error if that source were the only one; "kalkarsa" is what the
+    whole error falls to if it goes away and the rest stay; "kazanç" is
+    the difference between that and the published figure, which is the
+    metres the money would actually buy.
+    """
+    return "\n\n".join(
+        [_breakdown_of(dissection) for dissection in dissections]
+        + [_wrapped(BREAKDOWN_NOTE)]
+    )
+
+
+def _breakdown_of(dissection: Dissection) -> str:
+    grid = [BREAKDOWN_COLUMNS]
+    for contribution in dissection.ranked():
+        grid.append((
+            contribution.label,
+            decimal_comma(contribution.alone_p50_m, 2),
+            decimal_comma(contribution.without_p50_m, 2),
+            _signed(contribution.saves_m(dissection.whole_p50_m)),
+            contribution.remedy,
+        ))
+    grid.append((
+        "Model artığı", decimal_comma(dissection.residue_p50_m, 2), "", "",
+        "hiçbir kaynak açık değilken kalan",
+    ))
+
+    widths = [
+        max(len(line[column]) for line in grid)
+        for column in range(len(BREAKDOWN_COLUMNS))
+    ]
+    lines = [
+        "{} — HPE P50 {} m, P95 {} m; bir menzilin σ'sı {} m, "
+        "geometri çarpanı ×{}".format(
+            dissection.name,
+            decimal_comma(dissection.whole_p50_m, 2),
+            decimal_comma(dissection.whole_p95_m, 2),
+            decimal_comma(dissection.range_sigma_m, 2),
+            decimal_comma(dissection.geometry_gain, 1),
+        ),
+        "",
+    ]
+    last = len(BREAKDOWN_COLUMNS) - 1
+    for index, line in enumerate(grid):
+        lines.append(("  " + "  ".join(
+            cell if column == last
+            else cell.ljust(widths[column]) if column == 0
+            else cell.rjust(widths[column])
+            for column, cell in enumerate(line)
+        )).rstrip())
+        if index == 0:
+            lines.append("  " + "  ".join("-" * width for width in widths))
+
+    lines.append("")
+    lines.append(_wrapped(
+        "Kareler toplamı {} m; yayımlanan {} m. Aradaki fark, kaynakların "
+        "birbirinden tam bağımsız olmadığıdır.".format(
+            decimal_comma(dissection.quadrature_p50_m, 2),
+            decimal_comma(dissection.whole_p50_m, 2),
+        ),
+        indent="  ",
+    ))
+
+    dominant = dissection.dominant()
+    if dominant is None:
+        lines.append(_wrapped(
+            "Tek bir baskın kaynak yok: en büyük ikisi birbirine yakın, "
+            "yani burada sıralama değil bir tercih vardır.",
+            indent="  ",
+        ))
+    else:
+        lines.append(_wrapped(
+            "Önce harcanacak yer: {}. Kalkarsa HPE P50 {} m'den {} m'ye "
+            "iner; bunun için gereken {}.".format(
+                dominant.label.lower(),
+                decimal_comma(dissection.whole_p50_m, 2),
+                decimal_comma(dominant.without_p50_m, 2),
+                dominant.remedy,
+            ),
+            indent="  ",
+        ))
+
+    for contribution in dissection.contributions:
+        if contribution.fixes_lost <= 0:
+            continue
+        lines.append(_wrapped(
+            "{} ayrıca {} çözüme mal oluyor: bu kaynak konumu "
+            "kötüleştirmekten çok konumun hiç üretilmemesine neden "
+            "oluyor.".format(contribution.label, contribution.fixes_lost),
+            indent="  ",
+        ))
+    return "\n".join(lines)
+
+
+BREAKDOWN_NOTE = (
+    "Her satır, aynı senaryonun tek bir hata kaynağı susturularak yeniden "
+    "koşturulmasıdır; yeni bir model değil (ADR-0020). Alıcının kendi "
+    "ölçümüne biçtiği varyans her koşuda aynı bırakılır, yoksa süzgeç "
+    "ağırlıklarını da değiştirir ve iki koşu karşılaştırılamaz olurdu.\n"
+    "\"Tek başına\" ile \"kalkarsa\" arasındaki uçurum kareli toplamdan "
+    "gelir: 2,00 m'lik bir toplamdan 0,50 m'yi çıkarmak geriye 1,94 m "
+    "bırakır. Yalnız ilk sütuna bakan biri, alınmaya değmeyecek bir "
+    "iyileştirmeyi değerli sanır."
+)

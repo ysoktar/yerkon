@@ -473,3 +473,85 @@ def test_the_edits_can_be_written_back_as_a_file(tmp_path):
     assert back.number("mounting.tall_mast.site_cost_tl") == 5000.0
     assert back.number("operating.maintenance_tl_per_visit") == 2200.0
     assert not back.entry("mounting.tall_mast.site_cost_tl").is_assumed
+
+
+# --- A site is a line or an area, and the viewer shows both ---------------
+
+
+def an_area(width_m=3000.0):
+    from yerkon.viewer.state import AnchorRun, ViewState
+
+    return ViewState(
+        scenario="urban",
+        corridor_m=3000.0,
+        width_m=width_m,
+        relief_m=0.0,
+        runs=(
+            AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 500.0, 0.0,
+                      stagger_m=250.0),
+        ),
+    )
+
+
+def test_width_turns_a_line_of_anchors_into_a_grid():
+    """ADR-0014's addendum. One knob decides the shape of the whole site.
+
+    Seven positions along by seven across is forty-nine anchors; the same
+    run with no width is the seven along it started as.
+    """
+    area = an_area()
+    corridor = area.merged({"width_m": 0.0})
+    terrain = area.terrain()
+
+    assert len(corridor.anchors(terrain)) == 7
+    assert len(area.anchors(terrain)) == 49
+
+
+def test_an_area_is_driven_round_and_across_rather_than_straight():
+    """A journey that only runs east never changes its cross-track geometry.
+
+    Which would make an area behave like the corridor it is not, so the
+    route has to turn.
+    """
+    area = an_area()
+    terrain = area.terrain()
+
+    straight = area.merged({"width_m": 0.0}).road(terrain)
+    circuit = area.road(terrain)
+
+    assert straight.length_m == pytest.approx(area.corridor_m, rel=0.05)
+    assert circuit.length_m > 3.0 * area.corridor_m
+    assert len({round(y) for _, y in circuit.centreline_m}) > 1
+
+
+def test_a_staggered_row_is_offset_and_an_unstaggered_one_is_not():
+    """A perfect grid puts every anchor a receiver sees on one of two lines.
+
+    Which is a worse arrangement than anything anybody builds, so
+    alternate rows shift along.
+    """
+    terrain = an_area().terrain()
+    staggered = {a.position_m[0] for a in an_area().anchors(terrain)}
+    square = {
+        a.position_m[0]
+        for a in an_area().merged({
+            "runs": tuple(
+                {**run.as_json(), "stagger_m": 0.0} for run in an_area().runs
+            )
+        }).anchors(terrain)
+    }
+    assert len(staggered) == 2 * len(square)
+
+
+def test_only_the_bore_and_the_mixed_corridor_are_lines():
+    """The report's town and open country are areas. ADR-0014's addendum.
+
+    A mode list where every mode was a corridor is what put a factor of
+    four into the urban row for no physical reason.
+    """
+    from yerkon.viewer.state import MODES, from_scenario
+
+    shapes = {name: from_scenario(name).width_m > 0.0 for name in MODES}
+    assert shapes == {
+        "urban": True, "rural": True, "tunnel": False, "mixed": False
+    }

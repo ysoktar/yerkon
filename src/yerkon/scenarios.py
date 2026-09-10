@@ -12,6 +12,7 @@ physics is elsewhere.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, replace
 from typing import Optional
 
@@ -85,6 +86,19 @@ class Deployed:
     #: sweep would give, and the true one.
     confined_width_m: Optional[float] = None
 
+    @property
+    def serves_a_corridor(self) -> bool:
+        """Whether this deployment serves a line or an area.
+
+        A tunnel is a bore: it has a length and a width and cost per
+        route kilometre is the figure that means something. A town and a
+        stretch of open country are areas, and their route kilometres are
+        the length of a test journey through them rather than a
+        dimension of the service. Reporting one as the other invited
+        exactly that confusion.
+        """
+        return self.confined_width_m is not None
+
     def served_km2(self) -> Optional[float]:
         """Area served, where it follows from the geometry rather than a sweep."""
         if self.confined_width_m is None:
@@ -142,6 +156,82 @@ def _straight_road(length_m: float, terrain: Terrain, step_m: float = 500.0) -> 
     )
 
 
+def _anchors_over(
+    width_m: float,
+    height_m: float,
+    spacing_m: float,
+    mounting: MountingOption,
+    terrain: Terrain,
+    radio: Radio = SX1280,
+    prefix: str = "A",
+    stagger_m: float = 0.0,
+):
+    """Anchors across an area rather than along a line.
+
+    A town and a stretch of open country are not corridors. Anchors go
+    where the structures are, which over a built-up area is a rough grid
+    of streets, and the geometry that gives a receiver is nothing like
+    the geometry of a line: a corridor leaves the cross-track direction
+    barely observable, and an area does not.
+
+    ``stagger_m`` offsets alternate rows, because a perfect grid puts
+    every anchor a receiver can see on one of two lines through it, which
+    is a worse arrangement than anything real.
+    """
+    from yerkon.world import Anchor
+
+    placed = []
+    index = 0
+    for row, y in enumerate(np.arange(0.0, height_m + 1.0, spacing_m)):
+        offset = stagger_m if row % 2 else 0.0
+        for x in np.arange(offset, width_m + 1.0, spacing_m):
+            placed.append(
+                Anchor(
+                    "{}{}".format(prefix, index),
+                    (float(x), float(y)),
+                    mounting,
+                    terrain,
+                    radio=radio,
+                )
+            )
+            index += 1
+    return tuple(placed)
+
+
+def _circuit(
+    width_m: float, height_m: float, terrain: Terrain, inset_m: float = 0.0,
+    step_m: float = 200.0,
+) -> Road:
+    """A route around and across an area, rather than a straight line.
+
+    A vehicle in a town turns. A journey that only ever runs east is a
+    journey whose cross-track geometry never changes, and it would make
+    an area deployment look like a corridor.
+    """
+    left, right = inset_m, width_m - inset_m
+    bottom, top = inset_m, height_m - inset_m
+    corners = [
+        (left, bottom), (right, bottom), (right, top), (left, top),
+        (left, bottom), (right, top),
+    ]
+
+    centreline = []
+    for start, finish in zip(corners, corners[1:]):
+        span = math.dist(start, finish)
+        steps = max(int(span / step_m), 1)
+        for step in range(steps):
+            fraction = step / steps
+            centreline.append((
+                start[0] + (finish[0] - start[0]) * fraction,
+                start[1] + (finish[1] - start[1]) * fraction,
+            ))
+    centreline.append(corners[-1])
+    return Road(
+        centreline_m=centreline, terrain=terrain,
+        surface_m=graded_alignment(centreline, terrain),
+    )
+
+
 def _anchors_along(
     length_m: float,
     spacing_m: float,
@@ -186,11 +276,6 @@ def _unit(identifier, road, speed_m_s, duration_s, start_m=0.0,
 #:
 #: A figure nobody supplied, and the single number that decides how far
 #: an urban anchor reaches. It comes from the settings file.
-#: Absorption by buildings, vegetation and traffic that height does not
-#: clear, in decibels per kilometre at 2,4 GHz.
-#:
-#: A figure nobody supplied, and the single number that decides how far
-#: an urban anchor reaches. It comes from the settings file.
 URBAN_CLUTTER_DB_PER_KM = DEFAULTS.number("site.urban_clutter_db_per_km")
 
 
@@ -213,20 +298,24 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         micro_roughness_m=0.5,
     )
 
-    URBAN_ROAD = _straight_road(6000.0, URBAN_TERRAIN, step_m=200.0)
+    #: A town, three kilometres on a side. Not a street.
+    URBAN_M = 3000.0
+    URBAN_ROAD = _circuit(URBAN_M, URBAN_M, URBAN_TERRAIN, inset_m=300.0,
+                          step_m=150.0)
 
     URBAN = Deployed(
         scenario=Scenario(
             name="Şehir içi",
             terrain=URBAN_TERRAIN,
             deployment=Deployment(
-                anchors=_anchors_along(
-                    6000.0, 400.0, 25.0, mounting["lighting_column"], URBAN_TERRAIN,
-                    radio=module["sx1280"],
+                anchors=_anchors_over(
+                    URBAN_M, URBAN_M, 500.0, mounting["lighting_column"],
+                    URBAN_TERRAIN, radio=module["sx1280"], prefix="C",
+                    stagger_m=250.0,
                 ),
                 receivers=(
-                    _unit("araç", URBAN_ROAD, 13.9, 400.0),
-                    _unit("yaya", URBAN_ROAD, 1.4, 400.0, start_m=2000.0,
+                    _unit("araç", URBAN_ROAD, 13.9, 600.0),
+                    _unit("yaya", URBAN_ROAD, 1.4, 600.0, start_m=2000.0,
                           antenna_height_m=1.6, product="pedestrian"),
                 ),
                 scheme=SINGLE_SIDED,
@@ -241,11 +330,11 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         ),
         product=URBAN_ANCHOR,
         mounting=mounting["lighting_column"],
-        route_km=6.0,
+        route_km=URBAN_ROAD.length_m / 1000.0,
         weight=0.5,
         environment="Dış",
         technology="Karasal PNT (SX1280/LoRa TWR)",
-        coverage_margin_m=2000.0,
+        coverage_margin_m=1500.0,
         coverage_resolution_m=100.0,
     )
 
@@ -256,20 +345,23 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         amplitude_m=40.0, wavelength_m=3000.0, micro_roughness_m=0.2
     )
 
-    RURAL_ROAD = _straight_road(24_000.0, RURAL_TERRAIN)
+    #: Open country, twenty kilometres on a side. Not a highway.
+    RURAL_M = 20_000.0
+    RURAL_ROAD = _circuit(RURAL_M, RURAL_M, RURAL_TERRAIN, inset_m=2000.0)
 
     RURAL = Deployed(
         scenario=Scenario(
             name="Kırsal",
             terrain=RURAL_TERRAIN,
             deployment=Deployment(
-                anchors=_anchors_along(
-                    24_000.0, 2000.0, 400.0, mounting["tall_mast"], RURAL_TERRAIN,
-                    radio=module["e28"],
+                anchors=_anchors_over(
+                    RURAL_M, RURAL_M, 4000.0, mounting["tall_mast"],
+                    RURAL_TERRAIN, radio=module["e28"], prefix="M",
+                    stagger_m=2000.0,
                 ),
                 receivers=(
-                    _unit("araç", RURAL_ROAD, 27.8, 800.0),
-                    _unit("kamyon", RURAL_ROAD, 22.2, 800.0, start_m=6000.0),
+                    _unit("araç", RURAL_ROAD, 27.8, 2400.0),
+                    _unit("kamyon", RURAL_ROAD, 22.2, 2400.0, start_m=20_000.0),
                 ),
                 scheme=SINGLE_SIDED,
                 region=TURKEY,
@@ -281,12 +373,12 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         ),
         product=RURAL_ANCHOR,
         mounting=mounting["tall_mast"],
-        route_km=24.0,
+        route_km=RURAL_ROAD.length_m / 1000.0,
         weight=0.4,
         environment="Dış",
         technology="Karasal PNT (E28-SX1280 TWR)",
         coverage_margin_m=8000.0,
-        coverage_resolution_m=250.0,
+        coverage_resolution_m=500.0,
     )
 
 
@@ -343,7 +435,6 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     )
 
 
-
     return {"urban": URBAN, "rural": RURAL, "tunnel": TUNNEL}
 
 
@@ -353,7 +444,6 @@ URBAN = CHOICES["urban"]
 RURAL = CHOICES["rural"]
 TUNNEL = CHOICES["tunnel"]
 ALL = (URBAN, RURAL, TUNNEL)
-
 
 
 #: The default journey mix for the weighted row, by scenario key.
