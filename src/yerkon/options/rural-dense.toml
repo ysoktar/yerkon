@@ -4,11 +4,13 @@
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-dense'
-title = 'Kırsal: 3 km ızgara, 30 m direk — %90 kullanılabilirlik'
+title = 'Kırsal: 3 km ızgara, 30 m direk — %91,4, iki katı sermayeye'
 origin = 'shipped'
-note = """The cheapest way past ninety percent availability in open country, measured rather than guessed (ADR-0022). Forty-nine masts at three kilometres instead of thirty-three at four, each five metres taller. About twice the mast capital of the default for roughly seven points of availability.
+note = """Forty-nine masts at three kilometres instead of thirty-three at four, each five metres taller: 91,43 % availability against the default's 89,50 %, for 6 516 151 TL against 3 154 228 TL.
 
-It beats the taller-mast option at equal money, because steel and foundation grow about as the square of height: six million lira buys 90,5 % here and 87,8 % there."""
+Read that before buying it. It is 1,9 points for 3,4 million lira, or about 1,7 million a point — poor value, and it was not always. The note this replaces promised "the cheapest way past ninety percent" and was written when the default sat at 82,26 %. Sizing the rural round by how many anchors answer rather than by how many a fix needs took it to 89,50 % for no capital at all (ADR-0022), and most of what this option used to buy went with it.
+
+It still beats rural-tall per point, because steel grows about as the square of height. The two are much closer than they were."""
 
 [values]
 'mounting.tall_mast.height_m' = 30.0

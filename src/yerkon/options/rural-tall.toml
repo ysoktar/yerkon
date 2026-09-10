@@ -4,11 +4,13 @@
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-tall'
-title = 'Kırsal: 35 m direk, aynı ızgara — direk sayısı artmadan'
+title = 'Kırsal: 35 m direk, aynı ızgara — yeni saha açmadan'
 origin = 'shipped'
-note = """The other way of buying rural availability: keep all thirty-three masts where they are and make them ten metres taller. Availability goes from 82,3 % to 87,8 % with no new site, no new access road and no new power connection, which matters where getting to a site is the hard part rather than paying for it.
+note = """The same thirty-three masts where they already are, ten metres taller: 90,12 % availability against the default's 89,50 %, for 5 847 028 TL against 3 154 228 TL.
 
-It loses to rural-dense at equal money and wins on anything counted per site. Both are here because which one is right depends on costs this project does not have."""
+That is 0,6 points for 2,7 million lira — worse value than rural-dense on every count except the one this option exists for: no new site, no new access road, no new power connection. Where getting to a site is the hard part rather than paying for it, that can still be the right answer, and this project has no figure for how hard it is.
+
+Both options were written when the default sat at 82,26 % and promised far more than they now deliver. The round-size fix (ADR-0022) took most of the headroom for nothing."""
 
 [values]
 'mounting.tall_mast.height_m' = 35.0
