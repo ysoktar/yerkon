@@ -141,6 +141,16 @@ clocks, rates — and the share each result reports as resting on guesses
 falls. Sourcing the mast cost alone takes the siting answer from %94
 assumed to %69.
 
+**Or edit them in the viewer.** All 33 appear in `yerkon view`, grouped,
+each with what it affects written under it. Change one and everything
+rebuilds live: raise the mast height from 25 m to 40 m and the panel
+asks first, then the reach ring in the scene grows from 5,52 to 6,98 km.
+Change a site cost and it applies at once, because a price moves no
+physics. A figure edited by hand stays an assumption unless you give it a
+source — that distinction is the difference between exploring and
+reporting. **Dosyaya yaz** writes what you have back out as a file that
+goes straight back in through `--assumptions`.
+
 It moves the answers, too. At a mast cost of 8500 TL existing signs still
 win; at 5000 TL masts take over at 17 anchors for 264906 TL. The
 break-even the costing predicts at 6588 TL is something you can walk up

@@ -50,11 +50,14 @@ def design_of(state: ViewState, run=None) -> Design:
     run at a time and the panel says which.
     """
     run = run or (state.runs[0] if state.runs else None)
+    # From the state's own catalogues, so that editing a mounting height
+    # or a noise figure by hand moves what the panel says it moves.
+    mounting_of, radio_of = state.catalogues()
     return Design(
         region=chosen(REGION_CHOICES, state.region, "region"),
-        anchor_radio=chosen(RADIO_CHOICES, run.radio if run else "sx1280", "radio"),
+        anchor_radio=chosen(radio_of, run.radio if run else "sx1280", "radio"),
         mounting=chosen(
-            MOUNTING_CHOICES, run.mounting if run else "mast", "mounting"
+            mounting_of, run.mounting if run else "mast", "mounting"
         ),
         receiver_height_m=_lowest_unit(state),
         surface_roughness_m=state.roughness_m,
@@ -202,7 +205,57 @@ def scene(state: ViewState) -> dict:
             for run in state.runs
         ],
         "round_s": deployment.round_duration_s(),
+        "assumed": len(state.settings().assumed),
+        "assumed_total": len(state.settings().entries),
         "state": state.as_json(),
+    }
+
+
+#: How the figures are grouped in the panel, and what to call each group.
+GROUPS = (
+    ("mounting", "Montaj yapıları"),
+    ("operating", "İşletme giderleri"),
+    ("radio", "Modüllerin yayımlanmamış değerleri"),
+    ("clock", "Saatler"),
+    ("ranging", "Ölçüm alışverişi"),
+    ("site", "Saha"),
+    ("estimator", "Kestirici"),
+)
+
+
+def figures(state: ViewState) -> dict:
+    """Every figure nobody supplied, as the panel needs it.
+
+    Sent whole rather than by group, because the thing a person wants to
+    see is how much of the study is still resting on guesses, and that is
+    a property of the list rather than of any part of it.
+    """
+    settings = state.settings()
+    listed = []
+    for key, entry in sorted(settings.entries.items()):
+        head = key.split(".")[0]
+        listed.append({
+            "key": key,
+            "group": head,
+            "value": float(entry.sourced.value),
+            "unit": entry.sourced.unit,
+            "provenance": entry.sourced.provenance.value,
+            "source": entry.sourced.source,
+            "note": entry.sourced.note,
+            "affects": entry.affects,
+            "sensitivity": entry.sensitivity,
+            "assumed": entry.is_assumed,
+            "edited": key in state.overrides,
+        })
+    return {
+        "figures": listed,
+        "groups": [
+            {"key": key, "label": label}
+            for key, label in GROUPS
+            if any(f["group"] == key for f in listed)
+        ],
+        "assumed": len(settings.assumed),
+        "total": len(settings.entries),
     }
 
 

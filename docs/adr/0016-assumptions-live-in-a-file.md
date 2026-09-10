@@ -65,5 +65,23 @@ figure is not a cost, and getting it wrong shortens every link in the
 study. It is on the same list as the price of a maintenance visit
 because it has the same standing: somebody guessed it.
 
+All of them are editable while the viewer runs. Every figure appears in
+the panel with what it affects written under it, and changing one rebuilds
+everything from it: the mounting catalogue, the radios, the clocks, the
+rates, the scenarios. A figure that moves the link budget — a mounting
+height, a noise figure, a clock residual — cascades through the same
+confirmation panel as any other setting; one that only moves a price
+applies at once.
+
+A number typed into a viewer is still a guess, so an edit keeps its
+ASSUMPTION provenance unless a source is given with it. That distinction
+is the whole difference between exploring and reporting, and it means the
+counter in the panel tells the truth about how much of what is on screen
+rests on nothing.
+
+An afternoon of that is worth keeping, so the viewer writes the edited
+file back out. It is the same shape the loader reads, so it goes straight
+back in through --assumptions.
+
 What this does not do is remove the assumptions. It makes them a
 finite, ordered, enforceable list instead of a property of the code.

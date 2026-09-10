@@ -340,18 +340,136 @@ def test_the_page_scripts_parse():
         )
 
 
-def test_the_page_asks_for_every_file_the_server_serves():
-    """A missing script is a 404 and a dead page, not a Python failure."""
+def test_the_page_asks_for_nothing_the_server_does_not_serve():
+    """A missing file or a wrong route is a dead page and no Python failure."""
     import pathlib
     import re
 
-    static = pathlib.Path(__file__).resolve().parent.parent / (
-        "src/yerkon/viewer/static"
-    )
-    page = (static / "index.html").read_text(encoding="utf-8")
-    for reference in re.findall(r'(?:src|href)="/([^"]+)"', page):
-        assert (static / reference).exists(), reference
+    viewer = pathlib.Path(__file__).resolve().parent.parent / "src/yerkon/viewer"
+    static = viewer / "static"
+    routing = (viewer / "server.py").read_text(encoding="utf-8")
 
+    page = (static / "index.html").read_text(encoding="utf-8")
     application = (static / "app.js").read_text(encoding="utf-8")
-    for imported in re.findall(r'from "/([^"]+)"', application):
-        assert (static / imported).exists(), imported
+
+    wanted = set(re.findall(r'(?:src|href)="(/[^"]*)"', page))
+    wanted |= set(re.findall(r'from "(/[^"]+)"', application))
+    wanted |= set(re.findall(r'(?:ask|fetch)\(\s*"(/[^"]+)"', application))
+
+    for reference in sorted(wanted):
+        if reference in ("/", ""):
+            continue
+        if reference.startswith("/api/"):
+            assert '"{}"'.format(reference) in routing, reference
+        else:
+            assert (static / reference.lstrip("/")).exists(), reference
+
+
+# --- Editing the figures while it runs ------------------------------------
+
+
+def test_every_figure_nobody_supplied_is_offered_for_editing():
+    from yerkon.settings import DEFAULTS
+    from yerkon.viewer.scene import figures
+
+    listed = figures(a_state())
+    assert len(listed["figures"]) == len(DEFAULTS.entries)
+    assert listed["assumed"] == len(DEFAULTS.assumed)
+    assert listed["groups"]
+
+
+def test_each_figure_carries_what_a_person_needs_to_change_it():
+    from yerkon.viewer.scene import figures
+
+    for figure in figures(a_state())["figures"]:
+        assert figure["unit"] and figure["note"] and figure["affects"]
+        assert "value" in figure and "assumed" in figure
+
+
+def test_editing_a_figure_rebuilds_what_it_feeds():
+    """The mounting catalogue, the radios, the clocks, the scenarios."""
+    state = a_state().merged(
+        {"overrides": {"mounting.tall_mast.site_cost_tl": 5000.0}}
+    )
+    anchors = state.anchors(state.terrain())
+    assert float(anchors[0].mounting.site_cost_tl.value) == 5000.0
+
+
+def test_editing_a_figure_that_moves_the_link_budget_has_to_be_confirmed():
+    """A mounting height and a noise figure both change how far it reaches."""
+    for key, value in (
+        ("mounting.tall_mast.height_m", 40.0),
+        ("radio.sx1280.noise_figure_db", 12.0),
+    ):
+        found = cascades(a_state(), {"overrides": {key: value}})
+        assert found is not None, key
+        labels = [c["label"] for c in found["groups"][0]["follows"]]
+        assert "usable range" in labels, key
+
+
+def test_editing_a_price_does_not_have_to_be_confirmed():
+    """It moves what the deployment costs and nothing about the physics."""
+    assert cascades(
+        a_state(), {"overrides": {"mounting.tall_mast.site_cost_tl": 5000.0}}
+    ) is None
+
+
+def test_a_figure_edited_by_hand_is_still_an_assumption():
+    """A number typed into a viewer is a different guess, not a measurement."""
+    state = a_state().merged(
+        {"overrides": {"mounting.tall_mast.site_cost_tl": 5000.0}}
+    )
+    settings = state.settings()
+    assert settings.number("mounting.tall_mast.site_cost_tl") == 5000.0
+    assert settings.entry("mounting.tall_mast.site_cost_tl").is_assumed
+
+
+def test_a_figure_given_a_source_stops_being_an_assumption():
+    state = a_state().merged({
+        "overrides": {
+            "mounting.tall_mast.site_cost_tl": {
+                "value": 5000.0, "source": "a quotation",
+            }
+        }
+    })
+    settings = state.settings()
+    assert not settings.entry("mounting.tall_mast.site_cost_tl").is_assumed
+    assert len(settings.assumed) == len(a_state().settings().assumed) - 1
+
+
+def test_an_edited_figure_moves_the_answer():
+    """Not decoration: a worse noise figure shortens every link on screen."""
+    from yerkon.viewer.scene import reach_of
+
+    plain = a_state()
+    noisy = plain.merged({"overrides": {"radio.e28.noise_figure_db": 12.0}}) \
+        if "radio.e28.noise_figure_db" in plain.settings().entries else \
+        plain.merged({"overrides": {"radio.sx1280.noise_figure_db": 12.0}})
+    assert reach_of(noisy, noisy.runs[0]) < reach_of(plain, plain.runs[0])
+
+
+def test_a_figure_the_file_does_not_hold_is_refused():
+    state = a_state().merged({"overrides": {"not.a.figure": 1.0}})
+    with pytest.raises(KeyError, match="nothing may be assumed in the code"):
+        state.settings()
+
+
+def test_the_edits_can_be_written_back_as_a_file(tmp_path):
+    """A viewer that loses an afternoon's work is a toy."""
+    from yerkon.settings import load
+
+    state = a_state().merged({
+        "overrides": {
+            "mounting.tall_mast.site_cost_tl": {
+                "value": 5000.0, "source": "a quotation",
+            },
+            "operating.maintenance_tl_per_visit": 2200.0,
+        }
+    })
+    path = tmp_path / "written.toml"
+    path.write_text(state.settings().to_toml(), encoding="utf-8")
+
+    back = load(str(path))
+    assert back.number("mounting.tall_mast.site_cost_tl") == 5000.0
+    assert back.number("operating.maintenance_tl_per_visit") == 2200.0
+    assert not back.entry("mounting.tall_mast.site_cost_tl").is_assumed

@@ -21,9 +21,17 @@ from yerkon.design import (
     chosen,
 )
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
+from yerkon.hardware import radios
 from yerkon.ranging import SCHEMES
-from yerkon.scenarios import CHOICES, Deployed, _straight_road
-from yerkon.world import Anchor, Terrain, flat_terrain, rolling_terrain
+from yerkon.scenarios import CHOICES, Deployed, _straight_road, catalogue
+from yerkon.settings import DEFAULTS, Settings
+from yerkon.world import (
+    Anchor,
+    Terrain,
+    flat_terrain,
+    mountings,
+    rolling_terrain,
+)
 
 
 #: A group of anchors of one kind, laid along part of the corridor.
@@ -42,9 +50,10 @@ class AnchorRun:
     spacing_m: float = 2000.0
     offset_m: float = 400.0
 
-    def anchors(self, terrain: Terrain) -> list:
-        mounting = chosen(MOUNTING_CHOICES, self.mounting, "mounting")
-        radio = chosen(RADIO_CHOICES, self.radio, "radio")
+    def anchors(self, terrain: Terrain, catalogues=None) -> list:
+        mounting_of, radio_of = catalogues or (MOUNTING_CHOICES, RADIO_CHOICES)
+        mounting = chosen(mounting_of, self.mounting, "mounting")
+        radio = chosen(radio_of, self.radio, "radio")
         spacing = max(self.spacing_m, 25.0)
         out = []
         for index, x in enumerate(
@@ -131,7 +140,36 @@ class ViewState:
     #: Cell size of the coverage sweep, in metres.
     sweep_m: float = 500.0
 
+    #: Figures changed by hand, keyed as `assumptions.toml` keys them.
+    #:
+    #: Every number nobody supplied is editable while the viewer is
+    #: running, and everything is rebuilt from it: the mounting
+    #: catalogue, the radios, the clocks, the rates, the scenarios. A
+    #: value alone is still a guess; one given a source stops counting as
+    #: an assumption (ADR-0016).
+    overrides: dict = field(default_factory=dict)
+
     # -- the world --------------------------------------------------------
+
+    def settings(self) -> Settings:
+        """The figures this run uses: the shipped file, plus any edits."""
+        return DEFAULTS.with_values(self.overrides)
+
+    def catalogues(self):
+        """Mountings and radios built from this run's own figures."""
+        settings = self.settings()
+        by_key = mountings(settings)
+        return (
+            {
+                "sign": by_key["roadside_sign"],
+                "gantry": by_key["sign_gantry"],
+                "billboard": by_key["billboard"],
+                "column": by_key["lighting_column"],
+                "mast": by_key["tall_mast"],
+                "tunnel": by_key["tunnel_bracket"],
+            },
+            radios(settings),
+        )
 
     def terrain(self) -> Terrain:
         if self.relief_m <= 0.0:
@@ -149,9 +187,12 @@ class ViewState:
 
     def anchors(self, terrain: Terrain) -> tuple[Anchor, ...]:
         """Every run's anchors, with anything dragged or deleted applied."""
+        catalogues = self.catalogues()
         placed = []
         for run in self.runs:
-            for identifier, ground, mounting, radio in run.anchors(terrain):
+            for identifier, ground, mounting, radio in run.anchors(
+                terrain, catalogues
+            ):
                 if identifier in self.removed:
                     continue
                 x, y = self.moved.get(identifier, ground)
@@ -165,6 +206,7 @@ class ViewState:
 
     def receivers(self, terrain: Terrain) -> tuple[Receiver, ...]:
         road = _straight_road(self.corridor_m, terrain)
+        _, radio_of = self.catalogues()
         return tuple(
             Receiver(
                 identifier=unit.identifier,
@@ -176,7 +218,7 @@ class ViewState:
                     antenna_height_m=unit.antenna_height_m,
                 ),
                 radios=tuple(
-                    chosen(RADIO_CHOICES, name, "radio") for name in unit.radios
+                    chosen(radio_of, name, "radio") for name in unit.radios
                 ),
                 product=unit.kind,
             )
@@ -203,12 +245,15 @@ class ViewState:
 
     def deployed(self) -> Deployed:
         """The scenario dressed as a table row, for pricing and reporting."""
-        template = CHOICES.get(self.scenario, CHOICES["rural"])
+        template = catalogue(self.settings()).get(
+            self.scenario, catalogue(self.settings())["rural"]
+        )
+        mounting_of, _ = self.catalogues()
         return replace(
             template,
             scenario=self.scenario_object(),
             mounting=chosen(
-                MOUNTING_CHOICES, self.runs[0].mounting if self.runs else "mast",
+                mounting_of, self.runs[0].mounting if self.runs else "mast",
                 "mounting",
             ),
             route_km=self.corridor_m / 1000.0,
@@ -239,6 +284,10 @@ class ViewState:
                 run if isinstance(run, AnchorRun) else AnchorRun(**run)
                 for run in cleaned["runs"]
             )
+        if "overrides" in cleaned:
+            cleaned["overrides"] = {
+                str(key): value for key, value in cleaned["overrides"].items()
+            }
         if "units" in cleaned:
             cleaned["units"] = tuple(
                 unit if isinstance(unit, UnitPlan)
@@ -255,7 +304,7 @@ class ViewState:
                 out[name] = [run.as_json() for run in value]
             elif name == "units":
                 out[name] = [unit.as_json() for unit in value]
-            elif name == "moved":
+            elif name in ("moved", "overrides"):
                 out[name] = dict(value)
             elif name == "removed":
                 out[name] = list(value)

@@ -26,7 +26,7 @@ from typing import Optional
 
 from yerkon.design import Design
 from yerkon.proposal import propose
-from yerkon.viewer.scene import design_of, scene, simulate, sweep
+from yerkon.viewer.scene import design_of, figures, scene, simulate, sweep
 from yerkon.viewer.state import (
     CASCADING,
     CASCADING_RUN,
@@ -73,13 +73,18 @@ def cascades(state: ViewState, changes: dict) -> Optional[dict]:
     tolerance, the ground roughness — is proposed against every run,
     because it moves all of them and a person should see all of it.
     """
-    if not any(name in CASCADING or name == "runs" for name in changes):
+    if not any(
+        name in CASCADING or name in ("runs", "overrides") for name in changes
+    ):
         return None
 
     proposed = state.merged(changes)
     groups = []
 
-    shared = {name: value for name, value in changes.items() if name in CASCADING}
+    shared = {
+        name: value for name, value in changes.items()
+        if name in CASCADING or name == "overrides"
+    }
     for index, run in enumerate(state.runs):
         after_run = proposed.runs[index] if index < len(proposed.runs) else run
         edits = {}
@@ -142,6 +147,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/style.css":
             return self._file("style.css", "text/css; charset=utf-8")
+        if path == "/api/figures":
+            return self._json(lambda: figures(self.session.read()))
+        if path == "/api/figures.toml":
+            return self._toml(self.session.read())
         if path == "/api/scene":
             return self._json(lambda: scene(self.session.read()))
         if path == "/api/sweep":
@@ -202,6 +211,23 @@ class Handler(BaseHTTPRequestHandler):
         return {"state": updated.as_json()}
 
     # -- plumbing ----------------------------------------------------------
+
+    def _toml(self, state: ViewState) -> None:
+        """The figures as a file, so an afternoon's editing survives the tab.
+
+        Served as a download rather than shown, because the useful thing
+        to do with it is put it beside the project and pass it back with
+        --assumptions.
+        """
+        payload = state.settings().to_toml().encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/toml; charset=utf-8")
+        self.send_header(
+            "Content-Disposition", 'attachment; filename="assumptions.toml"'
+        )
+        self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
 
     def _file(self, name: str, content_type: str) -> None:
         path = STATIC / name

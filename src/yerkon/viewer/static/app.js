@@ -71,8 +71,12 @@ async function edit(changes, cascading) {
 async function apply(changes) {
   const { state: updated } = await ask("/api/apply", { changes });
   state = updated;
-  fillControls();
+  // The scene first. The cards quote each group's reach and each unit's
+  // anchor count, and those only exist once the engine has recomputed
+  // them; drawing the cards first shows the previous run's numbers.
   await refreshScene();
+  fillControls();
+  await loadFigures();
   scheduleSweep();
 }
 
@@ -367,6 +371,83 @@ function drawUnits() {
   });
 }
 
+/* Every figure nobody supplied, editable while the study runs.
+ *
+ * The report gave a bill of materials and nothing else, so between
+ * seventy-nine and ninety-nine percent of what this produces rests on
+ * placeholders. Editing one here rebuilds everything from it — the
+ * mounting catalogue, the radios, the clocks, the rates, the scenarios —
+ * which is the only way to find out which of them is worth an afternoon
+ * of somebody's time (ADR-0016).
+ *
+ * A figure that moves the link budget cascades like any other setting
+ * and goes through the confirmation sheet. One that only moves a price
+ * does not, and applies at once.
+ */
+
+let figuresData = null;
+
+const CASCADING_FIGURES = /(height_m|noise_figure_db|threshold_db|clutter|residual_ppm|tolerance_ppm|turnaround_s|payload_bytes)/;
+
+function drawFigures() {
+  const host = document.getElementById("figures");
+  if (!figuresData) { host.innerHTML = ""; return; }
+  host.innerHTML = "";
+
+  document.getElementById("assumed-count").textContent =
+    `${figuresData.assumed}/${figuresData.total} varsayım`;
+
+  for (const group of figuresData.groups) {
+    const heading = document.createElement("div");
+    heading.className = "group";
+    heading.textContent = group.label;
+    host.appendChild(heading);
+
+    for (const figure of figuresData.figures.filter(f => f.group === group.key)) {
+      const row = document.createElement("div");
+      row.className = "figure";
+
+      const name = document.createElement("div");
+      name.className = "name";
+      const short = figure.key.split(".").slice(1).join(" · ");
+      name.innerHTML = `<b></b><span></span>`;
+      name.querySelector("b").textContent = short;
+      name.querySelector("span").textContent = figure.affects;
+      name.title = figure.note + (
+        figure.sensitivity ? `\n\n${figure.sensitivity}` : "");
+      row.appendChild(name);
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.value = figure.value;
+      input.step = "any";
+      if (figure.edited) input.classList.add("edited");
+      input.title = figure.assumed ? "Hâlâ varsayım" : `Kaynak: ${figure.source}`;
+      input.onchange = () => {
+        const overrides = Object.assign({}, state.overrides);
+        overrides[figure.key] = Number(input.value);
+        edit({ overrides }, CASCADING_FIGURES.test(figure.key))
+          .catch(e => say(e.message, true));
+      };
+      row.appendChild(input);
+
+      const unit = document.createElement("div");
+      unit.className = "unit";
+      unit.textContent = figure.unit;
+      row.appendChild(unit);
+
+      host.appendChild(row);
+    }
+  }
+}
+
+async function loadFigures() {
+  try {
+    figuresData = await ask("/api/figures");
+    drawFigures();
+  } catch (error) { say(error.message, true); }
+}
+
 function fillControls() {
   for (const [name, id] of Object.entries(OUTPUTS)) {
     const input = document.getElementById(name);
@@ -413,8 +494,9 @@ function wireControls() {
       const { state: loaded } = await ask("/api/mode", { mode: event.target.value });
       state = loaded;
       framed = false;
-      fillControls();
       await refreshScene();
+      fillControls();
+      await loadFigures();
       scheduleSweep();
     } catch (error) { say(error.message, true); }
   };
@@ -446,12 +528,21 @@ function wireControls() {
     }]) }, false).catch(e => say(e.message, true));
   };
 
+  document.getElementById("clear-overrides").onclick = () => {
+    if (!Object.keys(state.overrides || {}).length) {
+      say("Değiştirilmiş sayı yok.");
+      return;
+    }
+    edit({ overrides: {} }, true).catch(e => say(e.message, true));
+  };
+
   document.getElementById("run").onclick = runSimulation;
   document.getElementById("reset").onclick = async () => {
     const { state: fresh } = await ask("/api/reset", {});
     state = fresh;
-    fillControls();
     await refreshScene();
+    fillControls();
+    await loadFigures();
     scheduleSweep();
   };
 }
@@ -719,5 +810,6 @@ async function runSimulation() {
   resize();
   await refreshScene();
   fillControls();
+  await loadFigures();
   scheduleSweep();
 })();

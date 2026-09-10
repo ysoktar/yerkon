@@ -70,6 +70,55 @@ class Settings:
     def number(self, key: str) -> float:
         return float(self.sourced(key).value)
 
+    def with_values(self, edits) -> "Settings":
+        """A copy with some figures replaced. Refuses a key it has no entry for.
+
+        ``edits`` is a mapping of key to a number, or to a mapping with a
+        ``value`` and an optional ``source``. A figure given a source
+        stops counting as an assumption; one given only a number does
+        not, because it is still a guess, just a different one.
+        """
+        if not edits:
+            return self
+        changed = dict(self.entries)
+        for key, given in edits.items():
+            entry = self.entry(key)
+            if isinstance(given, dict):
+                edit = Edit(key, float(given["value"]),
+                            str(given.get("source", "")))
+            else:
+                edit = Edit(key, float(given))
+            changed[key] = _edited(entry, edit)
+        return Settings(entries=changed, path=self.path)
+
+    def to_toml(self) -> str:
+        """The file this Settings would be, so an afternoon's work can be kept.
+
+        A viewer that lets somebody try thirty figures and then loses
+        them is a toy. This writes the same shape the loader reads.
+        """
+        lines = [
+            "# Written by the YERKON viewer.",
+            "#",
+            "# Every figure this project needs that nobody supplied. To",
+            "# source one: set its value, say where it came from in",
+            "# `source`, and change `provenance` from ASSUMPTION.",
+            "",
+        ]
+        for key, entry in sorted(self.entries.items()):
+            was = entry.sourced
+            lines.append('[values.{}]'.format(_quote(key)))
+            lines.append("value = {!r}".format(float(was.value)))
+            lines.append("unit = {}".format(_quote(was.unit)))
+            lines.append("provenance = {}".format(_quote(was.provenance.value)))
+            lines.append("source = {}".format(_quote(was.source)))
+            lines.append("note = {}".format(_quote(was.note)))
+            lines.append("affects = {}".format(_quote(entry.affects)))
+            if entry.sensitivity:
+                lines.append("sensitivity = {}".format(_quote(entry.sensitivity)))
+            lines.append("")
+        return "\n".join(lines)
+
     @property
     def assumed(self) -> tuple[Entry, ...]:
         """The entries still resting on nothing, in key order."""
@@ -149,6 +198,54 @@ def load(path: Optional[str] = None) -> Settings:
         )
 
     return Settings(entries=entries, path=str(where))
+
+
+EDITED_NOTE = "Set by hand in the viewer, over: {}"
+
+
+def _quote(text: str) -> str:
+    """TOML basic string, escaped."""
+    return '"{}"'.format(
+        text.replace("\\", "\\\\").replace('"', '\\"')
+        .replace("\n", "\\n")
+    )
+
+
+@dataclass(frozen=True)
+class Edit:
+    """A figure changed by hand, and what it was changed to.
+
+    A number typed into a viewer is still a guess unless somebody says
+    where it came from, so an edit keeps ASSUMPTION provenance until a
+    source is given with it. Saying so is the whole difference between
+    exploring and reporting.
+    """
+
+    key: str
+    value: float
+    source: str = ""
+
+
+def _edited(entry: Entry, edit: Edit) -> Entry:
+    was = entry.sourced
+    provenance = (
+        Provenance.MEASUREMENT if edit.source.strip() else was.provenance
+    )
+    return Entry(
+        key=entry.key,
+        sourced=Sourced(
+            float(edit.value),
+            was.unit,
+            provenance,
+            edit.source.strip() or was.source,
+            note=(
+                was.note if edit.source.strip()
+                else EDITED_NOTE.format(was.note)
+            ),
+        ),
+        affects=entry.affects,
+        sensitivity=entry.sensitivity,
+    )
 
 
 #: The shipped file, loaded once. Every module's defaults come from here.
