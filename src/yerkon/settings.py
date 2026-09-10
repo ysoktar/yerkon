@@ -85,7 +85,21 @@ class Settings:
         return self.entry(key).sourced
 
     def number(self, key: str) -> float:
-        return float(self.sourced(key).value)
+        found = self.sourced(key)
+        if found.is_text:
+            raise TypeError(
+                "{} holds the name {!r}, not a number. Ask for its text."
+                .format(key, found.value)
+            )
+        return float(found.value)
+
+    def text(self, key: str) -> str:
+        """A figure that is a name rather than a quantity.
+
+        Which fetched ground a row stands on, for instance. Empty means
+        "none", which is how a row asks for modelled terrain instead.
+        """
+        return str(self.sourced(key).value)
 
     def with_values(self, edits) -> "Settings":
         """A copy with some figures replaced. Refuses a key it has no entry for.
@@ -101,10 +115,10 @@ class Settings:
         for key, given in edits.items():
             entry = self.entry(key)
             if isinstance(given, dict):
-                edit = Edit(key, float(given["value"]),
+                edit = Edit(key, _like(entry, given["value"]),
                             str(given.get("source", "")))
             else:
-                edit = Edit(key, float(given))
+                edit = Edit(key, _like(entry, given))
             changed[key] = _edited(entry, edit)
         return Settings(entries=changed, path=self.path)
 
@@ -125,7 +139,9 @@ class Settings:
         for key, entry in sorted(self.entries.items()):
             was = entry.sourced
             lines.append('[values.{}]'.format(_quote(key)))
-            lines.append("value = {!r}".format(float(was.value)))
+            lines.append("value = {}".format(
+                _quote(was.value) if was.is_text else repr(float(was.value))
+            ))
             lines.append("unit = {}".format(_quote(was.unit)))
             lines.append("provenance = {}".format(_quote(was.provenance.value)))
             lines.append("source = {}".format(_quote(was.source)))
@@ -219,7 +235,8 @@ def load(path: Optional[str] = None) -> Settings:
         entries[key] = Entry(
             key=key,
             sourced=Sourced(
-                float(fields["value"]),
+                fields["value"] if isinstance(fields["value"], str)
+                else float(fields["value"]),
                 str(fields["unit"]),
                 provenance,
                 str(fields["source"]),
@@ -254,8 +271,20 @@ class Edit:
     """
 
     key: str
-    value: float
+    value: "float | str"
     source: str = ""
+
+
+def _like(entry: Entry, given) -> "float | str":
+    """An edit read as whatever kind of figure the entry already is.
+
+    A page sends everything as text, so without this a site name would
+    arrive as a number and fail, or a spacing would be stored as the
+    string "3000" and compare unequal to 3000.
+    """
+    if entry.sourced.is_text:
+        return str(given)
+    return float(given)
 
 
 def _edited(entry: Entry, edit: Edit) -> Entry:
@@ -266,7 +295,7 @@ def _edited(entry: Entry, edit: Edit) -> Entry:
     return Entry(
         key=entry.key,
         sourced=Sourced(
-            float(edit.value),
+            edit.value,
             was.unit,
             provenance,
             edit.source.strip() or was.source,

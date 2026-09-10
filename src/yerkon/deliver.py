@@ -43,6 +43,22 @@ class Written:
     about: str
 
 
+def _shown(sourced) -> str:
+    """A figure as a person reads it.
+
+    Not every figure is a quantity: which ground a row stands on is a
+    name, and it belongs in this table beside the spacings (ADR-0027).
+    """
+    if sourced.is_text:
+        return "`{}`".format(sourced.value) if sourced.value else "—"
+    return readable(float(sourced.value))
+
+
+def _as_read(value) -> str:
+    """A figure from an option's diff, name or number."""
+    return value if isinstance(value, str) else readable(value)
+
+
 def _quiet(line: str) -> None:
     return
 
@@ -176,7 +192,7 @@ def figures_md(settings: Settings) -> str:
         out.append("| Sayı | Değer | Dayanak | Neyi etkiliyor |\n|---|---|---|---|")
         for entry in entries:
             out.append("| `{}` | {} {} | {} | {} |".format(
-                entry.key, readable(float(entry.sourced.value)),
+                entry.key, _shown(entry.sourced),
                 entry.sourced.unit,
                 entry.sourced.provenance.value.title(),
                 entry.affects,
@@ -206,7 +222,7 @@ def options_md(settings: Settings) -> str:
         out.append("| Sayı | Şu an | Bu seçenekte |\n|---|---|---|")
         for key, was, now in option.differences(settings):
             out.append("| `{}` | {} | {} |".format(
-                key, readable(was), readable(now)))
+                key, _as_read(was), _as_read(now)))
         out.append("\n{}\n".format(option.note))
     return "\n".join(out)
 

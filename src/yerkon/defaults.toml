@@ -677,3 +677,32 @@ provenance = "DESIGN"
 source = "this project, as a deployment choice"
 note = """Which ground this is. Separate from the measurement seed on purpose: holding this and varying that asks what the noise does on one landscape, and the reverse asks what one deployment does on many. Mixed into one seed, neither question could be asked."""
 affects = "which patches are rough and which are smooth in the tunnel row"
+
+# --- Which ground each row stands on -------------------------------------
+
+[values."urban.site"]
+value = "kizilay"
+unit = "fetched site"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Which fetched ground this row stands on, by directory name under `src/yerkon/site/ankara/`. Ankara's centre, three kilometres on a side, rising and falling ninety-one metres across it. Empty falls back to modelled terrain, which is rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — including from the viewer — can go here."""
+affects = "the urban row's obstruction geometry, and therefore every figure in it"
+sensitivity = "the same rural deployment gives 89,5 % availability on Polatlı and about 45 % on Gölbaşı, with nothing changed but this"
+
+[values."rural.site"]
+value = "polatli"
+unit = "fetched site"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Which fetched ground this row stands on, by directory name under `src/yerkon/site/ankara/`. The Polatlı plain west of Ankara, where the intercity roads run. Set this to `golbasi` to stand the same deployment on 907 m of relief instead, which is what it costs in terrain it was not designed for. Empty falls back to modelled terrain, which is rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — including from the viewer — can go here."""
+affects = "the rural row's obstruction geometry, and therefore every figure in it"
+sensitivity = "the same rural deployment gives 89,5 % availability on Polatlı and about 45 % on Gölbaşı, with nothing changed but this"
+
+[values."tunnel.site"]
+value = "kizilcahamam"
+unit = "fetched site"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Which fetched ground this row stands on, by directory name under `src/yerkon/site/ankara/`. The mountain the bore goes through. Only its two portal elevations are used, because a tunnel goes through a hill rather than over it. Empty falls back to modelled terrain, which is rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — including from the viewer — can go here."""
+affects = "the tunnel row's obstruction geometry, and therefore every figure in it"
+sensitivity = "the same rural deployment gives 89,5 % availability on Polatlı and about 45 % on Gölbaşı, with nothing changed but this"

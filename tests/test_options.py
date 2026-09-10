@@ -106,8 +106,10 @@ def test_every_shipped_option_says_what_it_does_and_actually_does_it(name):
 
     moved = option.applied_to(DEFAULTS)
     for key, was, now in option.differences(DEFAULTS):
-        assert moved.number(key) == pytest.approx(now)
-        assert was != pytest.approx(now), key
+        # A figure may be a name rather than a quantity: which ground a
+        # row stands on is as much a deployment choice as its spacing.
+        assert moved.sourced(key).value == now, key
+        assert was != now, key
 
 
 def test_an_option_naming_a_figure_that_does_not_exist_is_refused(tmp_path):
@@ -293,3 +295,68 @@ def test_a_search_finds_a_real_arrangement_and_writes_it_back(tmp_path):
         len(catalogue(tighter)["tunnel"].scenario.deployment.anchors)
         > len(catalogue(DEFAULTS)["tunnel"].scenario.deployment.anchors)
     )
+
+
+# --- A figure that is a name -----------------------------------------------
+
+
+def test_which_ground_a_row_stands_on_is_a_figure_like_any_other():
+    """ADR-0027. Otherwise an option can claim to move a row and not.
+
+    `rural-hard-ground` set the *fallback* relief figure, which is only
+    consulted when nothing has been fetched. Polatlı is fetched, so the
+    option did exactly nothing — it produced the default's numbers to
+    every decimal place and said so nowhere. Nothing raised, because
+    changing a figure nobody reads is not an error.
+    """
+    from yerkon.scenarios import catalogue
+
+    for row in ("urban", "rural", "tunnel"):
+        assert DEFAULTS.sourced("{}.site".format(row)).is_text
+
+    hills = DEFAULTS.with_values({"rural.site": "golbasi"})
+    assert (
+        catalogue(hills)["rural"].scenario.terrain.description
+        != catalogue(DEFAULTS)["rural"].scenario.terrain.description
+    )
+
+
+def test_the_hard_ground_option_actually_reaches_other_ground():
+    from yerkon.scenarios import catalogue
+
+    moved = read("rural-hard-ground").applied_to(DEFAULTS)
+    assert moved.text("rural.site") == "golbasi"
+    assert (
+        catalogue(moved)["rural"].scenario.terrain
+        != catalogue(DEFAULTS)["rural"].scenario.terrain
+    )
+
+
+def test_asking_a_name_for_a_number_says_so_rather_than_guessing():
+    with pytest.raises(TypeError, match="not a number"):
+        DEFAULTS.number("rural.site")
+    assert DEFAULTS.text("rural.site") == "polatli"
+
+
+def test_an_edited_name_stays_a_name_and_an_edited_number_stays_a_number():
+    """A page sends everything as text.
+
+    Without coercion by the entry's own kind, a spacing would be stored
+    as the string "3000" and compare unequal to 3000 everywhere.
+    """
+    edited = DEFAULTS.with_values(
+        {"rural.site": "golbasi", "rural.anchor_spacing_m": "2500"}
+    )
+    assert edited.text("rural.site") == "golbasi"
+    assert edited.number("rural.anchor_spacing_m") == 2500.0
+
+
+def test_a_settings_file_survives_a_name_being_written_out_and_read_back(tmp_path):
+    from yerkon.settings import load
+
+    path = tmp_path / "written.toml"
+    path.write_text(
+        DEFAULTS.with_values({"rural.site": "golbasi"}).to_toml(),
+        encoding="utf-8",
+    )
+    assert load(str(path)).text("rural.site") == "golbasi"

@@ -240,7 +240,9 @@ def figures(state: ViewState) -> dict:
         listed.append({
             "key": key,
             "group": head,
-            "value": float(entry.sourced.value),
+            "value": entry.sourced.value if entry.sourced.is_text
+            else float(entry.sourced.value),
+            "is_text": entry.sourced.is_text,
             "unit": entry.sourced.unit,
             "provenance": entry.sourced.provenance.value,
             "source": entry.sourced.source,

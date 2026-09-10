@@ -455,17 +455,29 @@ function drawFigures() {
         figure.sensitivity ? `\n\n${figure.sensitivity}` : "");
       row.appendChild(name);
 
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = figure.value;
-      input.step = "any";
+      // A figure may be a name rather than a quantity — which ground a
+      // row stands on (ADR-0027). Offered as the sites actually fetched,
+      // because typing a directory name that is not there is the one
+      // mistake this can make.
+      const input = document.createElement(
+        figure.is_text ? "select" : "input");
+      if (figure.is_text) {
+        input.innerHTML = options(
+          [["", "modellenmiş"]].concat(SITES.map(n => [n, n])),
+          String(figure.value));
+      } else {
+        input.type = "number";
+        input.value = figure.value;
+        input.step = "any";
+      }
       if (figure.edited) input.classList.add("edited");
       input.title = figure.assumed
         ? "Hâlâ varsayım — kaynağı defaults.toml'a yaz"
         : `Kaynak: ${figure.source}`;
       input.onchange = () => {
         const overrides = Object.assign({}, state.overrides);
-        overrides[figure.key] = Number(input.value);
+        overrides[figure.key] = figure.is_text
+          ? input.value : Number(input.value);
         edit({ overrides }, CASCADING_FIGURES.test(figure.key))
           .catch(e => say(e.message, true));
       };

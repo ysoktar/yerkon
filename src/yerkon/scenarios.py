@@ -303,6 +303,12 @@ SITES = pathlib.Path(__file__).resolve().parent / "site" / "ankara"
 #: over the same twenty kilometres is the ground this deployment is for,
 #: and Gölbaşı stays in the package as the case that says what happens
 #: when it is not (ADR-0021).
+#: What each row stands on when nobody has said otherwise.
+#:
+#: The settings file is the authority — `<row>.site` — so an option or a
+#: slider can move a row onto other ground, including anything fetched
+#: from the viewer (ADR-0027). These remain as the shipped answer and as
+#: what the tests name.
 URBAN_SITE = "kizilay"
 RURAL_SITE = "polatli"
 HARD_RURAL_SITE = "golbasi"
@@ -318,7 +324,7 @@ TUNNEL_SITE = "kizilcahamam"
 TUNNEL_BORE = ((435.0, 870.0), (2435.0, 870.0))
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=16)
 def fetched(name: str) -> Optional["Site"]:
     """The ground for one row, or nothing if it was never fetched.
 
@@ -327,6 +333,8 @@ def fetched(name: str) -> Optional["Site"]:
     a process runs; the only thing that would is a `yerkon fetch` in
     another terminal, and that is a restart either way.
     """
+    if not name:
+        return None
     cache = SiteCache(SITES / name)
     return cache.load() if cache.exists else None
 
@@ -363,7 +371,7 @@ def urban_ground(settings: Settings, clutter_db_per_km: float) -> Terrain:
     one: a level plane hands every reflection the specular angle the
     two-ray model assumes (ADR-0021).
     """
-    site = fetched(URBAN_SITE)
+    site = fetched(settings.text("urban.site"))
     if site is not None:
         return _patched(
             terrain_from_site(site, clutter_loss_db_per_km=clutter_db_per_km),
@@ -380,7 +388,7 @@ def urban_ground(settings: Settings, clutter_db_per_km: float) -> Terrain:
 
 def rural_ground(settings: Settings) -> Terrain:
     """The same, over open country, where the relief is an order larger."""
-    site = fetched(RURAL_SITE)
+    site = fetched(settings.text("rural.site"))
     if site is not None:
         return _patched(terrain_from_site(site), settings, "rural")
     return _patched(rolling_terrain(
@@ -392,7 +400,7 @@ def rural_ground(settings: Settings) -> Terrain:
 
 
 def tunnel_ground(
-    settings: Settings, length_m: float, site_name: str = TUNNEL_SITE
+    settings: Settings, length_m: float, site_name: Optional[str] = None
 ) -> Terrain:
     """The floor of the bore, which slopes because every bore does.
 
@@ -402,6 +410,8 @@ def tunnel_ground(
     portal elevations are its own and the gradient follows from them.
     Where it has not, the gradient is the one that alignment measured.
     """
+    if site_name is None:
+        site_name = settings.text("tunnel.site")
     site = fetched(site_name) if site_name else None
     (entry_x, entry_y), _ = TUNNEL_BORE
     # The far portal moves with the bore's length, so shortening the

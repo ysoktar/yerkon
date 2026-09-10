@@ -162,6 +162,10 @@ def test_no_default_reads_as_zero_unless_it_is_zero():
     from yerkon.settings import DEFAULTS
 
     for key, entry in DEFAULTS.entries.items():
+        # A figure may be a name rather than a quantity (ADR-0027);
+        # rounding is not a question that applies to one.
+        if entry.sourced.is_text:
+            continue
         value = float(entry.sourced.value)
         if value != 0.0:
             assert readable(value) != "0", key

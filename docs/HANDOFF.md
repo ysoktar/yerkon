@@ -149,7 +149,7 @@ not code.
   radio, and the model now says most of it is clock rather than timing
   resolution, which the same measurement could confirm or refute. The
   dissection raises the stakes: the SX1280's 2,94 m floor is the largest
-  single contributor to both the urban row (1,04 m of 1,24 m) and the
+  single contributor to both the urban row (1,14 m of 1,62 m) and the
   weighted row, so what that number really is decides what the whole
   table says about the open road.
 

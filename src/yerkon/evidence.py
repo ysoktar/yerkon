@@ -44,9 +44,15 @@ class Provenance(str, Enum):
 
 @dataclass(frozen=True)
 class Sourced:
-    """A value and the reason to believe it."""
+    """A value and the reason to believe it.
 
-    value: float
+    Usually a number. Sometimes a name — which fetched ground a row
+    stands on is as much a figure that shapes the study as the spacing of
+    its anchors, and keeping it out of the file meant an option could
+    claim to move a row onto other terrain and silently not (ADR-0027).
+    """
+
+    value: "float | str"
     unit: str
     provenance: Provenance
     source: str
@@ -64,5 +70,14 @@ class Sourced:
                 "a design choice needs a note saying why it was chosen"
             )
 
+    @property
+    def is_text(self) -> bool:
+        return isinstance(self.value, str)
+
     def __float__(self) -> float:
+        if self.is_text:
+            raise TypeError(
+                "{!r} is a name, not a number. Ask for its text."
+                .format(self.value)
+            )
         return float(self.value)

@@ -338,6 +338,7 @@ Four ship, and the first two are there together on purpose:
 | `rural-tall` | The same 33 masts, 10 m taller — loses at equal money, wins per site |
 | `urban-dense` | Anchors on every lighting column rather than every other |
 | `rural-hard-ground` | The Gölbaşı hills: what this design costs where it was not meant to go |
+| | *(this one shipped broken and did nothing — see ADR-0027)* |
 | `tunnel-precise` | 120 m brackets — HPE P50 1,81 m → 0,48 m for 23000 TL. Found by the solver |
 
 Which of the first two is right depends on whether money or site access
@@ -403,17 +404,17 @@ sixteen runs each — and reports what every one of them was worth
 with it.
 
 ```
-Tünel — HPE P50 1,81 m, P95 2,96 m; bir menzilin σ'sı 0,10 m, geometri çarpanı ×18,1
+Tünel — HPE P50 1,77 m, P95 2,99 m; bir menzilin σ'sı 0,10 m, geometri çarpanı ×17,7
 
   Hata kaynağı           Tek başına  Kalkarsa  Kazanç  Çare
   ---------------------  ----------  --------  ------  -----------------------------------
-  Direk konum ölçümü           1,77      0,17    1,64  direkleri GNSS ile daha iyi ölçmek
-  Donanım ölçüm tabanı         0,19      1,78    0,02  daha iyi bir modül
-  Dalga formu gürültüsü        0,11      1,82   -0,02  daha yüksek güç, daha yakın direk
-  Saat kayması                 0,10      1,80    0,00  TCXO ya da çift taraflı TWR
-  Fazladan yol (engel)         0,09      1,81    0,00  direği yükseltmek
-  Kaybolan alışveriş           0,09      1,81    0,00  daha temiz kanal
-  Tur içi hareket              0,00      1,80    0,01  daha kısa tur
+  Direk konum ölçümü           1,78      0,17    1,61  direkleri GNSS ile daha iyi ölçmek
+  Donanım ölçüm tabanı         0,18      1,79   -0,02  daha iyi bir modül
+  Dalga formu gürültüsü        0,12      1,79   -0,01  daha yüksek güç, daha yakın direk
+  Saat kayması                 0,10      1,78    0,00  TCXO ya da çift taraflı TWR
+  Fazladan yol (engel)         0,09      1,77    0,00  direği yükseltmek
+  Kaybolan alışveriş           0,09      1,77    0,00  daha temiz kanal
+  Tur içi hareket              0,00      1,79   -0,02  daha kısa tur
   Model artığı                 0,09                    hiçbir kaynak açık değilken kalan
 ```
 
@@ -428,7 +429,7 @@ measure and comes out the least accurate of the three. The dissection
 says why: its bore multiplies one range's sigma by eighteen, and what it
 multiplies hardest is the anchor survey error, the one term that never
 averages out. Buying a better radio for it buys nothing; surveying its
-brackets properly takes it from 1,81 m to 0,17 m.
+brackets properly takes it from 1,77 m to 0,17 m.
 
 On the open road the ranking inverts. In town the module's own
 measurement floor is worth 1,13 m and the survey error 0,09 m; in the
@@ -443,7 +444,7 @@ One row of the table only became measurable when the ground did.
 **Fazladan yol** — the extra distance a signal travels over an
 obstruction — read exactly 0,00 m everywhere while two of the three
 scenarios stood on a level plane, not because the term is small but
-because a plane cannot obstruct anything. On real Ankara it is 0,41 m in
+because a plane cannot obstruct anything. On real Ankara it is 0,42 m in
 the country, 0,11 m in town and 0,09 m in the bore. See ADR-0021.
 
 ## Fetching a site

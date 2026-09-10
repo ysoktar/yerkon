@@ -49,11 +49,21 @@ class Option:
         return settings.with_values(self.values)
 
     def differences(self, settings: Settings = DEFAULTS) -> tuple[tuple, ...]:
-        """What this option moves, as (key, from, to)."""
-        return tuple(
-            (key, settings.number(key), float(value))
-            for key, value in sorted(self.values.items())
-        )
+        """What this option moves, as (key, from, to).
+
+        A figure may be a name rather than a number — which ground a row
+        stands on is as much a deployment choice as its spacing
+        (ADR-0027) — so both sides come back as they are stored.
+        """
+        out = []
+        for key, value in sorted(self.values.items()):
+            was = settings.sourced(key)
+            out.append((
+                key,
+                was.value if was.is_text else float(was.value),
+                str(value) if was.is_text else float(value),
+            ))
+        return tuple(out)
 
     def as_toml(self) -> str:
         lines = [
@@ -72,7 +82,8 @@ class Option:
             "[values]",
         ]
         for key, value in sorted(self.values.items()):
-            lines.append("{!r} = {!r}".format(key, float(value)))
+            lines.append("{!r} = {!r}".format(
+                key, value if isinstance(value, str) else float(value)))
         return "\n".join(lines) + "\n"
 
     def describe(self, settings: Settings = DEFAULTS) -> str:
@@ -80,9 +91,14 @@ class Option:
         lines = ["{}  —  {}".format(self.name, self.title)]
         for key, was, now in self.differences(settings):
             lines.append("    {:<38} {} -> {}".format(
-                key, readable(was), readable(now)
+                key, _shown(was), _shown(now)
             ))
         return "\n".join(lines)
+
+
+def _shown(value) -> str:
+    """A figure as a person reads it, name or number."""
+    return value if isinstance(value, str) else readable(value)
 
 
 def available(where: Optional[pathlib.Path] = None) -> tuple[str, ...]:
@@ -117,7 +133,10 @@ def read(name: str, where: Optional[pathlib.Path] = None) -> Option:
         name=str(payload["name"]),
         title=str(payload["title"]),
         note=str(payload["note"]),
-        values={str(k): float(v) for k, v in payload["values"].items()},
+        values={
+            str(k): v if isinstance(v, str) else float(v)
+            for k, v in payload["values"].items()
+        },
         origin=str(payload.get("origin", "shipped")),
     )
 

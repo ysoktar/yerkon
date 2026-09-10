@@ -6,7 +6,9 @@
 name = 'rural-hard-ground'
 title = 'Kırsal: Gölbaşı tepeleri — tasarlanmadığı arazide'
 origin = 'shipped'
-note = """The same deployment on 907 m of relief instead of 486 m. Availability falls from 89,6 % to about 45 %, and closing the grid does not rescue it: 189 masts instead of 33 reaches 61 % (ADR-0021). This is not a proposal. It is the case that says what this design costs in terrain it was not meant for, and it is here so that number can be reproduced rather than quoted."""
+note = """The same deployment on 907 m of relief instead of Polatlı's 486 m. Availability falls from about 90 % to about 45 %, and closing the grid does not rescue it: 189 masts instead of 33 reaches 61 % (ADR-0021). This is not a proposal. It is the case that says what this design costs in terrain it was not meant for, and it is here so that number can be reproduced rather than quoted.
+
+It moves the row's site rather than the fallback relief figure. The first version set site.rural_relief_m, which is only consulted when no ground has been fetched — so it changed nothing at all, and said so nowhere (ADR-0027)."""
 
 [values]
-'site.rural_relief_m' = 907.0
+'rural.site' = 'golbasi'
