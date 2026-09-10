@@ -87,7 +87,11 @@ bore, carrying all three anchor modules at once. None of the report's
 three rows measures that arrangement; this one does.
 
 **Zemin** picks the ground: fetched Ankara — Kızılay, Polatlı,
-Kızılcahamam, Gölbaşı — or modelled hills. There is no flat option, on
+Kızılcahamam, Gölbaşı — or modelled hills. **Yeni bir yer getir** fetches
+anywhere else: a bounding box, a grid spacing, and whether to ask
+OpenStreetMap for buildings. It writes into the package's own site folder,
+so it appears in this selector at once and is committed with everything
+else. There is no flat option, on
 the selector or on the relief slider, because nowhere is flat and a level
 plane is the most favourable surface this model can draw rather than the
 neutral one (ADR-0021). Choosing a fetched site greys out the three
@@ -269,7 +273,12 @@ Kızılcahamam, falling 1,79 % between portals whose elevations are the
 mountain's.
 
 Nothing anywhere is flat, and that is a decision rather than a detail —
-see ADR-0021. Each row also carries two units sharing the air, which is
+see ADR-0021. The reflecting ground varies from patch to patch too, at
+two or three scales with its own seed per row (ADR-0026); what that work
+turned up is that **a slope had been counted as roughness**, by a factor
+of forty, which switched the coherent reflection off everywhere that was
+not level. Corrected, the table moved by less than seed noise: the old
+model reached the same place by the wrong route. Each row also carries two units sharing the air, which is
 why the update rate is half what one unit would see; and only the tunnel
 is a corridor, which the addendum to ADR-0014 explains.
 

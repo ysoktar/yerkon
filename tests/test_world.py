@@ -193,6 +193,52 @@ def test_relief_is_a_trade_rather_than_a_help():
 
     assert flat_share == 1.0, "level ground blocks nothing"
     assert gentle_sigma < flat_sigma, "the links that survive relief are better"
-    assert gentle_share < flat_share, "and relief costs some of them entirely"
     assert rugged_share < gentle_share / 2.0, "rugged ground closes almost nothing"
     assert rugged_sigma > flat_sigma, "and what it leaves is worse"
+
+
+def test_gentle_relief_helps_by_aiming_the_cancelling_ray_away():
+    """And not by scattering it. ADR-0026.
+
+    A tilted patch is a mirror that works perfectly and points somewhere
+    else, so a few metres of undulation can be worth ten decibels — which
+    is why the strongest two-ray nulls in the world are over airfields
+    and calm water rather than over countryside.
+
+    This used to be asserted the other way round: that gentle relief cost
+    some links entirely. It does not, at this scale, and the old model
+    only appeared to agree because it counted a slope as roughness and
+    got the same weak reflection for the wrong reason.
+    """
+    from yerkon.hardware import E28_2G4M27S, SX1280, W24P_U
+    from yerkon.rf import Terminal, aimed_fraction, evaluate_link
+
+    distance_m = 6000.0
+
+    def loss_over(terrain):
+        anchor = Anchor("m", (0.0, 0.0), TALL_MAST, terrain)
+        tx = Terminal(E28_2G4M27S, W24P_U, anchor.position_m)
+        rx = Terminal(SX1280, W24P_U, (
+            distance_m, 0.0, terrain.height_at(distance_m, 0.0) + 2.0))
+        obstruction = terrain.obstruction_between(
+            tx.position_m, rx.position_m, 200)
+        budget = evaluate_link(tx, rx, obstruction=obstruction)
+        return budget.path_loss_db, obstruction
+
+    flat_db, flat_ground = loss_over(flat_terrain())
+    gentle_db, gentle_ground = loss_over(rolling_terrain(10.0, 2000.0, seed=3))
+
+    assert flat_ground.reflection_tilt_rad == 0.0, "a plane does not tilt"
+    assert aimed_fraction(distance_m, flat_ground.reflection_tilt_rad, 2.45e9) == 1.0
+
+    assert abs(gentle_ground.reflection_tilt_rad) > 0.0
+    assert aimed_fraction(
+        distance_m, gentle_ground.reflection_tilt_rad, 2.45e9) < 0.01
+
+    assert gentle_db < flat_db - 3.0, (
+        "undulation should be worth several decibels: flat {:.1f}, "
+        "gentle {:.1f}".format(flat_db, gentle_db)
+    )
+    # And it is the aiming that does it, not the roughness: the patch is
+    # smooth enough that scattering alone would leave the ray intact.
+    assert gentle_ground.surface_roughness_m < 5.0

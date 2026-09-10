@@ -463,27 +463,58 @@ def test_the_floor_rises_with_the_survey_error_rather_than_saturating():
     assert large > small * 2.0
 
 
-def test_a_survey_error_hides_under_a_noisier_radio():
-    """Which is why it was invisible until the tunnel row got good.
+def test_a_survey_error_does_not_hide_where_the_geometry_amplifies_it():
+    """The two errors do not meet on equal terms, and this is a corridor.
 
-    A spread radio ranges to about three metres, and a tenth of a metre
-    of survey error disappears underneath that. The floor is real
-    everywhere and only binding where the rest is better than it.
+    Ranging noise is zero-mean, so a filter running across many rounds
+    averages it down. A survey error is fixed at installation, so it does
+    not average at all — and a corridor multiplies what it does not
+    average (ADR-0019, ADR-0020). Thirty centimetres of it therefore
+    shows straight through a radio that ranges to nearly eight metres.
+
+    This used to assert the opposite: that a small survey error hides
+    under a noisy radio. That is true where the geometry does not
+    amplify — an area, where the multiplier is under one — and false
+    here, which is the whole reason the tunnel row is the least accurate
+    in the study despite the best hardware.
     """
     quiet = run_scenario(a_scenario(anchor_survey_sigma_m=0.0, seed=3))
     surveyed = run_scenario(a_scenario(anchor_survey_sigma_m=0.3, seed=3))
-    assert surveyed.percentile(50)[0] == pytest.approx(
-        quiet.percentile(50)[0], rel=0.5
+
+    assert quiet.median_range_sigma_m > 5.0, "this radio is meant to be noisy"
+    assert surveyed.percentile(50)[0] > quiet.percentile(50)[0] * 1.5, (
+        "0,3 m of survey error should show through: {:.2f} m against "
+        "{:.2f} m".format(surveyed.percentile(50)[0], quiet.percentile(50)[0])
     )
 
 
-def test_lost_packets_cost_availability():
+def test_lost_packets_are_absorbed_until_suddenly_they_are_not():
     """Interference and collisions are not in the link budget and are in
-    the band, so they are counted here instead."""
+    the band, so they are counted here instead.
+
+    They do not cost availability smoothly. A round attempts several
+    ranges and a running filter survives on one, so losing four in ten
+    costs nothing at all — the same redundancy that lets the urban row
+    lose 27 % of its exchanges and still fix every round. Past that the
+    margin runs out and it collapses: seven in ten halves availability,
+    nine in ten leaves none.
+
+    Written as the shape of the curve rather than as one comparison,
+    because the old version asserted that 40 % loss costs availability
+    and it does not — it was passing on a scenario whose links were
+    marginal for an unrelated reason.
+    """
+    absorbed = run_scenario(a_scenario(packet_loss=0.4))
     quiet = run_scenario(a_scenario(packet_loss=0.0))
-    busy = run_scenario(a_scenario(packet_loss=0.4))
-    assert busy.availability < quiet.availability
-    assert busy.lost_links > quiet.lost_links
+    strained = run_scenario(a_scenario(packet_loss=0.7))
+    swamped = run_scenario(a_scenario(packet_loss=0.9))
+
+    assert absorbed.lost_links > quiet.lost_links, "the losses are real"
+    assert absorbed.availability == pytest.approx(quiet.availability), (
+        "four in ten should be absorbed by the redundancy in a round"
+    )
+    assert strained.availability < quiet.availability / 1.5
+    assert swamped.availability < 0.05
 
 
 def test_a_survey_error_is_the_same_for_every_measurement_to_one_anchor():

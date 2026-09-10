@@ -43,6 +43,7 @@ if TYPE_CHECKING:  # pragma: no cover
 from yerkon.world import (
     bore_terrain,
     mountings,
+    patchwork,
     MountingOption,
     Road,
     Terrain,
@@ -330,6 +331,28 @@ def fetched(name: str) -> Optional["Site"]:
     return cache.load() if cache.exists else None
 
 
+def _patched(terrain: Terrain, settings: Settings, row: str) -> Terrain:
+    """Give a terrain ground that is not the same everywhere.
+
+    The site's roughness stays its typical figure — the patchwork is
+    centred on it — and the reflection asks what the ground is like where
+    it lands rather than taking one number for the whole place
+    (ADR-0026). Its seed is the row's own, kept apart from the
+    measurement seed so a run can hold the landscape and vary the noise,
+    or the reverse.
+    """
+    spread = settings.number("{}.ground_roughness_spread".format(row))
+    if spread <= 0.0:
+        return terrain
+    return replace(terrain, patches=patchwork(
+        typical_m=terrain.micro_roughness_m,
+        patch_m=settings.number("{}.ground_patch_m".format(row)),
+        spread=spread,
+        levels=int(settings.number("{}.ground_levels".format(row))),
+        seed=int(settings.number("{}.ground_seed".format(row))),
+    ))
+
+
 def urban_ground(settings: Settings, clutter_db_per_km: float) -> Terrain:
     """Real Ankara if it is on hand, and rolling ground if it is not.
 
@@ -342,27 +365,30 @@ def urban_ground(settings: Settings, clutter_db_per_km: float) -> Terrain:
     """
     site = fetched(URBAN_SITE)
     if site is not None:
-        return terrain_from_site(site, clutter_loss_db_per_km=clutter_db_per_km)
-    return rolling_terrain(
+        return _patched(
+            terrain_from_site(site, clutter_loss_db_per_km=clutter_db_per_km),
+            settings, "urban",
+        )
+    return _patched(rolling_terrain(
         amplitude_m=settings.number("site.urban_relief_m"),
         wavelength_m=settings.number("site.urban_relief_wavelength_m"),
         clutter_loss_db_per_km=clutter_db_per_km,
         micro_roughness_m=0.5,
         seed=101,
-    )
+    ), settings, "urban")
 
 
 def rural_ground(settings: Settings) -> Terrain:
     """The same, over open country, where the relief is an order larger."""
     site = fetched(RURAL_SITE)
     if site is not None:
-        return terrain_from_site(site)
-    return rolling_terrain(
+        return _patched(terrain_from_site(site), settings, "rural")
+    return _patched(rolling_terrain(
         amplitude_m=settings.number("site.rural_relief_m"),
         wavelength_m=settings.number("site.rural_relief_wavelength_m"),
         micro_roughness_m=0.4,
         seed=202,
-    )
+    ), settings, "rural")
 
 
 def tunnel_ground(
@@ -385,20 +411,20 @@ def tunnel_ground(
     # clamping would spread a real fall over an unreal distance, so that
     # case takes the measured gradient instead.
     if site is not None and entry_x + length_m <= site.width_m:
-        return bore_terrain(
+        return _patched(bore_terrain(
             entry_elevation_m=site.height_at(entry_x, entry_y),
             exit_elevation_m=site.height_at(entry_x + length_m, entry_y),
             length_m=length_m,
             description="bore through {}, portals from {}".format(
                 site_name, site.manifest.elevation_source
             ),
-        )
+        ), settings, "tunnel")
     grade = settings.number("site.tunnel_grade")
-    return bore_terrain(
+    return _patched(bore_terrain(
         entry_elevation_m=0.0,
         exit_elevation_m=-grade * length_m,
         length_m=length_m,
-    )
+    ), settings, "tunnel")
 
 
 #: Absorption by buildings, vegetation and traffic that height does not

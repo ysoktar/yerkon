@@ -25,7 +25,7 @@ from yerkon.numbers import decimal_comma
 from yerkon.options import available, read, write
 from yerkon.parallel import workers
 from yerkon.report import build
-from yerkon.scenarios import catalogue
+from yerkon.scenarios import SITES, catalogue
 from yerkon.settings import Settings
 from yerkon.solve import SEARCHABLE, AlreadyMet, Target, search
 from yerkon.terms import LABELS, NAMES, REMEDIES
@@ -264,6 +264,78 @@ def deliver(state: ViewState, into: str, only: Optional[list] = None,
             "files": [
                 {"name": one.path.name, "about": one.about} for one in written
             ],
+        }
+
+    return work
+
+
+# --- Bringing in new ground -----------------------------------------------
+
+
+def fetch(state: ViewState, payload: dict) -> Callable:
+    """Fetch real ground for anywhere, from the page.
+
+    The only thing in this project that touches the network, and it was
+    the one thing the page could not do — so using anywhere but the four
+    Ankara sites meant dropping to a terminal, which for a viewer that is
+    meant to be the main way in is a hole (ADR-0008, ADR-0024).
+
+    Writes into the package's own site folder, so what it fetches shows
+    up in the ground selector immediately and is committed with
+    everything else.
+    """
+
+    def work(say: Say) -> dict:
+        from yerkon.site.cache import SiteCache
+        from yerkon.site.fetch import (
+            CopernicusElevation,
+            OpenStreetMapBuildings,
+            ServiceElevation,
+            build_site,
+        )
+        from yerkon.site.model import BoundingBox
+
+        name = str(payload.get("name", "")).strip()
+        if not name or not name.replace("-", "").replace("_", "").isalnum():
+            raise ValueError(
+                "a site needs a name of letters, digits, dashes or "
+                "underscores; got {!r}".format(name)
+            )
+
+        bounds = BoundingBox(
+            south=float(payload["south"]), west=float(payload["west"]),
+            north=float(payload["north"]), east=float(payload["east"]),
+        )
+        spacing = float(payload.get("spacing_m") or 30.0)
+        want_buildings = bool(payload.get("buildings", True))
+
+        say("Fetching {:.4f},{:.4f} to {:.4f},{:.4f} at {:.0f} m.".format(
+            bounds.south, bounds.west, bounds.north, bounds.east, spacing))
+        say("The only thing here that uses the network. It can take a while.")
+
+        site = build_site(
+            bounds,
+            elevation=(CopernicusElevation(cache=str(SITES / "_tiles")),
+                       ServiceElevation()),
+            features=OpenStreetMapBuildings() if want_buildings else None,
+            spacing_m=spacing,
+        )
+        SiteCache(SITES / name).save(site)
+
+        say("{:.0f} x {:.0f} m, relief {:.0f} m, roughness {:.2f} m".format(
+            site.width_m, site.height_m, site.relief_m, site.roughness_m()))
+        for note in site.manifest.notes:
+            say(note)
+
+        return {
+            "name": name,
+            "describe": site.manifest.describe(),
+            "width_m": round(site.width_m),
+            "height_m": round(site.height_m),
+            "relief_m": round(site.relief_m, 1),
+            "roughness_m": round(site.roughness_m(), 2),
+            "buildings": site.manifest.building_count,
+            "notes": list(site.manifest.notes),
         }
 
     return work

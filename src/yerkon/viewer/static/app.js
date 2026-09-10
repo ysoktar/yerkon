@@ -1300,6 +1300,34 @@ function drawDelivered(result, host) {
   host.appendChild(list);
 }
 
+function drawFetched(result, host) {
+  const table = document.createElement("table");
+  table.className = "out";
+  table.innerHTML =
+    `<tr><th colspan="2">${result.name}</th></tr>` +
+    `<tr><td>boyut</td><td>${result.width_m} × ${result.height_m} m</td></tr>` +
+    `<tr><td>yükselti farkı</td><td>${result.relief_m} m</td></tr>` +
+    `<tr><td>pürüz</td><td>${result.roughness_m} m</td></tr>` +
+    `<tr><td>bina</td><td>${result.buildings}</td></tr>`;
+  host.appendChild(table);
+
+  for (const note of result.notes || []) {
+    const line = document.createElement("p");
+    line.className = "hint";
+    line.textContent = note;
+    host.appendChild(line);
+  }
+
+  const use = document.createElement("button");
+  use.className = "quiet";
+  use.textContent = "Bu zemine geç";
+  use.onclick = () => edit({ site: result.name }, false)
+    .then(() => { framed = false; return refreshScene(); })
+    .then(() => fillControls())
+    .catch(e => say(e.message, true));
+  host.appendChild(use);
+}
+
 function wireTasks() {
   const chosenRows = () => {
     const picked = document.getElementById("task-only").value;
@@ -1336,6 +1364,22 @@ function wireTasks() {
       into: document.getElementById("deliver-into").value.trim(),
       with_budget: document.getElementById("deliver-budget").checked,
     }, "task-out", drawDelivered);
+
+  document.getElementById("run-fetch").onclick = () => {
+    const box = id => {
+      const raw = document.getElementById(id).value;
+      return raw === "" ? null : Number(raw);
+    };
+    watch("fetch", {
+      where: {
+        name: document.getElementById("fetch-name").value.trim(),
+        south: box("fetch-south"), west: box("fetch-west"),
+        north: box("fetch-north"), east: box("fetch-east"),
+        spacing_m: box("fetch-spacing"),
+        buildings: document.getElementById("fetch-buildings").checked,
+      },
+    }, "fetch-out", drawFetched);
+  };
 
   document.getElementById("frame-all").onclick = frameEverything;
 }

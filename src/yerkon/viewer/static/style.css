@@ -199,3 +199,18 @@ label.tick {
 }
 
 label.tick input { width: auto; }
+
+
+#fetch-panel {
+  border: 1px solid #dfe4e9;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+#fetch-panel summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #22282e;
+}

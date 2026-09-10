@@ -570,3 +570,110 @@ provenance = "DESIGN"
 source = "this project, as a deployment choice"
 note = """Ranging error a link may have and still be used. Tight, because the module ranges to a tenth of a metre and a two metre measurement here means something went wrong."""
 affects = "which tunnel links reach the estimator"
+
+# --- What the ground is made of ------------------------------------------
+#
+# One roughness figure for a whole site says every reflection meets
+# the same surface. These make it vary from place to place, at two
+# or three scales, deterministically in position — a patch is rough
+# as a fact about that place, not as a draw that averages out
+# (ADR-0026).
+
+[values."urban.ground_patch_m"]
+value = 200.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far you travel before the ground is something else. A town changes cover every block or two: tarmac, pavement, a park, a car park. Two hundred metres is roughly that. The finer levels are this divided by six, so one figure sets the whole ladder."""
+affects = "how quickly the reflecting surface changes along a link in the urban row"
+
+[values."urban.ground_roughness_spread"]
+value = 0.7
+unit = "fraction"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How much rougher or smoother one patch is than another, as the width of a log-normal in multiples of the typical figure. Centred on mean square rather than mean, so the site's measured roughness keeps meaning exactly what it measured and only the variation around it is added. Zero makes every patch identical, which is the single-figure model this replaced."""
+affects = "how much the coherent reflection varies link to link in the urban row"
+sensitivity = "the Ament factor is exponential in roughness times the grazing angle, so at a few hundred metres this is the difference between a two-ray null and none"
+
+[values."urban.ground_levels"]
+value = 2.0
+unit = "scales"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How many scales the ground varies at. Two is cover and texture; three adds a finer one. They share the same total variance, so a third level splits it finer rather than making the ground rougher."""
+affects = "how finely the reflecting surface varies in the urban row"
+
+[values."urban.ground_seed"]
+value = 1101.0
+unit = "seed"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Which ground this is. Separate from the measurement seed on purpose: holding this and varying that asks what the noise does on one landscape, and the reverse asks what one deployment does on many. Mixed into one seed, neither question could be asked."""
+affects = "which patches are rough and which are smooth in the urban row"
+
+[values."rural.ground_patch_m"]
+value = 600.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far you travel before the ground is something else. Open country changes at field boundaries — stubble, ploughed earth, pasture, scrub — which on the Anatolian plateau is a few hundred metres. The finer levels are this divided by six, so one figure sets the whole ladder."""
+affects = "how quickly the reflecting surface changes along a link in the rural row"
+
+[values."rural.ground_roughness_spread"]
+value = 0.6
+unit = "fraction"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How much rougher or smoother one patch is than another, as the width of a log-normal in multiples of the typical figure. Centred on mean square rather than mean, so the site's measured roughness keeps meaning exactly what it measured and only the variation around it is added. Zero makes every patch identical, which is the single-figure model this replaced."""
+affects = "how much the coherent reflection varies link to link in the rural row"
+sensitivity = "the Ament factor is exponential in roughness times the grazing angle, so at a few hundred metres this is the difference between a two-ray null and none"
+
+[values."rural.ground_levels"]
+value = 2.0
+unit = "scales"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How many scales the ground varies at. Two is cover and texture; three adds a finer one. They share the same total variance, so a third level splits it finer rather than making the ground rougher."""
+affects = "how finely the reflecting surface varies in the rural row"
+
+[values."rural.ground_seed"]
+value = 2202.0
+unit = "seed"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Which ground this is. Separate from the measurement seed on purpose: holding this and varying that asks what the noise does on one landscape, and the reverse asks what one deployment does on many. Mixed into one seed, neither question could be asked."""
+affects = "which patches are rough and which are smooth in the rural row"
+
+[values."tunnel.ground_patch_m"]
+value = 50.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far you travel before the ground is something else. A bore is the most uniform surface in the study, and still not uniform: expansion joints, drainage channels, wet stretches. Fifty metres is about the spacing of those. The finer levels are this divided by six, so one figure sets the whole ladder."""
+affects = "how quickly the reflecting surface changes along a link in the tunnel row"
+
+[values."tunnel.ground_roughness_spread"]
+value = 0.4
+unit = "fraction"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How much rougher or smoother one patch is than another, as the width of a log-normal in multiples of the typical figure. Centred on mean square rather than mean, so the site's measured roughness keeps meaning exactly what it measured and only the variation around it is added. Zero makes every patch identical, which is the single-figure model this replaced."""
+affects = "how much the coherent reflection varies link to link in the tunnel row"
+sensitivity = "the Ament factor is exponential in roughness times the grazing angle, so at a few hundred metres this is the difference between a two-ray null and none"
+
+[values."tunnel.ground_levels"]
+value = 2.0
+unit = "scales"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How many scales the ground varies at. Two is cover and texture; three adds a finer one. They share the same total variance, so a third level splits it finer rather than making the ground rougher."""
+affects = "how finely the reflecting surface varies in the tunnel row"
+
+[values."tunnel.ground_seed"]
+value = 3303.0
+unit = "seed"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Which ground this is. Separate from the measurement seed on purpose: holding this and varying that asks what the noise does on one landscape, and the reverse asks what one deployment does on many. Mixed into one seed, neither question could be asked."""
+affects = "which patches are rough and which are smooth in the tunnel row"

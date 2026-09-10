@@ -48,6 +48,28 @@
   <section>
     <h2>Arazi</h2>
     <label>Zemin <select id="site"></select></label>
+    <details id="fetch-panel">
+      <summary>Yeni bir yer getir</summary>
+      <p class="hint">Ankara ya da başka bir yer. Ağ kullanan tek şey
+        budur; bir kez getirilir, sonrası çevrimdışı koşar (ADR-0008).</p>
+      <label>Ad <input type="text" id="fetch-name" placeholder="ör. izmir"></label>
+      <div class="pair">
+        <label>Güney <input type="number" id="fetch-south" step="0.0001"
+                            placeholder="39,9115"></label>
+        <label>Batı <input type="number" id="fetch-west" step="0.0001"
+                           placeholder="32,8194"></label>
+        <label>Kuzey <input type="number" id="fetch-north" step="0.0001"
+                            placeholder="39,9385"></label>
+        <label>Doğu <input type="number" id="fetch-east" step="0.0001"
+                           placeholder="32,8546"></label>
+      </div>
+      <label>Izgara aralığı (m)
+        <input type="number" id="fetch-spacing" value="30" step="10"></label>
+      <label class="tick"><input type="checkbox" id="fetch-buildings" checked>
+        OpenStreetMap binalarını da getir</label>
+      <div class="row"><button id="run-fetch" class="quiet">Getir</button></div>
+      <div id="fetch-out"></div>
+    </details>
     <p class="hint" id="ground-note">—</p>
     <label>Tepe yüksekliği <output id="relief-out"></output>
       <input type="range" id="relief_m" min="5" max="1000" step="5"></label>

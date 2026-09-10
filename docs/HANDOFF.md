@@ -48,7 +48,7 @@ later (ADR-0006).
 | `hardware.py` | the modules the report names, with their published figures |
 | `regulatory.py` | what each region's rules allow: Turkey, Europe, the United States, licensed |
 | `rf.py` | the link budget |
-| `world.py` | terrain, graded road alignments, mounting structures |
+| `world.py` | terrain, graded road alignments, mounting structures, and the patchwork that makes reflecting ground vary from place to place |
 | `site/` | real ground and buildings, fetched once into a cache, plus four fetched Ankara areas shipped inside the package |
 | `observation.py` | the one type the estimator may see, importing nothing |
 | `ranging.py` | the two-way exchange, its clocks, and what it costs in air time |

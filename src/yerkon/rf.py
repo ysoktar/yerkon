@@ -82,6 +82,19 @@ class Obstruction:
     steep grazing angles and weak at shallow ones, so it matters at 2 km
     and barely at 10 km.
 
+    ``reflection_at_fraction`` is where along the path it lands, which
+    with a mast at one end and a vehicle at the other is nowhere near the
+    middle.
+
+    ``reflection_tilt_rad`` is how far that patch tilts along the path.
+    A tilted mirror is still a mirror: it does not scatter the ray, it
+    aims it somewhere else. Two degrees of slope swings the reflection by
+    four, which over a few hundred metres puts it clear of the receiver
+    entirely — and on real ground most patches are tilted (ADR-0026).
+    Keeping it apart from roughness matters because they are different
+    physics with the same symptom: one scatters the ray and the other
+    misses with it.
+
     ``clutter_loss_db`` is everything the elevation model does not carry:
     buildings, vegetation, traffic.
     """
@@ -91,6 +104,8 @@ class Obstruction:
     clutter_loss_db: float = 0.0
     reflection_surface_m: float = 0.0
     surface_roughness_m: float = 0.0
+    reflection_tilt_rad: float = 0.0
+    reflection_at_fraction: float = 0.5
 
     def __post_init__(self) -> None:
         if not 0.0 < self.peak_at_fraction < 1.0:
@@ -211,12 +226,57 @@ def specular_fraction(
     return math.exp(-2.0 * g * g)
 
 
+def aimed_fraction(
+    distance_m: float,
+    tilt_rad: float,
+    frequency_hz: float,
+    at_fraction: float = 0.5,
+) -> float:
+    """How much of the reflection still arrives where it can interfere.
+
+    Roughness scatters a ray. Tilt does not: a sloping patch is a mirror
+    that works perfectly and points somewhere else. A surface tilted by
+    ``tau`` swings the reflected ray by ``2*tau``, which over half the
+    path displaces it by ``2*tau*d/2``. If that displacement is large
+    against the first Fresnel radius at the reflection point, the ray
+    arrives too far off to cancel anything and the link is effectively
+    free-space.
+
+    ``at_fraction`` is where along the path the reflection lands, and it
+    is not the middle. A 25 m mast talking to a receiver at 1,5 m puts it
+    at 93 % of the way along, a few hundred metres from the receiver
+    rather than kilometres, so the swung ray has far less room to drift
+    off. Assuming the midpoint overstated the miss sevenfold on exactly
+    the geometry this study is made of.
+
+    Rolled off smoothly rather than cut, because the zone edge is not a
+    wall: the contribution falls away over it rather than stopping.
+
+    This is not a small correction on real ground. Reflecting patches
+    under the Ankara scenarios are tilted a degree or two, and at those
+    distances a degree or two is three to eight Fresnel radii of miss:
+    between 84 % and 96 % of links, depending on the row (ADR-0026).
+    """
+    if tilt_rad == 0.0 or distance_m <= 0.0:
+        return 1.0
+    zone_m = first_fresnel_radius_m(distance_m, frequency_hz, at_fraction)
+    if zone_m <= 0.0:
+        return 1.0
+    # The reflected ray still has to reach the receiver: how far it
+    # travels after bouncing is what the swing acts over.
+    to_receiver_m = distance_m * max(1.0 - at_fraction, 1e-6)
+    missed_by = abs(2.0 * math.tan(abs(tilt_rad))) * to_receiver_m / zone_m
+    return math.exp(-(missed_by ** 2))
+
+
 def two_ray_path_loss_db(
     distance_m: float,
     tx_height_m: float,
     rx_height_m: float,
     frequency_hz: float,
     roughness_m: float = 0.0,
+    tilt_rad: float = 0.0,
+    reflection_at: float = 0.5,
 ) -> float:
     """Loss over reflecting ground, in dB.
 
@@ -239,7 +299,7 @@ def two_ray_path_loss_db(
     )
     rho = specular_fraction(
         distance_m, tx_height_m, rx_height_m, roughness_m, frequency_hz
-    )
+    ) * aimed_fraction(distance_m, tilt_rad, frequency_hz, reflection_at)
     # Scattered ground returns no coherent ray to cancel with, so the
     # excess over free space is only paid for the part that stays
     # specular.
@@ -412,6 +472,8 @@ def evaluate_link(
         max(rx[2] - surface_m, 0.1),
         frequency_hz,
         roughness_m=obstruction.surface_roughness_m,
+        tilt_rad=obstruction.reflection_tilt_rad,
+        reflection_at=obstruction.reflection_at_fraction,
     )
     path_loss_db = spread_db + diffraction_db + obstruction.clutter_loss_db
 
