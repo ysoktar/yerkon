@@ -1,4 +1,4 @@
-# 0016. Assumptions live in a file, and nowhere else
+# 0016. Every figure the report did not supply lives in one file
 
 ## Status
 Accepted. Extends ADR-0006.
@@ -20,7 +20,14 @@ Worse, nothing stopped another one being added. The discipline was a
 habit, and habits are not enforceable.
 
 ## Decision
-Every figure nobody supplied lives in `src/yerkon/assumptions.toml`. Each
+Every figure nobody supplied lives in `src/yerkon/defaults.toml`.
+
+It is called defaults rather than assumptions because that is what it
+stays. A figure does not leave the file when somebody sources it; it just
+stops being an assumption. What each rests on is its own `provenance`,
+which is a property of the figure and not of the file it lives in.
+
+Each
 entry carries its value, unit, provenance, source, a note saying what it
 stands for, what it affects, and where it was measured, what doubling it
 does.
@@ -41,7 +48,7 @@ Replacing a figure is three edits in one place: the value, the source,
 and provenance from ASSUMPTION to whatever it now is. Everything
 downstream stops counting it at that moment.
 
-`yerkon assumptions` lists what is left. `--assumptions FILE` on every
+`yerkon defaults` lists what is left. `--defaults FILE` on every
 other verb runs the whole study against a different file.
 
 ## Consequences
@@ -81,7 +88,7 @@ rests on nothing.
 
 An afternoon of that is worth keeping, so the viewer writes the edited
 file back out. It is the same shape the loader reads, so it goes straight
-back in through --assumptions.
+back in through --defaults.
 
 What this does not do is remove the assumptions. It makes them a
 finite, ordered, enforceable list instead of a property of the code.

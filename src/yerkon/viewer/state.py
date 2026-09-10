@@ -140,7 +140,7 @@ class ViewState:
     #: Cell size of the coverage sweep, in metres.
     sweep_m: float = 500.0
 
-    #: Figures changed by hand, keyed as `assumptions.toml` keys them.
+    #: Figures changed by hand, keyed as `defaults.toml` keys them.
     #:
     #: Every number nobody supplied is editable while the viewer is
     #: running, and everything is rebuilt from it: the mounting

@@ -159,7 +159,7 @@ def test_no_module_writes_an_assumption_of_its_own():
             offenders.append(str(path.relative_to(SRC)))
     assert not offenders, (
         "these construct an assumption instead of reading one from "
-        "assumptions.toml: {}".format(", ".join(offenders))
+        "defaults.toml: {}".format(", ".join(offenders))
     )
 
 

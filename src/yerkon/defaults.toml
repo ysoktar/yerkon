@@ -1,4 +1,8 @@
-# Every number in this project that nobody supplied.
+# Every figure this project needs that the report did not supply.
+#
+# Called defaults rather than assumptions because that is what it stays.
+# A figure does not leave this file when somebody sources it; it just
+# stops being an assumption. What each one rests on is its `provenance`.
 #
 # The report gave a bill of materials and nothing else. Each figure below
 # is a placeholder standing in for a measurement or a quotation, and each

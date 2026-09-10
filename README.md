@@ -40,7 +40,7 @@ Built and tested:
   configuration rather than as code.
 - `report.py`, the four rows and what they rest on.
 - `siting.py`, the search for the cheapest deployment that meets a target.
-- `settings.py` and `assumptions.toml`, every figure nobody supplied, in
+- `settings.py` and `defaults.toml`, every figure nobody supplied, in
   one file that nothing else may add to.
 - `viewer/`, a local web app over the same engine: the corridor in three
   dimensions, every setting live, and the confirmation panel in front of
@@ -100,18 +100,20 @@ draws its own three dimensions rather than loading a library from a
 content delivery network, so it works with the machine offline
 (ADR-0013).
 
-## The assumptions
+## The defaults
 
 The report gave a bill of materials and nothing else. Every other figure
-this project needs is a placeholder somebody wrote, and all of them live
-in one file:
+this project needs is a default somebody chose, and all of them live in
+one file. It is called defaults rather than assumptions because that is
+what it stays: a figure does not leave the file when somebody sources it,
+it just stops being an assumption.
 
 ```bash
-yerkon assumptions --full
+yerkon defaults --full
 ```
 
 ```
-Still assumed in src/yerkon/assumptions.toml
+Still assumed in src/yerkon/defaults.toml
 33 of 33 figures are still assumptions (%100).
 
 mounting.tall_mast.site_cost_tl                  85000,00 TL
@@ -131,9 +133,9 @@ Replacing one is three edits in one place: the value, the source, and
 `provenance` from `ASSUMPTION` to what it now is. Then:
 
 ```bash
-yerkon table --assumptions my-figures.toml
-yerkon site  --assumptions my-figures.toml
-yerkon view  --assumptions my-figures.toml
+yerkon table --defaults my-figures.toml
+yerkon site  --defaults my-figures.toml
+yerkon view  --defaults my-figures.toml
 ```
 
 Everything is rebuilt from it — scenarios, mounting catalogue, radios,
@@ -149,7 +151,7 @@ Change a site cost and it applies at once, because a price moves no
 physics. A figure edited by hand stays an assumption unless you give it a
 source — that distinction is the difference between exploring and
 reporting. **Dosyaya yaz** writes what you have back out as a file that
-goes straight back in through `--assumptions`.
+goes straight back in through `--defaults`.
 
 It moves the answers, too. At a mast cost of 8500 TL existing signs still
 win; at 5000 TL masts take over at 17 anchors for 264906 TL. The

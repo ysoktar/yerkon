@@ -10,8 +10,8 @@ report's comparison table.
 ``view`` starts a local web app: the same engine, drawn in three
 dimensions, with every setting live.
 
-``assumptions`` lists every figure nobody supplied, what it affects and
-what replacing it would move.
+``defaults`` lists every figure the model needs that nobody supplied,
+what it affects, and what replacing it would move.
 
 ``site`` searches for the cheapest deployment that meets a target.
 
@@ -265,14 +265,14 @@ def describe_outcome(design_: Design) -> str:
     return "\n".join(lines)
 
 
-def _add_assumptions_flag(parser: argparse.ArgumentParser) -> None:
+def _add_defaults_flag(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
-        "--assumptions", metavar="FILE",
+        "--defaults", metavar="FILE",
         help=(
             "a settings file of the figures nobody supplied. Everything "
             "is rebuilt from it: mounting costs and heights, the "
             "unpublished radio figures, the clocks, and the operating "
-            "rates. See `yerkon assumptions`."
+            "rates. See `yerkon defaults`."
         ),
     )
 
@@ -280,7 +280,7 @@ def _add_assumptions_flag(parser: argparse.ArgumentParser) -> None:
 def _settings_from(args):
     from yerkon.settings import load
 
-    return load(args.assumptions) if args.assumptions else None
+    return load(args.defaults) if args.defaults else None
 
 
 def table(argv: list[str] | None = None) -> int:
@@ -303,7 +303,7 @@ def table(argv: list[str] | None = None) -> int:
         "--no-notes", action="store_true",
         help="print the table alone, without what it rests on",
     )
-    _add_assumptions_flag(parser)
+    _add_defaults_flag(parser)
     parser.add_argument(
         "--weight", action="append", metavar="NAME=SHARE",
         help=(
@@ -382,7 +382,7 @@ def view(argv: list[str] | None = None) -> int:
         "--no-browser", action="store_true",
         help="print the address instead of opening it",
     )
-    _add_assumptions_flag(parser)
+    _add_defaults_flag(parser)
     args = parser.parse_args(argv)
 
     try:
@@ -430,7 +430,7 @@ def site(argv: list[str] | None = None) -> int:
     parser.add_argument("--region", default="TR")
     parser.add_argument("--all", action="store_true",
                         help="list every candidate, not only those that meet")
-    _add_assumptions_flag(parser)
+    _add_defaults_flag(parser)
     args = parser.parse_args(argv)
 
     from yerkon.evaluate import Journey, Receiver
@@ -540,13 +540,13 @@ def site(argv: list[str] | None = None) -> int:
     return 0
 
 
-def assumptions(argv: list[str] | None = None) -> int:
+def defaults(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        prog="yerkon assumptions",
+        prog="yerkon defaults",
         description=(
-            "Every figure this project needs that nobody supplied, in one "
-            "list, with what each affects. Replacing one is an edit to "
-            "assumptions.toml, not a change to the code."
+            "Every figure this project needs that the report did not "
+            "supply, in one list, with what each affects. Replacing one "
+            "is an edit to defaults.toml, not a change to the code."
         ),
     )
     parser.add_argument(
@@ -602,7 +602,7 @@ def assumptions(argv: list[str] | None = None) -> int:
     if not args.sourced:
         print("To replace one: copy {}, edit the value and the source, and "
               "change provenance from ASSUMPTION.".format(DEFAULT_FILE))
-        print("Then pass --assumptions with your copy to any other command.")
+        print("Then pass --defaults with your copy to any other command.")
     return 0
 
 
@@ -616,7 +616,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon table  [--markdown] [--only rural]")
         print("  yerkon view   [--port 8765]")
         print("  yerkon site   [--corridor 12000] [--tolerance 5]")
-        print("  yerkon assumptions [--full]")
+        print("  yerkon defaults [--full]")
         return 0
     verb, rest = argv[0], argv[1:]
     if verb == "fetch":
@@ -629,8 +629,8 @@ def main(argv: list[str] | None = None) -> int:
         return view(rest)
     if verb == "site":
         return site(rest)
-    if verb == "assumptions":
-        return assumptions(rest)
+    if verb == "defaults":
+        return defaults(rest)
     print("Unknown command: {}".format(verb), file=sys.stderr)
     return 2
 

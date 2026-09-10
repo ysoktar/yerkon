@@ -58,7 +58,7 @@ later (ADR-0006).
 | `scenarios.py` | the three deployments the table describes, as configuration |
 | `report.py` | the four rows, the ten columns, and the notes under them |
 | `siting.py` | the search for the cheapest deployment that meets a target |
-| `settings.py` | every figure nobody supplied, loaded from `assumptions.toml` |
+| `settings.py` | every figure the report did not supply, from `defaults.toml` |
 | `viewer/` | the local web app: state, scene, server, and its own renderer |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
@@ -85,9 +85,9 @@ though it were coverage is wrong.
 Everything on the original list is built. What remains is measurement,
 not code.
 
-1. **The figures.** All thirty-three are in `src/yerkon/assumptions.toml`
+1. **The figures.** All thirty-three are in `src/yerkon/defaults.toml`
    with what each affects and, where it was measured, what doubling it
-   does. Run `yerkon assumptions --full` for the work list. The mast cost
+   does. Run `yerkon defaults --full` for the work list. The mast cost
    is the most consequential: the siting search says existing signs beat
    masts by five and a half times, and the break-even is 6588 TL.
 2. **The residual clock offset after frequency correction**, half a part

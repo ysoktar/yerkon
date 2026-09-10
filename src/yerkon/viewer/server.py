@@ -217,13 +217,13 @@ class Handler(BaseHTTPRequestHandler):
 
         Served as a download rather than shown, because the useful thing
         to do with it is put it beside the project and pass it back with
-        --assumptions.
+        --defaults.
         """
         payload = state.settings().to_toml().encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/toml; charset=utf-8")
         self.send_header(
-            "Content-Disposition", 'attachment; filename="assumptions.toml"'
+            "Content-Disposition", 'attachment; filename="defaults.toml"'
         )
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()

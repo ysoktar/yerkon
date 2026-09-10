@@ -1,8 +1,14 @@
-"""Every number nobody supplied, loaded from a file rather than written here.
+"""Every figure the report did not supply, loaded rather than written here.
 
-`assumptions.toml` beside this module is the whole list. Nothing in the
-rest of `src/` may construct an assumption of its own, and a test in
-`tests/test_architecture.py` refuses the build if anything tries.
+`defaults.toml` beside this module is the whole list. It is called
+defaults rather than assumptions because that is what it stays: a figure
+does not leave the file when somebody sources it, it just stops being an
+assumption. What each entry rests on is its own `provenance`, not the
+name of the file it lives in.
+
+Nothing in the rest of `src/` may construct an assumption of its own, and
+a test in `tests/test_architecture.py` refuses the build if anything
+tries.
 
 The point is not tidiness. A placeholder buried in a function is a
 placeholder nobody will ever find, and this project's costings rest
@@ -26,7 +32,7 @@ from typing import Optional
 from yerkon.evidence import Provenance, Sourced
 
 HERE = pathlib.Path(__file__).resolve().parent
-DEFAULT_FILE = HERE / "assumptions.toml"
+DEFAULT_FILE = HERE / "defaults.toml"
 
 REQUIRED = ("value", "unit", "provenance", "source", "note", "affects")
 

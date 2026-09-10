@@ -371,7 +371,7 @@ function drawUnits() {
   });
 }
 
-/* Every figure nobody supplied, editable while the study runs.
+/* Every default the report did not supply, editable while the study runs.
  *
  * The report gave a bill of materials and nothing else, so between
  * seventy-nine and ninety-nine percent of what this produces rests on
@@ -395,7 +395,7 @@ function drawFigures() {
   host.innerHTML = "";
 
   document.getElementById("assumed-count").textContent =
-    `${figuresData.assumed}/${figuresData.total} varsayım`;
+    `${figuresData.total} değerin ${figuresData.assumed} tanesi varsayım`;
 
   for (const group of figuresData.groups) {
     const heading = document.createElement("div");
@@ -422,7 +422,9 @@ function drawFigures() {
       input.value = figure.value;
       input.step = "any";
       if (figure.edited) input.classList.add("edited");
-      input.title = figure.assumed ? "Hâlâ varsayım" : `Kaynak: ${figure.source}`;
+      input.title = figure.assumed
+        ? "Hâlâ varsayım — kaynağı defaults.toml'a yaz"
+        : `Kaynak: ${figure.source}`;
       input.onchange = () => {
         const overrides = Object.assign({}, state.overrides);
         overrides[figure.key] = Number(input.value);
