@@ -401,8 +401,13 @@ def test_the_page_asks_for_nothing_the_server_does_not_serve():
     wanted = set(re.findall(r'(?:src|href)="(/[^"]*)"', page))
     wanted |= set(re.findall(r'from "(/[^"]+)"', application))
     wanted |= set(re.findall(r'(?:ask|fetch)\(\s*"(/[^"]+)"', application))
+    # Template literals too. `ask(`/api/job?id=${...}`)` slipped past the
+    # quoted forms for a whole feature, which is exactly the dead route
+    # this test exists to catch.
+    wanted |= set(re.findall(r'(?:ask|fetch)\(\s*`(/[^`$]+)', application))
 
     for reference in sorted(wanted):
+        reference = reference.split("?")[0]
         if reference in ("/", ""):
             continue
         if reference.startswith("/api/"):
@@ -621,3 +626,257 @@ def test_the_reach_drawn_is_the_reach_the_ground_gives():
 
     modelled = a_state(roughness_m=0.05)
     assert design_of(modelled).surface_roughness_m == pytest.approx(0.05)
+
+
+# --- Everything the command line can do, from the page --------------------
+
+
+def test_every_control_the_page_offers_is_wired_to_something():
+    """A control that looks live and does nothing is worse than no control.
+
+    The other direction from the route test: not "does every route the
+    script asks for exist" but "does anything actually reach every button,
+    box and menu the page draws". Only interactive elements — a div the
+    stylesheet positions is not a promise to the person looking at it.
+    """
+    import pathlib
+    import re
+
+    static = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static"
+    )
+    page = (static / "index.html").read_text(encoding="utf-8")
+    application = (static / "app.js").read_text(encoding="utf-8")
+
+    interactive = set(re.findall(
+        r'<(?:button|input|select|textarea)\b[^>]*\bid="([a-z0-9_-]+)"', page
+    ))
+    assert len(interactive) > 10, "this stopped matching the page's controls"
+
+    unused = {name for name in interactive if name not in application}
+    assert not unused, "the page draws {} and nothing reaches them".format(
+        ", ".join(sorted(unused))
+    )
+
+
+def test_the_page_can_reach_every_verb_the_command_line_has():
+    """ADR-0024. Anything worth doing is doable without a terminal.
+
+    Named as the list of verbs rather than discovered, so that adding one
+    to the command line and not to the page fails here.
+    """
+    import pathlib
+
+    viewer = pathlib.Path(__file__).resolve().parent.parent / "src/yerkon/viewer"
+    routing = (viewer / "server.py").read_text(encoding="utf-8")
+    for verb in ("table", "budget", "solve"):
+        assert '"{}"'.format(verb) in routing, verb
+    assert "/api/options" in routing
+    assert "/api/option" in routing
+
+
+def test_a_task_the_server_does_not_have_says_what_it_does_have():
+    from yerkon.viewer.tasks import budget, table
+
+    assert callable(table(a_state()))
+    assert callable(budget(a_state()))
+
+
+def test_a_task_runs_against_the_settings_the_page_is_showing():
+    """Not against the shipped defaults.
+
+    Somebody who has spent an afternoon moving figures has to be able to
+    ask what their arrangement costs, without writing it to a file first.
+    """
+    from yerkon.viewer.tasks import deployments_of
+
+    denser = a_state().merged({
+        "overrides": {"urban.anchor_spacing_m": 250.0,
+                      "urban.anchor_stagger_m": 125.0}
+    })
+    standard = deployments_of(a_state(), ["urban"])[0]
+    edited = deployments_of(denser, ["urban"])[0]
+    assert (
+        len(edited.scenario.deployment.anchors)
+        > len(standard.scenario.deployment.anchors)
+    )
+
+
+def test_asking_for_a_scenario_that_does_not_exist_says_so():
+    from yerkon.viewer.tasks import deployments_of
+
+    with pytest.raises(ValueError, match="no scenario called"):
+        deployments_of(a_state(), ["atlantis"])
+
+
+def test_a_blank_target_field_is_not_a_bar_of_zero():
+    """An empty box means "I do not care", not "must be at least nothing".
+
+    Read the other way, every search would be filtered by conditions
+    nobody set, and the ones that matter would be diluted by them.
+    """
+    import math
+
+    from yerkon.viewer.tasks import target_from
+
+    wide = target_from({"availability": 0.9, "hpe_p50_m": ""})
+    assert wide.availability == 0.9
+    assert math.isinf(wide.hpe_p50_m)
+    assert target_from({}).describe() == "nothing in particular"
+
+
+def test_applying_an_option_keeps_the_edits_already_made():
+    """An option is a short list of edits, so it composes with the rest.
+
+    A person who has already corrected the mast cost and then picks a
+    denser grid must not silently lose the correction.
+    """
+    from yerkon.options import read
+
+    edited = a_state().merged({
+        "overrides": {"mounting.tall_mast.site_cost_tl":
+                      {"value": 61000.0, "source": "a quotation"}}
+    })
+    option = read("rural-dense")
+    overrides = dict(edited.overrides)
+    for key, value in option.values.items():
+        overrides[key] = {"value": value, "source": "option"}
+    both = edited.merged({"overrides": overrides})
+
+    assert both.settings().number("rural.anchor_spacing_m") == 3000.0
+    assert not both.settings().entry(
+        "mounting.tall_mast.site_cost_tl").is_assumed
+
+
+# --- Long work, watched rather than waited on ----------------------------
+
+
+def test_a_long_task_reports_as_it_goes_rather_than_only_at_the_end():
+    """ADR-0024. Twelve minutes of silence is indistinguishable from broken."""
+    import time
+
+    from yerkon.viewer.jobs import Jobs
+
+    registry = Jobs()
+
+    def work(say):
+        say("first")
+        say("second")
+        return {"done": True}
+
+    job = registry.start("test", work, total=2)
+    for _ in range(100):
+        if registry.read(job.identifier).done:
+            break
+        time.sleep(0.02)
+
+    finished = registry.read(job.identifier)
+    assert finished.progress == ["first", "second"]
+    assert finished.result == {"done": True}
+    assert finished.error is None
+
+
+def test_a_task_that_fails_says_why_on_the_page(capsys):
+    """A traceback in a terminal nobody is looking at is not an error message."""
+    import time
+
+    from yerkon.viewer.jobs import Jobs
+
+    registry = Jobs()
+
+    def work(say):
+        raise ValueError("the ground was never fetched")
+
+    job = registry.start("test", work)
+    for _ in range(100):
+        if registry.read(job.identifier).done:
+            break
+        time.sleep(0.02)
+
+    finished = registry.read(job.identifier)
+    assert finished.error == "the ground was never fetched"
+    assert finished.result is None
+
+
+def test_polling_a_task_cannot_see_a_half_written_line():
+    """The reader gets a copy, so a list being appended to is never shared."""
+    from yerkon.viewer.jobs import Jobs
+
+    registry = Jobs()
+    job = registry.start("test", lambda say: (say("one"), {})[-1])
+    first = registry.read(job.identifier)
+    first.progress.append("not really")
+    assert "not really" not in registry.read(job.identifier).progress
+
+
+def test_asking_after_a_task_that_was_never_started_says_so():
+    from yerkon.viewer.jobs import Jobs
+
+    assert Jobs().read("nothing") is None
+
+
+# --- Moving around the scene ---------------------------------------------
+
+
+def read_app_js():
+    import pathlib
+
+    return (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/app.js"
+    ).read_text(encoding="utf-8")
+
+
+def test_the_camera_can_be_moved_and_not_only_turned():
+    """A viewer that only orbits is unusable over twenty kilometres.
+
+    There is no way to look at a corner of a site if the point you turn
+    around never moves, and until this was added there was not one.
+    """
+    application = read_app_js()
+    assert "panning" in application
+    assert "orbit.target = [" in application
+    for gesture in ("event.button === 2", "event.shiftKey", "NUDGE"):
+        assert gesture in application, gesture
+
+
+def test_the_camera_is_framed_once_and_then_left_alone():
+    """Re-centring on every refresh is what made panning pointless.
+
+    Any slide a person made was undone by their next edit, which reads as
+    a broken camera rather than as a deliberate reset.
+    """
+    application = read_app_js()
+    framing = application[application.index("terrainData = latest.terrain;"):]
+    framing = framing[: framing.index("scheduleSweep")]
+    target = framing.index("orbit.target = [state.corridor_m")
+    guard = framing.index("if (!framed)")
+    assert guard < target, "the camera target is set outside the framing guard"
+
+
+def test_zoom_follows_the_wheel_rather_than_stepping():
+    """A fixed step per event makes a trackpad unusable and a mouse coarse.
+
+    Trackpads send many small deltas and mice send few large ones; a
+    twelve percent jump per event served neither.
+    """
+    application = read_app_js()
+    assert "event.deltaY / 100" in application
+    assert "Math.exp(" in application
+    assert "Math.sign(event.deltaY)" not in application
+
+
+def test_dragging_an_anchor_follows_the_ground_rather_than_one_plane():
+    """Over rolling ground the two differ by more than a mast is tall.
+
+    A drag against the plane through the origin drops an anchor visibly
+    away from the cursor, which looks like a broken hit test.
+    """
+    application = read_app_js()
+    assert "function groundUnder" in application
+    settled = application[application.index("function groundUnder"):]
+    settled = settled[: settled.index("function frameOn")]
+    assert settled.count("onPlane") == 2, (
+        "groundUnder should sample the level plane and then the real height"
+    )

@@ -109,6 +109,31 @@ height and set of modules, drawn on the route it takes.
 Everything is live. Drag an anchor, shift-click to remove it, add or drop
 a run or a unit, move any slider, and the scene and the numbers follow.
 
+**Moving around.** Drag to turn. Right-drag, middle-drag or shift-drag to
+slide the ground — the point you grab stays under the cursor. The wheel
+zooms towards the cursor, scaled by how far it actually turned, so a
+trackpad creeps and a mouse notch steps. WASD and the arrows walk the way
+the camera faces; `F` frames everything, which is what you want after
+getting lost. Framing happens on the first load and on a mode change and
+never again, so a view you set stays set.
+
+**Everything the command line does, the page does** (ADR-0024), and it
+runs against the settings the page is showing rather than the shipped
+defaults — so an afternoon of edits can be costed without writing a file
+first:
+
+- **Hazır seçenekler** lists the named options and applies one as
+  overrides, composing with your own edits rather than replacing them.
+- **Tablo** runs the report rows.
+- **Hata dağılımı** runs the error dissection and draws each source as a
+  bar, worst first.
+- **Çözücü** searches deployments against a target and saves the winner
+  as a new named option, which the options list then offers.
+
+The last three take minutes, because every figure in them comes from
+running the real simulation. They run on a thread and report a line at a
+time, so you can watch rather than wonder.
+
 Changes that force other changes — region, module, mounting, tolerance,
 roughness — raise the confirmation panel first, listing every value that
 would move with its old and new figure and why it follows, answered once

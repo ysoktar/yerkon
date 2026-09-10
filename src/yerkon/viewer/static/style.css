@@ -92,3 +92,85 @@ dd.warn { color: var(--warn); }
   letter-spacing: 0.09em; color: #61707e; }
 a.button { display: inline-flex; align-items: center; justify-content: center;
   text-decoration: none; }
+
+
+/* The camera hint, and the panels that report long work. */
+
+#controls-hint {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 4;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid #d6dbe0;
+  font-size: 11px;
+  color: #4a5560;
+}
+
+#controls-hint b { color: #22282e; font-weight: 600; }
+#controls-hint button { padding: 2px 8px; font-size: 11px; }
+
+.option {
+  border: 1px solid #dfe4e9;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.option header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.option header b { font-size: 12px; }
+.option .moves { font-size: 11px; color: #55606b; }
+.option .moves span { display: block; font-variant-numeric: tabular-nums; }
+.option .why { font-size: 11px; color: #6b7681; margin: 4px 0 0; }
+
+#task-out, #solve-out { margin-top: 8px; }
+
+.log {
+  max-height: 190px;
+  overflow-y: auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  background: #f4f6f8;
+  border-radius: 5px;
+  padding: 6px 8px;
+  white-space: pre-wrap;
+  color: #4a5560;
+}
+
+table.out {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  margin-top: 8px;
+}
+
+table.out th, table.out td {
+  padding: 3px 4px;
+  border-bottom: 1px solid #e6eaee;
+  text-align: right;
+}
+
+table.out th:first-child, table.out td:first-child { text-align: left; }
+table.out th { color: #6b7681; font-weight: 500; }
+
+.bar {
+  height: 4px;
+  border-radius: 2px;
+  background: #1f6feb;
+  margin-top: 2px;
+}
+
+.dominant { background: #b4551d; }

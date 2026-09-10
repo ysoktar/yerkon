@@ -204,7 +204,13 @@ def build(
 
     deployments = reweighted(tuple(deployments), weights)
     results = tuple(run(d, rates) for d in deployments)
-    rows = tuple(r.row() for r in results) + (weighted(results),)
+    rows = tuple(r.row() for r in results)
+    if len(results) > 1:
+        # A weighted average of one scenario is that scenario, and
+        # printing it twice under a name that promises a combination is
+        # worse than not printing it. The block has four rows when it
+        # describes three deployments (ADR-0005).
+        rows += (weighted(results),)
     return results, rows
 
 

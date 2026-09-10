@@ -26,7 +26,16 @@ from typing import Optional
 
 from yerkon.design import Design
 from yerkon.proposal import propose
+from yerkon.viewer.jobs import Jobs
+from yerkon.options import read as read_option
 from yerkon.viewer.scene import design_of, figures, scene, simulate, sweep
+from yerkon.viewer.tasks import (
+    budget as budget_task,
+    listed,
+    solve as solve_task,
+    table as table_task,
+    target_from,
+)
 from yerkon.viewer.state import (
     CASCADING,
     CASCADING_RUN,
@@ -129,6 +138,12 @@ def _change(change) -> dict:
 
 class Handler(BaseHTTPRequestHandler):
     session: Session = Session()
+    #: Work that takes minutes: the table, the dissection, a search.
+    #:
+    #: Started here and polled, rather than answered inside one request,
+    #: because a browser gives up long before a twelve minute dissection
+    #: finishes and because a person should be able to watch it (ADR-0024).
+    jobs: Jobs = Jobs()
 
     # Quiet: a page that redraws on every drag would otherwise bury the
     # terminal in request lines.
@@ -157,6 +172,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(lambda: sweep(self.session.read()))
         if path == "/api/simulate":
             return self._json(lambda: simulate(self.session.read()))
+        if path == "/api/options":
+            return self._json(
+                lambda: listed(self.session.read().settings())
+            )
+        if path == "/api/job":
+            return self._json(self._job)
         self.send_error(404)
 
     def do_POST(self) -> None:
@@ -179,6 +200,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(
                 lambda: {"state": self.session.write(ViewState()).as_json()}
             )
+        if path == "/api/option":
+            return self._json(lambda: self._option(body.get("name", "")))
+        if path == "/api/run":
+            return self._json(lambda: self._run(body))
         self.send_error(404)
 
     # -- the two things a POST can mean -----------------------------------
@@ -204,6 +229,63 @@ class Handler(BaseHTTPRequestHandler):
                 )
             )
         return {"state": self.session.write(from_scenario(name)).as_json()}
+
+    def _option(self, name: str) -> dict:
+        """Apply a named deployment option to what the page is showing.
+
+        An option is a short list of edits to the settings, so it lands
+        in the same overrides a person edits by hand: it composes with
+        their work rather than replacing it, and it can be undone the
+        same way.
+        """
+        option = read_option(name)
+        state = self.session.read()
+        overrides = dict(state.overrides)
+        for key, value in option.values.items():
+            overrides[key] = {
+                "value": float(value),
+                "source": "option: {}".format(option.name),
+            }
+        updated = self.session.write(state.merged({"overrides": overrides}))
+        return {"state": updated.as_json(), "applied": option.name}
+
+    def _run(self, body: dict) -> dict:
+        """Start a long task and hand back something to poll.
+
+        The page holds no physics, so it cannot run any of these itself;
+        what it gets is an identifier and a stream of lines.
+        """
+        kind = body.get("kind", "")
+        state = self.session.read()
+        only = body.get("only") or None
+
+        if kind == "table":
+            work = table_task(state, only)
+        elif kind == "budget":
+            work = budget_task(state, only, body.get("sources") or None)
+        elif kind == "solve":
+            work = solve_task(
+                state,
+                body.get("scenario", "rural"),
+                target_from(body.get("target", {})),
+                body.get("vary") or None,
+                (body.get("save") or "").strip() or None,
+            )
+        else:
+            raise ValueError(
+                "no such task: {!r}. There is: table, budget, solve".format(kind)
+            )
+        return {"job": self.jobs.start(kind, work).as_json()}
+
+    def _job(self) -> dict:
+        """How a running task is getting on."""
+        from urllib.parse import parse_qs, urlparse
+
+        wanted = parse_qs(urlparse(self.path).query).get("id", [""])[0]
+        job = self.jobs.read(wanted)
+        if job is None:
+            raise ValueError("no task called {!r} is running".format(wanted))
+        return {"job": job.as_json()}
 
     def _apply(self, changes: dict) -> dict:
         state = self.session.read()

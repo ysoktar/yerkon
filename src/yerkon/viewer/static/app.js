@@ -676,14 +676,38 @@ function render() {
   draw.paint(context, width, height, items);
 }
 
-/* ---------- dragging an anchor ---------- */
+/* ---------- moving the camera, and dragging an anchor ----------
+ *
+ * Three things move: the camera turns around a point, that point slides
+ * over the ground, and the distance to it changes. A viewer with only
+ * the first is unusable over a twenty kilometre site, because there is
+ * no way to look at a corner of it.
+ *
+ * Every gesture is captured on the canvas, so a drag that leaves the
+ * window keeps working until the button comes up. Losing a turn halfway
+ * because the pointer crossed into the panel is the kind of thing that
+ * makes a scene feel broken when the maths is fine.
+ */
 
 let dragging = null;
 let spinning = null;
+let panning = null;
+const pinch = new Map();
+let pinchSpan = null;
+
+/* How far the camera can get from what it is looking at. The lower bound
+ * is a tunnel bracket at arm's length; the upper is a rural region with
+ * room around it. */
+const NEAREST_M = 400;
+const FURTHEST_M = 400000;
 
 function pixel(event) {
   const box = canvas.getBoundingClientRect();
   return [event.clientX - box.left, event.clientY - box.top];
+}
+
+function view() {
+  return draw.camera(orbit, container.clientWidth, container.clientHeight);
 }
 
 function markerAt(px, py) {
@@ -697,29 +721,105 @@ function markerAt(px, py) {
   return best;
 }
 
+/* Where a pixel lands on the ground, following the terrain rather than
+ * one flat plane. One pass over the level plane to find roughly where we
+ * are, then again at that place's real height: over rolling ground the
+ * two differ by more than a mast is tall, and a drag that used the first
+ * would drop an anchor visibly away from the cursor. */
+function groundUnder(px, py) {
+  const camera = view();
+  const flat = camera.onPlane(px, py, groundAt(0, 0) * draw.VERTICAL);
+  if (!flat) return null;
+  const settled = camera.onPlane(
+    px, py, groundAt(flat[0], flat[1]) * draw.VERTICAL);
+  return settled || flat;
+}
+
+function frameOn(target, distance) {
+  orbit.target = target;
+  if (distance) {
+    orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M, distance));
+  }
+  render();
+}
+
+/* -- turning, sliding and zooming -- */
+
 canvas.addEventListener("pointerdown", event => {
+  if (event.pointerType === "touch") {
+    pinch.set(event.pointerId, [event.clientX, event.clientY]);
+    if (pinch.size === 2) { spinning = panning = null; return; }
+  }
   const [px, py] = pixel(event);
   const hit = markerAt(px, py);
+
   if (hit && event.shiftKey) {
     apply({ removed: (state.removed || []).concat([hit.id]) })
       .catch(e => say(e.message, true));
     return;
   }
-  if (hit) { dragging = hit.id; canvas.setPointerCapture(event.pointerId); return; }
-  spinning = { x: event.clientX, y: event.clientY, yaw: orbit.yaw, pitch: orbit.pitch };
+  canvas.setPointerCapture(event.pointerId);
+  if (hit && event.button === 0) { dragging = hit.id; return; }
+
+  // Right button, middle button, or a held modifier slides the ground.
+  // Left alone turns. Both are on the canvas, so neither is lost when
+  // the pointer crosses the panel.
+  const slide = event.button === 1 || event.button === 2 ||
+                event.ctrlKey || event.metaKey || event.shiftKey;
+  const seat = { x: event.clientX, y: event.clientY, target: orbit.target.slice() };
+  if (slide) {
+    panning = Object.assign(seat, { at: groundUnder(px, py) });
+  } else {
+    panning = null;
+    spinning = Object.assign(seat, { yaw: orbit.yaw, pitch: orbit.pitch });
+  }
 });
 
+canvas.addEventListener("contextmenu", event => event.preventDefault());
+
 canvas.addEventListener("pointermove", event => {
+  if (event.pointerType === "touch" && pinch.has(event.pointerId)) {
+    pinch.set(event.pointerId, [event.clientX, event.clientY]);
+    if (pinch.size === 2) return twoFingers();
+  }
+
   if (dragging) {
-    const [px, py] = pixel(event);
-    const view = draw.camera(orbit, container.clientWidth, container.clientHeight);
-    const point = view.onPlane(px, py, groundAt(0, 0) * draw.VERTICAL);
+    const point = groundUnder(...pixel(event));
     if (point) {
       const anchor = latest.anchors.find(a => a.id === dragging);
       if (anchor) { anchor.x = point[0]; anchor.y = point[1]; render(); }
     }
     return;
   }
+
+  if (panning) {
+    // Slide by however far the ground has moved under the cursor, so
+    // the point grabbed stays under it. Falls back to a distance-scaled
+    // nudge when the ray misses the ground, which happens near the
+    // horizon.
+    const here = groundUnder(...pixel(event));
+    if (panning.at && here) {
+      orbit.target = [
+        panning.target[0] + (panning.at[0] - here[0]),
+        panning.target[1] + (panning.at[1] - here[1]),
+        panning.target[2],
+      ];
+    } else {
+      const pace = orbit.distance * 0.0014;
+      const along = -(event.clientX - panning.x) * pace;
+      const across = (event.clientY - panning.y) * pace;
+      orbit.target = [
+        panning.target[0] + along * Math.cos(orbit.yaw + Math.PI / 2)
+          + across * Math.cos(orbit.yaw),
+        panning.target[1] + along * Math.sin(orbit.yaw + Math.PI / 2)
+          + across * Math.sin(orbit.yaw),
+        panning.target[2],
+      ];
+    }
+    render();
+    return;
+  }
+
   if (spinning) {
     orbit.yaw = spinning.yaw + (event.clientX - spinning.x) * 0.006;
     orbit.pitch = Math.min(1.45, Math.max(0.06,
@@ -728,7 +828,22 @@ canvas.addEventListener("pointermove", event => {
   }
 });
 
-window.addEventListener("pointerup", () => {
+function twoFingers() {
+  const [a, b] = [...pinch.values()];
+  const span = Math.hypot(a[0] - b[0], a[1] - b[1]);
+  if (pinchSpan && span > 1) {
+    orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M,
+      orbit.distance * (pinchSpan / span)));
+    render();
+  }
+  pinchSpan = span;
+}
+
+function letGo(event) {
+  if (event && pinch.has(event.pointerId)) {
+    pinch.delete(event.pointerId);
+    if (pinch.size < 2) pinchSpan = null;
+  }
   if (dragging) {
     const anchor = latest.anchors.find(a => a.id === dragging);
     if (anchor) {
@@ -740,15 +855,97 @@ window.addEventListener("pointerup", () => {
     }
     dragging = null;
   }
-  spinning = null;
-});
+  spinning = panning = null;
+}
+
+canvas.addEventListener("pointerup", letGo);
+canvas.addEventListener("pointercancel", letGo);
+window.addEventListener("blur", () => letGo(null));
 
 canvas.addEventListener("wheel", event => {
   event.preventDefault();
-  orbit.distance = Math.min(220000, Math.max(1200,
-    orbit.distance * (1 + Math.sign(event.deltaY) * 0.12)));
+  // Scaled by how much the wheel actually turned, so a trackpad's small
+  // deltas creep and a mouse notch steps. The old fixed twelve percent
+  // per event made a trackpad unusable and a mouse imprecise.
+  const notches = Math.max(-4, Math.min(4, event.deltaY / 100));
+  const was = orbit.distance;
+  orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M,
+    orbit.distance * Math.exp(notches * 0.18)));
+
+  // Zoom towards the cursor rather than towards the middle. Without
+  // this, getting close to one anchor means zooming in and then
+  // hunting for it again.
+  const under = groundUnder(...pixel(event));
+  if (under && was > 0) {
+    const share = 1 - orbit.distance / was;
+    orbit.target = [
+      orbit.target[0] + (under[0] - orbit.target[0]) * share,
+      orbit.target[1] + (under[1] - orbit.target[1]) * share,
+      orbit.target[2],
+    ];
+  }
   render();
 }, { passive: false });
+
+/* -- the keyboard, for anyone who would rather not drag -- */
+
+const NUDGE = {
+  ArrowLeft: [-1, 0], a: [-1, 0], ArrowRight: [1, 0], d: [1, 0],
+  ArrowUp: [0, 1], w: [0, 1], ArrowDown: [0, -1], s: [0, -1],
+};
+
+window.addEventListener("keydown", event => {
+  const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(
+    (document.activeElement || {}).tagName || "");
+  if (typing || event.altKey || event.ctrlKey || event.metaKey) return;
+
+  const nudge = NUDGE[event.key];
+  if (nudge) {
+    event.preventDefault();
+    // Along the way the camera is facing, not along the world's axes,
+    // which is what "forward" means to somebody looking at a screen.
+    const pace = orbit.distance * (event.shiftKey ? 0.16 : 0.05);
+    const [sideways, forward] = nudge;
+    orbit.target = [
+      orbit.target[0] + pace * (forward * Math.cos(orbit.yaw)
+        - sideways * Math.sin(orbit.yaw)),
+      orbit.target[1] + pace * (forward * Math.sin(orbit.yaw)
+        + sideways * Math.cos(orbit.yaw)),
+      orbit.target[2],
+    ];
+    return render();
+  }
+
+  if (event.key === "q" || event.key === "e") {
+    orbit.yaw += event.key === "q" ? -0.12 : 0.12;
+    return render();
+  }
+  if (event.key === "+" || event.key === "=" || event.key === "-") {
+    orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M,
+      orbit.distance * (event.key === "-" ? 1.2 : 1 / 1.2)));
+    return render();
+  }
+  if (event.key === "f" || event.key === "0") {
+    frameEverything();
+    return;
+  }
+});
+
+/* Put the whole deployment back on screen. The one gesture a person
+ * needs after getting lost, and getting lost is the price of being able
+ * to go anywhere. */
+function frameEverything() {
+  if (!latest || !latest.anchors.length) return;
+  const xs = latest.anchors.map(a => a.x);
+  const ys = latest.anchors.map(a => a.y);
+  const span = Math.max(
+    Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), 1000);
+  frameOn(
+    [(Math.min(...xs) + Math.max(...xs)) / 2,
+     (Math.min(...ys) + Math.max(...ys)) / 2, 0],
+    span * 1.6,
+  );
+}
 
 /* ---------- numbers ---------- */
 
@@ -795,6 +992,263 @@ function showNumbers(drawn, result) {
     }>${value}</dd>`).join("");
 }
 
+
+/* ---------- named options, and the work that takes minutes ----------
+ *
+ * Everything the command line can do, started from here. The page still
+ * holds no physics: it posts what it wants, polls a task identifier, and
+ * renders what comes back (ADR-0024).
+ */
+
+let optionsData = null;
+
+async function loadOptions() {
+  try {
+    optionsData = await ask("/api/options");
+    drawOptions();
+    drawSolveScenarios();
+  } catch (error) { say(error.message, true); }
+}
+
+function drawOptions() {
+  const host = document.getElementById("options");
+  if (!host || !optionsData) return;
+  host.innerHTML = "";
+  if (!optionsData.options.length) {
+    host.innerHTML =
+      '<p class="hint">Hazır seçenek yok. Çözücü ile bir tane kaydet.</p>';
+    return;
+  }
+  for (const option of optionsData.options) {
+    const card = document.createElement("div");
+    card.className = "option";
+
+    const head = document.createElement("header");
+    head.innerHTML = `<b>${option.title}</b>`;
+    const use = document.createElement("button");
+    use.className = "quiet";
+    use.textContent = "Uygula";
+    use.onclick = () => applyOption(option.name);
+    head.appendChild(use);
+    card.appendChild(head);
+
+    const moves = document.createElement("div");
+    moves.className = "moves";
+    moves.innerHTML = option.moves.length
+      ? option.moves.map(m =>
+          `<span>${m.key.split(".").slice(-2).join(" · ")}: ` +
+          `${m.from} → ${m.to}</span>`).join("")
+      : "<span>şu anki ayarlarla aynı</span>";
+    card.appendChild(moves);
+
+    const why = document.createElement("p");
+    why.className = "why";
+    why.textContent = option.note.split("\n")[0];
+    card.appendChild(why);
+
+    host.appendChild(card);
+  }
+}
+
+async function applyOption(name) {
+  try {
+    const { applied } = await ask("/api/option", { name });
+    await refreshScene();
+    fillControls();
+    await loadFigures();
+    await loadOptions();
+    say(`${applied} uygulandı.`);
+  } catch (error) { say(error.message, true); }
+}
+
+/* -- watching a long task -- */
+
+function logInto(host, job) {
+  host.innerHTML = "";
+  const log = document.createElement("div");
+  log.className = "log";
+  log.textContent = job.progress.join("\n");
+  log.scrollTop = log.scrollHeight;
+  host.appendChild(log);
+  return log;
+}
+
+async function watch(kind, body, host, render) {
+  const target = document.getElementById(host);
+  target.innerHTML = '<p class="hint">Başlatılıyor…</p>';
+  let job;
+  try {
+    ({ job } = await ask("/api/run", Object.assign({ kind }, body)));
+  } catch (error) { return say(error.message, true); }
+
+  const log = logInto(target, job);
+  // A second between polls. The work reports a line per simulation and
+  // a simulation is tens of seconds, so anything faster is just noise
+  // on the wire.
+  while (!job.done) {
+    await new Promise(resume => setTimeout(resume, 1000));
+    try {
+      ({ job } = await ask(`/api/job?id=${job.id}`));
+    } catch (error) { return say(error.message, true); }
+    log.textContent = job.progress.join("\n");
+    log.scrollTop = log.scrollHeight;
+  }
+
+  if (job.error) {
+    say(job.error, true);
+    const trouble = document.createElement("p");
+    trouble.className = "hint";
+    trouble.textContent = job.error;
+    target.appendChild(trouble);
+    return;
+  }
+  render(job.result, target);
+}
+
+/* -- the table -- */
+
+function drawTable(result, host) {
+  const table = document.createElement("table");
+  table.className = "out";
+  table.innerHTML =
+    "<tr>" + result.columns.map(c => `<th>${c}</th>`).join("") + "</tr>" +
+    result.rows.map(row =>
+      `<tr><td>${row.system}</td>` +
+      row.cells.map(c => `<td>${c}</td>`).join("") + "</tr>").join("");
+  host.appendChild(table);
+}
+
+/* -- where the error came from -- */
+
+function drawBudget(result, host) {
+  for (const scenario of result.scenarios) {
+    const table = document.createElement("table");
+    table.className = "out";
+    const head =
+      `<tr><th colspan="4">${scenario.name} — HPE P50 ` +
+      `${scenario.whole_p50_m} m · bir menzil ${scenario.range_sigma_m} m · ` +
+      `geometri ×${scenario.geometry_gain}</th></tr>` +
+      "<tr><th>Hata kaynağı</th><th>Tek başına</th><th>Kalkarsa</th>" +
+      "<th>Kazanç</th></tr>";
+    table.innerHTML = head + scenario.sources.map(source => {
+      const width = Math.max(2, Math.round(source.share * 100));
+      const shade = source.source === scenario.dominant ? " dominant" : "";
+      return `<tr><td>${source.label}` +
+        `<div class="bar${shade}" style="width:${width}%"></div></td>` +
+        `<td>${source.alone_m}</td><td>${source.without_m}</td>` +
+        `<td>${source.saves_m}</td></tr>`;
+    }).join("") +
+      `<tr><td>Model artığı</td><td>${scenario.residue_m}</td>` +
+      "<td></td><td></td></tr>";
+    host.appendChild(table);
+
+    const note = document.createElement("p");
+    note.className = "hint";
+    note.textContent = scenario.dominant
+      ? `Önce harcanacak yer: ${
+          scenario.sources.find(s => s.source === scenario.dominant).remedy}.`
+      : "Tek bir baskın kaynak yok: en büyük ikisi birbirine yakın.";
+    host.appendChild(note);
+  }
+  const why = document.createElement("p");
+  why.className = "hint";
+  why.textContent =
+    '"Tek başına" o kaynak tek olsaydı kalacak hata; "kalkarsa" o kaynak ' +
+    "gidince toplamın ineceği yer. İkincisi her zaman daha küçüktür, çünkü " +
+    "hatalar kareli toplanır — ve satın alma kararı olan odur.";
+  host.appendChild(why);
+}
+
+/* -- the solver -- */
+
+function drawSolveScenarios() {
+  const select = document.getElementById("solve-scenario");
+  if (!select || !optionsData) return;
+  const names = Object.keys(optionsData.searchable);
+  select.innerHTML = names
+    .map(name => `<option value="${name}">${name}</option>`).join("");
+  select.value = names.includes("rural") ? "rural" : names[0];
+}
+
+function drawSolved(result, host) {
+  if (!result.met) {
+    const nothing = document.createElement("p");
+    nothing.className = "hint";
+    nothing.textContent =
+      `Hiçbiri hedefi karşılamadı. ${result.tried} yerleşim denendi; ` +
+      `en iyisi %${result.closest} kullanılabilirlik verdi. Hedefi ` +
+      "gevşet ya da aranacak sayıları genişlet.";
+    host.appendChild(nothing);
+    return;
+  }
+
+  const table = document.createElement("table");
+  table.className = "out";
+  table.innerHTML =
+    `<tr><th colspan="2">${result.meeting}/${result.tried} yerleşim ` +
+    "karşıladı — en ucuzu</th></tr>" +
+    result.moves.map(m =>
+      `<tr><td>${m.key.split(".").slice(-2).join(" · ")}</td>` +
+      `<td>${m.from} → ${m.to}</td></tr>`).join("") +
+    `<tr><td>direk</td><td>${result.anchors}</td></tr>` +
+    `<tr><td>kullanılabilirlik</td><td>${result.availability}</td></tr>` +
+    `<tr><td>HPE P50 / P95</td><td>${result.hpe_p50_m} / ` +
+    `${result.hpe_p95_m} m</td></tr>` +
+    `<tr><td>sabitleme</td><td>${result.fixes_per_second}/sn</td></tr>` +
+    `<tr><td>CAPEX</td><td>${result.capex_tl} TL</td></tr>`;
+  host.appendChild(table);
+
+  const note = document.createElement("p");
+  note.className = "hint";
+  if (result.already_met) {
+    note.textContent = result.already_met;
+  } else if (result.saved) {
+    note.textContent = `"${result.saved}" olarak kaydedildi.`;
+  } else {
+    note.textContent = "Kaydetmek için bir ad ver ve yeniden ara.";
+  }
+  host.appendChild(note);
+
+  if (result.saved) {
+    const use = document.createElement("button");
+    use.className = "quiet";
+    use.textContent = "Bunu uygula";
+    use.onclick = () => applyOption(result.saved);
+    host.appendChild(use);
+    loadOptions();
+  }
+}
+
+function wireTasks() {
+  const onlyCurrent = () => [state.scenario].filter(
+    name => optionsData && name in optionsData.searchable);
+
+  document.getElementById("run-table").onclick = () =>
+    watch("table", { only: onlyCurrent() }, "task-out", drawTable);
+
+  document.getElementById("run-budget").onclick = () =>
+    watch("budget", { only: onlyCurrent() }, "task-out", drawBudget);
+
+  document.getElementById("run-solve").onclick = () => {
+    const number = id => {
+      const raw = document.getElementById(id).value;
+      return raw === "" ? null : Number(raw);
+    };
+    watch("solve", {
+      scenario: document.getElementById("solve-scenario").value,
+      target: {
+        availability: number("solve-availability"),
+        hpe_p50_m: number("solve-hpe50"),
+        hpe_p95_m: number("solve-hpe95"),
+        fixes_per_second: number("solve-fixes"),
+      },
+      save: document.getElementById("solve-save").value.trim(),
+    }, "solve-out", drawSolved);
+  };
+
+  document.getElementById("frame-all").onclick = frameEverything;
+}
+
 /* ---------- the loop ---------- */
 
 async function refreshScene() {
@@ -808,10 +1262,11 @@ async function refreshScene() {
   document.getElementById("terrain-note").textContent =
     `${latest.terrain.description} · ${latest.anchors.length} direk`;
   terrainData = latest.terrain;
-  orbit.target = [state.corridor_m / 2, state.width_m / 2, 0];
   if (!framed) {
-    // Frame the whole corridor the first time, then leave the camera
-    // where the person put it.
+    // Frame everything the first time, then leave the camera exactly
+    // where the person put it. Re-centring on every refresh is what made
+    // panning pointless: any slide was undone by the next edit.
+    orbit.target = [state.corridor_m / 2, state.width_m / 2, 0];
     orbit.distance = Math.max(
       6000, Math.max(state.corridor_m, state.width_m) * 1.5);
     framed = true;
@@ -855,9 +1310,11 @@ async function runSimulation() {
 
 (async function start() {
   wireControls();
+  wireTasks();
   resize();
   await refreshScene();
   fillControls();
   await loadFigures();
+  await loadOptions();
   scheduleSweep();
 })();

@@ -64,7 +64,7 @@ later (ADR-0006).
 | `options.py` | named deployment options: a short list of edits and why |
 | `solve.py` | the search for the cheapest arrangement meeting a target |
 | `calibrate.py` | a MATLAB measurement read back as a default |
-| `viewer/` | the local web app: state, scene, server, and its own renderer |
+| `viewer/` | the local web app: state, scene, server, its own renderer, and every verb the command line has (`tasks.py`, `jobs.py`) |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
 | `numbers.py` | comma decimal mark, no thousands separator |
