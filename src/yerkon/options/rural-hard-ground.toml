@@ -1,0 +1,12 @@
+# A YERKON deployment option.
+#
+# Applied over defaults.toml with `--option rural-hard-ground`. Only the
+# figures that differ are listed; everything else stays as it is.
+
+name = 'rural-hard-ground'
+title = 'Kırsal: Gölbaşı tepeleri — tasarlanmadığı arazide'
+origin = 'shipped'
+note = """The same deployment on 907 m of relief instead of 486 m. Availability falls from 89,6 % to about 45 %, and closing the grid does not rescue it: 189 masts instead of 33 reaches 61 % (ADR-0021). This is not a proposal. It is the case that says what this design costs in terrain it was not meant for, and it is here so that number can be reproduced rather than quoted."""
+
+[values]
+'site.rural_relief_m' = 907.0

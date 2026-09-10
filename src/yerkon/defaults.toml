@@ -408,19 +408,19 @@ note = """How far apart the rises are, from the same grid. Ankara's centre sits 
 affects = "how often a link in the urban fallback has ground in the way"
 
 [values."site.rural_relief_m"]
-value = 907.0
+value = 486.0
 unit = "m"
 provenance = "MEASUREMENT"
-source = "Copernicus DEM 30 m, Gölbaşı 39,66-39,84 N 32,78-33,02 E, fetched 2026-09-10"
-note = """Ground rise and fall across the twenty kilometres of open country the rural row describes. Real Anatolian steppe climbs most of a kilometre over that distance, which is more than twenty times the relief this project used before anybody fetched the ground."""
+source = "Copernicus DEM 30 m, Polatlı 39,48-39,66 N 32,02-32,28 E, fetched 2026-09-10"
+note = """Ground rise and fall across the twenty kilometres of open country the rural row describes. Anatolian steppe where the intercity roads run: twelve times the relief this project used before anybody fetched the ground, and half that of the hills at Gölbaşı, where the same deployment produces a position 45 % of the time instead of 82 %. It has to match the site the row actually stands on, or a machine with no cache runs a harder study than one with it and nothing says so."""
 affects = "the rural row's obstruction geometry when no site is fetched"
-sensitivity = "the old 40 m figure let almost every rural link run clear; 907 m does not"
+sensitivity = "the old 40 m figure let almost every rural link run clear; at Gölbaşı's 907 m no spacing this project can afford does"
 
 [values."site.rural_relief_wavelength_m"]
 value = 6000.0
 unit = "m"
 provenance = "DERIVED"
-source = "Copernicus DEM 30 m, Gölbaşı, fetched 2026-09-10"
+source = "Copernicus DEM 30 m, Polatlı, fetched 2026-09-10"
 note = """How far apart the ridges are, from the same grid. Long enough that a four kilometre anchor spacing does not sit at one lucky point on the profile."""
 affects = "how often a link in the rural fallback is blocked by a ridge"
 
@@ -432,3 +432,141 @@ source = "Copernicus DEM 30 m, Kızılcahamam 40,41-40,43 N 32,61-32,63 E, fetch
 note = """Fall of the bore from one portal to the other, over two kilometres. Taken from the real ground at the two portals of an alignment that keeps between nine and a hundred and fifty-six metres of rock above it. It sits inside the half to three percent a road tunnel is built to for drainage, which is the check that this is an alignment somebody could build rather than a line through a hill."""
 affects = "the tunnel row's vertical geometry, and therefore its VPE"
 sensitivity = "a level floor would put every anchor and every receiver at one height, which no tunnel is built to"
+
+# --- Deployment geometry -------------------------------------------------
+#
+# Not assumptions. Nobody can measure what anchor spacing really is;
+# it is the thing being decided. They live here so that one file
+# changes every number in the table, and they are counted apart from
+# the figures that are waiting for a source (ADR-0023).
+
+[values."urban.extent_m"]
+value = 3000.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far the town runs, on a side. Three kilometres of Ankara centre, which is what the fetched Kızılay grid covers."""
+affects = "the urban row's service area, anchor count and therefore its cost per square kilometre"
+
+[values."urban.anchor_spacing_m"]
+value = 500.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far apart the lighting columns carrying anchors stand. Roughly every other junction on a town grid."""
+affects = "the urban row's anchor count, coverage and cost"
+sensitivity = "halving it quadruples the anchors and therefore the capital"
+
+[values."urban.anchor_stagger_m"]
+value = 250.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far alternate rows shift along. A perfect grid puts every anchor a receiver can see on one of two lines through it, which is a worse arrangement than anything anybody builds."""
+affects = "the urban row's horizontal geometry"
+
+[values."urban.anchors_per_round"]
+value = 8.0
+unit = "anchors"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How many anchors a unit polls before it is fixed. Eight is right where nearly everything polled answers, which at a 500 m grid in a town it does. See ADR-0022 for where it is not."""
+affects = "the urban row's update rate and availability"
+
+[values."urban.accept_sigma_m"]
+value = 15.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Ranging error a link may have and still be used. Beyond it a measurement drags a fix rather than improving it, which is why real receivers gate on signal quality too."""
+affects = "which urban links reach the estimator"
+
+[values."rural.extent_m"]
+value = 20000.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far the open country runs, on a side. Twenty kilometres of the Polatlı plain, which is what the fetched grid covers."""
+affects = "the rural row's service area and cost per square kilometre"
+
+[values."rural.anchor_spacing_m"]
+value = 4000.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far apart the masts stand. Well inside what the radio reaches — spacing here is a line-of-sight question, not a range one, because not one rural link fails for distance (ADR-0022)."""
+affects = "the rural row's mast count, availability and capital"
+sensitivity = "3000 m with 30 m masts reaches 90,5 % availability for about twice the mast capital"
+
+[values."rural.anchor_stagger_m"]
+value = 2000.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Half a spacing, so alternate rows interleave rather than lining up."""
+affects = "the rural row's horizontal geometry"
+
+[values."rural.anchors_per_round"]
+value = 12.0
+unit = "anchors"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How many anchors a unit polls before it is fixed. Twelve rather than eight, because half of what is polled over real relief never answers: eight attempts yield about four replies, exactly what a cold fix needs with nothing spare. Worth 5,5 points of availability and a third of the update rate (ADR-0022)."""
+affects = "the rural row's availability, update rate and horizontal error"
+sensitivity = "sixteen buys another 0,8 points and costs more update rate than it returns"
+
+[values."rural.accept_sigma_m"]
+value = 30.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Ranging error a link may have and still be used. Measured as never binding on this row: raising it to 60 m changes no figure to two decimal places, because no rural link that closes is noisier than 30 m."""
+affects = "which rural links reach the estimator"
+
+[values."tunnel.length_m"]
+value = 2000.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How long the bore is. Two kilometres, matching the alignment found through the fetched Kızılcahamam mountain."""
+affects = "the tunnel row's served area and cost per route kilometre"
+
+[values."tunnel.anchor_spacing_m"]
+value = 150.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far apart the brackets stand along the bore. An impulse radio reaches far less than a spread one, and a bore is a corridor, so the spacing is set by geometry rather than by cost."""
+affects = "the tunnel row's anchor count and its capital, which is the largest per square kilometre in the table"
+
+[values."tunnel.anchor_offset_m"]
+value = 4.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How far off the centreline the brackets sit. The bore is 12 m wide, so this is roughly against the wall."""
+affects = "the tunnel row's horizontal geometry, which amplifies a range error eighteenfold"
+
+[values."tunnel.width_m"]
+value = 12.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How wide the carriageway is. A tunnel is not a plane, so its served area is its length times this and nothing else (ADR-0012)."""
+affects = "the tunnel row's service area, and therefore every per-square-kilometre figure in that row"
+
+[values."tunnel.anchors_per_round"]
+value = 8.0
+unit = "anchors"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """How many anchors a unit polls before it is fixed. Eight is right here: at 150 m spacing in a shielded bore, almost everything polled answers."""
+affects = "the tunnel row's update rate, which is the fastest in the table"
+
+[values."tunnel.accept_sigma_m"]
+value = 2.0
+unit = "m"
+provenance = "DESIGN"
+source = "this project, as a deployment choice"
+note = """Ranging error a link may have and still be used. Tight, because the module ranges to a tenth of a metre and a two metre measurement here means something went wrong."""
+affects = "which tunnel links reach the estimator"

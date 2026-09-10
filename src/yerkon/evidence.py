@@ -26,6 +26,18 @@ class Provenance(str, Enum):
     DERIVED = "DERIVED"
     """Computed from other sourced numbers by stated physics."""
 
+    DESIGN = "DESIGN"
+    """A deployment choice somebody made, not a quantity anybody measured.
+
+    Anchor spacing, how much ground a row covers, how many anchors a
+    round polls. These are not placeholders waiting for a measurement —
+    measuring them is meaningless, because they are the thing being
+    decided. They live in the same file as everything else so that one
+    place changes every number in the table, and they are counted apart
+    from the assumptions so that "99 % of this costing rests on figures
+    nobody supplied" keeps meaning what it says.
+    """
+
     ASSUMPTION = "ASSUMPTION"
     """This project chose it. No source exists."""
 
@@ -46,6 +58,10 @@ class Sourced:
         if self.provenance is Provenance.ASSUMPTION and not self.note.strip():
             raise ValueError(
                 "an assumption needs a note saying what it rests on"
+            )
+        if self.provenance is Provenance.DESIGN and not self.note.strip():
+            raise ValueError(
+                "a design choice needs a note saying why it was chosen"
             )
 
     def __float__(self) -> float:

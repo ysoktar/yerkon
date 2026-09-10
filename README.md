@@ -45,8 +45,13 @@ Built and tested:
   dissection that re-runs each scenario with one of them silenced, so the
   table's accuracy figures come with the reason they are what they are.
 - `siting.py`, the search for the cheapest deployment that meets a target.
-- `settings.py` and `defaults.toml`, every figure nobody supplied, in
-  one file that nothing else may add to.
+- `settings.py` and `defaults.toml`, every figure nobody supplied *and*
+  every number that shapes a deployment, in one file that nothing else
+  may add to.
+- `options.py` and `options/`, named deployment options — a short list of
+  edits to that file and the reason somebody made them.
+- `solve.py`, the search for the cheapest arrangement that meets a
+  target, which saves its winner as a new option.
 - `viewer/`, a local web app over the same engine: the site in three
   dimensions, every setting live, and the confirmation panel in front of
   any change that forces another.
@@ -273,6 +278,59 @@ priced curve, and the two things that were tried and did not work.
 **VPE is what the geometry supports**, with no height constraint
 anywhere. Tens of metres in the open, under seven in the tunnel where the
 anchors surround the receiver rather than lining up beside it (ADR-0011).
+
+## Choosing a deployment
+
+```bash
+yerkon options                       # what is on hand
+yerkon options rural-dense           # one of them in full
+yerkon table --option rural-dense    # run the table against it
+```
+
+Every number that shapes a deployment lives in `defaults.toml` alongside
+the physics — anchor spacing, site extent, stagger, anchors polled per
+round, ranging tolerance, bore width. So an **option** is just a short
+list of edits to that file plus the reason somebody made them, and a new
+one costs a file rather than a code change (ADR-0023). Options compose
+with `--defaults`, so real quotations and a denser grid survive together.
+
+Four ship, and the first two are there together on purpose:
+
+| option | what it is |
+|---|---|
+| `rural-dense` | 49 masts at 3 km, 30 m tall — the cheapest way past 90 % |
+| `rural-tall` | The same 33 masts, 10 m taller — loses at equal money, wins per site |
+| `urban-dense` | Anchors on every lighting column rather than every other |
+| `rural-hard-ground` | The Gölbaşı hills: what this design costs where it was not meant to go |
+
+Which of the first two is right depends on whether money or site access
+is the scarce thing, and this project does not have the figures to say.
+So it ships both rather than picking.
+
+### Searching for a new one
+
+```bash
+yerkon solve --scenario tunnel --availability 0.99 --hpe-p50 1.0 --save tunnel-precise
+```
+
+Searches arrangements against a target, and saves the cheapest that meets
+it as a named option. Every candidate is a full simulation against real
+ground — slow, and its answers agree with the table by construction.
+
+It found something nobody had tried, because trying it used to mean
+editing a literal: **120 m bracket spacing takes the tunnel row from
+1,81 m to 0,48 m** at the fiftieth percentile. Seventeen anchors instead
+of fourteen, 23000 TL more, in the row whose cost per square kilometre is
+already the largest in the table by three orders of magnitude.
+
+Two things it refuses. If nothing meets the target it returns nothing
+rather than the best of a bad set, because a search that hands back its
+least-bad failure needs checking by hand every time. And if the settings
+already meet the target it says so instead of saving an option that
+changes nothing.
+
+`--vary KEY=A,B,C` searches any figure in the settings file, not just the
+short default list per scenario.
 
 ## Where the error came from
 

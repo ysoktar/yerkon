@@ -1,0 +1,16 @@
+# A YERKON deployment option.
+#
+# Applied over defaults.toml with `--option tunnel-precise`. Only the
+# figures that differ are listed; everything else stays as it is.
+
+name = 'tunnel-precise'
+title = 'tunnel: availability ≥ 99.0%, HPE P50 ≤ 1.00 m — 17 anchors  129 785 TL'
+origin = 'yerkon solve'
+note = """Found by searching 6 arrangements of the tunnel row against the real ground it stands on, and keeping the cheapest that met availability ≥ 99.0%, HPE P50 ≤ 1.00 m.
+
+It delivers 100.0% availability, 0.48 m at the fiftieth percentile and 2.40 m at the ninety-fifth, at 25.88 fixes a second, from 17 anchors.
+
+Every candidate was a full simulation rather than a fitted model, so these figures come from the same engine the table does (ADR-0023)."""
+
+[values]
+'tunnel.anchor_spacing_m' = 120.0

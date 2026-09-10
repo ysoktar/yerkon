@@ -1,0 +1,15 @@
+# A YERKON deployment option.
+#
+# Applied over defaults.toml with `--option rural-tall`. Only the
+# figures that differ are listed; everything else stays as it is.
+
+name = 'rural-tall'
+title = 'Kırsal: 35 m direk, aynı ızgara — direk sayısı artmadan'
+origin = 'shipped'
+note = """The other way of buying rural availability: keep all thirty-three masts where they are and make them ten metres taller. Availability goes from 82,3 % to 87,8 % with no new site, no new access road and no new power connection, which matters where getting to a site is the hard part rather than paying for it.
+
+It loses to rural-dense at equal money and wins on anything counted per site. Both are here because which one is right depends on costs this project does not have."""
+
+[values]
+'mounting.tall_mast.height_m' = 35.0
+'mounting.tall_mast.site_cost_tl' = 166600.0

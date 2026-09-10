@@ -52,6 +52,17 @@ class Entry:
     def is_assumed(self) -> bool:
         return self.sourced.provenance is Provenance.ASSUMPTION
 
+    @property
+    def is_a_choice(self) -> bool:
+        """Whether this is a deployment decision rather than a quantity.
+
+        A choice is not a placeholder. Nobody can measure what anchor
+        spacing "really is", so counting one among the figures waiting
+        for a source would inflate the share of the study that is
+        guesswork and hide the ones that genuinely are.
+        """
+        return self.sourced.provenance is Provenance.DESIGN
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -137,15 +148,30 @@ class Settings:
     def sourced_entries(self) -> tuple[Entry, ...]:
         return tuple(
             entry for _, entry in sorted(self.entries.items())
-            if not entry.is_assumed
+            if not entry.is_assumed and not entry.is_a_choice
+        )
+
+    @property
+    def choices(self) -> tuple[Entry, ...]:
+        """The deployment decisions, which are changed rather than measured."""
+        return tuple(
+            entry for _, entry in sorted(self.entries.items())
+            if entry.is_a_choice
         )
 
     @property
     def assumed_share(self) -> float:
-        """How much of the list is still a placeholder, as a fraction."""
-        if not self.entries:
+        """How much of the list is still a placeholder, as a fraction.
+
+        Deployment choices are left out of both halves. They are not
+        waiting for anybody to measure them, so counting them would
+        dilute the number that says how much of this study is still
+        guesswork.
+        """
+        measurable = len(self.entries) - len(self.choices)
+        if measurable <= 0:
             return 0.0
-        return len(self.assumed) / len(self.entries)
+        return len(self.assumed) / measurable
 
 
 def load(path: Optional[str] = None) -> Settings:

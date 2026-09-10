@@ -16,6 +16,12 @@ what it affects, and what replacing it would move.
 ``budget`` takes each scenario's error apart, one source at a time, and
 says which one is worth spending money on.
 
+``options`` lists the named deployment options on hand, and every other
+verb takes ``--option`` to run against one.
+
+``solve`` searches deployment arrangements for the cheapest that meets a
+target, and saves the winner as a new option.
+
 ``calibrate`` reads what a MATLAB run measured and says what to put in
 the defaults file.
 
@@ -277,6 +283,20 @@ def describe_outcome(design_: Design) -> str:
     return "\n".join(lines)
 
 
+def _add_option_flag(parser: argparse.ArgumentParser) -> None:
+    from yerkon.options import available
+
+    parser.add_argument(
+        "--option", metavar="NAME",
+        help=(
+            "run against a named deployment option instead of the "
+            "defaults. On hand: {}. See `yerkon options`.".format(
+                ", ".join(available()) or "none"
+            )
+        ),
+    )
+
+
 def _add_defaults_flag(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--defaults", metavar="FILE",
@@ -290,9 +310,21 @@ def _add_defaults_flag(parser: argparse.ArgumentParser) -> None:
 
 
 def _settings_from(args):
+    """The settings a run should use: a file, an option, both, or neither.
+
+    An option is a short list of edits, so it applies over whatever file
+    is in play rather than replacing it. That way `--defaults` holding
+    somebody's real quotations and `--option rural-dense` holding a
+    denser grid compose, instead of one silently discarding the other.
+    """
+    from yerkon.options import settings_for
     from yerkon.settings import load
 
-    return load(args.defaults) if args.defaults else None
+    settings = load(args.defaults) if args.defaults else None
+    name = getattr(args, "option", None)
+    if not name:
+        return settings
+    return settings_for(name, settings)
 
 
 def table(argv: list[str] | None = None) -> int:
@@ -316,6 +348,7 @@ def table(argv: list[str] | None = None) -> int:
         help="print the table alone, without what it rests on",
     )
     _add_defaults_flag(parser)
+    _add_option_flag(parser)
     parser.add_argument(
         "--weight", action="append", metavar="NAME=SHARE",
         help=(
@@ -395,6 +428,7 @@ def view(argv: list[str] | None = None) -> int:
         help="print the address instead of opening it",
     )
     _add_defaults_flag(parser)
+    _add_option_flag(parser)
     args = parser.parse_args(argv)
 
     try:
@@ -458,6 +492,7 @@ def site(argv: list[str] | None = None) -> int:
     parser.add_argument("--all", action="store_true",
                         help="list every candidate, not only those that meet")
     _add_defaults_flag(parser)
+    _add_option_flag(parser)
     args = parser.parse_args(argv)
 
     from yerkon.evaluate import Journey, Receiver
@@ -669,6 +704,7 @@ def budget(argv: list[str] | None = None) -> int:
         ),
     )
     _add_defaults_flag(parser)
+    _add_option_flag(parser)
     args = parser.parse_args(argv)
 
     try:
@@ -699,6 +735,187 @@ def budget(argv: list[str] | None = None) -> int:
 
     print(as_breakdown(dissect_all(chosen, sources)))
     return 0
+
+
+def options(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon options",
+        description=(
+            "List the named deployment options on hand and say what each "
+            "one changes. An option is a short list of edits to the "
+            "settings file, so it composes with --defaults rather than "
+            "replacing it. `yerkon solve --save` writes new ones."
+        ),
+    )
+    parser.add_argument("name", nargs="?",
+                        help="show one option in full rather than listing all")
+    args = parser.parse_args(argv)
+
+    from yerkon.options import available, read
+    from yerkon.settings import DEFAULTS
+
+    names = available()
+    if not names:
+        print("No options on hand. `yerkon solve --save NAME` writes one.")
+        return 0
+
+    if args.name:
+        try:
+            option = read(args.name)
+        except (FileNotFoundError, ValueError) as error:
+            print(error, file=sys.stderr)
+            return 2
+        print(option.describe(DEFAULTS))
+        print()
+        print(option.note)
+        print()
+        print("Run it with: yerkon table --option {}".format(option.name))
+        return 0
+
+    for name in names:
+        option = read(name)
+        print(option.describe(DEFAULTS))
+        print("    {}".format(option.note.split("\n")[0]))
+        print()
+    print("Any of them: yerkon table --option NAME")
+    return 0
+
+
+def solve(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon solve",
+        description=(
+            "Search deployment arrangements for the cheapest that meets a "
+            "target, and optionally save it as a named option. Every "
+            "candidate is a full simulation against real ground, so this "
+            "is slow and its answers agree with the table by construction."
+        ),
+    )
+    parser.add_argument("--scenario", default="rural",
+                        choices=sorted(SCENARIO_CHOICES),
+                        help="which row to search")
+    parser.add_argument("--availability", type=float, default=0.0,
+                        help="share of attempted fixes that must produce a "
+                             "position, for example 0.95")
+    parser.add_argument("--hpe-p50", type=float, default=None, metavar="M",
+                        help="horizontal error at the fiftieth percentile, "
+                             "in metres, at most")
+    parser.add_argument("--hpe-p95", type=float, default=None, metavar="M",
+                        help="horizontal error at the ninety-fifth "
+                             "percentile, in metres, at most")
+    parser.add_argument("--fixes", type=float, default=0.0, metavar="PER_S",
+                        help="fixes a unit must get per second, at least")
+    parser.add_argument("--vary", action="append", metavar="KEY=A,B,C",
+                        help="a settings figure to search and the values to "
+                             "try. Repeat for several. Defaults to a short "
+                             "list per scenario.")
+    parser.add_argument("--save", metavar="NAME",
+                        help="save the winner as an option under this name")
+    _add_defaults_flag(parser)
+    _add_option_flag(parser)
+    args = parser.parse_args(argv)
+
+    import math
+
+    from yerkon.numbers import decimal_comma
+    from yerkon.options import write
+    from yerkon.settings import DEFAULTS
+    from yerkon.solve import SEARCHABLE, AlreadyMet, Target, search
+
+    try:
+        settings = _settings_from(args) or DEFAULTS
+        over = _varying(args.vary)
+    except (FileNotFoundError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    target = Target(
+        availability=args.availability,
+        hpe_p50_m=math.inf if args.hpe_p50 is None else args.hpe_p50,
+        hpe_p95_m=math.inf if args.hpe_p95 is None else args.hpe_p95,
+        fixes_per_second=args.fixes,
+    )
+    knobs = over or SEARCHABLE.get(args.scenario) or {}
+    candidates = 1
+    for values in knobs.values():
+        candidates *= len(values)
+
+    print("Searching {} arrangements of the {} row for: {}".format(
+        candidates, args.scenario, target.describe()), file=sys.stderr)
+    print("Each is a full simulation. This takes a while.", file=sys.stderr)
+
+    seen = [0]
+
+    def note(outcome):
+        seen[0] += 1
+        print("  [{:3d}/{:3d}] {:4d} anchors  avail {:6.2%}  HPE50 {:5.2f}  "
+              "{:>12} TL  {}".format(
+                  seen[0], candidates, outcome.anchors, outcome.availability,
+                  outcome.hpe_p50_m, decimal_comma(outcome.capex_tl, 0),
+                  "meets" if target.met_by(outcome) else "",
+              ), file=sys.stderr)
+
+    try:
+        found = search(args.scenario, target, over, settings, watching=note)
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    best = found.best
+    if best is None:
+        print("\nNothing met {}.".format(target.describe()))
+        print("{} arrangements tried. The closest reached {:.2%} "
+              "availability at {} TL.".format(
+                  len(found.tried),
+                  max(o.availability for o in found.tried),
+                  decimal_comma(min(o.capex_tl for o in found.tried), 0)))
+        print("Widen the search with --vary, or ask for less.")
+        return 1
+
+    print("\n{} of {} arrangements met it. The cheapest:".format(
+        len(found.met), len(found.tried)))
+    for key, value in sorted(best.values.items()):
+        was = settings.number(key)
+        print("  {:<40} {} -> {}".format(key, readable(was), readable(value)))
+    print("\n  {} anchors, {} TL to build, {} TL a year to run".format(
+        best.anchors, decimal_comma(best.capex_tl, 0),
+        decimal_comma(best.opex_tl_per_year, 0)))
+    print("  availability {:.2%}, HPE P50 {} m, P95 {} m, {} fixes a second".format(
+        best.availability, decimal_comma(best.hpe_p50_m, 2),
+        decimal_comma(best.hpe_p95_m, 2),
+        decimal_comma(best.fixes_per_second, 2)))
+
+    if args.save:
+        try:
+            path = write(found.as_option(args.save, settings))
+        except AlreadyMet as nothing_to_do:
+            print("\n{}.".format(nothing_to_do))
+            return 0
+        print("\nSaved as {}. Run it with: yerkon table --option {}".format(
+            path, args.save))
+    else:
+        print("\nPass --save NAME to keep this as an option.")
+    return 0
+
+
+def _varying(pairs: list[str] | None) -> dict | None:
+    """Parse --vary KEY=A,B,C, saying what went wrong rather than raising."""
+    if not pairs:
+        return None
+    over = {}
+    for pair in pairs:
+        key, _, listed = pair.partition("=")
+        if not listed:
+            raise ValueError(
+                "--vary wants KEY=A,B,C; {!r} has no values".format(pair)
+            )
+        try:
+            over[key] = tuple(float(v) for v in listed.split(","))
+        except ValueError:
+            raise ValueError(
+                "--vary {} has something that is not a number".format(key)
+            ) from None
+    return over
 
 
 def calibrate(argv: list[str] | None = None) -> int:
@@ -758,6 +975,8 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon view   [--port 8765]")
         print("  yerkon site   [--corridor 12000] [--tolerance 5] [--ground polatli]")
         print("  yerkon budget [--only tunnel] [--source survey]")
+        print("  yerkon options [NAME]")
+        print("  yerkon solve  --scenario rural --availability 0.95 --save NAME")
         print("  yerkon defaults [--full]")
         print("  yerkon calibrate out/clock_residual.csv")
         return 0
@@ -774,6 +993,10 @@ def main(argv: list[str] | None = None) -> int:
         return site(rest)
     if verb == "budget":
         return budget(rest)
+    if verb == "options":
+        return options(rest)
+    if verb == "solve":
+        return solve(rest)
     if verb == "defaults":
         return defaults(rest)
     if verb == "calibrate":

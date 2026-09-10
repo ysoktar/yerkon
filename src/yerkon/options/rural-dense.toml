@@ -1,0 +1,17 @@
+# A YERKON deployment option.
+#
+# Applied over defaults.toml with `--option rural-dense`. Only the
+# figures that differ are listed; everything else stays as it is.
+
+name = 'rural-dense'
+title = 'Kırsal: 3 km ızgara, 30 m direk — %90 kullanılabilirlik'
+origin = 'shipped'
+note = """The cheapest way past ninety percent availability in open country, measured rather than guessed (ADR-0022). Forty-nine masts at three kilometres instead of thirty-three at four, each five metres taller. About twice the mast capital of the default for roughly seven points of availability.
+
+It beats the taller-mast option at equal money, because steel and foundation grow about as the square of height: six million lira buys 90,5 % here and 87,8 % there."""
+
+[values]
+'mounting.tall_mast.height_m' = 30.0
+'mounting.tall_mast.site_cost_tl' = 122400.0
+'rural.anchor_spacing_m' = 3000.0
+'rural.anchor_stagger_m' = 1500.0

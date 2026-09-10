@@ -1,0 +1,13 @@
+# A YERKON deployment option.
+#
+# Applied over defaults.toml with `--option urban-dense`. Only the
+# figures that differ are listed; everything else stays as it is.
+
+name = 'urban-dense'
+title = 'Şehir içi: 300 m ızgara — daha sık aydınlatma direği'
+origin = 'shipped'
+note = """Anchors on every lighting column rather than every other one. A town has the structures already, so this buys geometry for the price of the modules and the fitting rather than for the price of a site — which is the whole reason the urban row is the cheapest per square kilometre in the table."""
+
+[values]
+'urban.anchor_spacing_m' = 300.0
+'urban.anchor_stagger_m' = 150.0

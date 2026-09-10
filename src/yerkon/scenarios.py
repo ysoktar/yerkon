@@ -428,8 +428,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
 
     URBAN_TERRAIN = urban_ground(settings, clutter)
 
-    #: A town, three kilometres on a side. Not a street.
-    URBAN_M = 3000.0
+    # Every number that shapes a deployment comes from the settings file,
+    # so one file changes every figure in the table and the viewer can
+    # move any of them while it is running (ADR-0023).
+    URBAN_M = settings.number("urban.extent_m")
     URBAN_ROAD = _circuit(URBAN_M, URBAN_M, URBAN_TERRAIN, inset_m=300.0,
                           step_m=150.0)
 
@@ -439,20 +441,25 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             terrain=URBAN_TERRAIN,
             deployment=Deployment(
                 anchors=_anchors_over(
-                    URBAN_M, URBAN_M, 500.0, mounting["lighting_column"],
-                    URBAN_TERRAIN, radio=module["sx1280"], prefix="C",
-                    stagger_m=250.0,
+                    URBAN_M, URBAN_M,
+                    settings.number("urban.anchor_spacing_m"),
+                    mounting["lighting_column"], URBAN_TERRAIN,
+                    radio=module["sx1280"], prefix="C",
+                    stagger_m=settings.number("urban.anchor_stagger_m"),
                 ),
                 receivers=(
                     _unit("araç", URBAN_ROAD, 13.9, 600.0),
                     _unit("yaya", URBAN_ROAD, 1.4, 600.0, start_m=2000.0,
                           antenna_height_m=1.6, product="pedestrian"),
                 ),
+                max_anchors_per_round=int(
+                    settings.number("urban.anchors_per_round")
+                ),
                 scheme=SINGLE_SIDED,
                 region=TURKEY,
             ),
             seed=101,
-            accept_sigma_m=15.0,
+            accept_sigma_m=settings.number("urban.accept_sigma_m"),
             anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
             # A town's share of the band is spoken for, so more exchanges
             # are lost here than anywhere else in the study.
@@ -473,8 +480,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
 
     RURAL_TERRAIN = rural_ground(settings)
 
-    #: Open country, twenty kilometres on a side. Not a highway.
-    RURAL_M = 20_000.0
+    RURAL_M = settings.number("rural.extent_m")
     RURAL_ROAD = _circuit(RURAL_M, RURAL_M, RURAL_TERRAIN, inset_m=2000.0)
 
     RURAL = Deployed(
@@ -483,9 +489,11 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             terrain=RURAL_TERRAIN,
             deployment=Deployment(
                 anchors=_anchors_over(
-                    RURAL_M, RURAL_M, 4000.0, mounting["tall_mast"],
-                    RURAL_TERRAIN, radio=module["e28"], prefix="M",
-                    stagger_m=2000.0,
+                    RURAL_M, RURAL_M,
+                    settings.number("rural.anchor_spacing_m"),
+                    mounting["tall_mast"], RURAL_TERRAIN,
+                    radio=module["e28"], prefix="M",
+                    stagger_m=settings.number("rural.anchor_stagger_m"),
                 ),
                 receivers=(
                     _unit("araç", RURAL_ROAD, 27.8, 2400.0),
@@ -505,12 +513,14 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                 # how many anchors answer, not by how many a position
                 # needs. Sixteen buys only another 0,8 points and costs
                 # more than it returns.
-                max_anchors_per_round=12,
+                max_anchors_per_round=int(
+                    settings.number("rural.anchors_per_round")
+                ),
                 scheme=SINGLE_SIDED,
                 region=TURKEY,
             ),
             seed=202,
-            accept_sigma_m=30.0,
+            accept_sigma_m=settings.number("rural.accept_sigma_m"),
             anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
             packet_loss=settings.number("ranging.packet_loss"),
         ),
@@ -535,7 +545,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     #: that term to claim otherwise. What it does not do any more is model
     #: the floor as level: the bore falls 1,79 % between real portals, so
     #: anchors and receivers sit at different heights along it (ADR-0021).
-    TUNNEL_M = 2000.0
+    TUNNEL_M = settings.number("tunnel.length_m")
     TUNNEL_TERRAIN = tunnel_ground(settings, TUNNEL_M)
 
     TUNNEL_ROAD = _straight_road(TUNNEL_M, TUNNEL_TERRAIN, step_m=100.0)
@@ -546,8 +556,11 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             terrain=TUNNEL_TERRAIN,
             deployment=Deployment(
                 anchors=_anchors_along(
-                    TUNNEL_M, 150.0, 4.0, mounting["tunnel_bracket"],
-                    TUNNEL_TERRAIN, radio=module["dwm3000"],
+                    TUNNEL_M,
+                    settings.number("tunnel.anchor_spacing_m"),
+                    settings.number("tunnel.anchor_offset_m"),
+                    mounting["tunnel_bracket"], TUNNEL_TERRAIN,
+                    radio=module["dwm3000"],
                 ),
                 receivers=(
                     _unit("araç", TUNNEL_ROAD, 22.2, 85.0),
@@ -561,11 +574,14 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                 # floor, so the frame buys nothing and costs a third of
                 # the air: 0,72 m at the ninety-fifth percentile instead
                 # of 1,00, and half again as many fixes. See ADR-0010.
+                max_anchors_per_round=int(
+                    settings.number("tunnel.anchors_per_round")
+                ),
                 scheme=SINGLE_SIDED,
                 region=TURKEY,
             ),
             seed=303,
-            accept_sigma_m=2.0,
+            accept_sigma_m=settings.number("tunnel.accept_sigma_m"),
             anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
             # A bore is a shielded box: nothing outside it is competing
             # for the band, and ultra-wideband does not share one anyway.
@@ -577,7 +593,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         weight=0.1,
         environment="İç + dış",
         technology="Karasal PNT (UWB/DWM3000 TWR)",
-        confined_width_m=12.0,
+        confined_width_m=settings.number("tunnel.width_m"),
     )
 
 

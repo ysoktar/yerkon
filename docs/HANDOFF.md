@@ -60,7 +60,9 @@ later (ADR-0006).
 | `terms.py` | the seven named error sources, so each can be switched off |
 | `budget.py` | the dissection: what each source was worth, by re-running |
 | `siting.py` | the search for the cheapest deployment that meets a target |
-| `settings.py` | every figure the report did not supply, from `defaults.toml` |
+| `settings.py` | every figure the report did not supply, and every number that shapes a deployment, from `defaults.toml` |
+| `options.py` | named deployment options: a short list of edits and why |
+| `solve.py` | the search for the cheapest arrangement meeting a target |
 | `calibrate.py` | a MATLAB measurement read back as a default |
 | `viewer/` | the local web app: state, scene, server, and its own renderer |
 | `design.py` | the settings a person chooses, and what they imply |
@@ -88,7 +90,7 @@ though it were coverage is wrong.
 Everything on the original list is built. What remains is measurement,
 not code.
 
-1. **The figures.** All thirty-three are in `src/yerkon/defaults.toml`
+1. **The figures.** All of them are in `src/yerkon/defaults.toml`
    with what each affects and, where it was measured, what doubling it
    does. Run `yerkon defaults --full` for the work list. The mast cost
    is the most consequential: the siting search says existing signs beat
