@@ -59,6 +59,7 @@ later (ADR-0006).
 | `report.py` | the four rows, the ten columns, and the notes under them |
 | `siting.py` | the search for the cheapest deployment that meets a target |
 | `settings.py` | every figure the report did not supply, from `defaults.toml` |
+| `calibrate.py` | a MATLAB measurement read back as a default |
 | `viewer/` | the local web app: state, scene, server, and its own renderer |
 | `design.py` | the settings a person chooses, and what they imply |
 | `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
@@ -91,12 +92,17 @@ not code.
    is the most consequential: the siting search says existing signs beat
    masts by five and a half times, and the break-even is 6588 TL.
 2. **The residual clock offset after frequency correction**, half a part
-   per million. It decides whether single-sided ranging is usable on the
-   slow radio, and it is the least supported number in the physics.
-3. **The multipath channel and the implementation floor**, against
-   MATLAB. The floor is one published measurement per radio, and the
-   model now claims most of it is clock rather than timing resolution,
-   which the same measurement could confirm or refute.
+   per million. `matlab/yerkon_clock_residual.m` measures it; run it and
+   bring the CSV back to `yerkon calibrate`. Simulated under additive
+   noise it comes out at 0,02 to 0,04 ppm, so the default is
+   conservative by more than ten times and the remaining risk is phase
+   noise and drift, which the simulation does not model.
+3. **The implementation floor**, 2,94 m, needs a bench and not a
+   simulation. One chip at 1625 kHz is 184 m of flight, so a waveform
+   simulation says 18 m and contradicts a measurement for a reason
+   already understood. The SX1280's ranging timing does not come from
+   the symbol correlation; it comes from an undocumented mechanism
+   inside the part.
 4. **What structures actually stand where.** The siting search's answer
    moves with the survey, and the defaults are an assumption about a
    typical stretch of Turkish highway.

@@ -72,10 +72,16 @@ def test_the_amplifier_is_inert_in_turkey_and_worth_having_in_america():
     assert amped_us.usable_range_m > 2.0 * plain_us.usable_range_m
 
 
-def test_a_link_reaches_far_beyond_where_it_still_measures():
-    """ADR-0007. Quoting the closure distance as coverage is the error."""
+def test_a_link_reaches_beyond_where_it_still_measures():
+    """ADR-0007. Quoting the closure distance as coverage is the error.
+
+    Twice, not the five times an earlier version of this model claimed by
+    counting the despreading gain into both the range and the threshold
+    (ADR-0017). The distinction is smaller than it was and it is still
+    the one siting turns on.
+    """
     outcome = derive(Design())
-    assert outcome.closure_range_m > 5.0 * outcome.usable_range_m
+    assert outcome.closure_range_m > 2.0 * outcome.usable_range_m
 
 
 def test_a_tolerance_below_the_radios_own_floor_is_met_nowhere():
@@ -97,12 +103,19 @@ def test_rough_ground_helps_rather_than_hurts():
     assert rough > smooth
 
 
-def test_a_saturated_search_is_visible_as_such():
-    """A design that outruns the search must not read as one that stopped."""
-    outcome = derive(
-        Design(region=UNITED_STATES, anchor_radio=E28_2G4M27S)
-    )
-    assert outcome.closure_range_m == pytest.approx(DEFAULT_SEARCH_LIMIT_M)
+def test_no_legal_configuration_outruns_the_search_any_more():
+    """It used to, and that was the symptom rather than the cause.
+
+    Under the double-counted processing gain the loudest legal
+    configuration closed past sixty kilometres and the search simply ran
+    out of room. Counting the gain once puts every jurisdiction inside
+    twenty-six (ADR-0017).
+    """
+    from yerkon.regulatory import REGIONS
+
+    for region in REGIONS.values():
+        outcome = derive(Design(region=region, anchor_radio=E28_2G4M27S))
+        assert outcome.closure_range_m < DEFAULT_SEARCH_LIMIT_M, region.region
 
 
 # --- The named catalogues -------------------------------------------------

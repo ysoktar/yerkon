@@ -87,7 +87,10 @@ def test_the_stock_hardware_reaches_ten_kilometres():
     """
     budget = evaluate_link(mast(35.0), vehicle(10_000.0))
     assert budget.closes
-    assert budget.margin_db > 20.0
+    # Eight decibels, not the thirty an earlier version of this model
+    # claimed by counting the despreading gain twice (ADR-0017). It still
+    # closes, and it is no longer comfortable.
+    assert budget.margin_db > 5.0
 
 
 def test_height_buys_range_because_of_ground_reflection():
@@ -117,10 +120,10 @@ def test_a_link_that_closes_is_not_a_link_that_ranges():
     gone. Reporting the closure distance as the range would overstate what
     an anchor covers by a factor of several.
     """
-    far = evaluate_link(mast(25.0), vehicle(15_000.0))
+    far = evaluate_link(mast(25.0), vehicle(10_000.0))
     assert far.closes
-    assert far.margin_db > 20.0
-    assert ranging_sigma_m(far, E28_2G4M27S) > 20.0
+    assert far.margin_db > 0.0
+    assert ranging_sigma_m(far, E28_2G4M27S) > 10.0
 
     useful = usable_range_m(mast(25.0), vehicle(1.0), E28_2G4M27S, target_sigma_m=5.0)
     assert 3_000.0 < useful < far.distance_m
@@ -223,7 +226,7 @@ def test_a_narrowband_radio_does_not_deliver_centimetres_up_close():
 
 
 def test_the_floor_stops_binding_once_the_signal_gets_weak():
-    far = evaluate_link(mast(45.0), vehicle(25_000.0))
+    far = evaluate_link(mast(45.0), vehicle(12_000.0))
     assert cramer_rao_sigma_m(far, E28_2G4M27S) > float(
         E28_2G4M27S.implementation_floor_m.value
     )
@@ -282,3 +285,60 @@ def test_height_is_measured_above_the_reflecting_surface():
         obstruction=Obstruction(reflection_surface_m=-40.0),
     )
     assert on_a_ridge.path_loss_db < on_the_flat.path_loss_db - 5.0
+
+
+# --- Which ratio a threshold is quoted on ---------------------------------
+
+
+def test_a_lora_link_closes_where_its_in_band_ratio_meets_its_threshold():
+    """ADR-0017, and the check that would have caught the bug.
+
+    A LoRa datasheet's -20 dB is quoted in the occupied bandwidth:
+    despreading is what makes it workable and is already assumed in the
+    figure. Adding the correlation gain on top grants the link thirty
+    decibels twice, which is what the first version of this model did.
+    """
+    edge = usable = None
+    for distance_m in range(1000, 40_000, 50):
+        budget = evaluate_link(mast(25.0), vehicle(float(distance_m)))
+        if not budget.closes:
+            break
+        edge = budget
+    assert edge is not None
+    threshold = float(E28_2G4M27S.demodulation_threshold_db.value)
+    assert edge.snr_db == pytest.approx(threshold, abs=0.3)
+
+
+def test_an_impulse_link_closes_on_the_ratio_after_its_accumulation():
+    """It does not spread a symbol, so its working point is quoted after
+    the preamble accumulation rather than before it."""
+    from yerkon.hardware import DWM3000
+
+    anchor = Terminal(DWM3000, W24P_U, (0.0, 0.0, 4.5))
+    edge = None
+    for distance_m in range(20, 2000, 5):
+        budget = evaluate_link(
+            anchor, Terminal(DWM3000, W24P_U, (float(distance_m), 0.0, 1.5))
+        )
+        if not budget.closes:
+            break
+        edge = budget
+    assert edge is not None
+    threshold = float(DWM3000.demodulation_threshold_db.value)
+    assert edge.effective_snr_db == pytest.approx(threshold, abs=1.0)
+
+
+def test_a_link_never_closes_far_below_the_part_it_is_made_of():
+    """The sanity check the model failed for a fortnight.
+
+    Its claimed closure range needed -156 dBm at the receiver against a
+    part whose best-case sensitivity is -132 dBm. No arrangement of
+    antennas makes a radio hear twenty-four decibels below itself.
+    """
+    edge = None
+    for distance_m in range(1000, 40_000, 50):
+        budget = evaluate_link(mast(25.0), vehicle(float(distance_m)))
+        if not budget.closes:
+            break
+        edge = budget
+    assert edge.received_dbm > float(E28_2G4M27S.sensitivity_dbm.value)

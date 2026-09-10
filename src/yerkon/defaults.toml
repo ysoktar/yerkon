@@ -285,7 +285,11 @@ per million at 2,4 GHz is a 1,2 kHz residual, which is unremarkable for a \
 receiver that has already had to lock to the signal. The least supported \
 number in the ranging model and the first worth measuring."""
 affects = "whether single-sided ranging is usable at all on the slow radio"
-sensitivity = "at six times this the clock term exceeds the measured 2,94 m floor"
+sensitivity = """at six times this the clock term exceeds the measured 2,94 m \
+floor. Simulated under additive noise only, matlab/yerkon_clock_residual.m puts \
+the residual at 0,02 to 0,04 ppm, so this default is conservative by more than \
+an order of magnitude and the remaining risk is phase noise and drift, which \
+that simulation does not model."""
 
 [values."clock.tcxo.tolerance_ppm"]
 value = 2.0

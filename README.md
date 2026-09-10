@@ -331,18 +331,26 @@ open ground with the receiver on a vehicle roof at 1,5 m:
 
 | Link | Margin | Ranging sigma |
 |---|---|---|
-| 5 km, 25 m mast | 44,9 dB | 4,10 m |
-| 10 km, 25 m mast | 32,8 dB | 16,41 m |
-| 5 km, 35 m mast | 47,8 dB | 2,94 m |
-| 10 km, 35 m mast | 35,8 dB | 11,72 m |
-| 15 km, 35 m mast | 28,7 dB | 26,37 m |
+| 5 km, 25 m mast | 14,8 dB | 4,10 m |
+| 10 km, 25 m mast | 2,7 dB | 16,41 m |
+| 5 km, 35 m mast | 17,7 dB | 2,94 m |
+| 10 km, 35 m mast | 5,7 dB | 11,72 m |
+| 15 km, 35 m mast | does not close | — |
 
 Every one of those links closes, and that is the least interesting thing
 about them. Closing is not the constraint; **precision** is. A link with
 33 dB in hand still measures distance to sixteen metres, because the
 ranging bound falls off with signal-to-noise ratio long after the packet
-is still being decoded. Reading "the link closes at 15 km" as "the system
-works at 15 km" is the mistake this table exists to prevent.
+is still being decoded.
+
+The gap is a factor of two, not the factor of seven this project claimed
+for a fortnight. The link budget was adding the 30,1 dB despreading gain
+and then testing against a threshold that already assumed it, so links
+"closed" 24 dB below the part's own sensitivity. Writing a simulation of
+the receiver is what caught it: nothing demodulates at −20 dB after
+correlation, because there is no peak to find. Corrected, the SX1280
+closes to 11,7 km and ranges usefully to 5,52 km (ADR-0017). The usable
+range did not move — only the overstated half.
 
 Height is what buys range. Solving for the distance at which ranging
 sigma reaches 5 m, over open ground:
@@ -415,11 +423,18 @@ part, so the published measurements are themselves evidence that the
 frequency-offset estimate every receiver already makes is doing the
 ranging work too. Without it, ranging on this radio does not function.
 
-With it, the scheme to choose is a per-radio answer. On the SX1280 at
-kilometres the waveform bound is metres and the clock term is one metre,
-so single-sided ranging costs nothing and saves a third of the air time.
-On the impulse radio at 100 m the floor is 10 cm and the single-sided
-clock term is also 10 cm, so double-sided earns its extra frame.
+`matlab/yerkon_clock_residual.m` measures that estimate rather than
+assuming it. Under additive noise it leaves **0,02 to 0,04 ppm**, which
+is ten times better than the 0,5 ppm default and puts the clock's
+contribution at under a tenth of a metre. It models no phase noise, no
+multipath and no drift during the exchange, so read it as a floor.
+
+With correction, the scheme to choose is a per-radio answer. On the
+SX1280 at kilometres the waveform bound is metres and the clock term is
+one metre, so single-sided ranging costs nothing and saves a third of the
+air time. On the impulse radio at 100 m the floor is 10 cm and the
+single-sided clock term is also 10 cm, so double-sided earns its extra
+frame.
 
 Air time is now a quantity the study can spend, and it buys less than it
 looks:

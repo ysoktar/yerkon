@@ -13,6 +13,9 @@ dimensions, with every setting live.
 ``defaults`` lists every figure the model needs that nobody supplied,
 what it affects, and what replacing it would move.
 
+``calibrate`` reads what a MATLAB run measured and says what to put in
+the defaults file.
+
 ``site`` searches for the cheapest deployment that meets a target.
 
 ``design`` shows what a set of settings implies, and asks once before
@@ -44,7 +47,7 @@ from yerkon.design import (
     chosen,
     derive,
 )
-from yerkon.numbers import decimal_comma
+from yerkon.numbers import decimal_comma, readable
 from yerkon.report import as_markdown, as_text, build, footnotes
 from yerkon.scenarios import ALL as ALL_SCENARIOS, CHOICES as SCENARIO_CHOICES
 from yerkon.proposal import OUTCOME_LABELS, confirm, show_outcome
@@ -588,7 +591,7 @@ def defaults(argv: list[str] | None = None) -> int:
     for entry in listed:
         print("{key:<{width}}  {value:>12} {unit}".format(
             key=entry.key, width=width,
-            value=decimal_comma(float(entry.sourced.value), 2),
+            value=readable(float(entry.sourced.value)),
             unit=entry.sourced.unit,
         ))
         print("{:<{width}}  affects: {}".format("", entry.affects, width=width))
@@ -606,6 +609,52 @@ def defaults(argv: list[str] | None = None) -> int:
     return 0
 
 
+def calibrate(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon calibrate",
+        description=(
+            "Read a measurement from the MATLAB scripts and print the "
+            "defaults.toml entry that replaces the figure it stands in "
+            "for. Nothing is written; the entry is printed to be pasted."
+        ),
+    )
+    parser.add_argument("files", nargs="+", metavar="CSV",
+                        help="what a MATLAB script wrote")
+    args = parser.parse_args(argv)
+
+    from yerkon.calibrate import read
+    from yerkon.settings import DEFAULTS
+
+    measured = []
+    for path in args.files:
+        try:
+            measured.append(read(path))
+        except (FileNotFoundError, ValueError) as error:
+            print(error, file=sys.stderr)
+            return 2
+
+    for one in measured:
+        try:
+            was = DEFAULTS.number(one.key)
+        except KeyError:
+            was = None
+        print("# {}".format(one.key))
+        if was is not None:
+            print("#   default {} {} -> measured {} {}".format(
+                readable(was), one.unit, readable(one.value), one.unit))
+            if was != 0.0:
+                print("#   a factor of {} {}".format(
+                    readable(max(was, one.value) / min(was, one.value)),
+                    "better" if one.value < was else "worse",
+                ))
+        print(one.as_toml())
+        print()
+
+    print("# Paste these over the matching entries in defaults.toml,")
+    print("# then re-run anything with --defaults pointing at it.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not argv or argv[0] in {"-h", "--help"}:
@@ -617,6 +666,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon view   [--port 8765]")
         print("  yerkon site   [--corridor 12000] [--tolerance 5]")
         print("  yerkon defaults [--full]")
+        print("  yerkon calibrate out/clock_residual.csv")
         return 0
     verb, rest = argv[0], argv[1:]
     if verb == "fetch":
@@ -631,6 +681,8 @@ def main(argv: list[str] | None = None) -> int:
         return site(rest)
     if verb == "defaults":
         return defaults(rest)
+    if verb == "calibrate":
+        return calibrate(rest)
     print("Unknown command: {}".format(verb), file=sys.stderr)
     return 2
 

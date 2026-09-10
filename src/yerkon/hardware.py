@@ -61,9 +61,23 @@ class Radio:
     #: Correlation gain the receiver recovers, in dB. A spread waveform
     #: works below the noise floor; an impulse radio does not spread.
     processing_gain_db: Sourced
-    #: Lowest signal-to-noise ratio, after processing gain, at which the
-    #: receiver still demodulates.
+    #: Lowest signal-to-noise ratio at which the receiver still
+    #: demodulates.
     demodulation_threshold_db: Sourced
+    #: Whether that threshold is quoted on the ratio in the occupied
+    #: bandwidth, or on the ratio after the receiver's correlation gain.
+    #:
+    #: The two conventions differ by the whole of the processing gain,
+    #: which is thirty decibels, and getting it wrong grants a link that
+    #: gain twice. A LoRa datasheet's "-20 dB" is in-band: despreading is
+    #: what makes it workable and is already assumed in the figure. An
+    #: impulse radio's working point is quoted after accumulation,
+    #: because there is no spreading to assume.
+    #:
+    #: See ADR-0017. The first version of this model added the gain to
+    #: both and let the SX1280 close a link twenty-four decibels below
+    #: its own sensitivity.
+    threshold_is_in_band: bool
     #: Duration of one waveform symbol, in seconds.
     #:
     #: For a spread waveform this is the chip sequence; for an impulse
@@ -148,7 +162,13 @@ def _sx1280_family(
         demodulation_threshold_db=Sourced(
             -20.0, "dB", Provenance.DATASHEET,
             "SX1280 datasheet, SF10 demodulation floor relative to noise",
+            note=(
+                "Quoted in the occupied bandwidth. LoRa works below the "
+                "noise because despreading lifts it, and that is what "
+                "this figure already allows for."
+            ),
         ),
+        threshold_is_in_band=True,
         symbol_duration_s=Sourced(
             2 ** 10 / 1625e3, "s", Provenance.DERIVED,
             "2^SF / bandwidth at SF10 and 1625 kHz",
@@ -258,6 +278,9 @@ DWM3000 = Radio(
     demodulation_threshold_db=DEFAULTS.sourced(
         "radio.dwm3000.demodulation_threshold_db"
     ),
+    # An impulse radio does not spread a symbol, so its working point is
+    # quoted after the preamble accumulation rather than before it.
+    threshold_is_in_band=False,
     implementation_floor_m=Sourced(
         0.10, "m", Provenance.DATASHEET,
         "Qorvo DW3000 datasheet, stated ranging accuracy class",

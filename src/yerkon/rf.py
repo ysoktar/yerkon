@@ -123,15 +123,30 @@ class LinkBudget:
 
     _processing_gain_db: float = 0.0
     _threshold_db: float = 0.0
+    _threshold_is_in_band: bool = True
 
     @property
     def closes(self) -> bool:
-        return self.effective_snr_db >= self._threshold_db
+        """Whether the receiver can demodulate this at all.
+
+        Compared against whichever ratio the part's threshold is quoted
+        on. A LoRa figure is in-band and already assumes despreading; an
+        impulse radio's is quoted after accumulation. Adding the
+        correlation gain to a threshold that already contains it grants
+        the link thirty decibels it does not have (ADR-0017).
+        """
+        return self._demodulation_snr_db >= self._threshold_db
+
+    @property
+    def _demodulation_snr_db(self) -> float:
+        return (
+            self.snr_db if self._threshold_is_in_band else self.effective_snr_db
+        )
 
     @property
     def margin_db(self) -> float:
         """How much the link has to spare before it stops working."""
-        return self.effective_snr_db - self._threshold_db
+        return self._demodulation_snr_db - self._threshold_db
 
     @property
     def has_fresnel_clearance(self) -> bool:
@@ -386,6 +401,7 @@ def evaluate_link(
         diffraction_loss_db=diffraction_db,
         _processing_gain_db=float(radio.processing_gain_db.value),
         _threshold_db=float(radio.demodulation_threshold_db.value),
+        _threshold_is_in_band=radio.threshold_is_in_band,
     )
 
 

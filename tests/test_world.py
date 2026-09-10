@@ -150,29 +150,49 @@ def test_terrain_cannot_add_signal():
         flat_terrain(clutter_loss_db_per_km=-1.0)
 
 
-def test_terrain_helps_a_long_link_until_it_starts_blocking_it():
-    """Flat ground is not the best case, and rugged ground is not either.
+def test_relief_is_a_trade_rather_than_a_help():
+    """Flat ground is not the best case, and relief is not simply better.
 
-    Perfectly flat ground is the worst case for reflection: it returns a
-    clean cancelling ray. Gentle relief scatters that ray and lifts the
-    mast above the reflecting surface, and both help. Rugged relief then
-    starts putting hills in the path, and diffraction costs more than the
-    reflection ever did.
+    Perfectly level ground returns a clean cancelling ray, so every link
+    over it is mediocre and every link over it works. Relief scatters
+    that ray and lifts the mast above the reflecting surface, which makes
+    the links that survive markedly better — and it drops the receiver
+    into dips, where the link does not survive at all.
+
+    Measured across a corridor rather than at one distance, because the
+    answer depends on where the receiver is standing and an earlier
+    version of this test rested on a lucky one.
     """
+    import statistics
+
     from yerkon.hardware import E28_2G4M27S, SX1280, W24P_U
     from yerkon.rf import Terminal, evaluate_link, ranging_sigma_m
 
-    def sigma_over(terrain):
-        anchor = Anchor("m", (0.0, 0.0), TALL_MAST, terrain)
-        receiver_z = terrain.height_at(10_000.0, 0.0) + 2.0
-        tx = Terminal(E28_2G4M27S, W24P_U, anchor.position_m)
-        rx = Terminal(SX1280, W24P_U, (10_000.0, 0.0, receiver_z))
-        obstruction = terrain.obstruction_between(tx.position_m, rx.position_m, 200)
-        return ranging_sigma_m(evaluate_link(tx, rx, obstruction=obstruction), E28_2G4M27S)
+    def sweep(terrain):
+        alive = []
+        attempted = 0
+        for distance_m in range(3000, 10_001, 250):
+            attempted += 1
+            anchor = Anchor("m", (0.0, 0.0), TALL_MAST, terrain)
+            receiver_z = terrain.height_at(float(distance_m), 0.0) + 2.0
+            tx = Terminal(E28_2G4M27S, W24P_U, anchor.position_m)
+            rx = Terminal(SX1280, W24P_U, (float(distance_m), 0.0, receiver_z))
+            obstruction = terrain.obstruction_between(
+                tx.position_m, rx.position_m, 200
+            )
+            budget = evaluate_link(tx, rx, obstruction=obstruction)
+            if budget.closes:
+                alive.append(ranging_sigma_m(budget, E28_2G4M27S))
+        return len(alive) / attempted, (
+            statistics.median(alive) if alive else math.inf
+        )
 
-    flat = sigma_over(flat_terrain())
-    gentle = sigma_over(rolling_terrain(10.0, 2000.0, seed=3))
-    rugged = sigma_over(rolling_terrain(80.0, 2000.0, seed=11))
+    flat_share, flat_sigma = sweep(flat_terrain())
+    gentle_share, gentle_sigma = sweep(rolling_terrain(10.0, 2000.0, seed=3))
+    rugged_share, rugged_sigma = sweep(rolling_terrain(80.0, 2000.0, seed=11))
 
-    assert gentle < flat, "gentle relief beats flat ground"
-    assert rugged > flat * 2.0, "rugged relief is far worse than either"
+    assert flat_share == 1.0, "level ground blocks nothing"
+    assert gentle_sigma < flat_sigma, "the links that survive relief are better"
+    assert gentle_share < flat_share, "and relief costs some of them entirely"
+    assert rugged_share < gentle_share / 2.0, "rugged ground closes almost nothing"
+    assert rugged_sigma > flat_sigma, "and what it leaves is worse"
