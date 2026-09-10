@@ -327,6 +327,7 @@ Four ship, and the first two are there together on purpose:
 | `rural-tall` | The same 33 masts, 10 m taller — loses at equal money, wins per site |
 | `urban-dense` | Anchors on every lighting column rather than every other |
 | `rural-hard-ground` | The Gölbaşı hills: what this design costs where it was not meant to go |
+| `tunnel-precise` | 120 m brackets — HPE P50 1,81 m → 0,48 m for 23000 TL. Found by the solver |
 
 Which of the first two is right depends on whether money or site access
 is the scarce thing, and this project does not have the figures to say.

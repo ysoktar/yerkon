@@ -57,6 +57,14 @@ class Jobs:
     second never waits on a simulation.
     """
 
+    #: How many finished tasks to keep before dropping the oldest.
+    #:
+    #: A page left open for a day runs a lot of these, and each holds
+    #: every line it printed. Keeping the last few is enough: the page
+    #: polls one at a time and stops caring the moment it has rendered
+    #: the result.
+    REMEMBERED = 16
+
     def __init__(self) -> None:
         self._jobs: dict = {}
         self._lock = threading.Lock()
@@ -71,6 +79,7 @@ class Jobs:
         job = Job(identifier=uuid.uuid4().hex[:12], kind=kind, total=total)
         with self._lock:
             self._jobs[job.identifier] = job
+            self._forget_the_oldest()
 
         def say(line: str) -> None:
             with self._lock:
@@ -111,3 +120,19 @@ class Jobs:
     def forget(self, identifier: str) -> None:
         with self._lock:
             self._jobs.pop(identifier, None)
+
+    def _forget_the_oldest(self) -> None:
+        """Drop finished tasks past the limit. Never a running one.
+
+        Dictionaries keep their insertion order, so the oldest finished
+        task is the first one that is done. A task still running is never
+        dropped however old it is: a twelve minute dissection would
+        otherwise vanish from under the page watching it.
+        """
+        while len(self._jobs) > self.REMEMBERED:
+            stale = next(
+                (key for key, job in self._jobs.items() if job.done), None
+            )
+            if stale is None:
+                return
+            self._jobs.pop(stale)

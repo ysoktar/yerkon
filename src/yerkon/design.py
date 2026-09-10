@@ -14,7 +14,6 @@ reports what it says.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Optional
 
 from yerkon.hardware import Antenna, DWM3000, E28_2G4M27S, Radio, SX1280, W24P_U
 from yerkon.regulatory import REGIONS, SpectrumRule, TURKEY

@@ -24,7 +24,6 @@ from typing import Optional, Sequence
 from yerkon.cost import (
     DEFAULT_RATES,
     Costing,
-    Inventory,
     OperatingRates,
     operating_rates,
     price,

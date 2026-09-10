@@ -38,7 +38,6 @@ from yerkon.viewer.tasks import (
 )
 from yerkon.viewer.state import (
     CASCADING,
-    CASCADING_RUN,
     MODES,
     ViewState,
     from_scenario,

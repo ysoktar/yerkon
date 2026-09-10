@@ -31,9 +31,9 @@ from yerkon.cost import (
     Inventory,
     Product,
 )
-from yerkon.evaluate import Deployment, Journey, Receiver, Scenario, coverage
-from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280, Radio, W24P_U, radios
-from yerkon.ranging import DOUBLE_SIDED, SINGLE_SIDED, Scheme
+from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
+from yerkon.hardware import DWM3000, SX1280, Radio, W24P_U, radios
+from yerkon.ranging import SINGLE_SIDED
 from yerkon.regulatory import TURKEY
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.site.cache import SiteCache
@@ -43,11 +43,8 @@ if TYPE_CHECKING:  # pragma: no cover
 from yerkon.world import (
     bore_terrain,
     mountings,
-    BILLBOARD,
-    LIGHTING_COLUMN,
     MountingOption,
     Road,
-    TALL_MAST,
     Terrain,
     graded_alignment,
     rolling_terrain,
@@ -422,6 +419,12 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     """
     mounting = mountings(settings)
     module = radios(settings)
+    # The modules a unit carries, rebuilt from this run's own figures.
+    #
+    # Not `BOTH_MODULES`. The link budget takes its noise figure from the
+    # *receiving* terminal, so a unit holding the shipped part made every
+    # edit to a radio figure invisible to link closure: the anchors moved
+    # and the thing deciding whether the packet arrived did not.
     both = (module["sx1280"], module["dwm3000"])
     clutter = settings.number("site.urban_clutter_db_per_km")
 
@@ -448,9 +451,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     stagger_m=settings.number("urban.anchor_stagger_m"),
                 ),
                 receivers=(
-                    _unit("araç", URBAN_ROAD, 13.9, 600.0),
+                    _unit("araç", URBAN_ROAD, 13.9, 600.0, radios=both),
                     _unit("yaya", URBAN_ROAD, 1.4, 600.0, start_m=2000.0,
-                          antenna_height_m=1.6, product="pedestrian"),
+                          antenna_height_m=1.6, product="pedestrian",
+                          radios=both),
                 ),
                 max_anchors_per_round=int(
                     settings.number("urban.anchors_per_round")
@@ -496,8 +500,9 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     stagger_m=settings.number("rural.anchor_stagger_m"),
                 ),
                 receivers=(
-                    _unit("araç", RURAL_ROAD, 27.8, 2400.0),
-                    _unit("kamyon", RURAL_ROAD, 22.2, 2400.0, start_m=20_000.0),
+                    _unit("araç", RURAL_ROAD, 27.8, 2400.0, radios=both),
+                    _unit("kamyon", RURAL_ROAD, 22.2, 2400.0,
+                          start_m=20_000.0, radios=both),
                 ),
                 # Twelve, not the eight the other rows use, and the
                 # difference is worth 6,8 points of availability without
@@ -563,9 +568,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     radio=module["dwm3000"],
                 ),
                 receivers=(
-                    _unit("araç", TUNNEL_ROAD, 22.2, 85.0),
+                    _unit("araç", TUNNEL_ROAD, 22.2, 85.0, radios=both),
                     _unit("yaya", TUNNEL_ROAD, 1.4, 85.0, start_m=600.0,
-                          antenna_height_m=1.6, product="pedestrian"),
+                          antenna_height_m=1.6, product="pedestrian",
+                          radios=both),
                 ),
                 # Single-sided, on the strength of a measurement rather
                 # than a preference. At the residual offset this project

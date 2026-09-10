@@ -10,7 +10,6 @@ Nothing here computes physics. It arranges.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
-from typing import Optional
 
 import numpy as np
 
@@ -24,7 +23,6 @@ from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import radios
 from yerkon.ranging import SCHEMES
 from yerkon.scenarios import (
-    CHOICES,
     Deployed,
     SITES,
     _circuit,

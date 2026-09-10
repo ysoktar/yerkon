@@ -59,7 +59,6 @@ from yerkon.design import (
 from yerkon.numbers import decimal_comma, readable
 from yerkon.report import as_breakdown, as_markdown, as_text, build, footnotes
 from yerkon.scenarios import (
-    ALL as ALL_SCENARIOS,
     CHOICES as SCENARIO_CHOICES,
     fetched,
 )

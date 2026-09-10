@@ -33,7 +33,7 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from yerkon.evaluate import Samples, combine, run_scenario
+from yerkon.evaluate import combine, run_scenario
 from yerkon.scenarios import ALL, Deployed
 from yerkon.terms import ALL as EVERYTHING, LABELS, NAMES, REMEDIES, Terms
 

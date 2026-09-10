@@ -1167,7 +1167,53 @@ function drawSolveScenarios() {
   const names = Object.keys(optionsData.searchable);
   select.innerHTML = names
     .map(name => `<option value="${name}">${name}</option>`).join("");
-  select.value = names.includes("rural") ? "rural" : names[0];
+  select.value = names.includes(state.scenario) ? state.scenario
+    : names.includes("rural") ? "rural" : names[0];
+  select.onchange = drawSolveVary;
+  drawSolveVary();
+
+  // Which rows the table and the dissection run. Derived from the mode
+  // before, which meant the mixed corridor — not one of the report's
+  // rows — quietly expanded to all three and took twelve minutes.
+  const rows = document.getElementById("task-only");
+  rows.innerHTML = '<option value="">hepsi</option>' + names
+    .map(name => `<option value="${name}">${name}</option>`).join("");
+  if (names.includes(state.scenario)) rows.value = state.scenario;
+}
+
+/* What the search may move, and what is worth trying. Editable, because
+ * the short default list per scenario answers the usual question and not
+ * every question — and the command line has always been able to say. */
+function drawSolveVary() {
+  const host = document.getElementById("solve-vary");
+  if (!host || !optionsData) return;
+  const scenario = document.getElementById("solve-scenario").value;
+  const knobs = optionsData.searchable[scenario] || {};
+  host.innerHTML = "";
+  for (const [key, values] of Object.entries(knobs)) {
+    const wrap = document.createElement("label");
+    wrap.textContent = key.split(".").slice(-2).join(" · ");
+    const input = document.createElement("input");
+    input.type = "text";
+    input.dataset.key = key;
+    input.className = "vary";
+    input.value = values.join(", ");
+    wrap.appendChild(input);
+    host.appendChild(wrap);
+  }
+}
+
+/* Read those boxes back. A blank one drops that figure from the search
+ * entirely rather than searching it over nothing. */
+function varyingNow() {
+  const over = {};
+  for (const input of document.querySelectorAll("#solve-vary input.vary")) {
+    const values = input.value.split(",")
+      .map(part => Number(part.trim()))
+      .filter(value => Number.isFinite(value));
+    if (values.length) over[input.dataset.key] = values;
+  }
+  return Object.keys(over).length ? over : null;
 }
 
 function drawSolved(result, host) {
@@ -1220,14 +1266,16 @@ function drawSolved(result, host) {
 }
 
 function wireTasks() {
-  const onlyCurrent = () => [state.scenario].filter(
-    name => optionsData && name in optionsData.searchable);
+  const chosenRows = () => {
+    const picked = document.getElementById("task-only").value;
+    return picked ? [picked] : [];
+  };
 
   document.getElementById("run-table").onclick = () =>
-    watch("table", { only: onlyCurrent() }, "task-out", drawTable);
+    watch("table", { only: chosenRows() }, "task-out", drawTable);
 
   document.getElementById("run-budget").onclick = () =>
-    watch("budget", { only: onlyCurrent() }, "task-out", drawBudget);
+    watch("budget", { only: chosenRows() }, "task-out", drawBudget);
 
   document.getElementById("run-solve").onclick = () => {
     const number = id => {
@@ -1242,6 +1290,7 @@ function wireTasks() {
         hpe_p95_m: number("solve-hpe95"),
         fixes_per_second: number("solve-fixes"),
       },
+      vary: varyingNow(),
       save: document.getElementById("solve-save").value.trim(),
     }, "solve-out", drawSolved);
   };

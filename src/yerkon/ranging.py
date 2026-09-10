@@ -26,7 +26,7 @@ from typing import Callable, Optional, Sequence
 
 import numpy as np
 
-from yerkon.evidence import Provenance, Sourced
+from yerkon.evidence import Sourced
 from yerkon.hardware import SPEED_OF_LIGHT_M_S, Radio
 from yerkon.observation import RangeObservation
 from yerkon.regulatory import TURKEY, SpectrumRule

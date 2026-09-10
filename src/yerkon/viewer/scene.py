@@ -11,16 +11,12 @@ instant, the sweep takes seconds, and the run takes longer still.
 
 from __future__ import annotations
 
-import math
-from typing import Optional
 
 import numpy as np
 
 from yerkon.cost import DEFAULT_RATES, price
-from yerkon.design import Design, MOUNTING_CHOICES, RADIO_CHOICES, REGION_CHOICES, chosen
+from yerkon.design import Design, REGION_CHOICES, chosen
 from yerkon.evaluate import coverage_grid, run_scenario
-from yerkon.estimator import track
-from yerkon.numbers import decimal_comma
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.viewer.state import ViewState, fetched_sites
 
@@ -31,15 +27,6 @@ from yerkon.viewer.state import ViewState, fetched_sites
 #: is still moving.
 MESH_COLUMNS = 100
 MESH_ROWS = 40
-
-
-def sweep_margin_m(state: ViewState) -> float:
-    """How far past the anchors both the sweep and the mesh reach.
-
-    One function, because a mesh smaller than the sweep paints coverage
-    cells over nothing and a mesh larger than it wastes the frame.
-    """
-    return max(state.spacing_m * 3.0, 4000.0)
 
 
 def design_of(state: ViewState, run=None) -> Design:

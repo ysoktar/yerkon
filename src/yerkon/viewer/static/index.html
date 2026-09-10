@@ -66,7 +66,7 @@
     <label>Menzil toleransı <output id="tol-out"></output>
       <input type="range" id="tolerance_m" min="0.1" max="30" step="0.1" data-cascades></label>
     <label>Yolculuk süresi <output id="journey-out"></output>
-      <input type="range" id="journey_s" min="30" max="900" step="30"></label>
+      <input type="range" id="journey_s" min="30" max="3600" step="30"></label>
   </section>
 
   <section>
@@ -82,9 +82,11 @@
   <section>
     <h2>Çalıştır</h2>
     <p class="hint" style="margin-top:0">
-      Hepsi bu sayfadaki ayarlarla, tablonun kullandığı motorla koşar.
-      Dakikalar sürer; ilerlemesi aşağıda görünür.
+      Raporun satırlarını, bu sayfadaki <em>sayılarla</em> koşar — ekranda
+      sürüklediğin yerleşimle değil; onun için "Simülasyonu çalıştır"
+      var. Dakikalar sürer; ilerlemesi aşağıda görünür.
     </p>
+    <label>Hangi satırlar <select id="task-only"></select></label>
     <div class="row">
       <button id="run-table" class="quiet">Tablo</button>
       <button id="run-budget" class="quiet">Hata dağılımı</button>
@@ -110,6 +112,7 @@
       <label>Sabitleme/sn ≥
         <input type="number" id="solve-fixes" step="0.1" placeholder="—"></label>
     </div>
+    <div id="solve-vary"></div>
     <label>Kaydedilecek ad
       <input type="text" id="solve-save" placeholder="ör. kirsal-hedef"></label>
     <div class="row"><button id="run-solve">Ara</button></div>

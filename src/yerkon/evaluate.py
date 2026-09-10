@@ -18,13 +18,13 @@ first stopped, and every swept comparison it published was contaminated.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional, Sequence
 
 import numpy as np
 
 from yerkon.estimator import DEFAULT_MANOEUVRE_M_S2, TrackingFilter, trilaterate
-from yerkon.hardware import Antenna, DWM3000, Radio, SX1280, W24P_U
+from yerkon.hardware import Antenna, Radio, SX1280, W24P_U
 from yerkon.observation import RangeObservation
 from yerkon.ranging import (
     CRYSTAL,

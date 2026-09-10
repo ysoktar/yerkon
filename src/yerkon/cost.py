@@ -17,7 +17,6 @@ hides that is worse than no total.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Sequence
 
 from yerkon.evidence import Provenance, Sourced
 from yerkon.numbers import decimal_comma

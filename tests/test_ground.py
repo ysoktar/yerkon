@@ -6,6 +6,7 @@ import pytest
 
 from yerkon.scenarios import (
     CHOICES,
+    catalogue,
     HARD_RURAL_SITE,
     RURAL_SITE,
     SITES,
@@ -265,3 +266,40 @@ def test_a_longer_rural_round_buys_availability_on_every_seed():
             run_scenario(longer).availability
             > run_scenario(shorter).availability
         ), seed
+
+
+# --- The figures reaching both ends of a link -----------------------------
+
+
+def test_editing_a_radio_figure_reaches_the_receiver_and_not_only_the_anchor():
+    """The link budget takes its noise figure from the *receiving* terminal.
+
+    So a unit built from the shipped part made every edit to a radio
+    figure invisible to link closure: the anchors moved and the thing
+    deciding whether the packet arrived did not. `--defaults` and the
+    viewer's own sliders both went through this, silently doing nothing.
+    """
+    from yerkon.settings import DEFAULTS
+
+    noisier = DEFAULTS.with_values({"radio.sx1280.noise_figure_db": 14.0})
+    deployment = CHOICES["urban"].scenario.deployment
+    edited = catalogue(noisier)["urban"].scenario.deployment
+
+    assert float(deployment.receivers[0].radios[0].noise_figure_db.value) == 6.0
+    assert float(edited.receivers[0].radios[0].noise_figure_db.value) == 14.0
+    assert float(edited.anchors[0].radio.noise_figure_db.value) == 14.0
+
+
+@pytest.mark.parametrize("name", ["urban", "rural", "tunnel"])
+def test_every_unit_carries_the_modules_this_run_built(name):
+    """Not the module-level ones. Checked per row, because it was one
+    scenario's units that were wired correctly and two that were not."""
+    from yerkon.settings import DEFAULTS
+
+    quieter = DEFAULTS.with_values({"radio.dwm3000.noise_figure_db": 3.0})
+    for unit in catalogue(quieter)[name].scenario.deployment.receivers:
+        impulse = [
+            radio for radio in unit.radios if "DWM" in radio.part.upper()
+        ]
+        assert impulse, "{} carries no impulse module".format(unit.identifier)
+        assert float(impulse[0].noise_figure_db.value) == 3.0

@@ -16,12 +16,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Callable, Optional, Sequence
+from typing import Callable, Optional, Sequence, TYPE_CHECKING
 
-from yerkon.evidence import Provenance, Sourced
+from yerkon.evidence import Sourced
 from yerkon.hardware import Radio, SX1280
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.rf import Obstruction, first_fresnel_radius_m
+
+if TYPE_CHECKING:  # pragma: no cover
+    from yerkon.site.model import Site
 
 Metres = float
 

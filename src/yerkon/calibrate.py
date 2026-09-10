@@ -13,7 +13,6 @@ point is that a measurement should be easy to bring back.
 from __future__ import annotations
 
 import csv
-import math
 import pathlib
 from dataclasses import dataclass
 from typing import Optional, Sequence

@@ -616,8 +616,6 @@ def test_the_reach_drawn_is_the_reach_the_ground_gives():
     deployment on ground nobody is standing on — and nothing on screen
     would say which of the two was real.
     """
-    from yerkon.viewer.scene import design_of
-
     real = a_state(site="kizilay", roughness_m=0.05)
     assert design_of(real).surface_roughness_m == pytest.approx(
         real.terrain().micro_roughness_m
@@ -880,3 +878,69 @@ def test_dragging_an_anchor_follows_the_ground_rather_than_one_plane():
     assert settled.count("onPlane") == 2, (
         "groundUnder should sample the level plane and then the real height"
     )
+
+
+def test_no_slider_stops_short_of_a_value_a_mode_actually_sets():
+    """A slider that clamps shows one number while the state holds another.
+
+    The rural mode ran a forty minute journey and the slider stopped at
+    fifteen, so it read 900 and cut the journey to a quarter the moment
+    anybody touched it — a setting silently changed by looking at it.
+    """
+    import pathlib
+    import re
+
+    from yerkon.viewer.state import MODES, from_scenario
+
+    page = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/index.html"
+    ).read_text(encoding="utf-8")
+    ranges = {
+        found.group(1): (float(found.group(2)), float(found.group(3)))
+        for found in re.finditer(
+            r'id="([a-z_]+)"[^>]*min="([-\d.]+)"[^>]*max="([-\d.]+)"', page)
+    }
+    assert ranges, "no sliders found; this stopped matching the page"
+
+    for mode in MODES:
+        state = from_scenario(mode)
+        for name, (low, high) in ranges.items():
+            value = getattr(state, name, None)
+            if not isinstance(value, (int, float)):
+                continue
+            assert low <= value <= high, (
+                "{} sets {} to {}, outside the slider's [{}, {}]".format(
+                    mode, name, value, low, high)
+            )
+
+
+def test_a_finished_task_is_eventually_forgotten_but_a_running_one_never_is():
+    """A page left open for a day runs a lot of these, each holding its log.
+
+    Dropping the oldest keeps that bounded. Dropping a *running* one would
+    make a twelve minute dissection vanish from under the page watching
+    it, which is worse than any amount of memory.
+    """
+    import time
+
+    from yerkon.viewer.jobs import Jobs
+
+    registry = Jobs()
+    started = [
+        registry.start("quick", lambda say: {}).identifier
+        for _ in range(Jobs.REMEMBERED + 8)
+    ]
+    for _ in range(200):
+        if registry.read(started[-1]) and registry.read(started[-1]).done:
+            break
+        time.sleep(0.01)
+
+    kept = [one for one in started if registry.read(one) is not None]
+    assert len(kept) <= Jobs.REMEMBERED
+    assert started[-1] in kept, "the newest task was dropped"
+
+    running = registry.start("slow", lambda say: (time.sleep(3), {})[-1])
+    for _ in range(Jobs.REMEMBERED + 8):
+        registry.start("quick", lambda say: {})
+    assert registry.read(running.identifier) is not None

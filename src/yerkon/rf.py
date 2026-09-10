@@ -24,7 +24,6 @@ import math
 from dataclasses import dataclass
 from typing import Optional
 
-from yerkon.evidence import Provenance, Sourced
 from yerkon.hardware import SPEED_OF_LIGHT_M_S, Antenna, Radio
 from yerkon.regulatory import TURKEY, SpectrumRule
 

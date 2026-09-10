@@ -19,9 +19,9 @@ from typing import Callable, Optional
 
 from yerkon.budget import dissect_all
 from yerkon.numbers import decimal_comma
-from yerkon.options import Option, available, read, write
+from yerkon.options import available, read, write
 from yerkon.report import build
-from yerkon.scenarios import DEFAULT_WEIGHTS, catalogue
+from yerkon.scenarios import catalogue
 from yerkon.settings import Settings
 from yerkon.solve import SEARCHABLE, AlreadyMet, Target, search
 from yerkon.terms import LABELS, NAMES, REMEDIES

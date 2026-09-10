@@ -29,10 +29,10 @@ from __future__ import annotations
 import itertools
 import math
 from dataclasses import dataclass, field
-from typing import Callable, Optional, Sequence
+from typing import Callable, Optional
 
-from yerkon.cost import DEFAULT_RATES, OperatingRates, operating_rates, price
-from yerkon.evaluate import Samples, run_scenario
+from yerkon.cost import OperatingRates, operating_rates, price
+from yerkon.evaluate import run_scenario
 from yerkon.options import Option
 from yerkon.scenarios import catalogue
 from yerkon.settings import DEFAULTS, Settings
