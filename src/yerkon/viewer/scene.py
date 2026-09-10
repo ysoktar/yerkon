@@ -207,7 +207,15 @@ def scene(state: ViewState) -> dict:
 
 
 #: How the figures are grouped in the panel, and what to call each group.
+#:
+#: A figure whose group is missing from here is sent to the page and
+#: never drawn, which is how the sixteen deployment figures spent a whole
+#: release "editable in the viewer" without appearing in it. The test
+#: below the panel checks every group present in the file has a heading.
 GROUPS = (
+    ("urban", "Şehir içi yerleşimi"),
+    ("rural", "Kırsal yerleşim"),
+    ("tunnel", "Tünel yerleşimi"),
     ("mounting", "Montaj yapıları"),
     ("operating", "İşletme giderleri"),
     ("radio", "Modüllerin yayımlanmamış değerleri"),

@@ -22,6 +22,9 @@ verb takes ``--option`` to run against one.
 ``solve`` searches deployment arrangements for the cheapest that meets a
 target, and saves the winner as a new option.
 
+``deliver`` writes the whole study out as Markdown: the table, the
+error budget, the figures and what they rest on, and the options.
+
 ``calibrate`` reads what a MATLAB run measured and says what to put in
 the defaults file.
 
@@ -57,6 +60,7 @@ from yerkon.design import (
     derive,
 )
 from yerkon.numbers import decimal_comma, readable
+from yerkon.parallel import workers
 from yerkon.report import as_breakdown, as_markdown, as_text, build, footnotes
 from yerkon.scenarios import (
     CHOICES as SCENARIO_CHOICES,
@@ -373,9 +377,10 @@ def table(argv: list[str] | None = None) -> int:
         if args.only else tuple(available.values())
     )
 
-    print("Running {} scenario{}{}. This takes a minute.".format(
+    print("Running {} scenario{}{} on {} processes.".format(
         len(chosen), "" if len(chosen) == 1 else "s",
         " against {}".format(settings.path) if settings else "",
+        workers(),
     ), file=sys.stderr)
 
     try:
@@ -688,7 +693,7 @@ def budget(argv: list[str] | None = None) -> int:
             "Take each scenario's position error apart, one source at a "
             "time, and say which source is worth removing. Every line is "
             "the same simulation the table uses, re-run with one error "
-            "silenced, so this is slow: a couple of minutes per scenario."
+            "silenced, spread over as many cores as the machine spares."
         ),
     )
     parser.add_argument(
@@ -731,6 +736,7 @@ def budget(argv: list[str] | None = None) -> int:
         ),
         file=sys.stderr,
     )
+    print("Spread over {} processes.".format(workers()), file=sys.stderr)
 
     print(as_breakdown(dissect_all(chosen, sources)))
     return 0
@@ -786,8 +792,9 @@ def solve(argv: list[str] | None = None) -> int:
         description=(
             "Search deployment arrangements for the cheapest that meets a "
             "target, and optionally save it as a named option. Every "
-            "candidate is a full simulation against real ground, so this "
-            "is slow and its answers agree with the table by construction."
+            "candidate is a full simulation against real ground, spread "
+            "over as many cores as the machine spares. Its answers agree "
+            "with the table by construction."
         ),
     )
     parser.add_argument("--scenario", default="rural",
@@ -841,7 +848,8 @@ def solve(argv: list[str] | None = None) -> int:
 
     print("Searching {} arrangements of the {} row for: {}".format(
         candidates, args.scenario, target.describe()), file=sys.stderr)
-    print("Each is a full simulation. This takes a while.", file=sys.stderr)
+    print("Each is a full simulation, spread over {} processes.".format(
+        workers()), file=sys.stderr)
 
     seen = [0]
 
@@ -917,6 +925,67 @@ def _varying(pairs: list[str] | None) -> dict | None:
     return over
 
 
+def deliver(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon deliver",
+        description=(
+            "Write the study out as Markdown: the four rows, the error "
+            "budget behind them, every figure and what it rests on, and "
+            "the deployments that could be built instead. Everything "
+            "this project knows, as files somebody can hand over."
+        ),
+    )
+    parser.add_argument(
+        "--into", default="docs/teslim", metavar="DIR",
+        help="where to write the files (default: docs/teslim)",
+    )
+    parser.add_argument(
+        "--only", action="append", choices=sorted(SCENARIO_CHOICES),
+        help="write only these scenarios; repeat the flag for several",
+    )
+    parser.add_argument(
+        "--no-budget", action="store_true",
+        help=(
+            "skip the error budget, which is by far the slowest part. "
+            "Use it when only the table needs refreshing."
+        ),
+    )
+    _add_defaults_flag(parser)
+    _add_option_flag(parser)
+    args = parser.parse_args(argv)
+
+    try:
+        settings = _settings_from(args)
+    except (FileNotFoundError, ValueError) as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    from yerkon.deliver import deliver as write_it
+    from yerkon.scenarios import catalogue
+    from yerkon.settings import DEFAULTS
+
+    settings = settings or DEFAULTS
+    available = catalogue(settings)
+    chosen = (
+        tuple(available[name] for name in args.only)
+        if args.only else tuple(available.values())
+    )
+
+    print("Writing {} scenario{} into {} on {} processes.".format(
+        len(chosen), "" if len(chosen) == 1 else "s", args.into, workers(),
+    ), file=sys.stderr)
+
+    written = write_it(
+        args.into, chosen, settings,
+        with_budget=not args.no_budget,
+        say=lambda line: print("  " + line, file=sys.stderr),
+    )
+    print()
+    for one in written:
+        print("{}  —  {}".format(one.path, one.about))
+    return 0
+
+
 def calibrate(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon calibrate",
@@ -974,6 +1043,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon view   [--port 8765]")
         print("  yerkon site   [--corridor 12000] [--tolerance 5] [--ground polatli]")
         print("  yerkon budget [--only tunnel] [--source survey]")
+        print("  yerkon deliver [--into docs/teslim] [--no-budget]")
         print("  yerkon options [NAME]")
         print("  yerkon solve  --scenario rural --availability 0.95 --save NAME")
         print("  yerkon defaults [--full]")
@@ -992,6 +1062,8 @@ def main(argv: list[str] | None = None) -> int:
         return site(rest)
     if verb == "budget":
         return budget(rest)
+    if verb == "deliver":
+        return deliver(rest)
     if verb == "options":
         return options(rest)
     if verb == "solve":

@@ -31,6 +31,7 @@ from yerkon.options import read as read_option
 from yerkon.viewer.scene import design_of, figures, scene, simulate, sweep
 from yerkon.viewer.tasks import (
     budget as budget_task,
+    deliver as deliver_task,
     listed,
     solve as solve_task,
     table as table_task,
@@ -262,6 +263,11 @@ class Handler(BaseHTTPRequestHandler):
             work = table_task(state, only)
         elif kind == "budget":
             work = budget_task(state, only, body.get("sources") or None)
+        elif kind == "deliver":
+            work = deliver_task(
+                state, body.get("into", ""), only,
+                with_budget=bool(body.get("with_budget", True)),
+            )
         elif kind == "solve":
             work = solve_task(
                 state,
@@ -272,7 +278,8 @@ class Handler(BaseHTTPRequestHandler):
             )
         else:
             raise ValueError(
-                "no such task: {!r}. There is: table, budget, solve".format(kind)
+                "no such task: {!r}. There is: table, budget, solve, "
+                "deliver".format(kind)
             )
         return {"job": self.jobs.start(kind, work).as_json()}
 

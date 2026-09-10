@@ -52,6 +52,8 @@ Built and tested:
   edits to that file and the reason somebody made them.
 - `solve.py`, the search for the cheapest arrangement that meets a
   target, which saves its winner as a new option.
+- `parallel.py`, the independent runs spread over the machine's cores.
+- `deliver.py`, the whole study written out as Markdown.
 - `viewer/`, a local web app over the same engine: the site in three
   dimensions, every setting live, and the confirmation panel in front of
   any change that forces another.
@@ -357,6 +359,27 @@ changes nothing.
 
 `--vary KEY=A,B,C` searches any figure in the settings file, not just the
 short default list per scenario.
+
+## Handing it over
+
+```bash
+yerkon deliver --into docs/teslim          # everything
+yerkon deliver --into docs/teslim --no-budget   # just the table, quickly
+```
+
+Four Markdown files, because they answer different questions and get read
+by different people:
+
+| file | what is in it |
+|---|---|
+| `tablo.md` | the four rows, the ground each stands on, and the notes |
+| `hata-butcesi.md` | what each error source was worth, and what removing it takes |
+| `sayilar.md` | every figure, what it affects, and what it rests on — with design choices kept apart from placeholders |
+| `secenekler.md` | the deployments that could be built instead |
+
+Every file carries the date and the figure count it was made from, so a
+delivered table can be reconciled with the repository a month later. The
+error budget is skippable because it is by far the slowest part.
 
 ## Where the error came from
 

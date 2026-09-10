@@ -30,6 +30,7 @@ from yerkon.cost import (
 )
 from yerkon.budget import Dissection
 from yerkon.evaluate import Samples, combine, coverage, run_scenario
+from yerkon.parallel import spread
 from yerkon.numbers import decimal_comma
 from yerkon.scenarios import ALL, Deployed, catalogue, reweighted
 from yerkon.settings import Settings
@@ -202,7 +203,9 @@ def build(
         rates = rates or DEFAULT_RATES
 
     deployments = reweighted(tuple(deployments), weights)
-    results = tuple(run(d, rates) for d in deployments)
+    # Each row is a journey and a coverage sweep and depends on no other,
+    # so the rows are run at the same time (ADR-0025).
+    results = spread(_run_one, [(d, rates) for d in deployments])
     rows = tuple(r.row() for r in results)
     if len(results) > 1:
         # A weighted average of one scenario is that scenario, and
@@ -211,6 +214,12 @@ def build(
         # describes three deployments (ADR-0005).
         rows += (weighted(results),)
     return results, rows
+
+
+def _run_one(task) -> Result:
+    """One row. Top-level so a worker process can import it."""
+    deployed, rates = task
+    return run(deployed, rates)
 
 
 def as_markdown(rows: Sequence[Row]) -> str:

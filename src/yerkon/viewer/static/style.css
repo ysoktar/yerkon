@@ -174,3 +174,28 @@ table.out th { color: #6b7681; font-weight: 500; }
 }
 
 .dominant { background: #b4551d; }
+
+
+/* A row of the search space: which figure, and what to try for it. */
+
+.vary-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.vary-row select, .vary-row input { width: 100%; }
+.vary-row select { font-size: 10px; }
+
+
+label.tick {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+label.tick input { width: auto; }

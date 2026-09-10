@@ -34,6 +34,7 @@ from typing import Callable, Optional
 from yerkon.cost import OperatingRates, operating_rates, price
 from yerkon.evaluate import run_scenario
 from yerkon.options import Option
+from yerkon.parallel import spread
 from yerkon.scenarios import catalogue
 from yerkon.settings import DEFAULTS, Settings
 
@@ -298,12 +299,19 @@ def search(
         settings.entry(key)      # fail now, not forty simulations in
 
     keys = sorted(knobs)
-    tried = []
-    for combination in itertools.product(*(knobs[key] for key in keys)):
-        outcome = evaluate(
-            scenario_name, dict(zip(keys, combination)), settings
-        )
-        tried.append(outcome)
-        if watching is not None:
-            watching(outcome)
+    candidates = [
+        (scenario_name, dict(zip(keys, combination)), settings)
+        for combination in itertools.product(*(knobs[key] for key in keys))
+    ]
+    # Candidates are independent, so they go out to as many cores as the
+    # machine will spare. Results come back in the order they went out,
+    # which is what lets a watcher read as a list being worked through
+    # rather than as a scramble (ADR-0025).
+    tried = spread(_evaluate_one, candidates, watching=watching)
     return Search(scenario=scenario_name, target=target, tried=tuple(tried))
+
+
+def _evaluate_one(task) -> Outcome:
+    """One candidate. Top-level so a worker process can import it."""
+    scenario_name, values, settings = task
+    return evaluate(scenario_name, values, settings)

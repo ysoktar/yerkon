@@ -1169,7 +1169,11 @@ function drawSolveScenarios() {
     .map(name => `<option value="${name}">${name}</option>`).join("");
   select.value = names.includes(state.scenario) ? state.scenario
     : names.includes("rural") ? "rural" : names[0];
-  select.onchange = drawSolveVary;
+  select.onchange = () => {
+    varying = suggestedFor(select.value);
+    drawSolveVary();
+  };
+  if (!varying.length) varying = suggestedFor(select.value);
   drawSolveVary();
 
   // Which rows the table and the dissection run. Derived from the mode
@@ -1181,88 +1185,119 @@ function drawSolveScenarios() {
   if (names.includes(state.scenario)) rows.value = state.scenario;
 }
 
-/* What the search may move, and what is worth trying. Editable, because
- * the short default list per scenario answers the usual question and not
- * every question — and the command line has always been able to say. */
-function drawSolveVary() {
-  const host = document.getElementById("solve-vary");
-  if (!host || !optionsData) return;
-  const scenario = document.getElementById("solve-scenario").value;
-  const knobs = optionsData.searchable[scenario] || {};
-  host.innerHTML = "";
-  for (const [key, values] of Object.entries(knobs)) {
-    const wrap = document.createElement("label");
-    wrap.textContent = key.split(".").slice(-2).join(" · ");
-    const input = document.createElement("input");
-    input.type = "text";
-    input.dataset.key = key;
-    input.className = "vary";
-    input.value = values.join(", ");
-    wrap.appendChild(input);
-    host.appendChild(wrap);
-  }
+/* What the search may move, and what is worth trying.
+ *
+ * The short list per scenario is a starting point, not the search space.
+ * Any figure in the settings file can be searched — the engine validates
+ * the key and refuses one it has no entry for — so this lets a person
+ * add, drop and retune rows rather than choosing from a menu somebody
+ * else wrote (ADR-0025).
+ */
+
+let varying = [];
+
+function suggestedFor(scenario) {
+  const knobs = (optionsData && optionsData.searchable[scenario]) || {};
+  return Object.entries(knobs).map(([key, values]) => ({ key, values }));
 }
 
-/* Read those boxes back. A blank one drops that figure from the search
- * entirely rather than searching it over nothing. */
+function drawSolveVary() {
+  const host = document.getElementById("solve-vary");
+  if (!host) return;
+  host.innerHTML = "";
+
+  for (const [index, row] of varying.entries()) {
+    const card = document.createElement("div");
+    card.className = "vary-row";
+
+    const which = document.createElement("select");
+    which.innerHTML = (figuresData ? figuresData.figures : [])
+      .map(figure =>
+        `<option value="${figure.key}"` +
+        `${figure.key === row.key ? " selected" : ""}>` +
+        `${figure.key}</option>`).join("");
+    which.onchange = () => {
+      varying[index].key = which.value;
+      drawSolveVary();
+    };
+
+    const values = document.createElement("input");
+    values.type = "text";
+    values.className = "vary";
+    values.value = row.values.join(", ");
+    values.onchange = () => { varying[index].values = readValues(values.value); };
+
+    const drop = document.createElement("button");
+    drop.className = "drop";
+    drop.title = "Bu sayıyı aramadan çıkar";
+    drop.textContent = "✕";
+    drop.onclick = () => { varying.splice(index, 1); drawSolveVary(); };
+
+    card.append(which, values, drop);
+    host.appendChild(card);
+  }
+
+  const buttons = document.createElement("div");
+  buttons.className = "row";
+
+  const add = document.createElement("button");
+  add.className = "quiet";
+  add.textContent = "Sayı ekle";
+  add.onclick = () => {
+    const first = figuresData && figuresData.figures[0];
+    if (!first) return;
+    // Seeded around whatever the figure is now, because a row that
+    // starts empty is a row that searches nothing.
+    const now = first.value;
+    varying.push({ key: first.key, values: [now * 0.5, now, now * 1.5] });
+    drawSolveVary();
+  };
+
+  const reset = document.createElement("button");
+  reset.className = "quiet";
+  reset.textContent = "Önerilene dön";
+  reset.onclick = () => {
+    varying = suggestedFor(document.getElementById("solve-scenario").value);
+    drawSolveVary();
+  };
+
+  buttons.append(add, reset);
+  host.appendChild(buttons);
+
+  const size = document.createElement("p");
+  size.className = "hint";
+  const candidates = varying.reduce(
+    (total, row) => total * Math.max(row.values.length, 1), 1);
+  size.textContent = varying.length
+    ? `${candidates} yerleşim denenecek. Her biri tam bir simülasyon.`
+    : "Aranacak sayı yok. Ekle, ya da önerilene dön.";
+  host.appendChild(size);
+}
+
+function readValues(text) {
+  return text.split(",")
+    .map(part => Number(part.trim()))
+    .filter(value => Number.isFinite(value));
+}
+
+/* Read the rows back. A row with no usable numbers is dropped rather
+ * than searched over nothing. */
 function varyingNow() {
   const over = {};
-  for (const input of document.querySelectorAll("#solve-vary input.vary")) {
-    const values = input.value.split(",")
-      .map(part => Number(part.trim()))
-      .filter(value => Number.isFinite(value));
-    if (values.length) over[input.dataset.key] = values;
+  for (const row of varying) {
+    if (row.values.length) over[row.key] = row.values;
   }
   return Object.keys(over).length ? over : null;
 }
 
-function drawSolved(result, host) {
-  if (!result.met) {
-    const nothing = document.createElement("p");
-    nothing.className = "hint";
-    nothing.textContent =
-      `Hiçbiri hedefi karşılamadı. ${result.tried} yerleşim denendi; ` +
-      `en iyisi %${result.closest} kullanılabilirlik verdi. Hedefi ` +
-      "gevşet ya da aranacak sayıları genişlet.";
-    host.appendChild(nothing);
-    return;
-  }
-
-  const table = document.createElement("table");
-  table.className = "out";
-  table.innerHTML =
-    `<tr><th colspan="2">${result.meeting}/${result.tried} yerleşim ` +
-    "karşıladı — en ucuzu</th></tr>" +
-    result.moves.map(m =>
-      `<tr><td>${m.key.split(".").slice(-2).join(" · ")}</td>` +
-      `<td>${m.from} → ${m.to}</td></tr>`).join("") +
-    `<tr><td>direk</td><td>${result.anchors}</td></tr>` +
-    `<tr><td>kullanılabilirlik</td><td>${result.availability}</td></tr>` +
-    `<tr><td>HPE P50 / P95</td><td>${result.hpe_p50_m} / ` +
-    `${result.hpe_p95_m} m</td></tr>` +
-    `<tr><td>sabitleme</td><td>${result.fixes_per_second}/sn</td></tr>` +
-    `<tr><td>CAPEX</td><td>${result.capex_tl} TL</td></tr>`;
-  host.appendChild(table);
-
-  const note = document.createElement("p");
-  note.className = "hint";
-  if (result.already_met) {
-    note.textContent = result.already_met;
-  } else if (result.saved) {
-    note.textContent = `"${result.saved}" olarak kaydedildi.`;
-  } else {
-    note.textContent = "Kaydetmek için bir ad ver ve yeniden ara.";
-  }
-  host.appendChild(note);
-
-  if (result.saved) {
-    const use = document.createElement("button");
-    use.className = "quiet";
-    use.textContent = "Bunu uygula";
-    use.onclick = () => applyOption(result.saved);
-    host.appendChild(use);
-    loadOptions();
-  }
+function drawDelivered(result, host) {
+  const list = document.createElement("table");
+  list.className = "out";
+  list.innerHTML =
+    `<tr><th colspan="2">${result.into}</th></tr>` +
+    result.files.map(file =>
+      `<tr><td>${file.name}</td><td>${file.about}</td></tr>`).join("");
+  host.appendChild(list);
 }
 
 function wireTasks() {
@@ -1294,6 +1329,13 @@ function wireTasks() {
       save: document.getElementById("solve-save").value.trim(),
     }, "solve-out", drawSolved);
   };
+
+  document.getElementById("run-deliver").onclick = () =>
+    watch("deliver", {
+      only: chosenRows(),
+      into: document.getElementById("deliver-into").value.trim(),
+      with_budget: document.getElementById("deliver-budget").checked,
+    }, "task-out", drawDelivered);
 
   document.getElementById("frame-all").onclick = frameEverything;
 }

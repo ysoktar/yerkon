@@ -33,7 +33,8 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from yerkon.evaluate import combine, run_scenario
+from yerkon.evaluate import Samples, combine, run_scenario
+from yerkon.parallel import spread
 from yerkon.scenarios import ALL, Deployed
 from yerkon.terms import ALL as EVERYTHING, LABELS, NAMES, REMEDIES, Terms
 
@@ -202,11 +203,24 @@ def dissect_all(
 
 
 def _runs_of(deployed: Deployed, sources: Sequence[str]) -> dict:
-    """Every configuration this dissection needs, run and kept by name."""
-    return {
-        name: run_scenario(deployed.scenario, terms)
-        for name, terms in _every_run(sources)
-    }
+    """Every configuration this dissection needs, run and kept by name.
+
+    Sixteen runs for seven sources, none of which depends on any other,
+    so they go out to as many cores as the machine will spare. Each
+    reseeds from the scenario, so where a run happens changes nothing
+    about what it produces (ADR-0025).
+    """
+    wanted = _every_run(sources)
+    samples = spread(
+        _run_one, [(deployed.scenario, terms) for _, terms in wanted]
+    )
+    return {name: sample for (name, _), sample in zip(wanted, samples)}
+
+
+def _run_one(task) -> "Samples":
+    """One configuration. Top-level so a worker process can import it."""
+    scenario, terms = task
+    return run_scenario(scenario, terms)
 
 
 def _every_run(sources: Sequence[str]) -> tuple[tuple[str, Terms], ...]:

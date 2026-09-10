@@ -63,6 +63,8 @@ later (ADR-0006).
 | `settings.py` | every figure the report did not supply, and every number that shapes a deployment, from `defaults.toml` |
 | `options.py` | named deployment options: a short list of edits and why |
 | `solve.py` | the search for the cheapest arrangement meeting a target |
+| `parallel.py` | independent runs spread over the machine's cores |
+| `deliver.py` | the whole study written out as Markdown |
 | `calibrate.py` | a MATLAB measurement read back as a default |
 | `viewer/` | the local web app: state, scene, server, its own renderer, and every verb the command line has (`tasks.py`, `jobs.py`) |
 | `design.py` | the settings a person chooses, and what they imply |

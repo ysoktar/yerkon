@@ -944,3 +944,27 @@ def test_a_finished_task_is_eventually_forgotten_but_a_running_one_never_is():
     for _ in range(Jobs.REMEMBERED + 8):
         registry.start("quick", lambda say: {})
     assert registry.read(running.identifier) is not None
+
+
+def test_every_figure_in_the_file_has_a_heading_to_be_drawn_under():
+    """The panel renders per group, so one without a heading is invisible.
+
+    Sixteen deployment figures spent a release documented as "editable in
+    the viewer" and never appeared in it: the server sent them and the
+    page had nowhere to put them. Nothing failed, because a figure that
+    is not drawn does not raise.
+    """
+    from yerkon.settings import DEFAULTS
+    from yerkon.viewer.scene import GROUPS, figures
+
+    headings = {key for key, _ in GROUPS}
+    present = {key.split(".")[0] for key in DEFAULTS.entries}
+    assert present <= headings, "no heading for {}".format(
+        ", ".join(sorted(present - headings))
+    )
+
+    listed = figures(a_state())
+    drawn = sum(
+        1 for figure in listed["figures"] if figure["group"] in headings
+    )
+    assert drawn == listed["total"]

@@ -17,9 +17,13 @@ from __future__ import annotations
 import math
 from typing import Callable, Optional
 
+import pathlib
+
 from yerkon.budget import dissect_all
+from yerkon.deliver import deliver as write_study
 from yerkon.numbers import decimal_comma
 from yerkon.options import available, read, write
+from yerkon.parallel import workers
 from yerkon.report import build
 from yerkon.scenarios import catalogue
 from yerkon.settings import Settings
@@ -50,8 +54,8 @@ def table(state: ViewState, only: Optional[list] = None) -> Callable:
 
     def work(say: Say) -> dict:
         chosen = deployments_of(state, only)
-        say("Running {} scenario{}.".format(
-            len(chosen), "" if len(chosen) == 1 else "s"))
+        say("Running {} scenario{} on {} processes.".format(
+            len(chosen), "" if len(chosen) == 1 else "s", workers()))
         results, rows = build(chosen, settings=state.settings())
         say("Done.")
         return {
@@ -89,9 +93,10 @@ def budget(state: ViewState, only: Optional[list] = None,
     def work(say: Say) -> dict:
         chosen = deployments_of(state, only)
         wanted = tuple(sources) if sources else NAMES
-        say("Running {} simulations: {} scenario{} against {} sources.".format(
-            len(chosen) * (2 * len(wanted) + 2), len(chosen),
-            "" if len(chosen) == 1 else "s", len(wanted)))
+        say("Running {} simulations: {} scenario{} against {} sources, "
+            "on {} processes.".format(
+                len(chosen) * (2 * len(wanted) + 2), len(chosen),
+                "" if len(chosen) == 1 else "s", len(wanted), workers()))
 
         dissections = dissect_all(chosen, wanted)
         say("Done.")
@@ -159,8 +164,8 @@ def solve(
         candidates = 1
         for values in knobs.values():
             candidates *= len(values)
-        say("Searching {} arrangements of {} for {}.".format(
-            candidates, scenario, target.describe()))
+        say("Searching {} arrangements of {} for {}, on {} processes.".format(
+            candidates, scenario, target.describe(), workers()))
 
         seen = [0]
 
@@ -239,6 +244,29 @@ def target_from(payload: dict) -> Target:
         hpe_p95_m=bar("hpe_p95_m", math.inf),
         fixes_per_second=bar("fixes_per_second", 0.0),
     )
+
+
+# --- Writing the study out ------------------------------------------------
+
+
+def deliver(state: ViewState, into: str, only: Optional[list] = None,
+            with_budget: bool = True) -> Callable:
+    """Write the whole study out as Markdown, from the page's own figures."""
+
+    def work(say: Say) -> dict:
+        chosen = deployments_of(state, only)
+        written = write_study(
+            into or "docs/teslim", chosen, state.settings(),
+            with_budget=with_budget, say=say,
+        )
+        return {
+            "into": str(pathlib.Path(into or "docs/teslim").resolve()),
+            "files": [
+                {"name": one.path.name, "about": one.about} for one in written
+            ],
+        }
+
+    return work
 
 
 # --- Named options --------------------------------------------------------

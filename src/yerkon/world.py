@@ -182,6 +182,92 @@ class Terrain:
         return profile[-1][1]
 
 
+# --- The shapes ground comes in -------------------------------------------
+#
+# Each of these is a callable rather than a closure, and the difference
+# is not style. A closure cannot cross a process boundary, so a Terrain
+# built from one drags the whole Scenario holding it into a single core:
+# the table, the error dissection and the deployment search were all
+# stuck on one, and each of them is dozens of independent simulations
+# (ADR-0025). Written this way they pickle, and the work fans out.
+
+
+@dataclass(frozen=True)
+class Level:
+    """One height everywhere. A laboratory instrument; see `flat_terrain`."""
+
+    elevation_m: float = 0.0
+
+    def __call__(self, x: float, y: float) -> float:
+        return self.elevation_m
+
+
+@dataclass(frozen=True)
+class Rolling:
+    """Smooth hills from two sine components at incommensurate wavelengths.
+
+    They do not repeat over a corridor, so no anchor sits at a lucky spot
+    by construction.
+    """
+
+    amplitude_m: float
+    wavelength_m: float
+    seed: int = 0
+
+    @property
+    def phase(self) -> float:
+        return (self.seed % 360) * math.pi / 180.0
+
+    def __call__(self, x: float, y: float) -> float:
+        phase = self.phase
+        long_wave = math.sin(2.0 * math.pi * x / self.wavelength_m + phase)
+        short_wave = 0.35 * math.sin(
+            2.0 * math.pi * x / (self.wavelength_m * 0.37) + 2.0 * phase
+        )
+        across = 0.2 * math.sin(2.0 * math.pi * y / (self.wavelength_m * 0.6))
+        return self.amplitude_m * (long_wave + short_wave + across) / 1.55
+
+
+@dataclass(frozen=True)
+class Sloping:
+    """A straight floor between two portals. The inside of a bore."""
+
+    entry_elevation_m: float
+    exit_elevation_m: float
+    length_m: float
+
+    def __call__(self, x: float, y: float) -> float:
+        along = min(max(x / self.length_m, 0.0), 1.0)
+        return self.entry_elevation_m + (
+            self.exit_elevation_m - self.entry_elevation_m
+        ) * along
+
+
+@dataclass(frozen=True)
+class Fetched:
+    """Real ground, and whatever stands on it.
+
+    A point inside a building's footprint reports the roof rather than
+    the ground, because that is the surface a path over it has to clear.
+    Folding the two together keeps one answer to "how high is the
+    obstacle here", which is the only question the link budget asks.
+    """
+
+    site: "Site" = field(repr=False)
+
+    def __call__(self, x: float, y: float) -> float:
+        ground = self.site.height_at(x, y)
+        buildings = self.site.buildings
+        if buildings is None or buildings.is_empty:
+            return ground
+        inside = (
+            (x - buildings.centre_x_m) ** 2 + (y - buildings.centre_y_m) ** 2
+        ) <= buildings.radius_m**2
+        if not inside.any():
+            return ground
+        return ground + float(buildings.height_m[inside].max())
+
+
 def flat_terrain(
     elevation_m: float = 0.0,
     clutter_loss_db_per_km: float = 0.0,
@@ -199,7 +285,7 @@ def flat_terrain(
     asking what a deployment delivers.
     """
     return Terrain(
-        elevation_m=lambda x, y: elevation_m,
+        elevation_m=Level(elevation_m),
         clutter_loss_db_per_km=clutter_loss_db_per_km,
         micro_roughness_m=micro_roughness_m,
         description="flat at {:.0f} m".format(elevation_m),
@@ -219,22 +305,8 @@ def terrain_from_site(site: "Site", clutter_loss_db_per_km: float = 0.0) -> Terr
     separately keeps one answer to "how high is the obstacle here", which
     is the only question the link budget asks.
     """
-    buildings = site.buildings
-    have_buildings = buildings is not None and not buildings.is_empty
-
-    def elevation(x: float, y: float) -> float:
-        ground = site.height_at(x, y)
-        if not have_buildings:
-            return ground
-        inside = (
-            (x - buildings.centre_x_m) ** 2 + (y - buildings.centre_y_m) ** 2
-        ) <= buildings.radius_m**2
-        if not inside.any():
-            return ground
-        return ground + float(buildings.height_m[inside].max())
-
     return Terrain(
-        elevation_m=elevation,
+        elevation_m=Fetched(site),
         clutter_loss_db_per_km=clutter_loss_db_per_km,
         micro_roughness_m=site.roughness_m(),
         description=site.manifest.describe(),
@@ -254,18 +326,8 @@ def rolling_terrain(
     not repeat over a corridor and no anchor sits at a lucky spot by
     construction.
     """
-    phase = (seed % 360) * math.pi / 180.0
-
-    def elevation(x: float, y: float) -> float:
-        long_wave = math.sin(2.0 * math.pi * x / wavelength_m + phase)
-        short_wave = 0.35 * math.sin(
-            2.0 * math.pi * x / (wavelength_m * 0.37) + 2.0 * phase
-        )
-        across = 0.2 * math.sin(2.0 * math.pi * y / (wavelength_m * 0.6))
-        return amplitude_m * (long_wave + short_wave + across) / 1.55
-
     return Terrain(
-        elevation_m=elevation,
+        elevation_m=Rolling(amplitude_m, wavelength_m, seed),
         clutter_loss_db_per_km=clutter_loss_db_per_km,
         micro_roughness_m=micro_roughness_m,
         description="rolling, {:.0f} m over {:.0f} m".format(amplitude_m, wavelength_m),
@@ -297,12 +359,8 @@ def bore_terrain(
     fall_m = exit_elevation_m - entry_elevation_m
     grade = fall_m / length_m
 
-    def elevation(x: float, y: float) -> float:
-        along = min(max(x / length_m, 0.0), 1.0)
-        return entry_elevation_m + fall_m * along
-
     return Terrain(
-        elevation_m=elevation,
+        elevation_m=Sloping(entry_elevation_m, exit_elevation_m, length_m),
         clutter_loss_db_per_km=0.0,
         micro_roughness_m=micro_roughness_m,
         description=description or "bore, {:+.2f}% over {:.0f} m".format(
@@ -503,6 +561,27 @@ class Road:
         return rise / run
 
 
+@dataclass(frozen=True)
+class Alignment:
+    """A road surface as a sampled profile, read back by distance along.
+
+    A callable rather than a closure so a Road — and everything holding
+    one — can cross a process boundary (ADR-0025).
+    """
+
+    profile_m: tuple
+    spacing_m: float
+    length_m: float
+
+    def __call__(self, distance_m: float) -> float:
+        along = min(max(distance_m, 0.0), self.length_m)
+        position = along / self.spacing_m
+        index = min(int(position), len(self.profile_m) - 2)
+        share = position - index
+        here = self.profile_m[index]
+        return here + (self.profile_m[index + 1] - here) * share
+
+
 def graded_alignment(
     centreline_m: Sequence[tuple[float, float]],
     terrain: Terrain,
@@ -546,11 +625,4 @@ def graded_alignment(
     for i in range(n - 1, -1, -1):
         profile[i] = min(profile[i], profile[i + 1] + limit)
 
-    def surface(distance_m: float) -> float:
-        d = min(max(distance_m, 0.0), length_m)
-        position = d / spacing
-        index = min(int(position), n - 1)
-        f = position - index
-        return profile[index] + (profile[index + 1] - profile[index]) * f
-
-    return surface
+    return Alignment(tuple(profile), spacing, length_m)
