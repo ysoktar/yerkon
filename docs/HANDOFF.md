@@ -49,7 +49,7 @@ later (ADR-0006).
 | `regulatory.py` | what each region's rules allow: Turkey, Europe, the United States, licensed |
 | `rf.py` | the link budget |
 | `world.py` | terrain, graded road alignments, mounting structures |
-| `site/` | real ground and buildings, fetched once into a cache |
+| `site/` | real ground and buildings, fetched once into a cache, plus four fetched Ankara areas shipped inside the package |
 | `observation.py` | the one type the estimator may see, importing nothing |
 | `ranging.py` | the two-way exchange, its clocks, and what it costs in air time |
 | `estimator.py` | ranges into positions, seeing nothing else |
@@ -107,7 +107,16 @@ not code.
 4. **What structures actually stand where.** The siting search's answer
    moves with the survey, and the defaults are an assumption about a
    typical stretch of Turkish highway.
-5. **How well the anchors can actually be surveyed.** `yerkon budget`
+5. **Buildings, and the roads themselves.** OpenStreetMap was
+   unreachable from the machine that fetched the ground, so none of the
+   four Ankara sites carries a building footprint or a road alignment.
+   Two consequences, both conservative: the urban row's obstruction comes
+   from a clutter figure per kilometre rather than from the buildings
+   that are actually there, and every rural journey is a rectangle over
+   the ground rather than a road that follows it. A real alignment would
+   raise the rural figures, because roads run where the links do. One
+   `yerkon fetch` from a machine that can reach Overpass fixes both.
+6. **How well the anchors can actually be surveyed.** `yerkon budget`
    makes this the single most consequential figure for the tunnel row:
    at the assumed 0,15 m it is worth 1,84 m of position error there,
    against 0,17 m for everything else combined, because the bore's

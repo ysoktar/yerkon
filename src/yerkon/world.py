@@ -184,7 +184,17 @@ def flat_terrain(
     clutter_loss_db_per_km: float = 0.0,
     micro_roughness_m: float = 0.0,
 ) -> Terrain:
-    """Perfectly level ground. The worst case for ground reflection."""
+    """Perfectly level ground, for isolating one variable in a test.
+
+    Nowhere is flat, and no scenario in this project uses this: the three
+    the table describes stand on fetched Ankara ground, and where no
+    fetch has happened they fall back to rolling terrain rather than to
+    this (ADR-0021). A perfectly level plane is a laboratory instrument.
+    It is the worst case for ground reflection, because every reflection
+    arrives at the specular angle the two-ray model assumes, and that
+    makes it useful for asking what one term does — and misleading for
+    asking what a deployment delivers.
+    """
     return Terrain(
         elevation_m=lambda x, y: elevation_m,
         clutter_loss_db_per_km=clutter_loss_db_per_km,
@@ -256,6 +266,45 @@ def rolling_terrain(
         clutter_loss_db_per_km=clutter_loss_db_per_km,
         micro_roughness_m=micro_roughness_m,
         description="rolling, {:.0f} m over {:.0f} m".format(amplitude_m, wavelength_m),
+    )
+
+
+def bore_terrain(
+    entry_elevation_m: float,
+    exit_elevation_m: float,
+    length_m: float,
+    micro_roughness_m: float = 0.02,
+    description: str = "",
+) -> Terrain:
+    """The floor of a tunnel: straight, and never level.
+
+    A bore is the one place in this study where the ground really is a
+    plane, and even there it is a sloping one. Road tunnels are built to
+    a drainage gradient — typically between half a percent and three —
+    because water has to leave, and a floor modelled as level is a floor
+    no highway authority would accept.
+
+    The two portal elevations are the real ones where a site has been
+    fetched, so the gradient is the mountain's rather than a choice.
+    Between them the bore is straight: it goes through the hill, not over
+    it, which is why this cannot be built by draping a road over terrain.
+    """
+    if length_m <= 0.0:
+        raise ValueError("a bore has a length")
+    fall_m = exit_elevation_m - entry_elevation_m
+    grade = fall_m / length_m
+
+    def elevation(x: float, y: float) -> float:
+        along = min(max(x / length_m, 0.0), 1.0)
+        return entry_elevation_m + fall_m * along
+
+    return Terrain(
+        elevation_m=elevation,
+        clutter_loss_db_per_km=0.0,
+        micro_roughness_m=micro_roughness_m,
+        description=description or "bore, {:+.2f}% over {:.0f} m".format(
+            100.0 * grade, length_m
+        ),
     )
 
 

@@ -22,6 +22,9 @@ where = ["src"]
 [tool.setuptools.package-data]
 "yerkon" = ["defaults.toml"]
 "yerkon.viewer" = ["static/*"]
+# Fetched Ankara ground. A megabyte, and the reason an install reproduces
+# the table's numbers with no network (ADR-0008, ADR-0021).
+"yerkon.site" = ["ankara/*/*.npy", "ankara/*/*.npz", "ankara/*/*.json"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

@@ -22,7 +22,7 @@ from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.estimator import track
 from yerkon.numbers import decimal_comma
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
-from yerkon.viewer.state import ViewState
+from yerkon.viewer.state import ViewState, fetched_sites
 
 #: Samples across the scene for the ground mesh.
 #:
@@ -60,7 +60,12 @@ def design_of(state: ViewState, run=None) -> Design:
             mounting_of, run.mounting if run else "mast", "mounting"
         ),
         receiver_height_m=_lowest_unit(state),
-        surface_roughness_m=state.roughness_m,
+        # From the ground the simulation will actually stand on, not
+        # from the slider. A fetched grid brings its own roughness and
+        # ignores that slider, so reading it here would draw a reach
+        # ring the run does not agree with — and nothing on screen
+        # would say which of the two was the deployment.
+        surface_roughness_m=state.terrain().micro_roughness_m,
         target_ranging_sigma_m=state.tolerance_m,
     )
 
@@ -189,6 +194,9 @@ def scene(state: ViewState) -> dict:
             "ys": [float(y) for y in ys],
             "heights": heights,
             "description": terrain.description,
+            # What ground is on hand, found rather than listed, so a
+            # fourth `yerkon fetch` appears in the menu on its own.
+            "sites": list(fetched_sites()),
         },
         "road": road,
         "anchors": anchors,

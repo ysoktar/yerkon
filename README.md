@@ -27,7 +27,9 @@ Built and tested:
   link closes and how precisely it can measure.
 - `world.py`, terrain, a graded road alignment, and the structures an
   anchor can be mounted on.
-- `site/`, real ground and real buildings, fetched once and cached.
+- `site/`, real ground and real buildings, fetched once and cached —
+  including four fetched Ankara areas committed inside the package, so a
+  clone reproduces the table with no network.
 - `observation.py`, the one type the estimator may see. It imports
   nothing, which is what makes ADR-0003 enforceable rather than hoped for.
 - `estimator.py`, ranges into positions: a damped least-squares first fix
@@ -76,6 +78,14 @@ Four modes: the report's urban, rural and tunnel rows, and a **mixed
 corridor** that runs out of a town, across open country and through a
 bore, carrying all three anchor modules at once. None of the report's
 three rows measures that arrangement; this one does.
+
+**Zemin** picks the ground: fetched Ankara — Kızılay, Polatlı,
+Kızılcahamam, Gölbaşı — or modelled hills. There is no flat option, on
+the selector or on the relief slider, because nowhere is flat and a level
+plane is the most favourable surface this model can draw rather than the
+neutral one (ADR-0021). Choosing a fetched site greys out the three
+modelled-terrain sliders, since a real grid brings its own relief,
+roughness and obstructions.
 
 **En** — the site's width — is the knob that decides the shape of
 everything. At zero the site is a corridor: anchors line the road either
@@ -212,16 +222,24 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,24 | 2,69 | 32,85 | %100,00 | 12,63 | 15902 | 7367 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 2,14 | 5,97 | 122,07 | %100,00 | 372,50 | 8468 | 351 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,81 | 2,67 | 6,64 | %98,02 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 1,54 | 4,37 | 88,90 | %99,84 | 155,32 | 456680 | 88775 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,64 | 4,92 | 43,65 | %99,11 | 10,54 | 19055 | 8828 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 2,31 | 8,15 | 121,10 | %82,26 | 671,75 | 4696 | 195 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,81 | 2,96 | 8,25 | %100,00 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 1,90 | 5,96 | 87,76 | %87,39 | 273,97 | 456748 | 89443 |
 
-Each row carries two units sharing the air, which is why the update rate
-is half what one unit would see. Urban is a town three kilometres on a
-side and rural is open country twenty kilometres on a side; only the
-tunnel is a corridor, and the addendum to ADR-0014 is what that change
-cost the earlier figures.
+Every row stands on **real Ankara ground**, fetched once from the
+Copernicus 30 m DEM and committed inside the package, so a clone
+reproduces these numbers with no network (ADR-0008). The town is Kızılay,
+three kilometres on a side, rising and falling 91 m across it. The open
+country is the Polatlı plain, twenty kilometres on a side and 486 m of
+relief. The tunnel is a real 2 km alignment through the mountains at
+Kızılcahamam, falling 1,79 % between portals whose elevations are the
+mountain's.
+
+Nothing anywhere is flat, and that is a decision rather than a detail —
+see ADR-0021. Each row also carries two units sharing the air, which is
+why the update rate is half what one unit would see; and only the tunnel
+is a corridor, which the addendum to ADR-0014 explains.
 
 The OPEX column is the one the report leaves empty for all four rows. It
 comes from an inventory of named recurring items rather than a percentage
@@ -238,8 +256,15 @@ than lines, so their route kilometres are the length of a test journey
 and no cost per kilometre is quoted for them at all.
 
 **The service area is where a position is available**, not where a packet
-arrives. For the rural region those are 372,50 and 853,75 km², a factor
-of 2,3, and the notes print both every time (ADR-0012).
+arrives. For the rural region those are 671,75 and 1188,00 km², a factor
+of 1,8, and the notes print both every time (ADR-0012).
+
+**Rural availability is 82 %, and the terrain decides it.** Nearly half
+of rural exchanges are lost to ground in the way. That is what real
+relief does to a four kilometre grid of masts, and the same deployment
+on the hills at Gölbaşı — also fetched, also shipped — manages 45 %.
+Closing the grid does not rescue it: 189 masts instead of 33, five and a
+half times the capital, reaches 61 %. The full curve is in ADR-0021.
 
 **VPE is what the geometry supports**, with no height constraint
 anywhere. Tens of metres in the open, under seven in the tunnel where the
@@ -258,18 +283,18 @@ sixteen runs each — and reports what every one of them was worth
 with it.
 
 ```
-Tünel — HPE P50 1,81 m, P95 2,67 m; bir menzilin σ'sı 0,10 m, geometri çarpanı ×18,1
+Tünel — HPE P50 1,81 m, P95 2,96 m; bir menzilin σ'sı 0,10 m, geometri çarpanı ×18,1
 
   Hata kaynağı           Tek başına  Kalkarsa  Kazanç  Çare
   ---------------------  ----------  --------  ------  -----------------------------------
-  Direk konum ölçümü           1,84      0,17    1,63  direkleri GNSS ile daha iyi ölçmek
-  Donanım ölçüm tabanı         0,17      1,84   -0,03  daha iyi bir modül
-  Dalga formu gürültüsü        0,07      1,81    0,00  daha yüksek güç, daha yakın direk
-  Saat kayması                 0,03      1,81    0,00  TCXO ya da çift taraflı TWR
-  Tur içi hareket              0,00      1,78    0,03  daha kısa tur
-  Fazladan yol (engel)         0,00      1,81    0,00  direği yükseltmek
-  Kaybolan alışveriş           0,00      1,81    0,00  daha temiz kanal
-  Model artığı                 0,00                    hiçbir kaynak açık değilken kalan
+  Direk konum ölçümü           1,77      0,17    1,64  direkleri GNSS ile daha iyi ölçmek
+  Donanım ölçüm tabanı         0,19      1,78    0,02  daha iyi bir modül
+  Dalga formu gürültüsü        0,11      1,82   -0,02  daha yüksek güç, daha yakın direk
+  Saat kayması                 0,10      1,80    0,00  TCXO ya da çift taraflı TWR
+  Fazladan yol (engel)         0,09      1,81    0,00  direği yükseltmek
+  Kaybolan alışveriş           0,09      1,81    0,00  daha temiz kanal
+  Tur içi hareket              0,00      1,80    0,01  daha kısa tur
+  Model artığı                 0,09                    hiçbir kaynak açık değilken kalan
 ```
 
 Two columns, because they answer different questions. **Tek başına** is
@@ -285,11 +310,21 @@ multiplies hardest is the anchor survey error, the one term that never
 averages out. Buying a better radio for it buys nothing; surveying its
 brackets properly takes it from 1,81 m to 0,17 m.
 
-In town the ranking inverts — the module's own measurement floor is worth
-1,04 m and the survey error 0,09 m — and the geometry multiplier is 0,42,
-*below one*. An area with a filter running across it comes out better
-than a single range. That number is the quantitative form of what the
-corridor framing had been hiding.
+On the open road the ranking inverts. In town the module's own
+measurement floor is worth 1,13 m and the survey error 0,09 m; in the
+country the waveform noise is worth 1,62 m and the floor 1,35 m, close
+enough that the dissection declines to name a winner between them. The
+geometry multiplier for both is *below one* — 0,6 and 0,5 — so an area
+with a filter running across it comes out better than a single range.
+That number is the quantitative form of what the corridor framing had
+been hiding.
+
+One row of the table only became measurable when the ground did.
+**Fazladan yol** — the extra distance a signal travels over an
+obstruction — read exactly 0,00 m everywhere while two of the three
+scenarios stood on a level plane, not because the term is small but
+because a plane cannot obstruct anything. On real Ankara it is 0,41 m in
+the country, 0,11 m in town and 0,09 m in the bore. See ADR-0021.
 
 ## Fetching a site
 

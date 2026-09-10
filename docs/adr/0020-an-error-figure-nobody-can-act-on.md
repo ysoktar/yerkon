@@ -69,10 +69,18 @@ never averages out. Buying a better radio for that deployment buys
 nothing. Surveying its brackets properly takes it from 1,81 m to 0,17 m.
 
 In the **town**, the ranking inverts: the module's measurement floor is
-worth 1,04 m and the survey error 0,09 m. The geometry multiplier is
-0,42 — *below one*. An area deployment with a filter running across it
+worth 1,13 m and the survey error 0,09 m. The geometry multiplier is
+0,6 — *below one*. An area deployment with a filter running across it
 comes out better than a single range, which is the quantitative form of
 the thing the corridor framing had been hiding.
+
+One figure the dissection produced was an artefact of the ground rather
+than a finding, and it took ADR-0021 to see it. `excess_path` came out at
+exactly 0,00 m in all four rows, which read as "obstructions cost
+nothing" and in fact meant "two of these three scenarios stand on a
+plane, and a plane cannot obstruct anything". On real Ankara ground it is
+the third or fourth largest term in every row. A dissection is only as
+honest as the world it re-runs.
 
 The cost is honesty about runtime: `yerkon budget` is minutes, not
 seconds, and it says so before it starts. The alternative was a number

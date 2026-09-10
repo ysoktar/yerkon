@@ -91,9 +91,55 @@ def test_a_setting_the_viewer_does_not_have_is_refused():
         a_state().merged({"colour": "blue"})
 
 
-def test_flat_ground_is_asked_for_by_setting_the_relief_to_zero():
-    assert "flat" in a_state(relief_m=0.0).terrain().description
-    assert "rolling" in a_state(relief_m=40.0).terrain().description
+def test_the_viewer_will_not_draw_a_flat_surface():
+    """ADR-0021. Nowhere is flat, so the page does not offer flat.
+
+    The relief slider used to reach zero and return a perfectly level
+    plane. That is not a simplification of anywhere: it is the most
+    favourable ground this project can draw, because every reflection
+    arrives at the specular angle the two-ray model assumes. Asking for
+    it now gets rolling ground with a metre of relief, and the slider
+    itself does not go below five.
+    """
+    for relief_m in (0.0, -10.0, 40.0):
+        assert "flat" not in a_state(relief_m=relief_m).terrain().description
+
+
+def test_naming_a_fetched_site_puts_the_deployment_on_real_ground():
+    """The whole point of ADR-0008 arriving in the viewer.
+
+    A fetched grid brings its own relief, its own roughness and its own
+    obstructions, so none of the three modelled sliders applies to it.
+    """
+    from yerkon.viewer.state import fetched_sites
+
+    available = fetched_sites()
+    assert available, "the package ships fetched Ankara ground"
+
+    real = a_state(site=available[0]).terrain()
+    assert "rolling" not in real.description
+    assert real.micro_roughness_m > 0.0
+
+
+def test_a_site_that_was_never_fetched_says_so_rather_than_inventing_ground():
+    with pytest.raises(ValueError, match="no site fetched"):
+        a_state(site="atlantis").terrain()
+
+
+def test_a_bore_slopes_and_does_not_follow_the_mountain_over_it():
+    """A tunnel goes through a hill, so its floor cannot be draped terrain.
+
+    It is a straight line between two portals, and it falls, because
+    every road tunnel is built to a drainage gradient.
+    """
+    bore = from_scenario("tunnel").terrain()
+    assert bore.height_at(0.0, 0.0) != bore.height_at(2000.0, 0.0)
+    # Straight: the midpoint sits exactly between the portals.
+    ends = (bore.height_at(0.0, 0.0), bore.height_at(2000.0, 0.0))
+    assert bore.height_at(1000.0, 0.0) == pytest.approx(sum(ends) / 2.0)
+    # And within what a road tunnel is built to.
+    grade = abs(ends[1] - ends[0]) / 2000.0
+    assert 0.004 <= grade <= 0.030
 
 
 def test_a_moved_anchor_stays_where_it_was_put():
@@ -555,3 +601,23 @@ def test_only_the_bore_and_the_mixed_corridor_are_lines():
     assert shapes == {
         "urban": True, "rural": True, "tunnel": False, "mixed": False
     }
+
+
+def test_the_reach_drawn_is_the_reach_the_ground_gives():
+    """A ring the run does not agree with is worse than no ring.
+
+    A fetched grid brings its own surface roughness and ignores the
+    slider, so a reach ring computed from the slider would describe a
+    deployment on ground nobody is standing on — and nothing on screen
+    would say which of the two was real.
+    """
+    from yerkon.viewer.scene import design_of
+
+    real = a_state(site="kizilay", roughness_m=0.05)
+    assert design_of(real).surface_roughness_m == pytest.approx(
+        real.terrain().micro_roughness_m
+    )
+    assert design_of(real).surface_roughness_m != pytest.approx(0.05)
+
+    modelled = a_state(roughness_m=0.05)
+    assert design_of(modelled).surface_roughness_m == pytest.approx(0.05)

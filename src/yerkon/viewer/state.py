@@ -23,16 +23,39 @@ from yerkon.design import (
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import radios
 from yerkon.ranging import SCHEMES
-from yerkon.scenarios import CHOICES, Deployed, _circuit, _straight_road, catalogue
+from yerkon.scenarios import (
+    CHOICES,
+    Deployed,
+    SITES,
+    _circuit,
+    _straight_road,
+    catalogue,
+    fetched,
+    tunnel_ground,
+)
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.world import (
     Anchor,
     Road,
     Terrain,
-    flat_terrain,
     mountings,
     rolling_terrain,
+    terrain_from_site,
 )
+
+
+#: Fetched ground a person can drop the deployment onto, by directory name.
+#:
+#: Whatever `yerkon fetch` has written into the package's own site folder,
+#: found rather than listed, so fetching a fourth place puts it in the
+#: menu without anything here changing.
+def fetched_sites() -> tuple[str, ...]:
+    if not SITES.exists():
+        return ()
+    return tuple(sorted(
+        directory.name for directory in SITES.iterdir()
+        if (directory / "manifest.json").exists()
+    ))
 
 
 #: A group of anchors of one kind, laid over part of the site.
@@ -155,10 +178,33 @@ class ViewState:
     #: The units driving through them.
     units: tuple = DEFAULT_UNITS
 
-    #: Height of the rolling ground, peak to trough. Zero is flat.
-    relief_m: float = 40.0
+    #: Fetched ground to stand on, by directory name. Empty is modelled.
+    #:
+    #: A real grid brings its own relief, its own roughness and its own
+    #: obstructions, so when one is named the three sliders below it stop
+    #: applying — the page says so rather than leaving them looking live.
+    site: str = ""
+
+    #: Whether the units run through the ground rather than over it.
+    #:
+    #: A bore is the one arrangement that cannot be built by draping a
+    #: road over terrain, because it goes through the hill. Its floor is
+    #: a straight line between two portals, and it slopes, because every
+    #: road tunnel is built to a drainage gradient.
+    bore: bool = False
+
+    #: Height of the modelled ground, peak to trough.
+    #:
+    #: Ankara's centre moves ninety-one metres over three kilometres and
+    #: its open country most of a kilometre over twenty. Nowhere is flat,
+    #: so nothing here offers flat: this is what the ground does when no
+    #: fetched grid is standing in for it (ADR-0021). The default pair is
+    #: gentler than either fetched place — rolling farmland rather than
+    #: the steppe or the town — because it is the ground a person sees
+    #: before choosing any, and the fetched grids are there to be harder.
+    relief_m: float = 91.0
     #: How far apart the hills are.
-    hill_spacing_m: float = 3000.0
+    hill_spacing_m: float = 6000.0
     #: Height scatter the elevation model is too coarse to carry.
     roughness_m: float = 0.2
     #: Absorption by things standing on the ground, per kilometre.
@@ -208,13 +254,29 @@ class ViewState:
         )
 
     def terrain(self) -> Terrain:
-        if self.relief_m <= 0.0:
-            return flat_terrain(
-                clutter_loss_db_per_km=self.clutter_db_per_km,
-                micro_roughness_m=self.roughness_m,
+        """Real ground where a site is named, modelled ground where none is.
+
+        Never a plane either way. A level surface hands every reflection
+        the specular angle the two-ray model assumes, which makes it the
+        most favourable ground this project can draw and the least like
+        anywhere a receiver will actually be (ADR-0021).
+        """
+        if self.bore:
+            return tunnel_ground(
+                self.settings(), max(self.corridor_m, 100.0), self.site
+            )
+        if self.site:
+            site = fetched(self.site)
+            if site is None:
+                raise ValueError(
+                    "no site fetched at {}. Run `yerkon fetch --into {}` "
+                    "first; see ADR-0008.".format(SITES / self.site, SITES / self.site)
+                )
+            return terrain_from_site(
+                site, clutter_loss_db_per_km=self.clutter_db_per_km
             )
         return rolling_terrain(
-            amplitude_m=self.relief_m,
+            amplitude_m=max(self.relief_m, 1.0),
             wavelength_m=max(self.hill_spacing_m, 100.0),
             clutter_loss_db_per_km=self.clutter_db_per_km,
             micro_roughness_m=self.roughness_m,
@@ -373,7 +435,8 @@ def from_scenario(name: str) -> ViewState:
     """
     if name == "urban":
         return ViewState(
-            scenario="urban", corridor_m=3000.0, width_m=3000.0, relief_m=0.0,
+            scenario="urban", corridor_m=3000.0, width_m=3000.0,
+            site="kizilay",
             clutter_db_per_km=30.0, roughness_m=0.5, tolerance_m=5.0,
             sweep_m=200.0, journey_s=240.0,
             runs=(
@@ -387,7 +450,8 @@ def from_scenario(name: str) -> ViewState:
         )
     if name == "tunnel":
         return ViewState(
-            scenario="tunnel", corridor_m=2000.0, relief_m=0.0,
+            scenario="tunnel", corridor_m=2000.0,
+            site="kizilcahamam", bore=True,
             clutter_db_per_km=0.0, roughness_m=0.05, tolerance_m=1.0,
             sweep_m=100.0, journey_s=85.0, scheme="double",
             runs=(AnchorRun("T", "dwm3000", "sign", 0.0, 2000.0, 150.0, 4.0),),
@@ -399,7 +463,7 @@ def from_scenario(name: str) -> ViewState:
     if name == "rural":
         return ViewState(
             scenario="rural", corridor_m=20_000.0, width_m=20_000.0,
-            relief_m=40.0, hill_spacing_m=3000.0, roughness_m=0.2,
+            site="golbasi", roughness_m=0.2,
             tolerance_m=5.0, sweep_m=500.0, journey_s=2400.0,
             runs=(
                 AnchorRun("M", "e28", "mast", 0.0, 20_000.0, 4000.0, 0.0,
@@ -417,8 +481,12 @@ def from_scenario(name: str) -> ViewState:
         # measures on its own, and it is the one mode besides the tunnel
         # that really is a line: width stays at zero.
         return ViewState(
-            scenario="mixed", corridor_m=20_000.0, relief_m=30.0,
-            hill_spacing_m=3000.0, roughness_m=0.2, tolerance_m=5.0,
+            # Modelled rather than fetched, because no single fetched
+            # place is a town, open country and a bore in a line. This is
+            # the one mode whose ground is a construction, and it is
+            # still not a flat one.
+            scenario="mixed", corridor_m=20_000.0, relief_m=250.0,
+            hill_spacing_m=6000.0, roughness_m=0.2, tolerance_m=5.0,
             sweep_m=400.0, journey_s=600.0,
             runs=(
                 AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 400.0, 25.0),

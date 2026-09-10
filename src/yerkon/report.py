@@ -277,12 +277,13 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
                 "Per square kilometre it therefore looks enormous beside "
                 "the open-road rows, which is arithmetic and not a "
                 "judgement: a tunnel serves a line. Compare it on cost per "
-                "route kilometre instead. Propagation is modelled as level "
-                "ground with no waveguide term, which understates what a "
-                "real tunnel delivers.".format(
+                "route kilometre instead. The floor is {}; propagation "
+                "carries no waveguide term, which understates what a real "
+                "tunnel delivers.".format(
                     result.deployed.scenario.name,
                     decimal_comma(result.deployed.confined_width_m or 0.0, 0),
                     decimal_comma(result.deployed.route_km, 1),
+                    result.deployed.scenario.terrain.description,
                 )
             )
         built = "    {}: {} TL to build, {} TL a year to run".format(

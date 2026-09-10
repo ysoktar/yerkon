@@ -52,7 +52,12 @@ from yerkon.design import (
 )
 from yerkon.numbers import decimal_comma, readable
 from yerkon.report import as_breakdown, as_markdown, as_text, build, footnotes
-from yerkon.scenarios import ALL as ALL_SCENARIOS, CHOICES as SCENARIO_CHOICES
+from yerkon.scenarios import (
+    ALL as ALL_SCENARIOS,
+    CHOICES as SCENARIO_CHOICES,
+    fetched,
+)
+from yerkon.viewer.state import fetched_sites
 from yerkon.proposal import OUTCOME_LABELS, confirm, show_outcome
 from yerkon.terms import NAMES as SOURCE_NAMES
 from yerkon.site.model import BoundingBox
@@ -429,8 +434,23 @@ def site(argv: list[str] | None = None) -> int:
                         help="ranging error a link may have, in metres")
     parser.add_argument("--covered", type=float, default=0.95,
                         help="share of the corridor that must have a position")
-    parser.add_argument("--relief", type=float, default=40.0,
-                        help="height of the rolling ground, in metres")
+    parser.add_argument("--relief", type=float, default=91.0,
+                        help=(
+                            "height of the modelled rolling ground, in "
+                            "metres. There is no zero: nowhere is flat, and "
+                            "a level plane is the most favourable ground "
+                            "this model can draw rather than the neutral "
+                            "one (ADR-0021). Ignored when --ground names a "
+                            "fetched site."
+                        ))
+    parser.add_argument("--ground", metavar="NAME",
+                        help=(
+                            "stand the search on fetched ground instead of "
+                            "modelled hills, by site name. The package "
+                            "ships Ankara: {}".format(
+                                ", ".join(fetched_sites()) or "none fetched"
+                            )
+                        ))
     parser.add_argument("--radio", default="e28",
                         help="anchor module: {}".format(
                             ", ".join(sorted(RADIO_CHOICES))))
@@ -443,7 +463,9 @@ def site(argv: list[str] | None = None) -> int:
     from yerkon.evaluate import Journey, Receiver
     from yerkon.hardware import DWM3000, SX1280
     from yerkon.siting import Requirement, cheapest
-    from yerkon.world import Road, graded_alignment, rolling_terrain, flat_terrain
+    from yerkon.world import (
+        Road, graded_alignment, rolling_terrain, terrain_from_site,
+    )
 
     from yerkon.cost import operating_rates
     from yerkon.hardware import radios as radio_catalogue
@@ -463,11 +485,23 @@ def site(argv: list[str] | None = None) -> int:
         print(error, file=sys.stderr)
         return 2
 
-    terrain = (
-        flat_terrain() if args.relief <= 0.0
-        else rolling_terrain(amplitude_m=args.relief, wavelength_m=3000.0,
-                             micro_roughness_m=0.2)
-    )
+    if args.ground:
+        site = fetched(args.ground)
+        if site is None:
+            print("no site fetched called {}. There is: {}".format(
+                args.ground, ", ".join(fetched_sites()) or "nothing",
+            ), file=sys.stderr)
+            return 2
+        terrain = terrain_from_site(site)
+    else:
+        # Never a plane. A level surface hands every reflection the
+        # specular angle the two-ray term assumes, which would make the
+        # search recommend structures that only work on ground nobody
+        # will ever build on (ADR-0021).
+        terrain = rolling_terrain(
+            amplitude_m=max(args.relief, 1.0), wavelength_m=3000.0,
+            micro_roughness_m=0.2,
+        )
     centreline = [
         (float(x), 0.0)
         for x in range(0, int(args.corridor) + 1, 500)
@@ -722,7 +756,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon design [--region TR] [--mounting mast] [--tolerance 5]")
         print("  yerkon table  [--markdown] [--only rural]")
         print("  yerkon view   [--port 8765]")
-        print("  yerkon site   [--corridor 12000] [--tolerance 5]")
+        print("  yerkon site   [--corridor 12000] [--tolerance 5] [--ground polatli]")
         print("  yerkon budget [--only tunnel] [--source survey]")
         print("  yerkon defaults [--full]")
         print("  yerkon calibrate out/clock_residual.csv")

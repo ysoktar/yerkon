@@ -1,0 +1,19 @@
+{
+  "bounds": {
+    "south": 39.9115,
+    "west": 32.8194,
+    "north": 39.9385,
+    "east": 32.8546
+  },
+  "grid_spacing_m": 30.0,
+  "manifest": {
+    "elevation_source": "Copernicus DEM 30 m (1 tile)",
+    "elevation_resolution_m": 30.0,
+    "fetched_at": "2026-09-10T04:09:40+00:00",
+    "feature_source": null,
+    "building_count": 0,
+    "notes": [
+      "OpenStreetMap unavailable: OpenStreetMap did not answer: HTTPSConnectionPool(host='overpass-api.de', port=443): Max retries exceeded with url: /api/interpreter (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))"
+    ]
+  }
+}

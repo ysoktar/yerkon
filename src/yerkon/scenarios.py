@@ -13,8 +13,10 @@ physics is elsewhere.
 from __future__ import annotations
 
 import math
+import pathlib
+from functools import lru_cache
 from dataclasses import dataclass, replace
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 import numpy as np
 
@@ -34,7 +36,12 @@ from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280, Radio, W24P_U, radios
 from yerkon.ranging import DOUBLE_SIDED, SINGLE_SIDED, Scheme
 from yerkon.regulatory import TURKEY
 from yerkon.settings import DEFAULTS, Settings
+from yerkon.site.cache import SiteCache
+
+if TYPE_CHECKING:  # pragma: no cover
+    from yerkon.site.model import Site
 from yerkon.world import (
+    bore_terrain,
     mountings,
     BILLBOARD,
     LIGHTING_COLUMN,
@@ -42,9 +49,9 @@ from yerkon.world import (
     Road,
     TALL_MAST,
     Terrain,
-    flat_terrain,
     graded_alignment,
     rolling_terrain,
+    terrain_from_site,
 )
 
 
@@ -271,6 +278,132 @@ def _unit(identifier, road, speed_m_s, duration_s, start_m=0.0,
 
 # --- Urban ----------------------------------------------------------------
 
+# --- Ground -------------------------------------------------------------
+
+#: Fetched Ankara ground, shipped with the package.
+#:
+#: Four directories, each a `yerkon fetch` of a real place: the town the
+#: urban row describes, the open country the rural row describes, the
+#: mountain the tunnel row goes through, and the hills that say what
+#: happens when the open country is not gentle. Committing them is the
+#: point of ADR-0008 — a cache directory is a self-contained artefact, so
+#: anybody who clones this repository gets the same ground and therefore
+#: the same numbers, with no network.
+SITES = pathlib.Path(__file__).resolve().parent / "site" / "ankara"
+
+#: Which fetched site each row stands on.
+#:
+#: The rural row stands on the Polatlı plain rather than on the hills at
+#: Gölbaşı, and the choice is a finding rather than a convenience. Both
+#: are fetched and both ship. On Gölbaşı's 907 m of relief the same
+#: thirty-three masts produce a position 45 % of the time, and closing
+#: the grid to 1,5 km — one hundred and eighty-nine masts, five and a
+#: half times the capital — only reaches 61 %. That is not a spacing
+#: problem. It is that an intercity road does not cross a mountain range
+#: on a rectangle, and neither does the network beside it: roads follow
+#: the gentler ground, which is why the towns are there. Polatlı's 486 m
+#: over the same twenty kilometres is the ground this deployment is for,
+#: and Gölbaşı stays in the package as the case that says what happens
+#: when it is not (ADR-0021).
+URBAN_SITE = "kizilay"
+RURAL_SITE = "polatli"
+HARD_RURAL_SITE = "golbasi"
+TUNNEL_SITE = "kizilcahamam"
+
+#: Where the tunnel's bore runs through the fetched mountain, in metres.
+#:
+#: Found by searching the fetched grid for a two kilometre line that
+#: keeps rock above it the whole way and falls at a gradient a road
+#: tunnel is actually built to. This one keeps between nine and a hundred
+#: and fifty-six metres of overburden and falls 1,79 %, so its portal
+#: elevations are a real mountain's rather than a choice.
+TUNNEL_BORE = ((435.0, 870.0), (2435.0, 870.0))
+
+
+@lru_cache(maxsize=8)
+def fetched(name: str) -> Optional["Site"]:
+    """The ground for one row, or nothing if it was never fetched.
+
+    Cached, because the viewer asks for it on every drag and a fetched
+    grid is a megabyte off disk. A cache directory does not change while
+    a process runs; the only thing that would is a `yerkon fetch` in
+    another terminal, and that is a restart either way.
+    """
+    cache = SiteCache(SITES / name)
+    return cache.load() if cache.exists else None
+
+
+def urban_ground(settings: Settings, clutter_db_per_km: float) -> Terrain:
+    """Real Ankara if it is on hand, and rolling ground if it is not.
+
+    Never flat. Ankara's centre rises and falls ninety-one metres across
+    the three kilometres this row covers, and a plane would put every
+    anchor and every receiver at one height — which is not a
+    simplification of that town but a different one, and a favourable
+    one: a level plane hands every reflection the specular angle the
+    two-ray model assumes (ADR-0021).
+    """
+    site = fetched(URBAN_SITE)
+    if site is not None:
+        return terrain_from_site(site, clutter_loss_db_per_km=clutter_db_per_km)
+    return rolling_terrain(
+        amplitude_m=settings.number("site.urban_relief_m"),
+        wavelength_m=settings.number("site.urban_relief_wavelength_m"),
+        clutter_loss_db_per_km=clutter_db_per_km,
+        micro_roughness_m=0.5,
+        seed=101,
+    )
+
+
+def rural_ground(settings: Settings) -> Terrain:
+    """The same, over open country, where the relief is an order larger."""
+    site = fetched(RURAL_SITE)
+    if site is not None:
+        return terrain_from_site(site)
+    return rolling_terrain(
+        amplitude_m=settings.number("site.rural_relief_m"),
+        wavelength_m=settings.number("site.rural_relief_wavelength_m"),
+        micro_roughness_m=0.4,
+        seed=202,
+    )
+
+
+def tunnel_ground(
+    settings: Settings, length_m: float, site_name: str = TUNNEL_SITE
+) -> Terrain:
+    """The floor of the bore, which slopes because every bore does.
+
+    Not the mountain's surface: a tunnel goes through a hill rather than
+    over it, so this is a straight line between two portals and not
+    terrain draped over ground. Where the mountain has been fetched, the
+    portal elevations are its own and the gradient follows from them.
+    Where it has not, the gradient is the one that alignment measured.
+    """
+    site = fetched(site_name) if site_name else None
+    (entry_x, entry_y), _ = TUNNEL_BORE
+    # The far portal moves with the bore's length, so shortening the
+    # tunnel gives the gradient of that shorter line rather than a two
+    # kilometre one's applied to it. A bore longer than the fetched
+    # mountain has no second portal to read, and inventing one by
+    # clamping would spread a real fall over an unreal distance, so that
+    # case takes the measured gradient instead.
+    if site is not None and entry_x + length_m <= site.width_m:
+        return bore_terrain(
+            entry_elevation_m=site.height_at(entry_x, entry_y),
+            exit_elevation_m=site.height_at(entry_x + length_m, entry_y),
+            length_m=length_m,
+            description="bore through {}, portals from {}".format(
+                site_name, site.manifest.elevation_source
+            ),
+        )
+    grade = settings.number("site.tunnel_grade")
+    return bore_terrain(
+        entry_elevation_m=0.0,
+        exit_elevation_m=-grade * length_m,
+        length_m=length_m,
+    )
+
+
 #: Absorption by buildings, vegetation and traffic that height does not
 #: clear, in decibels per kilometre at 2,4 GHz.
 #:
@@ -293,10 +426,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     clutter = settings.number("site.urban_clutter_db_per_km")
 
 
-    URBAN_TERRAIN = flat_terrain(
-        clutter_loss_db_per_km=clutter,
-        micro_roughness_m=0.5,
-    )
+    URBAN_TERRAIN = urban_ground(settings, clutter)
 
     #: A town, three kilometres on a side. Not a street.
     URBAN_M = 3000.0
@@ -341,9 +471,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
 
     # --- Rural ----------------------------------------------------------------
 
-    RURAL_TERRAIN = rolling_terrain(
-        amplitude_m=40.0, wavelength_m=3000.0, micro_roughness_m=0.2
-    )
+    RURAL_TERRAIN = rural_ground(settings)
 
     #: Open country, twenty kilometres on a side. Not a highway.
     RURAL_M = 20_000.0
@@ -386,13 +514,16 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
 
     #: A tunnel is a waveguide, and a waveguide loses less than open ground.
     #:
-    #: This project models the bore as level ground with no obstruction, which
-    #: understates what a real tunnel delivers rather than overstating it. The
-    #: numbers that come out are therefore conservative, and the model would
-    #: need a waveguide term to claim otherwise.
-    TUNNEL_TERRAIN = flat_terrain(micro_roughness_m=0.05)
+    #: This project models the bore with no waveguide term, which understates
+    #: what a real tunnel delivers rather than overstating it. The numbers
+    #: that come out are therefore conservative, and the model would need
+    #: that term to claim otherwise. What it does not do any more is model
+    #: the floor as level: the bore falls 1,79 % between real portals, so
+    #: anchors and receivers sit at different heights along it (ADR-0021).
+    TUNNEL_M = 2000.0
+    TUNNEL_TERRAIN = tunnel_ground(settings, TUNNEL_M)
 
-    TUNNEL_ROAD = _straight_road(2000.0, TUNNEL_TERRAIN, step_m=100.0)
+    TUNNEL_ROAD = _straight_road(TUNNEL_M, TUNNEL_TERRAIN, step_m=100.0)
 
     TUNNEL = Deployed(
         scenario=Scenario(
@@ -400,8 +531,8 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             terrain=TUNNEL_TERRAIN,
             deployment=Deployment(
                 anchors=_anchors_along(
-                    2000.0, 150.0, 4.0, mounting["tunnel_bracket"], TUNNEL_TERRAIN,
-                    radio=module["dwm3000"],
+                    TUNNEL_M, 150.0, 4.0, mounting["tunnel_bracket"],
+                    TUNNEL_TERRAIN, radio=module["dwm3000"],
                 ),
                 receivers=(
                     _unit("araç", TUNNEL_ROAD, 22.2, 85.0),
@@ -427,7 +558,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         ),
         product=TUNNEL_ANCHOR,
         mounting=mounting["tunnel_bracket"],
-        route_km=2.0,
+        route_km=TUNNEL_M / 1000.0,
         weight=0.1,
         environment="İç + dış",
         technology="Karasal PNT (UWB/DWM3000 TWR)",

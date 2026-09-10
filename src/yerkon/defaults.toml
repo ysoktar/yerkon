@@ -389,3 +389,46 @@ vehicle braking hard is about 6; ordinary driving is well under 1. Too small \
 and the filter stops believing new measurements; too large and it stops \
 smoothing."""
 affects = "HPE, through how much the filter smooths"
+
+[values."site.urban_relief_m"]
+value = 91.0
+unit = "m"
+provenance = "MEASUREMENT"
+source = "Copernicus DEM 30 m, Ankara Kızılay 39,91-39,94 N 32,82-32,85 E, fetched 2026-09-10"
+note = """Ground rise and fall across the three kilometres of town the urban row describes. Used only when the fetched site is not on hand: with it, the ground is the real grid and this is what that grid measured. Nowhere is flat, and a fallback that was would make the urban row a different study from the one the cache produces (ADR-0021)."""
+affects = "the urban row's obstruction and reflection geometry when no site is fetched"
+sensitivity = "flat ground gives every reflection the specular angle the two-ray model assumes, which is the worst case for it"
+
+[values."site.urban_relief_wavelength_m"]
+value = 1800.0
+unit = "m"
+provenance = "DERIVED"
+source = "Copernicus DEM 30 m, Ankara Kızılay, fetched 2026-09-10"
+note = """How far apart the rises are, from the same grid. Ankara's centre sits across a valley and two ridges over this distance, so the fallback has to undulate over roughly this span rather than over a corridor's several kilometres."""
+affects = "how often a link in the urban fallback has ground in the way"
+
+[values."site.rural_relief_m"]
+value = 907.0
+unit = "m"
+provenance = "MEASUREMENT"
+source = "Copernicus DEM 30 m, Gölbaşı 39,66-39,84 N 32,78-33,02 E, fetched 2026-09-10"
+note = """Ground rise and fall across the twenty kilometres of open country the rural row describes. Real Anatolian steppe climbs most of a kilometre over that distance, which is more than twenty times the relief this project used before anybody fetched the ground."""
+affects = "the rural row's obstruction geometry when no site is fetched"
+sensitivity = "the old 40 m figure let almost every rural link run clear; 907 m does not"
+
+[values."site.rural_relief_wavelength_m"]
+value = 6000.0
+unit = "m"
+provenance = "DERIVED"
+source = "Copernicus DEM 30 m, Gölbaşı, fetched 2026-09-10"
+note = """How far apart the ridges are, from the same grid. Long enough that a four kilometre anchor spacing does not sit at one lucky point on the profile."""
+affects = "how often a link in the rural fallback is blocked by a ridge"
+
+[values."site.tunnel_grade"]
+value = 0.0179
+unit = "fraction"
+provenance = "MEASUREMENT"
+source = "Copernicus DEM 30 m, Kızılcahamam 40,41-40,43 N 32,61-32,63 E, fetched 2026-09-10"
+note = """Fall of the bore from one portal to the other, over two kilometres. Taken from the real ground at the two portals of an alignment that keeps between nine and a hundred and fifty-six metres of rock above it. It sits inside the half to three percent a road tunnel is built to for drainage, which is the check that this is an alignment somebody could build rather than a line through a hill."""
+affects = "the tunnel row's vertical geometry, and therefore its VPE"
+sensitivity = "a level floor would put every anchor and every receiver at one height, which no tunnel is built to"

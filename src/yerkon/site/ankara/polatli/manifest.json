@@ -1,0 +1,17 @@
+{
+  "bounds": {
+    "south": 39.4801,
+    "west": 32.0169,
+    "north": 39.6599,
+    "east": 32.2831
+  },
+  "grid_spacing_m": 60.0,
+  "manifest": {
+    "elevation_source": "Copernicus DEM 30 m (1 tile)",
+    "elevation_resolution_m": 30.0,
+    "fetched_at": "2026-09-10T04:29:21+00:00",
+    "feature_source": null,
+    "building_count": 0,
+    "notes": []
+  }
+}

@@ -211,3 +211,26 @@ def test_the_panel_does_not_do_its_own_physics():
         assert physics not in text, (
             "proposal.py calls {} directly instead of asking design".format(physics)
         )
+
+
+def test_nothing_that_ships_stands_on_flat_ground():
+    """ADR-0021. A plane is a test instrument, not a place.
+
+    Two of the three scenarios stood on one, and it looked like the
+    neutral choice. It is the most favourable ground this model can
+    draw: every reflection off it arrives at the specular angle the
+    two-ray term assumes, and nothing can obstruct anything, so the one
+    error the dissection could not measure was the one the terrain made
+    impossible. A comment saying "use real ground" would rot; this will
+    not.
+    """
+    offenders = []
+    for path in sorted(SRC.rglob("*.py")):
+        if path.name == "world.py":
+            continue          # where flat_terrain is defined, and documented
+        if "flat_terrain" in path.read_text(encoding="utf-8"):
+            offenders.append(str(path.relative_to(SRC)))
+    assert not offenders, (
+        "these build a level surface instead of standing on real or rolling "
+        "ground: {}".format(", ".join(offenders))
+    )

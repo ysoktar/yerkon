@@ -24,6 +24,12 @@ const MOUNTINGS = [["sign", "Levha (3 m)"], ["gantry", "Portal (6 m)"],
                    ["column", "Aydınlatma direği (12 m)"], ["mast", "Direk (25 m)"]];
 const KINDS = [["vehicle", "Kara aracı alıcısı"], ["pedestrian", "Yaya alıcısı"]];
 
+/* What ground is on hand. The server finds it rather than listing it, so
+ * a fourth `yerkon fetch` turns up here without any of this changing.
+ * The empty option is modelled ground, never flat ground: nowhere is
+ * flat, and this page does not offer a surface that is. */
+let SITES = [];
+
 /* One colour per anchor group, so a run in the panel and its masts in
  * the scene are recognisably the same thing. */
 export const RUN_COLOURS = [
@@ -225,6 +231,31 @@ function number(label, value, step, onChange) {
   input.onchange = () => onChange(Number(input.value));
   wrap.appendChild(input);
   return wrap;
+}
+
+function drawSites() {
+  const select = document.getElementById("site");
+  const entries = [["", "Modellenmiş (tepeli)"]]
+    .concat(SITES.map(name => [name, `${name} (gerçek zemin)`]));
+  select.innerHTML = options(entries, state.site || "");
+  select.onchange = () => edit({ site: select.value }, false)
+    .catch(e => say(e.message, true));
+
+  // A fetched grid brings its own relief and its own roughness, so the
+  // three sliders under it stop meaning anything. Saying so beats
+  // leaving them looking live.
+  const real = Boolean(state.site);
+  for (const id of ["relief_m", "hill_spacing_m", "roughness_m"]) {
+    const input = document.getElementById(id);
+    if (input) input.disabled = real;
+  }
+  const note = document.getElementById("ground-note");
+  if (note) {
+    note.textContent = real
+      ? (latest && latest.terrain && latest.terrain.description) || "gerçek zemin"
+      : "Ölçülmüş bir zemin yokken tepeler modellenir. Hiçbir yer düz değildir, "
+        + "bu yüzden düz bir seçenek yoktur.";
+  }
 }
 
 function drawRuns() {
@@ -468,6 +499,7 @@ function fillControls() {
     document.getElementById(name).value = state[name];
   }
   document.getElementById("mode").value = state.scenario;
+  drawSites();
   drawRuns();
   drawUnits();
 }
@@ -768,6 +800,11 @@ function showNumbers(drawn, result) {
 async function refreshScene() {
   latest = await ask("/api/scene");
   state = latest.state;
+  // The server finds what ground has been fetched; the page never keeps
+  // its own list, so a place fetched while this is running turns up on
+  // the next refresh.
+  SITES = latest.terrain.sites || [];
+  drawSites();
   document.getElementById("terrain-note").textContent =
     `${latest.terrain.description} · ${latest.anchors.length} direk`;
   terrainData = latest.terrain;
