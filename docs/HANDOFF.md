@@ -116,6 +116,10 @@ not code.
    the ground rather than a road that follows it. A real alignment would
    raise the rural figures, because roads run where the links do. One
    `yerkon fetch` from a machine that can reach Overpass fixes both.
+   It is now the largest single thing standing between the rural row and
+   a better number: at 89,6 % availability the remaining failures are
+   ground in the way, and a journey that follows a road instead of a
+   rectangle over open country would avoid much of it (ADR-0022).
 6. **How well the anchors can actually be surveyed.** `yerkon budget`
    makes this the single most consequential figure for the tunnel row:
    at the assumed 0,15 m it is worth 1,84 m of position error there,

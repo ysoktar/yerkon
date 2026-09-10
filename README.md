@@ -223,9 +223,9 @@ yerkon table
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
 | YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 1,64 | 4,92 | 43,65 | %99,11 | 10,54 | 19055 | 8828 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 2,31 | 8,15 | 121,10 | %82,26 | 671,75 | 4696 | 195 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 2,71 | 10,35 | 143,34 | %89,55 | 671,75 | 4696 | 195 |
 | YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,81 | 2,96 | 8,25 | %100,00 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 1,90 | 5,96 | 87,76 | %87,39 | 273,97 | 456748 | 89443 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,02 | 7,65 | 109,84 | %93,39 | 273,97 | 456748 | 89443 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone
@@ -259,12 +259,16 @@ and no cost per kilometre is quoted for them at all.
 arrives. For the rural region those are 671,75 and 1188,00 km², a factor
 of 1,8, and the notes print both every time (ADR-0012).
 
-**Rural availability is 82 %, and the terrain decides it.** Nearly half
-of rural exchanges are lost to ground in the way. That is what real
-relief does to a four kilometre grid of masts, and the same deployment
-on the hills at Gölbaşı — also fetched, also shipped — manages 45 %.
-Closing the grid does not rescue it: 189 masts instead of 33, five and a
-half times the capital, reaches 61 %. The full curve is in ADR-0021.
+**Rural availability is decided by terrain, and by the length of a
+round.** Not one rural link fails for distance — every single failure
+would close if the ground were taken away — so more masts are the wrong
+instinct. What was wrong was the round: eight anchors polled over ground
+that blocks half of them yields about four replies, exactly what a cold
+fix needs and nothing spare. Polling twelve took the row from 82,3 % to
+89,6 % for no capital at all, costing a third of the update rate and
+0,4 m of horizontal error. Getting past 90 % does cost money: about twice
+the mast capital, either as more masts or taller ones. ADR-0022 has the
+priced curve, and the two things that were tried and did not work.
 
 **VPE is what the geometry supports**, with no height constraint
 anywhere. Tens of metres in the open, under seven in the tunnel where the
@@ -312,12 +316,12 @@ brackets properly takes it from 1,81 m to 0,17 m.
 
 On the open road the ranking inverts. In town the module's own
 measurement floor is worth 1,13 m and the survey error 0,09 m; in the
-country the waveform noise is worth 1,62 m and the floor 1,35 m, close
-enough that the dissection declines to name a winner between them. The
-geometry multiplier for both is *below one* — 0,6 and 0,5 — so an area
-with a filter running across it comes out better than a single range.
-That number is the quantitative form of what the corridor framing had
-been hiding.
+country the waveform noise dominates at 2,10 m against the floor's
+1,51 m, because a rural link is kilometres long and the bound rises with
+distance. The geometry multiplier for both is *below one* — 0,6 and 0,5 —
+so an area with a filter running across it comes out better than a single
+range. That number is the quantitative form of what the corridor framing
+had been hiding.
 
 One row of the table only became measurable when the ground did.
 **Fazladan yol** — the extra distance a signal travels over an

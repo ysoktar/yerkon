@@ -173,3 +173,95 @@ def test_flat_terrain_survives_as_a_test_instrument_and_says_so():
     """
     assert flat_terrain(elevation_m=900.0).height_at(1e6, -1e6) == 900.0
     assert "laboratory" in flat_terrain.__doc__
+
+
+# --- What a round is sized by ---------------------------------------------
+
+
+def test_no_rural_link_fails_for_distance():
+    """ADR-0022. Every rural failure is ground in the way, not range.
+
+    The two look identical in the availability column and have opposite
+    remedies: more masts fix distance, and nothing about spacing fixes a
+    ridge. If this ever stops holding, the rural row's whole cost
+    argument changes and somebody should have to notice.
+    """
+    import numpy as np
+
+    from yerkon.rf import Terminal, evaluate_link
+
+    deployed = CHOICES["rural"]
+    deployment = deployed.scenario.deployment
+    terrain = deployed.scenario.terrain
+    unit = deployment.receivers[0]
+
+    closed = blocked = out_of_range = 0
+    for at_s in np.linspace(0.0, unit.journey.duration_s - 1.0, 40):
+        here = unit.journey.position_at(float(at_s))
+        for _, anchor, radio in deployment.nearest_to(unit, here):
+            receiver = Terminal(radio, deployment.antenna, here)
+            over_ground = evaluate_link(
+                anchor, receiver,
+                obstruction=terrain.obstruction_between(
+                    anchor.position_m, receiver.position_m
+                ),
+                region=deployment.region,
+            )
+            if over_ground.closes:
+                closed += 1
+            elif evaluate_link(
+                anchor, receiver, obstruction=None, region=deployment.region
+            ).closes:
+                blocked += 1
+            else:
+                out_of_range += 1
+
+    assert closed and blocked, "this sample shows neither outcome"
+    assert out_of_range == 0, (
+        "{} rural links failed for distance; the row's remedy is no longer "
+        "line of sight".format(out_of_range)
+    )
+
+
+def test_the_rural_round_polls_more_anchors_than_a_fix_needs():
+    """ADR-0022. Eight attempts over blocked ground yield four replies.
+
+    Which is exactly what a cold fix needs and nothing spare, and it is
+    why the rural row sat in the low eighties. A round is sized by how
+    many anchors answer, not by how many a position needs — and those are
+    the same number only over ground that hides nothing.
+    """
+    rural = CHOICES["rural"].scenario.deployment
+    assert rural.max_anchors_per_round >= 12
+
+    # The other two rows poll almost nothing that fails, so a longer
+    # round would buy them nothing and cost update rate.
+    for name in ("urban", "tunnel"):
+        assert CHOICES[name].scenario.deployment.max_anchors_per_round == 8
+
+
+@pytest.mark.slow
+def test_a_longer_rural_round_buys_availability_on_every_seed():
+    """The check the neighbour list failed, applied to what replaced it.
+
+    A change measured on one seed is a change measured on nothing: the
+    ordering trick this replaced gave +2,57 points on the first seed it
+    was tried on and −1,24 on the third. This one is positive on all of
+    them, and the test says so rather than trusting the run that
+    happened to be shipped.
+    """
+    from dataclasses import replace
+
+    from yerkon.evaluate import run_scenario
+
+    base = CHOICES["rural"].scenario
+    for seed in (202, 404):
+        longer = replace(base, seed=seed)
+        shorter = replace(
+            longer,
+            deployment=replace(longer.deployment, max_anchors_per_round=8),
+        )
+        assert (
+            run_scenario(longer).availability
+            > run_scenario(shorter).availability
+        ), seed

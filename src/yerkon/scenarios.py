@@ -491,6 +491,21 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     _unit("araç", RURAL_ROAD, 27.8, 2400.0),
                     _unit("kamyon", RURAL_ROAD, 22.2, 2400.0, start_m=20_000.0),
                 ),
+                # Twelve, not the eight the other rows use, and the
+                # difference is worth 6,8 points of availability without
+                # a single extra mast (ADR-0022).
+                #
+                # Eight was chosen when a position needs four and a
+                # little margin looked generous. Over real relief that
+                # reasoning fails: every rural link that fails, fails to
+                # terrain rather than to distance, so roughly half the
+                # anchors polled never answer and eight attempts yield
+                # about four replies — exactly the number a cold fix
+                # needs, with nothing spare. The round has to be sized by
+                # how many anchors answer, not by how many a position
+                # needs. Sixteen buys only another 0,8 points and costs
+                # more than it returns.
+                max_anchors_per_round=12,
                 scheme=SINGLE_SIDED,
                 region=TURKEY,
             ),
