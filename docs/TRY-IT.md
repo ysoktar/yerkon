@@ -24,6 +24,38 @@ yerkon view
 page does too, against the settings the page is showing rather than the
 shipped defaults.
 
+### The panel (this is new)
+
+Six steps, in the order somebody actually works for a fresh area, each
+collapsing to a line that says what it currently holds:
+
+    1 YER       kizilay · ölçülmüş zemin
+    2 SAHA      3,0 km × 3,0 km alan
+    3 YERLEŞİM  49 direk · 1 grup · 2 alıcı
+    4 HEDEF     ±5,0 m · TR · tek yönlü
+    5 DAYANAK   72 değerin 35 tanesi varsayım
+    6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
+
+One open at a time. **Sonuç** is pinned to the bottom and never scrolls
+away, so changing a control and seeing what it did is one movement
+instead of two.
+
+Worth trying:
+
+- **Type in the search box** (or press `/`). It covers every control and
+  all seventy-two figures. Turkish is folded, so `gurultu` finds *gürültü
+  katsayısı* and `olcum` finds the measurement ones. Only the steps
+  holding a hit open.
+- **Every slider now has a number beside it.** Type 4000 into *Direk
+  aralığı* — a slider whose step is 500 could not be given it. The number
+  may also go past the slider's ends on purpose.
+- **Open Dayanak and tick *Yalnız varsayımları göster*.** Thirty-five of
+  seventy-two. Each figure is named in Turkish, with its `defaults.toml`
+  key on hover and a coloured dot for where the value came from. Mast cost
+  (85 000 TL) is the one worth an afternoon.
+- **Pull *Boy* down on the Kırsal tab.** It now proposes what it would do
+  to the anchor group before doing it.
+
 ### Moving around (this was broken)
 
 The camera could only orbit a fixed point, and every edit re-centred it,
@@ -31,7 +63,12 @@ so panning was pointless.
 
 - **Drag** turns.
 - **Right-drag**, middle-drag or **Shift+drag** slides the ground. The
-  point you grab stays under the cursor.
+  point you grab stays under the cursor. *This used to flicker* — the
+  scene lurched forward and back on alternate frames for as long as the
+  drag lasted. The pivot rides on the ground, the ground moves the eye,
+  the eye moves where the cursor lands, and that moved the pivot: a loop
+  with a gain above one. The slide now reads the cursor against the
+  camera as it stood when you took hold of the ground (ADR-0033).
 - **Wheel** zooms *towards the cursor*, scaled by how far the wheel
   actually turned — a trackpad creeps, a mouse notch steps.
 - **W A S D** / arrows walk the way the camera faces. Shift goes faster.

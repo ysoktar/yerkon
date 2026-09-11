@@ -838,7 +838,17 @@ def test_every_control_the_page_offers_is_wired_to_something():
     ))
     assert len(interactive) > 10, "this stopped matching the page's controls"
 
-    unused = {name for name in interactive if name not in application}
+    # A ranged setting draws two controls that share one state field: the
+    # slider `x` and the exact number `x-num`, which the page reaches by
+    # building the name rather than by spelling it.
+    assert '"-num"' in application, (
+        "the number beside each slider is no longer reached by convention;"
+        " this test's allowance for it is now hiding dead controls"
+    )
+    unused = {
+        name for name in interactive
+        if name.removesuffix("-num") not in application
+    }
     assert not unused, "the page draws {} and nothing reaches them".format(
         ", ".join(sorted(unused))
     )
@@ -1105,6 +1115,45 @@ def test_framing_aims_at_the_ground_rather_than_at_sea_level():
     )
 
 
+def test_a_slide_reads_the_cursor_against_the_camera_it_started_with():
+    """Otherwise the slide is a loop through the terrain, and it rings.
+
+    The pivot rides on the ground, so its height moves the eye, the eye
+    moves where the cursor's ray lands, and that moves the pivot. Over
+    real relief the gain is above one: the scene lurched forward and back
+    on alternate frames for as long as the drag lasted. Measured as a
+    frame-to-frame difference that alternated 9,8 / 5,7 / 9,6 / 5,7 while
+    a steady turn stayed level.
+    """
+    application = read_app_js()
+    grab = application[application.index("if (slide) {"):]
+    grab = grab[: grab.index("} else {")]
+    assert "from: view()" in grab, (
+        "the slide does not keep the camera it started with"
+    )
+
+    move = application[application.index("if (panning) {"):]
+    move = move[: move.index("if (spinning)")]
+    assert "panning.from.onPlane" in move, (
+        "the slide reads the cursor against the live camera, which is the"
+        " loop that oscillated"
+    )
+    assert "groundUnder(...pixel(event))" not in move
+
+
+def test_the_ground_is_sampled_between_its_samples():
+    """A nearest-sample lookup is a staircase seven hundred metres wide.
+
+    That was tolerable while it only placed coverage cells and became a
+    bug the moment the camera's pivot started riding on it.
+    """
+    application = read_app_js()
+    body = application[application.index("function sampleAt"):]
+    body = body[: body.index("\nfunction within")]
+    assert "Math.round" not in body, "still taking the nearest sample"
+    assert "Math.floor" in body
+
+
 def test_zoom_follows_the_wheel_rather_than_stepping():
     """A fixed step per event makes a trackpad unusable and a mouse coarse.
 
@@ -1130,6 +1179,85 @@ def test_dragging_an_anchor_follows_the_ground_rather_than_one_plane():
     assert settled.count("onPlane") == 2, (
         "groundUnder should sample the level plane and then the real height"
     )
+
+
+def test_every_step_of_the_panel_says_what_it_currently_holds():
+    """A collapsed step is only worth collapsing if it still reports.
+
+    The panel was one column of every control the engine has, in the
+    order the engine grew them. Somebody scrolls that looking for the one
+    thing they came for, and cannot see what the other five sections are
+    set to without opening all five.
+    """
+    import pathlib
+    import re
+
+    static = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static"
+    )
+    page = (static / "index.html").read_text(encoding="utf-8")
+    application = read_app_js()
+
+    steps = re.findall(r'<details class="step" id="(step-[a-z]+)"', page)
+    assert len(steps) >= 5, "the panel is no longer built as steps"
+
+    lines = set(re.findall(r'<span class="now" id="(sum-[a-z]+)"', page))
+    assert len(lines) == len(steps), "a step has no line of its own"
+    for line in lines:
+        assert '"{}"'.format(line) in application, (
+            "{} is drawn and nothing ever writes to it".format(line)
+        )
+
+
+def test_the_search_matches_however_the_word_is_spelled():
+    """Somebody hunting the noise figure types "gurultu" as often as
+    "gürültü", and a search that answers one of them is a search people
+    stop using."""
+    application = read_app_js()
+    assert "function folded" in application or "const folded" in application
+    fold = application[application.index("const FOLD"):]
+    fold = fold[: fold.index("function wireFind")]
+    for letter in ("ı", "ş", "ğ", "ü", "ö", "ç"):
+        assert letter in fold, letter
+
+
+def test_a_hidden_row_is_actually_hidden():
+    """A class that sets `display` outranks the browser's [hidden].
+
+    A searched-away figure row is a grid, so it stayed on screen with the
+    attribute set on it and the search looked broken while doing exactly
+    what it was told.
+    """
+    import pathlib
+
+    style = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/style.css"
+    ).read_text(encoding="utf-8")
+    assert "[hidden] { display: none !important; }" in style
+
+
+def test_every_key_the_settings_file_uses_has_a_name_in_the_panel():
+    """`clock.crystal.residual_ppm` is what goes in the file and what
+    somebody editing the file needs; it is not a name. Seventy-two of
+    them read as a dump of variables rather than as the set of things
+    this study rests on."""
+    from yerkon.settings import DEFAULTS
+
+    application = read_app_js()
+    terms = application[application.index("const TERMS = {"):]
+    terms = terms[: terms.index("\n};")]
+
+    missing = sorted({
+        part
+        for key in DEFAULTS.entries
+        for part in key.split(".")[1:]
+        if "{}:".format(part) not in terms
+        # A part name that is a product is already a name.
+        and part not in ("sx1280", "dwm3000", "tcxo")
+    })
+    assert not missing, "no Turkish name for: {}".format(", ".join(missing))
 
 
 def test_no_slider_stops_short_of_a_value_a_mode_actually_sets():

@@ -23,6 +23,8 @@ const CHOICES = {
 let RADIOS = [];
 let MOUNTINGS = [];
 let TABS = [];
+/* What each row is called, as the engine named it. */
+const MODE_LABEL = {};
 const KINDS = [["vehicle", "Kara aracı alıcısı"], ["pedestrian", "Yaya alıcısı"]];
 
 /* What ground is on hand. The server finds it rather than listing it, so
@@ -288,8 +290,18 @@ function drawSites() {
   if (note) {
     note.textContent = real
       ? (latest && latest.terrain && latest.terrain.description) || "gerçek zemin"
-      : "Ölçülmüş bir zemin yokken tepeler modellenir. Hiçbir yer düz değildir, "
-        + "bu yüzden düz bir seçenek yoktur.";
+      : "Ölçülmüş bir zemin seçilmedi; tepeler aşağıdan modellenir.";
+  }
+  // Say that the three sliders stopped applying, beside the three
+  // sliders, rather than leaving them greyed out with no reason given.
+  const modelled = document.getElementById("modelled-note");
+  if (modelled) {
+    modelled.textContent = real
+      ? "Ölçülmüş bir zemin kendi rölyefini, kendi pürüzünü ve kendi "
+        + "engellerini getirir, bu yüzden aşağıdaki üç değer uygulanmaz."
+      : "Ölçülmüş bir zemin seçilmemişse tepeler aşağıdaki üç değerden "
+        + "modellenir. Hiçbir yer düz değildir, bu yüzden düz bir seçenek "
+        + "yoktur.";
   }
 }
 
@@ -299,6 +311,8 @@ function drawRuns() {
   state.runs.forEach((run, index) => {
     const card = document.createElement("div");
     card.className = "card";
+    card.dataset.find = `direk grup ${run.identifier} modül montaj aralık `
+      + `yoldan kaydırma başlangıç bitiş ${run.radio} ${run.mounting}`;
 
     const head = document.createElement("header");
     head.innerHTML =
@@ -368,6 +382,8 @@ function drawUnits() {
   state.units.forEach((unit, index) => {
     const card = document.createElement("div");
     card.className = "card";
+    card.dataset.find = `alıcı ${unit.identifier} ${unit.kind} hız anten `
+      + `modül başlangıç ${unit.radios.join(" ")}`;
 
     const head = document.createElement("header");
     head.innerHTML =
@@ -459,6 +475,93 @@ function drawUnits() {
  */
 
 let figuresData = null;
+let onlyAssumed = false;
+
+/* What each part of a settings key is called in the language the rest of
+ * the page is written in.
+ *
+ * `clock.crystal.residual_ppm` is what goes in `defaults.toml` and it is
+ * what somebody editing the file needs to see, but it is not a name — a
+ * list of seventy-two of them reads as a dump of variables rather than as
+ * the set of things this study is resting on. The key stays, in the
+ * tooltip and in what the search matches; the line says what it is.
+ *
+ * A fragment nobody has translated falls through as itself, so a figure
+ * added to the settings file turns up here readable enough and never
+ * disappears.
+ */
+const TERMS = {
+  accept_sigma_m: "kabul eşiği",
+  anchor_kwh_per_year: "yıllık elektrik",
+  anchor_offset_m: "yoldan uzaklık",
+  anchor_spacing_m: "direk aralığı",
+  anchor_stagger_m: "sıra kaydırması",
+  anchor_survey_sigma_m: "direk ölçüm hatası",
+  anchors_per_round: "turdaki direk sayısı",
+  anchors_sharing_central_operation: "merkezi işletmeyi paylaşan direk",
+  billboard: "pano",
+  central_operation_tl_per_year: "merkezi işletme, yıllık",
+  clock: "saat",
+  connectivity_tl_per_year: "hat ücreti, yıllık",
+  crystal: "kristal",
+  demodulation_threshold_db: "çözme eşiği",
+  electricity_tl_per_kwh: "elektrik birim fiyatı",
+  estimator: "kestirici",
+  extent_m: "uzunluk",
+  extra_off_grid_visits_per_year: "şebeke dışı ek ziyaret",
+  ground_levels: "zemin pürüz katmanı",
+  ground_patch_m: "zemin yaması",
+  ground_roughness_spread: "pürüz saçılımı",
+  ground_seed: "zemin tohumu",
+  height_m: "yükseklik",
+  length_m: "uzunluk",
+  lighting_column: "aydınlatma direği",
+  maintenance_tl_per_visit: "bakım, ziyaret başına",
+  maintenance_visits_per_year: "yıllık bakım ziyareti",
+  manoeuvre_m_s2: "manevra ivmesi",
+  mounting: "montaj",
+  noise_figure_db: "gürültü katsayısı",
+  off_grid_supply_tl: "şebeke dışı besleme",
+  operating: "işletme",
+  packet_loss: "paket kaybı",
+  payload_bytes: "paket yükü",
+  radio: "modül",
+  ranging: "ölçüm",
+  residual_ppm: "düzeltme sonrası kalan sapma",
+  roadside_sign: "yol levhası",
+  rural: "kırsal",
+  rural_relief_m: "kırsal tepe yüksekliği",
+  rural_relief_wavelength_m: "kırsal tepe aralığı",
+  service_life_years: "hizmet ömrü",
+  sign_gantry: "portal",
+  site: "saha",
+  site_cost_tl: "saha maliyeti",
+  tall_mast: "direk",
+  tolerance_ppm: "toleransı",
+  tunnel: "tünel",
+  tunnel_bracket: "tünel askısı",
+  tunnel_grade: "tünel eğimi",
+  turnaround_s: "dönüş süresi",
+  urban: "şehir içi",
+  urban_clutter_db_per_km: "şehir içi engel kaybı",
+  urban_packet_loss: "şehir içi paket kaybı",
+  urban_relief_m: "şehir içi tepe yüksekliği",
+  urban_relief_wavelength_m: "şehir içi tepe aralığı",
+  width_m: "genişlik",
+};
+
+/* Where a figure came from, as the panel says it. */
+const PROVENANCE = {
+  datasheet: "veri sayfası",
+  measurement: "ölçüm",
+  standard: "standart",
+  derived: "türetilmiş",
+  design: "tasarım kararı",
+  assumption: "varsayım",
+};
+
+const named = key =>
+  key.split(".").slice(1).map(part => TERMS[part] || part).join(" · ");
 
 const CASCADING_FIGURES = /(height_m|noise_figure_db|threshold_db|clutter|residual_ppm|tolerance_ppm|turnaround_s|payload_bytes)/;
 
@@ -471,22 +574,43 @@ function drawFigures() {
     `${figuresData.total} değerin ${figuresData.assumed} tanesi varsayım`;
 
   for (const group of figuresData.groups) {
+    // Heading and rows together, so a search that empties a group takes
+    // its heading with it rather than leaving ten titles over nothing.
+    const block = document.createElement("div");
+    block.className = "figures-group";
+    host.appendChild(block);
+
     const heading = document.createElement("div");
     heading.className = "group";
     heading.textContent = group.label;
-    host.appendChild(heading);
+    block.appendChild(heading);
 
     for (const figure of figuresData.figures.filter(f => f.group === group.key)) {
+      if (onlyAssumed && !figure.assumed) continue;
       const row = document.createElement("div");
       row.className = "figure";
+      // Its key, its group and what it affects, so the search box finds
+      // it by any of them.
+      const where = String(figure.provenance).toLowerCase();
+      // Its key, its name, its group, where it came from and what it
+      // affects, so the search finds it by any of them.
+      row.dataset.find = `${figure.key} ${named(figure.key)} ${group.label} `
+        + `${PROVENANCE[where] || where} ${figure.affects}`;
 
       const name = document.createElement("div");
       name.className = "name";
-      const short = figure.key.split(".").slice(1).join(" · ");
-      name.innerHTML = `<b></b><span></span>`;
-      name.querySelector("b").textContent = short;
+      name.innerHTML = `<i class="prov"></i><b></b><span></span>`;
+      // Where the number came from, as a mark rather than as a tooltip.
+      //
+      // Thirty-five of sixty-nine are still guesses, and which thirty-five
+      // is the single most useful thing this list can say. It said it in
+      // a title attribute, which is to say it said it to nobody.
+      const mark = name.querySelector(".prov");
+      mark.classList.add(where);
+      mark.title = PROVENANCE[where] || where;
+      name.querySelector("b").textContent = named(figure.key);
       name.querySelector("span").textContent = figure.affects;
-      name.title = figure.note + (
+      name.title = `${figure.key}\n\n${figure.note}` + (
         figure.sensitivity ? `\n\n${figure.sensitivity}` : "");
       row.appendChild(name);
 
@@ -523,8 +647,10 @@ function drawFigures() {
       unit.textContent = figure.unit;
       row.appendChild(unit);
 
-      host.appendChild(row);
+      block.appendChild(row);
     }
+    // A group the assumption filter emptied takes its heading with it.
+    if (!block.querySelector(".figure")) block.remove();
   }
 }
 
@@ -532,22 +658,196 @@ async function loadFigures() {
   try {
     figuresData = await ask("/api/figures");
     drawFigures();
+    drawSummary();
   } catch (error) { say(error.message, true); }
 }
 
+/* A ranged setting is shown three ways at once: what it means, where it
+ * sits, and what it is.
+ *
+ * A slider alone cannot be given 4000 exactly when its step is 500, and a
+ * number alone gives no sense of the range it lives in. The pair costs a
+ * line and removes the whole class of "I know the value I want and this
+ * control will not let me say it".
+ */
+function showKnob(name, value) {
+  const slider = document.getElementById(name);
+  if (!slider) return;
+  slider.value = value;
+  const exact = document.getElementById(name + "-num");
+  if (exact) exact.value = value;
+  const said = document.getElementById(OUTPUTS[name]);
+  if (said) said.textContent = UNITS[name](Number(value));
+}
+
 function fillControls() {
-  for (const [name, id] of Object.entries(OUTPUTS)) {
-    const input = document.getElementById(name);
-    if (!input) continue;
-    input.value = state[name];
-    document.getElementById(id).textContent = UNITS[name](state[name]);
-  }
+  for (const name of Object.keys(OUTPUTS)) showKnob(name, state[name]);
   for (const name of Object.keys(CHOICES)) {
     document.getElementById(name).value = state[name];
   }
   drawSites();
   drawRuns();
   drawUnits();
+  drawSummary();
+}
+
+/* ---------- the six steps, each collapsed to its own state ----------
+ *
+ * The panel used to be one column of every control the engine has, in the
+ * order the engine grew them, about three thousand pixels of it. Nobody
+ * reads that; they scroll it looking for the one thing they came for, and
+ * they cannot see what the other five sections are currently set to
+ * without opening all five.
+ *
+ * So each step carries a line of its own state, and that line is enough
+ * to know whether the step needs opening at all.
+ */
+function drawSummary() {
+  if (!state) return;
+  const anchors = latest ? latest.anchors.length : 0;
+  const assumed = figuresData
+    ? `${figuresData.total} değerin ${figuresData.assumed} tanesi varsayım`
+    : "—";
+  const edits = Object.keys(state.overrides || {}).length;
+  const scope = document.getElementById("task-only");
+
+  const said = {
+    "sum-place": state.site
+      ? `${state.site} · ölçülmüş zemin`
+      : `modellenmiş · ${UNITS.relief_m(state.relief_m)} / `
+        + `${UNITS.hill_spacing_m(state.hill_spacing_m)}`,
+    "sum-site": state.width_m > 0
+      ? `${UNITS.corridor_m(state.corridor_m)} × ${UNITS.width_m(state.width_m)} alan`
+      : `${UNITS.corridor_m(state.corridor_m)} koridor`,
+    "sum-layout": `${anchors} direk · ${state.runs.length} grup · `
+      + `${state.units.length} alıcı`,
+    "sum-target": `±${UNITS.tolerance_m(state.tolerance_m)} · ${state.region}`
+      + ` · ${state.scheme === "double" ? "çift yönlü" : "tek yönlü"}`,
+    "sum-basis": assumed + (edits ? ` · ${edits} düzenleme` : ""),
+    // An empty value is every row; a named one is that row alone.
+    "sum-run": scope && scope.value
+      ? `yalnız ${MODE_LABEL[scope.value] || scope.value}`
+      : "üç satır ve ağırlıklı ortalama",
+  };
+  for (const [id, text] of Object.entries(said)) {
+    const line = document.getElementById(id);
+    if (line) line.textContent = text;
+  }
+}
+
+/* ---------- finding one setting among a hundred ----------
+ *
+ * Between the deployment controls and the sixty-nine figures nobody
+ * supplied, this page holds more settings than fit in anybody's head.
+ * Every row carries the words somebody might look for it by, so typing
+ * two of them opens the step it lives in and hides everything else.
+ */
+/* Turkish, folded to the letters a keyboard reaches without thinking.
+ *
+ * Somebody hunting for the noise figure types "gurultu" as often as
+ * "gürültü", and a search that answers only one of them is a search
+ * people stop using. Both sides are folded, so either spelling finds it.
+ */
+const FOLD = { "ı": "i", "İ": "i", "ş": "s", "ğ": "g", "ü": "u", "ö": "o",
+               "ç": "c", "â": "a", "î": "i", "û": "u" };
+
+const folded = text => text.toLocaleLowerCase("tr")
+  .replace(/[ıİşğüöçâîû]/g, letter => FOLD[letter] || letter);
+
+function wireFind() {
+  const box = document.getElementById("find");
+  const clear = document.getElementById("find-clear");
+  const steps = () => [...document.querySelectorAll("details.step")];
+  // Which steps were open before the search opened more of them. A
+  // search that leaves six sections hanging open once it is cleared has
+  // undone the thing the steps are for.
+  let before = null;
+
+  const apply = () => {
+    const wanted = folded(box.value.trim());
+    document.body.classList.toggle("finding", Boolean(wanted));
+    let hits = 0;
+    for (const row of document.querySelectorAll("[data-find]")) {
+      const match = !wanted
+        || folded(row.dataset.find).includes(wanted)
+        || folded(row.textContent).includes(wanted);
+      row.hidden = !match;
+      if (match && wanted) hits++;
+    }
+    // Everything a step holds that is not a searchable row — its
+    // headings, its button rows, its explanations — goes with the rows
+    // it belongs to. Without this, searching for one figure still showed
+    // the whole of the ready-made options above it and the match was two
+    // screens down.
+    for (const empty of document.querySelectorAll(".figures-group")) {
+      empty.hidden = Boolean(wanted)
+        && !empty.querySelector("[data-find]:not([hidden])");
+    }
+    for (const step of steps()) {
+      for (const block of step.children) {
+        if (block.tagName === "SUMMARY") continue;
+        block.hidden = Boolean(wanted) && !(
+          (block.matches("[data-find]") && !block.hidden)
+          || block.querySelector("[data-find]:not([hidden])")
+        );
+      }
+    }
+
+    if (wanted && before === null) before = steps().map(step => step.open);
+    // While searching, a step is open exactly when it holds a hit. Open
+    // is the only way a match is visible at all, and leaving the others
+    // open puts the thing somebody searched for behind two screens of
+    // the things they did not.
+    steps().forEach((step, index) => {
+      if (!wanted) {
+        step.classList.remove("empty");
+        if (before) step.open = before[index];
+        return;
+      }
+      const found = step.querySelector(
+        "[data-find]:not([hidden])") !== null;
+      step.classList.toggle("empty", !found);
+      step.open = found;
+    });
+    if (!wanted) before = null;
+    document.getElementById("find-empty").hidden = !wanted || hits > 0;
+  };
+
+  box.oninput = apply;
+  clear.onclick = () => { box.value = ""; apply(); box.focus(); };
+  box.onkeydown = event => {
+    if (event.key === "Escape") { box.value = ""; apply(); box.blur(); }
+  };
+  // One key to reach it, because the alternative is reaching for a mouse
+  // to find a control you are about to type a number into anyway.
+  window.addEventListener("keydown", event => {
+    if (event.key !== "/" || event.ctrlKey || event.metaKey) return;
+    const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(
+      (document.activeElement || {}).tagName || "");
+    if (typing) return;
+    event.preventDefault();
+    box.focus();
+    box.select();
+  });
+  apply();
+}
+
+/* One step open at a time, and brought into view when it opens.
+ *
+ * Closing a step loses nothing, because its summary carries its state,
+ * and keeping one open is what holds the panel to a screen. Without the
+ * scroll, opening the fifth step puts its contents below the fold and
+ * the click reads as having done nothing.
+ */
+function wireSteps() {
+  const steps = [...document.querySelectorAll("details.step")];
+  for (const step of steps) {
+    step.addEventListener("toggle", () => {
+      if (!step.open || document.body.classList.contains("finding")) return;
+      for (const other of steps) if (other !== step) other.open = false;
+      step.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+  }
 }
 
 function wireControls() {
@@ -562,18 +862,29 @@ function wireControls() {
   }
 
   for (const name of Object.keys(OUTPUTS)) {
-    const input = document.getElementById(name);
-    if (!input) continue;
-    // While the handle is moving, only the label follows. The engine is
-    // asked once, when it is let go, because a sweep takes seconds.
-    input.oninput = () => {
-      document.getElementById(OUTPUTS[name]).textContent =
-        UNITS[name](Number(input.value));
-    };
-    input.onchange = () =>
-      edit({ [name]: Number(input.value) },
-           input.hasAttribute("data-cascades"))
+    const slider = document.getElementById(name);
+    if (!slider) continue;
+    const exact = document.getElementById(name + "-num");
+    const send = value =>
+      edit({ [name]: Number(value) }, slider.hasAttribute("data-cascades"))
         .catch(e => say(e.message, true));
+
+    // While the handle is moving, only the page follows. The engine is
+    // asked once, when it is let go, because a sweep takes seconds.
+    slider.oninput = () => showKnob(name, slider.value);
+    slider.onchange = () => send(slider.value);
+    if (exact) {
+      // The number may say what the slider cannot reach — a corridor of
+      // 42 km, a tolerance of 0,05 m. The slider then sits at its end
+      // and the value is still the value; clamping it here would be the
+      // control quietly changing a setting by being looked at.
+      exact.oninput = () => {
+        const said = document.getElementById(OUTPUTS[name]);
+        if (said) said.textContent = UNITS[name](Number(exact.value));
+        slider.value = exact.value;
+      };
+      exact.onchange = () => send(exact.value);
+    }
   }
 
   document.getElementById("add-run").onclick = () => {
@@ -610,6 +921,11 @@ function wireControls() {
       return;
     }
     edit({ overrides: {} }, true).catch(e => say(e.message, true));
+  };
+
+  document.getElementById("only-assumed").onchange = event => {
+    onlyAssumed = event.target.checked;
+    drawFigures();
   };
 
   document.getElementById("run").onclick = runSimulation;
@@ -653,13 +969,36 @@ function drawnTerrain() {
   return detail || terrainData;
 }
 
+/* The mesh's height at a point, between its samples as well as on them.
+ *
+ * This used to take the nearest sample, which makes it a staircase: the
+ * height jumps by whatever the relief does between two samples, seven
+ * hundred metres apart on a large site. That was tolerable while it only
+ * placed coverage cells, and became a bug the moment the camera's pivot
+ * started riding on it, because the pan is a loop through this function
+ * — the pivot's height moves the eye, the eye moves where the cursor's
+ * ray lands, and that moves the pivot. A staircase has an infinite slope
+ * at every step, so the loop found one and oscillated: the scene lurched
+ * forward and back on alternate frames for as long as the drag lasted.
+ *
+ * Interpolated, the slope of this function is the slope of the ground,
+ * the loop's gain is that slope, and a hillside is not a cliff.
+ */
 function sampleAt(mesh, x, y) {
   const { xs, ys, heights } = mesh;
-  const column = Math.min(xs.length - 1, Math.max(0, Math.round(
-    ((x - xs[0]) / (xs[xs.length - 1] - xs[0])) * (xs.length - 1))));
-  const row = Math.min(ys.length - 1, Math.max(0, Math.round(
-    ((y - ys[0]) / (ys[ys.length - 1] - ys[0])) * (ys.length - 1))));
-  return heights[row][column];
+  const at = (values, value) => {
+    const last = values.length - 1;
+    const step = (value - values[0]) / (values[last] - values[0]) * last;
+    const low = Math.min(last, Math.max(0, Math.floor(step)));
+    return [low, Math.min(last, low + 1), Math.min(1, Math.max(0, step - low))];
+  };
+  const [west, east, alongX] = at(xs, x);
+  const [south, north, alongY] = at(ys, y);
+  const lower = heights[south][west]
+    + (heights[south][east] - heights[south][west]) * alongX;
+  const upper = heights[north][west]
+    + (heights[north][east] - heights[north][west]) * alongX;
+  return lower + (upper - lower) * alongY;
 }
 
 function within(mesh, x, y) {
@@ -966,7 +1305,22 @@ canvas.addEventListener("pointerdown", event => {
                 event.ctrlKey || event.metaKey || event.shiftKey;
   const seat = { x: event.clientX, y: event.clientY, target: orbit.target.slice() };
   if (slide) {
-    panning = Object.assign(seat, { at: groundUnder(px, py) });
+    // The camera as it stood when the ground was grabbed, kept for the
+    // length of the gesture.
+    //
+    // A slide asks where the cursor lands on the ground and moves the
+    // pivot by the difference. The pivot rides on the ground, so its
+    // height moves the eye, which moves where the cursor lands, which
+    // moves the pivot — a loop, and over real relief its gain is above
+    // one. It oscillated: the scene lurched forward and back on
+    // alternate frames for as long as the drag lasted, which is what
+    // the flicker was.
+    //
+    // Reading every later cursor position against the grab-time camera
+    // breaks the loop outright, and it is also what a rigid drag means:
+    // the mapping from pixels to ground is the one that was on screen
+    // when the ground was taken hold of.
+    panning = Object.assign(seat, { at: groundUnder(px, py), from: view() });
   } else {
     panning = null;
     spinning = Object.assign(seat, { yaw: orbit.yaw, pitch: orbit.pitch });
@@ -999,7 +1353,10 @@ canvas.addEventListener("pointermove", event => {
     // from. Near the horizon a ray meets the ground kilometres away and
     // a pixel of movement throws the site off screen; that is a grab
     // that should never have been honoured, not a slide.
-    const here = groundUnder(...pixel(event));
+    const [atX, atY] = pixel(event);
+    const here = panning.at && panning.from
+      ? panning.from.onPlane(atX, atY, panning.at[2])
+      : null;
     const far = here && panning.at
       && Math.hypot(panning.at[0] - here[0], panning.at[1] - here[1])
          > orbit.distance * 3;
@@ -1245,6 +1602,11 @@ function drawOptions() {
   for (const option of optionsData.options) {
     const card = document.createElement("div");
     card.className = "option";
+    // Searchable by its name, its title and the figures it moves — a
+    // ready-made option is a setting like any other.
+    card.dataset.find = `seçenek ${option.name} ${option.title} `
+      + (option.moves || []).map(move => `${move.key} ${named(move.key)}`)
+        .join(" ");
 
     const head = document.createElement("header");
     head.innerHTML = `<b>${option.title}</b>`;
@@ -1257,9 +1619,12 @@ function drawOptions() {
 
     const moves = document.createElement("div");
     moves.className = "moves";
+    // Named the way the figures list names them, so a person reading an
+    // option and a person reading the figure it moves read the same
+    // words. The key itself is a hover away.
     moves.innerHTML = option.moves.length
       ? option.moves.map(m =>
-          `<span>${m.key.split(".").slice(-2).join(" · ")}: ` +
+          `<span title="${m.key}">${named(m.key)}: ` +
           `${m.from} → ${m.to}</span>`).join("")
       : "<span>şu anki ayarlarla aynı</span>";
     card.appendChild(moves);
@@ -1408,6 +1773,7 @@ function drawSolveScenarios() {
     TABS.map(([name, label]) =>
       `<option value="${name}">yalnız ${label}</option>`).join("");
   rows.value = state.scenario;
+  rows.onchange = drawSummary;
 }
 
 /* What the search may move, and what is worth trying.
@@ -1622,6 +1988,7 @@ async function refreshScene() {
     MOUNTINGS = latest.choices.mountings;
     RADIOS = latest.choices.radios;
     TABS = latest.choices.modes;
+    for (const [name, label] of TABS) MODE_LABEL[name] = label;
   }
   drawTabs();
   drawSites();
@@ -1680,6 +2047,8 @@ async function runSimulation() {
 (async function start() {
   wireControls();
   wireTasks();
+  wireSteps();
+  wireFind();
   resize();
   await refreshScene();
   fillControls();

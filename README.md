@@ -81,10 +81,36 @@ route, each anchor and the ring it ranges within tolerance; the swept
 coverage painted on the ground in two colours, one for ground a packet
 reaches and one for ground where four anchors are in reach at once.
 
-Four modes: the report's urban, rural and tunnel rows, and a **mixed
-corridor** that runs out of a town, across open country and through a
-bore, carrying all three anchor modules at once. None of the report's
-three rows measures that arrangement; this one does.
+Three tabs, one per row of the table, all held at once: switching does
+not discard what you set up, and a run takes either the tab you are on
+(one row) or all three and the weighted row they make (ADR-0028).
+
+**The panel is six steps, in the order somebody works** (ADR-0034): where
+the ground is, what shape the site is, what stands on it, what it has to
+achieve, what that rests on, and what to run. Each collapses to a line
+carrying its own state —
+
+    1 YER       kizilay · ölçülmüş zemin
+    2 SAHA      3,0 km × 3,0 km alan
+    3 YERLEŞİM  49 direk · 1 grup · 2 alıcı
+    4 HEDEF     ±5,0 m · TR · tek yönlü
+    5 DAYANAK   72 değerin 35 tanesi varsayım
+    6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
+
+— so the whole study reads without scrolling, and the result stays pinned
+to the bottom of the panel while you change the controls that move it.
+One step is open at a time; closing loses nothing, because the line says
+what the step holds.
+
+Every ranged setting has a slider *and* an exact number: a slider whose
+step is 500 cannot be given 4000, and a number alone says nothing about
+the range it lives in. The number may go past the slider's ends, because
+clamping it would be a control changing a setting by being looked at.
+
+The **search box** covers every setting, the seventy-two figures
+included, and folds Turkish to the letters a keyboard reaches without
+thinking — `gurultu` finds *gürültü katsayısı*. `/` focuses it. A step is
+open exactly when it holds a hit.
 
 **Zemin** picks the ground: fetched Ankara — Kızılay, Polatlı,
 Kızılcahamam, Gölbaşı — or modelled hills. **Yeni bir yer getir** fetches
@@ -104,7 +130,9 @@ side and units drive straight. Above zero it is an area: anchors spread
 over a staggered grid and units drive a circuit round the edge and across
 the middle. The geometry a receiver gets from the two is not comparable,
 which is why both are shown rather than one assumed. Urban and rural open
-as areas; the tunnel and the mixed corridor open as lines.
+as areas; the tunnel opens as a line. **Boy** — the site's length — brings
+its anchor runs inside it when it shortens, through the confirmation panel
+with every figure it moves (ADR-0032).
 
 Anchors are edited as *runs* — a group carrying one module on one
 mounting at one spacing — and a site may hold as many as it needs, each
@@ -115,8 +143,18 @@ height and set of modules, drawn on the route it takes.
 Everything is live. Drag an anchor, shift-click to remove it, add or drop
 a run or a unit, move any slider, and the scene and the numbers follow.
 
+Under **Dayanak**, each of the seventy-two figures is named in Turkish
+with its `defaults.toml` key a hover away, and carries a coloured mark for
+where its value came from — datasheet, measurement, standard, derived,
+design decision, assumption. *Yalnız varsayımları göster* cuts the list to
+the thirty-five that are still guesses, which is the part worth an
+afternoon of somebody's time.
+
 **Moving around.** Drag to turn. Right-drag, middle-drag or shift-drag to
-slide the ground — the point you grab stays under the cursor. The wheel
+slide the ground — the point you grab stays under the cursor, read
+against the camera as it stood when you took hold of it, because reading
+it against the live one closes a loop through the terrain that rings
+(ADR-0033). The wheel
 zooms towards the cursor, scaled by how far it actually turned, so a
 trackpad creeps and a mouse notch steps. WASD and the arrows walk the way
 the camera faces, `Q`/`E` turn and `R`/`F` tilt, and `G` frames

@@ -6,6 +6,12 @@
   --warn: #b4551d;
 }
 * { box-sizing: border-box; }
+
+/* The browser hides [hidden] with a rule of its own, and any class here
+ * that sets `display` outranks it — so a searched-away figure row, which
+ * is a grid, stayed on screen with the hidden attribute set on it and the
+ * search looked broken while doing exactly what it was told. */
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; overflow: hidden;
   font: 13px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
 #scene { position: absolute; inset: 0; right: 340px; background: #dfe7ee; }
@@ -246,3 +252,176 @@ label.tick input { width: auto; }
   font-weight: 600;
   margin-bottom: -1px;
 }
+
+
+/* ---------- the panel as six steps ----------
+ *
+ * Every control the engine has, in one column, in the order the engine
+ * grew them, was about three thousand pixels of it. Nobody reads that.
+ * Each step collapses to a line carrying its own state instead, so the
+ * whole study is legible at a glance and only what is being worked on is
+ * open.
+ */
+
+details.step { border-top: 1px solid var(--line); }
+details.step:first-of-type { border-top: none; }
+
+details.step > summary {
+  display: grid;
+  grid-template-columns: 18px auto 1fr;
+  align-items: baseline;
+  gap: 8px;
+  padding: 11px 0 10px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+details.step > summary::-webkit-details-marker { display: none; }
+
+details.step > summary .n {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  background: #b6c0ca;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+}
+
+details.step[open] > summary .n { background: var(--accent); }
+
+details.step > summary .what {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #61707e;
+}
+
+details.step[open] > summary .what { color: var(--ink); font-weight: 600; }
+
+details.step > summary .now {
+  text-align: right;
+  font-size: 11px;
+  color: #8a97a3;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+details.step[open] > summary .now { color: #61707e; }
+details.step > summary:hover .now { color: var(--ink); }
+details.step > *:last-child { margin-bottom: 16px; }
+
+/* A step the search found nothing in. Closed, and kept in place, because
+ * its number is how somebody knows where they are. */
+details.step.empty > summary { opacity: 0.35; }
+
+
+/* ---------- one setting, three ways ----------
+ *
+ * What it means, where it sits in its range, and what it is exactly. A
+ * slider cannot be given 4000 when its step is 500, and a number alone
+ * says nothing about the range it lives in.
+ */
+
+label.knob {
+  display: grid;
+  grid-template-columns: 1fr 82px;
+  align-items: center;
+  gap: 2px 8px;
+  margin-bottom: 12px;
+}
+
+label.knob > span { font-size: 12px; }
+label.knob > output { float: none; text-align: right; font-size: 11px; }
+label.knob > input[type=range] { margin-top: 0; }
+
+label.knob > input.num {
+  width: 100%;
+  padding: 3px 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+label.knob > input:disabled { opacity: 0.45; }
+
+
+/* ---------- finding one setting among a hundred ---------- */
+
+.find { display: flex; gap: 6px; margin: 0 0 4px; }
+
+.find input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+}
+
+.find input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.find button { flex: 0 0 28px; padding: 4px; color: #8a97a3; }
+body:not(.finding) .find button { visibility: hidden; }
+.no-hits { margin: 2px 0 0; color: var(--warn); }
+
+/* While searching, the prose that explains a step is not what is being
+ * looked for. */
+body.finding .hint:not(.no-hits) { display: none; }
+
+
+/* ---------- where a number came from ---------- */
+
+.figure .name { display: grid; grid-template-columns: 9px 1fr; gap: 0 6px; }
+.figure .name b, .figure .name span { grid-column: 2; }
+
+i.prov {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-top: 4px;
+  background: #b6c0ca;
+}
+
+i.prov.datasheet { background: #2f9e57; }
+i.prov.measurement { background: #1f6feb; }
+i.prov.standard { background: #7a3f9e; }
+i.prov.derived { background: #5c6b7a; }
+i.prov.design { background: #0f9b9b; }
+i.prov.assumption { background: var(--warn); }
+
+.prov-key {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 8px;
+  margin: 8px 0;
+  font-size: 10px;
+  color: #61707e;
+}
+
+.prov-key i { margin-right: 5px; display: inline-block; vertical-align: 0; }
+
+
+/* ---------- the answer, always on screen ---------- */
+
+#readout {
+  position: sticky;
+  bottom: -40px;
+  margin: 0 -18px -40px;
+  padding: 2px 18px 12px;
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -8px 16px -12px rgba(18, 24, 31, 0.4);
+}
+
+#readout h2 { margin-top: 10px; }

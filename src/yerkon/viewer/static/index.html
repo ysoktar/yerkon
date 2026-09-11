@@ -10,48 +10,37 @@
 
 <div id="scene"></div>
 
+<!--
+  The panel is ordered the way somebody works, not the way the engine is
+  built: where the site is, what shape it is, what stands on it, what it
+  has to achieve, what that rests on, and what to run. Each step collapses
+  to a line carrying its own state, so the whole study reads at a glance
+  and only the step being worked on is open.
+-->
 <aside id="panel">
   <h1>YERKON</h1>
   <p class="sub" id="terrain-note">—</p>
 
   <nav id="tabs"></nav>
 
-  <section>
-    <h2>Satır</h2>
-    <p class="hint" style="margin-top:0">
-      Üç satırın üçü de hazır durur. Sekmeler arasında geçmek yaptığın
-      düzenlemeyi silmez; her sekme kendi yerleşimini tutar. Çalıştırırken
-      ya yalnız bu satırı ya da üçünü birden — o zaman ağırlıklı satır da
-      çıkar.
-    </p>
-    <label>Boy <output id="corridor-out"></output>
-      <input type="range" id="corridor_m" min="500" max="40000" step="500"
-             data-cascades></label>
-    <label>En <output id="width-out"></output>
-      <input type="range" id="width_m" min="0" max="40000" step="500"></label>
-    <p class="hint">En sıfırken saha bir koridordur: direkler yolun iki
-      yanına dizilir ve birimler düz gider. Sıfırdan büyükken saha bir
-      alandır: direkler kaydırmalı bir ızgaraya yayılır, birimler alanın
-      çevresini ve ortasını dolaşır. Geometri ikisinde tamamen
-      farklıdır.</p>
-  </section>
+  <div class="find">
+    <input type="search" id="find" placeholder="Ayarlarda ara…  ( / )"
+           autocomplete="off">
+    <button id="find-clear" class="quiet" title="Aramayı temizle">✕</button>
+  </div>
+  <p class="hint no-hits" id="find-empty" hidden>Bu arama hiçbir ayara
+    uymuyor.</p>
 
-  <section>
-    <h2>Direk grupları</h2>
-    <div id="runs"></div>
-    <div class="row"><button id="add-run" class="quiet">Grup ekle</button></div>
-  </section>
+  <details class="step" id="step-place" open>
+    <summary><span class="n">1</span><span class="what">Yer</span>
+      <span class="now" id="sum-place">—</span></summary>
 
-  <section>
-    <h2>Alıcılar</h2>
-    <div id="units"></div>
-    <div class="row"><button id="add-unit" class="quiet">Alıcı ekle</button></div>
-  </section>
+    <label data-find="zemin yer saha arazi site">Zemin
+      <select id="site"></select></label>
+    <p class="hint" id="ground-note">—</p>
 
-  <section>
-    <h2>Arazi</h2>
-    <label>Zemin <select id="site"></select></label>
-    <details id="fetch-panel">
+    <details id="fetch-panel" data-find="getir indir yeni yer openstreetmap
+                                        copernicus enlem boylam kutu">
       <summary>Yeni bir yer getir</summary>
       <p class="hint">Ankara ya da başka bir yer. Ağ kullanan tek şey
         budur; bir kez getirilir, sonrası çevrimdışı koşar (ADR-0008).</p>
@@ -73,28 +62,97 @@
       <div class="row"><button id="run-fetch" class="quiet">Getir</button></div>
       <div id="fetch-out"></div>
     </details>
-    <p class="hint" id="ground-note">—</p>
-    <label>Tepe yüksekliği <output id="relief-out"></output>
-      <input type="range" id="relief_m" min="5" max="1000" step="5"></label>
-    <label>Tepe aralığı <output id="hill-out"></output>
-      <input type="range" id="hill_spacing_m" min="500" max="10000" step="250"></label>
-    <label>Yüzey pürüzü <output id="rough-out"></output>
-      <input type="range" id="roughness_m" min="0" max="2" step="0.05" data-cascades></label>
-    <label>Engel kaybı <output id="clutter-out"></output>
-      <input type="range" id="clutter_db_per_km" min="0" max="60" step="2"></label>
-  </section>
 
-  <section>
-    <h2>Mevzuat ve ölçüm</h2>
-    <label>Bölge <select id="region" data-cascades></select></label>
-    <label>Ölçüm şeması <select id="scheme"></select></label>
-    <label>Menzil toleransı <output id="tol-out"></output>
-      <input type="range" id="tolerance_m" min="0.1" max="30" step="0.1" data-cascades></label>
-    <label>Yolculuk süresi <output id="journey-out"></output>
-      <input type="range" id="journey_s" min="30" max="3600" step="30"></label>
-  </section>
+    <p class="hint" id="modelled-note">Ölçülmüş bir zemin seçilmemişse
+      tepeler aşağıdaki üç değerden modellenir. Hiçbir yer düz değildir,
+      bu yüzden düz bir seçenek yoktur.</p>
 
-  <section>
+    <label class="knob" data-find="tepe yükseklik rölyef relief modellenmiş">
+      <span>Tepe yüksekliği</span><output id="relief-out"></output>
+      <input type="range" id="relief_m" min="5" max="1000" step="5">
+      <input type="number" id="relief_m-num" class="num" step="5"></label>
+    <label class="knob" data-find="tepe aralık dalga boyu modellenmiş">
+      <span>Tepe aralığı</span><output id="hill-out"></output>
+      <input type="range" id="hill_spacing_m" min="500" max="10000" step="250">
+      <input type="number" id="hill_spacing_m-num" class="num" step="250"></label>
+    <label class="knob" data-find="yüzey pürüz roughness saçılma">
+      <span>Yüzey pürüzü</span><output id="rough-out"></output>
+      <input type="range" id="roughness_m" min="0" max="2" step="0.05" data-cascades>
+      <input type="number" id="roughness_m-num" class="num" step="0.05"></label>
+    <label class="knob" data-find="engel kaybı clutter bina ağaç soğurma">
+      <span>Engel kaybı</span><output id="clutter-out"></output>
+      <input type="range" id="clutter_db_per_km" min="0" max="60" step="2">
+      <input type="number" id="clutter_db_per_km-num" class="num" step="2"></label>
+  </details>
+
+  <details class="step" id="step-site">
+    <summary><span class="n">2</span><span class="what">Saha</span>
+      <span class="now" id="sum-site">—</span></summary>
+
+    <p class="hint" style="margin-top:0">
+      Üç satırın üçü de hazır durur. Sekmeler arasında geçmek yaptığın
+      düzenlemeyi silmez; her sekme kendi yerleşimini tutar.
+    </p>
+    <label class="knob" data-find="boy koridor uzunluk saha">
+      <span>Boy</span><output id="corridor-out"></output>
+      <input type="range" id="corridor_m" min="500" max="40000" step="500"
+             data-cascades>
+      <input type="number" id="corridor_m-num" class="num" step="500"></label>
+    <label class="knob" data-find="en genişlik alan koridor saha">
+      <span>En</span><output id="width-out"></output>
+      <input type="range" id="width_m" min="0" max="40000" step="500">
+      <input type="number" id="width_m-num" class="num" step="500"></label>
+    <p class="hint">En sıfırken saha bir koridordur: direkler yolun iki
+      yanına dizilir ve birimler düz gider. Sıfırdan büyükken saha bir
+      alandır: direkler kaydırmalı bir ızgaraya yayılır, birimler alanın
+      çevresini ve ortasını dolaşır. Geometri ikisinde tamamen
+      farklıdır.</p>
+  </details>
+
+  <details class="step" id="step-layout">
+    <summary><span class="n">3</span><span class="what">Yerleşim</span>
+      <span class="now" id="sum-layout">—</span></summary>
+
+    <h2>Direk grupları</h2>
+    <div id="runs"></div>
+    <div class="row"><button id="add-run" class="quiet">Grup ekle</button></div>
+
+    <h2>Alıcılar</h2>
+    <div id="units"></div>
+    <div class="row"><button id="add-unit" class="quiet">Alıcı ekle</button></div>
+
+    <p class="hint">Direği sürükleyerek taşı, Shift ile tıklayarak kaldır.
+      Her grup kendi modülünü ve montajını taşır; her alıcı hangi
+      modülleri taşıyorsa o direkleri duyar.</p>
+  </details>
+
+  <details class="step" id="step-target">
+    <summary><span class="n">4</span><span class="what">Hedef</span>
+      <span class="now" id="sum-target">—</span></summary>
+
+    <label data-find="bölge mevzuat eirp güç yasal region">Bölge
+      <select id="region" data-cascades></select></label>
+    <label data-find="ölçüm şema twr tek çift yön">Ölçüm şeması
+      <select id="scheme"></select></label>
+    <label class="knob" data-find="menzil tolerans hassasiyet sigma hedef">
+      <span>Menzil toleransı</span><output id="tol-out"></output>
+      <input type="range" id="tolerance_m" min="0.1" max="30" step="0.1"
+             data-cascades>
+      <input type="number" id="tolerance_m-num" class="num" step="0.1"></label>
+    <label class="knob" data-find="yolculuk süre sefer dakika">
+      <span>Yolculuk süresi</span><output id="journey-out"></output>
+      <input type="range" id="journey_s" min="30" max="3600" step="30">
+      <input type="number" id="journey_s-num" class="num" step="30"></label>
+    <label class="knob" data-find="tarama hücre çözünürlük kapsama grid">
+      <span>Tarama hücresi</span><output id="sweep-out"></output>
+      <input type="range" id="sweep_m" min="50" max="1000" step="50">
+      <input type="number" id="sweep_m-num" class="num" step="50"></label>
+  </details>
+
+  <details class="step" id="step-basis">
+    <summary><span class="n">5</span><span class="what">Dayanak</span>
+      <span class="now" id="sum-basis">—</span></summary>
+
     <h2>Hazır seçenekler</h2>
     <p class="hint" style="margin-top:0">
       Her seçenek, ayar dosyasında birkaç sayıyı değiştiren kısa bir
@@ -102,21 +160,46 @@
       geri almak için "Geri al" yeter.
     </p>
     <div id="options"></div>
-  </section>
 
-  <section>
-    <h2>Çalıştır</h2>
+    <h2>Varsayılan değerler <span id="assumed-count" class="tag"></span></h2>
+    <p class="hint" style="margin-top:0">
+      Rapor yalnızca malzeme listesini verdi. Buradaki her sayı bir
+      varsayılandır; değiştirdiğinde her şey yeniden hesaplanır.
+    </p>
+    <div class="prov-key">
+      <span><i class="prov datasheet"></i>veri sayfası</span>
+      <span><i class="prov measurement"></i>ölçüm</span>
+      <span><i class="prov standard"></i>standart</span>
+      <span><i class="prov derived"></i>türetilmiş</span>
+      <span><i class="prov design"></i>tasarım kararı</span>
+      <span><i class="prov assumption"></i>varsayım</span>
+    </div>
+    <label class="tick"><input type="checkbox" id="only-assumed">
+      Yalnız varsayımları göster</label>
+    <div id="figures"></div>
+    <div class="row">
+      <a id="export" class="button quiet" href="/api/figures.toml"
+         download="defaults.toml">Dosyaya yaz</a>
+      <button id="clear-overrides" class="quiet">Geri al</button>
+    </div>
+  </details>
+
+  <details class="step" id="step-run">
+    <summary><span class="n">6</span><span class="what">Çalıştır</span>
+      <span class="now" id="sum-run">—</span></summary>
+
     <p class="hint" style="margin-top:0">
       Raporun satırlarını, bu sayfadaki <em>sayılarla</em> koşar — ekranda
-      sürüklediğin yerleşimle değil; onun için "Simülasyonu çalıştır"
-      var. Dakikalar sürer; ilerlemesi aşağıda görünür.
+      sürüklediğin yerleşimle değil; onun için aşağıdaki "Simülasyonu
+      çalıştır" var. Dakikalar sürer; ilerlemesi aşağıda görünür.
     </p>
-    <label>Hangi satırlar <select id="task-only"></select></label>
+    <label data-find="hangi satır tablo">Hangi satırlar
+      <select id="task-only"></select></label>
     <div class="row">
       <button id="run-table" class="quiet">Tablo</button>
       <button id="run-budget" class="quiet">Hata dağılımı</button>
     </div>
-    <label>Teslim klasörü
+    <label data-find="teslim klasör markdown rapor">Teslim klasörü
       <input type="text" id="deliver-into" value="docs/teslim"></label>
     <label class="tick"><input type="checkbox" id="deliver-budget" checked>
       Hata bütçesini de yaz (yavaş)</label>
@@ -124,16 +207,15 @@
       <button id="run-deliver" class="quiet">Markdown olarak yaz</button>
     </div>
     <div id="task-out"></div>
-  </section>
 
-  <section>
     <h2>Çözücü</h2>
     <p class="hint" style="margin-top:0">
       Hedefi karşılayan en ucuz yerleşimi arar. Boş bıraktığın alan
       koşul sayılmaz. Bulduğunu isimlendirip seçenek olarak kaydeder.
     </p>
-    <label>Senaryo <select id="solve-scenario"></select></label>
-    <div class="pair">
+    <label data-find="çözücü senaryo">Senaryo
+      <select id="solve-scenario"></select></label>
+    <div class="pair" data-find="çözücü koşul hedef kullanılabilirlik hpe">
       <label>Kullanılabilirlik ≥
         <input type="number" id="solve-availability" step="0.01"
                min="0" max="1" placeholder="0,95"></label>
@@ -145,45 +227,20 @@
         <input type="number" id="solve-fixes" step="0.1" placeholder="—"></label>
     </div>
     <div id="solve-vary"></div>
-    <label>Kaydedilecek ad
+    <label data-find="çözücü kaydet ad seçenek">Kaydedilecek ad
       <input type="text" id="solve-save" placeholder="ör. kirsal-hedef"></label>
     <div class="row"><button id="run-solve">Ara</button></div>
     <div id="solve-out"></div>
-  </section>
+  </details>
 
-  <section>
-    <h2>Tarama</h2>
-    <label>Hücre boyu <output id="sweep-out"></output>
-      <input type="range" id="sweep_m" min="50" max="1000" step="50"></label>
+  <section id="readout">
+    <h2>Sonuç</h2>
+    <dl id="numbers"></dl>
     <div class="row">
       <button id="run">Simülasyonu çalıştır</button>
       <button id="reset" class="quiet">Sıfırla</button>
     </div>
   </section>
-
-  <section>
-    <h2>Varsayılan değerler <span id="assumed-count" class="tag"></span></h2>
-    <p class="hint" style="margin-top:0">
-      Rapor yalnızca malzeme listesini verdi. Buradaki her sayı bir
-      varsayılandır; değiştirdiğinde her şey yeniden hesaplanır. Kaynağı
-      girilene kadar hepsi varsayım sayılır.
-    </p>
-    <div id="figures"></div>
-    <div class="row">
-      <a id="export" class="button quiet" href="/api/figures.toml"
-         download="defaults.toml">Dosyaya yaz</a>
-      <button id="clear-overrides" class="quiet">Geri al</button>
-    </div>
-  </section>
-
-  <section id="readout">
-    <h2>Sonuç</h2>
-    <dl id="numbers"></dl>
-  </section>
-
-  <p class="hint">Direği sürükleyerek taşı, Shift ile tıklayarak kaldır.
-  Her grup kendi modülünü ve montajını taşır; her alıcı hangi modülleri
-  taşıyorsa o direkleri duyar.</p>
 </aside>
 
 <div id="confirm" hidden>
