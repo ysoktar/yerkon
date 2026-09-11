@@ -116,6 +116,18 @@ class AnchorRun:
                 ))
         return out
 
+    def within(self, length_m: float) -> "AnchorRun":
+        """This run, with its ends brought inside a site of that length.
+
+        An anchor standing past the end of the site is an anchor on
+        ground the study does not model and a unit never drives past.
+        """
+        start = min(max(self.from_m, 0.0), length_m)
+        finish = min(max(self.to_m, start), length_m)
+        if (start, finish) == (self.from_m, self.to_m):
+            return self
+        return replace(self, from_m=start, to_m=finish)
+
     def as_json(self) -> dict:
         return {name: getattr(self, name) for name in AnchorRun.__dataclass_fields__}
 
@@ -403,6 +415,23 @@ class ViewState:
                 for unit in cleaned["units"]
             )
         return replace(self, **cleaned)
+
+    def within_site(self) -> "ViewState":
+        """This state, with every anchor run brought inside the site.
+
+        The site's width already shapes the anchors directly — a grid
+        runs from the road out to it — but its length did not, because a
+        run carries its own start and end. So one of the two sliders
+        moved the deployment and the other moved nothing, which is not a
+        distinction either of them makes on screen.
+
+        Only the length slider calls this. Typing an end into a run is a
+        person being explicit about that run, and clipping it under them
+        would be answering a question they did not ask.
+        """
+        length = max(self.corridor_m, 0.0)
+        clipped = tuple(run.within(length) for run in self.runs)
+        return self if clipped == self.runs else replace(self, runs=clipped)
 
     def as_json(self) -> dict:
         out = {}

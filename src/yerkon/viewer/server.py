@@ -28,7 +28,14 @@ from yerkon.design import Design
 from yerkon.proposal import propose
 from yerkon.viewer.jobs import Jobs
 from yerkon.options import read as read_option
-from yerkon.viewer.scene import design_of, figures, scene, simulate, sweep
+from yerkon.viewer.scene import (
+    design_of,
+    figures,
+    ground,
+    scene,
+    simulate,
+    sweep,
+)
 from yerkon.viewer.tasks import (
     budget as budget_task,
     deliver as deliver_task,
@@ -121,12 +128,13 @@ def cascades(state: ViewState, changes: dict) -> Optional[dict]:
     because it moves all of them and a person should see all of it.
     """
     if not any(
-        name in CASCADING or name in ("runs", "overrides") for name in changes
+        name in CASCADING or name in ("runs", "overrides", "corridor_m")
+        for name in changes
     ):
         return None
 
     proposed = state.merged(changes)
-    groups = []
+    groups = list(_shortened(state, proposed, changes))
 
     shared = {
         name: value for name, value in changes.items()
@@ -162,6 +170,56 @@ def cascades(state: ViewState, changes: dict) -> Optional[dict]:
             "[{}]\n{}".format(group["run"], group["panel"]) for group in groups
         ),
     }
+
+
+def _shortened(state: ViewState, proposed: ViewState, changes: dict):
+    """What shortening the site does to the anchor runs standing on it.
+
+    The site's width already shapes the anchors — a grid runs from the
+    road out to it — and its length did not, because a run carries its
+    own start and end. Making the length behave the same way moves
+    anchors somebody placed, which is exactly the kind of change ADR-0009
+    exists for: it is proposed with every figure it moves and waits for a
+    yes.
+    """
+    if "corridor_m" not in changes:
+        return
+    settled = proposed.within_site()
+    asked = {
+        "key": "corridor_m",
+        "label": "site length",
+        "before": state.corridor_m,
+        "after": proposed.corridor_m,
+        "because": "",
+    }
+    for before, after in zip(proposed.runs, settled.runs):
+        follows = [
+            {
+                "key": field,
+                "label": field,
+                "before": getattr(before, field),
+                "after": getattr(after, field),
+                "because": "an anchor past the end of the site stands on "
+                           "ground nothing models and nothing drives past",
+            }
+            for field in ("from_m", "to_m")
+            if getattr(before, field) != getattr(after, field)
+        ]
+        if not follows:
+            continue
+        yield {
+            "run": before.identifier,
+            "asked": [asked],
+            "follows": follows,
+            "panel": "site length {:.0f} -> {:.0f} m; {} run {}".format(
+                state.corridor_m, proposed.corridor_m, before.identifier,
+                ", ".join(
+                    "{} {:.0f} -> {:.0f}".format(
+                        change["key"], change["before"], change["after"])
+                    for change in follows
+                ),
+            ),
+        }
 
 
 def _change(change) -> dict:
@@ -206,6 +264,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._toml(self.session.read())
         if path == "/api/scene":
             return self._json(lambda: scene(self.session.read()))
+        if path == "/api/ground":
+            return self._json(lambda: self._ground())
         if path == "/api/sweep":
             return self._json(lambda: sweep(self.session.read()))
         if path == "/api/simulate":
@@ -243,6 +303,24 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/run":
             return self._json(lambda: self._run(body))
         self.send_error(404)
+
+    def _ground(self) -> dict:
+        """A finer mesh over the window the page says it is looking at."""
+        from urllib.parse import parse_qs, urlsplit
+
+        asked = parse_qs(urlsplit(self.path).query)
+
+        def edge(name: str) -> float:
+            try:
+                return float(asked[name][0])
+            except (KeyError, IndexError, ValueError):
+                raise ValueError("ground needs west, east, south and north")
+
+        west, east = edge("west"), edge("east")
+        south, north = edge("south"), edge("north")
+        if east <= west or north <= south:
+            raise ValueError("that window has no ground in it")
+        return ground(self.session.read(), west, east, south, north)
 
     # -- the two things a POST can mean -----------------------------------
 
@@ -333,8 +411,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def _apply(self, changes: dict) -> dict:
         state = self.session.read()
-        updated = self.session.write(state.merged(changes))
-        return {"state": updated.as_json()}
+        settled = state.merged(changes)
+        if "corridor_m" in changes:
+            # Whatever the panel just showed and got a yes for. Only the
+            # length slider clips: typing an end into a run is a person
+            # being explicit about that run.
+            settled = settled.within_site()
+        return {"state": self.session.write(settled).as_json()}
 
     # -- plumbing ----------------------------------------------------------
 

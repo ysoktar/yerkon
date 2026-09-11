@@ -10,7 +10,6 @@
  * else applies immediately.
  */
 
-const VERTICAL = 6;          // ground relief is exaggerated, or hills vanish
 const CHOICES = {
   region: [["TR", "Türkiye"], ["EU", "Avrupa"], ["US", "Amerika"],
            ["US-PTP", "Amerika (noktadan noktaya)"], ["LICENSED", "Lisanslı"]],
@@ -106,6 +105,13 @@ const WORDS = {
              "gücü bölgenin tavanı ve antenin kazancı belirliyor"],
   anchor_height_m: ["Direk yüksekliği",
                     "montaj yapısı direğin ne kadar yükseldiğini belirliyor"],
+  corridor_m: ["Sahanın boyu", ""],
+  from_m: ["Grubun başlangıcı",
+           "sahanın dışında kalan direk hiçbir şeyin modellemediği "
+           + "zeminde durur"],
+  to_m: ["Grubun bitişi",
+         "sahanın dışında kalan direk hiçbir şeyin modellemediği "
+         + "zeminde durur"],
   usable_range_m: ["Kullanılabilir menzil",
                    "menzil, hedeflenen hassasiyette link bütçesinin izin verdiği kadar"],
   closure_range_m: ["Bağlantının koptuğu mesafe",
@@ -631,16 +637,58 @@ let framed = false;
 let terrainData = null;
 let markers = [];
 
-function groundAt(x, y) {
-  // Nearest sample from the mesh the engine sent. Good enough to sit a
-  // coverage cell on; the elevation itself came from the engine.
-  if (!terrainData) return 0;
-  const { xs, ys, heights } = terrainData;
+/* A finer mesh over the ground actually on screen, when there is one.
+ *
+ * The site's own mesh is a fixed few thousand samples spread over
+ * everything there is, which over a forty kilometre site is one every
+ * seven hundred metres. Zoomed in on a mast, the hill it stands on was
+ * two flat facets — under a thirty metre elevation model, so the shape
+ * was measured and merely never asked for. This holds the answer to
+ * asking for it. Null at any distance where the site's own mesh is
+ * already as fine as the window would be.
+ */
+let detail = null;
+
+function drawnTerrain() {
+  return detail || terrainData;
+}
+
+function sampleAt(mesh, x, y) {
+  const { xs, ys, heights } = mesh;
   const column = Math.min(xs.length - 1, Math.max(0, Math.round(
     ((x - xs[0]) / (xs[xs.length - 1] - xs[0])) * (xs.length - 1))));
   const row = Math.min(ys.length - 1, Math.max(0, Math.round(
     ((y - ys[0]) / (ys[ys.length - 1] - ys[0])) * (ys.length - 1))));
   return heights[row][column];
+}
+
+function within(mesh, x, y) {
+  const { xs, ys } = mesh;
+  return x >= xs[0] && x <= xs[xs.length - 1]
+    && y >= ys[0] && y <= ys[ys.length - 1];
+}
+
+function groundAt(x, y) {
+  // Nearest sample from the mesh the engine sent, from the finer one
+  // where it covers this point. Good enough to sit a coverage cell on;
+  // the elevation itself came from the engine either way.
+  if (detail && within(detail, x, y)) return sampleAt(detail, x, y);
+  if (!terrainData) return 0;
+  return sampleAt(terrainData, x, y);
+}
+
+/* How wide one quad of the ground mesh is, in metres.
+ *
+ * The engine picks the mesh to suit the site, so this is asked rather
+ * than assumed; it is the scale at which a painted quad's single depth
+ * stops describing the whole of it.
+ */
+function meshCell() {
+  const mesh = drawnTerrain();
+  if (!mesh) return 0;
+  const { xs, ys } = mesh;
+  if (xs.length < 2 || ys.length < 2) return 0;
+  return (Math.abs(xs[1] - xs[0]) + Math.abs(ys[1] - ys[0])) / 2;
 }
 
 function resize() {
@@ -654,7 +702,29 @@ function resize() {
 }
 window.addEventListener("resize", resize);
 
+/* Paint once per frame, however many gestures arrived.
+ *
+ * A pointer reports at the rate of the device, which on a trackpad is
+ * well over a hundred times a second, and one frame of this scene costs
+ * about a sixtieth of a second to draw. Painting on every event meant
+ * the queue grew for as long as a drag lasted and the picture ran behind
+ * the hand — the camera arithmetic was right the whole time and moving
+ * still felt broken. The browser is asked for a frame instead and the
+ * events in between collapse into it.
+ */
+let framePending = false;
+
 function render() {
+  // Every path that redraws also reconsiders how fine the ground under
+  // the camera should be. Cheap: it only resets a timer, and the window
+  // it would ask for is compared with the one already in hand.
+  scheduleDetail();
+  if (framePending) return;
+  framePending = true;
+  requestAnimationFrame(() => { framePending = false; paintScene(); });
+}
+
+function paintScene() {
   if (!latest) return;
   const width = container.clientWidth;
   const height = container.clientHeight;
@@ -667,27 +737,47 @@ function render() {
   });
   const colourOf = id => colourIndex[id] || "#3a4652";
 
+  // How far something drawn on the ground has to be pulled towards the
+  // camera to sort in front of the quad it lies on: one mesh cell, which
+  // is how much a quad's own depth varies across itself.
+  const bias = meshCell();
+
   const items = [
-    ...draw.groundFaces(view, latest.terrain, light),
-    ...draw.cellFaces(view, sweepData, groundAt),
+    ...draw.groundFaces(view, drawnTerrain(), light),
+    ...draw.cellFaces(view, sweepData, groundAt, bias),
     ...draw.masts(view, latest.anchors, colourOf),
     ...draw.polyline(
       view,
       latest.road.map(p => [p.x, p.y, p.z * draw.VERTICAL + 10]),
-      "#22282e", 2,
+      "#22282e", 2, bias,
     ),
   ];
 
-  // Each group's reach, in its own colour. A UWB bracket and a mast on
-  // one corridor cover nothing like the same ground, and one ring size
-  // for all of them would say they did.
+  // Each group's reach, in its own colour, once for the group.
+  //
+  // A UWB bracket and a mast on one corridor cover nothing like the same
+  // ground, so the ring is per run — but every anchor within a run has
+  // the same reach, and drawing one each put forty-nine copies of a
+  // single fact over each other. The legend has always called it the
+  // group's range; the code drew each anchor's. The one being dragged
+  // gets its own, because that is the anchor a person is reasoning
+  // about while they drag it.
+  const rings = new Map();
   for (const anchor of latest.anchors) {
-    if (!anchor.reach_m) continue;
+    if (!anchor.reach_m || !anchor.run) continue;
+    if (!rings.has(anchor.run)) rings.set(anchor.run, []);
+    rings.get(anchor.run).push(anchor);
+  }
+  const shown = [...rings.values()].map(group => group[group.length >> 1]);
+  const held = latest.anchors.find(a => a.id === dragging && a.reach_m);
+  if (held && !shown.includes(held)) shown.push(held);
+  for (const anchor of shown) {
     items.push(...draw.ring(
       view,
       [anchor.x, anchor.y, anchor.ground_z * draw.VERTICAL + 6],
       anchor.reach_m,
       colourOf(anchor.run).replace("rgb(", "rgba(").replace(")", ",0.45)"),
+      bias,
     ));
   }
 
@@ -695,7 +785,7 @@ function render() {
     items.push(...draw.polyline(
       view,
       unit.trail.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 20]),
-      "rgba(180,85,29,0.55)", 1.5,
+      "rgba(180,85,29,0.55)", 1.5, bias,
     ));
   }
   items.push(...draw.units(view, latest.units || []));
@@ -724,10 +814,21 @@ const pinch = new Map();
 let pinchSpan = null;
 
 /* How far the camera can get from what it is looking at. The lower bound
- * is a tunnel bracket at arm's length; the upper is a rural region with
- * room around it. */
-const NEAREST_M = 400;
+ * is close enough to stand between two tunnel brackets a hundred and
+ * fifty metres apart; the upper is a rural region with room around it.
+ * Four hundred metres was the old floor, and at that distance a bore is
+ * a thin line whatever the wheel is told. */
+const NEAREST_M = 25;
 const FURTHEST_M = 400000;
+
+/* How far up and down the camera may look.
+ *
+ * Not flat along the ground: below about seven degrees a ray meets the
+ * terrain so far away that grabbing it slides the site off the screen,
+ * and the horizon fills the frame with quads a kilometre deep.
+ */
+const LOWEST_PITCH = 0.12;
+const HIGHEST_PITCH = 1.50;
 
 function pixel(event) {
   const box = canvas.getBoundingClientRect();
@@ -763,12 +864,81 @@ function groundUnder(px, py) {
   return settled || flat;
 }
 
+/* The point the camera turns around, put back on the ground under it.
+ *
+ * The pivot used to keep whatever height it was given when the scene was
+ * first framed, so sliding across four hundred metres of relief left it
+ * buried under the hill or hanging in the air above it — and turning
+ * about a buried pivot swings the whole site past the screen instead of
+ * rotating the thing being looked at. Following the ground is what makes
+ * turning feel like walking round something.
+ */
+function onGround(x, y) {
+  return [x, y, groundAt(x, y) * draw.VERTICAL];
+}
+
 function frameOn(target, distance) {
   orbit.target = target;
   if (distance) {
     orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M, distance));
   }
   render();
+}
+
+/* ---------- asking for the ground you are actually looking at ----------
+ *
+ * A window around what the camera is aimed at, clipped to the site. Only
+ * worth asking for when it is a good deal smaller than the site itself;
+ * otherwise the mesh already in hand is the same mesh, and asking for it
+ * again is a round trip that changes nothing on screen.
+ */
+
+//: How much of the site has to be off screen before a finer mesh is worth it.
+const DETAIL_SHARE = 0.6;
+
+let detailTimer = null;
+let detailAsked = null;
+
+function visibleGround() {
+  if (!terrainData) return null;
+  const { xs, ys } = terrainData;
+  const reach = orbit.distance;
+  const west = Math.max(xs[0], orbit.target[0] - reach);
+  const east = Math.min(xs[xs.length - 1], orbit.target[0] + reach);
+  const south = Math.max(ys[0], orbit.target[1] - reach);
+  const north = Math.min(ys[ys.length - 1], orbit.target[1] + reach);
+  if (east - west < 1 || north - south < 1) return null;
+  const enough =
+    (east - west) < (xs[xs.length - 1] - xs[0]) * DETAIL_SHARE
+    || (north - south) < (ys[ys.length - 1] - ys[0]) * DETAIL_SHARE;
+  return enough ? { west, east, south, north } : null;
+}
+
+function scheduleDetail() {
+  clearTimeout(detailTimer);
+  detailTimer = setTimeout(async () => {
+    const box = visibleGround();
+    if (!box) {
+      // Pulled back far enough that the site's own mesh is the finer of
+      // the two. Dropping it keeps one mesh on screen rather than a
+      // sharp patch left behind in the middle of a coarse one.
+      if (detail) { detail = null; detailAsked = null; paintScene(); }
+      return;
+    }
+    const key = [box.west, box.east, box.south, box.north]
+      .map(edge => Math.round(edge / 25)).join(",");
+    if (key === detailAsked) return;
+    detailAsked = key;
+    try {
+      const query = new URLSearchParams(
+        Object.entries(box).map(([edge, at]) => [edge, String(at)]));
+      detail = await ask("/api/ground?" + query.toString());
+      paintScene();
+    } catch (error) {
+      detail = null;
+      detailAsked = null;
+    }
+  }, 220);
 }
 
 /* -- turning, sliding and zooming -- */
@@ -825,24 +995,29 @@ canvas.addEventListener("pointermove", event => {
     // the point grabbed stays under it. Falls back to a distance-scaled
     // nudge when the ray misses the ground, which happens near the
     // horizon.
+    // Refused when the slide is wilder than the distance being looked
+    // from. Near the horizon a ray meets the ground kilometres away and
+    // a pixel of movement throws the site off screen; that is a grab
+    // that should never have been honoured, not a slide.
     const here = groundUnder(...pixel(event));
-    if (panning.at && here) {
-      orbit.target = [
+    const far = here && panning.at
+      && Math.hypot(panning.at[0] - here[0], panning.at[1] - here[1])
+         > orbit.distance * 3;
+    if (panning.at && here && !far) {
+      orbit.target = onGround(
         panning.target[0] + (panning.at[0] - here[0]),
         panning.target[1] + (panning.at[1] - here[1]),
-        panning.target[2],
-      ];
+      );
     } else {
       const pace = orbit.distance * 0.0014;
       const along = -(event.clientX - panning.x) * pace;
       const across = (event.clientY - panning.y) * pace;
-      orbit.target = [
+      orbit.target = onGround(
         panning.target[0] + along * Math.cos(orbit.yaw + Math.PI / 2)
           + across * Math.cos(orbit.yaw),
         panning.target[1] + along * Math.sin(orbit.yaw + Math.PI / 2)
           + across * Math.sin(orbit.yaw),
-        panning.target[2],
-      ];
+      );
     }
     render();
     return;
@@ -850,7 +1025,7 @@ canvas.addEventListener("pointermove", event => {
 
   if (spinning) {
     orbit.yaw = spinning.yaw + (event.clientX - spinning.x) * 0.006;
-    orbit.pitch = Math.min(1.45, Math.max(0.06,
+    orbit.pitch = Math.min(HIGHEST_PITCH, Math.max(LOWEST_PITCH,
       spinning.pitch + (event.clientY - spinning.y) * 0.005));
     render();
   }
@@ -906,11 +1081,10 @@ canvas.addEventListener("wheel", event => {
   const under = groundUnder(...pixel(event));
   if (under && was > 0) {
     const share = 1 - orbit.distance / was;
-    orbit.target = [
+    orbit.target = onGround(
       orbit.target[0] + (under[0] - orbit.target[0]) * share,
       orbit.target[1] + (under[1] - orbit.target[1]) * share,
-      orbit.target[2],
-    ];
+    );
   }
   render();
 }, { passive: false });
@@ -934,13 +1108,12 @@ window.addEventListener("keydown", event => {
     // which is what "forward" means to somebody looking at a screen.
     const pace = orbit.distance * (event.shiftKey ? 0.16 : 0.05);
     const [sideways, forward] = nudge;
-    orbit.target = [
+    orbit.target = onGround(
       orbit.target[0] + pace * (forward * Math.cos(orbit.yaw)
         - sideways * Math.sin(orbit.yaw)),
       orbit.target[1] + pace * (forward * Math.sin(orbit.yaw)
         + sideways * Math.cos(orbit.yaw)),
-      orbit.target[2],
-    ];
+    );
     return render();
   }
 
@@ -948,12 +1121,20 @@ window.addEventListener("keydown", event => {
     orbit.yaw += event.key === "q" ? -0.12 : 0.12;
     return render();
   }
+  // Tilting had no key at all, so the one gesture that cannot be done
+  // with a trackpad's single button was also the one gesture the
+  // keyboard could not do.
+  if (event.key === "r" || event.key === "f") {
+    orbit.pitch = Math.min(HIGHEST_PITCH, Math.max(LOWEST_PITCH,
+      orbit.pitch + (event.key === "r" ? 0.1 : -0.1)));
+    return render();
+  }
   if (event.key === "+" || event.key === "=" || event.key === "-") {
     orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M,
       orbit.distance * (event.key === "-" ? 1.2 : 1 / 1.2)));
     return render();
   }
-  if (event.key === "f" || event.key === "0") {
+  if (event.key === "g" || event.key === "0") {
     frameEverything();
     return;
   }
@@ -972,8 +1153,12 @@ window.addEventListener("keydown", event => {
  */
 function frameEverything() {
   if (!latest || !latest.anchors.length) return;
-  const xs = latest.anchors.map(a => a.x);
-  const ys = latest.anchors.map(a => a.y);
+  // The route counts. A corridor longer than its anchor run drives off
+  // past the last mast, and framing on the masts alone left the far half
+  // of the journey off screen.
+  const route = latest.road || [];
+  const xs = latest.anchors.map(a => a.x).concat(route.map(p => p.x));
+  const ys = latest.anchors.map(a => a.y).concat(route.map(p => p.y));
   const zs = latest.anchors.map(a => a.ground_z);
   const span = Math.max(
     Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys), 1000);
@@ -1443,6 +1628,11 @@ async function refreshScene() {
   document.getElementById("terrain-note").textContent =
     `${latest.terrain.description} · ${latest.anchors.length} direk`;
   terrainData = latest.terrain;
+  // The finer mesh described the ground before this edit. Dropped rather
+  // than kept, or a change of site leaves the old hill drawn in the
+  // middle of the new one.
+  detail = null;
+  detailAsked = null;
   if (!framed) {
     // Frame everything the first time, then leave the camera exactly
     // where the person put it. Re-centring on every refresh is what made

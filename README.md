@@ -119,9 +119,12 @@ a run or a unit, move any slider, and the scene and the numbers follow.
 slide the ground — the point you grab stays under the cursor. The wheel
 zooms towards the cursor, scaled by how far it actually turned, so a
 trackpad creeps and a mouse notch steps. WASD and the arrows walk the way
-the camera faces; `F` frames everything, which is what you want after
-getting lost. Framing happens on the first load and on a mode change and
-never again, so a view you set stays set.
+the camera faces, `Q`/`E` turn and `R`/`F` tilt, and `G` frames
+everything, which is what you want after getting lost. The point the
+camera turns around rides on the ground beneath it, so turning stays
+about the thing you are looking at rather than about a pivot buried
+under the hill. Framing happens on the first load and on a mode change
+and never again, so a view you set stays set.
 
 **Everything the command line does, the page does** (ADR-0024), and it
 runs against the settings the page is showing rather than the shipped

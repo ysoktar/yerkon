@@ -35,11 +35,55 @@ so panning was pointless.
 - **Wheel** zooms *towards the cursor*, scaled by how far the wheel
   actually turned — a trackpad creeps, a mouse notch steps.
 - **W A S D** / arrows walk the way the camera faces. Shift goes faster.
-- **Q** / **E** spin. **+** / **−** zoom. **F** frames everything.
+- **Q** / **E** spin. **R** / **F** tilt. **+** / **−** zoom. **G**
+  frames everything.
 - Drag an anchor: it now follows the terrain, not one flat plane.
 
 Set a view, change any slider, and check the camera *stays put*. That is
 the fix.
+
+Three more things changed here, and each is worth looking at directly:
+
+- **The picture is painted once a frame.** It used to be painted on every
+  pointer event, and a trackpad reports far faster than this scene can be
+  drawn — so the queue grew for as long as a drag lasted and the picture
+  ran behind the hand. The arithmetic was right the whole time.
+- **The point the camera turns around now rides on the ground.** Slide
+  across the rural row's four hundred and fifty metres of relief and then
+  turn: it rotates about what you are looking at, instead of swinging the
+  site past the screen from a pivot buried under the hill.
+- **Zooming in now shows the hill.** The site mesh is a few thousand
+  samples over the whole site, which over twenty kilometres is one every
+  seven hundred metres — close up, that was a flat green wall. Come in
+  and the engine is asked for the same budget over the window on screen,
+  down to about sixty metres, which is near the limit of the 30 m
+  elevation model underneath. Nothing is invented: it is the same
+  `height_at` the simulation calls (ADR-0031).
+
+Two drawing faults went with them, both from the same cause (ADR-0030).
+The road was handed to the painter as one shape with one distance, so
+every hill nearer than its average distance was painted over the whole of
+it — half of the rural circuit was invisible and the half that survived
+made an area deployment look like a line across a field. And the mesh was
+a fixed hundred by forty whatever the site's proportions, so twenty
+kilometres by twenty was sampled every 460 m one way and every 1100 m the
+other: the ground came out in stripes.
+
+### The two site sliders
+
+**En** (width) and **Boy** (length) sit one above the other and used to do
+entirely different things. Width laid a grid of anchors out to it; length
+moved the route and left thirty-six masts standing across a site less than
+half as long, because a run carries its own start and end (ADR-0032).
+
+Pull **Boy** down now and the confirmation panel says what it is about to
+do to the anchor groups before it does it:
+
+    İstediğin değişiklik    Sahanın boyu    20000 → 8000
+    Bunlar da değişiyor     Grubun bitişi   20000 → 8000
+
+Say no and nothing moves. Typing an end into a group by hand is still
+yours: only the slider clips.
 
 ### The ground
 

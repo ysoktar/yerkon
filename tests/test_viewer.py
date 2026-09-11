@@ -244,6 +244,44 @@ def test_a_shared_setting_is_proposed_against_every_run_it_moves():
     assert "T" not in moved
 
 
+def test_shortening_the_site_proposes_the_runs_it_would_shorten():
+    """The two site sliders did not mean the same kind of thing.
+
+    Width shapes the anchors directly — a grid runs from the road out to
+    it — and length did not, because a run carries its own start and end.
+    So one slider moved the deployment and the other moved nothing, with
+    nothing on screen saying why.
+    """
+    state = a_state(corridor_m=20_000.0, width_m=0.0)
+    found = cascades(state, {"corridor_m": 8000.0})
+
+    assert found, "shortening the site moved anchors and said nothing"
+    group = found["groups"][0]
+    assert group["run"] == state.runs[0].identifier
+    assert [c["key"] for c in group["asked"]] == ["corridor_m"]
+    moved = {c["key"]: (c["before"], c["after"]) for c in group["follows"]}
+    assert moved["to_m"] == (24_000.0, 8000.0)
+
+
+def test_lengthening_the_site_moves_no_anchors_and_asks_nothing():
+    """Nothing is standing outside it, so nothing has to come in."""
+    state = a_state(corridor_m=8000.0, width_m=0.0)
+    assert cascades(state, {"corridor_m": 30_000.0}) is None
+
+
+def test_a_run_keeps_the_end_somebody_typed_into_it():
+    """Clipping that would be answering a question nobody asked.
+
+    Only the length slider brings runs inside the site. Editing a run's
+    own end is a person being explicit about that run.
+    """
+    state = a_state(corridor_m=8000.0, width_m=0.0)
+    longer = state.merged({"runs": runs_of(state, to_m=30_000.0)})
+    assert longer.runs[0].to_m == 30_000.0
+    assert cascades(state, {"runs": runs_of(state, to_m=30_000.0)}) is None
+    assert longer.within_site().runs[0].to_m == 8000.0
+
+
 def test_changing_the_region_has_to_be_confirmed():
     found = cascades(a_state(region="TR"), {"region": "US"})
     assert found is not None
@@ -336,6 +374,73 @@ def test_the_ground_mesh_covers_everything_the_sweep_will_cover():
     assert max(drawn["terrain"]["xs"]) >= max(swept["xs"])
     assert min(drawn["terrain"]["ys"]) <= min(swept["ys"])
     assert max(drawn["terrain"]["ys"]) >= max(swept["ys"])
+
+
+def test_the_ground_mesh_holds_the_route_as_well_as_the_anchors():
+    """Or the site's length moves nothing a person can see.
+
+    An anchor run keeps its own start and end, so lengthening the
+    corridor stretched the road and left the mesh exactly where it was:
+    the ground stayed the shape it had been and the road drove off the
+    edge of it into nothing.
+    """
+    from yerkon.viewer.state import AnchorRun
+
+    # An anchor run over the first few kilometres of a longer site, which
+    # is the arrangement the mesh got wrong: the ground was drawn around
+    # the masts and the journey went somewhere else entirely.
+    short = a_state(
+        corridor_m=6000.0, width_m=0.0,
+        runs=(AnchorRun("M", "e28", "mast", 0.0, 3000.0, 1000.0, 100.0),),
+    )
+    long = short.merged({"corridor_m": 20_000.0})
+
+    drawn = scene(long)
+    east = max(point["x"] for point in drawn["road"])
+    assert max(drawn["terrain"]["xs"]) >= east, "the road runs off the ground"
+    assert max(drawn["terrain"]["xs"]) > max(scene(short)["terrain"]["xs"]), (
+        "the site got longer and the ground it is drawn on did not"
+    )
+
+
+def test_a_mesh_cell_is_about_as_wide_as_it_is_deep():
+    """A hundred by forty spread one budget over any site's proportions.
+
+    Twenty kilometres by twenty was sampled every 460 m along and every
+    1100 m across, so the ground came out in stripes and a hill read as a
+    ridge — the mesh could only resolve it in one direction.
+    """
+    from yerkon.viewer.scene import mesh_shape
+
+    for along, across in ((20_000.0, 20_000.0), (32_000.0, 8000.0),
+                          (3000.0, 3000.0), (24_000.0, 800.0)):
+        columns, rows = mesh_shape(along, across)
+        wide = along / (columns - 1)
+        deep = across / (rows - 1)
+        assert 0.2 < wide / deep < 5.0, (along, across, wide, deep)
+
+
+def test_the_ground_can_be_asked_for_over_one_window_of_the_site():
+    """Zoomed in, the site's own mesh is two flat facets under a 30 m model.
+
+    The detail is measured and was merely never asked for.
+    """
+    from yerkon.viewer.scene import ground
+
+    state = a_state()
+    whole = scene(state)["terrain"]
+    span = max(whole["xs"]) - min(whole["xs"])
+
+    middle = (min(whole["xs"]) + max(whole["xs"])) / 2
+    across = (min(whole["ys"]) + max(whole["ys"])) / 2
+    close = ground(
+        state, middle - span / 40, middle + span / 40,
+        across - span / 40, across + span / 40,
+    )
+    finer = close["xs"][1] - close["xs"][0]
+    coarser = whole["xs"][1] - whole["xs"][0]
+    assert finer < coarser / 5, (finer, coarser)
+    json.dumps(close)
 
 
 def test_the_sweep_reports_both_areas_and_they_differ():
@@ -922,9 +1027,48 @@ def test_the_camera_can_be_moved_and_not_only_turned():
     """
     application = read_app_js()
     assert "panning" in application
-    assert "orbit.target = [" in application
+    assert "orbit.target = onGround(" in application
     for gesture in ("event.button === 2", "event.shiftKey", "NUDGE"):
         assert gesture in application, gesture
+
+
+def test_the_point_the_camera_turns_around_rides_on_the_ground():
+    """A pivot that keeps the height it was framed at gets buried.
+
+    Ankara's rural grid moves four hundred and fifty metres and the
+    relief is drawn five times over, so sliding across it left the point
+    being turned around two kilometres under the hill in view space.
+    Turning about that swings the whole site past the screen rather than
+    rotating the thing being looked at, which is the single reason the
+    camera felt wrong after any pan.
+    """
+    application = read_app_js()
+    assert "function onGround" in application
+    body = application[application.index("function onGround"):]
+    body = body[: body.index("\n}")]
+    assert "groundAt(" in body and "draw.VERTICAL" in body
+
+    # Every gesture that slides the pivot has to use it, or the one that
+    # does not is the one that buries the camera again.
+    for gesture in ("panning", "wheel", "NUDGE"):
+        assert gesture in application, gesture
+    assert application.count("orbit.target = onGround(") == 4, (
+        "a gesture moves the pivot without putting it back on the ground"
+    )
+
+
+def test_the_scene_is_painted_once_a_frame_and_not_once_an_event():
+    """A trackpad reports far faster than this scene can be drawn.
+
+    Painting on every pointer event meant the queue grew for as long as a
+    drag lasted and the picture ran behind the hand. The arithmetic was
+    right the whole time and moving still felt broken.
+    """
+    application = read_app_js()
+    scheduler = application[application.index("function render()"):]
+    scheduler = scheduler[: scheduler.index("function paintScene")]
+    assert "requestAnimationFrame" in scheduler
+    assert "framePending" in scheduler
 
 
 def test_the_camera_is_framed_once_and_then_left_alone():

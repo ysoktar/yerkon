@@ -25,13 +25,64 @@ from yerkon.viewer.state import (
     fetched_sites,
 )
 
-#: Samples across the scene for the ground mesh.
+#: About how many quads the ground mesh is allowed.
 #:
-#: A hundred by forty is enough for hills three kilometres apart to read
-#: as hills, and small enough that the browser redraws it while a slider
-#: is still moving.
-MESH_COLUMNS = 100
-MESH_ROWS = 40
+#: Enough that hills three kilometres apart read as hills, and few enough
+#: that the browser redraws them while a slider is still moving.
+MESH_QUADS = 4200
+
+#: How coarse and how fine the mesh may get along one axis.
+MESH_LEAST = 24
+MESH_MOST = 150
+
+
+def mesh_shape(span_x: float, span_y: float) -> tuple[int, int]:
+    """How many samples along each axis, for cells that are roughly square.
+
+    A fixed hundred by forty spread the same budget over any site, so a
+    twenty by twenty kilometre one was sampled every 460 m along and
+    every 1100 m across: the ground came out in stripes, and a hill read
+    as a ridge because the mesh could only resolve it in one direction.
+    The count follows the site's own proportions instead, which keeps a
+    cell square whether the site is a square or a corridor.
+    """
+    span_x = max(span_x, 1.0)
+    span_y = max(span_y, 1.0)
+    aspect = span_x / span_y
+
+    def fit(count: float) -> int:
+        return int(min(MESH_MOST, max(MESH_LEAST, round(count))))
+
+    return fit((MESH_QUADS * aspect) ** 0.5), fit((MESH_QUADS / aspect) ** 0.5)
+
+
+def ground(
+    state: ViewState,
+    west: float,
+    east: float,
+    south: float,
+    north: float,
+) -> dict:
+    """A mesh over one window of the site, at the same budget as the whole.
+
+    The scene's mesh is spread over everything there is, which over a
+    forty kilometre site is a sample every seven hundred metres. Zoom in
+    on one mast and the hill it stands on is two flat facets — under a
+    thirty metre elevation model, so the detail is measured and simply
+    was not asked for. This asks for it: the same few thousand samples,
+    over the ground actually on screen.
+    """
+    terrain = state.terrain()
+    columns, rows = mesh_shape(east - west, north - south)
+    xs = np.linspace(west, east, columns)
+    ys = np.linspace(south, north, rows)
+    return {
+        "xs": [float(x) for x in xs],
+        "ys": [float(y) for y in ys],
+        "heights": [
+            [terrain.height_at(float(x), float(y)) for x in xs] for y in ys
+        ],
+    }
 
 
 def design_of(state: ViewState, run=None) -> Design:
@@ -104,7 +155,9 @@ def sweep_margin_m(state: ViewState) -> float:
     """How far past the anchors both the sweep and the mesh reach.
 
     One function, because a mesh smaller than the sweep paints coverage
-    cells over nothing and a mesh larger than it wastes the frame.
+    cells over nothing. The mesh may be larger — it also has to hold the
+    route, and a road outside the anchors is ground with no coverage on
+    it rather than coverage with no ground under it.
     """
     widest = max((run.spacing_m for run in state.runs), default=2000.0)
     return max(widest * 3.0, 4000.0)
@@ -116,18 +169,35 @@ def scene(state: ViewState) -> dict:
     deployment = state.deployment(terrain)
     mounting_of, radio_of = state.catalogues()
 
+    # The route the units actually take, not a line drawn along x. Over
+    # an area that is a circuit round the edge and across the middle, and
+    # drawing a straight line instead showed a deployment nobody was
+    # simulating — the picture and the run disagreeing with nothing on
+    # screen to say which was real.
+    driven = state.road(terrain)
+    route = [
+        driven.point_at(along)
+        for along in np.linspace(0.0, driven.length_m, 160)
+    ]
+
+    # Ground under everything on screen: the anchors and the route both.
+    #
+    # From the anchors alone, the corridor length moved nothing a person
+    # could see. An anchor run keeps its own start and end, so lengthening
+    # the site stretched the road and left the mesh where it was — the
+    # ground stayed exactly the shape it had been and the road drove off
+    # the edge of it into nothing. The site is what is drawn, and the
+    # route is half of the site.
     margin = sweep_margin_m(state)
-    positions = [a.position_m for a in deployment.anchors]
-    xs = np.linspace(
-        min(p[0] for p in positions) - margin,
-        max(p[0] for p in positions) + margin,
-        MESH_COLUMNS,
+    seen = [a.position_m[:2] for a in deployment.anchors]
+    seen += [(point[0], point[1]) for point in route]
+    west, east = min(p[0] for p in seen), max(p[0] for p in seen)
+    south, north = min(p[1] for p in seen), max(p[1] for p in seen)
+    columns, rows = mesh_shape(
+        east - west + 2 * margin, north - south + 2 * margin
     )
-    ys = np.linspace(
-        min(p[1] for p in positions) - margin,
-        max(p[1] for p in positions) + margin,
-        MESH_ROWS,
-    )
+    xs = np.linspace(west - margin, east + margin, columns)
+    ys = np.linspace(south - margin, north + margin, rows)
     heights = [[terrain.height_at(float(x), float(y)) for x in xs] for y in ys]
 
     # One reach per run, because a UWB bracket and a mast on the same
@@ -163,18 +233,8 @@ def scene(state: ViewState) -> dict:
             "reach_m": reach.get(run_id, 0.0),
         })
 
-    # The route the units actually take, not a line drawn along x. Over
-    # an area that is a circuit round the edge and across the middle, and
-    # drawing a straight line instead showed a deployment nobody was
-    # simulating — the picture and the run disagreeing with nothing on
-    # screen to say which was real.
-    driven = state.road(terrain)
     road = [
-        {"x": float(x), "y": float(y), "z": float(z)}
-        for x, y, z in (
-            driven.point_at(along)
-            for along in np.linspace(0.0, driven.length_m, 160)
-        )
+        {"x": float(x), "y": float(y), "z": float(z)} for x, y, z in route
     ]
 
     units = []
