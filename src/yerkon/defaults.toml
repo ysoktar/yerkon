@@ -1,708 +1,1258 @@
-# Every figure this project needs that the report did not supply.
+# Bu projenin ihtiyaç duyduğu, raporun vermediği her değer.
 #
-# Called defaults rather than assumptions because that is what it stays.
-# A figure does not leave this file when somebody sources it; it just
-# stops being an assumption. What each one rests on is its `provenance`.
+# Varsayım değil, varsayılan deniyor; çünkü kalıcı olan bu. Biri bir
+# değere kaynak bulunca o değer bu dosyadan çıkmaz, yalnızca varsayım
+# olmayı bırakır. Her birinin neye dayandığı `provenance` alanındadır.
 #
-# The report gave a bill of materials and nothing else. Each figure below
-# is a placeholder standing in for a measurement or a quotation, and each
-# one is here rather than in the code so that sourcing it is an edit to a
-# file rather than a change to a program.
+# Rapor yalnızca bir malzeme listesi verdi. Aşağıdaki her değer, bir
+# ölçümün ya da bir teklifin yerini tutan bir vekildir; ve her biri
+# koda değil bu dosyaya konmuştur ki kaynak bulmak bir programı
+# değiştirmek değil, bir dosyayı düzenlemek olsun.
 #
-# When you find the real figure: replace `value`, put where it came from
-# in `source`, and change `provenance` from ASSUMPTION to DATASHEET,
-# MEASUREMENT or STANDARD. Everything downstream stops counting it as an
-# assumption at that moment, and the share each result reports as resting
-# on guesses falls.
+# Gerçek değeri bulunca: `value` alanını değiştir, nereden geldiğini
+# `source` alanına yaz ve `provenance` alanını ASSUMPTION yerine
+# DATASHEET, MEASUREMENT ya da STANDARD yap. O anda aşağıdaki her şey
+# onu varsayım saymayı bırakır ve her sonucun "tahmine dayanıyor"
+# diye bildirdiği pay düşer.
 #
-# `affects` says what moves when the number does. `sensitivity` is
-# measured, not guessed: it is what doubling the value does to the figure
-# named in `affects`.
+# `affects`, sayı değişince neyin oynadığını söyler. `sensitivity`
+# tahmin değil ölçümdür: değeri iki katına çıkarmanın, `affects` içinde
+# adı geçen büyüklüğe ne yaptığıdır.
 #
-# Nothing in src/ may construct an assumption of its own. A test enforces
-# that, so this file is the whole list.
+# src/ içindeki hiçbir şey kendi başına bir varsayım kuramaz. Bunu bir
+# test zorlar, yani bu dosya listenin tamamıdır.
 
 # --------------------------------------------------------------------------
-# What a mounting structure is, and what using one costs
+# Bir montaj yapısı nedir ve kullanmak neye mal olur
 # --------------------------------------------------------------------------
-# Heights decide range, and range decides how many anchors a corridor
-# needs. Costs decide which structure wins, and the siting search says
-# that decision is worth more than every other choice in the project.
+# Yükseklikler menzili belirler, menzil de bir koridorun kaç direğe
+# ihtiyaç duyduğunu. Maliyetler hangi yapının kazandığını belirler ve
+# yerleşim araması bu kararın, projedeki diğer bütün seçimlerden daha
+# değerli olduğunu söylüyor.
 
 [values."mounting.roadside_sign.height_m"]
 value = 3.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Typical mounting height of a verge-mounted road sign."
-affects = "usable range from a sign: 1,66 km at a 5 m tolerance"
+source = "bu proje"
+source_en = "this project"
+note = """Banket üzerine monte edilmiş bir yol levhasının tipik montaj yüksekliği."""
+note_en = "Typical mounting height of a verge-mounted road sign."
+affects = "levhadan kullanılabilir menzili: 5 m toleransta 1,66 km"
+affects_en = "usable range from a sign: 1,66 km at a 5 m tolerance"
 
 [values."mounting.roadside_sign.site_cost_tl"]
 value = 2500.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Bracket, enclosure and the labour to fit a unit to a sign that \
-already stands. Not a fact about signs."""
-affects = "CAPEX of every anchor on a sign"
-sensitivity = "signs stop beating masts only above 62242 TL, so 25 times this"
+source = "bu proje"
+source_en = "this project"
+note = """Zaten duran bir levhaya bir birim takmanın kelepçesi, muhafazası ve \
+işçiliği. Levhalar hakkında bir olgu değil."""
+note_en = """Bracket, enclosure and the labour to fit a unit to a sign that already \
+stands. Not a fact about signs."""
+affects = "levhadaki her direğin CAPEX'ini"
+affects_en = "CAPEX of every anchor on a sign"
+sensitivity = """levhalar direkleri ancak 62242 TL'nin üstünde geçmeyi bırakır, yani \
+bunun 25 katı"""
+sensitivity_en = "signs stop beating masts only above 62242 TL, so 25 times this"
 
 [values."mounting.sign_gantry.height_m"]
 value = 6.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Clearance height of a highway sign portal over the carriageway."
-affects = "usable range from a gantry"
+source = "bu proje"
+source_en = "this project"
+note = "Karayolu levha portalının taşıt yolu üzerindeki geçiş yüksekliği."
+note_en = "Clearance height of a highway sign portal over the carriageway."
+affects = "portaldan kullanılabilir menzili"
+affects_en = "usable range from a gantry"
 
 [values."mounting.sign_gantry.site_cost_tl"]
 value = 4000.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "As a sign, plus the traffic management a gantry over live lanes needs."
-affects = "CAPEX of every anchor on a gantry"
+source = "bu proje"
+source_en = "this project"
+note = """Levha gibi, artı trafiğe açık şeritler üzerindeki bir portalın \
+gerektirdiği trafik yönetimi."""
+note_en = """As a sign, plus the traffic management a gantry over live lanes needs."""
+affects = "portaldaki her direğin CAPEX'ini"
+affects_en = "CAPEX of every anchor on a gantry"
 
 [values."mounting.billboard.height_m"]
 value = 10.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Top of a roadside advertising hoarding."
-affects = "usable range from a billboard"
+source = "bu proje"
+source_en = "this project"
+note = "Yol kenarındaki reklam panosunun üstü."
+note_en = "Top of a roadside advertising hoarding."
+affects = "panodan kullanılabilir menzili"
+affects_en = "usable range from a billboard"
 
 [values."mounting.billboard.site_cost_tl"]
 value = 3500.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "As a sign, plus access equipment and the owner's consent."
-affects = "CAPEX of every anchor on a billboard"
+source = "bu proje"
+source_en = "this project"
+note = "Levha gibi, artı erişim ekipmanı ve sahibinin izni."
+note_en = "As a sign, plus access equipment and the owner's consent."
+affects = "panodaki her direğin CAPEX'ini"
+affects_en = "CAPEX of every anchor on a billboard"
 
 [values."mounting.lighting_column.height_m"]
 value = 12.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Highway lighting column."
-affects = "usable range from a column: 3,83 km at a 5 m tolerance"
+source = "bu proje"
+source_en = "this project"
+note = "Karayolu aydınlatma direği."
+note_en = "Highway lighting column."
+affects = """aydınlatma direğinden kullanılabilir menzili: 5 m toleransta 3,83 km"""
+affects_en = "usable range from a column: 3,83 km at a 5 m tolerance"
 
 [values."mounting.lighting_column.site_cost_tl"]
 value = 3000.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "As a sign, plus a tap into the column's supply."
-affects = "CAPEX of every anchor on a column"
+source = "bu proje"
+source_en = "this project"
+note = "Levha gibi, artı direğin beslemesinden bir hat."
+note_en = "As a sign, plus a tap into the column's supply."
+affects = "aydınlatma direğindeki her direğin CAPEX'ini"
+affects_en = "CAPEX of every anchor on a column"
 
 [values."mounting.tall_mast.height_m"]
 value = 25.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Purpose-built mast. 25 m is the height a 10 km link needs against \
-a 2 m vehicle antenna over flat ground."""
-affects = "usable range from a mast: 5,52 km at a 5 m tolerance"
+source = "bu proje"
+source_en = "this project"
+note = """Amaca özel yapılmış direk. 25 m, düz zemin üzerinde 2 m'lik bir araç \
+anteni karşısında 10 km'lik bir bağlantının gerektirdiği yüksekliktir."""
+note_en = """Purpose-built mast. 25 m is the height a 10 km link needs against a 2 m \
+vehicle antenna over flat ground."""
+affects = "direkten kullanılabilir menzili: 5 m toleransta 5,52 km"
+affects_en = "usable range from a mast: 5,52 km at a 5 m tolerance"
 
 [values."mounting.tall_mast.site_cost_tl"]
 value = 85000.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """A twenty-five metre mast, its foundation, its installation and its \
-access. Two orders of magnitude above a bracket on an existing structure, \
-which is the whole reason the deployment mixes the two."""
-affects = "CAPEX of every anchor on a mast; 88,9 % of the rural row's capital"
-sensitivity = "masts beat signs only below 6588 TL, so 13 times cheaper than this"
+source = "bu proje"
+source_en = "this project"
+note = """Yirmi beş metrelik bir direk, temeli, montajı ve erişimi. Mevcut bir \
+yapıya takılan kelepçenin iki mertebe üstünde; yerleşimin ikisini \
+karıştırmasının bütün sebebi budur."""
+note_en = """A twenty-five metre mast, its foundation, its installation and its \
+access. Two orders of magnitude above a bracket on an existing \
+structure, which is the whole reason the deployment mixes the two."""
+affects = """direkteki her direğin CAPEX'ini; kırsal satırın sermayesinin %88,9'u"""
+affects_en = "CAPEX of every anchor on a mast; 88,9 % of the rural row's capital"
+sensitivity = """direkler levhaları ancak 6588 TL'nin altında geçer, yani bundan 13 kat \
+ucuz"""
+sensitivity_en = "masts beat signs only below 6588 TL, so 13 times cheaper than this"
 
 [values."mounting.tunnel_bracket.height_m"]
 value = 4.5
 unit = "m"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "The height a unit is bracketed at in a tunnel."
-affects = "usable range inside a bore"
+source = "bu proje"
+source_en = "this project"
+note = "Bir birimin tünelde askıya alındığı yükseklik."
+note_en = "The height a unit is bracketed at in a tunnel."
+affects = "tünel içinde kullanılabilir menzili"
+affects_en = "usable range inside a bore"
 
 [values."mounting.tunnel_bracket.site_cost_tl"]
 value = 6000.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Bracketing a unit to a tunnel lining."
-affects = "78,6 % of the tunnel row's capital"
+source = "bu proje"
+source_en = "this project"
+note = "Bir birimi tünel kaplamasına askıyla tutturmak."
+note_en = "Bracketing a unit to a tunnel lining."
+affects = "tünel satırının sermayesinin %78,6'sı"
+affects_en = "78,6 % of the tunnel row's capital"
 
 # --------------------------------------------------------------------------
-# What it costs to keep running
+# İşletmeyi sürdürmek neye mal olur
 # --------------------------------------------------------------------------
-# Maintenance is roughly half of operating cost in every scenario, so the
-# visit cost and the visit frequency are the two worth sourcing first.
+# Bakım, her senaryoda işletme maliyetinin kabaca yarısıdır; dolayısıyla
+# ziyaret maliyeti ile ziyaret sıklığı, önce kaynak bulunmaya değer iki
+# değerdir.
 
 [values."operating.electricity_tl_per_kwh"]
 value = 3.20
 unit = "TL/kWh"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "The tariff an anchor draws on."
-affects = "OPEX of anchors on structures that carry mains"
-sensitivity = "no effect on a mast deployment: masts have no mains"
+source = "bu proje"
+source_en = "this project"
+note = "Bir direğin üzerinden çektiği tarife."
+note_en = "The tariff an anchor draws on."
+affects = "şebeke elektriği taşıyan yapılardaki direklerin OPEX'ini"
+affects_en = "OPEX of anchors on structures that carry mains"
+sensitivity = "direk yerleşiminde etkisi yok: direklerde şebeke elektriği yok"
+sensitivity_en = "no effect on a mast deployment: masts have no mains"
 
 [values."operating.anchor_kwh_per_year"]
 value = 35.0
 unit = "kWh/year"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "One anchor's annual consumption."
-affects = "OPEX of anchors on structures that carry mains"
-sensitivity = "no effect on a mast deployment: masts have no mains"
+source = "bu proje"
+source_en = "this project"
+note = "Tek bir direğin yıllık tüketimi."
+note_en = "One anchor's annual consumption."
+affects = "şebeke elektriği taşıyan yapılardaki direklerin OPEX'ini"
+affects_en = "OPEX of anchors on structures that carry mains"
+sensitivity = "direk yerleşiminde etkisi yok: direklerde şebeke elektriği yok"
+sensitivity_en = "no effect on a mast deployment: masts have no mains"
 
 [values."operating.connectivity_tl_per_year"]
 value = 600.0
 unit = "TL/year"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "A cellular data plan per anchor that has no backhaul of its own."
-affects = "OPEX; 15,1 % of the rural row"
-sensitivity = "doubling it raises rural OPEX by 15,1 %"
+source = "bu proje"
+source_en = "this project"
+note = """Kendi taşıma hattı olmayan her direk için bir hücresel veri paketi."""
+note_en = "A cellular data plan per anchor that has no backhaul of its own."
+affects = "OPEX'i; kırsal satırın %15,1'i"
+affects_en = "OPEX; 15,1 % of the rural row"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %15,1 artırır"
+sensitivity_en = "doubling it raises rural OPEX by 15,1 %"
 
 [values."operating.off_grid_supply_tl"]
 value = 9500.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """A solar panel, battery and regulator, for an anchor on a structure \
-with no mains. Charged once, to capital."""
-affects = "CAPEX and OPEX; 72,6 % of the cheapest deployment the siting search finds"
-sensitivity = "doubling it raises rural OPEX by 30,0 % and CAPEX by 9,9 %"
+source = "bu proje"
+source_en = "this project"
+note = """Şebekesi olmayan bir yapıdaki direk için güneş paneli, akü ve regülatör. \
+Bir kez, sermayeye yazılır."""
+note_en = """A solar panel, battery and regulator, for an anchor on a structure with \
+no mains. Charged once, to capital."""
+affects = """CAPEX ve OPEX'i; yerleşim aramasının bulduğu en ucuz düzenin %72,6'sı"""
+affects_en = """CAPEX and OPEX; 72,6 % of the cheapest deployment the siting search \
+finds"""
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %30,0, CAPEX'i %9,9 artırır"
+sensitivity_en = "doubling it raises rural OPEX by 30,0 % and CAPEX by 9,9 %"
 
 [values."operating.service_life_years"]
 value = 8.0
 unit = "years"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "How long an outdoor unit lasts before it is replaced."
-affects = "OPEX; 33,4 % of the rural row"
-sensitivity = "doubling it lowers rural OPEX by 16,7 %"
+source = "bu proje"
+source_en = "this project"
+note = "Dış ortamdaki bir birimin değiştirilene kadar dayandığı süre."
+note_en = "How long an outdoor unit lasts before it is replaced."
+affects = "OPEX'i; kırsal satırın %33,4'ü"
+affects_en = "OPEX; 33,4 % of the rural row"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %16,7 düşürür"
+sensitivity_en = "doubling it lowers rural OPEX by 16,7 %"
 
 [values."operating.maintenance_visits_per_year"]
 value = 0.5
 unit = "visits/year"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Scheduled attendance at an anchor: one visit every two years."
-affects = "OPEX; part of the 45,4 % maintenance takes of the rural row"
-sensitivity = "doubling it raises rural OPEX by 22,7 %"
+source = "bu proje"
+source_en = "this project"
+note = "Bir direğe planlı bakım: iki yılda bir ziyaret."
+note_en = "Scheduled attendance at an anchor: one visit every two years."
+affects = "OPEX'i; bakımın kırsal satırda tuttuğu %45,4'ün bir parçası"
+affects_en = "OPEX; part of the 45,4 % maintenance takes of the rural row"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %22,7 artırır"
+sensitivity_en = "doubling it raises rural OPEX by 22,7 %"
 
 [values."operating.extra_off_grid_visits_per_year"]
 value = 0.5
 unit = "visits/year"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "The extra attendance an off-grid site needs: batteries age, panels foul."
-affects = "OPEX of anchors on structures with no mains"
-sensitivity = "doubling it raises rural OPEX by 22,7 %"
+source = "bu proje"
+source_en = "this project"
+note = """Şebeke dışı bir sahanın gerektirdiği ek bakım: aküler yaşlanır, paneller \
+kirlenir."""
+note_en = """The extra attendance an off-grid site needs: batteries age, panels foul."""
+affects = "şebeke dışı yapılardaki direklerin OPEX'ini"
+affects_en = "OPEX of anchors on structures with no mains"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %22,7 artırır"
+sensitivity_en = "doubling it raises rural OPEX by 22,7 %"
 
 [values."operating.maintenance_tl_per_visit"]
 value = 1800.0
 unit = "TL/visit"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "A crew, a vehicle and traffic management."
-affects = "OPEX; the single largest line in every scenario"
-sensitivity = "doubling it raises rural OPEX by 45,4 %"
+source = "bu proje"
+source_en = "this project"
+note = "Bir ekip, bir araç ve trafik yönetimi."
+note_en = "A crew, a vehicle and traffic management."
+affects = "OPEX'i; her senaryodaki en büyük tek kalem"
+affects_en = "OPEX; the single largest line in every scenario"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %45,4 artırır"
+sensitivity_en = "doubling it raises rural OPEX by 45,4 %"
 
 [values."operating.central_operation_tl_per_year"]
 value = 240000.0
 unit = "TL/year"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Running the central management system."
-affects = "OPEX; 6,1 % of the rural row"
-sensitivity = "doubling it raises rural OPEX by 6,1 %"
+source = "bu proje"
+source_en = "this project"
+note = "Merkezî yönetim sistemini işletmek."
+note_en = "Running the central management system."
+affects = "OPEX'i; kırsal satırın %6,1'i"
+affects_en = "OPEX; 6,1 % of the rural row"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %6,1 artırır"
+sensitivity_en = "doubling it raises rural OPEX by 6,1 %"
 
 [values."operating.anchors_sharing_central_operation"]
 value = 1000.0
 unit = "anchors"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """How wide the central system is amortised. A national network spreads \
-it far wider than one corridor does, which is why this is a rate and not a \
+source = "bu proje"
+source_en = "this project"
+note = """Merkezî sistemin kaç direğe yayıldığı. Ülke çapında bir ağ bunu tek bir \
+koridordan çok daha geniş yayar; bu yüzden her yerleşime eklenen sabit \
+bir sayı değil, bir orandır."""
+note_en = """How wide the central system is amortised. A national network spreads it \
+far wider than one corridor does, which is why this is a rate and not a \
 constant added to every deployment."""
-affects = "OPEX; 6,1 % of the rural row"
-sensitivity = "doubling it lowers rural OPEX by 3,0 %"
+affects = "OPEX'i; kırsal satırın %6,1'i"
+affects_en = "OPEX; 6,1 % of the rural row"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i %3,0 düşürür"
+sensitivity_en = "doubling it lowers rural OPEX by 3,0 %"
 
 # --------------------------------------------------------------------------
-# What the radios do that nobody published
+# Telsizlerin, kimsenin yayımlamadığı davranışları
 # --------------------------------------------------------------------------
 
 [values."radio.sx1280.noise_figure_db"]
 value = 6.0
 unit = "dB"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Semtech does not publish a noise figure for the SX1280. 6 dB is the \
-optimistic end for an integrated 2,4 GHz front end, chosen so the budget does \
-not manufacture a pessimistic range by accident."""
-affects = "every link budget: range, availability, and therefore anchor count"
+source = "bu proje"
+source_en = "this project"
+note = """Semtech SX1280 için gürültü katsayısı yayımlamıyor. 6 dB, tümleşik bir \
+2,4 GHz ön uç için iyimser uçtur; bütçenin kazara kötümser bir menzil \
+üretmemesi için seçildi."""
+note_en = """Semtech does not publish a noise figure for the SX1280. 6 dB is the \
+optimistic end for an integrated 2,4 GHz front end, chosen so the budget \
+does not manufacture a pessimistic range by accident."""
+affects = """her link bütçesini: menzil, kullanılabilirlik ve dolayısıyla direk \
+sayısı"""
+affects_en = "every link budget: range, availability, and therefore anchor count"
 
 [values."radio.dwm3000.noise_figure_db"]
 value = 6.0
 unit = "dB"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Qorvo publishes no noise figure; matched to the SX1280 figure."
-affects = "the tunnel row's range and availability"
+source = "bu proje"
+source_en = "this project"
+note = "Qorvo gürültü katsayısı yayımlamıyor; SX1280 değerine eşitlendi."
+note_en = "Qorvo publishes no noise figure; matched to the SX1280 figure."
+affects = "tünel satırının menzilini ve kullanılabilirliğini"
+affects_en = "the tunnel row's range and availability"
 
 [values."radio.dwm3000.demodulation_threshold_db"]
 value = 4.0
 unit = "dB"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Qorvo publishes sensitivity rather than a threshold. 4 dB is a \
-coherent receiver's usual working point."""
-affects = "where the tunnel link stops closing: a hard wall at about 375 m"
+source = "bu proje"
+source_en = "this project"
+note = """Qorvo eşik değil, hassasiyet yayımlıyor. 4 dB, eşevreli bir alıcının \
+olağan çalışma noktasıdır."""
+note_en = """Qorvo publishes sensitivity rather than a threshold. 4 dB is a coherent \
+receiver's usual working point."""
+affects = """tünel bağlantısının nerede kapanmayı bıraktığını: yaklaşık 375 m'de sert \
+bir duvar"""
+affects_en = "where the tunnel link stops closing: a hard wall at about 375 m"
 
 # --------------------------------------------------------------------------
-# What the clocks do
+# Saatlerin davranışı
 # --------------------------------------------------------------------------
 
 [values."clock.crystal.tolerance_ppm"]
 value = 10.0
 unit = "ppm"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Neither module publishes a crystal tolerance. Ten parts per million \
-is the usual grade for an uncompensated crystal of this size once temperature \
-and ageing are counted."""
-affects = "single-sided ranging error without frequency correction: 24,1 m"
+source = "bu proje"
+source_en = "this project"
+note = """İki modül de kristal toleransı yayımlamıyor. Sıcaklık ve yaşlanma \
+sayıldığında, bu boyutta telafisiz bir kristal için olağan sınıf \
+milyonda on parçadır."""
+note_en = """Neither module publishes a crystal tolerance. Ten parts per million is \
+the usual grade for an uncompensated crystal of this size once \
+temperature and ageing are counted."""
+affects = "frekans düzeltmesi olmadan tek yönlü ölçüm hatasını: 24,1 m"
+affects_en = "single-sided ranging error without frequency correction: 24,1 m"
 
 [values."clock.crystal.residual_ppm"]
 value = 0.0793
 unit = "ppm"
 provenance = "MEASUREMENT"
-source = "matlab/yerkon_clock_residual.m, run 2026-09-10"
-note = """What a carrier frequency offset estimate leaves behind. Worst \
-root-mean-square residual over +10 to +40 dB after correlation, for crystal \
-offsets of 2, 5, 10 and 20 ppm. Bias-limited rather than noise-limited: thirty \
-decibels more signal improves it only twice, because the floor is the parabolic \
-peak interpolator and not the channel. With no noise at all the same estimator \
-gives 0,0164 to 0,0643 ppm depending only on where the peak falls between bins, \
-which matches the measured plateau to four decimals. A systematic error does not \
-average down over repeated exchanges. Additive noise only: no phase noise, no \
-multipath and no drift during the exchange, so a real part will be worse."""
-affects = "whether single-sided ranging is usable at all on the slow radio"
-sensitivity = """At this value the single-sided clock term is 0,19 m, against a \
-2,94 m measured floor, so it contributes nothing. It would have to rise \
-fifteen-fold before it mattered. The 0,5 ppm this replaced was conservative by \
-six times."""
+source = "matlab/yerkon_clock_residual.m, 2026-09-10 koşumu"
+source_en = "matlab/yerkon_clock_residual.m, run 2026-09-10"
+note = """Taşıyıcı frekans kayması kestirimi geriye ne bırakıyor. İlinti sonrası \
++10 ile +40 dB arasındaki en kötü karesel ortalama artık; 2, 5, 10 ve 20 \
+ppm'lik kristal kaymaları için. Gürültüyle değil, yanlılıkla sınırlı: \
+otuz desibel daha fazla sinyal bunu ancak iki kat iyileştirir, çünkü \
+taban kanal değil parabolik tepe aradeğerleyicisidir. Hiç gürültü yokken \
+aynı kestirici, yalnızca tepenin gözler arasında nereye düştüğüne bağlı \
+olarak 0,0164 ile 0,0643 ppm verir; bu da ölçülen platoyla dört basamağa \
+kadar uyuşur. Sistematik hata, tekrarlanan alışverişlerde ortalamayla \
+azalmaz. Yalnız toplanır gürültü: faz gürültüsü, çok yolluluk ve \
+alışveriş sırasında sürüklenme yok; gerçek bir parça bundan kötü \
+olacaktır."""
+note_en = """What a carrier frequency offset estimate leaves behind. Worst \
+root-mean-square residual over +10 to +40 dB after correlation, for \
+crystal offsets of 2, 5, 10 and 20 ppm. Bias-limited rather than \
+noise-limited: thirty decibels more signal improves it only twice, \
+because the floor is the parabolic peak interpolator and not the \
+channel. With no noise at all the same estimator gives 0,0164 to 0,0643 \
+ppm depending only on where the peak falls between bins, which matches \
+the measured plateau to four decimals. A systematic error does not \
+average down over repeated exchanges. Additive noise only: no phase \
+noise, no multipath and no drift during the exchange, so a real part \
+will be worse."""
+affects = "yavaş modülde tek yönlü ölçümün kullanılabilir olup olmadığını"
+affects_en = "whether single-sided ranging is usable at all on the slow radio"
+sensitivity = """Bu değerde tek yönlü saat terimi 0,19 m; ölçülen 2,94 m'lik tabanın \
+yanında hiçbir şey katmıyor. Anlam kazanması için on beş katına çıkması \
+gerekirdi. Yerine geçtiği 0,5 ppm altı kat ihtiyatlıymış."""
+sensitivity_en = """At this value the single-sided clock term is 0,19 m, against a 2,94 m \
+measured floor, so it contributes nothing. It would have to rise \
+fifteen-fold before it mattered. The 0,5 ppm this replaced was \
+conservative by six times."""
 
 [values."clock.tcxo.tolerance_ppm"]
 value = 2.0
 unit = "ppm"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "A common temperature-compensated grade, for asking what one would buy."
-affects = "nothing unless a scenario chooses it"
+source = "bu proje"
+source_en = "this project"
+note = """Yaygın bir sıcaklık telafili sınıf; \"alsak ne alırdık\" sorusu için."""
+note_en = """A common temperature-compensated grade, for asking what one would buy."""
+affects = "bir senaryo onu seçmedikçe hiçbir şeyi"
+affects_en = "nothing unless a scenario chooses it"
 
 [values."clock.tcxo.residual_ppm"]
 value = 0.1
 unit = "ppm"
 provenance = "ASSUMPTION"
-source = "this project"
-note = "Correction over a part that barely drifts."
-affects = "nothing unless a scenario chooses it"
+source = "bu proje"
+source_en = "this project"
+note = "Zaten güç sürüklenen bir parça üzerinde düzeltme."
+note_en = "Correction over a part that barely drifts."
+affects = "bir senaryo onu seçmedikçe hiçbir şeyi"
+affects_en = "nothing unless a scenario chooses it"
 
 # --------------------------------------------------------------------------
-# The exchange and the sites
+# Alışveriş ve sahalar
 # --------------------------------------------------------------------------
 
 [values."ranging.turnaround_s"]
 value = 0.0003
 unit = "s"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Time a radio needs between receiving a frame and answering it: \
-transceiver turnaround plus whatever the host does. Short next to an SF10 \
-frame and not next to a UWB one."""
-affects = "single-sided clock error and the round duration"
+source = "bu proje"
+source_en = "this project"
+note = """Bir telsizin bir çerçeveyi aldıktan sonra yanıtlamak için gereksindiği \
+süre: alıcı-verici dönüşü artı ana birimin yaptığı her ne ise. Bir SF10 \
+çerçevesinin yanında kısa, bir UWB çerçevesinin yanında değil."""
+note_en = """Time a radio needs between receiving a frame and answering it: \
+transceiver turnaround plus whatever the host does. Short next to an \
+SF10 frame and not next to a UWB one."""
+affects = "tek yönlü saat hatasını ve tur süresini"
+affects_en = "single-sided clock error and the round duration"
 
 [values."ranging.payload_bytes"]
 value = 16.0
 unit = "bytes"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Addresses, a sequence number, and the timestamps a double-sided \
-exchange carries in its last frame. The preamble dominates either way."""
-affects = "air time, and therefore how often each unit is fixed"
+source = "bu proje"
+source_en = "this project"
+note = """Adresler, bir sıra numarası ve çift yönlü bir alışverişin son \
+çerçevesinde taşıdığı zaman damgaları. Her hâlükârda önsöz baskındır."""
+note_en = """Addresses, a sequence number, and the timestamps a double-sided exchange \
+carries in its last frame. The preamble dominates either way."""
+affects = "hava süresini, dolayısıyla her birimin ne sıklıkta konumlandığını"
+affects_en = "air time, and therefore how often each unit is fixed"
 
 [values."site.urban_clutter_db_per_km"]
 value = 30.0
 unit = "dB/km"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Absorption by buildings, vegetation and traffic that height does not \
-clear. Thirty is the middle of the published range for dense built-up areas \
-at 2,4 GHz."""
-affects = "how far an urban anchor reaches, and therefore the urban row entirely"
+source = "bu proje"
+source_en = "this project"
+note = """Yüksekliğin aşamadığı binalar, bitki örtüsü ve trafiğin soğurması. Otuz, \
+2,4 GHz'de yoğun yapılı alanlar için yayımlanmış aralığın ortasıdır."""
+note_en = """Absorption by buildings, vegetation and traffic that height does not \
+clear. Thirty is the middle of the published range for dense built-up \
+areas at 2,4 GHz."""
+affects = """şehir içi bir direğin ne kadar uzağa eriştiğini, dolayısıyla şehir içi \
+satırın tamamını"""
+affects_en = """how far an urban anchor reaches, and therefore the urban row entirely"""
 
 [values."ranging.anchor_survey_sigma_m"]
 value = 0.15
 unit = "m"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """How well an anchor's own position is known. The estimator is given \
-the surveyed position and treats it as exact, so whatever is wrong with it goes \
-straight into every fix that anchor contributes to. Fixed per anchor rather than \
-drawn per measurement: a survey error does not change between exchanges and does \
-not average out. Fifteen centimetres is what a careful GNSS survey of a roadside \
-structure achieves."""
-affects = "a floor under HPE that no amount of ranging removes"
+source = "bu proje"
+source_en = "this project"
+note = """Bir direğin kendi konumunun ne kadar iyi bilindiği. Kestiriciye ölçülmüş \
+konum verilir ve onu kesin sayar; dolayısıyla o konumdaki hata, o \
+direğin katkıda bulunduğu her konuma doğrudan geçer. Ölçüm başına \
+çekilmek yerine direk başına sabit: bir ölçüm hatası alışverişler \
+arasında değişmez ve ortalamayla kaybolmaz. On beş santimetre, yol \
+kenarındaki bir yapının dikkatli bir GNSS ölçümüyle ulaşılan değerdir."""
+note_en = """How well an anchor's own position is known. The estimator is given the \
+surveyed position and treats it as exact, so whatever is wrong with it \
+goes straight into every fix that anchor contributes to. Fixed per \
+anchor rather than drawn per measurement: a survey error does not change \
+between exchanges and does not average out. Fifteen centimetres is what \
+a careful GNSS survey of a roadside structure achieves."""
+affects = "HPE'nin altındaki, hiçbir ölçümün kaldıramadığı tabanı"
+affects_en = "a floor under HPE that no amount of ranging removes"
 
 [values."ranging.packet_loss"]
 value = 0.05
 unit = "fraction"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Share of exchanges that fail for reasons the link budget does not \
-model: interference from the rest of a shared band, collisions with traffic this \
-study does not simulate, and fades the two-ray model averages over. 2,4 GHz is \
-the same band as wireless networking and a town is full of it. Five percent is a \
-lightly loaded band; a busy one is worse and a tunnel is better."""
-affects = "availability, and the number of ranges a fix is built from"
+source = "bu proje"
+source_en = "this project"
+note = """Link bütçesinin modellemediği sebeplerle başarısız olan alışverişlerin \
+payı: paylaşımlı bandın geri kalanından gelen girişim, bu çalışmanın \
+benzetmediği trafikle çakışmalar ve iki ışınlı modelin ortalamaladığı \
+sönümlemeler. 2,4 GHz, kablosuz ağlarla aynı banttır ve bir şehir \
+bununla doludur. Yüzde beş hafif yüklü bir banttır; yoğun olanı daha \
+kötü, tünel daha iyidir."""
+note_en = """Share of exchanges that fail for reasons the link budget does not model: \
+interference from the rest of a shared band, collisions with traffic \
+this study does not simulate, and fades the two-ray model averages over. \
+2,4 GHz is the same band as wireless networking and a town is full of \
+it. Five percent is a lightly loaded band; a busy one is worse and a \
+tunnel is better."""
+affects = "kullanılabilirliği ve bir konumun kaç ölçümden kurulduğunu"
+affects_en = "availability, and the number of ranges a fix is built from"
 
 [values."site.urban_packet_loss"]
 value = 0.15
 unit = "fraction"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """The same, in town, where the band is congested. Nothing measures this \
-and it is the difference between an urban availability that reads like a rural \
-one and an urban availability that reads like a town."""
-affects = "the urban row's availability"
+source = "bu proje"
+source_en = "this project"
+note = """Aynısı, bandın tıkalı olduğu şehir içinde. Bunu hiçbir şey ölçmüyor ve \
+bu, kırsal gibi okunan bir şehir içi kullanılabilirlik ile şehir gibi \
+okunan bir kullanılabilirlik arasındaki farktır."""
+note_en = """The same, in town, where the band is congested. Nothing measures this \
+and it is the difference between an urban availability that reads like a \
+rural one and an urban availability that reads like a town."""
+affects = "şehir içi satırın kullanılabilirliğini"
+affects_en = "the urban row's availability"
 
 [values."estimator.manoeuvre_m_s2"]
 value = 1.5
 unit = "m/s^2"
 provenance = "ASSUMPTION"
-source = "this project"
-note = """Unmodelled acceleration the filter expects between measurements. A \
-vehicle braking hard is about 6; ordinary driving is well under 1. Too small \
-and the filter stops believing new measurements; too large and it stops \
-smoothing."""
-affects = "HPE, through how much the filter smooths"
+source = "bu proje"
+source_en = "this project"
+note = """Süzgecin ölçümler arasında beklediği, modellenmemiş ivme. Sert fren \
+yapan bir araç yaklaşık 6; sıradan sürüş 1'in epey altında. Çok küçükse \
+süzgeç yeni ölçümlere inanmayı bırakır; çok büyükse yumuşatmayı bırakır."""
+note_en = """Unmodelled acceleration the filter expects between measurements. A \
+vehicle braking hard is about 6; ordinary driving is well under 1. Too \
+small and the filter stops believing new measurements; too large and it \
+stops smoothing."""
+affects = "HPE'yi, süzgecin ne kadar yumuşattığı üzerinden"
+affects_en = "HPE, through how much the filter smooths"
 
 [values."site.urban_relief_m"]
 value = 91.0
 unit = "m"
 provenance = "MEASUREMENT"
-source = "Copernicus DEM 30 m, Ankara Kızılay 39,91-39,94 N 32,82-32,85 E, fetched 2026-09-10"
-note = """Ground rise and fall across the three kilometres of town the urban row describes. Used only when the fetched site is not on hand: with it, the ground is the real grid and this is what that grid measured. Nowhere is flat, and a fallback that was would make the urban row a different study from the one the cache produces (ADR-0021)."""
-affects = "the urban row's obstruction and reflection geometry when no site is fetched"
-sensitivity = "flat ground gives every reflection the specular angle the two-ray model assumes, which is the worst case for it"
+source = "Copernicus DEM 30 m, Ankara Kızılay 39,91-39,94 N 32,82-32,85 E, 2026-09-10'da getirildi"
+source_en = """Copernicus DEM 30 m, Ankara Kızılay 39,91-39,94 N 32,82-32,85 E, fetched \
+2026-09-10"""
+note = """Şehir içi satırın anlattığı üç kilometrelik şehirde zeminin iniş çıkışı. \
+Yalnızca getirilen saha elde yokken kullanılır: elde varken zemin gerçek \
+ızgaradır ve bu, o ızgaranın ölçtüğü değerdir. Hiçbir yer düz değildir; \
+düz olan bir yedek, şehir içi satırı önbelleğin ürettiğinden farklı bir \
+çalışma hâline getirirdi (ADR-0021)."""
+note_en = """Ground rise and fall across the three kilometres of town the urban row \
+describes. Used only when the fetched site is not on hand: with it, the \
+ground is the real grid and this is what that grid measured. Nowhere is \
+flat, and a fallback that was would make the urban row a different study \
+from the one the cache produces (ADR-0021)."""
+affects = """hiçbir saha getirilmemişken şehir içi satırın engel ve yansıma \
+geometrisini"""
+affects_en = """the urban row's obstruction and reflection geometry when no site is \
+fetched"""
+sensitivity = """düz zemin her yansımaya iki ışınlı modelin varsaydığı aynasal açıyı \
+verir; bu da o model için en kötü durumdur"""
+sensitivity_en = """flat ground gives every reflection the specular angle the two-ray model \
+assumes, which is the worst case for it"""
 
 [values."site.urban_relief_wavelength_m"]
 value = 1800.0
 unit = "m"
 provenance = "DERIVED"
-source = "Copernicus DEM 30 m, Ankara Kızılay, fetched 2026-09-10"
-note = """How far apart the rises are, from the same grid. Ankara's centre sits across a valley and two ridges over this distance, so the fallback has to undulate over roughly this span rather than over a corridor's several kilometres."""
-affects = "how often a link in the urban fallback has ground in the way"
+source = "Copernicus DEM 30 m, Ankara Kızılay, 2026-09-10'da getirildi"
+source_en = "Copernicus DEM 30 m, Ankara Kızılay, fetched 2026-09-10"
+note = """Yükseltilerin birbirinden ne kadar uzak olduğu, aynı ızgaradan. \
+Ankara'nın merkezi bu mesafede bir vadi ile iki sırtın üzerine oturur; \
+dolayısıyla yedek zeminin, bir koridorun birkaç kilometresi yerine \
+kabaca bu açıklıkta dalgalanması gerekir."""
+note_en = """How far apart the rises are, from the same grid. Ankara's centre sits \
+across a valley and two ridges over this distance, so the fallback has \
+to undulate over roughly this span rather than over a corridor's several \
+kilometres."""
+affects = """şehir içi yedek zeminde bir bağlantının önüne ne sıklıkta zemin \
+çıktığını"""
+affects_en = "how often a link in the urban fallback has ground in the way"
 
 [values."site.rural_relief_m"]
 value = 486.0
 unit = "m"
 provenance = "MEASUREMENT"
-source = "Copernicus DEM 30 m, Polatlı 39,48-39,66 N 32,02-32,28 E, fetched 2026-09-10"
-note = """Ground rise and fall across the twenty kilometres of open country the rural row describes. Anatolian steppe where the intercity roads run: twelve times the relief this project used before anybody fetched the ground, and half that of the hills at Gölbaşı, where the same deployment produces a position 45 % of the time instead of 82 %. It has to match the site the row actually stands on, or a machine with no cache runs a harder study than one with it and nothing says so."""
-affects = "the rural row's obstruction geometry when no site is fetched"
-sensitivity = "the old 40 m figure let almost every rural link run clear; at Gölbaşı's 907 m no spacing this project can afford does"
+source = "Copernicus DEM 30 m, Polatlı 39,48-39,66 N 32,02-32,28 E, 2026-09-10'da getirildi"
+source_en = """Copernicus DEM 30 m, Polatlı 39,48-39,66 N 32,02-32,28 E, fetched \
+2026-09-10"""
+note = """Kırsal satırın anlattığı yirmi kilometrelik açık arazide zeminin iniş \
+çıkışı. Şehirlerarası yolların geçtiği Anadolu bozkırı: bu projenin \
+zemini getirmeden önce kullandığı rölyefin on iki katı, Gölbaşı \
+tepelerininse yarısı — ki orada aynı yerleşim %82 yerine %45 oranında \
+konum üretiyor. Satırın gerçekten üzerinde durduğu sahayla uyuşmak \
+zorunda; yoksa önbelleği olmayan bir makine, olanından daha zor bir \
+çalışma koşar ve bunu hiçbir şey söylemez."""
+note_en = """Ground rise and fall across the twenty kilometres of open country the \
+rural row describes. Anatolian steppe where the intercity roads run: \
+twelve times the relief this project used before anybody fetched the \
+ground, and half that of the hills at Gölbaşı, where the same deployment \
+produces a position 45 % of the time instead of 82 %. It has to match \
+the site the row actually stands on, or a machine with no cache runs a \
+harder study than one with it and nothing says so."""
+affects = "hiçbir saha getirilmemişken kırsal satırın engel geometrisini"
+affects_en = "the rural row's obstruction geometry when no site is fetched"
+sensitivity = """eski 40 m'lik değer neredeyse her kırsal bağlantının açıktan geçmesine \
+izin veriyordu; Gölbaşı'nın 907 m'sinde bu projenin göze alabileceği \
+hiçbir aralık bunu yapamaz"""
+sensitivity_en = """the old 40 m figure let almost every rural link run clear; at Gölbaşı's \
+907 m no spacing this project can afford does"""
 
 [values."site.rural_relief_wavelength_m"]
 value = 6000.0
 unit = "m"
 provenance = "DERIVED"
-source = "Copernicus DEM 30 m, Polatlı, fetched 2026-09-10"
-note = """How far apart the ridges are, from the same grid. Long enough that a four kilometre anchor spacing does not sit at one lucky point on the profile."""
-affects = "how often a link in the rural fallback is blocked by a ridge"
+source = "Copernicus DEM 30 m, Polatlı, 2026-09-10'da getirildi"
+source_en = "Copernicus DEM 30 m, Polatlı, fetched 2026-09-10"
+note = """Sırtların birbirinden ne kadar uzak olduğu, aynı ızgaradan. Dört \
+kilometrelik bir direk aralığının profil üzerinde tek bir şanslı noktaya \
+oturmayacağı kadar uzun."""
+note_en = """How far apart the ridges are, from the same grid. Long enough that a \
+four kilometre anchor spacing does not sit at one lucky point on the \
+profile."""
+affects = """kırsal yedek zeminde bir bağlantının ne sıklıkta bir sırtla kesildiğini"""
+affects_en = "how often a link in the rural fallback is blocked by a ridge"
 
 [values."site.tunnel_grade"]
 value = 0.0179
 unit = "fraction"
 provenance = "MEASUREMENT"
-source = "Copernicus DEM 30 m, Kızılcahamam 40,41-40,43 N 32,61-32,63 E, fetched 2026-09-10"
-note = """Fall of the bore from one portal to the other, over two kilometres. Taken from the real ground at the two portals of an alignment that keeps between nine and a hundred and fifty-six metres of rock above it. It sits inside the half to three percent a road tunnel is built to for drainage, which is the check that this is an alignment somebody could build rather than a line through a hill."""
-affects = "the tunnel row's vertical geometry, and therefore its VPE"
-sensitivity = "a level floor would put every anchor and every receiver at one height, which no tunnel is built to"
+source = "Copernicus DEM 30 m, Kızılcahamam 40,41-40,43 N 32,61-32,63 E, 2026-09-10'da getirildi"
+source_en = """Copernicus DEM 30 m, Kızılcahamam 40,41-40,43 N 32,61-32,63 E, fetched \
+2026-09-10"""
+note = """Tünelin bir portaldan diğerine, iki kilometrede düşüşü. Üzerinde dokuz \
+ile yüz elli altı metre arasında kaya tutan bir güzergâhın iki \
+portalındaki gerçek zeminden alındı. Bir karayolu tünelinin drenaj için \
+yapıldığı yüzde yarım ile üç aralığının içinde kalıyor; bu da burasının \
+bir tepenin içinden geçen bir çizgi değil, birinin gerçekten \
+yapabileceği bir güzergâh olduğunun denetimidir."""
+note_en = """Fall of the bore from one portal to the other, over two kilometres. \
+Taken from the real ground at the two portals of an alignment that keeps \
+between nine and a hundred and fifty-six metres of rock above it. It \
+sits inside the half to three percent a road tunnel is built to for \
+drainage, which is the check that this is an alignment somebody could \
+build rather than a line through a hill."""
+affects = "tünel satırının düşey geometrisini, dolayısıyla VPE'sini"
+affects_en = "the tunnel row's vertical geometry, and therefore its VPE"
+sensitivity = """düz bir taban her direği ve her alıcıyı tek bir yüksekliğe koyardı; \
+hiçbir tünel böyle yapılmaz"""
+sensitivity_en = """a level floor would put every anchor and every receiver at one height, \
+which no tunnel is built to"""
 
-# --- Deployment geometry -------------------------------------------------
+# --- Yerleşim geometrisi -------------------------------------------------
 #
-# Not assumptions. Nobody can measure what anchor spacing really is;
-# it is the thing being decided. They live here so that one file
-# changes every number in the table, and they are counted apart from
-# the figures that are waiting for a source (ADR-0023).
+# Bunlar varsayım değil. Direk aralığının "gerçekte" ne olduğunu kimse
+# ölçemez; karara bağlanan şeyin kendisi odur. Burada dururlar ki tek
+# bir dosya tablodaki her sayıyı değiştirsin; ve kaynak bekleyen
+# değerlerden ayrı sayılırlar (ADR-0023).
 
 [values."urban.extent_m"]
 value = 3000.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far the town runs, on a side. Three kilometres of Ankara centre, which is what the fetched Kızılay grid covers."""
-affects = "the urban row's service area, anchor count and therefore its cost per square kilometre"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Şehrin bir kenarda ne kadar sürdüğü. Ankara merkezinden üç kilometre; \
+getirilen Kızılay ızgarasının kapsadığı da bu."""
+note_en = """How far the town runs, on a side. Three kilometres of Ankara centre, \
+which is what the fetched Kızılay grid covers."""
+affects = """şehir içi satırın hizmet alanını, direk sayısını ve dolayısıyla \
+kilometrekare başına maliyetini"""
+affects_en = """the urban row's service area, anchor count and therefore its cost per \
+square kilometre"""
 
 [values."urban.anchor_spacing_m"]
 value = 500.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far apart the lighting columns carrying anchors stand. Roughly every other junction on a town grid."""
-affects = "the urban row's anchor count, coverage and cost"
-sensitivity = "halving it quadruples the anchors and therefore the capital"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Direk taşıyan aydınlatma direklerinin birbirinden ne kadar uzakta \
+durduğu. Şehir ızgarasında kabaca iki kavşakta bir."""
+note_en = """How far apart the lighting columns carrying anchors stand. Roughly every \
+other junction on a town grid."""
+affects = "şehir içi satırın direk sayısını, kapsamasını ve maliyetini"
+affects_en = "the urban row's anchor count, coverage and cost"
+sensitivity = "yarıya indirmek direk sayısını, dolayısıyla sermayeyi dörde katlar"
+sensitivity_en = "halving it quadruples the anchors and therefore the capital"
 
 [values."urban.anchor_stagger_m"]
 value = 250.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far alternate rows shift along. A perfect grid puts every anchor a receiver can see on one of two lines through it, which is a worse arrangement than anything anybody builds."""
-affects = "the urban row's horizontal geometry"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Ardışık sıraların boyuna ne kadar kaydığı. Kusursuz bir ızgara, bir \
+alıcının görebildiği her direği içinden geçen iki çizgiden birine koyar; \
+bu da kimsenin yapmadığı, daha kötü bir düzendir."""
+note_en = """How far alternate rows shift along. A perfect grid puts every anchor a \
+receiver can see on one of two lines through it, which is a worse \
+arrangement than anything anybody builds."""
+affects = "şehir içi satırın yatay geometrisini"
+affects_en = "the urban row's horizontal geometry"
 
 [values."urban.anchors_per_round"]
 value = 8.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How many anchors a unit polls before it is fixed. Eight is right where nearly everything polled answers, which at a 500 m grid in a town it does. See ADR-0022 for where it is not."""
-affects = "the urban row's update rate and availability"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Yoklananın \
+neredeyse hepsinin cevap verdiği yerde sekiz doğrudur; bir şehirde 500 m \
+ızgarada da öyledir. Olmadığı yer için ADR-0022'ye bak."""
+note_en = """How many anchors a unit polls before it is fixed. Eight is right where \
+nearly everything polled answers, which at a 500 m grid in a town it \
+does. See ADR-0022 for where it is not."""
+affects = "şehir içi satırın güncelleme hızını ve kullanılabilirliğini"
+affects_en = "the urban row's update rate and availability"
 
 [values."urban.accept_sigma_m"]
 value = 15.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Ranging error a link may have and still be used. Beyond it a measurement drags a fix rather than improving it, which is why real receivers gate on signal quality too."""
-affects = "which urban links reach the estimator"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir bağlantının sahip olabileceği ve yine de kullanılabileceği ölçüm \
+hatası. Ötesinde bir ölçüm konumu iyileştirmek yerine sürükler; gerçek \
+alıcıların sinyal kalitesine de kapı koymasının sebebi budur."""
+note_en = """Ranging error a link may have and still be used. Beyond it a measurement \
+drags a fix rather than improving it, which is why real receivers gate \
+on signal quality too."""
+affects = "hangi şehir içi bağlantıların kestiriciye ulaştığını"
+affects_en = "which urban links reach the estimator"
 
 [values."rural.extent_m"]
 value = 20000.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far the open country runs, on a side. Twenty kilometres of the Polatlı plain, which is what the fetched grid covers."""
-affects = "the rural row's service area and cost per square kilometre"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Açık arazinin bir kenarda ne kadar sürdüğü. Polatlı ovasından yirmi \
+kilometre; getirilen ızgaranın kapsadığı da bu."""
+note_en = """How far the open country runs, on a side. Twenty kilometres of the \
+Polatlı plain, which is what the fetched grid covers."""
+affects = "kırsal satırın hizmet alanını ve kilometrekare başına maliyetini"
+affects_en = "the rural row's service area and cost per square kilometre"
 
 [values."rural.anchor_spacing_m"]
 value = 4000.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far apart the masts stand. Well inside what the radio reaches — spacing here is a line-of-sight question, not a range one, because not one rural link fails for distance (ADR-0022)."""
-affects = "the rural row's mast count, availability and capital"
-sensitivity = "3000 m with 30 m masts reaches 90,5 % availability for about twice the mast capital"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Direklerin birbirinden ne kadar uzakta durduğu. Telsizin eriştiğinin \
+epey içinde — buradaki aralık bir menzil sorusu değil, görüş hattı \
+sorusudur, çünkü tek bir kırsal bağlantı bile mesafe yüzünden düşmüyor \
+(ADR-0022)."""
+note_en = """How far apart the masts stand. Well inside what the radio reaches — \
+spacing here is a line-of-sight question, not a range one, because not \
+one rural link fails for distance (ADR-0022)."""
+affects = "kırsal satırın direk sayısını, kullanılabilirliğini ve sermayesini"
+affects_en = "the rural row's mast count, availability and capital"
+sensitivity = """30 m direklerle 3000 m, direk sermayesinin yaklaşık iki katına %90,5 \
+kullanılabilirliğe ulaşır"""
+sensitivity_en = """3000 m with 30 m masts reaches 90,5 % availability for about twice the \
+mast capital"""
 
 [values."rural.anchor_stagger_m"]
 value = 2000.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Half a spacing, so alternate rows interleave rather than lining up."""
-affects = "the rural row's horizontal geometry"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Aralığın yarısı; böylece ardışık sıralar hizalanmak yerine geçmeli \
+durur."""
+note_en = """Half a spacing, so alternate rows interleave rather than lining up."""
+affects = "kırsal satırın yatay geometrisini"
+affects_en = "the rural row's horizontal geometry"
 
 [values."rural.anchors_per_round"]
 value = 12.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How many anchors a unit polls before it is fixed. Twelve rather than eight, because half of what is polled over real relief never answers: eight attempts yield about four replies, exactly what a cold fix needs with nothing spare. Worth 5,5 points of availability and a third of the update rate (ADR-0022)."""
-affects = "the rural row's availability, update rate and horizontal error"
-sensitivity = "sixteen buys another 0,8 points and costs more update rate than it returns"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Sekiz değil on iki, \
+çünkü gerçek rölyefte yoklananın yarısı hiç cevap vermiyor: sekiz deneme \
+yaklaşık dört yanıt verir, ki bu da soğuk bir konum için gerekenin tam \
+kendisidir, yedeksiz. 5,5 puan kullanılabilirlik ve güncelleme hızının \
+üçte biri değerinde (ADR-0022)."""
+note_en = """How many anchors a unit polls before it is fixed. Twelve rather than \
+eight, because half of what is polled over real relief never answers: \
+eight attempts yield about four replies, exactly what a cold fix needs \
+with nothing spare. Worth 5,5 points of availability and a third of the \
+update rate (ADR-0022)."""
+affects = """kırsal satırın kullanılabilirliğini, güncelleme hızını ve yatay hatasını"""
+affects_en = "the rural row's availability, update rate and horizontal error"
+sensitivity = """on altı, 0,8 puan daha getirir ve getirdiğinden çok güncelleme hızı \
+götürür"""
+sensitivity_en = """sixteen buys another 0,8 points and costs more update rate than it \
+returns"""
 
 [values."rural.accept_sigma_m"]
 value = 30.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Ranging error a link may have and still be used. Measured as never binding on this row: raising it to 60 m changes no figure to two decimal places, because no rural link that closes is noisier than 30 m."""
-affects = "which rural links reach the estimator"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir bağlantının sahip olabileceği ve yine de kullanılabileceği ölçüm \
+hatası. Bu satırda hiç bağlayıcı olmadığı ölçüldü: 60 m'ye çıkarmak \
+hiçbir değeri iki ondalık basamağa kadar değiştirmiyor, çünkü kapanan \
+hiçbir kırsal bağlantı 30 m'den gürültülü değil."""
+note_en = """Ranging error a link may have and still be used. Measured as never \
+binding on this row: raising it to 60 m changes no figure to two decimal \
+places, because no rural link that closes is noisier than 30 m."""
+affects = "hangi kırsal bağlantıların kestiriciye ulaştığını"
+affects_en = "which rural links reach the estimator"
 
 [values."tunnel.length_m"]
 value = 2000.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How long the bore is. Two kilometres, matching the alignment found through the fetched Kızılcahamam mountain."""
-affects = "the tunnel row's served area and cost per route kilometre"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Tünelin ne kadar uzun olduğu. İki kilometre; getirilen Kızılcahamam \
+dağının içinden bulunan güzergâhla uyumlu."""
+note_en = """How long the bore is. Two kilometres, matching the alignment found \
+through the fetched Kızılcahamam mountain."""
+affects = """tünel satırının hizmet verdiği alanı ve güzergâh kilometresi başına \
+maliyetini"""
+affects_en = "the tunnel row's served area and cost per route kilometre"
 
 [values."tunnel.anchor_spacing_m"]
 value = 150.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far apart the brackets stand along the bore. An impulse radio reaches far less than a spread one, and a bore is a corridor, so the spacing is set by geometry rather than by cost."""
-affects = "the tunnel row's anchor count and its capital, which is the largest per square kilometre in the table"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. Darbeli bir \
+telsiz yayılı olandan çok daha kısa erişir ve tünel bir koridordur; \
+dolayısıyla aralığı maliyet değil geometri belirler."""
+note_en = """How far apart the brackets stand along the bore. An impulse radio \
+reaches far less than a spread one, and a bore is a corridor, so the \
+spacing is set by geometry rather than by cost."""
+affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \
+başına en büyük sermaye"""
+affects_en = """the tunnel row's anchor count and its capital, which is the largest per \
+square kilometre in the table"""
 
 [values."tunnel.anchor_offset_m"]
 value = 4.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far off the centreline the brackets sit. The bore is 12 m wide, so this is roughly against the wall."""
-affects = "the tunnel row's horizontal geometry, which amplifies a range error eighteenfold"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Askıların eksenden ne kadar uzakta durduğu. Tünel 12 m genişliğinde, \
+yani bu kabaca duvara dayalı demektir."""
+note_en = """How far off the centreline the brackets sit. The bore is 12 m wide, so \
+this is roughly against the wall."""
+affects = """tünel satırının yatay geometrisini; bir menzil hatasını on sekiz katına \
+çıkaran şey budur"""
+affects_en = """the tunnel row's horizontal geometry, which amplifies a range error \
+eighteenfold"""
 
 [values."tunnel.width_m"]
 value = 12.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How wide the carriageway is. A tunnel is not a plane, so its served area is its length times this and nothing else (ADR-0012)."""
-affects = "the tunnel row's service area, and therefore every per-square-kilometre figure in that row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Taşıt yolunun ne kadar geniş olduğu. Tünel bir düzlem değildir; \
+dolayısıyla hizmet verdiği alan uzunluğu çarpı budur, başka bir şey \
+değil (ADR-0012)."""
+note_en = """How wide the carriageway is. A tunnel is not a plane, so its served area \
+is its length times this and nothing else (ADR-0012)."""
+affects = """tünel satırının hizmet alanını, dolayısıyla o satırdaki kilometrekare \
+başına her değeri"""
+affects_en = """the tunnel row's service area, and therefore every per-square-kilometre \
+figure in that row"""
 
 [values."tunnel.anchors_per_round"]
 value = 8.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How many anchors a unit polls before it is fixed. Eight is right here: at 150 m spacing in a shielded bore, almost everything polled answers."""
-affects = "the tunnel row's update rate, which is the fastest in the table"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Burada sekiz doğru: \
+korunaklı bir tünelde 150 m aralıkta yoklananın neredeyse hepsi cevap \
+verir."""
+note_en = """How many anchors a unit polls before it is fixed. Eight is right here: \
+at 150 m spacing in a shielded bore, almost everything polled answers."""
+affects = "tünel satırının güncelleme hızını; tablodaki en hızlısı"
+affects_en = "the tunnel row's update rate, which is the fastest in the table"
 
 [values."tunnel.accept_sigma_m"]
 value = 2.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Ranging error a link may have and still be used. Tight, because the module ranges to a tenth of a metre and a two metre measurement here means something went wrong."""
-affects = "which tunnel links reach the estimator"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir bağlantının sahip olabileceği ve yine de kullanılabileceği ölçüm \
+hatası. Sıkı, çünkü modül metrenin onda birine kadar ölçer ve burada iki \
+metrelik bir ölçüm bir şeylerin ters gittiği anlamına gelir."""
+note_en = """Ranging error a link may have and still be used. Tight, because the \
+module ranges to a tenth of a metre and a two metre measurement here \
+means something went wrong."""
+affects = "hangi tünel bağlantılarının kestiriciye ulaştığını"
+affects_en = "which tunnel links reach the estimator"
 
-# --- What the ground is made of ------------------------------------------
+# --- Zemin neden yapılmış --------------------------------------------
 #
-# One roughness figure for a whole site says every reflection meets
-# the same surface. These make it vary from place to place, at two
-# or three scales, deterministically in position — a patch is rough
-# as a fact about that place, not as a draw that averages out
-# (ADR-0026).
+# Bütün bir saha için tek bir pürüz değeri, her yansımanın aynı yüzeye
+# çarptığını söyler. Bunlar onu yerden yere, iki ya da üç ölçekte ve
+# konuma göre belirlenimli olarak değiştirir — bir yama, ortalamayla
+# kaybolan bir çekiliş olarak değil, orası hakkında bir olgu olarak
+# pürüzlüdür (ADR-0026).
 
 [values."urban.ground_patch_m"]
 value = 200.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far you travel before the ground is something else. A town changes cover every block or two: tarmac, pavement, a park, a car park. Two hundred metres is roughly that. The finer levels are this divided by six, so one figure sets the whole ladder."""
-affects = "how quickly the reflecting surface changes along a link in the urban row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Bir şehir \
+örtüsünü her bir iki blokta değiştirir: asfalt, kaldırım, bir park, bir \
+otopark. İki yüz metre kabaca budur. İnce katmanlar bunun altıya \
+bölünmüşüdür, yani tek bir değer bütün merdiveni kurar."""
+note_en = """How far you travel before the ground is something else. A town changes \
+cover every block or two: tarmac, pavement, a park, a car park. Two \
+hundred metres is roughly that. The finer levels are this divided by \
+six, so one figure sets the whole ladder."""
+affects = """şehir içi satırda yansıtıcı yüzeyin bir bağlantı boyunca ne çabuk \
+değiştiğini"""
+affects_en = """how quickly the reflecting surface changes along a link in the urban row"""
 
 [values."urban.ground_roughness_spread"]
 value = 0.7
 unit = "fraction"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How much rougher or smoother one patch is than another, as the width of a log-normal in multiples of the typical figure. Centred on mean square rather than mean, so the site's measured roughness keeps meaning exactly what it measured and only the variation around it is added. Zero makes every patch identical, which is the single-figure model this replaced."""
-affects = "how much the coherent reflection varies link to link in the urban row"
-sensitivity = "the Ament factor is exponential in roughness times the grazing angle, so at a few hundred metres this is the difference between a two-ray null and none"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik değerin \
+katları cinsinden bir log-normalin genişliği olarak. Ortalamaya değil \
+karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü tam \
+olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
+çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar; bu da yerine \
+geçtiği tek değerli modeldir."""
+note_en = """How much rougher or smoother one patch is than another, as the width of \
+a log-normal in multiples of the typical figure. Centred on mean square \
+rather than mean, so the site's measured roughness keeps meaning exactly \
+what it measured and only the variation around it is added. Zero makes \
+every patch identical, which is the single-figure model this replaced."""
+affects = """şehir içi satırda eşevreli yansımanın bağlantıdan bağlantıya ne kadar \
+değiştiğini"""
+affects_en = """how much the coherent reflection varies link to link in the urban row"""
+sensitivity = """Ament çarpanı, pürüz ile sıyırma açısının çarpımında üsteldir; birkaç \
+yüz metrede bu, iki ışınlı bir sıfır ile hiç sıfır olmaması arasındaki \
+farktır"""
+sensitivity_en = """the Ament factor is exponential in roughness times the grazing angle, so \
+at a few hundred metres this is the difference between a two-ray null \
+and none"""
 
 [values."urban.ground_levels"]
 value = 2.0
 unit = "scales"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How many scales the ground varies at. Two is cover and texture; three adds a finer one. They share the same total variance, so a third level splits it finer rather than making the ground rougher."""
-affects = "how finely the reflecting surface varies in the urban row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Zeminin kaç ölçekte değiştiği. İki, örtü ve dokudur; üç, daha ince bir \
+tane ekler. Aynı toplam değişintiyi paylaşırlar, yani üçüncü katman \
+zemini pürüzlendirmez, pürüzü daha ince böler."""
+note_en = """How many scales the ground varies at. Two is cover and texture; three \
+adds a finer one. They share the same total variance, so a third level \
+splits it finer rather than making the ground rougher."""
+affects = "şehir içi satırda yansıtıcı yüzeyin ne kadar ince değiştiğini"
+affects_en = "how finely the reflecting surface varies in the urban row"
 
 [values."urban.ground_seed"]
 value = 1101.0
 unit = "seed"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Which ground this is. Separate from the measurement seed on purpose: holding this and varying that asks what the noise does on one landscape, and the reverse asks what one deployment does on many. Mixed into one seed, neither question could be asked."""
-affects = "which patches are rough and which are smooth in the urban row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bu zeminin hangisi olduğu. Ölçüm tohumundan bilerek ayrı: bunu \
+sabitleyip onu değiştirmek, gürültünün tek bir arazide ne yaptığını \
+sorar; tersi ise tek bir yerleşimin birçok arazide ne yaptığını. Tek \
+tohuma karıştırılsalardı iki soru da sorulamazdı."""
+note_en = """Which ground this is. Separate from the measurement seed on purpose: \
+holding this and varying that asks what the noise does on one landscape, \
+and the reverse asks what one deployment does on many. Mixed into one \
+seed, neither question could be asked."""
+affects = """şehir içi satırda hangi yamaların pürüzlü hangilerinin düz olduğunu"""
+affects_en = "which patches are rough and which are smooth in the urban row"
 
 [values."rural.ground_patch_m"]
 value = 600.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far you travel before the ground is something else. Open country changes at field boundaries — stubble, ploughed earth, pasture, scrub — which on the Anatolian plateau is a few hundred metres. The finer levels are this divided by six, so one figure sets the whole ladder."""
-affects = "how quickly the reflecting surface changes along a link in the rural row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Açık arazi \
+tarla sınırlarında değişir — anız, sürülmüş toprak, mera, çalılık — ki \
+Anadolu platosunda bu birkaç yüz metredir. İnce katmanlar bunun altıya \
+bölünmüşüdür, yani tek bir değer bütün merdiveni kurar."""
+note_en = """How far you travel before the ground is something else. Open country \
+changes at field boundaries — stubble, ploughed earth, pasture, scrub — \
+which on the Anatolian plateau is a few hundred metres. The finer levels \
+are this divided by six, so one figure sets the whole ladder."""
+affects = """kırsal satırda yansıtıcı yüzeyin bir bağlantı boyunca ne çabuk \
+değiştiğini"""
+affects_en = """how quickly the reflecting surface changes along a link in the rural row"""
 
 [values."rural.ground_roughness_spread"]
 value = 0.6
 unit = "fraction"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How much rougher or smoother one patch is than another, as the width of a log-normal in multiples of the typical figure. Centred on mean square rather than mean, so the site's measured roughness keeps meaning exactly what it measured and only the variation around it is added. Zero makes every patch identical, which is the single-figure model this replaced."""
-affects = "how much the coherent reflection varies link to link in the rural row"
-sensitivity = "the Ament factor is exponential in roughness times the grazing angle, so at a few hundred metres this is the difference between a two-ray null and none"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik değerin \
+katları cinsinden bir log-normalin genişliği olarak. Ortalamaya değil \
+karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü tam \
+olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
+çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar; bu da yerine \
+geçtiği tek değerli modeldir."""
+note_en = """How much rougher or smoother one patch is than another, as the width of \
+a log-normal in multiples of the typical figure. Centred on mean square \
+rather than mean, so the site's measured roughness keeps meaning exactly \
+what it measured and only the variation around it is added. Zero makes \
+every patch identical, which is the single-figure model this replaced."""
+affects = """kırsal satırda eşevreli yansımanın bağlantıdan bağlantıya ne kadar \
+değiştiğini"""
+affects_en = """how much the coherent reflection varies link to link in the rural row"""
+sensitivity = """Ament çarpanı, pürüz ile sıyırma açısının çarpımında üsteldir; birkaç \
+yüz metrede bu, iki ışınlı bir sıfır ile hiç sıfır olmaması arasındaki \
+farktır"""
+sensitivity_en = """the Ament factor is exponential in roughness times the grazing angle, so \
+at a few hundred metres this is the difference between a two-ray null \
+and none"""
 
 [values."rural.ground_levels"]
 value = 2.0
 unit = "scales"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How many scales the ground varies at. Two is cover and texture; three adds a finer one. They share the same total variance, so a third level splits it finer rather than making the ground rougher."""
-affects = "how finely the reflecting surface varies in the rural row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Zeminin kaç ölçekte değiştiği. İki, örtü ve dokudur; üç, daha ince bir \
+tane ekler. Aynı toplam değişintiyi paylaşırlar, yani üçüncü katman \
+zemini pürüzlendirmez, pürüzü daha ince böler."""
+note_en = """How many scales the ground varies at. Two is cover and texture; three \
+adds a finer one. They share the same total variance, so a third level \
+splits it finer rather than making the ground rougher."""
+affects = "kırsal satırda yansıtıcı yüzeyin ne kadar ince değiştiğini"
+affects_en = "how finely the reflecting surface varies in the rural row"
 
 [values."rural.ground_seed"]
 value = 2202.0
 unit = "seed"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Which ground this is. Separate from the measurement seed on purpose: holding this and varying that asks what the noise does on one landscape, and the reverse asks what one deployment does on many. Mixed into one seed, neither question could be asked."""
-affects = "which patches are rough and which are smooth in the rural row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bu zeminin hangisi olduğu. Ölçüm tohumundan bilerek ayrı: bunu \
+sabitleyip onu değiştirmek, gürültünün tek bir arazide ne yaptığını \
+sorar; tersi ise tek bir yerleşimin birçok arazide ne yaptığını. Tek \
+tohuma karıştırılsalardı iki soru da sorulamazdı."""
+note_en = """Which ground this is. Separate from the measurement seed on purpose: \
+holding this and varying that asks what the noise does on one landscape, \
+and the reverse asks what one deployment does on many. Mixed into one \
+seed, neither question could be asked."""
+affects = "kırsal satırda hangi yamaların pürüzlü hangilerinin düz olduğunu"
+affects_en = "which patches are rough and which are smooth in the rural row"
 
 [values."tunnel.ground_patch_m"]
 value = 50.0
 unit = "m"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How far you travel before the ground is something else. A bore is the most uniform surface in the study, and still not uniform: expansion joints, drainage channels, wet stretches. Fifty metres is about the spacing of those. The finer levels are this divided by six, so one figure sets the whole ladder."""
-affects = "how quickly the reflecting surface changes along a link in the tunnel row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Tünel bu \
+çalışmadaki en tekdüze yüzeydir ve yine de tekdüze değildir: genleşme \
+derzleri, drenaj kanalları, ıslak kesimler. Elli metre kabaca bunların \
+aralığıdır. İnce katmanlar bunun altıya bölünmüşüdür, yani tek bir değer \
+bütün merdiveni kurar."""
+note_en = """How far you travel before the ground is something else. A bore is the \
+most uniform surface in the study, and still not uniform: expansion \
+joints, drainage channels, wet stretches. Fifty metres is about the \
+spacing of those. The finer levels are this divided by six, so one \
+figure sets the whole ladder."""
+affects = """tünel satırında yansıtıcı yüzeyin bir bağlantı boyunca ne çabuk \
+değiştiğini"""
+affects_en = """how quickly the reflecting surface changes along a link in the tunnel \
+row"""
 
 [values."tunnel.ground_roughness_spread"]
 value = 0.4
 unit = "fraction"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How much rougher or smoother one patch is than another, as the width of a log-normal in multiples of the typical figure. Centred on mean square rather than mean, so the site's measured roughness keeps meaning exactly what it measured and only the variation around it is added. Zero makes every patch identical, which is the single-figure model this replaced."""
-affects = "how much the coherent reflection varies link to link in the tunnel row"
-sensitivity = "the Ament factor is exponential in roughness times the grazing angle, so at a few hundred metres this is the difference between a two-ray null and none"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik değerin \
+katları cinsinden bir log-normalin genişliği olarak. Ortalamaya değil \
+karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü tam \
+olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
+çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar; bu da yerine \
+geçtiği tek değerli modeldir."""
+note_en = """How much rougher or smoother one patch is than another, as the width of \
+a log-normal in multiples of the typical figure. Centred on mean square \
+rather than mean, so the site's measured roughness keeps meaning exactly \
+what it measured and only the variation around it is added. Zero makes \
+every patch identical, which is the single-figure model this replaced."""
+affects = """tünel satırında eşevreli yansımanın bağlantıdan bağlantıya ne kadar \
+değiştiğini"""
+affects_en = """how much the coherent reflection varies link to link in the tunnel row"""
+sensitivity = """Ament çarpanı, pürüz ile sıyırma açısının çarpımında üsteldir; birkaç \
+yüz metrede bu, iki ışınlı bir sıfır ile hiç sıfır olmaması arasındaki \
+farktır"""
+sensitivity_en = """the Ament factor is exponential in roughness times the grazing angle, so \
+at a few hundred metres this is the difference between a two-ray null \
+and none"""
 
 [values."tunnel.ground_levels"]
 value = 2.0
 unit = "scales"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """How many scales the ground varies at. Two is cover and texture; three adds a finer one. They share the same total variance, so a third level splits it finer rather than making the ground rougher."""
-affects = "how finely the reflecting surface varies in the tunnel row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Zeminin kaç ölçekte değiştiği. İki, örtü ve dokudur; üç, daha ince bir \
+tane ekler. Aynı toplam değişintiyi paylaşırlar, yani üçüncü katman \
+zemini pürüzlendirmez, pürüzü daha ince böler."""
+note_en = """How many scales the ground varies at. Two is cover and texture; three \
+adds a finer one. They share the same total variance, so a third level \
+splits it finer rather than making the ground rougher."""
+affects = "tünel satırında yansıtıcı yüzeyin ne kadar ince değiştiğini"
+affects_en = "how finely the reflecting surface varies in the tunnel row"
 
 [values."tunnel.ground_seed"]
 value = 3303.0
 unit = "seed"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Which ground this is. Separate from the measurement seed on purpose: holding this and varying that asks what the noise does on one landscape, and the reverse asks what one deployment does on many. Mixed into one seed, neither question could be asked."""
-affects = "which patches are rough and which are smooth in the tunnel row"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bu zeminin hangisi olduğu. Ölçüm tohumundan bilerek ayrı: bunu \
+sabitleyip onu değiştirmek, gürültünün tek bir arazide ne yaptığını \
+sorar; tersi ise tek bir yerleşimin birçok arazide ne yaptığını. Tek \
+tohuma karıştırılsalardı iki soru da sorulamazdı."""
+note_en = """Which ground this is. Separate from the measurement seed on purpose: \
+holding this and varying that asks what the noise does on one landscape, \
+and the reverse asks what one deployment does on many. Mixed into one \
+seed, neither question could be asked."""
+affects = "tünel satırında hangi yamaların pürüzlü hangilerinin düz olduğunu"
+affects_en = "which patches are rough and which are smooth in the tunnel row"
 
-# --- Which ground each row stands on -------------------------------------
+# --- Her satırın hangi zeminin üzerinde durduğu ---------------------------
 
 [values."urban.site"]
 value = "kizilay"
 unit = "fetched site"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Which fetched ground this row stands on, by directory name under `src/yerkon/site/ankara/`. Ankara's centre, three kilometres on a side, rising and falling ninety-one metres across it. Empty falls back to modelled terrain, which is rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — including from the viewer — can go here."""
-affects = "the urban row's obstruction geometry, and therefore every figure in it"
-sensitivity = "the same rural deployment gives 89,5 % availability on Polatlı and about 45 % on Gölbaşı, with nothing changed but this"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/ankara/` \
+altındaki klasör adıyla. Ankara'nın merkezi, bir kenarı üç kilometre, \
+üzerinde doksan bir metre iniş çıkışla. Boş bırakılırsa modellenmiş \
+zemine düşer; o da tepelidir ve asla düz değildir (ADR-0021). `yerkon \
+fetch`'in yazdığı her şey — görüntüleyiciden yazdıkları dâhil — buraya \
+gelebilir."""
+note_en = """Which fetched ground this row stands on, by directory name under \
+`src/yerkon/site/ankara/`. Ankara's centre, three kilometres on a side, \
+rising and falling ninety-one metres across it. Empty falls back to \
+modelled terrain, which is rolling and never flat (ADR-0021). Anything \
+`yerkon fetch` writes — including from the viewer — can go here."""
+affects = """şehir içi satırın engel geometrisini, dolayısıyla içindeki her değeri"""
+affects_en = """the urban row's obstruction geometry, and therefore every figure in it"""
+sensitivity = """aynı kırsal yerleşim Polatlı'da %89,5, Gölbaşı'nda yaklaşık %45 \
+kullanılabilirlik verir; bundan başka hiçbir şey değişmeden"""
+sensitivity_en = """the same rural deployment gives 89,5 % availability on Polatlı and about \
+45 % on Gölbaşı, with nothing changed but this"""
 
 [values."rural.site"]
 value = "polatli"
 unit = "fetched site"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Which fetched ground this row stands on, by directory name under `src/yerkon/site/ankara/`. The Polatlı plain west of Ankara, where the intercity roads run. Set this to `golbasi` to stand the same deployment on 907 m of relief instead, which is what it costs in terrain it was not designed for. Empty falls back to modelled terrain, which is rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — including from the viewer — can go here."""
-affects = "the rural row's obstruction geometry, and therefore every figure in it"
-sensitivity = "the same rural deployment gives 89,5 % availability on Polatlı and about 45 % on Gölbaşı, with nothing changed but this"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/ankara/` \
+altındaki klasör adıyla. Ankara'nın batısındaki, şehirlerarası yolların \
+geçtiği Polatlı ovası. Bunu `golbasi` yaparsan aynı yerleşim 907 m \
+rölyefin üzerine oturur; tasarlanmadığı arazide neye mal olduğu budur. \
+Boş bırakılırsa modellenmiş zemine düşer; o da tepelidir ve asla düz \
+değildir (ADR-0021). `yerkon fetch`'in yazdığı her şey — \
+görüntüleyiciden yazdıkları dâhil — buraya gelebilir."""
+note_en = """Which fetched ground this row stands on, by directory name under \
+`src/yerkon/site/ankara/`. The Polatlı plain west of Ankara, where the \
+intercity roads run. Set this to `golbasi` to stand the same deployment \
+on 907 m of relief instead, which is what it costs in terrain it was not \
+designed for. Empty falls back to modelled terrain, which is rolling and \
+never flat (ADR-0021). Anything `yerkon fetch` writes — including from \
+the viewer — can go here."""
+affects = "kırsal satırın engel geometrisini, dolayısıyla içindeki her değeri"
+affects_en = """the rural row's obstruction geometry, and therefore every figure in it"""
+sensitivity = """aynı kırsal yerleşim Polatlı'da %89,5, Gölbaşı'nda yaklaşık %45 \
+kullanılabilirlik verir; bundan başka hiçbir şey değişmeden"""
+sensitivity_en = """the same rural deployment gives 89,5 % availability on Polatlı and about \
+45 % on Gölbaşı, with nothing changed but this"""
 
 [values."tunnel.site"]
 value = "kizilcahamam"
 unit = "fetched site"
 provenance = "DESIGN"
-source = "this project, as a deployment choice"
-note = """Which fetched ground this row stands on, by directory name under `src/yerkon/site/ankara/`. The mountain the bore goes through. Only its two portal elevations are used, because a tunnel goes through a hill rather than over it. Empty falls back to modelled terrain, which is rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — including from the viewer — can go here."""
-affects = "the tunnel row's obstruction geometry, and therefore every figure in it"
-sensitivity = "the same rural deployment gives 89,5 % availability on Polatlı and about 45 % on Gölbaşı, with nothing changed but this"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/ankara/` \
+altındaki klasör adıyla. Tünelin içinden geçtiği dağ. Yalnızca iki \
+portal yüksekliği kullanılır, çünkü bir tünel tepenin üzerinden değil \
+içinden geçer. Boş bırakılırsa modellenmiş zemine düşer; o da tepelidir \
+ve asla düz değildir (ADR-0021). `yerkon fetch`'in yazdığı her şey — \
+görüntüleyiciden yazdıkları dâhil — buraya gelebilir."""
+note_en = """Which fetched ground this row stands on, by directory name under \
+`src/yerkon/site/ankara/`. The mountain the bore goes through. Only its \
+two portal elevations are used, because a tunnel goes through a hill \
+rather than over it. Empty falls back to modelled terrain, which is \
+rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — \
+including from the viewer — can go here."""
+affects = """tünel satırının engel geometrisini, dolayısıyla içindeki her değeri"""
+affects_en = """the tunnel row's obstruction geometry, and therefore every figure in it"""
+sensitivity = """aynı kırsal yerleşim Polatlı'da %89,5, Gölbaşı'nda yaklaşık %45 \
+kullanılabilirlik verir; bundan başka hiçbir şey değişmeden"""
+sensitivity_en = """the same rural deployment gives 89,5 % availability on Polatlı and about \
+45 % on Gölbaşı, with nothing changed but this"""

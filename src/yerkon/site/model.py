@@ -8,6 +8,8 @@ from typing import Optional
 
 import numpy as np
 
+from yerkon.language import say
+
 
 @dataclass(frozen=True)
 class BoundingBox:
@@ -125,18 +127,18 @@ class SiteManifest:
     def has_buildings(self) -> bool:
         return self.feature_source is not None
 
-    def describe(self) -> str:
+    def describe(self, language: Optional[str] = None) -> str:
         parts = [
-            "ground from {} at {:.0f} m".format(
-                self.elevation_source, self.elevation_resolution_m
-            )
+            say("site.ground", language,
+                source=self.elevation_source,
+                resolution_m=self.elevation_resolution_m)
         ]
         if self.has_buildings:
-            parts.append(
-                "{} buildings from {}".format(self.building_count, self.feature_source)
-            )
+            parts.append(say("site.buildings", language,
+                             source=self.feature_source,
+                             count=self.building_count))
         else:
-            parts.append("no building data, so open ground is assumed everywhere")
+            parts.append(say("site.no_buildings", language))
         return "; ".join(parts)
 
 

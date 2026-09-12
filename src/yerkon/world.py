@@ -20,6 +20,8 @@ from typing import Callable, Optional, Sequence, TYPE_CHECKING
 
 from yerkon.evidence import Sourced
 from yerkon.hardware import Radio, SX1280
+from yerkon.language import say
+from yerkon.numbers import decimal_comma
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.rf import Obstruction, first_fresnel_radius_m
 
@@ -57,7 +59,7 @@ class Terrain:
     elevation_m: Callable[[float, float], float] = field(repr=False)
     clutter_loss_db_per_km: float = 0.0
     micro_roughness_m: float = 0.0
-    description: str = "flat"
+    description: str = ""
     patches: Optional["Patchwork"] = None
 
     def __post_init__(self) -> None:
@@ -487,6 +489,7 @@ def flat_terrain(
     elevation_m: float = 0.0,
     clutter_loss_db_per_km: float = 0.0,
     micro_roughness_m: float = 0.0,
+    language: Optional[str] = None,
 ) -> Terrain:
     """Perfectly level ground, for isolating one variable in a test.
 
@@ -503,11 +506,15 @@ def flat_terrain(
         elevation_m=Level(elevation_m),
         clutter_loss_db_per_km=clutter_loss_db_per_km,
         micro_roughness_m=micro_roughness_m,
-        description="flat at {:.0f} m".format(elevation_m),
+        description=say("terrain.flat", language, elevation_m=elevation_m),
     )
 
 
-def terrain_from_site(site: "Site", clutter_loss_db_per_km: float = 0.0) -> Terrain:
+def terrain_from_site(
+    site: "Site",
+    clutter_loss_db_per_km: float = 0.0,
+    language: Optional[str] = None,
+) -> Terrain:
     """Turn fetched ground into terrain the link budget can use.
 
     Roughness comes from the site's own detrended scatter rather than
@@ -524,7 +531,7 @@ def terrain_from_site(site: "Site", clutter_loss_db_per_km: float = 0.0) -> Terr
         elevation_m=Fetched(site),
         clutter_loss_db_per_km=clutter_loss_db_per_km,
         micro_roughness_m=site.roughness_m(),
-        description=site.manifest.describe(),
+        description=site.manifest.describe(language),
     )
 
 
@@ -534,6 +541,7 @@ def rolling_terrain(
     clutter_loss_db_per_km: float = 0.0,
     micro_roughness_m: float = 0.0,
     seed: int = 0,
+    language: Optional[str] = None,
 ) -> Terrain:
     """Smooth hills. Deterministic given the seed.
 
@@ -545,7 +553,10 @@ def rolling_terrain(
         elevation_m=Rolling(amplitude_m, wavelength_m, seed),
         clutter_loss_db_per_km=clutter_loss_db_per_km,
         micro_roughness_m=micro_roughness_m,
-        description="rolling, {:.0f} m over {:.0f} m".format(amplitude_m, wavelength_m),
+        description=say(
+            "terrain.rolling", language,
+            amplitude_m=amplitude_m, wavelength_m=wavelength_m,
+        ),
     )
 
 
@@ -555,6 +566,7 @@ def bore_terrain(
     length_m: float,
     micro_roughness_m: float = 0.02,
     description: str = "",
+    language: Optional[str] = None,
 ) -> Terrain:
     """The floor of a tunnel: straight, and never level.
 
@@ -578,8 +590,9 @@ def bore_terrain(
         elevation_m=Sloping(entry_elevation_m, exit_elevation_m, length_m),
         clutter_loss_db_per_km=0.0,
         micro_roughness_m=micro_roughness_m,
-        description=description or "bore, {:+.2f}% over {:.0f} m".format(
-            100.0 * grade, length_m
+        description=description or say(
+            "terrain.bore", language,
+            length_m=length_m, grade=decimal_comma(100.0 * grade),
         ),
     )
 

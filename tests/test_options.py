@@ -238,7 +238,7 @@ def test_a_search_that_meets_nothing_returns_nothing():
         tried=(an_outcome(availability=0.5), an_outcome(availability=0.6)),
     )
     assert found.best is None
-    with pytest.raises(ValueError, match="nothing met"):
+    with pytest.raises(ValueError, match="hiçbir düzen karşılamadı"):
         found.as_option("hopeless")
 
 
@@ -254,7 +254,7 @@ def test_a_search_will_not_save_an_option_that_changes_nothing():
             "rural.anchor_spacing_m": DEFAULTS.number("rural.anchor_spacing_m")
         }),),
     )
-    with pytest.raises(AlreadyMet, match="already meet"):
+    with pytest.raises(AlreadyMet, match="zaten karşılıyor"):
         found.as_option("pointless")
 
 

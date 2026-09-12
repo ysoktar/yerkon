@@ -924,7 +924,7 @@ def test_a_blank_target_field_is_not_a_bar_of_zero():
     wide = target_from({"availability": 0.9, "hpe_p50_m": ""})
     assert wide.availability == 0.9
     assert math.isinf(wide.hpe_p50_m)
-    assert target_from({}).describe() == "nothing in particular"
+    assert target_from({}).describe() == "belirli bir şey değil"
 
 
 def test_applying_an_option_keeps_the_edits_already_made():
@@ -1015,6 +1015,96 @@ def test_asking_after_a_task_that_was_never_started_says_so():
     from yerkon.viewer.jobs import Jobs
 
     assert Jobs().read("nothing") is None
+
+
+# --- Two languages ---------------------------------------------------------
+
+
+def test_the_page_says_nothing_it_has_not_got_in_both_languages():
+    """A phrase with one language is a page nine tenths translated, which
+    is the failure nobody notices (ADR-0035)."""
+    import pathlib
+    import re
+
+    words = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/words.js"
+    ).read_text(encoding="utf-8")
+
+    phrases = re.findall(r'^  "([\w.]+)": \{(.*?)\},\n', words, re.S | re.M)
+    assert len(phrases) > 100, "this stopped matching the catalogue"
+    for key, body in phrases:
+        assert "tr:" in body, key
+        assert "en:" in body, key
+
+
+def test_a_phrase_names_its_fields_rather_than_counting_them():
+    """Positional substitution gave one language the other's numbers.
+
+    "72 değerin 35 tanesi varsayım" counts the total first and "35 of 72
+    figures are assumptions" counts the assumptions first, and with {} in
+    both, one of them is wrong. It was.
+    """
+    import pathlib
+
+    words = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/words.js"
+    ).read_text(encoding="utf-8")
+    # The phrases themselves, not the prose explaining why.
+    phrases = "".join(
+        line for line in words.split("export function say")[0].splitlines()
+        if line.lstrip().startswith('"')
+    )
+    assert "{}" not in phrases, (
+        "a phrase still counts its fields instead of naming them"
+    )
+
+
+def test_the_markup_holds_no_words_of_its_own():
+    """Every phrase is a name the page looks up, so switching language
+    reaches all of them."""
+    import pathlib
+    import re
+
+    page = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/index.html"
+    ).read_text(encoding="utf-8")
+    body = re.sub(r"<!--.*?-->", "", page, flags=re.S)
+    body = body[body.index("<aside"):]
+    left = [" ".join(run.split()) for run in re.split(r"<[^>]+>", body)]
+    turkish = [
+        run for run in left
+        if run and re.search(r"[çğıöşüÇĞİÖŞÜ]", run)
+    ]
+    assert not turkish, "still written into the markup: {}".format(turkish)
+
+
+def test_every_row_of_the_table_is_named_in_both():
+    from yerkon.viewer.state import MODES, mode_labels
+
+    turkish = mode_labels("tr")
+    english = mode_labels("en")
+    for name in MODES:
+        assert turkish[name] and english[name], name
+        assert turkish[name] != english[name], name
+
+
+def test_switching_language_moves_every_row_at_once():
+    """A language belongs to the person reading rather than to a row."""
+    session = Session()
+    session.speak("en")
+    for name in MODES:
+        assert session.read(name).language == "en"
+    assert "the rural row" in session.read("rural").settings().entry(
+        "rural.site").affects
+
+
+def test_resetting_a_row_keeps_the_language_on_screen():
+    session = Session()
+    session.speak("en")
+    assert session.reset("rural").language == "en"
 
 
 # --- Moving around the scene ---------------------------------------------

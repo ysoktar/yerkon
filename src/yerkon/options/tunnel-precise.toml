@@ -1,12 +1,21 @@
-# A YERKON deployment option.
+# Bir YERKON yerleşim seçeneği. / A YERKON deployment option.
+#
+# `--option tunnel-precise` ile defaults.toml üzerine uygulanır; yalnızca
+# farklı olan değerler listelenir.
 #
 # Applied over defaults.toml with `--option tunnel-precise`. Only the
 # figures that differ are listed; everything else stays as it is.
 
 name = 'tunnel-precise'
-title = 'tunnel: availability ≥ 99.0%, HPE P50 ≤ 1.00 m — 17 anchors  129 785 TL'
+title = 'Tünel: kullanılabilirlik ≥ %99,0, HPE P50 ≤ 1,00 m — 17 direk, 129 785 TL'
+title_en = 'tunnel: availability ≥ 99,0 %, HPE P50 ≤ 1,00 m — 17 anchors, 129 785 TL'
 origin = 'yerkon solve'
-note = """Found by searching 6 arrangements of the tunnel row against the real ground it stands on, and keeping the cheapest that met availability ≥ 99.0%, HPE P50 ≤ 1.00 m.
+note = """Tünel satırının 6 düzeni, üzerinde durduğu gerçek zemine karşı denenerek bulundu; kullanılabilirlik ≥ %99,0, HPE P50 ≤ 1,00 m koşulunu karşılayanların en ucuzu tutuldu.
+
+17 direkle, %100,0 kullanılabilirlik, ellinci yüzdelikte 0,48 m ve doksan beşinci yüzdelikte 2,40 m, saniyede 25,88 sabitleme veriyor.
+
+Her aday, uydurulmuş bir model değil tam bir benzetimdi; yani bu sayılar tablonun geldiği motorun ta kendisinden geliyor (ADR-0023)."""
+note_en = """Found by searching 6 arrangements of the tunnel row against the real ground it stands on, and keeping the cheapest that met availability ≥ 99.0%, HPE P50 ≤ 1.00 m.
 
 It delivers 100.0% availability, 0.48 m at the fiftieth percentile and 2.40 m at the ninety-fifth, at 25.88 fixes a second, from 17 anchors.
 

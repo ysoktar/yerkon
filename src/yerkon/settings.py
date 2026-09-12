@@ -30,11 +30,22 @@ from dataclasses import dataclass
 from typing import Optional
 
 from yerkon.evidence import Provenance, Sourced
+from yerkon.language import (
+    DEFAULT_LANGUAGE,
+    LANGUAGES,
+    chosen as language_chosen,
+)
 
 HERE = pathlib.Path(__file__).resolve().parent
 DEFAULT_FILE = HERE / "defaults.toml"
 
+#: Every entry says these, and the prose among them in both languages.
+#:
+#: The English is required rather than optional. An optional translation
+#: is one nobody writes, and the page would then show a figure whose note
+#: is Turkish beside one whose note is English (ADR-0035).
 REQUIRED = ("value", "unit", "provenance", "source", "note", "affects")
+TRANSLATED = ("source", "note", "affects", "sensitivity")
 
 
 @dataclass(frozen=True)
@@ -144,11 +155,18 @@ class Settings:
             ))
             lines.append("unit = {}".format(_quote(was.unit)))
             lines.append("provenance = {}".format(_quote(was.provenance.value)))
-            lines.append("source = {}".format(_quote(was.source)))
-            lines.append("note = {}".format(_quote(was.note)))
-            lines.append("affects = {}".format(_quote(entry.affects)))
-            if entry.sensitivity:
-                lines.append("sensitivity = {}".format(_quote(entry.sensitivity)))
+            # Both languages, from the shipped file, so that writing a
+            # settings file out and passing it back with --defaults does
+            # not quietly drop the half of it you were not reading.
+            other = _other_language(self, entry.key)
+            for name, value in (
+                ("source", was.source), ("note", was.note),
+                ("affects", entry.affects), ("sensitivity", entry.sensitivity),
+            ):
+                if value:
+                    lines.append("{} = {}".format(name, _quote(value)))
+                if other and other.get(name):
+                    lines.append("{}_en = {}".format(name, _quote(other[name])))
             lines.append("")
         return "\n".join(lines)
 
@@ -190,8 +208,15 @@ class Settings:
         return len(self.assumed) / measurable
 
 
-def load(path: Optional[str] = None) -> Settings:
-    """Read a settings file. Refuses an incomplete entry rather than filling it in."""
+def load(
+    path: Optional[str] = None, language: Optional[str] = None
+) -> Settings:
+    """Read a settings file, in one language.
+
+    Refuses an incomplete entry rather than filling it in. The values are
+    the same whichever language is asked for — only the prose beside them
+    changes, and a test builds the whole table twice to pin that.
+    """
     where = pathlib.Path(path) if path else DEFAULT_FILE
     if not where.exists():
         raise FileNotFoundError(
@@ -211,6 +236,7 @@ def load(path: Optional[str] = None) -> Settings:
             "figure the model needs.".format(where)
         )
 
+    wanted = language_chosen(language)
     entries = {}
     for key, fields in sorted(raw.items()):
         missing = [name for name in REQUIRED if name not in fields]
@@ -221,6 +247,20 @@ def load(path: Optional[str] = None) -> Settings:
                 "possible without reading the code."
                 .format(where, key, ", ".join(missing))
             )
+        def said(name: str) -> str:
+            """One field, in the language this file was asked for.
+
+            Falls back to the Turkish where a file has no English. A
+            settings file somebody wrote by hand to try one figure is
+            not a translation project, and refusing to load it would
+            make `--defaults` useless. The shipped file carries both,
+            and a test says so rather than the loader (ADR-0035).
+            """
+            turkish = str(fields.get(name, ""))
+            if wanted == "en":
+                return str(fields.get("{}_en".format(name), "")) or turkish
+            return turkish
+
         try:
             provenance = Provenance(fields["provenance"])
         except ValueError:
@@ -239,17 +279,36 @@ def load(path: Optional[str] = None) -> Settings:
                 else float(fields["value"]),
                 str(fields["unit"]),
                 provenance,
-                str(fields["source"]),
-                note=str(fields["note"]),
+                said("source"),
+                note=said("note"),
             ),
-            affects=str(fields["affects"]),
-            sensitivity=str(fields.get("sensitivity", "")),
+            affects=said("affects"),
+            sensitivity=said("sensitivity"),
         )
 
     return Settings(entries=entries, path=str(where))
 
 
 EDITED_NOTE = "Set by hand in the viewer, over: {}"
+
+
+def _other_language(settings: "Settings", key: str) -> Optional[dict]:
+    """The English beside a figure, when this Settings is the Turkish one.
+
+    Read from the shipped file rather than carried on the entry, because
+    an entry is one language by construction and carrying the other on it
+    would make every consumer ask which one it was holding.
+    """
+    english = IN_LANGUAGE.get("en")
+    if english is None or settings is english or key not in english.entries:
+        return None
+    entry = english.entries[key]
+    return {
+        "source": entry.sourced.source,
+        "note": entry.sourced.note,
+        "affects": entry.affects,
+        "sensitivity": entry.sensitivity,
+    }
 
 
 def _quote(text: str) -> str:
@@ -309,8 +368,17 @@ def _edited(entry: Entry, edit: Edit) -> Entry:
     )
 
 
-#: The shipped file, loaded once. Every module's defaults come from here.
+#: The shipped file, loaded once per language.
 #:
 #: A run that wants different figures loads its own and passes it to the
-#: catalogue builders, rather than mutating this.
-DEFAULTS = load()
+#: catalogue builders, rather than mutating these.
+IN_LANGUAGE = {name: load(language=name) for name in LANGUAGES}
+
+#: The shipped file in the default language. Every module's defaults come
+#: from here unless it was handed a Settings of its own.
+DEFAULTS = IN_LANGUAGE[DEFAULT_LANGUAGE]
+
+
+def defaults_in(language: Optional[str] = None) -> Settings:
+    """The shipped figures, in one language. The values do not differ."""
+    return IN_LANGUAGE[language_chosen(language)]

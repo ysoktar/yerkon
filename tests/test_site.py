@@ -123,7 +123,7 @@ def test_a_site_without_buildings_says_so_rather_than_implying_open_ground():
     """The difference between 'no buildings here' and 'nobody looked'."""
     manifest = SiteManifest("SRTM", 30.0, "2026-09-09T00:00:00+00:00")
     assert not manifest.has_buildings
-    assert "no building data" in manifest.describe()
+    assert "bina verisi yok" in manifest.describe()
 
 
 def test_a_site_with_buildings_reports_where_they_came_from():
@@ -131,7 +131,7 @@ def test_a_site_with_buildings_reports_where_they_came_from():
         "SRTM", 30.0, "2026-09-09T00:00:00+00:00",
         feature_source="OpenStreetMap", building_count=412,
     )
-    assert "412 buildings from OpenStreetMap" in manifest.describe()
+    assert "OpenStreetMap kaynağından 412 bina" in manifest.describe()
 
 
 # --- The cache ------------------------------------------------------------
@@ -212,7 +212,7 @@ def test_a_source_that_failed_is_recorded_not_hidden():
 
 
 def test_no_ground_at_all_is_the_one_fatal_case():
-    with pytest.raises(Unreachable, match="No elevation source answered"):
+    with pytest.raises(Unreachable, match="Hiçbir yükseklik kaynağı cevap vermedi"):
         build_site(ANKARA, elevation_sources=(DeadSource(),))
 
 
@@ -230,7 +230,7 @@ def test_missing_buildings_do_not_stop_a_fetch():
     )
     assert site.buildings is None
     assert not site.manifest.has_buildings
-    assert any("dead OSM unavailable" in note for note in site.manifest.notes)
+    assert any("dead OSM erişilemedi" in note for note in site.manifest.notes)
 
 
 # --- The GeoTIFF reader ---------------------------------------------------
@@ -270,6 +270,161 @@ def test_a_geotiff_on_disk_is_read_and_resampled(tmp_path):
 def test_the_services_are_named_so_a_manifest_can_cite_them():
     assert "OpenTopoData" in ServiceElevation().name
     assert OpenStreetMapBuildings().name == "OpenStreetMap"
+
+
+# --- OpenStreetMap, short of the network ---------------------------------
+#
+# Overpass is blocked from the sandbox this was built in (ADR-0021), and
+# every mirror with it, so the one thing these cannot check is the HTTP
+# hop. Everything on either side of it is checked here against a recorded
+# Overpass answer: the query that goes out, and what comes back becoming
+# buildings a link budget can be blocked by.
+
+
+OVERPASS_ANSWER = {
+    "version": 0.6,
+    "elements": [
+        # A mapper recorded a height.
+        {"type": "way", "id": 1, "center": {"lat": 39.9200, "lon": 32.8540},
+         "tags": {"building": "yes", "height": "24"}},
+        # Another recorded it with a unit on it.
+        {"type": "way", "id": 2, "center": {"lat": 39.9210, "lon": 32.8550},
+         "tags": {"building": "apartments", "height": "31 m"}},
+        # A third recorded storeys instead.
+        {"type": "way", "id": 3, "center": {"lat": 39.9220, "lon": 32.8560},
+         "tags": {"building": "yes", "building:levels": "8"}},
+        # A fourth recorded neither.
+        {"type": "way", "id": 4, "center": {"lat": 39.9230, "lon": 32.8570},
+         "tags": {"building": "retail"}},
+        # A fifth is a relation with no centre at all, which Overpass does
+        # return and which has no position to place.
+        {"type": "way", "id": 5, "tags": {"building": "yes"}},
+    ],
+}
+
+
+class RecordedOverpass:
+    """Overpass, as it answered. Records what was asked of it."""
+
+    def __init__(self, payload=None, status=200):
+        self.payload = OVERPASS_ANSWER if payload is None else payload
+        self.status = status
+        self.asked = None
+
+    def post(self, url, data=None, timeout=None):
+        self.asked = {"url": url, "data": data, "timeout": timeout}
+        return self
+
+    def raise_for_status(self):
+        if self.status != 200:
+            raise RuntimeError("{} from Overpass".format(self.status))
+
+    def json(self):
+        return self.payload
+
+
+def overpass_answering(monkeypatch, recorded):
+    """Put a recorded Overpass in the place the real one is imported from."""
+    import sys
+    import types
+
+    module = types.ModuleType("requests")
+    module.post = recorded.post
+    monkeypatch.setitem(sys.modules, "requests", module)
+    return recorded
+
+
+def test_the_overpass_query_asks_for_the_bounding_box_it_was_given(monkeypatch):
+    """South, west, north, east, in that order.
+
+    Overpass takes its bounding box in an order nothing else here uses, and
+    getting it wrong returns buildings from somewhere else entirely rather
+    than an error.
+    """
+    recorded = overpass_answering(monkeypatch, RecordedOverpass())
+    bounds = BoundingBox(south=39.91, west=32.84, north=39.93, east=32.86)
+
+    OpenStreetMapBuildings().buildings_for(bounds)
+
+    query = recorded.asked["data"]["data"]
+    assert "way[building](39.91,32.84,39.93,32.86)" in query, query
+    assert "out center tags" in query
+    assert "[out:json]" in query
+    assert recorded.asked["url"].endswith("/api/interpreter")
+
+
+def test_a_mapped_height_beats_a_storey_count_beats_a_default(monkeypatch):
+    """And the manifest says how many of each, because a site whose heights
+    are mostly the default is weaker evidence than one whose heights are
+    mapped."""
+    overpass_answering(monkeypatch, RecordedOverpass())
+    bounds = BoundingBox(south=39.91, west=32.84, north=39.93, east=32.86)
+
+    buildings, notes = OpenStreetMapBuildings().buildings_for(bounds)
+
+    # The one with no centre is dropped; Overpass returns those.
+    assert len(buildings.height_m) == 4
+    assert list(buildings.height_m) == [24.0, 31.0, 24.0, 9.0]
+    assert "2 bina yüksekliği etiketlenmiş, 1 tanesi kat sayısından" in (
+        " ".join(notes)
+    )
+
+
+def test_buildings_land_in_metres_from_the_corner_of_the_box(monkeypatch):
+    """Overpass answers in degrees and everything downstream is in metres."""
+    overpass_answering(monkeypatch, RecordedOverpass())
+    bounds = BoundingBox(south=39.91, west=32.84, north=39.93, east=32.86)
+    per_lat, per_lon = bounds.metres_per_degree()
+
+    buildings, _ = OpenStreetMapBuildings().buildings_for(bounds)
+
+    assert buildings.centre_x_m[0] == pytest.approx((32.8540 - 32.84) * per_lon)
+    assert buildings.centre_y_m[0] == pytest.approx((39.9200 - 39.91) * per_lat)
+    # Ordered south to north in the answer, so ordered up in metres.
+    assert list(buildings.centre_y_m) == sorted(buildings.centre_y_m)
+    assert (buildings.radius_m > 0).all()
+
+
+def test_overpass_failing_is_reported_rather_than_swallowed(monkeypatch):
+    """A site silently built with no buildings is a site that says a town
+    is open ground."""
+    overpass_answering(monkeypatch, RecordedOverpass(status=504))
+    bounds = BoundingBox(south=39.91, west=32.84, north=39.93, east=32.86)
+
+    with pytest.raises(Unreachable) as raised:
+        OpenStreetMapBuildings().buildings_for(bounds)
+    assert "OpenStreetMap" in str(raised.value)
+
+
+def test_fetched_buildings_become_ground_a_packet_can_be_blocked_by(monkeypatch):
+    """The whole point of asking Overpass: a link that crosses a tower
+    should not close as though the tower were not there."""
+    from yerkon.world import terrain_from_site
+
+    overpass_answering(monkeypatch, RecordedOverpass())
+    bounds = BoundingBox(south=39.91, west=32.84, north=39.93, east=32.86)
+    buildings, _ = OpenStreetMapBuildings().buildings_for(bounds)
+
+    # Its own site, big enough to hold the box the buildings came from.
+    site = Site(
+        bounds=bounds,
+        elevation_grid_m=np.zeros((120, 120)),
+        grid_spacing_m=30.0,
+        manifest=SiteManifest("test", 30.0, "2026-09-09T00:00:00+00:00"),
+        buildings=buildings,
+    )
+    terrain = terrain_from_site(site)
+
+    tallest = int(buildings.height_m.argmax())
+    x = float(buildings.centre_x_m[tallest])
+    y = float(buildings.centre_y_m[tallest])
+    # A point inside a footprint reports the roof, because that is the
+    # surface a path over it has to clear.
+    assert terrain.height_at(x, y) == pytest.approx(
+        float(buildings.height_m[tallest])
+    ), "the tallest building is not standing on the ground it was put on"
+    # And open ground beside it is still open ground.
+    assert terrain.height_at(x + 500.0, y + 500.0) == pytest.approx(0.0)
 
 
 def test_a_site_becomes_terrain_that_carries_its_own_roughness():
@@ -611,7 +766,7 @@ def test_a_cached_tile_is_read_without_touching_the_network(tmp_path):
 
     assert np.allclose(grid.values_m, 900.0)
     assert grid.resolution_m == pytest.approx(30.0)
-    assert "1 tile" in grid.source
+    assert "×1" in grid.source
 
 
 def test_two_tiles_are_joined_along_the_meridian_they_share(tmp_path):
@@ -628,7 +783,7 @@ def test_two_tiles_are_joined_along_the_meridian_they_share(tmp_path):
     straddling = BoundingBox(south=39.85, west=32.70, north=39.98, east=33.05)
     grid = copernicus.grid_for(straddling, spacing_m=500.0)
 
-    assert "2 tiles" in grid.source
+    assert "×2" in grid.source
     assert grid.values_m[0, 0] == pytest.approx(900.0), "west of the meridian"
     assert grid.values_m[0, -1] == pytest.approx(300.0), "east of it"
     assert set(np.unique(grid.values_m)) == {900.0, 300.0}

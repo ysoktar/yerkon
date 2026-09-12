@@ -21,6 +21,7 @@ from typing import Optional, Protocol
 
 import numpy as np
 
+from yerkon.language import say
 from yerkon.site.model import BoundingBox, Buildings, Site, SiteManifest
 
 DEFAULT_TIMEOUT_S = 30.0
@@ -270,9 +271,10 @@ class CopernicusElevation:
 
         return ElevationGrid(
             values_m=grid.values_m, spacing_m=grid.spacing_m,
-            source="{} ({} tile{})".format(
-                self.name, len(paths), "" if len(paths) == 1 else "s"
-            ),
+            # Written the same way in both languages, because it is a
+            # record of what was fetched rather than a sentence about it,
+            # and it is stored in the manifest on disk (ADR-0035).
+            source="{} ×{}".format(self.name, len(paths)),
             resolution_m=self.nominal_resolution_m,
         )
 
@@ -528,7 +530,7 @@ class OpenStreetMapBuildings:
         try:
             import requests
         except ImportError as error:
-            raise Unreachable("OpenStreetMap access needs requests.") from error
+            raise Unreachable(say("site.needs_requests")) from error
 
         query = (
             "[out:json][timeout:60];"
@@ -543,7 +545,9 @@ class OpenStreetMapBuildings:
             response.raise_for_status()
             payload = response.json()
         except Exception as error:
-            raise Unreachable("{} did not answer: {}".format(self.name, error)) from error
+            raise Unreachable(
+                say("site.no_answer", None, name=self.name, error=error)
+            ) from error
 
         per_lat, per_lon = bounds.metres_per_degree()
         xs, ys, radii, heights = [], [], [], []
@@ -574,13 +578,10 @@ class OpenStreetMapBuildings:
             heights.append(height)
 
         notes = (
-            "{} building heights tagged, {} from storey counts, {} defaulted "
-            "to {:.0f} m".format(
-                from_height_tag, from_levels, from_default, self.default_height_m
-            ),
-            "Footprints are circles of an area implied by height, because "
-            "OpenStreetMap centres were fetched rather than outlines. A link "
-            "budget only asks whether a building is in the way.",
+            say("site.heights_tagged", None,
+                tagged=from_height_tag, levels=from_levels,
+                defaulted=from_default, default_m=self.default_height_m),
+            say("site.footprints"),
         )
 
         return (
@@ -649,8 +650,8 @@ def build_site(
         # Carry each source's own reason forward. A caller told only that
         # nothing answered cannot tell a network failure from an area too
         # large to ask for, and those need opposite responses.
-        detail = "\n  ".join(refusals) if refusals else "no sources were given"
-        raise Unreachable("No elevation source answered.\n  " + detail)
+        detail = "\n  ".join(refusals) if refusals else say("site.no_sources")
+        raise Unreachable(say("site.no_elevation", None, detail=detail))
 
     buildings: Optional[Buildings] = None
     feature_source: Optional[str] = None
@@ -660,7 +661,8 @@ def build_site(
             feature_source = buildings_source.name
             notes.extend(building_notes)
         except Unreachable as error:
-            notes.append("{} unavailable: {}".format(buildings_source.name, error))
+            notes.append(say("site.unreachable", None,
+                              name=buildings_source.name, error=error))
 
     return Site(
         bounds=bounds,

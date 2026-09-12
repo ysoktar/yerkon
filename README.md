@@ -1,5 +1,7 @@
 # YERKON simulation
 
+*Türkçe: **[README.tr.md](README.tr.md)***
+
 Estimates what a terrestrial positioning network built from the YERKON
 hardware delivers, and what it costs to build and run. The output is the
 YERKON block of the comparison table on page 15 of the report.

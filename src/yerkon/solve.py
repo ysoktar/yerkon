@@ -33,6 +33,8 @@ from typing import Callable, Optional
 
 from yerkon.cost import OperatingRates, operating_rates, price
 from yerkon.evaluate import run_scenario
+from yerkon.language import LANGUAGES, say
+from yerkon.numbers import decimal_comma
 from yerkon.options import Option
 from yerkon.parallel import spread
 from yerkon.scenarios import catalogue
@@ -69,17 +71,22 @@ class Target:
             and outcome.fixes_per_second >= self.fixes_per_second
         )
 
-    def describe(self) -> str:
+    def describe(self, language: Optional[str] = None) -> str:
         parts = []
         if self.availability > 0.0:
-            parts.append("availability ≥ {:.1%}".format(self.availability))
+            parts.append(say(
+                "target.availability", language,
+                availability=decimal_comma(100.0 * self.availability, 1)))
         if math.isfinite(self.hpe_p50_m):
-            parts.append("HPE P50 ≤ {:.2f} m".format(self.hpe_p50_m))
+            parts.append(say("target.hpe_p50", language,
+                             value=decimal_comma(self.hpe_p50_m)))
         if math.isfinite(self.hpe_p95_m):
-            parts.append("HPE P95 ≤ {:.2f} m".format(self.hpe_p95_m))
+            parts.append(say("target.hpe_p95", language,
+                             value=decimal_comma(self.hpe_p95_m)))
         if self.fixes_per_second > 0.0:
-            parts.append("{:.2f} fixes a second".format(self.fixes_per_second))
-        return ", ".join(parts) or "nothing in particular"
+            parts.append(say("target.fixes", language,
+                             value=decimal_comma(self.fixes_per_second)))
+        return ", ".join(parts) or say("target.nothing", language)
 
 
 @dataclass(frozen=True)
@@ -207,6 +214,9 @@ class Search:
     scenario: str
     target: Target
     tried: tuple[Outcome, ...] = field(default_factory=tuple)
+    #: Which language its refusals are written in. What it saves is
+    #: written in both regardless (ADR-0035).
+    language: Optional[str] = None
 
     @property
     def met(self) -> tuple[Outcome, ...]:
@@ -228,11 +238,10 @@ class Search:
         """The winner, written up so it can be chosen by name from now on."""
         best = self.best
         if best is None:
-            raise ValueError(
-                "nothing met {}; there is no option to save".format(
-                    self.target.describe()
-                )
-            )
+            raise ValueError(say(
+                "solve.none_met", self.language,
+                target=self.target.describe(self.language),
+            ))
         moved = {
             key: value
             for key, value in best.values.items()
@@ -243,34 +252,41 @@ class Search:
             # changes nothing would put a file in the list whose whole
             # content is a claim, and choosing it later would look like a
             # decision when it is a no-op.
-            raise AlreadyMet(
-                "the settings already meet {}; the cheapest arrangement "
-                "that meets it is the one you have, so there is nothing "
-                "to save".format(self.target.describe())
-            )
+            raise AlreadyMet(say(
+                "solve.already_met", self.language,
+                target=self.target.describe(self.language),
+            ))
+        # Written in both languages at once, because an option is saved
+        # once and read by whoever opens it afterwards (ADR-0035).
+        said = {
+            language: {
+                "title": say(
+                    "solve.title", language,
+                    scenario=self.scenario,
+                    target=self.target.describe(language),
+                    anchors=best.anchors,
+                    capex="{:,.0f}".format(best.capex_tl).replace(",", " "),
+                ),
+                "note": say(
+                    "solve.note", language,
+                    scenario=self.scenario, tried=len(self.tried),
+                    target=self.target.describe(language),
+                    anchors=best.anchors,
+                    availability=decimal_comma(100.0 * best.availability, 1),
+                    hpe_p50=decimal_comma(best.hpe_p50_m),
+                    hpe_p95=decimal_comma(best.hpe_p95_m),
+                    fixes=decimal_comma(best.fixes_per_second),
+                ),
+            }
+            for language in LANGUAGES
+        }
         return Option(
             name=name,
-            title="{}: {} — {}".format(
-                self.scenario, self.target.describe(),
-                "{} anchors, {:,.0f} TL".format(best.anchors, best.capex_tl)
-                .replace(",", " "),
-            ),
+            title=said["tr"]["title"],
+            note=said["tr"]["note"],
+            title_en=said["en"]["title"],
+            note_en=said["en"]["note"],
             origin="yerkon solve",
-            note=(
-                "Found by searching {} arrangements of the {} row against "
-                "the real ground it stands on, and keeping the cheapest "
-                "that met {}.\n\n"
-                "It delivers {:.1%} availability, {:.2f} m at the fiftieth "
-                "percentile and {:.2f} m at the ninety-fifth, at {:.2f} "
-                "fixes a second, from {} anchors.\n\n"
-                "Every candidate was a full simulation rather than a "
-                "fitted model, so these figures come from the same engine "
-                "the table does (ADR-0023)."
-            ).format(
-                len(self.tried), self.scenario, self.target.describe(),
-                best.availability, best.hpe_p50_m, best.hpe_p95_m,
-                best.fixes_per_second, best.anchors,
-            ),
             values=moved,
         )
 

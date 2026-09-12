@@ -18,9 +18,9 @@ from yerkon.cost import DEFAULT_RATES, price
 from yerkon.design import Design, REGION_CHOICES, chosen
 from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
+from yerkon.language import LANGUAGES, LANGUAGE_NAMES
 from yerkon.viewer.state import (
-    MODES,
-    MODE_LABELS,
+    mode_labels,
     ViewState,
     fetched_sites,
 )
@@ -277,7 +277,14 @@ def scene(state: ViewState) -> dict:
             "radios": [
                 [key, radio.part] for key, radio in sorted(radio_of.items())
             ],
-            "modes": [[name, MODE_LABELS[name]] for name in MODES],
+            "modes": [
+                [name, label]
+                for name, label in mode_labels(state.language).items()
+            ],
+            # Served rather than written into the page, like everything
+            # else it offers: the page should never hold a second list
+            # that can drift from the engine's.
+            "languages": [[name, LANGUAGE_NAMES[name]] for name in LANGUAGES],
         },
         "road": road,
         "anchors": anchors,

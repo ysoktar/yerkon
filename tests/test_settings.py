@@ -81,7 +81,7 @@ def test_the_list_separates_what_is_measured_from_what_is_guessed():
         assert entry.sourced.provenance is Provenance.ASSUMPTION
     for entry in DEFAULTS.sourced_entries:
         assert entry.sourced.provenance is not Provenance.ASSUMPTION
-        assert entry.sourced.source != "this project"
+        assert entry.sourced.source != "bu proje"
 
 
 def test_the_clock_residual_is_the_one_that_has_been_measured():
@@ -97,7 +97,7 @@ def test_sourcing_a_figure_stops_it_counting_as_an_assumption(tmp_path):
 value = 85000.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"''',
+source = "bu proje"''',
         '''[values."mounting.tall_mast.site_cost_tl"]
 value = 5000.0
 unit = "TL"
@@ -110,6 +110,63 @@ source = "a quotation"''',
     assert not settings.entry("mounting.tall_mast.site_cost_tl").is_assumed
     assert len(settings.assumed) == len(DEFAULTS.assumed) - 1
     assert settings.assumed_share < DEFAULTS.assumed_share
+
+
+# --- Two languages --------------------------------------------------------
+
+
+def test_every_figure_says_the_same_thing_in_both_languages():
+    """A figure with one of them is a page half in a language nobody chose.
+
+    The loader falls back rather than refusing, so that a settings file
+    somebody wrote by hand to try one figure still loads. That makes this
+    the only thing standing between the shipped file and a half-English
+    panel (ADR-0035).
+    """
+    from yerkon.settings import TRANSLATED, defaults_in
+
+    turkish = defaults_in("tr")
+    english = defaults_in("en")
+    assert set(turkish.entries) == set(english.entries)
+
+    missing = []
+    for key in sorted(turkish.entries):
+        was, now = turkish.entries[key], english.entries[key]
+        for name, left, right in (
+            ("source", was.sourced.source, now.sourced.source),
+            ("note", was.sourced.note, now.sourced.note),
+            ("affects", was.affects, now.affects),
+            ("sensitivity", was.sensitivity, now.sensitivity),
+        ):
+            if left and left == right:
+                missing.append("{} {}".format(key, name))
+    assert "sensitivity" in TRANSLATED
+    assert not missing, "not translated: {}".format(", ".join(missing))
+
+
+def test_a_language_changes_no_number():
+    """It chooses which of two sentences is shown. Nothing else."""
+    from yerkon.settings import defaults_in
+
+    turkish = defaults_in("tr")
+    english = defaults_in("en")
+    for key, entry in turkish.entries.items():
+        other = english.entries[key]
+        assert entry.sourced.value == other.sourced.value, key
+        assert entry.sourced.unit == other.sourced.unit, key
+        assert entry.sourced.provenance is other.sourced.provenance, key
+
+
+def test_a_settings_file_written_out_keeps_both_languages():
+    """Or passing it back with --defaults drops the half you were not
+    reading."""
+    from yerkon.settings import defaults_in, load
+
+    written = write(pathlib.Path("/tmp"), defaults_in("tr").to_toml(),
+                    name="both.toml")
+    assert load(written).entry("rural.site").affects != (
+        load(written, "en").entry("rural.site").affects
+    )
 
 
 # --- What reads it --------------------------------------------------------

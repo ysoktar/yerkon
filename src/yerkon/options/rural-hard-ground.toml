@@ -1,12 +1,19 @@
-# A YERKON deployment option.
+# Bir YERKON yerleşim seçeneği. / A YERKON deployment option.
+#
+# `--option rural-hard-ground` ile defaults.toml üzerine uygulanır; yalnızca
+# farklı olan değerler listelenir.
 #
 # Applied over defaults.toml with `--option rural-hard-ground`. Only the
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-hard-ground'
 title = 'Kırsal: Gölbaşı tepeleri — tasarlanmadığı arazide'
+title_en = 'Rural: the Gölbaşı hills — terrain it was not designed for'
 origin = 'shipped'
-note = """The same deployment on 907 m of relief instead of Polatlı's 486 m. Availability falls from about 90 % to about 45 %, and closing the grid does not rescue it: 189 masts instead of 33 reaches 61 % (ADR-0021). This is not a proposal. It is the case that says what this design costs in terrain it was not meant for, and it is here so that number can be reproduced rather than quoted.
+note = """Aynı yerleşim, Polatlı'nın 486 m'si yerine 907 m rölyefin üzerinde. Kullanılabilirlik yaklaşık %90'dan yaklaşık %45'e düşüyor ve ızgarayı sıklaştırmak onu kurtarmıyor: 33 yerine 189 direk %61'e ulaşıyor (ADR-0021). Bu bir öneri değil. Bu tasarımın, tasarlanmadığı arazide neye mal olduğunu söyleyen durumdur; ve o sayının aktarılması değil yeniden üretilebilmesi için burada durur.
+
+Yedek rölyef değerini değil, satırın sahasını değiştirir. İlk hâli site.rural_relief_m'yi ayarlıyordu; o da yalnızca hiçbir zemin getirilmemişken okunuyor — yani hiçbir şeyi değiştirmiyordu ve bunu hiçbir yerde söylemiyordu (ADR-0027)."""
+note_en = """The same deployment on 907 m of relief instead of Polatlı's 486 m. Availability falls from about 90 % to about 45 %, and closing the grid does not rescue it: 189 masts instead of 33 reaches 61 % (ADR-0021). This is not a proposal. It is the case that says what this design costs in terrain it was not meant for, and it is here so that number can be reproduced rather than quoted.
 
 It moves the row's site rather than the fallback relief figure. The first version set site.rural_relief_m, which is only consulted when no ground has been fetched — so it changed nothing at all, and said so nowhere (ADR-0027)."""
 

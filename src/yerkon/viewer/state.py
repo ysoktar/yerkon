@@ -10,6 +10,7 @@ Nothing here computes physics. It arranges.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+from typing import Optional
 
 import numpy as np
 
@@ -31,7 +32,8 @@ from yerkon.scenarios import (
     fetched,
     tunnel_ground,
 )
-from yerkon.settings import DEFAULTS, Settings
+from yerkon.language import DEFAULT_LANGUAGE, say
+from yerkon.settings import Settings, defaults_in
 from yerkon.world import (
     Anchor,
     Road,
@@ -172,6 +174,12 @@ class ViewState:
     region: str = "TR"
     scheme: str = "single"
 
+    #: Which language the figures, the notes and the ground read in.
+    #:
+    #: Nothing else about the row depends on it: the same deployment,
+    #: the same numbers, the same table (ADR-0035).
+    language: str = DEFAULT_LANGUAGE
+
     corridor_m: float = 24_000.0
 
     #: How far the site extends across, in metres. Zero is a corridor.
@@ -245,7 +253,7 @@ class ViewState:
 
     def settings(self) -> Settings:
         """The figures this run uses: the shipped file, plus any edits."""
-        return DEFAULTS.with_values(self.overrides)
+        return defaults_in(self.language).with_values(self.overrides)
 
     def catalogues(self):
         """Mountings and radios built from this run's own figures."""
@@ -273,7 +281,8 @@ class ViewState:
         """
         if self.bore:
             return tunnel_ground(
-                self.settings(), max(self.corridor_m, 100.0), self.site
+                self.settings(), max(self.corridor_m, 100.0), self.site,
+                language=self.language,
             )
         if self.site:
             site = fetched(self.site)
@@ -283,7 +292,8 @@ class ViewState:
                     "first; see ADR-0008.".format(SITES / self.site, SITES / self.site)
                 )
             return terrain_from_site(
-                site, clutter_loss_db_per_km=self.clutter_db_per_km
+                site, clutter_loss_db_per_km=self.clutter_db_per_km,
+                language=self.language,
             )
         return rolling_terrain(
             amplitude_m=max(self.relief_m, 1.0),
@@ -291,6 +301,7 @@ class ViewState:
             clutter_loss_db_per_km=self.clutter_db_per_km,
             micro_roughness_m=self.roughness_m,
             seed=self.seed,
+            language=self.language,
         )
 
     def anchors(self, terrain: Terrain) -> tuple[Anchor, ...]:
@@ -356,7 +367,9 @@ class ViewState:
         return Scenario(
             # The row's own name, so a table run from the page prints the
             # same heading the report does rather than the tab's key.
-            name=MODE_LABELS.get(self.scenario, self.scenario),
+            name=mode_labels(self.language).get(
+                self.scenario, self.scenario
+            ),
             terrain=terrain,
             deployment=self.deployment(terrain),
             seed=self.seed,
@@ -518,12 +531,13 @@ def from_scenario(name: str) -> ViewState:
 #: modules, which is what made it a mixed corridor.
 MODES = ("urban", "rural", "tunnel")
 
-#: What each row is called on its tab.
-MODE_LABELS = {
-    "urban": "Şehir içi",
-    "rural": "Kırsal",
-    "tunnel": "Tünel",
-}
+def mode_labels(language: Optional[str] = None) -> dict:
+    """What each row is called on its tab, in one language."""
+    return {name: say("row." + name, language) for name in MODES}
+
+
+#: What each row is called, in the default language.
+MODE_LABELS = mode_labels()
 
 
 CASCADING = {

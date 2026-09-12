@@ -45,6 +45,7 @@ from yerkon.viewer.tasks import (
     table as table_task,
     target_from,
 )
+from yerkon.language import chosen as language_chosen
 from yerkon.viewer.state import (
     CASCADING,
     MODES,
@@ -106,11 +107,24 @@ class Session:
                 )
             return tuple((name, self.states[name]) for name in wanted)
 
+    def speak(self, language: Optional[str]) -> ViewState:
+        """Put every row into one language, and return the one showing."""
+        wanted = language_chosen(language)
+        with self._lock:
+            self.states = {
+                name: state.merged({"language": wanted})
+                for name, state in self.states.items()
+            }
+            return self.states[self.showing]
+
     def reset(self, name: Optional[str] = None) -> ViewState:
-        """Put one row back as it ships. The others keep their edits."""
+        """Put one row back as it ships, keeping the language on screen."""
         with self._lock:
             which = name or self.showing
-            self.states[which] = from_scenario(which)
+            language = self.states[which].language
+            self.states[which] = from_scenario(which).merged(
+                {"language": language}
+            )
             return self.states[which]
 
 
@@ -250,7 +264,7 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         if path in ("/", "/index.html"):
             return self._file("index.html", "text/html; charset=utf-8")
-        if path in ("/app.js", "/draw.js"):
+        if path in ("/app.js", "/draw.js", "/words.js"):
             return self._file(path.lstrip("/"), "text/javascript; charset=utf-8")
         if path == "/favicon.ico":
             self.send_response(204)
@@ -294,6 +308,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(lambda: self._apply(body.get("changes", {})))
         if path == "/api/mode":
             return self._json(lambda: self._mode(body.get("mode", "rural")))
+        if path == "/api/language":
+            return self._json(lambda: self._language(body.get("language")))
         if path == "/api/reset":
             return self._json(
                 lambda: {"state": self.session.reset().as_json()}
@@ -331,6 +347,15 @@ class Handler(BaseHTTPRequestHandler):
         state.merged(changes)
         found = cascades(state, changes)
         return {"cascades": found} if found else {"cascades": None}
+
+    def _language(self, language) -> dict:
+        """Say the whole study in the other language.
+
+        Every row at once rather than the one showing, because a language
+        is a property of the person reading rather than of a row, and a
+        page half in each is the thing this exists to avoid (ADR-0035).
+        """
+        return {"state": self.session.speak(language).as_json()}
 
     def _mode(self, name: str) -> dict:
         """Show one of the three rows, keeping what the others hold.

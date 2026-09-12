@@ -371,8 +371,12 @@ label.knob > input:disabled { opacity: 0.45; }
 }
 
 .find input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-.find button { flex: 0 0 28px; padding: 4px; color: #8a97a3; }
-body:not(.finding) .find button { visibility: hidden; }
+#find-clear { flex: 0 0 28px; padding: 4px; color: #8a97a3; }
+/* Scoped to the one button it is about. As `.find button` it also hid
+ * the language chooser, which lives in the same row — the chooser was
+ * built, styled and wired, and invisible until somebody typed a
+ * search. */
+body:not(.finding) #find-clear { visibility: hidden; }
 .no-hits { margin: 2px 0 0; color: var(--warn); }
 
 /* While searching, the prose that explains a step is not what is being
@@ -425,3 +429,28 @@ i.prov.assumption { background: var(--warn); }
 }
 
 #readout h2 { margin-top: 10px; }
+
+
+/* ---------- two languages, both on screen ----------
+ *
+ * Not a menu. There are two, and a two-item menu costs a click to find
+ * out what is in it.
+ */
+
+#languages { display: flex; gap: 2px; flex: 0 0 auto; }
+
+#languages button {
+  flex: 0 0 auto;
+  padding: 4px 7px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  border-color: var(--line);
+  background: #fff;
+  color: #8a97a3;
+}
+
+#languages button.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}

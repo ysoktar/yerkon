@@ -18,6 +18,7 @@ import tomllib
 from dataclasses import dataclass, field
 from typing import Optional
 
+from yerkon.language import chosen
 from yerkon.numbers import readable
 from yerkon.settings import DEFAULTS, Settings
 
@@ -38,6 +39,32 @@ class Option:
     values: dict = field(default_factory=dict)
     #: Where it came from: shipped with the project, or written by a search.
     origin: str = "shipped"
+    #: The English beside the Turkish above.
+    #:
+    #: Beside one another rather than in two files, for the same reason
+    #: the settings file carries both: two files drift, and an option
+    #: whose Turkish and English claim different things about the same
+    #: figures is worse than one with no English at all (ADR-0035).
+    #:
+    #: Last rather than beside their Turkish, because this class is built
+    #: positionally in a dozen places and putting a new field in the
+    #: middle of one silently shifts every argument after it — which is
+    #: how an option with no values at all passed a test that existed to
+    #: refuse exactly that.
+    title_en: str = ""
+    note_en: str = ""
+
+    def said(self, language: Optional[str] = None) -> tuple[str, str]:
+        """Its title and note, in one language.
+
+        Falls back to the Turkish where an option has no English — a
+        saved option written before this, or one somebody wrote by hand —
+        because refusing to show it would hide a deployment somebody
+        saved rather than prompt them to translate it.
+        """
+        if chosen(language) == "en":
+            return (self.title_en or self.title, self.note_en or self.note)
+        return (self.title, self.note)
 
     def applied_to(self, settings: Settings = DEFAULTS) -> Settings:
         """The settings this option describes.
@@ -67,28 +94,37 @@ class Option:
 
     def as_toml(self) -> str:
         lines = [
-            "# A YERKON deployment option.",
+            "# Bir YERKON yerleşim seçeneği. / A YERKON deployment option.",
             "#",
-            "# Applied over defaults.toml with `--option {}`. Only the".format(
-                self.name
-            ),
+            "# `--option {}` ile defaults.toml üzerine uygulanır; yalnızca"
+            .format(self.name),
+            "# farklı olan değerler listelenir.",
+            "#",
+            "# Applied over defaults.toml with `--option {}`. Only the"
+            .format(self.name),
             "# figures that differ are listed; everything else stays as it is.",
             "",
             "name = {!r}".format(self.name),
             "title = {!r}".format(self.title),
-            "origin = {!r}".format(self.origin),
-            'note = """{}"""'.format(self.note),
-            "",
-            "[values]",
         ]
+        if self.title_en:
+            lines.append("title_en = {!r}".format(self.title_en))
+        lines.append("origin = {!r}".format(self.origin))
+        lines.append('note = """{}"""'.format(self.note))
+        if self.note_en:
+            lines.append('note_en = """{}"""'.format(self.note_en))
+        lines += ["", "[values]"]
         for key, value in sorted(self.values.items()):
             lines.append("{!r} = {!r}".format(
                 key, value if isinstance(value, str) else float(value)))
         return "\n".join(lines) + "\n"
 
-    def describe(self, settings: Settings = DEFAULTS) -> str:
+    def describe(
+        self, settings: Settings = DEFAULTS, language: Optional[str] = None
+    ) -> str:
         """One block a person can read before choosing it."""
-        lines = ["{}  —  {}".format(self.name, self.title)]
+        title, _ = self.said(language)
+        lines = ["{}  —  {}".format(self.name, title)]
         for key, was, now in self.differences(settings):
             lines.append("    {:<38} {} -> {}".format(
                 key, _shown(was), _shown(now)
@@ -133,6 +169,8 @@ def read(name: str, where: Optional[pathlib.Path] = None) -> Option:
         name=str(payload["name"]),
         title=str(payload["title"]),
         note=str(payload["note"]),
+        title_en=str(payload.get("title_en", "")),
+        note_en=str(payload.get("note_en", "")),
         values={
             str(k): v if isinstance(v, str) else float(v)
             for k, v in payload["values"].items()

@@ -1,12 +1,21 @@
-# A YERKON deployment option.
+# Bir YERKON yerleşim seçeneği. / A YERKON deployment option.
+#
+# `--option rural-dense` ile defaults.toml üzerine uygulanır; yalnızca
+# farklı olan değerler listelenir.
 #
 # Applied over defaults.toml with `--option rural-dense`. Only the
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-dense'
 title = 'Kırsal: 3 km ızgara, 30 m direk — %91,4, iki katı sermayeye'
+title_en = 'Rural: a 3 km grid on 30 m masts — 91,4 %, for twice the capital'
 origin = 'shipped'
-note = """Forty-nine masts at three kilometres instead of thirty-three at four, each five metres taller: 91,43 % availability against the default's 89,50 %, for 6 516 151 TL against 3 154 228 TL.
+note = """Dört kilometrede otuz üç direk yerine üç kilometrede kırk dokuz direk, her biri beş metre daha uzun: varsayılanın %89,50'sine karşı %91,43 kullanılabilirlik, 3 154 228 TL'ye karşı 6 516 151 TL.
+
+Satın almadan önce bunu oku. 3,4 milyon liraya 1,9 puan, yani puan başına yaklaşık 1,7 milyon — kötü bir değer, ve hep böyle değildi. Yerine geçtiği not "yüzde doksanı geçmenin en ucuz yolu" diye söz veriyordu ve varsayılan %82,26'da dururken yazılmıştı. Kırsal turu, bir konumun kaç direğe ihtiyaç duyduğuna göre değil kaç direğin cevap verdiğine göre boyutlamak onu hiç sermaye harcamadan %89,50'ye çıkardı (ADR-0022) ve bu seçeneğin eskiden satın aldığının çoğu onunla birlikte gitti.
+
+Puan başına rural-tall'ı hâlâ geçiyor, çünkü çelik kabaca yüksekliğin karesiyle büyür. İkisi eskisinden çok daha yakın."""
+note_en = """Forty-nine masts at three kilometres instead of thirty-three at four, each five metres taller: 91,43 % availability against the default's 89,50 %, for 6 516 151 TL against 3 154 228 TL.
 
 Read that before buying it. It is 1,9 points for 3,4 million lira, or about 1,7 million a point — poor value, and it was not always. The note this replaces promised "the cheapest way past ninety percent" and was written when the default sat at 82,26 %. Sizing the rural round by how many anchors answer rather than by how many a fix needs took it to 89,50 % for no capital at all (ADR-0022), and most of what this option used to buy went with it.
 

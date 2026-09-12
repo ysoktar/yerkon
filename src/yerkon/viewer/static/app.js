@@ -10,11 +10,20 @@
  * else applies immediately.
  */
 
-const CHOICES = {
-  region: [["TR", "Türkiye"], ["EU", "Avrupa"], ["US", "Amerika"],
-           ["US-PTP", "Amerika (noktadan noktaya)"], ["LICENSED", "Lisanslı"]],
-  scheme: [["single", "Tek yönlü TWR"], ["double", "Çift yönlü TWR"]],
-};
+import { say, speak, speaks } from "/words.js";
+
+/* The choices whose names are this page's to give.
+ *
+ * Built rather than written down, so that switching language rebuilds
+ * them. Everything the engine can name for itself — the mountings, the
+ * modules, the rows, the ground — is served already named (ADR-0035).
+ */
+const choicesNow = () => ({
+  region: ["TR", "EU", "US", "US-PTP", "LICENSED"]
+    .map(code => [code, say("region." + code)]),
+  scheme: [["single", say("scheme.single")], ["double", say("scheme.double")]],
+});
+let CHOICES = {};
 
 /* Served by the engine rather than written here. The hardcoded version
  * drifted: it never listed the tunnel bracket, so the one mounting the
@@ -23,9 +32,13 @@ const CHOICES = {
 let RADIOS = [];
 let MOUNTINGS = [];
 let TABS = [];
+let LANGUAGES = [];
 /* What each row is called, as the engine named it. */
 const MODE_LABEL = {};
-const KINDS = [["vehicle", "Kara aracı alıcısı"], ["pedestrian", "Yaya alıcısı"]];
+const kindsNow = () => [
+  ["vehicle", say("unit.vehicle")], ["pedestrian", say("unit.pedestrian")],
+];
+let KINDS = [];
 
 /* What ground is on hand. The server finds it rather than listing it, so
  * a fourth `yerkon fetch` turns up here without any of this changing.
@@ -59,12 +72,18 @@ async function ask(path, body) {
   return payload;
 }
 
-function say(text, bad) {
+/* The line that tells you what just happened, and then stops.
+ *
+ * Named apart from `say`, which is the catalogue: one of them is a
+ * phrase and the other is the place a phrase goes, and they read alike
+ * enough that sharing a name would be a bug waiting for a long file.
+ */
+function flash(text, bad) {
   const el = document.getElementById("status");
   el.textContent = text;
   el.className = "on" + (bad ? " bad" : "");
-  clearTimeout(say.timer);
-  if (text) say.timer = setTimeout(() => { el.className = ""; }, 2600);
+  clearTimeout(flash.timer);
+  if (text) flash.timer = setTimeout(() => { el.className = ""; }, 2600);
 }
 
 /* ---------- editing ---------- */
@@ -97,27 +116,42 @@ async function apply(changes) {
  * translation and much better than a blank.
  */
 const WORDS = {
-  region: ["Bölge", ""],
-  anchor_radio: ["Modül", ""],
-  mounting: ["Montaj", ""],
-  receiver_height_m: ["Alıcı anten yüksekliği", ""],
-  surface_roughness_m: ["Yüzey pürüzü", ""],
-  target_ranging_sigma_m: ["Menzil toleransı", ""],
-  eirp_dbm: ["Yasal yayın gücü",
-             "gücü bölgenin tavanı ve antenin kazancı belirliyor"],
-  anchor_height_m: ["Direk yüksekliği",
-                    "montaj yapısı direğin ne kadar yükseldiğini belirliyor"],
-  corridor_m: ["Sahanın boyu", ""],
-  from_m: ["Grubun başlangıcı",
+  tr: {
+    region: ["Bölge", ""],
+    anchor_radio: ["Modül", ""],
+    mounting: ["Montaj", ""],
+    receiver_height_m: ["Alıcı anten yüksekliği", ""],
+    surface_roughness_m: ["Yüzey pürüzü", ""],
+    target_ranging_sigma_m: ["Menzil toleransı", ""],
+    eirp_dbm: ["Yasal yayın gücü",
+               "gücü bölgenin tavanı ve antenin kazancı belirliyor"],
+    anchor_height_m: ["Direk yüksekliği",
+                      "montaj yapısı direğin ne kadar yükseldiğini belirliyor"],
+    corridor_m: ["Sahanın boyu", ""],
+    from_m: ["Grubun başlangıcı",
+             "sahanın dışında kalan direk hiçbir şeyin modellemediği "
+             + "zeminde durur"],
+    to_m: ["Grubun bitişi",
            "sahanın dışında kalan direk hiçbir şeyin modellemediği "
            + "zeminde durur"],
-  to_m: ["Grubun bitişi",
-         "sahanın dışında kalan direk hiçbir şeyin modellemediği "
-         + "zeminde durur"],
-  usable_range_m: ["Kullanılabilir menzil",
-                   "menzil, hedeflenen hassasiyette link bütçesinin izin verdiği kadar"],
-  closure_range_m: ["Bağlantının koptuğu mesafe",
-                    "aynı bütçe bağlantının nerede çözülemez olduğunu belirliyor"],
+    usable_range_m: ["Kullanılabilir menzil",
+                     "menzil, hedeflenen hassasiyette link bütçesinin izin "
+                     + "verdiği kadar"],
+    closure_range_m: ["Bağlantının koptuğu mesafe",
+                      "aynı bütçe bağlantının nerede çözülemez olduğunu "
+                      + "belirliyor"],
+  },
+  // In English the engine's own label and reason are already English, so
+  // this only names the two the page adds.
+  en: {
+    corridor_m: ["The site's length", ""],
+    from_m: ["The group's start",
+             "an anchor past the end of the site stands on ground nothing "
+             + "models and nothing drives past"],
+    to_m: ["The group's end",
+           "an anchor past the end of the site stands on ground nothing "
+           + "models and nothing drives past"],
+  },
 };
 
 /* Values, where the engine names a thing rather than a number. Regions
@@ -135,7 +169,7 @@ const VALUE_WORDS = {
 const value = text => VALUE_WORDS[text] || text;
 
 function words(change) {
-  const found = WORDS[change.key];
+  const found = (WORDS[speaks()] || {})[change.key];
   return {
     label: found ? found[0] : change.label,
     because: found && found[1] ? found[1] : change.because,
@@ -175,12 +209,12 @@ function showConfirm(changes, cascades) {
   for (const group of groups) {
     if (several || groups.length === 0) {
       const heading = document.createElement("h2");
-      heading.textContent = `${group.run} grubu`;
+      heading.textContent = say("confirm.group", { run: group.run });
       heading.style.color = "var(--accent)";
       body.appendChild(heading);
     }
-    block(group.asked, "İstediğin değişiklik");
-    block(group.follows, "Bunlar da değişiyor");
+    block(group.asked, say("confirm.asked"));
+    block(group.follows, say("confirm.follows"));
   }
   document.getElementById("confirm").hidden = false;
 }
@@ -196,7 +230,7 @@ document.getElementById("confirm-no").onclick = () => {
   document.getElementById("confirm").hidden = true;
   pendingChanges = null;
   fillControls();          // put the control back where it was
-  say("Hiçbir şey değişmedi.");
+  flash(say("confirm.nothing"));
 };
 
 /* ---------- controls ---------- */
@@ -243,6 +277,84 @@ function number(label, value, step, onChange) {
   return wrap;
 }
 
+/* ---------- saying the page in one language ----------
+ *
+ * Everything the page says for itself carries the name of what it says
+ * rather than the words, and this puts the words in. Everything the
+ * engine says for itself — a figure's note, what it affects, the ground's
+ * description, an option's reason — arrives already in the language the
+ * session is set to, because it lives beside the value it describes
+ * (ADR-0035).
+ */
+function drawWords() {
+  for (const element of document.querySelectorAll("[data-say]")) {
+    element.textContent = say(element.dataset.say);
+  }
+  for (const element of document.querySelectorAll("[data-say-title]")) {
+    element.title = say(element.dataset.sayTitle);
+  }
+  for (const element of document.querySelectorAll("[data-say-placeholder]")) {
+    element.placeholder = say(element.dataset.sayPlaceholder);
+  }
+  CHOICES = choicesNow();
+  KINDS = kindsNow();
+  document.documentElement.lang = speaks();
+
+  // The gestures, as one line. Built rather than written into the markup
+  // because each is a key and a word, and the order of the two is not
+  // the same in both languages.
+  const gestures = document.getElementById("gestures");
+  if (gestures) {
+    gestures.innerHTML = [
+      [say("scene.drag"), say("scene.turns")],
+      [say("scene.slide_keys"), say("scene.slides")],
+      [say("scene.wheel"), say("scene.zooms")],
+      ["WASD", say("scene.walks")],
+      ["Q/E", say("scene.turns")],
+      ["R/F", say("scene.tilts")],
+      ["G", say("scene.frames")],
+    ].map(([key, what]) => `<b>${key}</b> ${what}`).join(" · ");
+  }
+}
+
+function drawLanguages() {
+  const host = document.getElementById("languages");
+  if (!host || !LANGUAGES.length) return;
+  host.innerHTML = "";
+  for (const [code, name] of LANGUAGES) {
+    const pick = document.createElement("button");
+    pick.textContent = code.toUpperCase();
+    pick.title = name;
+    if (code === speaks()) pick.classList.add("on");
+    pick.onclick = () => switchTo(code);
+    host.appendChild(pick);
+  }
+}
+
+/* Say the whole study in the other language.
+ *
+ * The engine is told first and then everything is redrawn from what it
+ * sends back, rather than the page translating what it already has: the
+ * notes, the options and the ground's description are the engine's
+ * words, and asking it again is the only way to get them.
+ */
+async function switchTo(code) {
+  if (code === speaks()) return;
+  try {
+    const { state: moved } = await ask("/api/language", { language: code });
+    speak(code);
+    state = moved;
+    drawWords();
+    drawLanguages();
+    await refreshScene();
+    fillControls();
+    await loadFigures();
+    await loadOptions();
+    wireTasks();
+    scheduleSweep();
+  } catch (error) { flash(error.message, true); }
+}
+
 /* The three rows. Switching keeps what each one holds (ADR-0028). */
 function drawTabs() {
   const host = document.getElementById("tabs");
@@ -267,16 +379,16 @@ async function showRow(name) {
     fillControls();
     await loadFigures();
     scheduleSweep();
-  } catch (error) { say(error.message, true); }
+  } catch (error) { flash(error.message, true); }
 }
 
 function drawSites() {
   const select = document.getElementById("site");
-  const entries = [["", "Modellenmiş (tepeli)"]]
-    .concat(SITES.map(name => [name, `${name} (gerçek zemin)`]));
+  const entries = [["", say("ground.modelled")]]
+    .concat(SITES.map(name => [name, say("ground.real", { site: name })]));
   select.innerHTML = options(entries, state.site || "");
   select.onchange = () => edit({ site: select.value }, false)
-    .catch(e => say(e.message, true));
+    .catch(e => flash(e.message, true));
 
   // A fetched grid brings its own relief and its own roughness, so the
   // three sliders under it stop meaning anything. Saying so beats
@@ -289,19 +401,16 @@ function drawSites() {
   const note = document.getElementById("ground-note");
   if (note) {
     note.textContent = real
-      ? (latest && latest.terrain && latest.terrain.description) || "gerçek zemin"
-      : "Ölçülmüş bir zemin seçilmedi; tepeler aşağıdan modellenir.";
+      ? (latest && latest.terrain && latest.terrain.description)
+        || say("ground.none")
+      : say("ground.none");
   }
   // Say that the three sliders stopped applying, beside the three
   // sliders, rather than leaving them greyed out with no reason given.
   const modelled = document.getElementById("modelled-note");
   if (modelled) {
-    modelled.textContent = real
-      ? "Ölçülmüş bir zemin kendi rölyefini, kendi pürüzünü ve kendi "
-        + "engellerini getirir, bu yüzden aşağıdaki üç değer uygulanmaz."
-      : "Ölçülmüş bir zemin seçilmemişse tepeler aşağıdaki üç değerden "
-        + "modellenir. Hiçbir yer düz değildir, bu yüzden düz bir seçenek "
-        + "yoktur.";
+    modelled.textContent = say(
+      real ? "ground.real.note" : "ground.modelled.note");
   }
 }
 
@@ -311,18 +420,20 @@ function drawRuns() {
   state.runs.forEach((run, index) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.dataset.find = `direk grup ${run.identifier} modül montaj aralık `
-      + `yoldan kaydırma başlangıç bitiş ${run.radio} ${run.mounting}`;
+    card.dataset.find = `direk grup anchor group ${run.identifier} `
+      + `modül montaj aralık yoldan kaydırma başlangıç bitiş `
+      + `module mounting spacing stagger start end `
+      + `${run.radio} ${run.mounting}`;
 
     const head = document.createElement("header");
     head.innerHTML =
       `<span class="swatch" style="background:${cssColour(runColour(index))}"></span>` +
       `<b>${run.identifier}</b>` +
-      `<button class="drop" title="Grubu kaldır">✕</button>`;
+      `<button class="drop" title="${say("run.drop")}">✕</button>`;
     head.querySelector(".drop").onclick = () => {
       const runs = state.runs.filter((_, i) => i !== index);
-      if (!runs.length) { say("En az bir direk grubu gerekli.", true); return; }
-      edit({ runs }, false).catch(e => say(e.message, true));
+      if (!runs.length) { flash(say("run.least"), true); return; }
+      edit({ runs }, false).catch(e => flash(e.message, true));
     };
     card.appendChild(head);
 
@@ -332,12 +443,12 @@ function drawRuns() {
       // A module or a mounting moves the link budget, so it has to be
       // confirmed. A position or a spacing does not.
       const cascading = "radio" in patch || "mounting" in patch;
-      edit({ runs }, cascading).catch(e => say(e.message, true));
+      edit({ runs }, cascading).catch(e => flash(e.message, true));
     };
 
     for (const [key, list] of [["radio", RADIOS], ["mounting", MOUNTINGS]]) {
       const wrap = document.createElement("label");
-      wrap.textContent = key === "radio" ? "Modül" : "Montaj";
+      wrap.textContent = say(key === "radio" ? "run.module" : "run.mounting");
       const select = document.createElement("select");
       select.innerHTML = options(list, run[key]);
       select.onchange = () => change({ [key]: select.value });
@@ -347,17 +458,18 @@ function drawRuns() {
 
     const pair = document.createElement("div");
     pair.className = "pair";
-    pair.appendChild(number("Başlangıç (m)", run.from_m, 100,
+    pair.appendChild(number(say("run.from"), run.from_m, 100,
       v => change({ from_m: v })));
-    pair.appendChild(number("Bitiş (m)", run.to_m, 100, v => change({ to_m: v })));
-    pair.appendChild(number("Aralık (m)", run.spacing_m, 50,
+    pair.appendChild(number(say("run.to"), run.to_m, 100,
+      v => change({ to_m: v })));
+    pair.appendChild(number(say("run.spacing"), run.spacing_m, 50,
       v => change({ spacing_m: v })));
-    pair.appendChild(number("Yoldan (m)", run.offset_m, 10,
+    pair.appendChild(number(say("run.offset"), run.offset_m, 10,
       v => change({ offset_m: v })));
     if (state.width_m > 0) {
       // Only over an area. A staggered row means nothing along a line,
       // and offering it there would suggest it did.
-      pair.appendChild(number("Kaydırma (m)", run.stagger_m, 25,
+      pair.appendChild(number(say("run.stagger"), run.stagger_m, 25,
         v => change({ stagger_m: v })));
     }
     card.appendChild(pair);
@@ -368,8 +480,9 @@ function drawRuns() {
       const note = document.createElement("p");
       note.className = "hint";
       note.style.margin = "4px 0 0";
-      note.textContent =
-        `${found.count} direk · menzil ${tr(found.reach_m / 1000)} km`;
+      note.textContent = say("run.count", {
+        anchors: found.count, reach: tr(found.reach_m / 1000),
+      });
       card.appendChild(note);
     }
     host.appendChild(card);
@@ -382,29 +495,30 @@ function drawUnits() {
   state.units.forEach((unit, index) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.dataset.find = `alıcı ${unit.identifier} ${unit.kind} hız anten `
-      + `modül başlangıç ${unit.radios.join(" ")}`;
+    card.dataset.find = `alıcı receiver ${unit.identifier} ${unit.kind} `
+      + `hız anten modül başlangıç speed antenna module start `
+      + `${unit.radios.join(" ")}`;
 
     const head = document.createElement("header");
     head.innerHTML =
       `<span class="swatch" style="background:#b4551d;border-radius:50%"></span>` +
       `<b>${unit.identifier}</b>` +
-      `<button class="drop" title="Alıcıyı kaldır">✕</button>`;
+      `<button class="drop" title="${say("unit.drop")}">✕</button>`;
     head.querySelector(".drop").onclick = () => {
       const units = state.units.filter((_, i) => i !== index);
-      if (!units.length) { say("En az bir alıcı gerekli.", true); return; }
-      edit({ units }, false).catch(e => say(e.message, true));
+      if (!units.length) { flash(say("unit.least"), true); return; }
+      edit({ units }, false).catch(e => flash(e.message, true));
     };
     card.appendChild(head);
 
     const change = patch => {
       const units = state.units.map((u, i) =>
         i === index ? Object.assign({}, u, patch) : u);
-      edit({ units }, false).catch(e => say(e.message, true));
+      edit({ units }, false).catch(e => flash(e.message, true));
     };
 
     const wrap = document.createElement("label");
-    wrap.textContent = "Tür";
+    wrap.textContent = say("unit.kind");
     const select = document.createElement("select");
     select.innerHTML = options(KINDS, unit.kind);
     select.onchange = () => change({ kind: select.value });
@@ -413,11 +527,11 @@ function drawUnits() {
 
     const pair = document.createElement("div");
     pair.className = "pair";
-    pair.appendChild(number("Hız (km/sa)", unit.speed_km_h, 5,
+    pair.appendChild(number(say("unit.speed"), unit.speed_km_h, 5,
       v => change({ speed_km_h: v })));
-    pair.appendChild(number("Başlangıç (m)", unit.start_m, 100,
+    pair.appendChild(number(say("unit.start"), unit.start_m, 100,
       v => change({ start_m: v })));
-    pair.appendChild(number("Anten (m)", unit.antenna_height_m, 0.1,
+    pair.appendChild(number(say("unit.antenna"), unit.antenna_height_m, 0.1,
       v => change({ antenna_height_m: v })));
     card.appendChild(pair);
 
@@ -436,7 +550,7 @@ function drawUnits() {
           ? unit.radios.concat([value])
           : unit.radios.filter(r => r !== value);
         if (!radios.length) {
-          say("Alıcıda en az bir modül olmalı.", true);
+          flash(say("unit.needs_module"), true);
           tick.checked = true;
           return;
         }
@@ -453,7 +567,7 @@ function drawUnits() {
       const note = document.createElement("p");
       note.className = "hint";
       note.style.margin = "4px 0 0";
-      note.textContent = `${heard.hears} direği duyuyor`;
+      note.textContent = say("unit.hears", { anchors: heard.hears });
       card.appendChild(note);
     }
     host.appendChild(card);
@@ -550,18 +664,16 @@ const TERMS = {
   width_m: "genişlik",
 };
 
-/* Where a figure came from, as the panel says it. */
-const PROVENANCE = {
-  datasheet: "veri sayfası",
-  measurement: "ölçüm",
-  standard: "standart",
-  derived: "türetilmiş",
-  design: "tasarım kararı",
-  assumption: "varsayım",
-};
-
-const named = key =>
-  key.split(".").slice(1).map(part => TERMS[part] || part).join(" · ");
+/* A figure's name, in the language the page is speaking.
+ *
+ * In English there is nothing to look up: the key is already English, so
+ * the underscores come out and the words are the words. A glossary for
+ * it would be a second list saying the same thing and drifting from the
+ * first.
+ */
+const named = key => key.split(".").slice(1).map(
+  part => (speaks() === "en" ? part.replace(/_/g, " ") : TERMS[part] || part)
+).join(" · ");
 
 const CASCADING_FIGURES = /(height_m|noise_figure_db|threshold_db|clutter|residual_ppm|tolerance_ppm|turnaround_s|payload_bytes)/;
 
@@ -571,7 +683,8 @@ function drawFigures() {
   host.innerHTML = "";
 
   document.getElementById("assumed-count").textContent =
-    `${figuresData.total} değerin ${figuresData.assumed} tanesi varsayım`;
+    say("figures.assumed",
+      { assumed: figuresData.assumed, total: figuresData.total });
 
   for (const group of figuresData.groups) {
     // Heading and rows together, so a search that empties a group takes
@@ -592,10 +705,11 @@ function drawFigures() {
       // Its key, its group and what it affects, so the search box finds
       // it by any of them.
       const where = String(figure.provenance).toLowerCase();
+      const whence = say("prov." + where);
       // Its key, its name, its group, where it came from and what it
       // affects, so the search finds it by any of them.
       row.dataset.find = `${figure.key} ${named(figure.key)} ${group.label} `
-        + `${PROVENANCE[where] || where} ${figure.affects}`;
+        + `${whence} ${figure.affects}`;
 
       const name = document.createElement("div");
       name.className = "name";
@@ -607,7 +721,7 @@ function drawFigures() {
       // a title attribute, which is to say it said it to nobody.
       const mark = name.querySelector(".prov");
       mark.classList.add(where);
-      mark.title = PROVENANCE[where] || where;
+      mark.title = whence;
       name.querySelector("b").textContent = named(figure.key);
       name.querySelector("span").textContent = figure.affects;
       name.title = `${figure.key}\n\n${figure.note}` + (
@@ -622,7 +736,7 @@ function drawFigures() {
         figure.is_text ? "select" : "input");
       if (figure.is_text) {
         input.innerHTML = options(
-          [["", "modellenmiş"]].concat(SITES.map(n => [n, n])),
+          [["", say("ground.modelled")]].concat(SITES.map(n => [n, n])),
           String(figure.value));
       } else {
         input.type = "number";
@@ -631,14 +745,14 @@ function drawFigures() {
       }
       if (figure.edited) input.classList.add("edited");
       input.title = figure.assumed
-        ? "Hâlâ varsayım — kaynağı defaults.toml'a yaz"
-        : `Kaynak: ${figure.source}`;
+        ? say("figures.still_assumed")
+        : say("figures.source", { source: figure.source });
       input.onchange = () => {
         const overrides = Object.assign({}, state.overrides);
         overrides[figure.key] = figure.is_text
           ? input.value : Number(input.value);
         edit({ overrides }, CASCADING_FIGURES.test(figure.key))
-          .catch(e => say(e.message, true));
+          .catch(e => flash(e.message, true));
       };
       row.appendChild(input);
 
@@ -659,7 +773,7 @@ async function loadFigures() {
     figuresData = await ask("/api/figures");
     drawFigures();
     drawSummary();
-  } catch (error) { say(error.message, true); }
+  } catch (error) { flash(error.message, true); }
 }
 
 /* A ranged setting is shown three ways at once: what it means, where it
@@ -706,28 +820,38 @@ function drawSummary() {
   if (!state) return;
   const anchors = latest ? latest.anchors.length : 0;
   const assumed = figuresData
-    ? `${figuresData.total} değerin ${figuresData.assumed} tanesi varsayım`
+    ? say("figures.assumed",
+      { assumed: figuresData.assumed, total: figuresData.total })
     : "—";
   const edits = Object.keys(state.overrides || {}).length;
   const scope = document.getElementById("task-only");
 
   const said = {
     "sum-place": state.site
-      ? `${state.site} · ölçülmüş zemin`
-      : `modellenmiş · ${UNITS.relief_m(state.relief_m)} / `
-        + `${UNITS.hill_spacing_m(state.hill_spacing_m)}`,
+      ? say("sum.place.real", { site: state.site })
+      : say("sum.place.modelled", {
+          relief: UNITS.relief_m(state.relief_m),
+          spacing: UNITS.hill_spacing_m(state.hill_spacing_m),
+        }),
     "sum-site": state.width_m > 0
-      ? `${UNITS.corridor_m(state.corridor_m)} × ${UNITS.width_m(state.width_m)} alan`
-      : `${UNITS.corridor_m(state.corridor_m)} koridor`,
-    "sum-layout": `${anchors} direk · ${state.runs.length} grup · `
-      + `${state.units.length} alıcı`,
-    "sum-target": `±${UNITS.tolerance_m(state.tolerance_m)} · ${state.region}`
-      + ` · ${state.scheme === "double" ? "çift yönlü" : "tek yönlü"}`,
-    "sum-basis": assumed + (edits ? ` · ${edits} düzenleme` : ""),
+      ? say("sum.site.area", {
+          length: UNITS.corridor_m(state.corridor_m),
+          width: UNITS.width_m(state.width_m),
+        })
+      : say("sum.site.corridor", { length: UNITS.corridor_m(state.corridor_m) }),
+    "sum-layout": say("sum.layout", {
+      anchors, runs: state.runs.length, units: state.units.length,
+    }),
+    "sum-target": say("sum.target", {
+      tolerance: UNITS.tolerance_m(state.tolerance_m),
+      region: state.region,
+      scheme: say("sum.scheme." + state.scheme),
+    }),
+    "sum-basis": edits ? say("sum.basis.edits", { assumed, edits }) : assumed,
     // An empty value is every row; a named one is that row alone.
     "sum-run": scope && scope.value
-      ? `yalnız ${MODE_LABEL[scope.value] || scope.value}`
-      : "üç satır ve ağırlıklı ortalama",
+      ? say("run.one_row", { row: MODE_LABEL[scope.value] || scope.value })
+      : say("run.all_rows"),
   };
   for (const [id, text] of Object.entries(said)) {
     const line = document.getElementById(id);
@@ -858,7 +982,7 @@ function wireControls() {
       .join("");
     select.onchange = () =>
       edit({ [name]: select.value }, select.hasAttribute("data-cascades"))
-        .catch(e => say(e.message, true));
+        .catch(e => flash(e.message, true));
   }
 
   for (const name of Object.keys(OUTPUTS)) {
@@ -867,7 +991,7 @@ function wireControls() {
     const exact = document.getElementById(name + "-num");
     const send = value =>
       edit({ [name]: Number(value) }, slider.hasAttribute("data-cascades"))
-        .catch(e => say(e.message, true));
+        .catch(e => flash(e.message, true));
 
     // While the handle is moving, only the page follows. The engine is
     // asked once, when it is let go, because a sweep takes seconds.
@@ -901,26 +1025,26 @@ function wireControls() {
       to_m: last ? last.to_m + 3000 : 3000,
       spacing_m: last ? last.spacing_m : 1000,
       offset_m: last ? last.offset_m : 100,
-    }]) }, false).catch(e => say(e.message, true));
+    }]) }, false).catch(e => flash(e.message, true));
   };
 
   document.getElementById("add-unit").onclick = () => {
     const used = new Set(state.units.map(u => u.identifier));
-    let identifier = "alıcı";
+    let identifier = say("unit.new");
     let n = 2;
-    while (used.has(identifier)) identifier = `alıcı ${n++}`;
+    while (used.has(identifier)) identifier = `${say("unit.new")} ${n++}`;
     edit({ units: state.units.concat([{
       identifier, kind: "vehicle", speed_km_h: 80, start_m: 0,
       antenna_height_m: 1.5, radios: ["sx1280", "dwm3000"],
-    }]) }, false).catch(e => say(e.message, true));
+    }]) }, false).catch(e => flash(e.message, true));
   };
 
   document.getElementById("clear-overrides").onclick = () => {
     if (!Object.keys(state.overrides || {}).length) {
-      say("Değiştirilmiş sayı yok.");
+      flash(say("figures.none_edited"));
       return;
     }
-    edit({ overrides: {} }, true).catch(e => say(e.message, true));
+    edit({ overrides: {} }, true).catch(e => flash(e.message, true));
   };
 
   document.getElementById("only-assumed").onchange = event => {
@@ -1292,7 +1416,7 @@ canvas.addEventListener("pointerdown", event => {
 
   if (hit && event.shiftKey) {
     apply({ removed: (state.removed || []).concat([hit.id]) })
-      .catch(e => say(e.message, true));
+      .catch(e => flash(e.message, true));
     return;
   }
   canvas.setPointerCapture(event.pointerId);
@@ -1411,7 +1535,7 @@ function letGo(event) {
       moved[dragging] = [anchor.x, anchor.y];
       // Moving an anchor forces no other setting to change, so it goes
       // straight through rather than to the confirmation sheet.
-      apply({ moved }).catch(e => say(e.message, true));
+      apply({ moved }).catch(e => flash(e.message, true));
     }
     dragging = null;
   }
@@ -1536,40 +1660,43 @@ function showNumbers(drawn, result) {
   const list = document.getElementById("numbers");
   const rows = [];
 
-  rows.push(["Direk sayısı", drawn.anchors.length]);
+  const warn = say("result.assumed_share");
+
+  rows.push([say("result.anchors"), drawn.anchors.length]);
   // Per group, because a UWB bracket and a mast on one corridor do not
   // cover remotely the same ground and one number for both would say
   // they did.
   for (const run of drawn.runs || []) {
-    rows.push([`${run.identifier}: menzil`, `${tr(run.reach_m / 1000)} km`]);
-    rows.push([`${run.identifier}: kopma`, `${tr(run.closure_m / 1000)} km`]);
+    rows.push([say("result.reach", { run: run.identifier }),
+               `${tr(run.reach_m / 1000)} km`]);
+    rows.push([say("result.closure", { run: run.identifier }),
+               `${tr(run.closure_m / 1000)} km`]);
   }
 
-  rows.push(["Alıcı sayısı", (drawn.units || []).length]);
-  rows.push(["Tur süresi", `${tr(drawn.round_s * 1000, 0)} ms`]);
-  rows.push(["Konum sıklığı", `${tr(1 / Math.max(drawn.round_s, 1e-9))} /s`]);
+  rows.push([say("result.units"), (drawn.units || []).length]);
+  rows.push([say("result.round"), `${tr(drawn.round_s * 1000, 0)} ms`]);
+  rows.push([say("result.rate"), `${tr(1 / Math.max(drawn.round_s, 1e-9))} /s`]);
 
   if (sweepData) {
-    rows.push(["Hizmet alanı", `${tr(sweepData.served_km2)} km²`]);
-    rows.push(["Paketin ulaştığı alan", `${tr(sweepData.reached_km2)} km²`]);
+    rows.push([say("result.served"), `${tr(sweepData.served_km2)} km²`]);
+    rows.push([say("result.reached"), `${tr(sweepData.reached_km2)} km²`]);
   }
   if (result) {
-    rows.push(["HPE P50", `${tr(result.hpe_p50_m)} m`]);
-    rows.push(["HPE P95", `${tr(result.hpe_p95_m)} m`]);
-    rows.push(["VPE P95", `${tr(result.vpe_p95_m)} m`]);
-    rows.push(["Kullanılabilirlik", `%${tr(result.availability * 100)}`]);
-    rows.push(["CAPEX", `${tr(result.capex_tl, 0)} TL`]);
-    rows.push(["OPEX", `${tr(result.opex_tl_per_year, 0)} TL/yıl`]);
-    rows.push(["CAPEX / km²", `${tr(result.capex_tl_per_km2, 0)} TL`]);
-    rows.push(["OPEX / km²", `${tr(result.opex_tl_per_km2_year, 0)} TL/yıl`]);
-    rows.push(["Varsayıma dayanan pay",
-               `%${tr(result.assumed_share * 100, 0)}`]);
+    rows.push([say("result.hpe50"), `${tr(result.hpe_p50_m)} m`]);
+    rows.push([say("result.hpe95"), `${tr(result.hpe_p95_m)} m`]);
+    rows.push([say("result.vpe95"), `${tr(result.vpe_p95_m)} m`]);
+    rows.push([say("result.availability"), `%${tr(result.availability * 100)}`]);
+    rows.push([say("result.capex"), `${tr(result.capex_tl, 0)} TL`]);
+    rows.push([say("result.opex"), `${tr(result.opex_tl_per_year, 0)} TL`]);
+    rows.push([say("result.capex_km2"), `${tr(result.capex_tl_per_km2, 0)} TL`]);
+    rows.push([say("result.opex_km2"),
+               `${tr(result.opex_tl_per_km2_year, 0)} TL`]);
+    rows.push([warn, `%${tr(result.assumed_share * 100, 0)}`]);
   }
 
   list.innerHTML = rows.map(([name, value]) =>
-    `<dt>${name}</dt><dd${
-      name === "Varsayıma dayanan pay" ? ' class="warn"' : ""
-    }>${value}</dd>`).join("");
+    `<dt>${name}</dt><dd${name === warn ? ' class="warn"' : ""}>${value}</dd>`
+  ).join("");
 }
 
 
@@ -1587,7 +1714,7 @@ async function loadOptions() {
     optionsData = await ask("/api/options");
     drawOptions();
     drawSolveScenarios();
-  } catch (error) { say(error.message, true); }
+  } catch (error) { flash(error.message, true); }
 }
 
 function drawOptions() {
@@ -1604,7 +1731,7 @@ function drawOptions() {
     card.className = "option";
     // Searchable by its name, its title and the figures it moves — a
     // ready-made option is a setting like any other.
-    card.dataset.find = `seçenek ${option.name} ${option.title} `
+    card.dataset.find = `seçenek option ${option.name} ${option.title} `
       + (option.moves || []).map(move => `${move.key} ${named(move.key)}`)
         .join(" ");
 
@@ -1626,7 +1753,7 @@ function drawOptions() {
       ? option.moves.map(m =>
           `<span title="${m.key}">${named(m.key)}: ` +
           `${m.from} → ${m.to}</span>`).join("")
-      : "<span>şu anki ayarlarla aynı</span>";
+      : `<span>${say("options.same")}</span>`;
     card.appendChild(moves);
 
     const why = document.createElement("p");
@@ -1645,8 +1772,8 @@ async function applyOption(name) {
     fillControls();
     await loadFigures();
     await loadOptions();
-    say(`${applied} uygulandı.`);
-  } catch (error) { say(error.message, true); }
+    flash(say("options.applied", { name: applied }));
+  } catch (error) { flash(error.message, true); }
 }
 
 /* -- watching a long task -- */
@@ -1667,7 +1794,7 @@ async function watch(kind, body, host, render) {
   let job;
   try {
     ({ job } = await ask("/api/run", Object.assign({ kind }, body)));
-  } catch (error) { return say(error.message, true); }
+  } catch (error) { return flash(error.message, true); }
 
   const log = logInto(target, job);
   // A second between polls. The work reports a line per simulation and
@@ -1677,13 +1804,13 @@ async function watch(kind, body, host, render) {
     await new Promise(resume => setTimeout(resume, 1000));
     try {
       ({ job } = await ask(`/api/job?id=${job.id}`));
-    } catch (error) { return say(error.message, true); }
+    } catch (error) { return flash(error.message, true); }
     log.textContent = job.progress.join("\n");
     log.scrollTop = log.scrollHeight;
   }
 
   if (job.error) {
-    say(job.error, true);
+    flash(job.error, true);
     const trouble = document.createElement("p");
     trouble.className = "hint";
     trouble.textContent = job.error;
@@ -1715,9 +1842,9 @@ function drawBudget(result, host) {
     const head =
       `<tr><th colspan="4">${scenario.name} — HPE P50 ` +
       `${scenario.whole_p50_m} m · bir menzil ${scenario.range_sigma_m} m · ` +
-      `geometri ×${scenario.geometry_gain}</th></tr>` +
-      "<tr><th>Hata kaynağı</th><th>Tek başına</th><th>Kalkarsa</th>" +
-      "<th>Kazanç</th></tr>";
+      `${say("budget.geometry", { gain: scenario.geometry_gain })}</th></tr>` +
+      `<tr><th>${say("budget.source")}</th><th>${say("budget.alone")}</th>` +
+      `<th>${say("budget.without")}</th><th>${say("budget.gain")}</th></tr>`;
     table.innerHTML = head + scenario.sources.map(source => {
       const width = Math.max(2, Math.round(source.share * 100));
       const shade = source.source === scenario.dominant ? " dominant" : "";
@@ -1726,7 +1853,7 @@ function drawBudget(result, host) {
         `<td>${source.alone_m}</td><td>${source.without_m}</td>` +
         `<td>${source.saves_m}</td></tr>`;
     }).join("") +
-      `<tr><td>Model artığı</td><td>${scenario.residue_m}</td>` +
+      `<tr><td>${say("budget.residue")}</td><td>${scenario.residue_m}</td>` +
       "<td></td><td></td></tr>";
     host.appendChild(table);
 
@@ -1735,15 +1862,13 @@ function drawBudget(result, host) {
     note.textContent = scenario.dominant
       ? `Önce harcanacak yer: ${
           scenario.sources.find(s => s.source === scenario.dominant).remedy}.`
-      : "Tek bir baskın kaynak yok: en büyük ikisi birbirine yakın.";
+      : say("budget.no_dominant");
     host.appendChild(note);
   }
   const why = document.createElement("p");
   why.className = "hint";
   why.textContent =
-    '"Tek başına" o kaynak tek olsaydı kalacak hata; "kalkarsa" o kaynak ' +
-    "gidince toplamın ineceği yer. İkincisi her zaman daha küçüktür, çünkü " +
-    "hatalar kareli toplanır — ve satın alma kararı olan odur.";
+    say("budget.note");
   host.appendChild(why);
 }
 
@@ -1769,9 +1894,9 @@ function drawSolveScenarios() {
   // rows — quietly expanded to all three and took twelve minutes.
   const rows = document.getElementById("task-only");
   rows.innerHTML =
-    `<option value="">üçü birden (+ ağırlıklı satır)</option>` +
+    `<option value="">${say("run.all_rows")}</option>` +
     TABS.map(([name, label]) =>
-      `<option value="${name}">yalnız ${label}</option>`).join("");
+      `<option value="${name}">${say("run.one_row", { row: label })}</option>`).join("");
   rows.value = state.scenario;
   rows.onchange = drawSummary;
 }
@@ -1820,7 +1945,7 @@ function drawSolveVary() {
 
     const drop = document.createElement("button");
     drop.className = "drop";
-    drop.title = "Bu sayıyı aramadan çıkar";
+    drop.title = say("vary.drop");
     drop.textContent = "✕";
     drop.onclick = () => { varying.splice(index, 1); drawSolveVary(); };
 
@@ -1833,7 +1958,7 @@ function drawSolveVary() {
 
   const add = document.createElement("button");
   add.className = "quiet";
-  add.textContent = "Sayı ekle";
+  add.textContent = say("vary.add");
   add.onclick = () => {
     const first = figuresData && figuresData.figures[0];
     if (!first) return;
@@ -1846,7 +1971,7 @@ function drawSolveVary() {
 
   const reset = document.createElement("button");
   reset.className = "quiet";
-  reset.textContent = "Önerilene dön";
+  reset.textContent = say("vary.reset");
   reset.onclick = () => {
     varying = suggestedFor(document.getElementById("solve-scenario").value);
     drawSolveVary();
@@ -1860,8 +1985,8 @@ function drawSolveVary() {
   const candidates = varying.reduce(
     (total, row) => total * Math.max(row.values.length, 1), 1);
   size.textContent = varying.length
-    ? `${candidates} yerleşim denenecek. Her biri tam bir simülasyon.`
-    : "Aranacak sayı yok. Ekle, ya da önerilene dön.";
+    ? say("vary.count", { candidates })
+    : say("vary.none");
   host.appendChild(size);
 }
 
@@ -1896,9 +2021,11 @@ function drawFetched(result, host) {
   table.className = "out";
   table.innerHTML =
     `<tr><th colspan="2">${result.name}</th></tr>` +
-    `<tr><td>boyut</td><td>${result.width_m} × ${result.height_m} m</td></tr>` +
-    `<tr><td>yükselti farkı</td><td>${result.relief_m} m</td></tr>` +
-    `<tr><td>pürüz</td><td>${result.roughness_m} m</td></tr>` +
+    `<tr><td>${say("fetched.size")}</td>` +
+    `<td>${result.width_m} × ${result.height_m} m</td></tr>` +
+    `<tr><td>${say("fetched.relief")}</td><td>${result.relief_m} m</td></tr>` +
+    `<tr><td>${say("fetched.roughness")}</td>` +
+    `<td>${result.roughness_m} m</td></tr>` +
     `<tr><td>bina</td><td>${result.buildings}</td></tr>`;
   host.appendChild(table);
 
@@ -1911,11 +2038,11 @@ function drawFetched(result, host) {
 
   const use = document.createElement("button");
   use.className = "quiet";
-  use.textContent = "Bu zemine geç";
+  use.textContent = say("fetched.use");
   use.onclick = () => edit({ site: result.name }, false)
     .then(() => { framed = false; return refreshScene(); })
     .then(() => fillControls())
-    .catch(e => say(e.message, true));
+    .catch(e => flash(e.message, true));
   host.appendChild(use);
 }
 
@@ -1988,12 +2115,23 @@ async function refreshScene() {
     MOUNTINGS = latest.choices.mountings;
     RADIOS = latest.choices.radios;
     TABS = latest.choices.modes;
+    LANGUAGES = latest.choices.languages || [];
     for (const [name, label] of TABS) MODE_LABEL[name] = label;
   }
+  // The session's language, not the markup's. Reloading a page that was
+  // switched to English used to come back with English figures under
+  // Turkish headings, because the page took its language from the `lang`
+  // attribute and the engine had kept its own.
+  if (state.language && state.language !== speaks()) {
+    speak(state.language);
+    drawWords();
+  }
   drawTabs();
+  drawLanguages();
   drawSites();
-  document.getElementById("terrain-note").textContent =
-    `${latest.terrain.description} · ${latest.anchors.length} direk`;
+  document.getElementById("terrain-note").textContent = say("terrain.note", {
+    ground: latest.terrain.description, anchors: latest.anchors.length,
+  });
   terrainData = latest.terrain;
   // The finer mesh described the ground before this edit. Dropped rather
   // than kept, or a change of site leaves the old hill drawn in the
@@ -2018,33 +2156,36 @@ function scheduleSweep() {
   clearTimeout(sweepTimer);
   sweepTimer = setTimeout(async () => {
     try {
-      say("Kapsama taranıyor…");
+      flash(say("busy.sweep"));
       sweepData = await ask("/api/sweep");
       render();
       showNumbers(latest, null);
-      say("");
-    } catch (error) { say(error.message, true); }
+      flash("");
+    } catch (error) { flash(error.message, true); }
   }, 250);
 }
 
 async function runSimulation() {
   const button = document.getElementById("run");
   button.disabled = true;
-  button.textContent = "Çalışıyor…";
+  button.textContent = say("result.running");
   try {
     const result = await ask("/api/simulate");
     sweepData = sweepData || { served_km2: result.served_km2,
                                reached_km2: result.reached_km2 };
     showNumbers(latest, result);
   } catch (error) {
-    say(error.message, true);
+    flash(error.message, true);
   } finally {
     button.disabled = false;
-    button.textContent = "Simülasyonu çalıştır";
+    button.textContent = say("result.run");
   }
 }
 
 (async function start() {
+  // The language the session is in, before anything is drawn in it.
+  speak(document.documentElement.lang === "en" ? "en" : "tr");
+  drawWords();
   wireControls();
   wireTasks();
   wireSteps();

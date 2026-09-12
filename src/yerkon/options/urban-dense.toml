@@ -1,12 +1,17 @@
-# A YERKON deployment option.
+# Bir YERKON yerleşim seçeneği. / A YERKON deployment option.
+#
+# `--option urban-dense` ile defaults.toml üzerine uygulanır; yalnızca
+# farklı olan değerler listelenir.
 #
 # Applied over defaults.toml with `--option urban-dense`. Only the
 # figures that differ are listed; everything else stays as it is.
 
 name = 'urban-dense'
 title = 'Şehir içi: 300 m ızgara — daha sık aydınlatma direği'
+title_en = 'Urban: a 300 m grid — anchors on every lighting column'
 origin = 'shipped'
-note = """Anchors on every lighting column rather than every other one. A town has the structures already, so this buys geometry for the price of the modules and the fitting rather than for the price of a site — which is the whole reason the urban row is the cheapest per square kilometre in the table."""
+note = """Her iki aydınlatma direğinden birine değil, hepsine direk. Bir şehirde yapılar zaten vardır; dolayısıyla bu, geometriyi bir sahanın bedeline değil modüllerin ve montajın bedeline satın alır — şehir içi satırın tabloda kilometrekare başına en ucuz olmasının bütün sebebi budur."""
+note_en = """Anchors on every lighting column rather than every other one. A town has the structures already, so this buys geometry for the price of the modules and the fitting rather than for the price of a site — which is the whole reason the urban row is the cheapest per square kilometre in the table."""
 
 [values]
 'urban.anchor_spacing_m' = 300.0

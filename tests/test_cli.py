@@ -127,7 +127,7 @@ def test_the_defaults_verb_can_list_what_has_been_sourced(capsys, tmp_path):
 value = 85000.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "this project"''',
+source = "bu proje"''',
         '''[values."mounting.tall_mast.site_cost_tl"]
 value = 5000.0
 unit = "TL"

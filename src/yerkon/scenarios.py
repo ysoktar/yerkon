@@ -35,6 +35,7 @@ from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import DWM3000, SX1280, Radio, W24P_U, radios
 from yerkon.ranging import SINGLE_SIDED
 from yerkon.regulatory import TURKEY
+from yerkon.language import say
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.site.cache import SiteCache
 
@@ -400,7 +401,10 @@ def rural_ground(settings: Settings) -> Terrain:
 
 
 def tunnel_ground(
-    settings: Settings, length_m: float, site_name: Optional[str] = None
+    settings: Settings,
+    length_m: float,
+    site_name: Optional[str] = None,
+    language: Optional[str] = None,
 ) -> Terrain:
     """The floor of the bore, which slopes because every bore does.
 
@@ -425,8 +429,9 @@ def tunnel_ground(
             entry_elevation_m=site.height_at(entry_x, entry_y),
             exit_elevation_m=site.height_at(entry_x + length_m, entry_y),
             length_m=length_m,
-            description="bore through {}, portals from {}".format(
-                site_name, site.manifest.elevation_source
+            description=say(
+                "terrain.bore.through", language,
+                site=site_name, source=site.manifest.elevation_source,
             ),
         ), settings, "tunnel")
     grade = settings.number("site.tunnel_grade")
@@ -434,6 +439,7 @@ def tunnel_ground(
         entry_elevation_m=0.0,
         exit_elevation_m=-grade * length_m,
         length_m=length_m,
+        language=language,
     ), settings, "tunnel")
 
 

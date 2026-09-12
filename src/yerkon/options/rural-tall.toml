@@ -1,12 +1,21 @@
-# A YERKON deployment option.
+# Bir YERKON yerleşim seçeneği. / A YERKON deployment option.
+#
+# `--option rural-tall` ile defaults.toml üzerine uygulanır; yalnızca
+# farklı olan değerler listelenir.
 #
 # Applied over defaults.toml with `--option rural-tall`. Only the
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-tall'
 title = 'Kırsal: 35 m direk, aynı ızgara — yeni saha açmadan'
+title_en = 'Rural: 35 m masts, the same grid — without opening a new site'
 origin = 'shipped'
-note = """The same thirty-three masts where they already are, ten metres taller: 90,12 % availability against the default's 89,50 %, for 5 847 028 TL against 3 154 228 TL.
+note = """Aynı otuz üç direk, zaten durdukları yerde, on metre daha uzun: varsayılanın %89,50'sine karşı %90,12 kullanılabilirlik, 3 154 228 TL'ye karşı 5 847 028 TL.
+
+Bu, 2,7 milyon liraya 0,6 puan eder — bu seçeneğin var olma sebebi dışında her bakımdan rural-dense'ten kötü bir değer: yeni saha yok, yeni ulaşım yolu yok, yeni enerji bağlantısı yok. Bir sahaya ulaşmanın kendisi, parasını ödemekten daha zor olduğu yerde bu hâlâ doğru cevap olabilir; ve bu projede bunun ne kadar zor olduğuna dair bir sayı yok.
+
+İki seçenek de varsayılan %82,26'da dururken yazıldı ve şimdi verdiklerinden çok daha fazlasını vaat ediyorlardı. Tur boyutu düzeltmesi (ADR-0022) boşluğun çoğunu bedelsiz aldı."""
+note_en = """The same thirty-three masts where they already are, ten metres taller: 90,12 % availability against the default's 89,50 %, for 5 847 028 TL against 3 154 228 TL.
 
 That is 0,6 points for 2,7 million lira — worse value than rural-dense on every count except the one this option exists for: no new site, no new access road, no new power connection. Where getting to a site is the hard part rather than paying for it, that can still be the right answer, and this project has no figure for how hard it is.
 

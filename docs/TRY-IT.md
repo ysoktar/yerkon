@@ -24,6 +24,22 @@ yerkon view
 page does too, against the settings the page is showing rather than the
 shipped defaults.
 
+### Two languages (this is new)
+
+**TR / EN**, beside the search box. It changes everything — the panel, the
+seventy-two figures' notes and what each affects, the ground's own
+description, the ready-made options' reasons, the solver's output. No
+number, no geometry and no result differs between them; a test builds the
+whole table twice to say so (ADR-0035).
+
+Worth trying: switch to EN, open **Basis**, and read what the figures
+actually say. Then switch back and check the same figure says the same
+thing in Turkish.
+
+What is *not* bilingual yet, and the page does not pretend otherwise:
+`yerkon table`, `yerkon budget` and the Markdown deliverables are the
+report's own words and are Turkish only.
+
 ### The panel (this is new)
 
 Six steps, in the order somebody actually works for a fresh area, each

@@ -60,7 +60,10 @@ def test_the_table_file_carries_the_rows_and_the_ground_under_them():
     for row in rows:
         assert row.system in body
     assert "Copernicus" in body
-    assert "bore through" in body
+    # The deliverables are the report's own words, which are Turkish
+    # (ADR-0035) — but the ground describes itself in whichever language
+    # the run asked for, and `yerkon deliver` asks for Turkish.
+    assert "içinden tünel" in body
     assert "ADR-0006" in body, "the OPEX column has to say where it came from"
 
 
