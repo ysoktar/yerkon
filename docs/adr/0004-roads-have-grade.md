@@ -1,25 +1,25 @@
-# 0004. Roads have grade
+# 0004. Yolların eğimi vardır
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-The previous codebase placed every road receiver at a constant 1,5 m
-elevation and then constrained the filter's height to a map surface with
-that same elevation. Vertical error measured the map's assumed accuracy and
-nothing else.
+## Bağlam
+Önceki kod tabanı her yol alıcısını sabit 1,5 m yüksekliğe koyuyor, sonra da
+süzgecin yüksekliğini aynı yüksekliğe sahip bir harita yüzeyine
+kısıtlıyordu. Düşey hata, haritanın varsayılan hassasiyetini ölçüyordu,
+başka hiçbir şeyi değil.
 
-## Decision
-A Site carries a terrain elevation field. Roads follow it with a grade, and
-a receiver's true height is the terrain elevation plus the vehicle's
-antenna mounting offset. Bridges and tunnel portals change that elevation
-sharply.
+## Karar
+Bir Site bir arazi yükseklik alanı taşır. Yollar onu bir eğimle izler ve bir
+alıcının gerçek yüksekliği, arazi yüksekliği artı aracın anten montaj
+farkıdır. Köprüler ve tünel portalları o yüksekliği keskin biçimde
+değiştirir.
 
-No scenario fixes the receiver's height, and the estimator's vertical
-coordinate is always free.
+Hiçbir senaryo alıcının yüksekliğini sabitlemez ve kestiricinin düşey
+bileşeni her zaman serbesttir.
 
-## Consequences
-Vertical dilution of precision now has something to act on. Reported
-vertical error will be large for the road scenarios, because a network of
-anchors at similar heights genuinely cannot resolve height well. That is
-the finding, not a fault.
+## Sonuçlar
+Düşey hassasiyet seyrelmesinin artık üzerine etki edeceği bir şey var. Yol
+senaryolarında bildirilen düşey hata büyük olacaktır, çünkü benzer
+yüksekliklerdeki direklerden oluşan bir ağ yüksekliği gerçekten iyi
+çözemez. Bu bir kusur değil, bulgunun kendisidir.

@@ -1,57 +1,54 @@
-# 0018. The first figure to stop being a guess
+# 0018. Tahmin olmayı bırakan ilk değer
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-`clock.crystal.residual_ppm` was 0,5, chosen because half a part per
-million at 2,4 GHz is a 1,2 kHz residual and that seemed unremarkable for
-a receiver that has already had to lock to the signal. It was the least
-supported number in the model and the one that decided whether
-single-sided two-way ranging worked on the SX1280 at all.
+## Bağlam
+`clock.crystal.residual_ppm` 0,5'ti; 2,4 GHz'de milyonda yarım parça 1,2
+kHz'lik bir artık eder ve bu, sinyale zaten kilitlenmek zorunda kalmış bir
+alıcı için sıradan göründüğü için seçilmişti. Modeldeki en az desteklenen
+sayıydı ve SX1280'de tek yönlü çift yönlü ölçümün hiç çalışıp
+çalışmadığına karar veren oydu.
 
-`matlab/yerkon_clock_residual.m` measured it. Eight preamble symbols,
-three hundred trials, crystal offsets of 2, 5, 10 and 20 ppm, over the
-signal-to-noise range where links actually close.
+`matlab/yerkon_clock_residual.m` onu ölçtü. Sekiz önsöz sembolü, üç yüz
+deneme, 2, 5, 10 ve 20 ppm'lik kristal kaymaları, bağlantıların gerçekten
+kapandığı sinyal-gürültü aralığında.
 
-## Decision
-The default is 0,0793 ppm, with `MEASUREMENT` provenance and the run it
-came from. That is the worst root-mean-square residual over the range,
-not the best and not the mean, because a figure that holds only at the
-strong end of a link fails at the far end.
+## Karar
+Varsayılan 0,0793 ppm; `MEASUREMENT` kaynağıyla ve geldiği koşumla
+birlikte. Bu, aralık üzerindeki en kötü karesel ortalama artıktır — en
+iyisi değil, ortalaması da değil — çünkü yalnızca bir bağlantının güçlü
+ucunda geçerli olan bir değer uzak uçta çöker.
 
-## Consequences
-Six times better than the guess, and the guess was conservative in the
-right direction.
+## Sonuçlar
+Tahminden altı kat iyi; ve tahmin doğru yönde ihtiyatlıymış.
 
-The measurement also says what limits it, which the guess could not. The
-residual barely improves with signal: thirty decibels more buys a factor
-of two, where a noise-limited estimator would buy thirty. Run with no
-noise at all, the same estimator gives 0,0164 to 0,0643 ppm depending
-only on where the peak falls between FFT bins — matching the measured
-plateau to four decimal places. The floor is the parabolic peak
-interpolator, not the channel.
+Ölçüm, tahminin söyleyemediği şeyi de söylüyor: onu neyin sınırladığını.
+Artık sinyalle zar zor iyileşiyor: otuz desibel fazlası iki kat satın
+alıyor, gürültüyle sınırlı bir kestirici otuz kat alırdı. Hiç gürültü
+olmadan koşulduğunda aynı kestirici, yalnızca tepenin FFT gözleri arasında
+nereye düştüğüne bağlı olarak 0,0164 ile 0,0643 ppm veriyor — ölçülen
+platoyla dört ondalık basamağa kadar uyuşuyor. Taban, kanal değil parabolik
+tepe aradeğerleyicisi.
 
-That distinction matters more than the number. A systematic error does
-not average down over repeated exchanges, so no amount of ranging
-removes it, and a finer interpolator would lower it. The figure is a
-property of an estimator rather than of a crystal.
+Bu ayrım sayının kendisinden daha önemli. Sistematik bir hata tekrarlanan
+alışverişlerde ortalamayla azalmaz, dolayısıyla hiçbir ölçüm miktarı onu
+kaldırmaz; ve daha ince bir aradeğerleyici onu düşürürdü. Değer, bir
+kristalin değil bir kestiricinin özelliğidir.
 
-One design decision changed. At the assumed residual the impulse radio's
-single-sided clock term was ten centimetres against a ten centimetre
-floor, so double-sided ranging earned its third frame. Measured, that
-term is 1,6 cm and the floor swallows it. The tunnel deployment is
-single-sided now: a third less air time, 0,72 m at the ninety-fifth
-percentile instead of 1,00, and half again as many fixes. A test holds
-the old value and checks that the old conclusion still follows from it,
-so it is clear the answer changed because a number did and not because
-the model did.
+Bir tasarım kararı değişti. Varsayılan artıkta darbeli telsizin tek yönlü
+saat terimi on santimetrelik bir tabana karşı on santimetreydi, yani çift
+yönlü ölçüm üçüncü çerçevesini hak ediyordu. Ölçülmüş hâliyle o terim 1,6
+cm ve taban onu yutuyor. Tünel yerleşimi artık tek yönlü: üçte bir az hava
+süresi, doksan beşinci yüzdelikte 1,00 yerine 0,72 m ve bir buçuk katı
+sabitleme. Bir test eski değeri tutuyor ve eski sonucun ondan hâlâ çıktığını
+denetliyor; böylece cevabın model değiştiği için değil bir sayı değiştiği
+için değiştiği açık oluyor.
 
-Thirty-two of thirty-three figures are still assumptions. This is what
-sourcing one looks like, and the ordering in `defaults.toml` says which
-to do next.
+Otuz üç değerin otuz ikisi hâlâ varsayım. Birine kaynak bulmak böyle
+görünüyor ve `defaults.toml`'daki sıralama sıradakinin hangisi olduğunu
+söylüyor.
 
-What the measurement does not cover: phase noise, multipath, and drift
-during the exchange. It is a floor. The remaining risk is that a real
-part sits well above it, and that needs a bench rather than a
-simulation.
+Ölçümün kapsamadıkları: faz gürültüsü, çok yolluluk ve alışveriş sırasında
+sürüklenme. Bu bir tabandır. Kalan risk, gerçek bir parçanın onun epey
+üstünde durmasıdır ve bu bir benzetim değil bir tezgâh gerektirir.

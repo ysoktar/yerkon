@@ -1,59 +1,62 @@
-# ADR-0028: three rows held at once, not one swapped in and out
+# ADR-0028: üç satır aynı anda tutulur, biri girip çıkmaz
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The viewer's four modes lived behind a dropdown, and switching rebuilt
-the arrangement from scratch. An afternoon spent on the rural row — a
-mast raised, anchors dragged, a spacing narrowed — was gone the moment
-somebody looked at the tunnel.
+Görüntüleyicinin dört kipi bir açılır listenin arkasında yaşıyordu ve
+geçiş yapmak düzeni sıfırdan yeniden kuruyordu. Kırsal satıra harcanmış
+bir öğleden sonra — yükseltilmiş bir direk, sürüklenmiş direkler,
+daraltılmış bir aralık — biri tünele bakar bakmaz yok oluyordu.
 
-That made the one thing the page is for impossible. The table has three
-rows; comparing them means preparing all three, and nothing could be
-prepared because nothing survived a glance elsewhere.
+Bu, sayfanın var olma sebebini olanaksız kılıyordu. Tablonun üç satırı
+vardır; onları karşılaştırmak üçünü de hazırlamak demektir ve hiçbiri
+hazırlanamıyordu, çünkü hiçbiri başka yere atılan bir bakıştan sağ
+çıkmıyordu.
 
-There was a second, quieter version of the same problem. A run from the
-page rebuilt its scenarios from `catalogue(settings)` — the shipped
-arrangement with the page's figures applied. So a table run reported the
-catalogue's deployment, not the one on screen. Drag an anchor, run the
-table, and the number that came back described something else.
+Aynı sorunun ikinci, daha sessiz bir sürümü vardı. Sayfadan başlatılan
+bir koşu senaryolarını `catalogue(settings)`'ten yeniden kuruyordu —
+sayfanın figürleri uygulanmış hazır düzen. Yani bir tablo koşusu,
+ekrandakini değil kataloğun yerleşimini bildiriyordu. Bir direği
+sürükle, tabloyu çalıştır; geri gelen sayı başka bir şeyi anlatıyordu.
 
-## Decision
+## Karar
 
-Three tabs, one per row, all held at once. `Session` keeps a `ViewState`
-per row and which one is showing; switching changes only the last.
-Resetting resets the row showing and leaves the others alone.
+Üç sekme, satır başına bir tane, hepsi aynı anda tutuluyor. `Session`
+satır başına bir `ViewState` ve hangisinin gösterildiğini saklar; geçiş
+yalnızca sonuncusunu değiştirir. Sıfırlamak gösterilen satırı sıfırlar,
+diğerlerine dokunmaz.
 
-A run takes **the rows as prepared**: `deployments_of` builds from each
-tab's own `ViewState`, not from the catalogue. What you set up is what
-you run.
+Bir koşu **satırları hazırlandıkları gibi** alır: `deployments_of` her
+sekmenin kendi `ViewState`'inden kurar, kataloğdan değil. Ne
+kurduysanız onu çalıştırırsınız.
 
-Running covers either the row showing — one row of output — or all
-three, which produces the three plus the weighted row they make. That is
-the shape of the block on page 15, so the page and the report now
-produce the same thing by construction rather than by coincidence.
+Çalıştırmak ya gösterilen satırı — tek satırlık çıktı — ya da üçünü
+birden kapsar; ikincisi üç satırı ve onların oluşturduğu ağırlıklı satırı
+üretir. Bu, 15. sayfadaki bloğun biçimidir; yani sayfa ile rapor artık
+aynı şeyi rastlantıyla değil kuruluşu gereği üretiyor.
 
-The mixed corridor that used to be a fourth mode is gone as a preset.
-Nothing is lost in kind: any tab still carries as many anchor runs of as
-many modules as it likes, which is all a mixed corridor ever was. The
-tests that covered it build one directly.
+Dördüncü bir kip olan karışık koridor bir hazır ayar olarak kalktı.
+Türce hiçbir şey kaybolmadı: herhangi bir sekme hâlâ istediği kadar
+modülden istediği kadar direk dizisi taşıyabilir ki karışık koridor da
+hep bundan ibaretti. Onu kapsayan sınamalar artık böyle birini doğrudan
+kuruyor.
 
-## Consequences
+## Sonuçlar
 
-Preparing and comparing is possible for the first time.
+Hazırlamak ve karşılaştırmak ilk kez olanaklı.
 
-Two things fell out of the change that were bugs on their own. The rural
-tab opened on the Gölbaşı hills while the rural row of the table stands
-on the Polatlı plain, so the picture and the published figure described
-different places. And the tunnel tab ran on a roadside sign rather than a
-tunnel bracket, because the page's mounting list was written by hand and
-had never gained the bracket — while `design.MOUNTING_CHOICES` had never
-gained it either, so asking for one raised. Two catalogues that disagreed
-with each other and with the model.
+Değişiklikten, kendi başlarına hata olan iki şey düştü. Kırsal sekme
+Gölbaşı tepelerinde açılıyordu, oysa tablonun kırsal satırı Polatlı
+ovasında durur; yani resim ile yayımlanan figür farklı yerleri
+anlatıyordu. Ve tünel sekmesi bir tünel askısı yerine bir yol kenarı
+levhası üzerinde çalışıyordu, çünkü sayfanın montaj listesi elle
+yazılmıştı ve askıyı hiç edinmemişti — `design.MOUNTING_CHOICES` de onu
+hiç edinmemişti, dolayısıyla birini istemek hata yükseltiyordu.
+Birbiriyle ve modelle çelişen iki katalog.
 
-The page no longer holds any of those lists. The engine serves the
-mountings, the radios and the rows, so a mounting that exists can be
-chosen and one that does not cannot be offered.
+Sayfa artık bu listelerin hiçbirini tutmuyor. Montajları, telsizleri ve
+satırları motor sunar; böylece var olan bir montaj seçilebilir, olmayan
+biri ise sunulamaz.

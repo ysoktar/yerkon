@@ -1,123 +1,122 @@
-# ADR-0022: size a round by how many anchors answer, not by how many a fix needs
+# ADR-0022: turu, bir sabitlemenin kaç direğe ihtiyaç duyduğuna göre değil kaçının cevap verdiğine göre boyutla
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-On real Ankara ground the rural row produced a position 82,3 % of the
-time. That is the weakest number in the table, and the obvious readings
-of it were all wrong.
+Gerçek Ankara zemininde kırsal satır zamanın %82,3'ünde bir konum
+üretiyordu. Bu tablodaki en zayıf sayı ve onun bariz okumalarının hepsi
+yanlıştı.
 
-The first question was what the failures actually are. Availability
-counts a link that did not close the same as a link that was never in
-range, and the two have opposite remedies: more masts fix distance, and
-nothing about spacing fixes a ridge. Measuring it separated them
-completely:
+İlk soru başarısızlıkların gerçekte ne olduğuydu. Kullanılabilirlik,
+kapanmamış bir bağlantıyı hiç menzilde olmamış bir bağlantıyla aynı sayar ve
+ikisinin çareleri zıttır: daha çok direk mesafeyi çözer, aralık hakkında
+hiçbir şey bir sırtı çözmez. Ölçmek ikisini tamamen ayırdı:
 
-| | share of rural links |
+| | kırsal bağlantıların payı |
 |---|---|
-| closed | 53,9 % |
-| killed by ground | 46,1 % |
-| too far even over clear ground | **0,0 %** |
+| kapanan | %53,9 |
+| zeminin öldürdüğü | %46,1 |
+| açık zeminde bile fazla uzak | **%0,0** |
 
-Not one rural link fails for distance. Every single failure would close
-if the terrain were taken away. The masts are not too far apart; they
-cannot see each other.
+Tek bir kırsal bağlantı bile mesafe yüzünden düşmüyor. Arazi kaldırılsa her
+bir başarısızlık kapanırdı. Direkler fazla aralıklı değil; birbirlerini
+göremiyorlar.
 
-## What was tried
+## Denenenler
 
-**Height.** A taller mast sees over more ridges, and it works: 25 m to
-35 m at unchanged spacing took availability from 82,3 % to 87,8 %,
-without a single extra mast. That reads like a bargain until height is
-priced. Steel and foundation grow faster than height — roughly as its
-square — so at equal money the comparison inverts:
+**Yükseklik.** Daha uzun bir direk daha çok sırtın üzerini görür ve işe
+yarıyor: aralık değişmeden 25 m'den 35 m'ye çıkmak kullanılabilirliği
+%82,3'ten %87,8'e götürdü, tek bir fazladan direk olmadan. Yükseklik
+fiyatlanana kadar bu bir kelepir gibi okunuyor. Çelik ve temel yükseklikten
+hızlı büyür — kabaca karesiyle — dolayısıyla eşit parada karşılaştırma
+tersine dönüyor:
 
-| spacing | height | masts | availability | mast capital |
+| aralık | yükseklik | direk | kullanılabilirlik | direk sermayesi |
 |---|---|---|---|---|
-| 4000 m | 25 m | 33 | 82,3 % | 2 805 000 TL |
-| 4000 m | 35 m | 33 | 87,8 % | 5 497 800 TL |
-| **3000 m** | **30 m** | **49** | **90,5 %** | **5 997 600 TL** |
-| 3000 m | 35 m | 49 | 90,7 % | 8 163 400 TL |
+| 4000 m | 25 m | 33 | %82,3 | 2 805 000 TL |
+| 4000 m | 35 m | 33 | %87,8 | 5 497 800 TL |
+| **3000 m** | **30 m** | **49** | **%90,5** | **5 997 600 TL** |
+| 3000 m | 35 m | 49 | %90,7 | 8 163 400 TL |
 
-For about six million lira you can buy 87,8 % with tall masts or 90,5 %
-with more of them. Spacing wins at equal budget. Either way it is roughly
-twice the capital for seven points.
+Yaklaşık altı milyon liraya ya uzun direklerle %87,8 ya da daha çok direkle
+%90,5 satın alabilirsin. Eşit bütçede aralık kazanıyor. Her iki hâlde de
+yedi puan için kabaca iki katı sermaye.
 
-**A neighbour list.** If the nearest anchor is behind a ridge while one
-twice as far is in plain sight, a round ordered by distance spends itself
-on links that cannot close. A diagnostic supported this: the nearest
-eight leave a unit short of four usable ranges 25 % of the time where the
-whole field would leave it short 20 %. So the receiver was made to call
-back whoever answered last round, keeping two slots free to discover new
-ones — which real receivers do, and which costs no mast, no power and no
-airtime.
+**Bir komşu listesi.** En yakın direk bir sırtın ardındayken iki katı uzakta
+olan biri apaçık görünüyorsa, mesafeye göre sıralanmış bir tur kendini
+kapanamayacak bağlantılara harcar. Bir tanılama bunu destekliyordu: en yakın
+sekiz, bir birimi zamanın %25'inde dört kullanılabilir menzilden yoksun
+bırakıyor; bütün alan ise %20'sinde bırakırdı. Dolayısıyla alıcı, geçen turda
+cevap vereni geri aramaya ve yenilerini keşfetmek için iki yuva boş tutmaya
+başladı — gerçek alıcıların yaptığı ve hiçbir direğe, güce ve hava süresine
+mal olmayan şey.
 
-On the first seed it gave +2,57 points. **Across three seeds it gave
-+2,57, +0,01 and −1,24.** It was noise, and it was very nearly shipped on
-the strength of one run. The five point diagnostic was real but it does
-not reach availability, because availability is not gated on getting four
-anchors: the tracking filter survives a round on a single range, so most
-of a cold-start deficit never shows up in the column.
+İlk tohumda +2,57 puan verdi. **Üç tohum boyunca +2,57, +0,01 ve −1,24
+verdi.** Gürültüydü ve tek bir koşumun gücüne dayanarak neredeyse
+gönderiliyordu. Beş puanlık tanılama gerçekti ama kullanılabilirliğe
+ulaşmıyor, çünkü kullanılabilirlik dört direk elde etmeye bağlı değil:
+izleme süzgeci bir turu tek bir menzille atlatıyor, dolayısıyla soğuk
+başlangıç eksiğinin çoğu sütunda hiç görünmüyor.
 
-**Being less fussy.** Raising the ranging tolerance from 30 m to 60 m
-changed nothing at all — not one figure to two decimal places. No rural
-link that closes is ever noisier than 30 m, so the acceptance gate was
-never binding. A dead lever, worth knowing is dead.
+**Daha az müşkülpesent olmak.** Ölçüm toleransını 30 m'den 60 m'ye
+yükseltmek hiçbir şey değiştirmedi — iki ondalık basamağa kadar tek bir
+değer bile. Kapanan hiçbir kırsal bağlantı 30 m'den gürültülü değil, yani
+kabul kapısı hiç bağlamıyordu. Ölü bir kol; öldüğünü bilmeye değer.
 
-## Decision
+## Karar
 
-Poll twelve anchors a round in the rural row rather than eight.
+Kırsal satırda tur başına sekiz yerine on iki direk yokla.
 
-| anchors per round | availability | HPE P50 | round |
+| tur başına direk | kullanılabilirlik | HPE P50 | tur |
 |---|---|---|---|
-| 8 | 82,3 % | 2,31 m | 509 ms |
-| **12** | **89,6 %** | **2,71 m** | **763 ms** |
-| 16 | 89,9 % | 2,97 m | 1018 ms |
+| 8 | %82,3 | 2,31 m | 509 ms |
+| **12** | **%89,6** | **2,71 m** | **763 ms** |
+| 16 | %89,9 | 2,97 m | 1018 ms |
 
-Across three seeds: +7,29, +5,32, +3,85 points. Positive every time,
-which is what the neighbour list was not.
+Üç tohum boyunca: +7,29, +5,32, +3,85 puan. Her seferinde pozitif; komşu
+listesinin olmadığı şey de buydu.
 
-Eight was chosen when the scenarios became areas, on the reasoning that a
-position needs four and a little margin looked generous. That reasoning
-holds over open ground and fails over real relief. Half the anchors
-polled never answer, so eight attempts yield about four replies —
-*exactly* what a cold fix needs, with nothing spare, which is why the
-column sat in the low eighties. Twelve attempts yield about six. Sixteen
-buys another 0,8 points and costs more in update rate than it returns.
+Sekiz, senaryolar alan olduğunda seçilmişti; bir konumun dörde ihtiyaç
+duyduğu ve biraz payın cömert göründüğü gerekçesiyle. O gerekçe açık zeminde
+tutuyor ve gerçek rölyefte çöküyor. Yoklanan direklerin yarısı hiç cevap
+vermiyor, dolayısıyla sekiz deneme yaklaşık dört yanıt veriyor — soğuk bir
+sabitlemenin gerektirdiğinin *tam kendisi*, yedeksiz; sütunun seksenlerin
+başında oturmasının sebebi de bu. On iki deneme yaklaşık altı veriyor. On
+altı, 0,8 puan daha getiriyor ve güncelleme hızında getirdiğinden fazlasını
+götürüyor.
 
-`max_anchors_per_round` already belonged to the deployment rather than to
-the project, so this is one number on the rural scenario. Urban and
-tunnel keep eight: in a town at a 500 m grid and in a bore at 150 m
-spacing, almost everything polled answers, and a longer round would buy
-nothing and cost update rate.
+`max_anchors_per_round` zaten projeye değil yerleşime aitti, dolayısıyla bu
+kırsal senaryoda tek bir sayı. Şehir içi ve tünel sekizde kalıyor: bir
+şehirde 500 m ızgarada ve bir tünelde 150 m aralıkta yoklananın neredeyse
+hepsi cevap veriyor ve daha uzun bir tur hiçbir şey satın almaz, güncelleme
+hızına mal olur.
 
-## Consequences
+## Sonuçlar
 
-The rural row goes from 82,26 % to 89,55 % availability for no capital at
-all. What it costs is update rate — 1,96 fixes a second per unit down to
-1,31 — and about 0,4 m of horizontal error, because the ranges in one
-round now span 763 ms and the vehicle moves 21 m in that time. For a
-system whose purpose is to be there when GNSS is not, availability is
-worth more than the third of a fix per second it costs.
+Kırsal satır hiç sermaye harcamadan %82,26'dan %89,55 kullanılabilirliğe
+gidiyor. Bedeli güncelleme hızı — birim başına saniyede 1,96 sabitlemeden
+1,31'e — ve yaklaşık 0,4 m yatay hata, çünkü bir turdaki menziller artık 763
+ms'ye yayılıyor ve araç o sürede 21 m yol alıyor. Amacı GNSS yokken orada
+olmak olan bir sistem için kullanılabilirlik, mal olduğu saniyede üçte bir
+sabitlemeden daha değerli.
 
-The generalisation is the part worth carrying: **a round is sized by how
-many anchors reply, not by how many a position needs.** Those are the
-same number only over ground that hides nothing, which is nowhere
+Taşınmaya değer genelleme şu: **bir tur, bir konumun kaç direğe ihtiyaç
+duyduğuna göre değil kaç direğin cevap verdiğine göre boyutlanır.** Bu ikisi
+yalnızca hiçbir şey gizlemeyen bir zeminde aynı sayıdır, ki öyle bir yer yok
 (ADR-0021).
 
-Two negative results are recorded above rather than deleted. The
-neighbour list is the more useful of them: it is a plausible, cheap,
-realistic-sounding mechanism that does not work here, and the next person
-to think of it should find out in a paragraph rather than in an
-afternoon.
+İki olumsuz sonuç silinmek yerine yukarıda kayıtlı. Komşu listesi ikisinin
+daha faydalısı: makul, ucuz, gerçekçi kulağa gelen ve burada işe yaramayan
+bir mekanizma; onu düşünecek bir sonraki kişi bunu bir öğleden sonrada değil
+bir paragrafta öğrensin.
 
-Getting past about 90 % needs money — roughly twice the mast capital, per
-the table above — or a journey that follows a road instead of a rectangle
-over open country. The second is not yet possible: OpenStreetMap is
-unreachable from the machine that fetched this ground, so no site in the
-package carries road geometry, and every rural journey drives over
-whatever is there. A real alignment would raise this figure again, and
-until one is fetched the rural row is conservative for a reason that is
-written down rather than assumed.
+Yaklaşık %90'ı geçmek para gerektiriyor — yukarıdaki tabloya göre kabaca iki
+katı direk sermayesi — ya da açık arazi üzerinde bir dikdörtgen yerine bir
+yolu izleyen bir yolculuk. İkincisi henüz mümkün değil: bu zemini getiren
+makineden OpenStreetMap'e erişilemiyor, dolayısıyla paketteki hiçbir saha yol
+geometrisi taşımıyor ve her kırsal yolculuk orada ne varsa onun üzerinde
+gidiyor. Gerçek bir güzergâh bu değeri yeniden yükseltirdi ve biri getirilene
+kadar kırsal satır, varsayılmak yerine yazılmış bir sebeple ihtiyatlıdır.

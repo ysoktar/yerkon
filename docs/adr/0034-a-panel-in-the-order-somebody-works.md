@@ -1,41 +1,41 @@
-# ADR-0034: a panel in the order somebody works
+# ADR-0034: birinin çalıştığı sırada bir panel
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-Everything this project can do is in the page (ADR-0024), and the page
-showed it as one column in the order the engine grew: site shape, anchor
-groups, receivers, terrain, regulation, ready-made options, run, solver,
-sweep, seventy-two settings, result. About three thousand pixels.
+Bu projenin yapabildiği her şey sayfadadır (ADR-0024) ve sayfa bunu
+motorun büyüdüğü sırayla tek bir sütun olarak gösteriyordu: saha biçimi,
+direk grupları, alıcılar, arazi, mevzuat, hazır seçenekler, çalıştır,
+çözücü, tarama, yetmiş iki ayar, sonuç. Yaklaşık üç bin piksel.
 
-Nobody reads three thousand pixels. They scroll it hunting for the one
-control they came for, and they cannot see what any of the other sections
-are currently set to without opening all of them. The answer — the four
-figures the whole study exists to produce — was at the bottom, past the
-seventy-two settings, so changing a control and seeing what it did meant
-scrolling twice.
+Kimse üç bin pikseli okumaz. Geldikleri tek denetimi ararken kaydırırlar
+ve diğer bölümlerin hangi değerde olduğunu hepsini açmadan göremezler.
+Cevap — bütün çalışmanın var olma sebebi olan dört figür — en altta,
+yetmiş iki ayarın ötesindeydi; yani bir denetimi değiştirip ne yaptığını
+görmek iki kez kaydırmak demekti.
 
-Think about somebody with a fresh stretch of road. What do they do, in
-order? Find the ground. Say what shape the site is. Put something on it.
-Say what it has to achieve. Ask what that rests on. Run it. That order
-appeared nowhere in the panel, and the first step — fetching a place —
-was fourth down and folded inside a `<details>`.
+Elinde taze bir yol parçası olan birini düşünün. Sırayla ne yaparlar?
+Zemini bul. Sahanın biçimini söyle. Üzerine bir şey koy. Neyi başarması
+gerektiğini söyle. Bunun neye dayandığını sor. Çalıştır. Bu sıra panelde
+hiçbir yerde görünmüyordu ve ilk adım — bir yer indirmek — dördüncü
+sıradaydı ve bir `<details>` içine katlanmıştı.
 
-The seventy-two settings had their own problem. They were labelled with
-their own keys: `clock.crystal.residual_ppm`. That is what belongs in
-`defaults.toml` and what somebody editing the file needs, and it is not a
-name — a list of seventy-two reads as a dump of variables rather than as
-the set of things this study is resting on. And thirty-five of them are
-still guesses, which is the single most useful thing the list can say; it
-said it in a `title` attribute, which is to say it said it to nobody.
+Yetmiş iki ayarın kendi sorunu vardı. Kendi anahtarlarıyla
+etiketlenmişlerdi: `clock.crystal.residual_ppm`. Bu, `defaults.toml`
+dosyasına ait olan ve dosyayı düzenleyen birinin ihtiyaç duyduğu şeydir;
+bir ad değildir — yetmiş iki maddelik bir liste, bu çalışmanın dayandığı
+şeyler kümesi olarak değil bir değişken dökümü olarak okunur. Ve
+otuz beşi hâlâ tahmindir ki bu, listenin söyleyebileceği en yararlı tek
+şeydir; onu bir `title` özniteliğinde söylüyordu, yani kimseye
+söylemiyordu.
 
-## Decision
+## Karar
 
-Six steps, in that order, each a `<details>` whose summary carries its own
-state:
+O sırada altı adım; her biri, özeti kendi durumunu taşıyan bir
+`<details>`:
 
     1 YER       kizilay · ölçülmüş zemin
     2 SAHA      3,0 km × 3,0 km alan
@@ -44,39 +44,43 @@ state:
     5 DAYANAK   72 değerin 35 tanesi varsayım
     6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
 
-One open at a time, brought into view when it opens. Closing loses
-nothing, because the line says what the step holds, and that is what
-holds the panel to a screen.
+Bir seferde biri açık ve açıldığında görüş alanına getiriliyor. Kapatmak
+hiçbir şey kaybettirmez, çünkü satır adımın ne tuttuğunu söyler; paneli
+bir ekrana sığdıran da budur.
 
-The result is pinned to the bottom of the panel and never scrolls away.
+Sonuç, panelin altına sabitlenmiştir ve asla kayıp gitmez.
 
-Every ranged setting draws a slider and an exact number. A slider whose
-step is 500 cannot be given 4000, and a number alone says nothing about
-the range it lives in; the number may also go past the slider's ends,
-because clamping it would be a control changing a setting by being
-looked at.
+Aralığı olan her ayar bir sürgü ve tam bir sayı çizer. Adımı 500 olan bir
+sürgüye 4000 verilemez ve tek başına bir sayı, içinde yaşadığı aralık
+hakkında hiçbir şey söylemez; sayı sürgünün uçlarını da geçebilir, çünkü
+onu kısıtlamak, bir denetimin kendisine bakıldığı için bir ayarı
+değiştirmesi olurdu.
 
-A search box over every setting, including all seventy-two figures.
-Turkish folded to the letters a keyboard reaches without thinking, so
-"gurultu" finds gürültü katsayısı. A step is open exactly when it holds a
-hit, and everything in it that does not is hidden.
+Yetmiş iki figür dahil her ayarın üzerinde bir arama kutusu. Türkçe, bir
+klavyenin düşünmeden ulaştığı harflere katlanır; böylece "gurultu",
+gürültü katsayısını bulur. Bir adım tam olarak bir eşleşme tuttuğunda
+açıktır ve içindeki eşleşmeyen her şey gizlenir.
 
-Each figure is named in the language the rest of the page is written in,
-with its key a hover away, and carries a coloured mark for where its value
-came from. "Yalnız varsayımları göster" reduces the list to the
-thirty-five that are still guesses.
+Her figür, sayfanın geri kalanının yazıldığı dilde adlandırılır;
+anahtarı bir imleç uzaklığındadır ve değerinin nereden geldiğini
+gösteren renkli bir işaret taşır. "Yalnız varsayımları göster" listeyi
+hâlâ tahmin olan otuz beşe indirir.
 
-## Consequences
+## Sonuçlar
 
-The whole study now reads in six lines without scrolling, and the answer
-is always on screen beside the controls that move it.
+Bütün çalışma artık kaydırmadan altı satırda okunuyor ve cevap her zaman
+onu kımıldatan denetimlerin yanında, ekranda.
 
-A figure added to `defaults.toml` with no Turkish name falls through as
-its own key rather than disappearing — and a test names the ones without
-one, so the list does not quietly drift back into being a dump of
-variables.
+`defaults.toml` dosyasına Türkçe adı olmadan eklenen bir figür,
+kaybolmak yerine kendi anahtarı olarak düşer — ve bir sınama adı
+olmayanları adıyla sayar, böylece liste sessizce yeniden bir değişken
+dökümüne dönüşmez.
 
-Still inconsistent, and worth saying: the line under each figure saying
-what it affects comes from the engine and is in English. Those strings
-are built with numbers in them on the Python side; translating them is a
-job for the engine, not for the page, and it is not done.
+Hâlâ tutarsız olan ve söylenmeye değen şey: her figürün altındaki, neyi
+etkilediğini söyleyen satır motordan gelir ve İngilizcedir. Bu dizgiler
+Python tarafında içlerinde sayılarla kurulur; onları çevirmek sayfanın
+değil motorun işidir ve yapılmamıştır.
+
+*Sonradan:* ADR-0035 tam olarak bunu yaptı. `affects`, `note`, `source`
+ve `sensitivity` artık her figürün yanında iki dilde durur; yukarıdaki
+paragraf yazıldığı andaki durumu anlatır.

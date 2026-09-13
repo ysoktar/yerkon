@@ -1,87 +1,90 @@
-# ADR-0030: one depth per thing is not enough
+# ADR-0030: şey başına tek derinlik yetmiyor
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The scene is painted back to front: every surface is projected, sorted by
-how far away it is, and drawn in that order. That is the whole renderer,
-and it is why the viewer needs no library and works offline (ADR-0008).
+Sahne arkadan öne boyanır: her yüzey izdüşürülür, ne kadar uzakta
+olduğuna göre sıralanır ve o sırayla çizilir. Oluşturucunun tamamı budur
+ve görüntüleyicinin hiçbir kitaplığa ihtiyaç duymamasının ve çevrimdışı
+çalışmasının sebebi de budur (ADR-0008).
 
-It has one assumption, and the assumption is that a thing is at *a*
-distance. Opening the rural row showed what happens when it is not.
+Tek bir varsayımı vardır ve o varsayım bir şeyin *bir* uzaklıkta
+olduğudur. Kırsal satırı açmak, olmadığında ne olduğunu gösterdi.
 
-The road was a twenty kilometre circuit sampled at a hundred and sixty
-points and handed over as one item, with the average depth of those
-points. Every hill nearer to the camera than that average was painted
-over the whole of it — including the near legs, which are in front of the
-hill. Half the circuit disappeared, and the half that survived made an
-area deployment look like a straight line drawn across a field. Nothing
-on screen said which was real.
+Yol, yüz altmış noktada örneklenmiş yirmi kilometrelik bir devreydi ve o
+noktaların ortalama derinliğiyle tek bir öğe olarak veriliyordu. Kameraya
+o ortalamadan daha yakın olan her tepe, devrenin tamamının üzerine
+boyanıyordu — tepenin önünde olan yakın kollar dahil. Devrenin yarısı
+kayboluyordu ve sağ kalan yarı, alansal bir yerleşimi bir tarlaya
+çizilmiş düz bir çizgi gibi gösteriyordu. Ekranda hangisinin gerçek
+olduğunu söyleyen hiçbir şey yoktu.
 
-Splitting it into one item per segment fixed that and exposed the same
-assumption a level down. A ground quad is seven hundred metres across on
-this site, and it too sorts at the depth of its middle: seen at a grazing
-angle its middle is most of a cell nearer than its far edge, so the quad
-covered the half of the road lying on its far side. The road came back as
-a dashed line.
+Onu parça başına bir öğeye bölmek bunu düzeltti ve aynı varsayımı bir
+kat aşağıda açığa çıkardı. Bu sahada bir zemin dörtgeni yedi yüz metre
+genişliğindedir ve o da ortasının derinliğinde sıralanır: sıyırma
+açısından bakıldığında ortası, uzak kenarından neredeyse bir hücre kadar
+daha yakındır; dolayısıyla dörtgen, uzak tarafında yatan yol yarısının
+üstünü örtüyordu. Yol kesik çizgi olarak geri geldi.
 
-Two more things came from the same reading of the frame:
+Aynı kare okumasından iki şey daha çıktı:
 
-The mesh was a fixed hundred by forty whatever the site. Twenty
-kilometres by twenty was therefore sampled every 460 m along and every
-1100 m across — the ground came out in stripes and a hill read as a
-ridge, because the mesh could only resolve it in one direction.
+Ağ, saha ne olursa olsun sabit yüz çarpı kırktı. Yirmi kilometreye
+yirmi kilometre böylece boyunca her 460 m'de, enine her 1100 m'de bir
+örnekleniyordu — zemin çizgili çıkıyordu ve bir tepe sırt gibi
+okunuyordu, çünkü ağ onu yalnızca tek yönde çözebiliyordu.
 
-And adjacent quads are antialiased independently, so the background
-showed through every shared edge as a hairline. Four thousand of them
-read as a wire grid laid over the hill rather than as ground.
+Ve komşu dörtgenler birbirinden bağımsız yumuşatıldığı için arka plan
+her ortak kenardan kıl gibi görünüyordu. Dört bin tanesi, zemin yerine
+tepenin üzerine serilmiş bir tel ızgara gibi okunuyordu.
 
-Two smaller things came out of the same place. A corner behind the eye
-cannot be projected, and the whole surface was being dropped for it — so
-the ground directly under a close camera went missing at exactly the
-distance where it is the only thing on screen. And the coverage overlay
-was held sixty units clear of the mesh to stop the painter burying it,
-which is twelve metres of real ground drawn five times over: close up it
-hovers visibly above the hill it describes.
+Aynı yerden iki küçük şey daha çıktı. Gözün arkasındaki bir köşe
+izdüşürülemez ve bunun için bütün yüzey atılıyordu — yani yakın bir
+kameranın tam altındaki zemin, tam da ekrandaki tek şey olduğu uzaklıkta
+kayboluyordu. Ve kapsama katmanı, boyacının onu gömmesini engellemek için
+ağdan altmış birim yukarıda tutuluyordu; bu da beş kat abartıyla çizilen
+on iki metrelik gerçek zemin demektir: yakından bakınca anlattığı tepenin
+görünür biçimde üzerinde asılı durur.
 
-## Decision
+## Karar
 
-A line that lies on the ground is pulled towards the camera by one mesh
-cell before it is sorted. That is the scale at which a quad's single
-depth stops describing the whole of it, so it is the right bias: enough
-to win against the quad it lies on, not enough to win against a hill in
-front of it. The page knows the mesh, so the page supplies it.
+Zemin üzerinde yatan bir çizgi, sıralanmadan önce kameraya doğru bir ağ
+hücresi kadar çekilir. Bir dörtgenin tek derinliğinin onun tamamını
+anlatmayı bıraktığı ölçek budur, dolayısıyla doğru kaydırma da budur:
+üzerinde yattığı dörtgene karşı kazanmaya yeter, önündeki bir tepeye
+karşı kazanmaya yetmez. Ağı sayfa bilir, dolayısıyla onu sayfa sağlar.
 
-The mesh is sampled from the site's own proportions, for cells that are
-roughly square at a fixed budget of about four thousand quads.
+Ağ, sahanın kendi oranlarından örneklenir; yaklaşık dört bin dörtgenlik
+sabit bir bütçede kabaca kare hücreler için.
 
-Each quad is grown half a pixel from its own middle, which closes the
-join with its neighbour. Stroking every quad in its own colour closes it
-too and costs a second pass over all four thousand.
+Her dörtgen kendi ortasından yarım piksel büyütülür; bu, komşusuyla olan
+birleşimi kapatır. Her dörtgeni kendi renginde konturlamak da kapatır ve
+dört binin tamamı üzerinde ikinci bir geçişe mal olur.
 
-A shape with a corner behind the eye is cut at the near plane and the
-part in front is drawn.
+Gözün arkasında köşesi olan bir şekil yakın düzlemde kesilir ve öndeki
+parçası çizilir.
 
-The coverage overlay sits on the ground and is biased forward like
-anything else drawn on it — by its own half-width as well as the mesh
-cell, because both surfaces are wide and both sort at the depth of their
-middles, so the two spreads add.
+Kapsama katmanı zemin üzerinde oturur ve üzerine çizilen her şey gibi
+öne kaydırılır — ağ hücresinin yanı sıra kendi yarı genişliği kadar da;
+çünkü her iki yüzey de geniştir ve her ikisi de ortalarının derinliğinde
+sıralanır, dolayısıyla iki yayılım toplanır.
 
-## Consequences
+## Sonuçlar
 
-The road is a road. The ground is ground.
+Yol bir yol. Zemin zemin.
 
-What generalises: a painter's renderer is exact only for things small
-against the depth differences between them, and both failures here were
-the same mistake at different scales. Anything drawn on a surface rather
-than at a point needs either a bias or a finer subdivision, and the size
-of the surface is what says how much.
+Genelleşen şey: bir boyacı oluşturucusu yalnızca aralarındaki derinlik
+farklarına göre küçük olan şeyler için tamdır ve buradaki iki
+başarısızlık da aynı hatanın farklı ölçeklerdeki hâliydi. Bir noktada
+değil bir yüzey üzerinde çizilen her şeyin ya bir kaydırmaya ya da daha
+ince bir bölüntüye ihtiyacı vardır ve ne kadar gerektiğini yüzeyin
+büyüklüğü söyler.
 
-What does not generalise, and is worth saying plainly: this is a depth
-bias, which is a fudge. It is correct for lines lying on the terrain and
-it would not be correct for a wall standing on it. If the scene ever
-grows something with real vertical extent, the answer is per-pixel depth,
-which means WebGL, which means the trade in ADR-0008 gets made again.
+Genelleşmeyen ve açıkça söylenmeye değen şey: bu bir derinlik
+kaydırmasıdır, yani bir el çabukluğudur. Arazi üzerinde yatan çizgiler
+için doğrudur, üzerinde duran bir duvar için doğru olmazdı. Sahne bir gün
+gerçek düşey yayılımı olan bir şey edinirse, cevap piksel başına
+derinliktir; o da WebGL demektir, o da ADR-0008'deki değiş tokuşun
+yeniden yapılması demektir.

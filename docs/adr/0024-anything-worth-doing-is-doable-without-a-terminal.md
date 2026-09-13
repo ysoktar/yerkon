@@ -1,92 +1,96 @@
-# ADR-0024: anything worth doing is doable without a terminal
+# ADR-0024: yapmaya değer her şey uçbirim olmadan da yapılabilir
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The project grew a verb at a time. `table` runs the report, `budget`
-takes each row's error apart, `solve` searches deployments, `options`
-lists the named ones, `defaults` lists the figures. Every one of them
-was reachable only from a shell.
+Proje her seferinde bir eylemle büyüdü. `table` raporu çalıştırır,
+`budget` her satırın hatasını parçalarına ayırır, `solve` yerleşimleri
+arar, `options` adlandırılmış olanları listeler, `defaults` figürleri
+listeler. Hepsine yalnızca bir kabuktan ulaşılabiliyordu.
 
-The viewer, meanwhile, could do the one thing that is fast: draw the
-scene and recompute a few numbers as sliders move. Everything that takes
-minutes stayed on the command line, which meant the person most likely
-to be exploring the design — moving a mast, dragging an anchor, trying a
-spacing — had to leave the picture, remember what they had changed, type
-it again as flags, and read the answer somewhere else.
+Görüntüleyici ise hızlı olan tek şeyi yapabiliyordu: sahneyi çizmek ve
+sürgüler hareket ettikçe birkaç sayıyı yeniden hesaplamak. Dakikalar
+süren her şey komut satırında kaldı; bu da tasarımı keşfetmesi en olası
+kişinin — bir direği kaydıran, bir direği sürükleyen, bir aralık
+deneyen kişinin — resmi terk etmesi, neyi değiştirdiğini hatırlaması,
+onu bayrak olarak yeniden yazması ve cevabı başka bir yerde okuması
+demekti.
 
-That is also how a figure gets lost. The viewer's edits live in its own
-session; a `yerkon table` in another window knows nothing about them.
+Bir figürün kaybolma biçimi de budur. Görüntüleyicinin düzenlemeleri
+kendi oturumunda yaşar; başka bir penceredeki `yerkon table` onlardan
+habersizdir.
 
-There was a second problem in the same place. The camera could only
-orbit a fixed point. Over a twenty kilometre rural region that is not a
-limitation, it is a wall: there is no way to look at a corner. Worse,
-`refreshScene` re-centred the camera on every response, so even the
-target could not be moved by hand — any change would have been undone by
-the next edit. Zoom stepped a fixed twelve percent per wheel event,
-which a trackpad turns into a lurch and a mouse into imprecision, and it
-zoomed towards the middle rather than towards the cursor, so getting
-close to one anchor meant zooming in and then hunting for it.
+Aynı yerde ikinci bir sorun vardı. Kamera yalnızca sabit bir nokta
+etrafında dönebiliyordu. Yirmi kilometrelik bir kırsal bölgede bu bir
+kısıt değil, bir duvardır: bir köşeye bakmanın yolu yoktur. Daha kötüsü,
+`refreshScene` her yanıtta kamerayı yeniden ortalıyordu; yani hedef bile
+elle kaydırılamıyordu — her değişiklik bir sonraki düzenlemeyle geri
+alınırdı. Yakınlaştırma her tekerlek olayında sabit yüzde on iki
+adımlıyordu; bunu bir dokunmatik yüzey sarsıntıya, bir fare
+belirsizliğe çeviriyordu ve imlece değil ortaya doğru
+yakınlaştırıyordu, dolayısıyla bir direğe yaklaşmak önce yakınlaşıp
+sonra onu aramak demekti.
 
-## Decision
+## Karar
 
-**Long work runs on a thread and reports as it goes.** A dissection is
-twelve minutes; a browser gives up long before that, and twelve minutes
-of silence is indistinguishable from broken. `yerkon.viewer.jobs` starts
-the work, collects the lines it prints, and hands back an identifier the
-page polls once a second. A failure becomes a message on the page rather
-than a traceback in a terminal nobody is looking at.
+**Uzun işler bir iş parçacığında çalışır ve ilerledikçe bildirir.** Bir
+hata ayrıştırması on iki dakikadır; bir tarayıcı çok önce pes eder ve on
+iki dakikalık sessizlik bozulmuştan ayırt edilemez. `yerkon.viewer.jobs`
+işi başlatır, yazdırdığı satırları toplar ve sayfanın saniyede bir
+yokladığı bir kimlik geri verir. Bir başarısızlık, kimsenin bakmadığı
+bir uçbirimdeki yığın izi yerine sayfadaki bir ileti olur.
 
-**Everything runs against the settings the page is showing.** Not
-against the shipped defaults. Somebody who has spent an afternoon moving
-figures can ask what their arrangement costs, where its error comes
-from, and what it would take to reach a target, without writing any of it
-to a file first. `yerkon.viewer.tasks` is the seam: it arranges, and the
-same modules the table is built from do the work (ADR-0001).
+**Her şey sayfanın gösterdiği ayarlara karşı çalışır.** Hazır gelen
+varsayılanlara karşı değil. Bir öğleden sonrasını figürleri kaydırmakla
+geçiren biri, düzeninin ne tuttuğunu, hatasının nereden geldiğini ve bir
+hedefe ulaşmak için neyin gerektiğini, hiçbirini önce bir dosyaya
+yazmadan sorabilir. `yerkon.viewer.tasks` dikiş yeridir: o düzenler ve işi
+tablonun kurulduğu modüllerin aynısı yapar (ADR-0001).
 
-**Options apply as overrides.** Choosing one lands its edits in the same
-place a person's hand edits live, so it composes with their work instead
-of replacing it, and it undoes the same way.
+**Seçenekler üstyazma olarak uygulanır.** Birini seçmek, düzenlemelerini
+bir kişinin el düzenlemelerinin yaşadığı yere indirir; böylece onların
+işinin yerini almak yerine onunla birleşir ve aynı şekilde geri alınır.
 
-**The camera moves.** Right-drag, middle-drag or a held modifier slides
-the ground under the cursor; the point grabbed stays under the pointer,
-which is the only pan that feels like a map rather than like a nudge.
-Wheel zoom scales with how far the wheel actually turned and moves
-towards the cursor. WASD and the arrows walk the way the camera faces
-rather than along the world's axes, because "forward" means what is on
-the screen. `F` frames everything, which is the one gesture a person
-needs after getting lost — and getting lost is the price of being able
-to go anywhere. Every gesture is captured on the canvas, so a drag that
-crosses into the panel keeps working until the button comes up.
+**Kamera hareket eder.** Sağ sürükleme, orta sürükleme ya da basılı bir
+değiştirici tuş zemini imlecin altından kaydırır; yakalanan nokta
+imlecin altında kalır, ki bu bir dürtme gibi değil bir harita gibi
+hissettiren tek kaydırmadır. Tekerlek yakınlaştırması tekerleğin
+gerçekte ne kadar döndüğüyle ölçeklenir ve imlece doğru gider. WASD ve
+ok tuşları dünyanın eksenleri boyunca değil kameranın baktığı yönde
+yürür, çünkü "ileri" ekranda olan demektir. `F` her şeyi çerçeveler; bu,
+kaybolduktan sonra insanın ihtiyaç duyduğu tek harekettir — ve kaybolmak,
+her yere gidebilmenin bedelidir. Her hareket tuval üzerinde yakalanır,
+böylece panele taşan bir sürükleme düğme kalkana kadar çalışmayı
+sürdürür.
 
-Framing now happens once, on the first load and on a mode change, and
-never again.
+Çerçeveleme artık bir kez oluyor: ilk yüklemede ve bir kip
+değişikliğinde, bir daha asla.
 
-## Consequences
+## Sonuçlar
 
-The command line and the page do the same things, and a test names the
-verbs so that adding one to a terminal and not to the page fails.
+Komut satırı ile sayfa aynı şeyleri yapar ve bir sınama eylemleri adıyla
+sayar; böylece bir uçbirime eylem ekleyip sayfaya eklememek başarısız
+olur.
 
-Two tests were also weakened without anybody noticing, and this found
-both. The route test matched only quoted paths, so a whole feature's
-`ask(\`/api/job?id=${...}\`)` would have gone unchecked — exactly the dead
-route it exists to catch. And nothing checked the other direction at
-all: that every button, box and menu the page draws is actually reached
-by the script. A control that looks live and does nothing is worse than
-no control.
+Kimse fark etmeden iki sınama da zayıflatılmıştı ve bu ikisini de
+buldu. Güzergâh sınaması yalnızca tırnaklı yolları eşliyordu, yani bütün
+bir özelliğin ``ask(`/api/job?id=${...}`)`` çağrısı denetlenmeden
+geçerdi — tam da yakalamak için var olduğu ölü güzergâh. Ve öbür yönü
+hiçbir şey denetlemiyordu: sayfanın çizdiği her düğmeye, kutuya ve
+menüye betiğin gerçekten ulaştığı. Canlı görünüp hiçbir şey yapmayan bir
+denetim, hiç denetim olmamasından kötüdür.
 
-The smoke test of the finished endpoints turned up a real reporting bug
-too. Asked for one scenario, the table printed a "weighted average" row
-identical to it — a weighted average of one thing is that thing, and
-printing it twice under a name that promises a combination is worse than
-not printing it. `build` now adds that row only when it has more than one
-deployment to combine.
+Bitmiş uç noktaların duman sınaması gerçek bir raporlama hatası da
+çıkardı. Tek senaryo istendiğinde tablo, ona birebir eş bir "ağırlıklı
+ortalama" satırı yazdırıyordu — tek bir şeyin ağırlıklı ortalaması o
+şeyin kendisidir ve onu bir birleştirme vaat eden bir ad altında iki kez
+yazdırmak, hiç yazdırmamaktan kötüdür. `build` artık o satırı yalnızca
+birleştirecek birden çok yerleşimi olduğunda ekler.
 
-What this does not do is make the work fast. A dissection over three
-scenarios is still twelve minutes, because every figure in it comes from
-running the real simulation rather than from a fitted model (ADR-0020).
-The page can now watch that happen, which is the honest improvement
-available.
+Bunun yapmadığı şey, işi hızlandırmak. Üç senaryo üzerinden bir
+ayrıştırma hâlâ on iki dakikadır, çünkü içindeki her figür uydurulmuş bir
+modelden değil gerçek benzetimi çalıştırmaktan gelir (ADR-0020). Sayfa
+artık bunun olmasını izleyebiliyor, ki bu da mevcut dürüst iyileştirmedir.

@@ -1,130 +1,126 @@
-# ADR-0021: nowhere is flat, and a plane is not the neutral choice
+# ADR-0021: hiçbir yer düz değildir ve bir düzlem tarafsız seçenek değildir
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-Two of the three scenarios stood on `flat_terrain`. The urban row was a
-perfectly level plane with a clutter figure over it; the tunnel row was a
-perfectly level bore. Only the rural row had relief, and it had 40 m of
-it over a 3 km wavelength — gentle farmland, chosen because it was a
-plausible-sounding number and not because anywhere measured it.
+Üç senaryonun ikisi `flat_terrain` üzerinde duruyordu. Şehir içi satırı
+üzerinde bir engel kaybı değeri olan kusursuz düz bir düzlemdi; tünel satırı
+kusursuz düz bir tüneldi. Yalnızca kırsal satırın rölyefi vardı ve 3 km
+dalga boyunda 40 m — yumuşak tarım arazisi; kulağa makul gelen bir sayı
+olduğu için seçilmişti, herhangi bir yer onu ölçtüğü için değil.
 
-A level plane looks like the neutral, conservative, assumption-free
-choice. It is none of those things.
+Düz bir düzlem tarafsız, ihtiyatlı, varsayımsız seçenek gibi görünür.
+Hiçbiri değildir.
 
-It is **the most favourable ground this model can draw.** The two-ray
-term takes a specular reflection off the ground between the terminals,
-and over a plane every reflection arrives at exactly the specular angle
-the model assumes. Real ground scatters most of that energy elsewhere.
-Flat ground is where the two-ray model is most confident and most
-generous.
+**Bu modelin çizebileceği en elverişli zemindir.** İki ışınlı terim,
+uçlar arasındaki zeminden aynasal bir yansıma alır ve bir düzlem üzerinde
+her yansıma tam olarak modelin varsaydığı aynasal açıyla varır. Gerçek zemin
+o enerjinin çoğunu başka yere saçar. Düz zemin, iki ışınlı modelin en emin
+ve en cömert olduğu yerdir.
 
-It also removes, by construction, one of the seven errors the
-dissection had just been built to measure: the excess path over an
-obstruction (ADR-0019, ADR-0020). Over a plane, nothing obstructs
-anything, so `excess_path` read exactly 0,00 m in every row — not because
-the term is small, but because the terrain could not produce it. On real
-Ankara it reads 0,41 m in the country, 0,11 m in town and 0,09 m in the
-bore. A model cannot measure a term its own ground forbids, and this one
-had been reporting that zero as a finding.
+Ayrıca, dağılımın ölçmek için yeni kurulduğu yedi hatadan birini kuruluş
+gereği ortadan kaldırır: bir engelin üzerindeki fazladan yol (ADR-0019,
+ADR-0020). Bir düzlem üzerinde hiçbir şey hiçbir şeyi engellemez,
+dolayısıyla `excess_path` her satırda tam olarak 0,00 m okuyordu — terim
+küçük olduğu için değil, arazi onu üretemediği için. Gerçek Ankara'da
+kırsalda 0,41 m, şehirde 0,11 m, tünelde 0,09 m okuyor. Bir model, kendi
+zemininin yasakladığı bir terimi ölçemez ve bu model o sıfırı bir bulgu diye
+bildiriyordu.
 
-And it makes the vertical geometry degenerate. On a level bore every
-anchor and every receiver sits at one height, which is the arrangement
-least able to say anything about VPE.
+Ve düşey geometriyi yozlaştırır. Düz bir tünelde her direk ve her alıcı tek
+bir yükseklikte durur; bu da VPE hakkında bir şey söyleyebilmeye en az
+elverişli düzendir.
 
-Ankara is not flat. Its centre rises and falls 91 m across three
-kilometres. The open country south of it climbs 907 m across twenty — an
-order of magnitude more than the figure this project had been using.
+Ankara düz değil. Merkezi üç kilometrede 91 m iniyor ve çıkıyor. Güneyindeki
+açık arazi yirmi kilometrede 907 m tırmanıyor — bu projenin kullandığı
+değerin bir mertebe üstü.
 
-## Decision
+## Karar
 
-Fetch Ankara, ship it, and never fall back to a plane.
+Ankara'yı getir, paketle gönder ve asla bir düzleme düşme.
 
-Three `yerkon fetch` runs are committed inside the package, under
-`src/yerkon/site/ankara/`: `kizilay` for the town, `golbasi` for the open
-country, `kizilcahamam` for the mountain the tunnel goes through. They
-total a megabyte. ADR-0008 already said a cache directory is a
-self-contained artefact; this is the first time the project has taken it
-at its word, and it means a clone reproduces every number with no
-network.
+Paketin içine, `src/yerkon/site/ankara/` altına üç `yerkon fetch` koşumu
+işlendi: şehir için `kizilay`, açık arazi için `golbasi`, tünelin içinden
+geçtiği dağ için `kizilcahamam`. Toplamı bir megabayt. ADR-0008 zaten bir
+önbellek klasörünün kendi kendine yeten bir eser olduğunu söylüyordu; proje
+onu ilk kez ciddiye alıyor ve bu, bir klonun her sayıyı ağ olmadan yeniden
+ürettiği anlamına geliyor.
 
-**A tunnel is the exception that proves the rule.** A bore cannot be
-built by draping a road over terrain, because it goes through the hill
-rather than over it. `bore_terrain` is a straight line between two
-portals — and it *slopes*, because every road tunnel is built to a
-drainage gradient. The alignment was found by searching the fetched
-mountain for a two kilometre line that keeps rock above it the whole way
-and falls within the half to three percent a road tunnel is built to.
-It keeps between 9 and 156 m of overburden and falls 1,79 %. Those
-portal elevations are a mountain's, not a choice.
+**Bir tünel, kuralı kanıtlayan istisnadır.** Bir tünel, bir yolu arazinin
+üzerine örterek kurulamaz, çünkü tepenin üzerinden değil içinden geçer.
+`bore_terrain` iki portal arasında düz bir çizgidir — ve *eğimlidir*, çünkü
+her karayolu tüneli bir drenaj eğimine göre yapılır. Güzergâh, getirilmiş
+dağda boyunca üstünde kaya tutan ve bir karayolu tünelinin yapıldığı yüzde
+yarım ile üç aralığına düşen iki kilometrelik bir çizgi aranarak bulundu.
+Üstünde 9 ile 156 m arasında örtü tutuyor ve %1,79 düşüyor. O portal
+yükseklikleri bir dağın, bir seçimin değil.
 
-**Where nothing has been fetched, the fallback is rolling ground, never
-a plane.** Its relief and its ridge spacing are in `defaults.toml` as
-what they are — measurements off the fetched grids, marked MEASUREMENT
-and sourced to the Copernicus fetch — so the fallback is traceable rather
-than invented.
+**Hiçbir şeyin getirilmediği yerde yedek tepeli zemindir, asla bir düzlem
+değil.** Rölyefi ve sırt aralığı `defaults.toml`'da ne iseler o olarak
+duruyor — getirilmiş ızgaralardan alınmış ölçümler, MEASUREMENT işaretli ve
+Copernicus getirmesine kaynaklanmış — yani yedek uydurulmuş değil
+izlenebilir.
 
-`flat_terrain` stays, and its docstring now says what it is: a laboratory
-instrument for isolating one variable in a test, not a description of
-anywhere. Nothing that ships uses it. The viewer's relief slider no
-longer reaches zero, and the viewer gained a ground selector, so real
-Ankara is one click away rather than a command-line fetch away.
+`flat_terrain` kalıyor ve docstring'i artık ne olduğunu söylüyor: bir testte
+tek bir değişkeni yalıtmak için bir laboratuvar aleti, herhangi bir yerin
+tanımı değil. Gönderilen hiçbir şey onu kullanmıyor. Görüntüleyicinin rölyef
+sürgüsü artık sıfıra ulaşmıyor ve görüntüleyici bir zemin seçicisi kazandı,
+yani gerçek Ankara bir komut satırı getirmesi değil bir tık uzakta.
 
-## Consequences
+## Sonuçlar
 
-The table moved, and the rural row moved twice.
+Tablo oynadı ve kırsal satır iki kez oynadı.
 
-Urban went from 1,24 m to 1,64 m at the fiftieth percentile and from
-100 % availability to 99,11 %: real ground puts things in the way that a
-plane could not.
+Şehir içi ellinci yüzdelikte 1,24 m'den 1,64 m'ye, kullanılabilirlikte
+%100'den %99,11'e gitti: gerçek zemin, bir düzlemin koyamayacağı şeyleri
+yola koyuyor.
 
-The tunnel moved the other way, and the reason is the one this ADR is
-about. A level bore put every anchor 4 m off the centreline at one height
-and every receiver at another — a fixed two-ray geometry repeated the
-length of the tunnel, and a fixed geometry can sit in a fixed null.
-Sloping the floor 1,79 % varies that geometry along the bore, and the
-lost exchanges fell from 37,7 % to 7,8 %, availability from 98,02 % to
-100 %. The level model was not conservative there either; it was
-differently wrong.
+Tünel diğer yöne oynadı ve sebebi bu ADR'nin konusu olan şey. Düz bir tünel
+her direği eksenden 4 m uzakta tek bir yüksekliğe, her alıcıyı başka birine
+koyuyordu — tünel boyunca tekrarlanan sabit bir iki ışınlı geometri; ve
+sabit bir geometri sabit bir sıfırın içinde oturabilir. Tabanı %1,79
+eğimlendirmek o geometriyi tünel boyunca değiştiriyor ve kaybolan
+alışverişler %37,7'den %7,8'e, kullanılabilirlik %98,02'den %100'e gitti.
+Düz model orada da ihtiyatlı değildi; farklı biçimde yanlıştı.
 
-The rural row is the finding, and it took two fetches to read correctly.
+Kırsal satır bulgunun kendisi ve doğru okumak iki getirme aldı.
 
-Put on the hills at Gölbaşı — 907 m of relief over twenty kilometres —
-the row collapsed: 45,28 % availability, two thirds of exchanges lost to
-terrain. The first instinct was that the grid was too coarse. It was not:
+Gölbaşı'ndaki tepelere konduğunda — yirmi kilometrede 907 m rölyef — satır
+çöktü: %45,28 kullanılabilirlik, alışverişlerin üçte ikisi araziye kurban.
+İlk içgüdü ızgaranın fazla seyrek olduğuydu. Değildi:
 
-| Mast spacing | Masts | Availability |
+| Direk aralığı | Direk | Kullanılabilirlik |
 |---|---|---|
-| 4000 m | 33 | 45,3 % |
-| 3000 m | 49 | 48,3 % |
-| 2500 m | 77 | 53,6 % |
-| 2000 m | 116 | 57,8 % |
-| 1500 m | 189 | 60,8 % |
+| 4000 m | 33 | %45,3 |
+| 3000 m | 49 | %48,3 |
+| 2500 m | 77 | %53,6 |
+| 2000 m | 116 | %57,8 |
+| 1500 m | 189 | %60,8 |
 
-Five and a half times the capital buys fifteen points. Siting each mast
-on the highest ground within 1,5 km buys eight. Neither is a fix, because
-neither addresses what is wrong: **an intercity road does not cross a
-mountain range on a rectangle**, and neither does the network beside it.
-A receiver in a valley cannot see a mast over the ridge above it however
-many masts there are.
+Beş buçuk katı sermaye on beş puan satın alıyor. Her direği 1,5 km içindeki
+en yüksek zemine yerleştirmek sekiz satın alıyor. Hiçbiri bir çözüm değil,
+çünkü hiçbiri yanlış olanı ele almıyor: **şehirlerarası bir yol bir dağ
+silsilesini bir dikdörtgen üzerinde geçmez** ve yanındaki ağ da geçmez. Bir
+vadideki alıcı, kaç direk olursa olsun üstündeki sırtın ardındaki bir direği
+göremez.
 
-Roads follow the gentler ground — that is why the towns are there — so
-the rural row now stands on the Polatlı plain west of Ankara, 486 m of
-relief over the same twenty kilometres, which is the ground an intercity
-corridor in this province actually runs through. The same thirty-three
-masts at the same four kilometre spacing give **82,3 %** availability
-there instead of 45,3 %, with only the ground changed.
+Yollar daha yumuşak zemini izler — şehirlerin orada olmasının sebebi de
+budur — dolayısıyla kırsal satır artık Ankara'nın batısındaki Polatlı
+ovasında duruyor: aynı yirmi kilometrede 486 m rölyef, ki bu ildeki
+şehirlerarası bir koridorun gerçekten geçtiği zemin. Aynı otuz üç direk aynı
+dört kilometrelik aralıkta orada %45,3 yerine **%82,3** kullanılabilirlik
+veriyor; yalnızca zemin değişti.
 
-Gölbaşı stays fetched and stays in the package. It is the case that says
-what this deployment costs in terrain it was not designed for, and that
-number belongs in the report rather than in a footnote nobody wrote.
+Gölbaşı getirilmiş hâlde ve pakette kalıyor. Bu yerleşimin tasarlanmadığı
+arazide neye mal olduğunu söyleyen durumdur ve o sayı, kimsenin yazmadığı
+bir dipnotta değil raporda durur.
 
-The one thing not fixed: the rural journey is still a rectangle over the
-ground rather than a road that follows it. OpenStreetMap was unreachable
-from the machine that did these fetches, so no site in the package
-carries buildings or road geometry. A real alignment would raise every
-rural figure again, and until one is fetched the rural row is
-conservative for a reason that is written down rather than assumed.
+Düzeltilmeyen tek şey: kırsal yolculuk hâlâ zemini izleyen bir yol değil
+zeminin üzerinde bir dikdörtgen. Bu getirmeleri yapan makineden
+OpenStreetMap'e erişilemedi, dolayısıyla paketteki hiçbir saha bina ya da
+yol geometrisi taşımıyor. Gerçek bir güzergâh her kırsal değeri yeniden
+yükseltirdi ve biri getirilene kadar kırsal satır, varsayılmak yerine
+yazılmış bir sebeple ihtiyatlıdır.

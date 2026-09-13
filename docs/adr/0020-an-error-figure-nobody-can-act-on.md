@@ -1,87 +1,82 @@
-# ADR-0020: an error figure nobody can act on is half a result
+# ADR-0020: kimsenin üzerine iş yapamayacağı bir hata değeri yarım sonuçtur
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The table says a receiver in town is out by 1,24 m at the fiftieth
-percentile, and in a bore by 1,81 m. Both are true and neither can be
-acted on. The question anybody holding a budget actually asks is which
-of those metres is the cheapest to remove, and the table does not answer
-it. Worse, the intuition is wrong: the tunnel is the most accurate
-deployment in the study by every hardware measure — an impulse radio, a
-ten centimetre measurement floor, anchors a hundred and fifty metres
-apart — and it comes out the *least* accurate of the three.
+Tablo, şehirdeki bir alıcının ellinci yüzdelikte 1,24 m, bir tünelde ise
+1,81 m şaştığını söylüyor. İkisi de doğru ve ikisinin de üzerine iş
+yapılamaz. Elinde bütçe olan birinin gerçekte sorduğu soru, o metrelerin
+hangisini kaldırmanın en ucuz olduğudur ve tablo bunu cevaplamaz. Daha
+kötüsü, sezgi yanlıştır: tünel, her donanım ölçütüne göre çalışmadaki en
+hassas yerleşimdir — darbeli bir telsiz, on santimetrelik bir ölçüm tabanı,
+yüz elli metre aralıklı direkler — ve üçünün *en az* hassası olarak çıkar.
 
-Two ways to answer it were available.
+Cevaplamanın iki yolu vardı.
 
-An **analytic error budget** propagates each term through a linearised
-geometry and adds them in quadrature. It is instant and it is a second
-model of the same thing. Where it disagreed with the simulation, nothing
-would say which was wrong, and the disagreement would be largest exactly
-where the answer matters most: a corridor's near-singular geometry, a
-bias that does not average, a filter that has been running for minutes.
+**Analitik bir hata bütçesi** her terimi doğrusallaştırılmış bir geometriden
+geçirir ve kareli toplar. Anlıktır ve aynı şeyin ikinci bir modelidir.
+Benzetimle çeliştiği yerde hangisinin yanlış olduğunu hiçbir şey söylemezdi
+ve çelişki, tam olarak cevabın en çok önem taşıdığı yerde en büyük olurdu:
+bir koridorun tekile yakın geometrisinde, ortalamayla kaybolmayan bir
+yanlılıkta, dakikalardır koşan bir süzgeçte.
 
-**Re-running the simulation with one error source silenced** is slow —
-sixteen full runs per scenario, a couple of minutes each — and it cannot
-disagree with the table, because it *is* the table's own engine with one
-term switched off.
+**Bir hata kaynağı susturularak benzetimin yeniden koşulması** yavaştır —
+senaryo başına on altı tam koşum, her biri birkaç dakika — ve tabloyla
+çelişemez, çünkü tablonun kendi motorunun bir terimi kapatılmış hâlidir.
 
-## Decision
+## Karar
 
-Dissect by re-running. `yerkon.terms.Terms` names the seven sources;
-`run_scenario` takes one and silences what it is told to; `yerkon.budget`
-runs the combinations and reports them.
+Yeniden koşarak dağıt. `yerkon.terms.Terms` yedi kaynağı adlandırır;
+`run_scenario` birini alır ve söyleneni susturur; `yerkon.budget`
+birleşimleri koşar ve bildirir.
 
-Three rules make the runs comparable.
+Koşumları karşılaştırılabilir kılan üç kural.
 
-**The receiver's belief does not change.** `measure` still reports the
-whole modelled variance in every observation, whatever is silenced. Only
-the error actually injected changes. A run that also narrowed the
-filter's variance would tighten its gains, and the difference between two
-such runs would be partly the estimator re-tuning itself rather than the
-error under study.
+**Alıcının inancı değişmez.** `measure`, ne susturulursa susturulsun her
+gözlemde modellenen bütün varyansı bildirmeye devam eder. Yalnızca gerçekten
+enjekte edilen hata değişir. Süzgecin varyansını da daraltan bir koşum
+kazançlarını sıkılaştırırdı ve iki böyle koşum arasındaki fark, kısmen
+incelenen hata değil kestiricinin kendini yeniden ayarlaması olurdu.
 
-**The floor is a term, not a clamp.** `sigma_terms_m` returns the
-implementation floor as whatever must be added in quadrature to reach it,
-which is zero wherever the physics is already above it. Summed, the three
-terms reproduce `max(hypot(waveform, clock), floor)` exactly, so the
-split changed no published number.
+**Taban bir terimdir, bir kırpma değil.** `sigma_terms_m`, uygulama tabanını
+ona ulaşmak için kareli olarak eklenmesi gereken şey olarak döndürür; fizik
+zaten onun üstündeyse bu sıfırdır. Toplandığında üç terim
+`max(hypot(dalga formu, saat), taban)` değerini tam olarak yeniden üretir,
+yani ayrım yayımlanmış hiçbir sayıyı değiştirmedi.
 
-**Both readings are printed.** *Alone* is the error if a source were the
-only one; *removing it* is what the whole falls to if that source goes
-and the rest stay. They differ enormously and only the second is a
-purchase decision: taking 0,50 m out of a 2,00 m total leaves 1,94 m. A
-report that printed only the first column would sell improvements worth
-six centimetres.
+**İki okuma da yazdırılır.** *Tek başına*, o kaynak tek olsaydı kalacak
+hatadır; *kalkarsa*, o kaynak gidip gerisi kalırsa bütünün ineceği yerdir.
+Muazzam farklıdırlar ve yalnızca ikincisi bir satın alma kararıdır: 2,00
+m'lik bir toplamdan 0,50 m çıkarmak 1,94 m bırakır. Yalnızca ilk sütunu
+yazdıran bir rapor, altı santimetre değerinde iyileştirmeler satardı.
 
-## Consequences
+## Sonuçlar
 
-The dissection immediately overturned the reading the table invited.
+Dağılım, tablonun davet ettiği okumayı hemen tersine çevirdi.
 
-In the **tunnel**, the anchor survey error is worth 1,84 m on its own and
-everything else together is worth 0,17 m. The bore's geometry multiplies
-one range's sigma by eighteen, because every anchor is within four metres
-of the same line, and what it multiplies hardest is the one error that
-never averages out. Buying a better radio for that deployment buys
-nothing. Surveying its brackets properly takes it from 1,81 m to 0,17 m.
+**Tünelde** direk etüt hatası tek başına 1,84 m değerinde ve diğer her şey
+birlikte 0,17 m. Tünelin geometrisi bir menzilin sigmasını on sekizle
+çarpıyor, çünkü her direk aynı çizginin dört metre içinde; ve en sert
+çarptığı şey ortalamayla asla kaybolmayan tek hata. O yerleşime daha iyi bir
+telsiz almak hiçbir şey satın almıyor. Askılarını düzgün ölçmek onu 1,81
+m'den 0,17 m'ye indiriyor.
 
-In the **town**, the ranking inverts: the module's measurement floor is
-worth 1,13 m and the survey error 0,09 m. The geometry multiplier is
-0,6 — *below one*. An area deployment with a filter running across it
-comes out better than a single range, which is the quantitative form of
-the thing the corridor framing had been hiding.
+**Şehirde** sıralama ters dönüyor: modülün ölçüm tabanı 1,13 m, etüt hatası
+0,09 m değerinde. Geometri çarpanı 0,6 — *birin altında*. Üzerinde bir
+süzgeç koşan bir alan yerleşimi, tek bir menzilden daha iyi çıkıyor; bu da
+koridor çerçevesinin gizlediği şeyin niceliksel hâli.
 
-One figure the dissection produced was an artefact of the ground rather
-than a finding, and it took ADR-0021 to see it. `excess_path` came out at
-exactly 0,00 m in all four rows, which read as "obstructions cost
-nothing" and in fact meant "two of these three scenarios stand on a
-plane, and a plane cannot obstruct anything". On real Ankara ground it is
-the third or fourth largest term in every row. A dissection is only as
-honest as the world it re-runs.
+Dağılımın ürettiği bir değer bir bulgu değil zeminin bir yapaylığıydı ve
+bunu görmek ADR-0021'i gerektirdi. `excess_path` dört satırda da tam olarak
+0,00 m çıkıyordu; bu "engellerin maliyeti yok" diye okunuyordu ve aslında
+"bu üç senaryonun ikisi bir düzlemin üzerinde duruyor ve bir düzlem hiçbir
+şeyi engelleyemez" demekti. Gerçek Ankara zemininde her satırdaki üçüncü ya
+da dördüncü en büyük terim. Bir dağılım, ancak yeniden koştuğu dünya kadar
+dürüsttür.
 
-The cost is honesty about runtime: `yerkon budget` is minutes, not
-seconds, and it says so before it starts. The alternative was a number
-that arrives instantly and cannot be checked against anything.
+Bedeli koşum süresi konusunda dürüstlüktür: `yerkon budget` saniyeler değil
+dakikalar sürer ve başlamadan önce bunu söyler. Alternatifi, anında gelen ve
+hiçbir şeye karşı denetlenemeyen bir sayıydı.

@@ -1,69 +1,66 @@
-# 0017. A demodulation threshold belongs to the ratio it is quoted on
+# 0017. Bir çözme eşiği, üzerinde verildiği orana aittir
 
-## Status
-Accepted. Corrects this project's own link budget.
+## Durum
+Kabul edildi. Bu projenin kendi link bütçesini düzeltir.
 
-## Context
-Writing a MATLAB script to measure the residual clock offset meant
-simulating the receiver, and simulating the receiver meant choosing a
-signal-to-noise ratio to simulate it at. The link budget said links close
-down to −20 dB *after* the 30,1 dB despreading gain, so the script needed
-to work at −20 dB post-correlation.
+## Bağlam
+Kalan saat kaymasını ölçmek için bir MATLAB betiği yazmak alıcıyı
+benzetmek, alıcıyı benzetmek de onu hangi sinyal-gürültü oranında
+benzeteceğini seçmek demekti. Link bütçesi bağlantıların 30,1 dB'lik yayma
+kazancından *sonra* −20 dB'ye kadar kapandığını söylüyordu, dolayısıyla
+betiğin ilinti sonrası −20 dB'de çalışması gerekiyordu.
 
-Nothing works at −20 dB post-correlation. The correlation peak is a
-hundredth of the noise floor; there is no peak to find. That was the
-first sign.
+İlinti sonrası −20 dB'de hiçbir şey çalışmaz. İlinti tepesi gürültü
+tabanının yüzde biridir; bulunacak bir tepe yoktur. İlk işaret buydu.
 
-The second was arithmetic. At the model's claimed closure range of
-38,9 km the received power was −156,0 dBm, against a part whose
-best-case published sensitivity is −132 dBm. No arrangement of antennas
-lets a radio hear twenty-four decibels below itself.
+İkincisi aritmetikti. Modelin iddia ettiği 38,9 km'lik kapanma menzilinde
+alınan güç −156,0 dBm'di; en iyi durumda yayımlanmış hassasiyeti −132 dBm
+olan bir parçaya karşı. Hiçbir anten düzeni bir telsizin kendisinin yirmi
+dört desibel altını duymasını sağlamaz.
 
-The cause was one line. A LoRa datasheet's "−20 dB" is quoted on the
-ratio *in the occupied bandwidth*: working below the noise floor is what
-despreading buys, and the figure already assumes it. The model added the
-despreading gain and then compared against that same figure, granting
-every link thirty decibels twice.
+Sebebi tek bir satırdı. Bir LoRa veri sayfasının "−20 dB"si, *işgal edilen
+bant genişliğindeki* oran üzerinden verilir: gürültü tabanının altında
+çalışmak yaymanın satın aldığı şeydir ve değer bunu zaten varsayar. Model
+yayma kazancını ekliyor, sonra da aynı değerle karşılaştırıyordu; yani her
+bağlantıya otuz desibeli iki kez veriyordu.
 
-## Decision
-A radio says which ratio its threshold is quoted on, and closure is
-tested against that one. `threshold_is_in_band` is `True` for the SX1280
-family, whose LoRa figure already assumes despreading, and `False` for
-the impulse radio, whose working point is quoted after preamble
-accumulation because there is no spreading to assume.
+## Karar
+Bir telsiz, eşiğinin hangi oran üzerinden verildiğini söyler ve kapanma ona
+karşı sınanır. `threshold_is_in_band`, LoRa değeri yaymayı zaten varsayan
+SX1280 ailesi için `True`; varsayılacak bir yayma olmadığı için çalışma
+noktası önsöz birikiminden sonra verilen darbeli telsiz için `False`.
 
-The processing gain still exists and still matters. It belongs in the
-Cramér-Rao bound, where the relevant quantity is energy per symbol over
-noise density, and not in the closure test.
+İşlem kazancı hâlâ vardır ve hâlâ önemlidir. İlgili niceliğin gürültü
+yoğunluğuna bölünmüş sembol başına enerji olduğu Cramér-Rao sınırına aittir,
+kapanma sınamasına değil.
 
-## Consequences
-The SX1280's closure range falls from 38,9 km to 11,7 km. Received power
-at the edge is −124,8 dBm, above the part rather than below it.
+## Sonuçlar
+SX1280'in kapanma menzili 38,9 km'den 11,7 km'ye düşüyor. Kenardaki alınan
+güç −124,8 dBm; parçanın altında değil üstünde.
 
-The usable range does not move at all: 5,52 km from a 25 m mast, before
-and after. The bound that sets it always used the post-correlation ratio
-and was always right. What was wrong was only the claim about how far a
-link keeps working after it has stopped being useful — which is to say,
-the overstated half of ADR-0007's distinction.
+Kullanılabilir menzil hiç oynamıyor: 25 m'lik bir direkten 5,52 km, öncesinde
+de sonrasında da. Onu belirleyen sınır her zaman ilinti sonrası oranı
+kullandı ve her zaman doğruydu. Yanlış olan tek şey, bir bağlantının işe
+yaramayı bıraktıktan sonra ne kadar çalışmaya devam ettiğine dair iddiaydı —
+yani ADR-0007'nin ayrımının abartılmış yarısı.
 
-So the four table rows barely move. Every link inside a deployment was
-already well within 11,7 km, and the corrected model changes the answer
-by a tenth of a metre here and there. The thing that was badly wrong was
-the thing nobody was using.
+Dolayısıyla dört tablo satırı zar zor oynuyor. Bir yerleşimin içindeki her
+bağlantı zaten 11,7 km'nin epey içindeydi ve düzeltilmiş model cevabı şurada
+burada onda bir metre değiştiriyor. Ciddi biçimde yanlış olan şey, kimsenin
+kullanmadığı şeydi.
 
-Two claims retract. "Reaching is not ranging" was a factor of seven and
-is a factor of two. And no legal configuration outruns the sixty
-kilometre search any more, where the loudest used to.
+İki iddia geri çekiliyor. "Erişmek ölçmek değildir" yedi kattı, iki kat.
+Ve artık hiçbir yasal yapılandırma altmış kilometrelik aramayı geçmiyor;
+eskiden en yüksek sesli olan geçiyordu.
 
-One finding was rebuilt rather than retracted. The claim that gentle
-relief beats flat ground rested on a single distance that happened to
-suit it. Swept across a corridor, relief is a trade: level ground closes
-at every distance with a median error of 5,63 m, ten metres of relief
-closes at 72 % of them with a median of 3,08 m, and eighty metres closes
-at 17 %. Relief improves the links that survive and kills the ones in
-dips.
+Bir bulgu geri çekilmek yerine yeniden kuruldu. Yumuşak rölyefin düz zemini
+yendiği iddiası, ona denk gelen tek bir mesafeye dayanıyordu. Bir koridor
+boyunca tarandığında rölyef bir takas: düz zemin her mesafede kapanıyor ve
+medyan hatası 5,63 m; on metre rölyef bunların %72'sinde kapanıyor ve medyanı
+3,08 m; seksen metre %17'sinde kapanıyor. Rölyef sağ kalan bağlantıları
+iyileştiriyor ve çukurdakileri öldürüyor.
 
-The simulation now agrees with the budget, which is the check that
-matters: the frequency-offset estimator works from +10 dB
-post-correlation upward, and +10 dB post-correlation is exactly where the
-corrected threshold puts the edge of the link.
+Benzetim artık bütçeyle uyuşuyor ve önemli olan denetim budur: frekans
+kayması kestiricisi ilinti sonrası +10 dB'den yukarıda çalışıyor ve ilinti
+sonrası +10 dB, düzeltilmiş eşiğin bağlantının kenarını koyduğu yerin ta
+kendisi.

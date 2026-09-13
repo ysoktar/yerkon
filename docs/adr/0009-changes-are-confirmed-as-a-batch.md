@@ -1,45 +1,43 @@
-# 0009. A change and everything it forces are confirmed together
+# 0009. Bir değişiklik ve zorladığı her şey birlikte onaylanır
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-Most of the settings in this project are not independent. Changing the
-region changes the legal radiated power, which changes how far a link
-still ranges within tolerance, which changes how far apart anchors can
-stand, which changes how many there are and what they cost. Changing the
-mounting structure or the target accuracy sets off the same chain.
+## Bağlam
+Bu projedeki ayarların çoğu bağımsız değil. Bölgeyi değiştirmek yasal
+yayılan gücü, o da bir bağlantının tolerans içinde ne kadar uzağa
+ölçebildiğini, o da direklerin ne kadar aralıklı durabileceğini, o da kaç
+tane olduklarını ve neye mal olduklarını değiştirir. Montaj yapısını ya da
+hedef hassasiyeti değiştirmek aynı zinciri tetikler.
 
-A tool that silently recomputed the rest would leave someone reading a
-cost figure without knowing which of their settings produced it. A tool
-that confirmed each consequence separately would ask four questions for
-one edit, and the person answering the second would not yet know what the
-fourth was going to be.
+Gerisini sessizce yeniden hesaplayan bir araç, bir maliyet değerini okuyan
+birini, ayarlarının hangisinin onu ürettiğini bilmeden bırakırdı. Her sonucu
+ayrı ayrı onaylatan bir araç ise tek bir düzenleme için dört soru sorardı ve
+ikinciyi cevaplayan kişi dördüncünün ne olacağını henüz bilmezdi.
 
-## Decision
-One edit produces one confirmation. The panel lists every value that
-would change — the one asked for and every one that follows from it —
-each with its old value, its new value, and, for the derived ones, why it
-follows. The answer is a single y/n, and nothing is applied until it is y.
+## Karar
+Bir düzenleme bir onay üretir. Panel değişecek her değeri listeler —
+istenen ve ondan çıkan her biri — her birini eski değeri, yeni değeri ve
+türetilmiş olanlar için neden takip ettiğiyle. Cevap tek bir evet/hayırdır
+ve evet gelene kadar hiçbir şey uygulanmaz.
 
-Derived values are computed by the same functions the simulation uses.
-There is no separate table of rules saying what forces what: the
-consequences are read off the physics, which is what makes them true
-rather than merely declared. See ADR-0002.
+Türetilmiş değerler benzetimin kullandığı fonksiyonların kendisiyle
+hesaplanır. Neyin neyi zorladığını söyleyen ayrı bir kural tablosu yoktur:
+sonuçlar fizikten okunur ve onları yalnızca ilan edilmiş değil doğru kılan
+budur. ADR-0002'ye bak.
 
-The panel is one function producing one description, and both the command
-line and the application render it. See ADR-0001.
+Panel, tek bir tanım üreten tek bir fonksiyondur ve hem komut satırı hem
+uygulama onu çizer. ADR-0001'e bak.
 
-## Consequences
-An edit whose consequences are unacceptable is rejected before anything
-changes, so there is no half-applied state to undo.
+## Sonuçlar
+Sonuçları kabul edilemez olan bir düzenleme, hiçbir şey değişmeden önce
+reddedilir; yani geri alınacak yarı uygulanmış bir durum olmaz.
 
-The panel grows as the model does. When the estimator lands, the chain
-extends from ranging precision through geometry to position error, and
-the same confirmation shows the new links without any change to how it is
-answered.
+Panel model büyüdükçe büyür. Kestirici geldiğinde zincir, ölçüm
+hassasiyetinden geometri üzerinden konum hatasına uzanır ve aynı onay, nasıl
+cevaplandığında hiçbir değişiklik olmadan yeni halkaları gösterir.
 
-A batch answer cannot accept some consequences and refuse others. That is
-deliberate: the consequences are not optional, they are what the settings
-mean. Refusing one means choosing different settings, not overriding the
-physics.
+Toplu bir cevap bazı sonuçları kabul edip bazılarını reddedemez. Bu
+bilerektir: sonuçlar isteğe bağlı değildir, ayarların anlamının ta
+kendisidir. Birini reddetmek, fiziği ezmek değil, farklı ayarlar seçmek
+demektir.

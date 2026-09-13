@@ -1,53 +1,54 @@
-# ADR-0029: the camera was aimed at sea level
+# ADR-0029: kamera deniz seviyesine nişanlanmıştı
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The 3D scene was blank. Not slow, not wrong — blank, on every mode
-standing on fetched ground. The panel beside it worked perfectly: forty
-nine anchors, a reach of 3,82 km, the terrain described. The picture
-showed nothing at all.
+3B sahne boştu. Yavaş değil, yanlış değil — boş; indirilmiş zemin
+üzerinde duran her kipte. Yanındaki panel kusursuz çalışıyordu: kırk
+dokuz direk, 3,82 km erişim, arazi tarif edilmiş. Resim hiçbir şey
+göstermiyordu.
 
-Every gesture worked. Dragging turned the camera, the wheel zoomed, the
-keys walked, and each one changed the pixels — because a blank screen
-lit differently is still a change. Testing that the camera *moved* is not
-testing that it is *pointed at anything*, and the difference is the whole
-bug.
+Her hareket çalışıyordu. Sürüklemek kamerayı döndürüyor, tekerlek
+yakınlaştırıyor, tuşlar yürütüyordu ve her biri pikselleri
+değiştiriyordu — çünkü başka türlü aydınlatılmış boş bir ekran da bir
+değişikliktir. Kameranın *hareket ettiğini* sınamak, onun *bir şeye
+nişanlandığını* sınamak değildir ve hatanın tamamı bu farktır.
 
-The framing set `orbit.target = [corridor / 2, width / 2, 0]`.
+Çerçeveleme `orbit.target = [corridor / 2, width / 2, 0]` koyuyordu.
 
-Relief is drawn five times over, so it reads as relief rather than as a
-faint ripple. Ankara's ground is 700 to 1900 m above sea level. Kızılay
-sits at about 1150 m, which in view space is 5750 units — and the camera
-was aimed at zero from 6000 units away, looking at a point almost the
-entire view distance below everything there is.
+Engebe beş kat abartılı çizilir, böylece silik bir dalgalanma değil
+engebe olarak okunur. Ankara'nın zemini deniz seviyesinden 700 ile 1900 m
+yukarıdadır. Kızılay yaklaşık 1150 m'dedir; bu da görüş uzayında 5750
+birim eder — ve kamera 6000 birim uzaktan sıfıra nişanlanmıştı; yani var
+olan her şeyin neredeyse bütün görüş uzaklığı kadar altındaki bir
+noktaya bakıyordu.
 
-Modelled terrain averages zero. It hid this completely until the
-scenarios moved onto real Ankara (ADR-0021), and then every default view
-of every row was empty.
+Modellenmiş arazinin ortalaması sıfırdır. Bu, senaryolar gerçek
+Ankara'ya taşınana kadar (ADR-0021) durumu tamamen gizledi; sonra her
+satırın her varsayılan görünümü boş çıktı.
 
-## Decision
+## Karar
 
-Frame on the scene, not on the origin: the middle of the anchors in x and
-y, and their mean ground height times the vertical exaggeration in z.
-`frameEverything` does it, the first framing calls it, and `F` calls it
-again.
+Başlangıç noktasına değil sahneye çerçevele: x ve y'de direklerin ortası,
+z'de ise ortalama zemin yüksekliği çarpı düşey abartı. Bunu
+`frameEverything` yapar, ilk çerçeveleme onu çağırır ve `F` onu yeniden
+çağırır.
 
-## Consequences
+## Sonuçlar
 
-It draws.
+Çiziyor.
 
-The lesson is about what the tests were checking. There was a test that
-the camera is framed once and not on every refresh, a test that zoom
-follows the wheel, a test that dragging follows the ground — all passing,
-all about mechanism, none about whether the result was visible. A
-screenshot would have caught this on the first run and no amount of
-reading would have.
+Ders, sınamaların neyi denetlediğiyle ilgili. Kameranın bir kez
+çerçevelendiğini ve her tazelemede çerçevelenmediğini sınayan bir sınama
+vardı; yakınlaştırmanın tekerleği izlediğini sınayan bir sınama;
+sürüklemenin zemini izlediğini sınayan bir sınama — hepsi geçiyordu,
+hepsi mekanizmaya dairdi, hiçbiri sonucun görünür olup olmadığına dair
+değildi. Bir ekran görüntüsü bunu ilk koşuda yakalardı; ne kadar okunsa
+yakalanmazdı.
 
-So the framing now has a test that names the two things it must account
-for — the ground height and the exaggeration it is drawn with — and the
-habit that found it is the one worth keeping: open the page and look at
-it.
+Bu yüzden çerçevelemenin artık hesaba katması gereken iki şeyi adıyla
+anan bir sınaması var — zemin yüksekliği ve çizildiği abartı — ve onu
+bulan alışkanlık, tutulmaya değer olan: sayfayı aç ve bak.

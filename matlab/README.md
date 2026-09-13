@@ -1,65 +1,66 @@
-# MATLAB measurements
+# MATLAB ölçümleri
 
-Two of the figures in `src/yerkon/defaults.toml` can be measured rather
-than guessed. One of them is here.
+`src/yerkon/defaults.toml` içindeki iki figür tahmin edilmek yerine
+ölçülebilir. Bunlardan biri burada.
 
-## Running it
+## Çalıştırmak
 
-Open MATLAB, `cd` to this folder, and:
+MATLAB'ı aç, bu klasöre `cd` yap ve:
 
 ```matlab
 yerkon_clock_residual
 ```
 
-It writes `out/clock_residual.csv`. Bring that back and:
+`out/clock_residual.csv` dosyasını yazar. Onu geri getir ve:
 
 ```powershell
 yerkon calibrate matlab\out\clock_residual.csv
 ```
 
-which prints the `defaults.toml` entry to paste over the figure it
-replaces, with the factor it moves by.
+bu komut, yerine geçtiği figürün üzerine yapıştırılacak `defaults.toml`
+girdisini, taşıdığı çarpanla birlikte yazdırır.
 
-Base MATLAB only. No toolboxes, and nothing to install.
+Yalnızca temel MATLAB. Araç kutusu yok, kurulacak bir şey yok.
 
-## What `yerkon_clock_residual.m` measures
+## `yerkon_clock_residual.m` neyi ölçer
 
-`clock.crystal.residual_ppm`, currently 0,5 and the least supported
-number in the model. It decides whether single-sided two-way ranging
-works on the SX1280 at all: in that scheme the residual clock offset
-multiplies a sixteen-millisecond reply delay, so 0,5 ppm is 1,20 m and
-ten parts per million, uncorrected, is 24,1 m.
+`clock.crystal.residual_ppm`. Bu betik çalıştırılmadan önce 0,5 varsayımıydı
+ve modeldeki en az desteklenen sayıydı; şimdi `defaults.toml` içinde bir
+MEASUREMENT olarak 0,0793 duruyor (ADR-0018). SX1280 üzerinde tek yönlü iki
+yollu menzil ölçümünün hiç çalışıp çalışmadığına o karar verir: bu düzende artık saat kayması on altı
+milisaniyelik bir yanıt gecikmesiyle çarpılır, yani 0,5 ppm 1,20 m eder
+ve milyonda on parça, düzeltilmediğinde, 24,1 m eder.
 
-The method is the one a real receiver uses. Dechirping an up-chirp gives
-a beat at `offset − mu*tau`; dechirping a down-chirp gives
-`offset + mu*tau`. Their **sum** is twice the frequency offset with the
-timing cancelled. Spectra are accumulated across the preamble before the
-peak is taken, because bin estimates are circular and averaging them
-arithmetically is wrong, and a parabolic interpolation then gets below
-the 1587 Hz bin — which is 0,65 ppm on its own and would otherwise swamp
-the answer.
+Yöntem, gerçek bir alıcının kullandığı yöntemdir. Yukarı cıvıltıyı
+cıvıltısızlaştırmak `offset − mu*tau` konumunda bir vuru verir; aşağı
+cıvıltıyı cıvıltısızlaştırmak `offset + mu*tau` verir. Bunların
+**toplamı**, zamanlaması sönmüş hâlde frekans kaymasının iki katıdır.
+Tepe alınmadan önce izgeler önsöz boyunca biriktirilir, çünkü göz
+kestirimleri döngüseldir ve onları aritmetik olarak ortalamak yanlıştır;
+sonra bir parabolik aradeğerleme 1587 Hz'lik gözün altına iner — ki o göz
+tek başına 0,65 ppm'dir ve olmasa cevabı boğardı.
 
-It sweeps signal-to-noise ratio from +5 to +40 dB **after correlation**,
-because that is where the link budget lives: a link at the SX1280's
-−20 dB in-band threshold sits at +10 dB after the 30,1 dB despreading
-gain (ADR-0017).
+Sinyal–gürültü oranını **ilinti sonrasında** +5'ten +40 dB'ye tarar,
+çünkü link bütçesi orada yaşar: SX1280'in −20 dB'lik bant içi eşiğindeki
+bir bağlantı, 30,1 dB'lik yayma kazancından sonra +10 dB'de oturur
+(ADR-0017).
 
-What it leaves out: phase noise, multipath, and drift during the
-exchange. Read the answer as a floor, not as the figure.
+Dışarıda bıraktıkları: evre gürültüsü, çok yolluluk ve alışveriş
+sırasındaki sürüklenme. Cevabı bir taban olarak oku, figürün kendisi
+olarak değil.
 
-## What is not here, and why
+## Burada olmayan ve nedeni
 
-The other figure is `radio.sx1280.implementation_floor_m`, the 2,94 m
-Stuart Robinson measured on the part. It cannot be measured by simulating
-the waveform.
+Diğer figür `radio.sx1280.implementation_floor_m`; Stuart Robinson'ın
+parça üzerinde ölçtüğü 2,94 m. Dalga biçimi benzetilerek ölçülemez.
 
-One chip at 1625 kHz is 615 ns, which is 184 m of flight. Interpolating a
-correlation peak gets to perhaps a tenth of that, so a chirp simulation
-says the part ranges to about 18 m. The part measurably ranges to 2,94 m.
-Its timing therefore does not come from the symbol correlation at all: it
-comes from a mechanism inside the SX1280 running far finer than a chip,
-which Semtech does not document.
+1625 kHz'de bir yonga 615 ns eder; bu da 184 m uçuş demektir. Bir ilinti
+tepesini aradeğerlemek bunun belki onda birine iner, yani bir cıvıltı
+benzetimi parçanın yaklaşık 18 m'ye kadar menzil ölçtüğünü söyler. Parça
+ölçülebilir biçimde 2,94 m'ye kadar menzil ölçer. Demek ki zamanlaması
+simge ilintisinden hiç gelmiyor: SX1280'in içinde bir yongadan çok daha
+ince çalışan ve Semtech'in belgelemediği bir düzenekten geliyor.
 
-A script producing 18 m would contradict a measurement for a reason
-already understood, which is worse than no script. That figure needs the
-part on a bench, not a simulation.
+18 m üreten bir betik, zaten anlaşılmış bir sebeple bir ölçümle
+çelişirdi; bu da betiğin hiç olmamasından kötüdür. O figürün bir
+benzetime değil, tezgâh üzerinde parçaya ihtiyacı var.

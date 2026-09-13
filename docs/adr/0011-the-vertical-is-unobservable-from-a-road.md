@@ -1,52 +1,54 @@
-# 0011. The vertical is unobservable from a road, and that is the answer
+# 0011. Düşey, bir yoldan gözlenemez ve cevap budur
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-Anchors go on structures beside a road. The catalogue spans three metres
-for a sign to twenty-five for a purpose-built mast, so a deployment can
-mix heights across a range of twenty-two metres. The links they serve are
-kilometres long.
+## Bağlam
+Direkler bir yolun kenarındaki yapılara konur. Katalog bir levha için üç
+metreden amaca özel bir direk için yirmi beş metreye uzanır, yani bir
+yerleşim yüksekliklerini yirmi iki metrelik bir aralıkta karıştırabilir.
+Hizmet ettikleri bağlantılar ise kilometrelerce uzundur.
 
-Twenty-two metres of height against four thousand metres of baseline is
-not a spread. Every range is very nearly horizontal, so the vertical
-component of a range measurement is a second-order term, and the geometry
-that would separate a receiver at one and a half metres from its mirror
-image above the anchors barely exists.
+Dört bin metrelik bir taban çizgisine karşı yirmi iki metre yükseklik bir
+yayılım değildir. Her menzil neredeyse tamamen yataydır, dolayısıyla bir
+menzil ölçümünün düşey bileşeni ikinci mertebeden bir terimdir ve bir buçuk
+metredeki bir alıcıyı direklerin üstündeki ayna görüntüsünden ayıracak
+geometri neredeyse hiç yoktur.
 
-The arithmetic shows this twice. A least-squares solve oscillates between
-the two sides of the anchor plane instead of settling, and where it does
-settle the vertical variance runs to hundreds of square metres.
+Aritmetik bunu iki kez gösterir. Bir en küçük kareler çözümü yerleşmek
+yerine direk düzleminin iki yanı arasında salınır ve yerleştiği yerde düşey
+varyans yüzlerce metrekareye çıkar.
 
-Measured over four hundred solves with anchors at one height and again
-with heights mixed from three to twenty-five metres, the vertical error
-is about the same: a median around twenty-five metres either way. Mixing
-mounting heights does not buy an observable vertical.
+Direkler tek yükseklikteyken ve yükseklikler üç ile yirmi beş metre arasında
+karıştırılmışken dört yüz çözüm üzerinden ölçüldüğünde düşey hata aşağı
+yukarı aynı: iki durumda da medyanı yirmi beş metre civarı. Montaj
+yüksekliklerini karıştırmak gözlenebilir bir düşey satın almıyor.
 
-## Decision
-No height constraint, as specified. The vertical stays a free parameter
-and its error is reported at whatever size the geometry produces.
+## Karar
+Belirtildiği gibi yükseklik kısıtı yok. Düşey serbest bir değişken olarak
+kalır ve hatası, geometrinin ürettiği büyüklükte bildirilir.
 
-The least-squares solve is damped, and the damping is raised whenever a
-step makes the fit worse. That is a statement about the arithmetic, not
-about where the receiver is: it makes the solve settle on one side of the
-plane instead of oscillating, and it does not shrink the vertical error.
+En küçük kareler çözümü sönümlüdür ve bir adım uyumu kötüleştirdiğinde
+sönüm yükseltilir. Bu, alıcının nerede olduğu hakkında değil aritmetik
+hakkında bir ifadedir: çözümün salınmak yerine düzlemin bir yanına
+yerleşmesini sağlar ve düşey hatayı küçültmez.
 
-An unobservable vertical is not an outage. A fix is refused when a
-*horizontal* axis is undetermined — anchors in a line, say — because such
-a position means nothing. A fix with a large vertical error still means
-something and is counted as a fix.
+Gözlenemez bir düşey bir kesinti değildir. Bir sabitleme, *yatay* bir eksen
+belirsiz olduğunda — mesela direkler tek sıradayken — reddedilir, çünkü
+böyle bir konum hiçbir anlam taşımaz. Büyük düşey hatası olan bir sabitleme
+hâlâ bir şey ifade eder ve sabitleme olarak sayılır.
 
-## Consequences
-The VPE column will read tens of metres for every road scenario, against
-an HPE of a few. That is a true statement about a terrestrial network of
-roadside anchors, and it is the reason real systems reach for a
-barometer, a road-surface model, or an anchor somewhere genuinely high.
+## Sonuçlar
+VPE sütunu her yol senaryosunda, birkaç metrelik bir HPE'ye karşı onlarca
+metre okuyacaktır. Bu, yol kenarı direklerinden oluşan karasal bir ağ
+hakkında doğru bir ifadedir ve gerçek sistemlerin bir barometreye, bir yol
+yüzeyi modeline ya da gerçekten yüksek bir yerdeki bir direğe uzanmalarının
+sebebidir.
 
-None of those is in the report's bill of materials, so none is modelled.
-If one is added later, this ADR is what it argues against.
+Bunların hiçbiri raporun malzeme listesinde yok, dolayısıyla hiçbiri
+modellenmiyor. Sonradan biri eklenirse, bu ADR onun karşısında duran
+gerekçedir.
 
-Reporting a small VPE would require telling the estimator the height it
-was meant to find. The previous codebase did something of that kind and
-its accuracy figures were statements about nothing.
+Küçük bir VPE bildirmek, kestiriciye bulması istenen yüksekliği söylemeyi
+gerektirirdi. Önceki kod tabanı bu türden bir şey yaptı ve hassasiyet
+değerleri hiçbir şey hakkında ifadelerdi.

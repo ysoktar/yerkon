@@ -1,50 +1,52 @@
-# 0008. Site data is fetched once into a cache, then read offline
+# 0008. Saha verisi bir kez önbelleğe getirilir, sonra çevrimdışı okunur
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-The project needs real ground and real buildings, from three sources that
-behave differently. A GeoTIFF is a file someone downloads. An elevation
-service answers coordinate queries over the network. OpenStreetMap answers
-feature queries over a different network service with its own rate limits.
+## Bağlam
+Projenin gerçek zemine ve gerçek binalara ihtiyacı var; üçü de farklı
+davranan üç kaynaktan. GeoTIFF birinin indirdiği bir dosyadır. Bir yükseklik
+servisi ağ üzerinden koordinat sorgularını cevaplar. OpenStreetMap ise kendi
+hız sınırları olan başka bir ağ servisi üzerinden öznitelik sorgularını
+cevaplar.
 
-Calling any of them from inside a simulation run would make results depend
-on a remote service being up, on its rate limiter, and on whatever it
-returns that day. A Monte Carlo run makes tens of thousands of ground
-queries, which no public service would tolerate and no reviewer could
-reproduce.
+Bunlardan herhangi birini bir benzetim koşumunun içinden çağırmak, sonuçları
+uzak bir servisin ayakta olmasına, hız sınırlayıcısına ve o gün ne
+döndürdüğüne bağımlı kılardı. Bir Monte Carlo koşumu on binlerce zemin
+sorgusu yapar; bunu hiçbir kamu servisi hoş görmez ve hiçbir denetçi
+yeniden üretemez.
 
-Separately, this development environment blocks all three, so nothing that
-calls them at run time can be tested here at all.
+Ayrıca bu geliştirme ortamı üçünü de engelliyor, dolayısıyla koşum anında
+onları çağıran hiçbir şey burada test edilemez.
 
-## Decision
-Fetching and reading are different operations at different times.
+## Karar
+Getirmek ve okumak farklı zamanlarda yapılan farklı işlemlerdir.
 
-`yerkon fetch` is the only thing that touches the network. It pulls
-elevation and features for a bounding box and writes them to a cache
-directory as plain files. Where several sources are reachable it uses them
-together: elevation from a raster or a service, features from
-OpenStreetMap, merged into one site.
+Ağa dokunan tek şey `yerkon fetch`'tir. Bir sınır kutusu için yüksekliği ve
+öznitelikleri çeker ve bir önbellek klasörüne düz dosyalar olarak yazar.
+Birden çok kaynağa erişilebildiği yerde onları birlikte kullanır: bir
+rasterden ya da bir servisten yükseklik, OpenStreetMap'ten öznitelikler,
+tek bir sahada birleştirilmiş.
 
-Everything else reads the cache and never opens a socket. A run against a
-populated cache is deterministic, offline, and reproducible by anyone with
-the same cache.
+Geri kalan her şey önbelleği okur ve hiç soket açmaz. Dolu bir önbelleğe
+karşı bir koşum belirlenimli, çevrimdışı ve aynı önbelleğe sahip herkes
+tarafından yeniden üretilebilirdir.
 
-A cache carries a manifest recording where each piece came from, when, and
-at what resolution, so a number in the table can be traced to a source the
-way a datasheet figure can.
+Bir önbellek, her parçanın nereden, ne zaman ve hangi çözünürlükte geldiğini
+kaydeden bir manifest taşır; böylece tablodaki bir sayı, bir veri sayfası
+değerinin izlenebildiği gibi bir kaynağa kadar izlenebilir.
 
-## Consequences
-The simulation cannot silently depend on a service being up.
+## Sonuçlar
+Benzetim, bir servisin ayakta olmasına sessizce bağımlı olamaz.
 
-Site data becomes an artefact that can be committed, shared and reviewed,
-which is what makes a range figure checkable rather than merely stated.
+Saha verisi işlenebilen, paylaşılabilen ve denetlenebilen bir eser hâline
+gelir; bir menzil değerini yalnızca ifade edilmiş değil denetlenebilir
+kılan da budur.
 
-The cost is a step: someone has to run the fetch before the first run for
-a new area. Synthetic terrain needs no fetch, so the default path stays
-one command.
+Bedeli bir adımdır: yeni bir alan için ilk koşumdan önce birinin getirmeyi
+çalıştırması gerekir. Yapay arazi getirme gerektirmez, dolayısıyla
+varsayılan yol tek bir komut olarak kalır.
 
-The fetch has to degrade rather than fail. A site with elevation and no
-buildings is worth having; the manifest records what is missing so the
-model does not quietly treat absent buildings as open ground.
+Getirme, düşmek yerine kabiliyet kaybetmek zorundadır. Yüksekliği olan ve
+binası olmayan bir saha elde tutmaya değer; manifest neyin eksik olduğunu
+kaydeder, böylece model olmayan binaları sessizce açık arazi saymaz.

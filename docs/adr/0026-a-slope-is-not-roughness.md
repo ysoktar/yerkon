@@ -1,102 +1,103 @@
-# ADR-0026: a slope is not roughness, and a tilted mirror is not a rough one
+# ADR-0026: eğim pürüzlülük değildir, eğik bir ayna da pürüzlü bir ayna değildir
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The request was to let the reflecting ground vary from place to place
-instead of being one number for a whole site, controllable per scenario,
-at two or three scales, with its own seed. Building it turned up two
-errors underneath it, and the second is the one that mattered.
+İstek, yansıtan zeminin bütün bir saha için tek bir sayı olmak yerine
+yerden yere değişmesine izin vermekti: senaryo başına denetlenebilir, iki
+ya da üç ölçekte, kendi tohumuyla. Onu kurmak altındaki iki hatayı
+ortaya çıkardı ve önemli olan ikincisiydi.
 
-**A slope was being counted as roughness.** `_reflection_surface`
-measured the scatter of the ground about the *mean height* of the
-reflecting patch. A hillside is a surface, not scatter: over a patch on a
-12 % grade that method reported 2,8 m of roughness where the ground was
-smooth to 7 cm. A factor of forty, and enough to drive the Ament factor
-to zero everywhere that was not level.
+**Eğim, pürüzlülük olarak sayılıyordu.** `_reflection_surface`, zeminin
+saçılımını yansıtan yamanın *ortalama yüksekliği* etrafında ölçüyordu.
+Bir yamaç bir yüzeydir, saçılım değil: %12 eğimli bir yama üzerinde bu
+yöntem, zemin 7 cm'ye kadar düzgünken 2,8 m pürüzlülük bildiriyordu.
+Kırk kat; ve düz olmayan her yerde Ament çarpanını sıfıra sürmeye yeter.
 
-So the coherent reflection was switched off across every outdoor link,
-and the patchwork was invisible underneath it — a variation of 0,1 m
-against a spurious 5,6 m.
+Böylece uyumlu yansıma her açık hava bağlantısında kapatılmıştı ve
+yamalı desen onun altında görünmezdi — sahte 5,6 m'ye karşı 0,1 m'lik bir
+değişim.
 
-**And detrending alone would have been worse than the bug.** With the
-slope removed, a tilted patch became a perfect mirror, and the model
-would have restored a clean two-ray null on ground that physically
-cannot produce one. Measured across the Ankara scenarios, the reflecting
-patch is tilted a degree or two on 84–96 % of links.
+**Ve yalnızca eğilim gidermek, hatanın kendisinden kötü olurdu.** Eğim
+kaldırıldığında eğik bir yama kusursuz bir aynaya dönüşürdü ve model,
+fiziksel olarak üretemeyeceği bir zeminde temiz bir iki-ışın sıfırını
+geri getirirdi. Ankara senaryolarında ölçüldüğünde, yansıtan yama
+bağlantıların %84–96'sında bir iki derece eğiktir.
 
-A tilted mirror does not scatter a ray. It aims it somewhere else. That
-is different physics with the same symptom, and conflating them is how
-the original error survived so long: it produced roughly the right
-answer.
+Eğik bir ayna bir ışını saçmaz. Onu başka bir yere nişanlar. Aynı
+belirtiyi veren farklı bir fiziktir ve ikisini birbirine karıştırmak,
+özgün hatanın bu kadar uzun süre yaşamasının sebebidir: aşağı yukarı
+doğru cevabı üretiyordu.
 
-## Decision
+## Karar
 
-**Roughness is measured about the patch's own plane.** A line is fitted
-across the reflecting window and what is left over is the roughness. The
-`Site` class already detrended for exactly this reason; this is the same
-thing, done where the reflection is.
+**Pürüzlülük, yamanın kendi düzlemi etrafında ölçülür.** Yansıma
+penceresi boyunca bir doğru uydurulur ve artakalan pürüzlülüktür. `Site`
+sınıfı zaten tam bu sebeple eğilim gideriyordu; bu da aynı şeydir,
+yansımanın olduğu yerde yapılmış.
 
-**Tilt is a separate term, `aimed_fraction`.** A surface tilted by τ
-swings the reflected ray by 2τ; if that displaces it far against the
-first Fresnel radius, it arrives too far off to cancel anything. Rolled
-off smoothly, because a zone edge is not a wall.
+**Eğiklik ayrı bir terimdir: `aimed_fraction`.** τ kadar eğik bir yüzey
+yansıyan ışını 2τ kadar savurur; bu, ışını ilk Fresnel yarıçapına karşı
+epeyce kaydırıyorsa, ışın bir şeyi sönümleyemeyecek kadar uzağa varır.
+Yumuşak bir geçişle azaltılır, çünkü bir kuşak kenarı bir duvar
+değildir.
 
-Getting this right needed one more correction. The first version put the
-reflection at the midpoint, and it is not there: a 25 m mast talking to a
-receiver at 1,5 m puts it 93 % of the way along, a few hundred metres
-from the receiver rather than kilometres, so the swung ray has far less
-room to drift. Assuming the midpoint overstated the miss sevenfold on
-exactly the geometry this study is made of.
+Bunu doğru yapmak bir düzeltme daha gerektirdi. İlk sürüm yansımayı orta
+noktaya koyuyordu ve orada değildir: 1,5 m'deki bir alıcıyla konuşan 25
+m'lik bir direk yansımayı yolun %93'üne koyar; alıcıdan kilometrelerce
+değil birkaç yüz metre uzağa, dolayısıyla savrulan ışının sapmak için
+çok daha az yeri olur. Orta noktayı varsaymak, tam da bu çalışmanın
+kurulu olduğu geometride kaçma miktarını yedi kat abartıyordu.
 
-**And the patchwork itself.** `Patchwork` makes roughness a function of
-position at two or three scales, per scenario, with its own seed kept
-apart from the measurement seed. Two properties matter:
+**Ve yamalı desenin kendisi.** `Patchwork`, pürüzlülüğü iki ya da üç
+ölçekte, senaryo başına ve ölçüm tohumundan ayrı tutulan kendi tohumuyla
+konumun bir işlevi yapar. İki özellik önemlidir:
 
-*It is a fact about the place, not a draw.* A receiver ranging to the
-same anchor from the same spot meets the same ground every time. Drawn as
-noise it would average out over a round; drawn from the position it does
-not — like the survey error and the excess path before it (ADR-0019).
-The hash is a stable mix rather than Python's, which is salted per
-process and would have given different ground in different workers the
-moment the work was spread (ADR-0025).
+*O, yer hakkında bir olgudur, bir çekiliş değil.* Aynı noktadan aynı
+direğe menzil ölçen bir alıcı her seferinde aynı zeminle karşılaşır.
+Gürültü olarak çekilseydi bir tur boyunca ortalamada sönerdi; konumdan
+çekildiğinde sönmez — ondan önceki ölçüm hatası ve fazla yol gibi
+(ADR-0019). Karma, Python'unki yerine kararlı bir karışımdır; Python'unki
+süreç başına tuzlanır ve iş yayıldığı anda farklı işçilerde farklı zemin
+verirdi (ADR-0025).
 
-*It leaves the site's roughness meaning what it measured.* The
-multipliers are centred on mean square rather than mean, because
-roughness enters through its square. Adding levels splits the same
-variance finer rather than making the ground rougher.
+*Sahanın pürüzlülüğünü ölçtüğü şey olarak bırakır.* Çarpanlar ortalama
+değil ortalama kare üzerinde ortalanır, çünkü pürüzlülük denkleme karesi
+üzerinden girer. Katman eklemek zemini pürüzlendirmez, aynı varyansı daha
+ince böler.
 
-## Consequences
+## Sonuçlar
 
-**The table barely moved.** Urban 1,64 → 1,62 m, rural 2,71 → 2,69,
-tunnel 1,81 → 1,77, weighted 2,02 → 1,93. Three corrections to the ground
-physics and the published figures are within seed noise of where they
-were, because the old model reached the same place by the wrong route:
-it killed the coherent reflection by calling a slope rough, and the new
-one kills it by correctly calling a slope tilted.
+**Tablo neredeyse kımıldamadı.** Şehir içi 1,64 → 1,62 m, kırsal 2,71 →
+2,69, tünel 1,81 → 1,77, ağırlıklı 2,02 → 1,93. Zemin fiziğinde üç
+düzeltme ve yayımlanan figürler eskiden bulundukları yerin tohum
+gürültüsü içinde, çünkü eski model aynı yere yanlış yoldan varıyordu:
+uyumlu yansımayı bir eğime pürüzlü diyerek öldürüyordu, yenisi ise bir
+eğime doğru biçimde eğik diyerek öldürüyor.
 
-That is the best available evidence that both models were describing the
-same world, and only one of them can say why.
+Bu, iki modelin de aynı dünyayı anlattığına ve ikisinden yalnızca
+birinin nedenini söyleyebildiğine dair elimizdeki en iyi kanıttır.
 
-**What did change is which row keeps its reflection.** The bore is a
-genuine plane, so its coherent fraction rose from 0,17 to 0,73 and the
-two-ray cancellation there is now real. Outdoors it stays near zero. This
-is why textbook two-ray nulls turn up over airfields and calm water and
-not over countryside, and the model now says so for the right reason.
+**Değişen şey, hangi satırın yansımasını koruduğu.** Tünel gerçek bir
+düzlemdir, dolayısıyla uyumlu payı 0,17'den 0,73'e çıktı ve oradaki
+iki-ışın sönümlemesi artık gerçek. Açık havada sıfıra yakın kalıyor. Ders
+kitabındaki iki-ışın sıfırlarının hava alanları ve durgun sular üzerinde
+çıkıp kırlar üzerinde çıkmamasının sebebi budur ve model artık bunu doğru
+sebeple söylüyor.
 
-**The patchwork changes nothing in these three scenarios, and that is a
-finding rather than an omission.** Outdoors the ray is aimed away
-whatever the roughness. In the bore the floor is 2 cm of scatter against
-a criterion of metres at that grazing angle — optically smooth, so
-varying it does nothing. It would matter on ground that is level *and*
-rough: a runway with snow on it, a ploughed plain, a frozen lake. A test
-pins that null result together with its reason, so that a scenario which
-does exercise it is noticed rather than passing silently.
+**Yamalı desen bu üç senaryoda hiçbir şeyi değiştirmiyor ve bu bir
+eksiklik değil bir bulgudur.** Açık havada ışın, pürüzlülük ne olursa
+olsun başka yere nişanlanır. Tünelde taban, o sıyırma açısında metrelerle
+ölçülen bir ölçüte karşı 2 cm saçılımdır — optik olarak düzgün, yani onu
+değiştirmek bir şey yapmaz. Düz *ve* pürüzlü zeminde önemli olurdu:
+üzerinde kar olan bir pist, sürülmüş bir ova, donmuş bir göl. Bir sınama
+bu boş sonucu sebebiyle birlikte sabitler, böylece onu gerçekten
+çalıştıran bir senaryo sessizce geçmek yerine fark edilir.
 
-**The page can fetch anywhere now.** The one thing in this project that
-touches the network was also the one thing the viewer could not do, so
-using anywhere but the four Ankara sites meant dropping to a terminal.
-For a viewer that is meant to be the main way in, that was a hole.
+**Sayfa artık her yeri indirebiliyor.** Bu projede ağa dokunan tek şey,
+aynı zamanda görüntüleyicinin yapamadığı tek şeydi; yani dört Ankara
+sahasının dışında bir yer kullanmak bir uçbirime inmek demekti. Ana giriş
+yolu olması amaçlanan bir görüntüleyici için bu bir delikti.

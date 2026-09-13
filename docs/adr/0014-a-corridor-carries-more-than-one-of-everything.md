@@ -1,97 +1,95 @@
-# 0014. A corridor carries more than one of everything
+# 0014. Bir koridor her şeyden birden fazlasını taşır
 
-## Status
-Accepted. Replaces the single-radio deployment.
+## Durum
+Kabul edildi. Tek telsizli yerleşimin yerine geçer.
 
-## Context
-The model gave a deployment one anchor module and one receiver, and the
-report describes neither.
+## Bağlam
+Model bir yerleşime bir direk modülü ve bir alıcı veriyordu; rapor ise
+ikisini de böyle anlatmıyor.
 
-The bill of materials names three anchor modules and assigns them to
-three places: a spread module for towns, the same silicon behind an
-amplifier for open country, an impulse radio for tunnels. A real corridor
-runs out of a town, across open country and through a bore, so it carries
-all three at once and no single row of the table measures that
-arrangement.
+Malzeme listesi üç direk modülünün adını veriyor ve onları üç yere
+atıyor: şehirler için yayılı bir modül, açık arazi için bir yükselticinin
+arkasındaki aynı silikon, tüneller için darbeli bir telsiz. Gerçek bir
+koridor bir şehirden çıkar, açık araziyi geçer ve bir tünelden geçer;
+dolayısıyla üçünü birden taşır ve tablonun tek bir satırı bile o düzeni
+ölçmez.
 
-Both receivers in the same bill carry two radios each. "Yaya alıcısı:
-SX1280, DWM3000, ESP32-S3..." and "Kara aracı alıcısı: SX1280, DWM3000,
-STM32...". That is not redundancy, it is what lets one unit range against
-town anchors on the road and tunnel anchors inside a bore without
-anything about the unit changing.
+Aynı listedeki iki alıcı da ikişer telsiz taşıyor. "Yaya alıcısı: SX1280,
+DWM3000, ESP32-S3…" ve "Kara aracı alıcısı: SX1280, DWM3000, STM32…". Bu
+yedeklilik değil; bir birimin yolda şehir direkleriyle, tünelin içinde
+tünel direkleriyle, birimde hiçbir şey değişmeden ölçmesini sağlayan şey.
 
-And a deployment serves traffic, not one vehicle.
+Ve bir yerleşim tek bir araca değil trafiğe hizmet eder.
 
-## Decision
-The radio belongs to the anchor. A deployment holds anchors of whatever
-kinds it was built with, and units that carry whatever modules they were
-built with. A unit ranges against every anchor it shares a waveform with
-and silently ignores the rest, which is what the hardware does.
+## Karar
+Telsiz direğe aittir. Bir yerleşim hangi türlerle kurulduysa o türden
+direkleri, hangi modüllerle kurulduysa o modülleri taşıyan birimleri tutar.
+Bir birim, dalga formunu paylaştığı her direkle ölçer ve gerisini sessizce
+yok sayar; donanımın yaptığı da budur.
 
-Units share the air. A round is as long as every unit's exchanges laid
-end to end, so a second unit does not halve the work, it doubles the
-wait.
+Birimler havayı paylaşır. Bir tur, her birimin alışverişlerinin uç uca
+dizilmesi kadar uzundur; dolayısıyla ikinci bir birim işi yarıya indirmez,
+beklemeyi ikiye katlar.
 
-The viewer edits anchors as *runs* — a stretch of corridor carrying one
-module on one mounting at one spacing — because that is how a network is
-specified and built. Several runs may overlap.
+Görüntüleyici direkleri *grup* olarak düzenler — tek bir montaj üzerinde tek
+bir modülü tek bir aralıkta taşıyan bir koridor kesimi — çünkü bir ağ böyle
+belirtilir ve böyle kurulur. Birkaç grup üst üste binebilir.
 
-## Consequences
-The capacity constraint became visible and it is severe. In town, sixteen
-anchors and two units make a round of 1018 ms, so each unit is fixed once
-a second. Adding units does not add fixes: measured over a journey, two
-units attempt the same number of rounds in total that one did. The air
-was already fully spent.
+## Sonuçlar
+Kapasite kısıtı görünür oldu ve ağır. Şehirde on altı direk ve iki birim
+1018 ms'lik bir tur eder, yani her birim saniyede bir kez konumlanır. Birim
+eklemek sabitleme eklemez: bir yolculuk boyunca ölçüldüğünde iki birim
+toplamda birinin denediği kadar tur deniyor. Hava zaten tamamen
+harcanmıştı.
 
-That cost accuracy immediately. Urban HPE at the median went from 3,35 m
-with one unit to 5,06 m with two, because each filter now coasts twice as
-long between updates. This is not a regression; it is the first honest
-figure, and the earlier one described a network with one customer.
+Bunun bedeli hemen hassasiyetten çıktı. Şehir içi HPE medyanda tek birimle
+3,35 m'den iki birimle 5,06 m'ye çıktı, çünkü her süzgeç artık güncellemeler
+arasında iki katı kadar boşta süzülüyor. Bu bir gerileme değil; ilk dürüst
+değer, ve öncekisi tek müşterisi olan bir ağı anlatıyordu.
 
-A shared setting no longer moves everything. Changing the region raises
-the ceiling for the spread runs and moves nothing for the impulse one,
-because an ultra-wideband rating is already an emission limit rather than
-a conducted power. The confirmation panel shows the runs that change and
-stays quiet about the one that does not.
+Paylaşılan bir ayar artık her şeyi oynatmıyor. Bölgeyi değiştirmek yayılı
+grupların tavanını yükseltir ve darbeli olanınkini hiç oynatmaz, çünkü bir
+ultra geniş bant sınıflandırması zaten iletilen güç değil bir yayım
+sınırıdır. Onay paneli değişen grupları gösterir ve değişmeyen hakkında
+susar.
 
-Swapping the urban module for the rural one changes nothing at all under
-the Turkish rule, so the panel does not appear. That was already known
-from the link budget; it is now visible where somebody would try it.
+Türk kuralı altında şehir içi modülü kırsal olanla değiştirmek hiçbir şeyi
+değiştirmez, dolayısıyla panel hiç çıkmaz. Bu link bütçesinden zaten
+biliniyordu; artık birinin deneyeceği yerde görünür.
 
-## Addendum, 2026-09-10: only the tunnel is a corridor
+## Ek, 2026-09-10: yalnızca tünel bir koridordur
 
-The three scenarios were all built as corridors — a line of anchors down
-one axis and a receiver driving east along it — because the first one
-written was a highway and the other two were copied from it. That was
-wrong for two of them, and the error was not small.
+Üç senaryo da koridor olarak kurulmuştu — tek eksende bir direk dizisi ve
+onun boyunca doğuya giden bir alıcı — çünkü yazılan ilki bir karayoluydu ve
+diğer ikisi ondan kopyalanmıştı. Bu, ikisi için yanlıştı ve hata küçük
+değildi.
 
-A town is an area. A stretch of open country is an area. Their anchors
-stand on a rough grid of streets or on masts spread over ground, and a
-vehicle in either one turns. Modelling them as lines gave every anchor a
-receiver could hear nearly the same bearing, which is the geometry that
-makes a corridor's cross-track direction barely observable, and the
-horizontal error inherited that amplification for no reason but the
-shape of the file.
+Bir şehir bir alandır. Bir açık arazi kesimi bir alandır. Direkleri kaba bir
+sokak ızgarasında ya da zemine yayılmış direklerde durur ve ikisinde de bir
+araç döner. Bunları çizgi olarak modellemek, bir alıcının duyabildiği her
+direğe neredeyse aynı kerterizi veriyordu; bu da bir koridorun enine
+doğrultusunu zar zor gözlenebilir kılan geometridir ve yatay hata, dosyanın
+şeklinden başka hiçbir sebep olmadan o büyütmeyi miras alıyordu.
 
-Urban is now a town three kilometres on a side, forty-six anchors on
-lighting columns at a five hundred metre grid with alternate rows
-staggered. Rural is twenty kilometres on a side, thirty-three masts at a
-four kilometre grid. Both are driven on a circuit that runs round the
-edge and across the middle, so the cross-track geometry changes as the
-unit turns. The tunnel is unchanged, because a bore really is a line.
+Şehir içi artık bir kenarı üç kilometre olan bir şehir: beş yüz metrelik bir
+ızgarada aydınlatma direklerinde kırk altı direk, ardışık sıralar kaydırmalı.
+Kırsal bir kenarı yirmi kilometre: dört kilometrelik bir ızgarada otuz üç
+direk. İkisi de çevreyi dolaşıp ortadan geçen bir turda sürülüyor, böylece
+birim döndükçe enine geometri değişiyor. Tünel değişmedi, çünkü bir tünel
+gerçekten bir çizgidir.
 
-What it moved: urban HPE at the fiftieth percentile from 5,31 m to
-1,24 m, rural from 4,22 m to 2,14 m, and the rural service area from
-58 km² to 372,50 km², which took its capital cost per square kilometre
-from 21424 TL to 8468 TL. A factor of four in accuracy and a factor of
-two and a half in cost, none of it from a change to the physics.
+Neyi oynattı: şehir içi HPE ellinci yüzdelikte 5,31 m'den 1,24 m'ye, kırsal
+4,22 m'den 2,14 m'ye ve kırsal hizmet alanı 58 km²'den 372,50 km²'ye; bu da
+kilometrekare başına sermaye maliyetini 21424 TL'den 8468 TL'ye götürdü.
+Hassasiyette dört kat, maliyette iki buçuk kat; hiçbiri fizikteki bir
+değişiklikten değil.
 
-Two consequences follow. A receiver over an area can hear far more
-anchors than it has time to range against, so `Deployment` grew
-`max_anchors_per_round`: it ranges against the nearest eight and ignores
-the rest, which is what real systems do and what keeps a round from
-taking two seconds. And `Deployed.serves_a_corridor` now decides whether
-cost per route kilometre is printed at all — for an area those route
-kilometres are the length of a test journey, not a dimension of the
-service, and reporting one as the other is what invited this in the
-first place.
+Bunu iki sonuç izler. Bir alan üzerindeki bir alıcı, ölçmeye vakti
+olduğundan çok daha fazla direk duyabilir, dolayısıyla `Deployment`
+`max_anchors_per_round` kazandı: en yakın sekiziyle ölçer ve gerisini yok
+sayar — gerçek sistemlerin yaptığı ve bir turun iki saniye sürmesini
+engelleyen şey budur. Ve `Deployed.serves_a_corridor` artık güzergâh
+kilometresi başına maliyetin hiç yazdırılıp yazdırılmayacağına karar veriyor
+— bir alan için o güzergâh kilometreleri hizmetin bir boyutu değil bir test
+yolculuğunun uzunluğudur ve birini diğeri diye bildirmek bütün bunu ilk
+etapta davet eden şeydi.

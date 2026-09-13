@@ -1,59 +1,59 @@
-# ADR-0032: two sliders that did not mean the same kind of thing
+# ADR-0032: aynı türden şey anlatmayan iki sürgü
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The site has two dimensions and the page has a slider for each. **En**
-(width) and **Boy** (length) sit one above the other, look identical, and
-did entirely different things.
+Sahanın iki boyutu vardır ve sayfada her biri için bir sürgü vardır.
+**En** ve **Boy** üst üste durur, birbirinin aynı görünür ve tamamen
+farklı şeyler yapıyordu.
 
-Width shapes the anchors directly: over an area a run lays a grid from
-the road out to `width_m`, so widening the site adds rows of masts and
-you watch it happen.
+En, direkleri doğrudan biçimlendirir: bir alan üzerinde bir dizi, yoldan
+`width_m`'e kadar bir ızgara serer; yani sahayı genişletmek direk
+sıraları ekler ve bunun olmasını izlersiniz.
 
-Length did nothing to them. An anchor run carries its own `from_m` and
-`to_m`, and those are what place it, so dragging **Boy** from twenty
-kilometres to eight left thirty-six masts standing exactly where they
-were across a site less than half as long. It changed the route, and —
-after the mesh started following the route — the ground. Not the
-deployment.
+Boy onlara hiçbir şey yapmıyordu. Bir direk dizisi kendi `from_m` ve
+`to_m` değerlerini taşır ve onu yerleştiren de bunlardır; dolayısıyla
+**Boy**'u yirmi kilometreden sekize çekmek, otuz altı direği yarısından
+kısa bir saha boyunca tam olarak durdukları yerde bırakıyordu. Güzergâhı
+değiştiriyordu ve — ağ güzergâhı izlemeye başladıktan sonra — zemini.
+Yerleşimi değil.
 
-That asymmetry is an accident of order. Width came later, wired to the
-anchors; length was already there, and the run's own ends were never
-reconciled with it.
+Bu bakışımsızlık bir sıra kazasıdır. En sonradan geldi ve direklere
+bağlandı; boy zaten oradaydı ve dizinin kendi uçları onunla hiç
+uzlaştırılmadı.
 
-## Decision
+## Karar
 
-Shortening the site brings its anchor runs inside it, and does so through
-the confirmation panel (ADR-0009), which is the rule this project already
-has for a change that forces another change. Pull **Boy** to 8 km and the
-panel says:
+Sahayı kısaltmak, direk dizilerini onun içine alır ve bunu onay
+panelinden geçerek yapar (ADR-0009); bu projenin bir değişikliğin başka
+bir değişikliği zorladığı durumlar için zaten sahip olduğu kural budur.
+**Boy**'u 8 km'ye çekin ve panel şunu der:
 
     İstediğin değişiklik    Sahanın boyu    20000 → 8000
     Bunlar da değişiyor     Grubun bitişi   20000 → 8000
 
-Nothing moves until yes.
+Evet denene kadar hiçbir şey kımıldamaz.
 
-Only the length slider clips. Typing an end into a run is a person being
-explicit about that run, and clipping it under them would be answering a
-question they did not ask — so a run may still be given an end past the
-site, deliberately, by hand.
+Yalnızca boy sürgüsü kırpar. Bir diziye elle uç yazmak, o dizi hakkında
+açıkça konuşan bir insandır ve altından onu kırpmak, sormadığı bir
+soruyu yanıtlamak olurdu — dolayısıyla bir diziye kasıtlı olarak, elle,
+sahanın ötesinde bir uç hâlâ verilebilir.
 
-## Consequences
+## Sonuçlar
 
-The two sliders now mean the same kind of thing, and the one that moves
-anchors says so before it moves them.
+İki sürgü artık aynı türden şey anlatıyor ve direkleri kımıldatan olan,
+kımıldatmadan önce bunu söylüyor.
 
-The report's own rows are untouched: `scenarios.catalogue()` places
-anchors directly rather than through a run, and in all three prepared
-tabs the run already spanned exactly the corridor, so no figure in the
-table moves.
+Raporun kendi satırlarına dokunulmadı: `scenarios.catalogue()` direkleri
+bir dizi üzerinden değil doğrudan yerleştirir ve hazırlanmış üç sekmenin
+hepsinde dizi zaten tam olarak koridoru kaplıyordu, dolayısıyla tablodaki
+hiçbir figür kımıldamaz.
 
-The alternative considered was clipping silently, the way width already
-grows the grid silently. Rejected because the two are not alike: widening
-adds anchors the person can see appear, while shortening discards
-placements they may have spent an afternoon on — including anchors
-dragged by hand. A change that can destroy work goes through the panel.
+Değerlendirilen diğer seçenek, enin ızgarayı sessizce büyütmesi gibi
+sessizce kırpmaktı. Reddedildi, çünkü ikisi benzer değil: genişletmek
+kişinin belirdiğini görebildiği direkler ekler, kısaltmak ise bir öğleden
+sonrasını harcamış olabileceği yerleşimleri atar — elle sürüklenmiş
+direkler dahil. Emeği yok edebilecek bir değişiklik panelden geçer.

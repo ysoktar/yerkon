@@ -1,46 +1,46 @@
-# ADR-0031: the ground you are looking at
+# ADR-0031: baktığın zemin
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-Zooming in on a mast showed a flat green wall.
+Bir direğe yakınlaşmak düz yeşil bir duvar gösteriyordu.
 
-The mesh is a few thousand samples spread over the whole site. Over the
-rural row that is one every seven hundred metres, so a camera six
-kilometres from a hillside sees two facets of it. The elevation model
-underneath is thirty metre Copernicus data: the shape of that hill is
-measured, and the viewer simply never asked for it.
+Ağ, bütün sahaya yayılmış birkaç bin örnektir. Kırsal satırda bu, her
+yedi yüz metrede bir örnek demektir; yani bir yamaçtan altı kilometre
+uzaktaki bir kamera onun iki yüzeyini görür. Altındaki yükseklik modeli
+otuz metrelik Copernicus verisidir: o tepenin biçimi ölçülmüştür,
+görüntüleyici onu hiç istememiştir.
 
-That made zooming pointless, which is half of what "moving around"
-means. The wheel worked perfectly and there was nothing at the end of it.
+Bu, yakınlaşmayı anlamsız kılıyordu ki "dolaşabilmenin" yarısı budur.
+Tekerlek kusursuz çalışıyordu ve ucunda hiçbir şey yoktu.
 
-## Decision
+## Karar
 
-`GET /api/ground?west=&east=&south=&north=` returns a mesh over one
-window of the site, at the same budget as the whole. The page asks for
-one when the camera has come in far enough that the window is well
-inside the site, and drops it when it pulls back out — a finer patch left
-in the middle of a coarser mesh is worse than either.
+`GET /api/ground?west=&east=&south=&north=`, sahanın tek bir penceresi
+üzerinde, bütünüyle aynı bütçede bir ağ döndürür. Sayfa, kamera pencere
+sahanın epeyce içinde kalacak kadar yaklaştığında birini ister ve geri
+çekildiğinde onu bırakır — daha kaba bir ağın ortasında bırakılmış daha
+ince bir yama, ikisinden de kötüdür.
 
-Asked on a timer that every redraw resets, so a drag asks once when it
-stops rather than sixty times while it runs, and skipped when the window
-rounds to the one already in hand.
+Her yeniden çizimin sıfırladığı bir zamanlayıcıyla istenir; böylece bir
+sürükleme sürerken altmış kez değil durduğunda bir kez ister ve pencere
+elde olana yuvarlandığında atlanır.
 
-## Consequences
+## Sonuçlar
 
-The wheel now leads somewhere. At six kilometres the rural hill is
-sampled every sixty metres instead of every seven hundred, which is
-about as fine as the source data goes.
+Tekerlek artık bir yere çıkıyor. Altı kilometrede kırsal tepe, yedi yüz
+metrede bir yerine altmış metrede bir örnekleniyor; bu da kaynak verinin
+gittiği inceliğe yakındır.
 
-Nothing is invented. The finer mesh is the same `height_at` the
-simulation calls, over the same terrain object, so the ground on screen
-and the ground a packet crosses stay the same ground (ADR-0001). It is a
-question of which samples get drawn, not of which ground exists.
+Hiçbir şey uydurulmuyor. Daha ince ağ, benzetimin çağırdığı aynı
+`height_at`'tir; aynı arazi nesnesi üzerinde, yani ekrandaki zemin ile
+bir paketin geçtiği zemin aynı zemin olarak kalır (ADR-0001). Sorun hangi
+zeminin var olduğu değil, hangi örneklerin çizildiğidir.
 
-The cost is one request per settled camera move, answered in about the
-time the scene endpoint takes. That is affordable because it is local,
-and it would not be over a network — which is the reason this project
-does not have to care.
+Bedel, yerleşen her kamera hareketi başına bir istek; sahne uç
+noktasının aldığı süreye yakın bir sürede yanıtlanıyor. Bu, yerel olduğu
+için karşılanabilir; bir ağ üzerinden olsa karşılanamazdı — ki bu
+projenin bunu dert etmek zorunda olmamasının sebebi de budur.

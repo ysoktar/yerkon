@@ -1,45 +1,45 @@
-# 0013. The viewer draws its own three dimensions
+# 0013. Görüntüleyici üç boyutunu kendi çizer
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-The viewer is a local web page. The obvious way to draw a heightfield,
-some masts and a grid of coverage cells in three dimensions is a WebGL
-library from a content delivery network, and that was the first attempt.
+## Bağlam
+Görüntüleyici yerel bir web sayfası. Bir yükseklik alanını, birkaç direği ve
+bir kapsama hücreleri ızgarasını üç boyutta çizmenin bariz yolu bir içerik
+dağıtım ağından gelen bir WebGL kütüphanesidir ve ilk denenen de oydu.
 
-It did not load. The network this project is developed on refuses the
-content delivery networks, and so, in general, will a machine on a site
-visit, a machine behind a corporate proxy, and a machine with no
-connection at all. A viewer that shows an empty grey rectangle when the
-network is unavailable is not a viewer.
+Yüklenmedi. Bu projenin geliştirildiği ağ içerik dağıtım ağlarını
+reddediyor; ve genel olarak bir saha ziyaretindeki makine, kurumsal bir
+vekil sunucunun arkasındaki makine ve hiç bağlantısı olmayan makine de öyle
+yapacaktır. Ağ yokken boş gri bir dikdörtgen gösteren bir görüntüleyici,
+görüntüleyici değildir.
 
-ADR-0008 already says the project fetches once and runs offline. A page
-that reaches out to a third party every time it opens contradicts that
-for no gain the study needs.
+ADR-0008 zaten projenin bir kez getirip çevrimdışı koştuğunu söylüyor. Her
+açılışta üçüncü bir tarafa uzanan bir sayfa, çalışmanın ihtiyaç duymadığı
+bir kazanç için bununla çelişir.
 
-## Decision
-The viewer projects and paints the scene itself, on a plain canvas, in
-about two hundred lines. Perspective projection, painter's algorithm,
-flat shading from the surface normal, and ray-to-plane intersection for
-dragging an anchor. No dependency, nothing to install, and identical
-behaviour on every machine.
+## Karar
+Görüntüleyici sahneyi kendi izdüşürüp kendi boyar; düz bir tuval üzerinde,
+yaklaşık iki yüz satırda. Perspektif izdüşümü, boyacı algoritması, yüzey
+normalinden düz gölgeleme ve bir direği sürüklemek için ışın-düzlem
+kesişimi. Bağımlılık yok, kurulacak bir şey yok ve her makinede özdeş
+davranış.
 
-Masts are drawn at a legible length on screen rather than to scale. A
-twenty-five metre mast beside a twenty-four kilometre corridor projects
-to less than a pixel, and painting it truthfully would make the control
-that matters most impossible to see or to grab. Its height is reported as
-a number in the panel, where it can be read instead of guessed at.
+Direkler ölçekli değil, ekranda okunabilir bir uzunlukta çizilir. Yirmi dört
+kilometrelik bir koridorun yanındaki yirmi beş metrelik bir direk bir
+pikselden aza izdüşer ve onu dürüstçe boyamak, en çok önem taşıyan kontrolü
+görülemez ve tutulamaz kılardı. Yüksekliği panelde bir sayı olarak
+bildirilir; orada tahmin edilmek yerine okunabilir.
 
-## Consequences
-The scene is simpler than a WebGL one: no shadows, no smooth normals,
-no textures. It shows what the study needs to show, which is where the
-ground rises, where the anchors are, how far each one ranges, and which
-ground has enough of them for a position.
+## Sonuçlar
+Sahne bir WebGL sahnesinden basittir: gölge yok, yumuşak normaller yok, doku
+yok. Çalışmanın göstermesi gerekeni gösterir: zeminin nerede yükseldiğini,
+direklerin nerede olduğunu, her birinin ne kadar uzağa ölçtüğünü ve hangi
+zeminde bir konum için yeterince direk bulunduğunu.
 
-Painting is done on interaction rather than on every frame, so a few
-thousand surfaces cost nothing.
+Boyama her karede değil etkileşimde yapılır, dolayısıyla birkaç bin yüzey
+hiçbir şeye mal olmaz.
 
-If the scene ever grows past what a canvas can paint at an interactive
-rate, the fix is a vendored library file inside the package rather than a
-link to somebody's network.
+Sahne bir gün bir tuvalin etkileşimli hızda boyayabileceğinin ötesine
+geçerse, çözüm birinin ağına bir bağlantı değil, paketin içine konmuş bir
+kütüphane dosyasıdır.

@@ -1,65 +1,64 @@
-# 0010. The clock is part of the ranging error, and the exchange decides how much
+# 0010. Saat, ölçüm hatasının parçasıdır ve ne kadarına alışveriş karar verir
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-The link budget gives a bound on how precisely a waveform can time an
-arrival. It says nothing about the exchange that carries the timing, and
-on the hardware this report names the exchange is where most of the error
-comes from.
+## Bağlam
+Link bütçesi, bir dalga formunun bir varışı ne kadar hassas
+zamanlayabileceğine bir sınır verir. Zamanlamayı taşıyan alışveriş hakkında
+hiçbir şey söylemez ve bu raporun adını verdiği donanımda hatanın çoğunun
+geldiği yer alışveriştir.
 
-A frame at SF10 lasts about sixteen milliseconds. In single-sided two-way
-ranging, the near radio measures a round trip on its own clock and
-subtracts a reply delay measured on the far radio's, so the difference
-between the two clocks multiplies that whole delay. At ten parts per
-million that is eighty nanoseconds, or twenty-four metres — eight times
-the only ranging error anyone has actually measured on the part.
+SF10'da bir çerçeve yaklaşık on altı milisaniye sürer. Tek yönlü çift yönlü
+ölçümde yakın telsiz gidiş dönüşü kendi saatiyle ölçer ve uzak telsizin
+saatiyle ölçülmüş bir yanıt gecikmesini çıkarır; dolayısıyla iki saat
+arasındaki fark o bütün gecikmeyi çarpar. Milyonda on parçada bu seksen
+nanosaniye, yani yirmi dört metre eder — parça üzerinde gerçekten ölçülmüş
+tek ölçüm hatasının sekiz katı.
 
-That the published measurements do not show twenty-four metres of error
-is itself evidence. It says the correction every coherent receiver
-already performs in order to demodulate is also doing the ranging work.
+Yayımlanmış ölçümlerin yirmi dört metrelik bir hata göstermemesi başlı
+başına bir kanıttır. Her eşevreli alıcının zaten çözmek için yaptığı
+düzeltmenin ölçüm işini de yaptığını söyler.
 
-## Decision
-A range measurement's error is the waveform bound and the clock term
-added in quadrature, with the part's measured floor applied underneath.
-The clock term comes from three things: the exchange scheme, the reply
-delay implied by the frame, and how much of the clock offset survives the
-receiver's frequency-offset estimate.
+## Karar
+Bir menzil ölçümünün hatası, dalga formu sınırı ile saat teriminin kareli
+toplamıdır; altına da parçanın ölçülmüş tabanı uygulanır. Saat terimi üç
+şeyden gelir: alışveriş şeması, çerçevenin ima ettiği yanıt gecikmesi ve
+saat kaymasının alıcının frekans kayması kestiriminden ne kadarının sağ
+kaldığı.
 
-Single-sided ranging multiplies the reply delay. Double-sided ranging
-cancels that to first order and multiplies the flight time instead, which
-is hundreds of times shorter but grows with distance.
+Tek yönlü ölçüm yanıt gecikmesini çarpar. Çift yönlü ölçüm bunu birinci
+mertebeden götürür ve onun yerine uçuş süresini çarpar; o da yüzlerce kat
+daha kısadır ama mesafeyle büyür.
 
-Airtime is counted in the radio's own symbols, over the same preamble the
-processing gain is taken over, so a radio cannot be given a cheap frame
-and a generous gain at once.
+Hava süresi telsizin kendi sembolleriyle, işlem kazancının alındığı önsözün
+üzerinden sayılır; böylece bir telsize aynı anda ucuz bir çerçeve ve cömert
+bir kazanç verilemez.
 
-## Consequences
-Which scheme to use was a per-radio answer while the residual offset was
-assumed, and became one answer once it was measured.
+## Sonuçlar
+Hangi şemanın kullanılacağı, kalan kayma varsayımken telsiz başına bir
+cevaptı; ölçüldüğünde tek bir cevap oldu.
 
-Assumed at half a part per million, the SX1280's single-sided clock term
-was one metre against a waveform bound of metres, so single-sided cost
-nothing there; the impulse radio's was ten centimetres against a ten
-centimetre floor, so double-sided earned its extra frame.
+Milyonda yarım parça varsayıldığında SX1280'in tek yönlü saat terimi,
+metrelerle ölçülen bir dalga formu sınırına karşı bir metreydi, yani tek
+yönlü orada hiçbir şeye mal olmuyordu; darbeli telsizinki ise on
+santimetrelik bir tabana karşı on santimetreydi, yani çift yönlü fazladan
+çerçevesini hak ediyordu.
 
-Measured, the residual is 0,0793 ppm (ADR-0018). The impulse radio's
-single-sided term falls to 1,6 cm, which its floor swallows whole, and
-the extra frame buys nothing on either radio. Both are single-sided now.
-On the tunnel row that is a third less air time, 0,72 m at the
-ninety-fifth percentile instead of 1,00, and half again as many fixes.
+Ölçülmüş hâliyle kalan 0,0793 ppm (ADR-0018). Darbeli telsizin tek yönlü
+terimi 1,6 cm'ye düşüyor, tabanı onu bütün yutuyor ve fazladan çerçeve iki
+telsizde de hiçbir şey satın almıyor. İkisi de artık tek yönlü. Tünel
+satırında bu, üçte bir az hava süresi, doksan beşinci yüzdelikte 1,00
+yerine 0,72 m ve bir buçuk katı sabitleme demek.
 
-A frequency-offset estimate is not optional on the slow radio. The model
-can be asked what happens without one, and the answer is that ranging
-stops working.
+Yavaş telsizde bir frekans kayması kestirimi isteğe bağlı değildir. Modele
+onsuz ne olduğu sorulabilir ve cevap, ölçümün çalışmayı bırakmasıdır.
 
-Airtime is now a quantity the study can spend. A round against six
-anchors on the SX1280 takes a quarter of a second, during which a vehicle
-at a hundred kilometres an hour travels nearly seven metres — more than
-twice the ranging error beside it. The estimator therefore cannot treat a
-round as simultaneous, and this is decided here rather than discovered
-later.
+Hava süresi artık çalışmanın harcayabileceği bir niceliktir. SX1280'de altı
+direğe karşı bir tur çeyrek saniye sürer; bu sürede saatte yüz kilometre
+giden bir araç yedi metreye yakın yol alır — yanındaki ölçüm hatasının iki
+katından fazla. Dolayısıyla kestirici bir turu eşzamanlı sayamaz ve buna
+sonradan keşfedilmek yerine burada karar verilir.
 
-Half a part per million of residual offset is the least supported number
-in the model and the first one worth measuring.
+Milyonda yarım parçalık kalan kayma modeldeki en az desteklenen sayıdır ve
+ölçülmeye değer ilk şeydir.

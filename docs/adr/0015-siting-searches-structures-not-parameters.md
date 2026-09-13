@@ -1,61 +1,59 @@
-# 0015. Siting searches structures, not parameters
+# 0015. Yerleşim araması değiştirgeleri değil yapıları arar
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-The last thing on the list, deferred until everything else was built. An
-optimiser is only as good as what it optimises, and until the link
-budget, the exchange, the estimator and the costing all existed and were
-tested, any siting algorithm would have been minimising a number nobody
-could defend.
+## Bağlam
+Listedeki son iş; geri kalan her şey kurulana kadar ertelendi. Bir eniyileyici
+ancak eniyilediği şey kadar iyidir ve link bütçesi, alışveriş, kestirici ve
+maliyetlendirme var olup test edilene kadar herhangi bir yerleşim
+algoritması, kimsenin savunamayacağı bir sayıyı küçültüyor olurdu.
 
-The costing then said what to optimise. The radios are about one percent
-of a mast-based deployment's capital. Searching over modules to save
-money would be searching the wrong percent.
+Sonra maliyetlendirme neyin eniyileneceğini söyledi. Telsizler, direk tabanlı
+bir yerleşimin sermayesinin yaklaşık yüzde biri. Para biriktirmek için
+modüller üzerinde arama yapmak, yanlış yüzde üzerinde arama yapmak olurdu.
 
-## Decision
-The search is over *which structure to use at each point and how far
-apart*, using only structures the corridor is said to carry, and building
-only where none stands. Every candidate is a deployment somebody could
-build: real anchors on real mountings, scored by the same link budget and
-priced by the same bill of materials the table uses.
+## Karar
+Arama, *her noktada hangi yapının kullanılacağı ve aralarının ne kadar
+olacağı* üzerinedir; yalnızca koridorun taşıdığı söylenen yapılar
+kullanılarak ve yalnızca hiçbiri yokken inşa edilerek. Her aday birinin
+kurabileceği bir yerleşimdir: gerçek montajlarda gerçek direkler, tablonun
+kullandığı link bütçesiyle puanlanmış ve aynı malzeme listesiyle
+fiyatlandırılmış.
 
-Two ways of mixing are searched, because they pull in opposite directions
-and neither wins in general. Taking the **cheapest** structure standing
-at each point gives the lowest price per anchor and, being short, needs
-more of them. Taking the **tallest** costs more each and needs fewer. The
-answer is whichever came out cheaper, and the runner-up is reported
-beside it.
+İki karıştırma biçimi aranır, çünkü zıt yönlere çekerler ve genel olarak
+hiçbiri kazanmaz. Her noktada duran **en ucuz** yapıyı almak direk başına en
+düşük fiyatı verir ve kısa olduğu için daha fazlasını gerektirir. **En uzun**
+olanı almak her biri için daha pahalıdır ve daha azını gerektirir. Cevap
+hangisi daha ucuza çıktıysa odur ve ikincisi yanında bildirilir.
 
-Spacings are searched from sparse to dense and the search stops at the
-first that meets the requirement, because denser is dearer and never
-covers less. The first written version searched dense to sparse and
-returned an answer that worked and cost two and a half times too much.
+Aralıklar seyrekten sıka doğru aranır ve arama gereksinimi karşılayan ilkinde
+durur, çünkü daha sık olan daha pahalıdır ve asla daha az kapsamaz. İlk
+yazılan sürüm sıktan seyreğe arıyordu ve işe yarayan, iki buçuk kat fazlaya
+mal olan bir cevap döndürüyordu.
 
-The area sweep runs once, on the winner. It is the slowest thing in the
-project and running it on every candidate would have made the search
-minutes instead of seconds.
+Alan taraması bir kez, kazanan üzerinde koşar. Projedeki en yavaş şeydir ve
+her adayda koşturmak aramayı saniyeler yerine dakikalar yapardı.
 
-## Consequences
-Over eight kilometres of rolling ground at a five metre tolerance, with
-signs standing every 250 m: twenty-one existing roadside signs at 600 m
-spacing meet the requirement for 274736 TL. Sixteen purpose-built
-twenty-five metre masts meet the same requirement for 1529323 TL.
+## Sonuçlar
+Tepeli zeminde sekiz kilometrede, beş metrelik bir toleransla ve her 250
+m'de bir levha dururken: 600 m aralıkta yirmi bir mevcut yol levhası
+gereksinimi 274736 TL'ye karşılıyor. On altı amaca özel yirmi beş metrelik
+direk aynı gereksinimi 1529323 TL'ye karşılıyor.
 
-Five and a half times, and the signs win despite reaching 1,66 km against
-a mast's 5,52. Height buys range and range is not what is scarce; what is
-scarce is money, and a sign that already stands costs a thirty-fourth of
-a mast that does not.
+Beş buçuk kat; ve levhalar, direğin 5,52 km'sine karşı 1,66 km'ye
+erişmelerine rağmen kazanıyor. Yükseklik menzil satın alır ve kıt olan
+menzil değildir; kıt olan paradır ve zaten duran bir levha, durmayan bir
+direğin otuz dörtte birine mal olur.
 
-That is the mixed-mounting strategy, arrived at by search rather than by
-assertion, and it inverts the intuition the range figures give.
+İşte karışık montaj stratejisi budur; iddia edilerek değil aranarak varıldı
+ve menzil değerlerinin verdiği sezgiyi ters çeviriyor.
 
-The search will also refuse. A tolerance under the radio's own
-measurement floor is not a siting problem and no arrangement of anchors
-meets it, so nothing is returned rather than the best of a bad set.
+Arama reddeder de. Telsizin kendi ölçüm tabanının altındaki bir tolerans bir
+yerleşim sorunu değildir ve hiçbir direk düzeni onu karşılamaz; dolayısıyla
+kötü bir kümenin en iyisi yerine hiçbir şey döner.
 
-What the search cannot do is invent a survey. What structures stand where
-is configuration, and the defaults are an assumption about a typical
-stretch of Turkish highway. A real deployment replaces them with what is
-actually there, and the answer will move.
+Aramanın yapamayacağı şey bir etüt uydurmaktır. Hangi yapının nerede durduğu
+yapılandırmadır ve varsayılanlar tipik bir Türk karayolu kesimi hakkında bir
+varsayımdır. Gerçek bir yerleşim onları gerçekte orada olanla değiştirir ve
+cevap oynar.

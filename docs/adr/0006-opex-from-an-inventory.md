@@ -1,25 +1,26 @@
-# 0006. OPEX comes from an inventory, not a percentage
+# 0006. OPEX bir envanterden gelir, bir yüzdeden değil
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-The report leaves OPEX empty for every YERKON row. The common shortcut, a
-fixed percentage of capital cost, would produce a number with no mechanism
-behind it and no way to check it.
+## Bağlam
+Rapor OPEX'i her YERKON satırı için boş bırakıyor. Yaygın kestirme —
+sermaye maliyetinin sabit bir yüzdesi — arkasında hiçbir mekanizma olmayan
+ve denetlenmesinin hiçbir yolu bulunmayan bir sayı üretirdi.
 
-## Decision
-Annual operating cost is the sum of named recurring items, each attached to
-a countable thing in the deployment: energy per anchor, connectivity per
-anchor or per gateway, hardware replacement from a stated service life,
-scheduled maintenance visits per site, and central system operation
-amortised across deployments.
+## Karar
+Yıllık işletme maliyeti, her biri yerleşimdeki sayılabilir bir şeye bağlı,
+adlandırılmış yinelenen kalemlerin toplamıdır: direk başına enerji, direk ya
+da geçit başına bağlantı, açıkça belirtilmiş bir hizmet ömründen donanım
+yenileme, saha başına planlı bakım ziyaretleri ve yerleşimlere yayılmış
+merkezî sistem işletmesi.
 
-Every rate is a named constant with its source recorded, in the same way
-hardware prices are. Where no source exists, the constant says so and the
-row is marked as an assumption.
+Her oran, kaynağı kaydedilmiş adlandırılmış bir sabittir — donanım
+fiyatlarıyla aynı şekilde. Kaynak yoksa sabit bunu söyler ve satır bir
+varsayım olarak işaretlenir.
 
-## Consequences
-OPEX responds to node count, so a design change that halves the anchors
-halves most of the operating cost too. Rates the project cannot source are
-visible as assumptions rather than hidden inside a percentage.
+## Sonuçlar
+OPEX düğüm sayısına tepki verir, yani direkleri yarıya indiren bir tasarım
+değişikliği işletme maliyetinin çoğunu da yarıya indirir. Projenin kaynak
+bulamadığı oranlar, bir yüzdenin içinde gizlenmek yerine varsayım olarak
+görünür.

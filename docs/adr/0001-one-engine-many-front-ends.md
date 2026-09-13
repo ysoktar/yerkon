@@ -1,31 +1,31 @@
-# 0001. One engine, many front ends
+# 0001. Tek motor, birçok ön yüz
 
-## Status
-Accepted.
+## Durum
+Kabul edildi.
 
-## Context
-The previous codebase grew four ways of running the same physics: a batch
-table generator, a set of ad-hoc sweep scripts, a MATLAB waveform study and
-a pile of comparison snippets kept in a scratch directory. The numbers in
-the documentation came from whichever one ran last, and two of them
-disagreed without anything failing.
+## Bağlam
+Önceki kod tabanı aynı fiziği koşmanın dört yolunu büyüttü: bir toplu tablo
+üreteci, bir avuç gelişigüzel tarama betiği, bir MATLAB dalga formu
+çalışması ve bir çalışma klasöründe tutulan bir yığın karşılaştırma parçası.
+Belgelerdeki sayılar en son hangisi koştuysa ondan geliyordu ve ikisi,
+hiçbir şey düşmeden birbiriyle çelişiyordu.
 
-## Decision
-One engine produces every number. It is deterministic given a seed and a
-scenario, and it emits a stream of typed events rather than only a summary.
+## Karar
+Her sayıyı tek bir motor üretir. Bir tohum ve bir senaryo verildiğinde
+belirlenimlidir ve yalnızca bir özet değil, tipli bir olay akışı yayar.
 
-Everything else consumes that stream:
+Geri kalan her şey o akışı tüketir:
 
-- the table generator reduces it to percentiles and costs,
-- the 3D viewer replays it,
-- experiments sweep scenario parameters and reduce many streams,
-- regression tests assert on it.
+- tablo üreteci onu yüzdeliklere ve maliyetlere indirger,
+- 3B görüntüleyici onu yeniden oynatır,
+- deneyler senaryo değiştirgelerini tarar ve birçok akışı indirger,
+- gerileme testleri onun üzerinde savda bulunur.
 
-A front end may not compute physics. If a viewer needs to show why a link
-failed, the engine puts the reason in the event.
+Bir ön yüz fizik hesaplayamaz. Bir görüntüleyicinin bir bağlantının neden
+düştüğünü göstermesi gerekiyorsa, sebebi olaya motor koyar.
 
-## Consequences
-The viewer cannot drift from the table, because both read the same run.
-Adding a front end costs nothing in physics. The cost is that the event
-stream is now an interface: adding a field is cheap, changing the meaning
-of one is not.
+## Sonuçlar
+Görüntüleyici tablodan ayrı düşemez, çünkü ikisi de aynı koşumu okur. Bir ön
+yüz eklemek fizik tarafında hiçbir şeye mal olmaz. Bedeli şudur: olay akışı
+artık bir arayüzdür — alan eklemek ucuzdur, bir alanın anlamını değiştirmek
+değildir.

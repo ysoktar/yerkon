@@ -1,97 +1,100 @@
-# ADR-0025: a closure is what kept this on one core
+# ADR-0025: bunu tek çekirdekte tutan şey bir kapanıştı
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-Everything slow in this project is the same shape: dozens of scenario
-runs that do not depend on each other. The table is three. The error
-dissection is sixteen a row, so forty-eight. A rural deployment search is
-thirty-six. Each run is tens of seconds, and they were all queued onto
-one core while the other three sat idle.
+Bu projede yavaş olan her şey aynı biçimdedir: birbirine bağlı olmayan
+onlarca senaryo koşusu. Tablo üçtür. Hata ayrıştırması satır başına on
+altı, yani kırk sekiz. Bir kırsal yerleşim araması otuz altıdır. Her
+koşu onlarca saniyedir ve hepsi tek bir çekirdeğe sıraya diziliyordu,
+diğer üçü boş otururken.
 
-The obstacle was not the design of the work. It was one line in each
-terrain constructor. `Terrain.elevation_m` held a closure —
-`lambda x, y: elevation_m`, or a `def elevation` capturing a site — and a
-closure cannot cross a process boundary. `Road` did the same through
-`graded_alignment`, which returned a `surface` function closing over a
-sampled profile. So a `Scenario` could not be pickled, and nothing
-holding one could be handed to a worker.
+Engel işin tasarımı değildi. Her arazi kurucusundaki bir satırdı.
+`Terrain.elevation_m` bir kapanış tutuyordu — `lambda x, y: elevation_m`
+ya da bir sahayı yakalayan bir `def elevation` — ve bir kapanış bir süreç
+sınırını geçemez. `Road` aynısını `graded_alignment` üzerinden yapıyordu;
+o da örneklenmiş bir kesit üzerine kapanan bir `surface` işlevi
+döndürüyordu. Yani bir `Scenario` turşulanamıyordu, dolayısıyla onu tutan
+hiçbir şey bir işçiye verilemiyordu.
 
-That is a small implementation detail with a large consequence, and it
-had never surfaced because nothing had tried.
+Bu, büyük sonucu olan küçük bir gerçekleştirme ayrıntısıdır ve hiç
+yüzeye çıkmamıştı çünkü hiçbir şey denememişti.
 
-There was a second thing, and the user found it rather than a test.
-`yerkon solve` searched a short hardcoded list of figures per scenario,
-so the page could retune the values but not choose which figures were in
-the search at all. A search space somebody else wrote is a menu, not a
-tool — and the command line had always taken `--vary`.
+İkinci bir şey daha vardı ve onu bir sınama değil kullanıcı buldu.
+`yerkon solve`, senaryo başına sabit yazılmış kısa bir figür listesini
+arıyordu; yani sayfa değerleri yeniden ayarlayabiliyor ama aramaya hangi
+figürlerin gireceğini hiç seçemiyordu. Başkasının yazdığı bir arama
+uzayı bir araç değil bir menüdür — ve komut satırı hep `--vary`
+alıyordu.
 
-## Decision
+## Karar
 
-**Replace the closures with small callables.** `Level`, `Rolling`,
-`Sloping` and `Fetched` are frozen dataclasses with `__call__`;
-`Alignment` is the road profile read back by distance along. They pickle,
-so a `Scenario` pickles, so the work fans out. They also repr and compare,
-which the closures did not.
+**Kapanışları küçük çağrılabilirlerle değiştir.** `Level`, `Rolling`,
+`Sloping` ve `Fetched`, `__call__` taşıyan donmuş veri sınıflarıdır;
+`Alignment` ise yol boyunca uzaklığa göre geri okunan yol kesitidir.
+Turşulanırlar, dolayısıyla bir `Scenario` turşulanır, dolayısıyla iş
+dağılır. Ayrıca kapanışların yapmadığı bir şeyi yaparlar: yazdırılır ve
+karşılaştırılırlar.
 
-**`yerkon.parallel.spread` runs the independent tasks.** Three rules
-shape it, and each of them is a way of not silently changing an answer:
+**`yerkon.parallel.spread` bağımsız işleri çalıştırır.** Onu üç kural
+biçimlendirir ve her biri bir cevabı sessizce değiştirmemenin bir
+yoludur:
 
-*Results come back in the order they went out.* A dissection matches runs
-to error sources by position; a pool returning them as they completed
-would attribute one source's runs to another and every figure would be
-plausible and wrong.
+*Sonuçlar gittikleri sırayla geri gelir.* Bir ayrıştırma, koşuları hata
+kaynaklarına konuma göre eşler; onları tamamlandıkça geri veren bir
+havuz, bir kaynağın koşularını bir başkasına yazardı ve her figür makul
+ve yanlış olurdu.
 
-*A worker seeds itself from the scenario.* `run_scenario` already reseeds
-from `Scenario.seed`, so a run is a property of the arrangement and not
-of the machine. Anything drawing from a shared generator would make every
-published figure depend on how many cores happened to be free.
+*Bir işçi tohumunu senaryodan alır.* `run_scenario` zaten
+`Scenario.seed`'den yeniden tohumlar, yani bir koşu makinenin değil
+düzenin bir özelliğidir. Paylaşılan bir üreteçten çeken herhangi bir şey,
+yayımlanan her figürü kaç çekirdeğin boş olduğuna bağımlı kılardı.
 
-*It leaves the machine a core.* A search should not make the viewer it
-was started from unusable, and one task is never worth the cost of
-starting a pool.
+*Makineye bir çekirdek bırakır.* Bir arama, başlatıldığı görüntüleyiciyi
+kullanılamaz hale getirmemelidir ve tek bir iş asla bir havuz başlatmanın
+bedeline değmez.
 
-Where the pool cannot start at all — a sandbox, a frozen build, a machine
-out of handles — it runs the tasks here instead. Slow beats broken.
+Havuzun hiç başlayamadığı yerde — bir kum havuzu, donmuş bir yapı,
+tutamağı tükenmiş bir makine — işleri burada çalıştırır. Yavaş, bozuktan
+iyidir.
 
-**The search space is built in the page.** Any figure in the settings
-file can be added to a search, dropped from it, or retuned; the engine
-already validated the key and refused one it had no entry for. The
-short list per scenario became what it always should have been: a
-suggested starting point, one click from being replaced.
+**Arama uzayı sayfada kurulur.** Ayarlar dosyasındaki herhangi bir figür
+bir aramaya eklenebilir, ondan çıkarılabilir ya da yeniden ayarlanabilir;
+motor anahtarı zaten doğruluyor ve karşılığı olmayanı reddediyordu.
+Senaryo başına kısa liste, hep olması gerektiği şeye dönüştü: önerilen
+bir başlangıç noktası, değiştirilmesi bir tık uzakta.
 
-**And the study writes itself out.** `yerkon deliver` renders four
-Markdown files — the rows and the ground under them, the error budget,
-every figure and what it rests on, the deployments that could have been
-built instead — because what this project is *for* is the block on page
-15 and the argument behind it, and until now all of that lived in a
-terminal or a browser tab. The dissection is skippable, since it is by
-far the slowest part and somebody refreshing the table should not wait
-for it.
+**Ve çalışma kendini yazıyor.** `yerkon deliver` dört Markdown dosyası
+üretir — satırlar ve altlarındaki zemin, hata bütçesi, her figür ve neye
+dayandığı, onun yerine kurulabilecek yerleşimler — çünkü bu projenin
+*amacı* 15. sayfadaki blok ve arkasındaki savdır; şimdiye kadar bunların
+tamamı bir uçbirimde ya da bir tarayıcı sekmesinde yaşıyordu. Ayrıştırma
+atlanabilir, çünkü açık ara en yavaş parçadır ve tabloyu tazeleyen
+birinin onu beklemesi gerekmez.
 
-## Consequences
+## Sonuçlar
 
-On four cores, using three:
+Dört çekirdekte, üçünü kullanarak:
 
-| | before | after |
+| | önce | sonra |
 |---|---|---|
-| `yerkon table` | ~4 min | 71 s |
-| `yerkon budget --only tunnel` | 82 s | 43 s |
-| the rural search (36 candidates) | ~25 min | ~9 min |
+| `yerkon table` | ~4 dk | 71 sn |
+| `yerkon budget --only tunnel` | 82 sn | 43 sn |
+| kırsal arama (36 aday) | ~25 dk | ~9 dk |
 
-Every figure is identical to the serial run — checked, not assumed, and
-now a test: the same scenario run in two processes and here must agree on
-availability and on both percentiles.
+Her figür seri koşuyla birebir aynıdır — varsayılmadı, denetlendi ve
+artık bir sınama: aynı senaryo iki süreçte ve burada çalıştırıldığında
+kullanılabilirlik ve her iki yüzdelik üzerinde anlaşmak zorunda.
 
-The speed matters more than the clock says. A thirty-six candidate search
-that takes half an hour is one somebody runs once and accepts; at nine
-minutes it is one they run three times with different targets. The
-`--vary` boxes in the page only became useful at the same time, and for
-the same reason.
+Hız, saatin söylediğinden çok daha önemli. Yarım saat süren otuz altı
+adaylı bir arama, insanın bir kez çalıştırıp kabul ettiği aramadır;
+dokuz dakikada ise farklı hedeflerle üç kez çalıştırdığı arama olur.
+Sayfadaki `--vary` kutuları da tam aynı anda ve aynı sebeple işe yarar
+hale geldi.
 
-What did not change: the work is still every candidate simulated in full.
-Nothing here is a faster model, and a surrogate fitted to a few runs would
-still be a second model of the same thing (ADR-0023).
+Değişmeyen şey: iş hâlâ her adayın tam olarak benzetilmesidir. Buradaki
+hiçbir şey daha hızlı bir model değildir ve birkaç koşuya uydurulmuş bir
+vekil model yine aynı şeyin ikinci bir modeli olurdu (ADR-0023).

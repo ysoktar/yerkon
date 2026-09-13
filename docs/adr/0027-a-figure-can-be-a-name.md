@@ -1,75 +1,80 @@
-# ADR-0027: a figure can be a name, and an option that changes nothing is a lie
+# ADR-0027: bir figür bir ad olabilir ve hiçbir şeyi değiştirmeyen seçenek bir yalandır
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-`rural-hard-ground` shipped as one of four named deployment options. Its
-note said it stood the rural row on Gölbaşı's 907 m of relief instead of
-Polatlı's 486 m, and that availability fell from about 90 % to about 45 %.
+`rural-hard-ground`, adlandırılmış dört yerleşim seçeneğinden biri
+olarak hazır geliyordu. Notu, kırsal satırı Polatlı'nın 486 m'lik
+engebesi yerine Gölbaşı'nın 907 m'lik engebesi üzerine oturttuğunu ve
+kullanılabilirliğin yaklaşık %90'dan yaklaşık %45'e düştüğünü söylüyordu.
 
-Checking the shipped options against their own notes after the ground
-corrections, it produced **exactly the default's numbers** — 89,50 %
-availability, 2,69 m at the fiftieth percentile, to every digit.
+Zemin düzeltmelerinden sonra hazır gelen seçenekler kendi notlarına karşı
+denetlenirken, bu seçeneğin **tam olarak varsayılanın sayılarını**
+ürettiği görüldü — %89,50 kullanılabilirlik, ellinci yüzdelikte 2,69 m;
+her basamağına kadar.
 
-It set `site.rural_relief_m`, which is the *fallback* relief used when no
-ground has been fetched. Polatlı is fetched and ships with the package,
-so the fallback is never consulted and the option changed nothing at all.
+`site.rural_relief_m` değerini ayarlıyordu; bu ise hiç zemin
+indirilmediğinde kullanılan *yedek* engebedir. Polatlı indirilmiştir ve
+paketle birlikte gelir, dolayısıyla yedeğe hiç başvurulmaz ve seçenek
+hiçbir şeyi değiştirmemiştir.
 
-Nothing raised. `options.write` already refuses an option naming a figure
-the settings file does not hold — that check exists precisely to stop a
-saved file that quietly does nothing. This one named a figure that
-exists and simply is not read in the configuration that ships.
+Hiçbir şey hata yükseltmedi. `options.write`, ayarlar dosyasının
+tutmadığı bir figürü adlandıran bir seçeneği zaten reddeder — bu
+denetim, tam olarak sessizce hiçbir şey yapmayan bir kaydedilmiş dosyayı
+engellemek için vardır. Bu seçenek ise var olan, ama hazır gelen
+yapılandırmada okunmayan bir figürü adlandırıyordu.
 
-The reason it could not do better is that the thing it needed to change
-was not a figure. Which site a row stands on lived in `scenarios.py` as
-`RURAL_SITE = "polatli"`, and `defaults.toml` held numbers only. So the
-option reached for the nearest number instead.
+Daha iyisini yapamamasının sebebi, değiştirmesi gereken şeyin bir figür
+olmamasıydı. Bir satırın hangi sahada durduğu `scenarios.py` içinde
+`RURAL_SITE = "polatli"` olarak yaşıyordu ve `defaults.toml` yalnızca
+sayı tutuyordu. Seçenek de en yakın sayıya uzandı.
 
-That also left the viewer's new fetch panel half-connected: somebody
-could fetch İzmir from the page, look at it, and have no way to put a
-report row on it.
+Bu aynı zamanda görüntüleyicinin yeni indirme panelini yarım bağlı
+bırakıyordu: biri sayfadan İzmir'i indirebilir, ona bakabilir ve bir
+rapor satırını onun üzerine koymanın hiçbir yolu olmazdı.
 
-## Decision
+## Karar
 
-**A `Sourced` value may be a name as well as a number.**
-`Settings.number` refuses a name with a message saying to ask for its
-text; `Settings.text` returns it. An edit is coerced by the kind the
-entry already is, because a page sends everything as text and without
-that a spacing would be stored as the string `"3000"` and compare
-unequal to `3000` everywhere.
+**Bir `Sourced` değer sayı olduğu gibi ad da olabilir.**
+`Settings.number` bir adı, metnini istemesini söyleyen bir iletiyle
+reddeder; `Settings.text` onu döndürür. Bir düzenleme, girdinin hâlihazırda
+olduğu türe zorlanır; çünkü bir sayfa her şeyi metin olarak gönderir ve
+bu olmadan bir aralık `"3000"` dizgisi olarak saklanır ve her yerde
+`3000` ile eşit çıkmazdı.
 
-`urban.site`, `rural.site` and `tunnel.site` are now DESIGN figures like
-the spacings beside them. They carry directory names under
-`src/yerkon/site/ankara/`, empty meaning modelled terrain. Anything
-`yerkon fetch` writes — including from the viewer — can go in one.
+`urban.site`, `rural.site` ve `tunnel.site` artık yanlarındaki aralıklar
+gibi DESIGN figürleridir. `src/yerkon/site/ankara/` altındaki dizin
+adlarını taşırlar; boş olması modellenmiş arazi demektir. `yerkon fetch`
+neyi yazarsa — görüntüleyiciden yazdıkları dahil — birine girebilir.
 
-`rural-hard-ground` sets `rural.site = "golbasi"` and now does what it
-says. In the figures panel a name renders as a picker of the sites
-actually fetched rather than a free text box, because typing a directory
-that is not there is the one mistake this can make.
+`rural-hard-ground` artık `rural.site = "golbasi"` ayarlıyor ve
+söylediğini yapıyor. Figürler panelinde bir ad, serbest metin kutusu
+yerine gerçekten indirilmiş sahalardan oluşan bir seçici olarak
+görünüyor; çünkü orada olmayan bir dizini yazmak bunun yapabileceği tek
+hatadır.
 
-## Consequences
+## Sonuçlar
 
-The fetch panel is connected end to end: fetch a place from the page,
-then point a report row at it, and the table, the dissection and the
-solver all run against it.
+İndirme paneli baştan sona bağlı: sayfadan bir yer indir, sonra bir rapor
+satırını ona yönlendir; tablo, ayrıştırma ve çözücü hepsi onun üzerinde
+çalışır.
 
-Three tests now pin the failure that got here: that the site is a figure,
-that the option reaches other ground, and that asking a name for a number
-says so rather than guessing.
+Üç sınama artık buraya getiren başarısızlığı sabitliyor: sahanın bir
+figür olduğunu, seçeneğin başka bir zemine ulaştığını ve bir addan sayı
+istemenin tahmin etmek yerine bunu söylediğini.
 
-The wider lesson is about the check that did not fire. `options.write`
-verifies that every key an option names exists. That is not the same
-question as whether the key is *read* in the configuration it will be
-applied to, and this project has now been caught twice by that gap —
-once here and once when sixteen deployment figures were sent to the
-viewer with no group heading to draw them under, so they were present,
-correct and invisible. Existence is cheap to check. Being consulted is
-not, and the only thing that catches it is running the thing and
-comparing against what it claimed.
+Daha geniş ders, ateşlenmeyen denetim hakkında. `options.write`, bir
+seçeneğin adlandırdığı her anahtarın var olduğunu doğrular. Bu, anahtarın
+uygulanacağı yapılandırmada *okunup okunmadığı* sorusuyla aynı değildir
+ve bu proje o boşluğa artık iki kez yakalandı — bir kez burada, bir kez de
+on altı yerleşim figürü görüntüleyiciye altlarında çizilecekleri bir grup
+başlığı olmadan gönderildiğinde; oradaydılar, doğruydular ve
+görünmezdiler. Varlığı denetlemek ucuzdur. Başvurulduğunu denetlemek
+değildir ve bunu yakalayan tek şey, şeyi çalıştırıp iddiasıyla
+karşılaştırmaktır.
 
-Which is what found this: not a test, but re-reading four notes against
-four fresh runs.
+Bunu bulan da o oldu: bir sınama değil, dört notu dört taze koşuya karşı
+yeniden okumak.
