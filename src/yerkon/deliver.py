@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from typing import Callable, Optional, Sequence
 
 from yerkon.budget import dissect_all
+from yerkon.language import say
 from yerkon.numbers import decimal_comma, readable
 from yerkon.options import available, read as read_option
 from yerkon.report import Result, Row, as_markdown, build, footnotes
@@ -32,7 +33,9 @@ from yerkon.scenarios import ALL, Deployed
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.terms import LABELS, REMEDIES
 
-Say = Callable[[str], None]
+#: How a run reports a line back to whoever started it. Named apart
+#: from ``say``, which turns a name into a sentence (ADR-0035).
+Tell = Callable[[str], None]
 
 
 @dataclass(frozen=True)
@@ -235,7 +238,8 @@ def deliver(
     deployments: Sequence[Deployed] = ALL,
     settings: Optional[Settings] = None,
     with_budget: bool = True,
-    say: Say = _quiet,
+    tell: Tell = _quiet,
+    language: Optional[str] = None,
 ) -> tuple[Written, ...]:
     """Run the study once and write it out as Markdown.
 
@@ -247,7 +251,7 @@ def deliver(
     directory = pathlib.Path(into)
     directory.mkdir(parents=True, exist_ok=True)
 
-    say("Running the table.")
+    tell(say("task.deliver.table", language))
     results, rows = build(deployments, settings=settings)
 
     written = [
@@ -260,7 +264,7 @@ def deliver(
     ]
 
     if with_budget:
-        say("Taking the error apart. This is the slow part.")
+        tell(say("task.deliver.budget", language))
         written.append(_write(
             directory / "hata-butcesi.md",
             budget_md(dissect_all(deployments), settings),
@@ -270,7 +274,7 @@ def deliver(
     written.append(_write(
         directory / "README.md", _index(written), "what is in each file"))
     for one in written:
-        say("Wrote {}".format(one.path))
+        tell(say("task.deliver.wrote", language, path=one.path))
     return tuple(written)
 
 

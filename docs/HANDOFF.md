@@ -180,3 +180,8 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
 - Konumsal `{}` ile iki dil: Türkçe cümle toplamı önce sayar, İngilizce
   varsayımı önce sayar ve biri sessizce diğerinin sayılarını alır. İki
   alanı olan ilk cümlede aldı da (ADR-0035).
+- İki dil yapıldıktan sonra bile uzun işlerin ilerleme kütüğü İngilizce
+  kaldı, çünkü satırları bir kataloğa değil `tell`'e verilen sabit
+  dizgilere yazılmıştı; İngilizce bir satır, biri sayfayı değiştirene
+  kadar sıradan koddan ayırt edilemiyor. Artık bir sınama `tell`'e sabit
+  dizgi verilmesini reddediyor (ADR-0035).

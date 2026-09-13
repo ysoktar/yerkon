@@ -191,6 +191,78 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "model, so these figures come from the same engine the table "
               "does (ADR-0023).",
     },
+    # -- what a long task says while it runs -------------------------------
+    #
+    # These are the lines the page shows while a job is going. They are
+    # here rather than beside the code that prints them for the same
+    # reason everything else is: a task started from the page in English
+    # that reports in Turkish is the half-and-half surface ADR-0035 was
+    # written to end.
+    "task.table.running": {
+        "tr": "{rows} satır {workers} süreçte çalışıyor.",
+        "en": "Running {rows} row{s} on {workers} processes.",
+    },
+    "task.budget.running": {
+        "tr": "{runs} benzetim çalışıyor: {rows} senaryo, {sources} hata "
+              "kaynağına karşı, {workers} süreçte.",
+        "en": "Running {runs} simulations: {rows} scenario{s} against "
+              "{sources} sources, on {workers} processes.",
+    },
+    "task.done": {"tr": "Bitti.", "en": "Done."},
+    "task.solve.searching": {
+        "tr": "{scenario} için {candidates} düzen, {target} hedefine karşı, "
+              "{workers} süreçte aranıyor.",
+        "en": "Searching {candidates} arrangements of {scenario} for "
+              "{target}, on {workers} processes.",
+    },
+    "task.solve.candidate": {
+        "tr": "[{seen}/{candidates}] {anchors} direk · {availability} "
+              "kullanılabilirlik · HPE50 {hpe_p50} m · {capex} TL{meets}",
+        "en": "[{seen}/{candidates}] {anchors} anchors · {availability} "
+              "availability · HPE50 {hpe_p50} m · {capex} TL{meets}",
+    },
+    "task.solve.meets": {"tr": "  ← karşılıyor", "en": "  ← meets"},
+    "task.solve.none_met": {
+        "tr": "Hiçbiri karşılamadı.",
+        "en": "Nothing met it.",
+    },
+    "task.solve.met": {
+        "tr": "{tried} düzenin {met} tanesi karşıladı.",
+        "en": "{met} of {tried} met it.",
+    },
+    "task.solve.saved": {
+        "tr": "{name} olarak kaydedildi.",
+        "en": "Saved as {name}.",
+    },
+    # A middle dot rather than a comma between the two halves of a
+    # coordinate: the decimal mark here is a comma too (ADR-0035), and
+    # "39,9208,32,8541" is four numbers to anybody reading it.
+    "task.fetch.fetching": {
+        "tr": "{south} · {west} ile {north} · {east} arası {spacing_m} m "
+              "aralıkla indiriliyor.",
+        "en": "Fetching {south} · {west} to {north} · {east} at "
+              "{spacing_m} m.",
+    },
+    "task.fetch.slow": {
+        "tr": "Buradaki ağı kullanan tek şey. Bir süre alabilir.",
+        "en": "The only thing here that uses the network. It can take a "
+              "while.",
+    },
+    "task.fetch.got": {
+        "tr": "{width_m} x {height_m} m, engebe {relief_m} m, pürüzlülük "
+              "{roughness_m} m",
+        "en": "{width_m} x {height_m} m, relief {relief_m} m, roughness "
+              "{roughness_m} m",
+    },
+    "task.deliver.table": {
+        "tr": "Tablo çalışıyor.",
+        "en": "Running the table.",
+    },
+    "task.deliver.budget": {
+        "tr": "Hata parçalarına ayrılıyor. Yavaş olan kısım bu.",
+        "en": "Taking the error apart. This is the slow part.",
+    },
+    "task.deliver.wrote": {"tr": "{path} yazıldı", "en": "Wrote {path}"},
 }
 
 

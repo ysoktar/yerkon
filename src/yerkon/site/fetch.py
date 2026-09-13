@@ -577,6 +577,11 @@ class OpenStreetMapBuildings:
             radii.append(_assumed_footprint_radius_m(height))
             heights.append(height)
 
+        # Written in the default language on purpose. A manifest note is
+        # part of the record of one fetch, beside `fetched_at` and the
+        # source's own error text — it says what happened that day, not
+        # what the page is currently set to, and it is stored on disk
+        # (ADR-0035).
         notes = (
             say("site.heights_tagged", None,
                 tagged=from_height_tag, levels=from_levels,

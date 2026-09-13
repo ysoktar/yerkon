@@ -21,6 +21,7 @@ import pathlib
 
 from yerkon.budget import dissect_all
 from yerkon.deliver import deliver as write_study
+from yerkon.language import say
 from yerkon.numbers import decimal_comma
 from yerkon.options import available, read, write
 from yerkon.parallel import workers
@@ -31,7 +32,20 @@ from yerkon.solve import SEARCHABLE, AlreadyMet, Target, search
 from yerkon.terms import LABELS, NAMES, REMEDIES
 from yerkon.viewer.state import ViewState
 
-Say = Callable[[str], None]
+#: How a running task reports a line back to the page.
+#:
+#: Named apart from ``say``, which is the one that turns a name into a
+#: sentence. A task builds a line with ``say`` and hands it to ``tell``.
+Tell = Callable[[str], None]
+
+
+def language_of(rows) -> str:
+    """Which language a run reports in: the one on screen.
+
+    Every row carries it and the chooser sets all three at once, so the
+    first is the one showing (ADR-0035).
+    """
+    return rows[0][1].language
 
 
 def deployments_of(rows) -> tuple:
@@ -63,12 +77,13 @@ def settings_of(rows) -> Settings:
 def table(rows) -> Callable:
     """The rows as prepared, plus the weighted row when all three run."""
 
-    def work(say: Say) -> dict:
+    def work(tell: Tell) -> dict:
+        language = language_of(rows)
         chosen = deployments_of(rows)
-        say("Running {} row{} on {} processes.".format(
-            len(chosen), "" if len(chosen) == 1 else "s", workers()))
+        tell(say("task.table.running", language, rows=len(chosen),
+                 s="" if len(chosen) == 1 else "s", workers=workers()))
         results, table_rows = build(chosen, settings=settings_of(rows))
-        say("Done.")
+        tell(say("task.done", language))
         return {
             "columns": [
                 "Sistem", "HPE P50", "HPE P95", "VPE P95",
@@ -100,16 +115,17 @@ def table(rows) -> Callable:
 def budget(rows, sources: Optional[list] = None) -> Callable:
     """Each row's error taken apart, one source at a time (ADR-0020)."""
 
-    def work(say: Say) -> dict:
+    def work(tell: Tell) -> dict:
+        language = language_of(rows)
         chosen = deployments_of(rows)
         wanted = tuple(sources) if sources else NAMES
-        say("Running {} simulations: {} scenario{} against {} sources, "
-            "on {} processes.".format(
-                len(chosen) * (2 * len(wanted) + 2), len(chosen),
-                "" if len(chosen) == 1 else "s", len(wanted), workers()))
+        tell(say("task.budget.running", language,
+                 runs=len(chosen) * (2 * len(wanted) + 2), rows=len(chosen),
+                 s="" if len(chosen) == 1 else "s", sources=len(wanted),
+                 workers=workers()))
 
         dissections = dissect_all(chosen, wanted)
-        say("Done.")
+        tell(say("task.done", language))
         return {
             "scenarios": [
                 {
@@ -163,7 +179,8 @@ def solve(
 ) -> Callable:
     """Search arrangements for the cheapest that meets a target (ADR-0023)."""
 
-    def work(say: Say) -> dict:
+    def work(tell: Tell) -> dict:
+        language = state.language
         settings = state.settings()
         knobs = over or SEARCHABLE.get(scenario)
         if not knobs:
@@ -174,26 +191,30 @@ def solve(
         candidates = 1
         for values in knobs.values():
             candidates *= len(values)
-        say("Searching {} arrangements of {} for {}, on {} processes.".format(
-            candidates, scenario, target.describe(), workers()))
+        tell(say("task.solve.searching", language, candidates=candidates,
+                 scenario=scenario, target=target.describe(language),
+                 workers=workers()))
 
         seen = [0]
 
         def note(outcome) -> None:
             seen[0] += 1
-            say("[{}/{}] {} anchors · {} availability · HPE50 {} m · {} TL{}"
-                .format(
-                    seen[0], candidates, outcome.anchors,
-                    "%" + decimal_comma(100.0 * outcome.availability, 1),
-                    decimal_comma(outcome.hpe_p50_m, 2),
-                    decimal_comma(outcome.capex_tl, 0),
-                    "  ← meets" if target.met_by(outcome) else "",
-                ))
+            tell(say(
+                "task.solve.candidate", language,
+                seen=seen[0], candidates=candidates, anchors=outcome.anchors,
+                availability="%" + decimal_comma(
+                    100.0 * outcome.availability, 1),
+                hpe_p50=decimal_comma(outcome.hpe_p50_m, 2),
+                capex=decimal_comma(outcome.capex_tl, 0),
+                meets=say("task.solve.meets", language)
+                if target.met_by(outcome) else "",
+            ))
 
-        found = search(scenario, target, over, settings, watching=note)
+        found = search(scenario, target, over, settings, watching=note,
+                       language=language)
         best = found.best
         if best is None:
-            say("Nothing met it.")
+            tell(say("task.solve.none_met", language))
             return {
                 "met": False,
                 "tried": len(found.tried),
@@ -201,7 +222,8 @@ def solve(
                     100.0 * max(o.availability for o in found.tried), 2),
             }
 
-        say("{} of {} met it.".format(len(found.met), len(found.tried)))
+        tell(say("task.solve.met", language, met=len(found.met),
+                 tried=len(found.tried)))
         outcome = {
             "met": True,
             "tried": len(found.tried),
@@ -230,10 +252,10 @@ def solve(
             try:
                 path = write(found.as_option(save_as, settings))
                 outcome["saved"] = save_as
-                say("Saved as {}.".format(path.name))
+                tell(say("task.solve.saved", language, name=path.name))
             except AlreadyMet as nothing_to_do:
                 outcome["already_met"] = str(nothing_to_do)
-                say(str(nothing_to_do))
+                tell(str(nothing_to_do))
         return outcome
 
     return work
@@ -262,11 +284,11 @@ def target_from(payload: dict) -> Target:
 def deliver(rows, into: str, with_budget: bool = True) -> Callable:
     """Write the study out as Markdown, from the rows as prepared."""
 
-    def work(say: Say) -> dict:
+    def work(tell: Tell) -> dict:
         chosen = deployments_of(rows)
         written = write_study(
             into or "docs/teslim", chosen, settings_of(rows),
-            with_budget=with_budget, say=say,
+            with_budget=with_budget, tell=tell, language=language_of(rows),
         )
         return {
             "into": str(pathlib.Path(into or "docs/teslim").resolve()),
@@ -294,7 +316,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
     everything else.
     """
 
-    def work(say: Say) -> dict:
+    def work(tell: Tell) -> dict:
         from yerkon.site.cache import SiteCache
         from yerkon.site.fetch import (
             CopernicusElevation,
@@ -318,9 +340,13 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         spacing = float(payload.get("spacing_m") or 30.0)
         want_buildings = bool(payload.get("buildings", True))
 
-        say("Fetching {:.4f},{:.4f} to {:.4f},{:.4f} at {:.0f} m.".format(
-            bounds.south, bounds.west, bounds.north, bounds.east, spacing))
-        say("The only thing here that uses the network. It can take a while.")
+        tell(say("task.fetch.fetching", state.language,
+                 south=decimal_comma(bounds.south, 4),
+                 west=decimal_comma(bounds.west, 4),
+                 north=decimal_comma(bounds.north, 4),
+                 east=decimal_comma(bounds.east, 4),
+                 spacing_m=decimal_comma(spacing, 0)))
+        tell(say("task.fetch.slow", state.language))
 
         site = build_site(
             bounds,
@@ -335,10 +361,13 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         )
         SiteCache(SITES / name).save(site)
 
-        say("{:.0f} x {:.0f} m, relief {:.0f} m, roughness {:.2f} m".format(
-            site.width_m, site.height_m, site.relief_m, site.roughness_m()))
+        tell(say("task.fetch.got", state.language,
+                 width_m=decimal_comma(site.width_m, 0),
+                 height_m=decimal_comma(site.height_m, 0),
+                 relief_m=decimal_comma(site.relief_m, 0),
+                 roughness_m=decimal_comma(site.roughness_m(), 2)))
         for note in site.manifest.notes:
-            say(note)
+            tell(note)
 
         return {
             "name": name,

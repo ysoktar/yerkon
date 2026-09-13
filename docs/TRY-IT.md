@@ -30,7 +30,8 @@ gönderilen varsayılanlara değil sayfanın gösterdiği ayarlara karşı koşa
 
 Arama kutusunun yanında **TR / EN**. Her şeyi değiştirir: panel, yetmiş
 iki değerin notları ve neyi etkiledikleri, zeminin kendi açıklaması, hazır
-seçeneklerin gerekçeleri, çözücünün çıktısı. Hiçbir sayı, hiçbir geometri
+seçeneklerin gerekçeleri, çözücünün çıktısı ve uzun bir iş sürerken
+akan ilerleme kütüğü. Hiçbir sayı, hiçbir geometri
 ve hiçbir sonuç ikisi arasında farklı değil; bunu bir test bütün tabloyu
 iki kez kurarak söylüyor (ADR-0035).
 
@@ -39,8 +40,10 @@ dediğini oku. Sonra geri dön ve aynı değerin Türkçe de aynı şeyi
 söylediğini kontrol et.
 
 Henüz iki dilli *olmayan* ve sayfanın aksini iddia etmediği kısım:
-`yerkon table`, `yerkon budget` ve Markdown teslimleri raporun kendi
-sözleridir ve yalnızca Türkçedir.
+tablonun satır adları ile sütun başlıkları, Markdown teslimlerinin içeriği
+ve komut satırının kendisi. Bunlar raporun kendi sözleridir ve yalnızca
+Türkçedir. Bir sahanın künye notları da öyle: onlar o günkü indirmenin
+kaydıdır, sayfanın ayarı değil (ADR-0035).
 
 ### Panel (bu yeni)
 

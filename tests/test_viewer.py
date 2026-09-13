@@ -1038,6 +1038,48 @@ def test_the_page_says_nothing_it_has_not_got_in_both_languages():
         assert "en:" in body, key
 
 
+def test_the_engine_says_nothing_it_has_not_got_in_both_languages():
+    """The twin of the test above, for the sentences Python builds.
+
+    `say` raises on a name it does not hold, but a name holding only one
+    language fails at the moment somebody switches — which is a run
+    halfway through a search, not a test run.
+    """
+    from yerkon.language import CATALOGUE, LANGUAGES
+
+    for key, both in CATALOGUE.items():
+        for language in LANGUAGES:
+            assert both.get(language), "{} has no {}".format(key, language)
+        assert set(both) == set(LANGUAGES), key
+
+
+def test_a_built_sentence_names_its_fields():
+    """The same failure as the one below, on the engine's side.
+
+    Positional `{}` is what gave one language the other's numbers. Each
+    language may still use a different subset of the named fields — the
+    English "row{s}" has a plural the Turkish does not need — because a
+    field nobody substitutes is simply left out, and only an unnamed one
+    goes by position.
+    """
+    import string
+
+    from yerkon.language import CATALOGUE, LANGUAGES
+
+    for key, both in CATALOGUE.items():
+        named = [
+            {
+                field for _, field, _, _ in string.Formatter().parse(
+                    both[language])
+                if field
+            }
+            for language in LANGUAGES
+        ]
+        assert "" not in set().union(*named), (
+            "{} counts a field instead of naming it".format(key)
+        )
+
+
 def test_a_phrase_names_its_fields_rather_than_counting_them():
     """Positional substitution gave one language the other's numbers.
 
@@ -1105,6 +1147,43 @@ def test_resetting_a_row_keeps_the_language_on_screen():
     session = Session()
     session.speak("en")
     assert session.reset("rural").language == "en"
+
+
+def test_a_long_task_reports_in_the_language_on_screen():
+    """The job log is part of the page, so it is part of the promise.
+
+    A run started in English that reported "Bitti." in its log was the
+    half-and-half surface ADR-0035 was written to end, and nothing
+    caught it because the lines were literals rather than names.
+    """
+    from yerkon.viewer.state import from_scenario
+    from yerkon.viewer.tasks import language_of
+
+    rows = [("rural", from_scenario("rural").merged({"language": "en"}))]
+    assert language_of(rows) == "en"
+    assert language_of([("rural", from_scenario("rural"))]) == "tr"
+
+
+def test_no_task_writes_a_progress_line_of_its_own():
+    """`tell` carries a sentence `say` built. A literal is one language.
+
+    Checked on the call rather than on the words, because a line in
+    English reads as ordinary code until somebody switches the page.
+    """
+    import pathlib
+    import re
+
+    root = pathlib.Path(__file__).resolve().parent.parent / "src" / "yerkon"
+    offenders = []
+    for path in (root / "viewer" / "tasks.py", root / "deliver.py"):
+        text = path.read_text(encoding="utf-8")
+        for found in re.finditer(r'\btell\(\s*"', text):
+            line = text[:found.start()].count("\n") + 1
+            offenders.append("{}:{}".format(path.name, line))
+    assert not offenders, (
+        "these hand a literal to tell instead of a sentence say built: "
+        "{}".format(", ".join(offenders))
+    )
 
 
 # --- Moving around the scene ---------------------------------------------

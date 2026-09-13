@@ -1,85 +1,96 @@
-# ADR-0035: two languages, beside each other
+# ADR-0035: iki dil, yan yana
 
-## Status
+## Durum
 
-Accepted.
+Kabul edildi.
 
-## Context
+## Bağlam
 
-The report this answers is Turkish, and the people who will check it work
-in Turkish. The code, the decisions and the tests are English, because
-that is what they were written in and rewriting fifteen thousand lines of
-comments would be a large, risky change that nobody would read.
+Bunun cevap verdiği rapor Türkçedir ve onu denetleyecek insanlar Türkçe
+çalışır. Kod, kararlar ve sınamalar İngilizcedir; çünkü yazıldıkları dil
+budur ve on beş bin satır açıklamayı yeniden yazmak, kimsenin
+okumayacağı büyük ve riskli bir değişiklik olurdu.
 
-The page sat between the two. Its chrome was Turkish; the seventy-two
-figures said what they rest on and what they affect in English; the
-ground described itself in English; the ready-made options argued for
-themselves in English. So the one surface built for the people who need
-it most was the one that could not decide.
+Sayfa ikisinin arasında duruyordu. Çerçevesi Türkçeydi; yetmiş iki figür
+neye dayandıklarını ve neyi etkilediklerini İngilizce söylüyordu; zemin
+kendini İngilizce anlatıyordu; hazır seçenekler kendi savlarını İngilizce
+kuruyordu. Yani en çok ihtiyacı olan insanlar için kurulmuş tek yüzey,
+karar veremeyen yüzeydi.
 
-Translating it was the first answer, and the wrong one: it deletes the
-English rather than adding the Turkish, and it makes the page unreadable
-to anyone reading the code beside it.
+Onu çevirmek ilk cevaptı ve yanlış olandı: Türkçeyi eklemek yerine
+İngilizceyi siler ve sayfayı, yanında kodu okuyan herkes için okunmaz
+kılar.
 
-## Decision
+## Karar
 
-Two languages, and neither is a translation of the other in the sense
-that one is the original. A chooser sits beside the search box — two
-buttons rather than a menu, because a two-item menu costs a click to find
-out what is in it — and switching asks the engine again rather than
-translating what the page already has.
+İki dil; ve hiçbiri, biri özgün olacak anlamda ötekinin çevirisi değil.
+Arama kutusunun yanında bir seçici durur — menü değil iki düğme, çünkü
+iki maddelik bir menü, içinde ne olduğunu öğrenmek için bir tıka mal
+olur — ve geçiş yapmak, sayfanın elindekini çevirmek yerine motora
+yeniden sorar.
 
-Text somebody **wrote** lives beside the value it describes:
-`note`/`note_en`, `affects`/`affects_en`, `source`/`source_en`,
-`sensitivity`/`sensitivity_en` in `defaults.toml`, and
-`title`/`title_en`, `note`/`note_en` in each option. Both beside one
-value, not in two files, because two files drift and the failure is not
-a bad translation — it is two different claims about the same number.
+Birinin **yazdığı** metin, anlattığı değerin yanında yaşar:
+`defaults.toml` içinde `note`/`note_en`, `affects`/`affects_en`,
+`source`/`source_en`, `sensitivity`/`sensitivity_en`; her seçenekte
+`title`/`title_en`, `note`/`note_en`. İkisi de tek bir değerin yanında,
+iki dosyada değil; çünkü iki dosya birbirinden kayar ve başarısızlık kötü
+bir çeviri değildir — aynı sayı hakkında iki farklı iddiadır.
 
-Text the project **builds** lives in `language.py`, as a pair of format
-strings under one name. Text the page builds lives in `words.js`, the
-same way. A name missing a language raises rather than falling back:
-a fallback is a page nine tenths translated and nobody noticing the
-tenth.
+Projenin **kurduğu** metin `language.py` içinde, tek bir ad altında bir
+biçim dizgisi çifti olarak yaşar. Sayfanın kurduğu metin `words.js`
+içinde, aynı şekilde. Bir dili eksik olan bir ad, yedeğe düşmek yerine
+hata yükseltir: yedek, onda dokuzu çevrilmiş ve onda birini kimsenin fark
+etmediği bir sayfa demektir.
 
-Nothing decides anything. The values, the geometry and every result are
-identical in both, and a test builds the whole table twice to say so.
+Hiçbir şey bir şeye karar vermez. Değerler, geometri ve her sonuç ikisinde
+de birebir aynıdır ve bir sınama bunu söylemek için bütün tabloyu iki kez
+kurar.
 
-Numbers are written the same way in both: a comma decimal mark and no
-thousands separator, which is what the report uses. The English is a way
-into the same study rather than a second study, and a figure with two
-written forms is a figure somebody can quote two ways.
+Sayılar ikisinde de aynı yazılır: virgüllü ondalık ayırıcı ve binlik
+ayırıcı yok; raporun kullandığı budur. İngilizce, ikinci bir çalışma
+değil aynı çalışmaya açılan bir yoldur ve iki yazılı biçimi olan bir
+figür, birinin iki türlü alıntılayabileceği bir figürdür.
 
-A recorded fact is not translated. `Copernicus DEM 30 m ×2` is what was
-fetched, stored in the manifest on disk; it used to read `(2 tiles)`,
-which meant the cached sites were English whatever the page was set to.
+Kayda geçmiş bir olgu çevrilmez. Bir sahanın künye notları da öyle:
+`fetched_at` ile ve kaynağın kendi hata metniyle birlikte, o günkü
+indirmenin kaydıdır ve diskte durur; sayfanın o an hangi dile ayarlı
+olduğunu değil, o gün ne olduğunu söyler. `Copernicus DEM 30 m ×2`, indirilmiş
+olan şeydir ve diskteki künyede saklanır; eskiden `(2 tiles)` yazıyordu,
+bu da önbellekteki sahaların sayfa ne olursa olsun İngilizce olması
+demekti.
 
-## Consequences
+## Sonuçlar
 
-The panel, the figures, the ground, the options and the solver's output
-all read in whichever language is chosen, and the engine is the only
-thing that holds any of those words.
+Panel, figürler, zemin, seçenekler, çözücünün çıktısı ve uzun bir iş
+sürerken sayfanın gösterdiği ilerleme kütüğü hangi dil seçilmişse onda
+okunuyor ve bu sözcüklerin hiçbirini tutan tek şey motor.
 
-Two things came out of the build worth keeping:
+İlerleme kütüğü ilk turda atlanmıştı: satırları `tell`'e verilen
+İngilizce sabit dizgilerdi ve İngilizce bir satır, biri sayfayı
+değiştirene kadar sıradan koddan ayırt edilemez. Şimdi kütüğün de her
+satırı kataloğdaki bir addır ve bir sınama, `tell`'e sabit dizgi
+verilmesini reddediyor. İlerleme geri çağrısının adı da `tell` oldu;
+`say` cümleyi kuran, `tell` onu sayfaya ileten.
 
-`say(key, ...values)` was positional at first, on the reasoning that the
-two languages do not want their pieces in the same order. They do not —
-"72 değerin 35 tanesi varsayım" counts the total first, "35 of 72 figures
-are assumptions" counts the assumptions first — and with `{}` in both,
-one language silently gets the other's numbers. It did, on the very first
-sentence that had two. Fields are named now, and each language orders
-them as it likes.
+Yapım sırasında tutmaya değen iki şey çıktı:
 
-Adding `title_en`/`note_en` in the middle of the `Option` dataclass
-shifted every positional argument after them, which made an option with
-no values at all pass the test that exists to refuse exactly that. New
-fields go on the end.
+`say(key, ...values)` önce konumsaldı; iki dilin parçalarını aynı sırada
+istemediği düşüncesiyle. İstemiyorlar da — "72 değerin 35 tanesi
+varsayım" önce toplamı sayar, "35 of 72 figures are assumptions" önce
+varsayımları sayar — ve ikisinde de `{}` varken bir dil sessizce
+ötekinin sayılarını alır. Aldı da; üstelik iki sayısı olan ilk cümlede.
+Alanlar artık adlandırılmış ve her dil onları istediği gibi sıralıyor.
 
-## What is not done
+`Option` veri sınıfının ortasına `title_en`/`note_en` eklemek, onlardan
+sonraki her konumsal bağımsız değişkeni kaydırdı; bu da hiç değeri
+olmayan bir seçeneğin, tam olarak bunu reddetmek için var olan sınamayı
+geçmesine yol açtı. Yeni alanlar sona eklenir.
 
-`report.py`, `deliver.py` and the command line still speak Turkish only.
-The table's row names, its column headings and the Markdown deliverables
-are the report's own words, and putting them in both is the same work
-again on a different surface. The page says so where it shows them: what
-the engine hands the viewer is in the chosen language, and what `yerkon
-table` prints is not.
+## Yapılmayan
+
+`report.py`, `deliver.py`'nin yazdığı Markdown ve komut satırı hâlâ
+yalnızca Türkçe konuşur. Tablonun satır adları, sütun başlıkları ve
+Markdown çıktıları raporun kendi sözcükleridir ve onları ikisi birden yapmak, aynı işin başka bir
+yüzeyde yeniden yapılmasıdır. Sayfa, onları gösterdiği yerde bunu
+söyler: motorun görüntüleyiciye verdiği seçilen dildedir, `yerkon table`
+komutunun yazdırdığı değildir.

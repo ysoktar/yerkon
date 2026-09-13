@@ -978,7 +978,7 @@ def deliver(argv: list[str] | None = None) -> int:
     written = write_it(
         args.into, chosen, settings,
         with_budget=not args.no_budget,
-        say=lambda line: print("  " + line, file=sys.stderr),
+        tell=lambda line: print("  " + line, file=sys.stderr),
     )
     print()
     for one in written:

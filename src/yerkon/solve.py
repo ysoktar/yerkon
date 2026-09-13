@@ -297,6 +297,7 @@ def search(
     over: Optional[dict] = None,
     settings: Settings = DEFAULTS,
     watching: Optional[Callable[[Outcome], None]] = None,
+    language: Optional[str] = None,
 ) -> Search:
     """Try every combination of the given figures, and report what met.
 
@@ -324,7 +325,8 @@ def search(
     # which is what lets a watcher read as a list being worked through
     # rather than as a scramble (ADR-0025).
     tried = spread(_evaluate_one, candidates, watching=watching)
-    return Search(scenario=scenario_name, target=target, tried=tuple(tried))
+    return Search(scenario=scenario_name, target=target, tried=tuple(tried),
+                  language=language)
 
 
 def _evaluate_one(task) -> Outcome:
