@@ -1,49 +1,51 @@
-# Trying the recent work
+# Son çalışmaları denemek
 
-Everything below landed on `claude/3d-localization-benchmark-bm3unn` in
-twelve commits on 10 September 2026. It is ordered so each step shows one
-thing, and the slow ones say how slow.
+Aşağıdaki her şey `claude/3d-localization-benchmark-bm3unn` dalında.
+Her adım bir şeyi gösterecek şekilde sıralandı ve yavaş olanlar ne kadar
+yavaş olduklarını söylüyor.
 
 ```bash
 git pull
 pip install -e ".[dev]"
 ```
 
-Nothing here needs the network. The ground the table stands on is
-committed inside the package.
+Buradaki hiçbir şey ağ gerektirmiyor. Tablonun üzerinde durduğu zemin
+paketin içinde işlenmiş durumda.
+
+Windows'taysan `docs/WINDOWS.md`'ye bak: PowerShell 5.1 üç yerde bash'ten
+ayrılıyor ve üçü de bu komutları kırıyor.
 
 ---
 
-## Start here: the app
+## Buradan başla: uygulama
 
 ```bash
 yerkon view
 ```
 
-**The GUI is the main way in** — everything the command line does, the
-page does too, against the settings the page is showing rather than the
-shipped defaults.
+**Ana giriş arayüz** — komut satırının yaptığı her şeyi sayfa da yapar ve
+gönderilen varsayılanlara değil sayfanın gösterdiği ayarlara karşı koşar.
 
-### Two languages (this is new)
+### İki dil (bu yeni)
 
-**TR / EN**, beside the search box. It changes everything — the panel, the
-seventy-two figures' notes and what each affects, the ground's own
-description, the ready-made options' reasons, the solver's output. No
-number, no geometry and no result differs between them; a test builds the
-whole table twice to say so (ADR-0035).
+Arama kutusunun yanında **TR / EN**. Her şeyi değiştirir: panel, yetmiş
+iki değerin notları ve neyi etkiledikleri, zeminin kendi açıklaması, hazır
+seçeneklerin gerekçeleri, çözücünün çıktısı. Hiçbir sayı, hiçbir geometri
+ve hiçbir sonuç ikisi arasında farklı değil; bunu bir test bütün tabloyu
+iki kez kurarak söylüyor (ADR-0035).
 
-Worth trying: switch to EN, open **Basis**, and read what the figures
-actually say. Then switch back and check the same figure says the same
-thing in Turkish.
+Denemeye değer: EN'e geç, **Basis**'i aç ve değerlerin gerçekte ne
+dediğini oku. Sonra geri dön ve aynı değerin Türkçe de aynı şeyi
+söylediğini kontrol et.
 
-What is *not* bilingual yet, and the page does not pretend otherwise:
-`yerkon table`, `yerkon budget` and the Markdown deliverables are the
-report's own words and are Turkish only.
+Henüz iki dilli *olmayan* ve sayfanın aksini iddia etmediği kısım:
+`yerkon table`, `yerkon budget` ve Markdown teslimleri raporun kendi
+sözleridir ve yalnızca Türkçedir.
 
-### The panel (this is new)
+### Panel (bu yeni)
 
-Six steps, in the order somebody actually works for a fresh area, each
-collapsing to a line that says what it currently holds:
+Altı adım, taze bir alan için birinin gerçekten çalıştığı sırayla; her
+biri o an ne tuttuğunu söyleyen tek bir satıra kapanıyor:
 
     1 YER       kizilay · ölçülmüş zemin
     2 SAHA      3,0 km × 3,0 km alan
@@ -52,243 +54,247 @@ collapsing to a line that says what it currently holds:
     5 DAYANAK   72 değerin 35 tanesi varsayım
     6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
 
-One open at a time. **Sonuç** is pinned to the bottom and never scrolls
-away, so changing a control and seeing what it did is one movement
-instead of two.
+Aynı anda biri açık. **Sonuç** alta sabitlenmiş ve hiç kaymıyor, yani bir
+kontrolü değiştirip ne yaptığını görmek iki hareket değil bir hareket.
 
-Worth trying:
+Denemeye değer:
 
-- **Type in the search box** (or press `/`). It covers every control and
-  all seventy-two figures. Turkish is folded, so `gurultu` finds *gürültü
-  katsayısı* and `olcum` finds the measurement ones. Only the steps
-  holding a hit open.
-- **Every slider now has a number beside it.** Type 4000 into *Direk
-  aralığı* — a slider whose step is 500 could not be given it. The number
-  may also go past the slider's ends on purpose.
-- **Open Dayanak and tick *Yalnız varsayımları göster*.** Thirty-five of
-  seventy-two. Each figure is named in Turkish, with its `defaults.toml`
-  key on hover and a coloured dot for where the value came from. Mast cost
-  (85 000 TL) is the one worth an afternoon.
-- **Pull *Boy* down on the Kırsal tab.** It now proposes what it would do
-  to the anchor group before doing it.
+- **Arama kutusuna yaz** (ya da `/` tuşuna bas). Her kontrolü ve yetmiş
+  iki değerin hepsini kapsıyor. Türkçe katlanıyor, yani `gurultu`
+  *gürültü katsayısı*'nı, `olcum` da ölçüm olanları buluyor. Yalnızca
+  isabet içeren adımlar açılıyor.
+- **Her sürgünün yanında artık bir sayı var.** *Direk aralığı*'na 4000
+  yaz — adımı 500 olan bir sürgüye bu verilemezdi. Sayı, bilerek sürgünün
+  uçlarını da geçebilir.
+- **Dayanak'ı aç ve *Yalnız varsayımları göster*'i işaretle.** Yetmiş
+  ikinin otuz beşi. Her değer Türkçe adlandırılmış, `defaults.toml`
+  anahtarı imleci üstüne getirince, ve değerin nereden geldiğini gösteren
+  renkli bir nokta var. Direk maliyeti (85 000 TL) bir öğleden sonraya
+  değen tek değer.
+- **Kırsal sekmesinde *Boy*'u aşağı çek.** Artık direk grubuna ne
+  yapacağını yapmadan önce öneriyor.
 
-### Moving around (this was broken)
+### Gezinme (bu bozuktu)
 
-The camera could only orbit a fixed point, and every edit re-centred it,
-so panning was pointless.
+Kamera yalnızca sabit bir noktanın etrafında dönebiliyordu ve her
+düzenleme onu yeniden ortalıyordu, yani kaydırmanın anlamı yoktu.
 
-- **Drag** turns.
-- **Right-drag**, middle-drag or **Shift+drag** slides the ground. The
-  point you grab stays under the cursor. *This used to flicker* — the
-  scene lurched forward and back on alternate frames for as long as the
-  drag lasted. The pivot rides on the ground, the ground moves the eye,
-  the eye moves where the cursor lands, and that moved the pivot: a loop
-  with a gain above one. The slide now reads the cursor against the
-  camera as it stood when you took hold of the ground (ADR-0033).
-- **Wheel** zooms *towards the cursor*, scaled by how far the wheel
-  actually turned — a trackpad creeps, a mouse notch steps.
-- **W A S D** / arrows walk the way the camera faces. Shift goes faster.
-- **Q** / **E** spin. **R** / **F** tilt. **+** / **−** zoom. **G**
-  frames everything.
-- Drag an anchor: it now follows the terrain, not one flat plane.
+- **Sürükle** döndürür.
+- **Sağ tık**, orta tık ya da **Shift+sürükle** zemini kaydırır. Tuttuğun
+  nokta imlecin altında kalır. *Bu eskiden titriyordu* — sürükleme
+  sürdüğü sürece sahne ileri gidip geri sıçrıyordu. Eksen zemine biner,
+  zemin gözü oynatır, göz imlecin değdiği yeri oynatır, o da ekseni
+  oynatır: kazancı birden büyük bir döngü. Kaydırma artık imleci, zemini
+  tuttuğun andaki kameraya karşı okuyor (ADR-0033).
+- **Tekerlek** *imlece doğru* yaklaşır, tekerleğin gerçekte ne kadar
+  döndüğüyle ölçeklenerek — touchpad süzülür, fare çentiği adımlar.
+- **W A S D** / oklar kameranın baktığı yöne yürür. Shift hızlandırır.
+- **Q** / **E** döndürür. **R** / **F** eğer. **+** / **−** yaklaştırır.
+  **G** her şeyi çerçeveler.
+- Bir direği sürükle: artık tek bir düz düzlemi değil araziyi izliyor.
 
-Set a view, change any slider, and check the camera *stays put*. That is
-the fix.
+Bir görüş kur, herhangi bir sürgüyü değiştir ve kameranın *yerinde
+kaldığını* kontrol et. Düzeltme budur.
 
-Three more things changed here, and each is worth looking at directly:
+Burada üç şey daha değişti ve her biri doğrudan bakmaya değer:
 
-- **The picture is painted once a frame.** It used to be painted on every
-  pointer event, and a trackpad reports far faster than this scene can be
-  drawn — so the queue grew for as long as a drag lasted and the picture
-  ran behind the hand. The arithmetic was right the whole time.
-- **The point the camera turns around now rides on the ground.** Slide
-  across the rural row's four hundred and fifty metres of relief and then
-  turn: it rotates about what you are looking at, instead of swinging the
-  site past the screen from a pivot buried under the hill.
-- **Zooming in now shows the hill.** The site mesh is a few thousand
-  samples over the whole site, which over twenty kilometres is one every
-  seven hundred metres — close up, that was a flat green wall. Come in
-  and the engine is asked for the same budget over the window on screen,
-  down to about sixty metres, which is near the limit of the 30 m
-  elevation model underneath. Nothing is invented: it is the same
-  `height_at` the simulation calls (ADR-0031).
+- **Resim kare başına bir kez çiziliyor.** Eskiden her fare olayında
+  çiziliyordu ve bir touchpad, bu sahnenin çizilebileceğinden çok daha
+  hızlı bildiriyor — yani sürükleme sürdüğü sürece kuyruk büyüyor ve
+  görüntü elin arkasından geliyordu. Matematik baştan sona doğruydu.
+- **Kameranın etrafında döndüğü nokta artık zemine biniyor.** Kırsal
+  satırın dört yüz elli metrelik rölyefi boyunca kaydır, sonra döndür:
+  tepenin altına gömülü bir eksenden sahayı ekranın önünden geçirmek
+  yerine baktığın şeyin etrafında dönüyor.
+- **Yaklaşmak artık tepeyi gösteriyor.** Saha ağı bütün sahaya yayılmış
+  birkaç bin örnek, ki yirmi kilometrede bu her yedi yüz metrede bir
+  demek — yakından bu düz bir yeşil duvardı. Yaklaşınca motordan aynı
+  bütçe ekrandaki pencere için isteniyor, altmış metreye kadar; ki bu da
+  alttaki 30 m yükseklik modelinin sınırına yakın. Hiçbir şey
+  uydurulmuyor: benzetimin çağırdığı `height_at`'ın kendisi (ADR-0031).
 
-Two drawing faults went with them, both from the same cause (ADR-0030).
-The road was handed to the painter as one shape with one distance, so
-every hill nearer than its average distance was painted over the whole of
-it — half of the rural circuit was invisible and the half that survived
-made an area deployment look like a line across a field. And the mesh was
-a fixed hundred by forty whatever the site's proportions, so twenty
-kilometres by twenty was sampled every 460 m one way and every 1100 m the
-other: the ground came out in stripes.
+Onlarla birlikte iki çizim hatası da gitti, ikisi de aynı sebepten
+(ADR-0030). Yol, çiziciye tek bir mesafesi olan tek bir şekil olarak
+veriliyordu, dolayısıyla ortalama mesafesinden yakın her tepe onun
+tamamının üzerine boyanıyordu — kırsal turun yarısı görünmüyor, sağ kalan
+yarısı da alan yerleşimini bir tarlaya çizilmiş çizgi gibi gösteriyordu.
+Ve ağ, sahanın oranları ne olursa olsun sabit yüze kırktı; yani yirmi
+kilometreye yirmi kilometre bir yönde her 460 m'de, diğer yönde her 1100
+m'de örnekleniyordu: zemin çizgi çizgi çıkıyordu.
 
-### The two site sliders
+### Sahanın iki sürgüsü
 
-**En** (width) and **Boy** (length) sit one above the other and used to do
-entirely different things. Width laid a grid of anchors out to it; length
-moved the route and left thirty-six masts standing across a site less than
-half as long, because a run carries its own start and end (ADR-0032).
+**En** ve **Boy** alt alta duruyor ve eskiden tamamen farklı şeyler
+yapıyorlardı. En, direkleri ızgarayla kendine kadar yayıyordu; Boy ise
+güzergâhı oynatıp otuz altı direği yarısından kısa bir sahanın üzerinde
+bırakıyordu, çünkü bir grup kendi başlangıcını ve bitişini taşır
+(ADR-0032).
 
-Pull **Boy** down now and the confirmation panel says what it is about to
-do to the anchor groups before it does it:
+**Boy**'u şimdi aşağı çek; onay paneli direk gruplarına ne yapacağını
+yapmadan önce söylüyor:
 
     İstediğin değişiklik    Sahanın boyu    20000 → 8000
     Bunlar da değişiyor     Grubun bitişi   20000 → 8000
 
-Say no and nothing moves. Typing an end into a group by hand is still
-yours: only the slider clips.
+Hayır de, hiçbir şey oynamasın. Bir gruba elle bitiş yazmak hâlâ senin:
+yalnızca sürgü kesiyor.
 
-### The ground
+### Zemin
 
-**Zemin** picks what the deployment stands on. Four real Ankara places
-ship with the package:
+**Zemin**, yerleşimin neyin üzerinde durduğunu seçer. Paketle dört gerçek
+Ankara yeri geliyor:
 
-| site | what it is |
+| saha | nedir |
 |---|---|
-| `kizilay` | the town — 91 m of relief across 3 km |
-| `polatli` | the steppe the intercity roads run through — 486 m over 20 km |
-| `golbasi` | hills — 907 m over 20 km |
-| `kizilcahamam` | the mountain the tunnel bores through |
+| `kizilay` | şehir — 3 km'de 91 m rölyef |
+| `polatli` | şehirlerarası yolların geçtiği bozkır — 20 km'de 486 m |
+| `golbasi` | tepeler — 20 km'de 907 m |
+| `kizilcahamam` | tünelin içinden geçtiği dağ |
 
-There is **no flat option**, on the selector or the relief slider.
-Nowhere is flat, and a level plane is the most favourable ground this
-model can draw rather than the neutral one.
+Ne seçicide ne de rölyef sürgüsünde **düz bir seçenek var**. Hiçbir yer
+düz değil ve düz bir düzlem, bu modelin çizebileceği en tarafsız değil en
+elverişli zemin.
 
-**Yeni bir yer getir** fetches anywhere else: a bounding box, a grid
-spacing, and whether to ask OpenStreetMap for buildings. It writes into
-the package's site folder, so it appears in the selector at once — and a
-report row can then stand on it (see `rural.site` below). *This is the
-one part I could not verify: the sandbox I work in blocks OpenStreetMap.
-The elevation half is the same path the four Ankara sites came through.*
+**Yeni bir yer getir** başka her yeri getirir: bir sınır kutusu, bir
+ızgara aralığı ve OpenStreetMap'e bina sorulup sorulmayacağı. Paketin
+saha klasörüne yazar, böylece seçicide hemen belirir — ve bir rapor satırı
+sonra onun üzerinde durabilir (aşağıda `rural.site`). *Doğrulayamadığım
+tek kısım bu: çalıştığım kum havuzu OpenStreetMap'i engelliyor. Yükseklik
+yarısı, dört Ankara sahasının geldiği yolun aynısı.*
 
-### Three tabs, all held at once
+### Üç sekme, üçü birden tutuluyor
 
-**Şehir içi · Kırsal · Tünel.** Each tab holds a prepared deployment;
-switching between them does not throw away what you set up. Under
-**Çalıştır → Hangi satırlar** you run either the tab you are on (one row)
-or all three, which produces the three plus the weighted row.
+**Şehir içi · Kırsal · Tünel.** Her sekme hazır bir yerleşim tutar;
+aralarında geçmek kurduğunu atmaz. **Çalıştır → Hangi satırlar** altından
+ya üzerinde olduğun sekmeyi (bir satır) ya da üçünü birden koşarsın —
+üçü artı ağırlıklı satır çıkar.
 
-A run uses **the arrangement in the tab**, not the shipped catalogue —
-drag an anchor and the table you run reflects it.
+Bir koşu **sekmedeki düzeni** kullanır, gönderilen kataloğu değil — bir
+direği sürükle, koştuğun tablo bunu yansıtsın.
 
-**En** (width) decides whether the site is a line or an area: at zero,
-anchors line a road and units drive straight; above zero they spread over
-a staggered grid and units drive a circuit. Urban and rural open as
-areas, the tunnel as a line.
+**En** sahanın bir çizgi mi bir alan mı olduğuna karar verir: sıfırda
+direkler bir yolun kenarına dizilir ve birimler düz gider; sıfırın
+üstünde kaydırmalı bir ızgaraya yayılır ve birimler bir tur atar. Şehir
+içi ve kırsal alan olarak, tünel çizgi olarak açılır.
 
-### Every number, live
+### Her sayı, canlı
 
-The **Varsayılan değerler** panel now holds *sixteen deployment figures*
-that used to be literals in the code — anchor spacing, site extent,
-stagger, anchors polled per round, ranging tolerance, bore width — plus
-the ground-patch controls. They were sent to the page for a whole release
-with no heading to draw them under, so they were present, correct and
-invisible. Now they are there.
+**Varsayılan değerler** paneli artık eskiden kodda birer sabit olan *on
+altı yerleşim değerini* tutuyor — direk aralığı, saha uzunluğu, kaydırma,
+tur başına yoklanan direk, menzil toleransı, tünel genişliği — artı zemin
+yaması kontrollerini. Bir sürüm boyunca sayfaya gönderiliyorlardı ama
+altlarına çizilecekleri bir başlık yoktu, yani mevcut, doğru ve
+görünmezdiler. Artık oradalar.
 
-`<row>.site` renders as a picker of the sites actually fetched.
+`<satır>.site`, gerçekten getirilmiş sahaların bir seçicisi olarak
+çiziliyor.
 
-### Running things (Çalıştır)
+### Çalıştırma (Çalıştır)
 
-| button | what it does | how long |
+| düğme | ne yapar | ne kadar sürer |
 |---|---|---|
-| **Tablo** | the report rows | ~70 s for all three |
-| **Hata dağılımı** | the error dissection, drawn as bars | ~4 min for all three |
-| **Markdown olarak yaz** | writes the whole study to files | table only: ~70 s |
+| **Tablo** | rapor satırları | üçü birden ~70 sn |
+| **Hata dağılımı** | hata dağılımı, çubuk olarak çizilmiş | üçü birden ~4 dk |
+| **Markdown olarak yaz** | bütün çalışmayı dosyalara yazar | yalnız tablo: ~70 sn |
 
-Pick one row in **Hangi satırlar** to make them quicker. They report a
-line at a time while they run.
+Hızlandırmak için **Hangi satırlar**'dan tek bir satır seç. Koşarken satır
+satır bildirirler.
 
-### The solver (Çözücü)
+### Çözücü
 
-Set a target — leave a box empty and it is not a condition — and it
-searches for the **cheapest arrangement that meets it**, not the best.
-Under **Sayı ekle** you choose *which* figures to search and what values
-to try; the short list per scenario is a starting point, not a menu.
+Bir hedef koy — bir kutuyu boş bırakırsan koşul sayılmaz — ve **onu
+karşılayan en ucuz düzeni** arasın, en iyisini değil. **Sayı ekle**
+altından *hangi* değerlerin aranacağını ve hangi değerlerin deneneceğini
+sen seçersin; senaryo başına kısa liste bir menü değil, bir başlangıç
+noktası.
 
-Worth trying, because it found something nobody had:
+Denemeye değer, çünkü kimsenin bulmadığı bir şey buldu:
 
-- Scenario `tunnel`, HPE P50 ≤ 1,0, availability ≥ 0,99
-- It finds 120 m bracket spacing: **1,77 m → 0,48 m** for about 23000 TL.
+- Senaryo `tunnel`, HPE P50 ≤ 1,0, kullanılabilirlik ≥ 0,99
+- 120 m askı aralığını buluyor: **1,77 m → 0,48 m**, yaklaşık 23000 TL'ye.
 
-Give it a name under **Kaydedilecek ad** and it saves as an option the
-list then offers.
+**Kaydedilecek ad** altından bir ad ver, listenin sonra sunacağı bir
+seçenek olarak kaydetsin.
 
 ---
 
-## From a terminal
+## Terminalden
 
 ```bash
-yerkon table                  # the four rows            ~70 s
-yerkon budget                 # the error dissection     ~4 min
-yerkon budget --only tunnel   #                          ~45 s
-yerkon options                # the named deployments
-yerkon options rural-dense    # one of them in full
-yerkon table --option rural-hard-ground     # the same rural row on hills
+yerkon table                  # dört satır              ~70 sn
+yerkon budget                 # hata dağılımı           ~4 dk
+yerkon budget --only tunnel   #                         ~45 sn
+yerkon options                # adlandırılmış yerleşimler
+yerkon options rural-dense    # birini tam olarak
+yerkon table --option rural-hard-ground     # aynı kırsal satır, tepelerde
 yerkon solve --scenario tunnel --hpe-p50 1.0 --availability 0.99
-yerkon deliver --into docs/teslim --no-budget   # the study as Markdown
-yerkon defaults --full        # every figure and what it rests on
+yerkon deliver --into docs/teslim --no-budget   # çalışma, Markdown olarak
+yerkon defaults --full        # her değer ve neye dayandığı
 ```
 
-Everything runs on as many cores as the machine spares — one less than it
-has, so the viewer stays usable. `yerkon table` was four minutes before
-that and is seventy seconds now.
+Her şey makinenin ayırabildiği kadar çekirdekte koşar — sahip olduğundan
+bir eksik, böylece görüntüleyici kullanılabilir kalır. `yerkon table`
+bundan önce dört dakikaydı, şimdi yetmiş saniye.
 
 ---
 
-## What to look for, and what it cost
+## Neye bakmalı ve neye mal oldu
 
-### The table
+### Tablo
 
-| | HPE P50 | HPE P95 | Availability |
+| | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
 | Şehir içi | 1,62 m | 4,52 m | %99,41 |
 | Kırsal | 2,69 m | 10,89 m | %89,50 |
 | Tünel | 1,77 m | 2,99 m | %100,00 |
 | Ağırlıklı | 1,93 m | 7,22 m | %93,44 |
 
-### Five findings worth checking yourself
+### Kendin denemeye değer beş bulgu
 
-**The tunnel is the least accurate row despite the best hardware.** Run
-`yerkon budget --only tunnel`. It ranges twenty-nine times better than the
-town and positions no better, because a bore multiplies one range's error
-eighteenfold and what it multiplies hardest is the anchor survey error —
-the one term that never averages out. Surveying the brackets properly
-takes that row from 1,77 m to 0,17 m. A better radio buys nothing.
+**Tünel, en iyi donanıma rağmen en az hassas satır.** `yerkon budget
+--only tunnel` koş. Şehirden yirmi dokuz kat daha iyi ölçüyor ve daha iyi
+konumlamıyor, çünkü bir tünel bir menzilin hatasını on sekizle çarpıyor ve
+en sert çarptığı şey direk etüt hatası — ortalamayla asla kaybolmayan tek
+terim. Askıları düzgün ölçmek o satırı 1,77 m'den 0,17 m'ye indiriyor.
+Daha iyi bir telsiz hiçbir şey satın almıyor.
 
-**Rural availability is a round-size problem, not a mast problem.** Not
-one rural link fails for distance — every failure is ground in the way.
-Polling twelve anchors a round instead of eight is worth 5,5 points and
-costs no capital. Nineteen extra masts buy less.
+**Kırsal kullanılabilirlik bir tur boyu sorunu, bir direk sorunu değil.**
+Tek bir kırsal bağlantı bile mesafe yüzünden düşmüyor — her başarısızlık
+yoldaki zemin. Tur başına sekiz yerine on iki direk yoklamak 5,5 puan
+değerinde ve hiç sermayeye mal olmuyor. On dokuz fazladan direk daha azını
+satın alıyor.
 
-**Both rural options are now poor value, and their notes say so.** They
-were written when the default sat at 82,26 %; the round-size fix took it
-to 89,50 % for nothing, and most of what they bought went with it.
-`rural-dense` is 1,9 points for 3,4 million lira.
+**İki kırsal seçenek de artık kötü bir değer ve notları bunu söylüyor.**
+Varsayılan %82,26'da dururken yazılmışlardı; tur boyu düzeltmesi onu
+bedelsiz %89,50'ye çıkardı ve satın aldıklarının çoğu onunla gitti.
+`rural-dense`, 3,4 milyon liraya 1,9 puan.
 
-**A slope was being counted as roughness, by a factor of forty.** On a
-12 % grade the model reported 2,8 m of roughness where the ground is
-smooth to 7 cm. Correcting it — and correcting the tilt term that has to
-come with it — moved the table by less than seed noise, because the old
-model was reaching the same place by the wrong route.
+**Bir eğim kırk kat pürüz sayılıyordu.** %12 eğimde model, zeminin 7 cm'ye
+kadar düz olduğu yerde 2,8 m pürüz bildiriyordu. Bunu düzeltmek — ve
+yanında gelmesi gereken eğim terimini düzeltmek — tabloyu tohum
+gürültüsünden az oynattı, çünkü eski model aynı yere yanlış yoldan
+varıyormuş.
 
-**One shipped option did nothing at all.** `rural-hard-ground` produced
-the default's numbers to every digit. Try `yerkon table --option
-rural-hard-ground` now and the rural row should collapse; before, it
-changed a figure nothing reads.
+**Gönderilen bir seçenek hiçbir şey yapmıyordu.** `rural-hard-ground`,
+varsayılanın sayılarını basamağı basamağına üretiyordu. Şimdi `yerkon
+table --option rural-hard-ground` dene, kırsal satır çökmeli; öncesinde
+hiçbir şeyin okumadığı bir değeri değiştiriyordu.
 
 ---
 
-## Where to argue with it
+## Nereden itiraz etmeli
 
-- `docs/adr/` — twenty-seven decisions, each with what it cost. The
-  recent ones are 0020 to 0027.
-- `src/yerkon/defaults.toml` — sixty-nine figures. Thirty-five are still
-  placeholders; the mast cost at 85000 TL is the one that decides whether
-  masts or existing roadside furniture win.
-- `yerkon defaults --full` prints all of it with what each affects.
+- `docs/adr/` — otuz beş karar, her biri neye mal olduğuyla. Son olanlar
+  0030–0035.
+- `src/yerkon/defaults.toml` — yetmiş iki değer. Otuz beşi hâlâ vekil;
+  85000 TL'deki direk maliyeti, direklerin mi mevcut yol donanımının mı
+  kazanacağına karar veren değer.
+- `yerkon defaults --full` hepsini, her birinin neyi etkilediğiyle
+  yazdırır.
 
-Two things I could not do from here, both written down rather than
-assumed: OpenStreetMap is unreachable from my sandbox, so no site carries
-buildings or road geometry — which makes the urban obstruction a clutter
-figure per kilometre and every rural journey a rectangle over the ground
-rather than a road following it. Both make the numbers conservative.
+Buradan yapamadığım iki şey, varsayılmak yerine yazıldı: OpenStreetMap
+kum havuzumdan erişilemiyor, dolayısıyla hiçbir saha bina ya da yol
+geometrisi taşımıyor — bu da şehir içi engeli kilometre başına bir engel
+kaybı değeri, her kırsal yolculuğu da zemini izleyen bir yol yerine
+zeminin üzerinde bir dikdörtgen yapıyor. İkisi de sayıları ihtiyatlı
+tarafta tutuyor.

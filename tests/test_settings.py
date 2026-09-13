@@ -157,13 +157,12 @@ def test_a_language_changes_no_number():
         assert entry.sourced.provenance is other.sourced.provenance, key
 
 
-def test_a_settings_file_written_out_keeps_both_languages():
+def test_a_settings_file_written_out_keeps_both_languages(tmp_path):
     """Or passing it back with --defaults drops the half you were not
     reading."""
     from yerkon.settings import defaults_in, load
 
-    written = write(pathlib.Path("/tmp"), defaults_in("tr").to_toml(),
-                    name="both.toml")
+    written = write(tmp_path, defaults_in("tr").to_toml(), name="both.toml")
     assert load(written).entry("rural.site").affects != (
         load(written, "en").entry("rural.site").affects
     )

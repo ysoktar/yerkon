@@ -1,96 +1,105 @@
-# YERKON simulation
+# YERKON benzetimi
 
-*Türkçe: **[README.tr.md](README.tr.md)***
+*English: **[README.en.md](README.en.md)***
 
-Estimates what a terrestrial positioning network built from the YERKON
-hardware delivers, and what it costs to build and run. The output is the
-YERKON block of the comparison table on page 15 of the report.
+YERKON donanımından kurulan karasal bir konumlandırma ağının ne
+verdiğini ve kurmanın ile işletmenin neye mal olduğunu kestirir. Çıktısı,
+raporun 15. sayfasındaki karşılaştırma tablosunun YERKON bloğudur.
 
-This is a rebuild. The previous version is in the git history and its
-numbers should not be used; the reasons are in `docs/adr/`, and the short
-version is that its filter could see the answer and its link range was a
-constant rather than a result.
+Bu bir yeniden yazımdır. Öncekinin sayıları kullanılmamalı; sebepleri
+`docs/adr/` altında, kısası şu: süzgeci cevabı görebiliyordu ve link
+menzili bir sonuç değil bir sabitti.
 
-## Where to start
+## Nereden başlamalı
 
-- `CONTEXT.md` is the glossary. Read it before the code.
-- `docs/adr/` records the decisions and what each one replaced.
-- `src/yerkon/rf.py` is the module the study turns on.
+- `CONTEXT.md` sözlüktür. Koddan önce onu oku.
+- `docs/adr/` kararları ve her birinin neyin yerine geçtiğini tutar.
+- `src/yerkon/rf.py` çalışmanın üzerinde döndüğü modüldür.
 
-## State
+Belgeler Türkçe, kod İngilizce. `CONTEXT.md` ikisi arasındaki köprüdür:
+her terimin başlığında kodun kullandığı İngilizce ad, yanında Türkçe
+karşılığı durur.
 
-Built and tested:
+## Durum
 
-- `evidence.py`, which makes a datasheet figure and a guess look different.
-- `hardware.py`, the parts the report's bill of materials names, with
-  their published figures.
-- `regulatory.py`, the power a band allows, per region.
-- `rf.py`, the link budget: one calculation that decides both whether a
-  link closes and how precisely it can measure.
-- `world.py`, terrain, a graded road alignment, and the structures an
-  anchor can be mounted on.
-- `site/`, real ground and real buildings, fetched once and cached —
-  including four fetched Ankara areas committed inside the package, so a
-  clone reproduces the table with no network.
-- `observation.py`, the one type the estimator may see. It imports
-  nothing, which is what makes ADR-0003 enforceable rather than hoped for.
-- `estimator.py`, ranges into positions: a damped least-squares first fix
-  and a constant-velocity filter that takes each range at its own instant.
-- `evaluate.py`, where the parts meet: journeys along a graded road,
-  per-fix error samples, availability, and swept service area.
-- `cost.py`, CAPEX from the bill of materials and OPEX from an inventory
-  of named recurring items, each carrying its own provenance.
-- `scenarios.py`, the three deployments the table describes, as
-  configuration rather than as code.
-- `report.py`, the four rows and what they rest on.
-- `terms.py` and `budget.py`, the seven named error sources and the
-  dissection that re-runs each scenario with one of them silenced, so the
-  table's accuracy figures come with the reason they are what they are.
-- `siting.py`, the search for the cheapest deployment that meets a target.
-- `settings.py` and `defaults.toml`, every figure nobody supplied *and*
-  every number that shapes a deployment, in one file that nothing else
-  may add to.
-- `options.py` and `options/`, named deployment options — a short list of
-  edits to that file and the reason somebody made them.
-- `solve.py`, the search for the cheapest arrangement that meets a
-  target, which saves its winner as a new option.
-- `parallel.py`, the independent runs spread over the machine's cores.
-- `deliver.py`, the whole study written out as Markdown.
-- `viewer/`, a local web app over the same engine: the site in three
-  dimensions, every setting live, and the confirmation panel in front of
-  any change that forces another.
-- `ranging.py`, the two-way exchange: clocks, schemes, air time.
-- `design.py` and `proposal.py`, the settings a person chooses and the
-  panel that shows every consequence of an edit before applying it.
+Kurulmuş ve test edilmiş:
 
-`docs/HANDOFF.md` has the open questions and what is still a placeholder.
+- `evidence.py` — bir veri sayfası değerini bir tahminden ayırt
+  edilebilir kılar.
+- `hardware.py` — raporun malzeme listesinin adını verdiği parçalar,
+  yayımlanmış değerleriyle.
+- `regulatory.py` — bir bandın izin verdiği güç, bölgeye göre.
+- `rf.py` — link bütçesi: bir bağlantının kapanıp kapanmadığına da, ne
+  kadar hassas ölçebildiğine de tek bir hesap karar verir.
+- `world.py` — arazi, eğim verilmiş bir yol güzergâhı ve bir direğin
+  monte edilebileceği yapılar.
+- `site/` — bir kez getirilip önbelleğe alınan gerçek zemin ve gerçek
+  binalar; paketin içine dört Ankara sahası işlenmiştir, böylece bir
+  klon tabloyu ağa hiç çıkmadan yeniden üretir.
+- `observation.py` — kestiricinin görmesine izin verilen tek tip. Hiçbir
+  şey import etmez; ADR-0003'ü umut edilen değil zorlanan bir kural
+  yapan budur.
+- `estimator.py` — menzilleri konuma çevirir: sönümlü en küçük karelerle
+  ilk sabitleme ve her menzili kendi anında alan sabit hızlı bir süzgeç.
+- `evaluate.py` — parçaların buluştuğu yer: eğimli yol boyunca
+  yolculuklar, sabitleme başına hata örnekleri, kullanılabilirlik ve
+  taranmış hizmet alanı.
+- `cost.py` — malzeme listesinden CAPEX, adlandırılmış yinelenen
+  kalemlerden oluşan bir envanterden OPEX; her biri kendi kaynağını
+  taşır.
+- `scenarios.py` — tablonun anlattığı üç yerleşim, kod olarak değil
+  yapılandırma olarak.
+- `report.py` — dört satır ve neye dayandıkları.
+- `terms.py` ve `budget.py` — adlandırılmış yedi hata kaynağı ve her
+  senaryoyu birini susturarak yeniden koşan dağılım; böylece tablonun
+  hassasiyet değerleri neden öyle olduklarının gerekçesiyle gelir.
+- `siting.py` — bir hedefi karşılayan en ucuz yerleşimin aranması.
+- `settings.py` ve `defaults.toml` — kimsenin vermediği her değer *ve*
+  bir yerleşimi şekillendiren her sayı, başka hiçbir şeyin ekleme
+  yapamayacağı tek bir dosyada.
+- `options.py` ve `options/` — adlandırılmış yerleşim seçenekleri: o
+  dosyaya yapılan kısa bir düzenleme listesi ve birinin bunu yapma
+  gerekçesi.
+- `solve.py` — bir hedefi karşılayan en ucuz düzenin aranması; kazananı
+  yeni bir seçenek olarak kaydeder.
+- `parallel.py` — bağımsız koşuları makinenin çekirdeklerine yayar.
+- `deliver.py` — bütün çalışmanın Markdown olarak yazılması.
+- `viewer/` — aynı motorun üzerinde yerel bir web uygulaması: sahanın üç
+  boyutu, her ayar canlı, ve başka bir şeyi zorlayan her değişikliğin
+  önünde onay paneli.
+- `ranging.py` — çift yönlü alışveriş: saatler, şemalar, hava süresi.
+- `design.py` ve `proposal.py` — birinin seçtiği ayarlar ve bir
+  düzenlemenin her sonucunu uygulamadan önce gösteren panel.
 
-## Running
+`docs/HANDOFF.md` açık soruları ve hâlâ vekil olan değerleri tutar.
+
+## Çalıştırma
 
 ```bash
 pip install -e ".[dev]"
 pytest
 ```
 
-## The viewer
+## Görüntüleyici
 
 ```bash
 yerkon view
 ```
 
-Opens a local web app. The site in three dimensions, with the ground, the
-route, each anchor and the ring it ranges within tolerance; the swept
-coverage painted on the ground in two colours, one for ground a packet
-reaches and one for ground where four anchors are in reach at once.
+Yerel bir web uygulaması açar. Sahanın üç boyutu: zemin, güzergâh, her
+direk ve toleransı içinde ölçebildiği halka; taranmış kapsama iki renkle
+zemine boyanmış — biri bir paketin ulaştığı zemin, diğeri aynı anda dört
+direğin erişimde olduğu zemin.
 
-Three tabs, one per row of the table, all held at once: switching does
-not discard what you set up, and a run takes either the tab you are on
-(one row) or all three and the weighted row they make (ADR-0028).
+Üç sekme, tablonun her satırı için biri, üçü birden tutulur: sekme
+değiştirmek hazırladığını silmez ve bir koşu ya üzerinde olduğun sekmeyi
+(bir satır) ya da üçünü birden ve oluşturdukları ağırlıklı satırı alır
+(ADR-0028).
 
-**The panel is six steps, in the order somebody works** (ADR-0034): where
-the ground is, what shape the site is, what stands on it, what it has to
-achieve, what that rests on, and what to run. Each collapses to a line
-carrying its own state —
+**Panel altı adımdır, birinin çalıştığı sırayla** (ADR-0034): zemin
+nerede, saha ne şekilde, üzerinde ne duruyor, neyi başarması gerekiyor,
+bu neye dayanıyor ve ne koşulacak. Her biri kendi durumunu taşıyan tek
+bir satıra kapanır —
 
     1 YER       kizilay · ölçülmüş zemin
     2 SAHA      3,0 km × 3,0 km alan
@@ -99,137 +108,133 @@ carrying its own state —
     5 DAYANAK   72 değerin 35 tanesi varsayım
     6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
 
-— so the whole study reads without scrolling, and the result stays pinned
-to the bottom of the panel while you change the controls that move it.
-One step is open at a time; closing loses nothing, because the line says
-what the step holds.
+— böylece bütün çalışma kaydırmadan okunur ve sonuç, onu oynatan
+kontrolleri değiştirirken panelin altında sabit kalır. Aynı anda bir adım
+açıktır; kapatmak hiçbir şey kaybettirmez, çünkü satır adımın ne
+tuttuğunu söyler.
 
-Every ranged setting has a slider *and* an exact number: a slider whose
-step is 500 cannot be given 4000, and a number alone says nothing about
-the range it lives in. The number may go past the slider's ends, because
-clamping it would be a control changing a setting by being looked at.
+Aralıklı her ayarın hem sürgüsü *hem* tam sayısı vardır: adımı 500 olan
+bir sürgüye 4000 verilemez, tek başına bir sayı da içinde yaşadığı aralık
+hakkında hiçbir şey söylemez. Sayı sürgünün uçlarını geçebilir, çünkü
+kırpmak bir kontrolün kendisine bakıldığı için bir ayarı değiştirmesi
+olurdu.
 
-The **search box** covers every setting, the seventy-two figures
-included, and folds Turkish to the letters a keyboard reaches without
-thinking — `gurultu` finds *gürültü katsayısı*. `/` focuses it. A step is
-open exactly when it holds a hit.
+**Arama kutusu** yetmiş iki değer dâhil her ayarı kapsar ve Türkçeyi
+klavyenin düşünmeden ulaştığı harflere katlar — `gurultu`, *gürültü
+katsayısı*'nı bulur. `/` onu odaklar. Bir adım tam olarak içinde bir
+isabet varken açıktır.
 
-**Zemin** picks the ground: fetched Ankara — Kızılay, Polatlı,
-Kızılcahamam, Gölbaşı — or modelled hills. **Yeni bir yer getir** fetches
-anywhere else: a bounding box, a grid spacing, and whether to ask
-OpenStreetMap for buildings. It writes into the package's own site folder,
-so it appears in this selector at once and is committed with everything
-else. There is no flat option, on
-the selector or on the relief slider, because nowhere is flat and a level
-plane is the most favourable surface this model can draw rather than the
-neutral one (ADR-0021). Choosing a fetched site greys out the three
-modelled-terrain sliders, since a real grid brings its own relief,
-roughness and obstructions.
+**İki dil.** Arama kutusunun yanındaki TR/EN her şeyi değiştirir: panel,
+yetmiş iki değerin notları ve neyi etkiledikleri, zeminin kendi
+açıklaması, hazır seçeneklerin gerekçeleri. Hiçbir sayı, hiçbir geometri
+ve hiçbir sonuç ikisi arasında farklı değildir; bunu bir test bütün
+tabloyu iki kez kurarak söyler (ADR-0035).
 
-**En** — the site's width — is the knob that decides the shape of
-everything. At zero the site is a corridor: anchors line the road either
-side and units drive straight. Above zero it is an area: anchors spread
-over a staggered grid and units drive a circuit round the edge and across
-the middle. The geometry a receiver gets from the two is not comparable,
-which is why both are shown rather than one assumed. Urban and rural open
-as areas; the tunnel opens as a line. **Boy** — the site's length — brings
-its anchor runs inside it when it shortens, through the confirmation panel
-with every figure it moves (ADR-0032).
+**Zemin** neyin üzerinde durulduğunu seçer: getirilmiş Ankara — Kızılay,
+Polatlı, Kızılcahamam, Gölbaşı — ya da modellenmiş tepeler. **Yeni bir
+yer getir** başka her yeri getirir: bir sınır kutusu, bir ızgara aralığı
+ve OpenStreetMap'e bina sorulup sorulmayacağı. Paketin kendi saha
+klasörüne yazar, böylece seçicide hemen belirir ve her şeyle birlikte
+işlenir. Ne seçicide ne de rölyef sürgüsünde düz bir seçenek vardır:
+hiçbir yer düz değildir ve düz bir düzlem bu modelin çizebileceği en
+tarafsız değil en elverişli yüzeydir (ADR-0021). Getirilmiş bir saha
+seçmek modellenmiş arazinin üç sürgüsünü soldurur, çünkü gerçek bir
+ızgara kendi rölyefini, pürüzünü ve engellerini getirir.
 
-Anchors are edited as *runs* — a group carrying one module on one
-mounting at one spacing — and a site may hold as many as it needs, each
-drawn in its own colour with its own reach ring. Units are edited the
-same way: as many as you like, each with its own speed, start, antenna
-height and set of modules, drawn on the route it takes.
+**En** — sahanın genişliği — her şeyin şeklini belirleyen düğmedir.
+Sıfırken saha bir koridordur: direkler yolun iki yanına dizilir, birimler
+düz gider. Sıfırdan büyükken bir alandır: direkler kaydırmalı bir ızgaraya
+yayılır, birimler alanın çevresini ve ortasını dolaşır. Bir alıcının
+ikisinden aldığı geometri karşılaştırılabilir değildir; ikisinin de
+gösterilip birinin varsayılmamasının sebebi budur. Şehir içi ve kırsal
+alan olarak açılır, tünel çizgi olarak. **Boy** — sahanın uzunluğu —
+kısaldığında direk gruplarını içine alır; oynattığı her değeri gösteren
+onay panelinden geçerek (ADR-0032).
 
-Everything is live. Drag an anchor, shift-click to remove it, add or drop
-a run or a unit, move any slider, and the scene and the numbers follow.
+Direkler *grup* olarak düzenlenir — tek bir modülü, tek bir montajı ve
+tek bir aralığı taşıyan bir küme — ve bir saha kaç tanesine ihtiyacı
+varsa o kadarını tutabilir; her biri kendi rengiyle ve kendi menzil
+halkasıyla çizilir. Birimler de aynı şekilde: istediğin kadar, her biri
+kendi hızı, başlangıcı, anten yüksekliği ve modül kümesiyle, izlediği
+güzergâhın üzerinde çizilmiş.
 
-Under **Dayanak**, each of the seventy-two figures is named in Turkish
-with its `defaults.toml` key a hover away, and carries a coloured mark for
-where its value came from — datasheet, measurement, standard, derived,
-design decision, assumption. *Yalnız varsayımları göster* cuts the list to
-the thirty-five that are still guesses, which is the part worth an
-afternoon of somebody's time.
+Her şey canlıdır. Bir direği sürükle, Shift ile tıklayıp kaldır, bir grup
+ya da bir birim ekle ya da çıkar, herhangi bir sürgüyü oynat — sahne ve
+sayılar takip eder.
 
-**Moving around.** Drag to turn. Right-drag, middle-drag or shift-drag to
-slide the ground — the point you grab stays under the cursor, read
-against the camera as it stood when you took hold of it, because reading
-it against the live one closes a loop through the terrain that rings
-(ADR-0033). The wheel
-zooms towards the cursor, scaled by how far it actually turned, so a
-trackpad creeps and a mouse notch steps. WASD and the arrows walk the way
-the camera faces, `Q`/`E` turn and `R`/`F` tilt, and `G` frames
-everything, which is what you want after getting lost. The point the
-camera turns around rides on the ground beneath it, so turning stays
-about the thing you are looking at rather than about a pivot buried
-under the hill. Framing happens on the first load and on a mode change
-and never again, so a view you set stays set.
+**Dayanak** altında yetmiş iki değerin her biri, `defaults.toml`
+anahtarı imleci üstüne getirince görünecek şekilde adlandırılmıştır ve
+değerinin nereden geldiğini gösteren renkli bir işaret taşır: veri
+sayfası, ölçüm, standart, türetilmiş, tasarım kararı, varsayım. *Yalnız
+varsayımları göster*, listeyi hâlâ tahmin olan otuz beşe indirir — birinin
+bir öğleden sonrasına değen kısım odur.
 
-**Everything the command line does, the page does** (ADR-0024), and it
-runs against the settings the page is showing rather than the shipped
-defaults — so an afternoon of edits can be costed without writing a file
-first:
+**Gezinme.** Döndürmek için sürükle. Zemini kaydırmak için sağ tık, orta
+tık ya da Shift+sürükle — tuttuğun nokta imlecin altında kalır ve
+imlecin konumu, zemini tuttuğun andaki kameraya karşı okunur; canlı
+kameraya karşı okumak arazi üzerinden çınlayan bir döngü kapatıyor
+(ADR-0033). Tekerlek imlece doğru yaklaşır, tekerleğin gerçekte ne kadar
+döndüğüyle ölçeklenerek: touchpad süzülür, fare çentiği adımlar. WASD ve
+oklar kameranın baktığı yöne yürür, `Q`/`E` döndürür, `R`/`F` eğer ve `G`
+her şeyi çerçeveler — kaybolduktan sonra istediğin budur. Kameranın
+etrafında döndüğü nokta altındaki zemine biner, böylece dönüş tepenin
+altına gömülü bir eksen etrafında değil baktığın şeyin etrafında kalır.
+Çerçeveleme ilk açılışta ve satır değişiminde olur, bir daha olmaz;
+kurduğun görüş kurulu kalır.
 
-- **Hazır seçenekler** lists the named options and applies one as
-  overrides, composing with your own edits rather than replacing them.
-- **Tablo** runs the report rows.
-- **Hata dağılımı** runs the error dissection and draws each source as a
-  bar, worst first.
-- **Çözücü** searches deployments against a target and saves the winner
-  as a new named option, which the options list then offers.
+**Komut satırının yaptığı her şeyi sayfa da yapar** (ADR-0024) ve
+gönderilen varsayılanlara değil sayfanın gösterdiği ayarlara karşı koşar
+— böylece bir öğleden sonralık düzenleme, önce dosya yazmadan
+maliyetlendirilebilir:
 
-The last three take minutes, because every figure in them comes from
-running the real simulation. They run on a thread and report a line at a
-time, so you can watch rather than wonder.
+- **Hazır seçenekler** adlandırılmış seçenekleri listeler ve birini
+  düzenleme olarak uygular; senin düzenlemelerinin yerine geçmez,
+  yanlarına eklenir.
+- **Tablo** rapor satırlarını koşar.
+- **Hata dağılımı** hata dağılımını koşar ve her kaynağı en kötüsü başta
+  olmak üzere çubuk olarak çizer.
+- **Çözücü** yerleşimleri bir hedefe karşı arar ve kazananı yeni bir
+  adlandırılmış seçenek olarak kaydeder; seçenek listesi de onu sunar.
 
-Changes that force other changes — region, module, mounting, tolerance,
-roughness — raise the confirmation panel first, listing every value that
-would move with its old and new figure and why it follows, answered once
-for the whole batch (ADR-0009). The panel is grouped by anchor run and
-says which it means, because a shared setting does not move every run the
-same way: switching to the American rules raises the ceiling for the
-spread runs and moves nothing for the impulse one. Dragging an anchor,
-adding a unit or changing the terrain forces nothing, so it applies
-immediately.
+Son üçü dakikalar sürer, çünkü içlerindeki her değer gerçek benzetimin
+koşulmasından gelir. Bir iş parçacığında koşar ve satır satır bildirir,
+böylece merak etmek yerine izleyebilirsin.
 
-The page holds no physics. Every number on it was computed by the modules
-that build the table, so the picture and the report cannot disagree. It
-draws its own three dimensions rather than loading a library from a
-content delivery network, so it works with the machine offline
-(ADR-0013).
+Başka değişiklikleri zorlayan değişiklikler — bölge, modül, montaj,
+tolerans, pürüz — önce onay panelini kaldırır; oynayacak her değeri eski
+ve yeni sayısıyla ve neden takip ettiğiyle listeler ve bütün küme için
+bir kez cevaplanır (ADR-0009). Panel direk grubuna göre gruplanır ve
+hangisini kastettiğini söyler, çünkü paylaşılan bir ayar her grubu aynı
+şekilde oynatmaz: Amerikan kurallarına geçmek yayılı grupların tavanını
+yükseltir, darbeli olanınkini hiç oynatmaz. Bir direği sürüklemek, bir
+birim eklemek ya da araziyi değiştirmek hiçbir şeyi zorlamaz, bu yüzden
+hemen uygulanır.
 
-## The defaults
+Sayfa hiçbir fizik tutmaz. Üzerindeki her sayı tabloyu kuran modüller
+tarafından hesaplanmıştır, dolayısıyla resim ile rapor birbiriyle
+çelişemez. Üç boyutunu bir içerik dağıtım ağından kütüphane yükleyerek
+değil kendi çizer, böylece makine çevrimdışıyken de çalışır (ADR-0013).
 
-The report gave a bill of materials and nothing else. Every other figure
-this project needs is a default somebody chose, and all of them live in
-one file. It is called defaults rather than assumptions because that is
-what it stays: a figure does not leave the file when somebody sources it,
-it just stops being an assumption.
+## Varsayılan değerler
+
+Rapor bir malzeme listesi verdi, başka bir şey vermedi. Bu projenin
+ihtiyaç duyduğu diğer her değer birinin seçtiği bir varsayılandır ve
+hepsi tek bir dosyada durur. Varsayım değil varsayılan denmesinin sebebi
+kalıcı olanın bu olmasıdır: biri bir değere kaynak bulunca o değer
+dosyadan çıkmaz, yalnızca varsayım olmayı bırakır.
 
 ```bash
 yerkon defaults --full
 ```
 
-```
-Still assumed in src/yerkon/defaults.toml
-35 of 36 figures are still assumptions (%97).
+`src/` içindeki hiçbir şey kendi başına bir varsayım kuramaz — bir test
+her modülün sözdizim ağacını gezer ve bir tanesi denerse yapıyı düşürür,
+yani dosya listenin tamamıdır (ADR-0016). Maliyetler, montaj
+yükseklikleri, yayımlanmamış iki telsiz değeri, saatler, şehir içi engel
+kaybı ve süzgecin manevra payı hepsi oradadır.
 
-mounting.tall_mast.site_cost_tl                  85000,00 TL
-                                          affects: CAPEX of every anchor on a
-                                          mast; 88,9 % of the rural row's capital
-                                          sensitivity: masts beat signs only
-                                          below 6588 TL, so 13 times cheaper
-```
-
-Nothing in `src/` may construct an assumption of its own — a test walks
-the syntax tree of every module and fails the build if one tries, so the
-file is the whole list (ADR-0016). Costs, mounting heights, the two
-unpublished radio figures, the clocks, the urban clutter figure and the
-filter's manoeuvre allowance are all on it.
-
-Replacing one is three edits in one place: the value, the source, and
-`provenance` from `ASSUMPTION` to what it now is. Then:
+Birini değiştirmek tek bir yerde üç düzenlemedir: değer, kaynak ve
+`provenance` alanının `ASSUMPTION` yerine artık ne olduğu. Sonra:
 
 ```bash
 yerkon table --defaults my-figures.toml
@@ -237,63 +242,63 @@ yerkon site  --defaults my-figures.toml
 yerkon view  --defaults my-figures.toml
 ```
 
-Everything is rebuilt from it — scenarios, mounting catalogue, radios,
-clocks, rates — and the share each result reports as resting on guesses
-falls. Sourcing the mast cost alone takes the siting answer from %94
-assumed to %69.
+Her şey ondan yeniden kurulur — senaryolar, montaj kataloğu, telsizler,
+saatler, oranlar — ve her sonucun tahmine dayandığını bildirdiği pay
+düşer. Yalnızca direk maliyetine kaynak bulmak, yerleşim cevabını %94
+varsayımdan %69'a indirir.
 
-**Or edit them in the viewer.** All 33 appear in `yerkon view`, grouped,
-each with what it affects written under it. Change one and everything
-rebuilds live: raise the mast height from 25 m to 40 m and the panel
-asks first, then the reach ring in the scene grows from 5,52 to 6,98 km.
-Change a site cost and it applies at once, because a price moves no
-physics. A figure edited by hand stays an assumption unless you give it a
-source — that distinction is the difference between exploring and
-reporting. **Dosyaya yaz** writes what you have back out as a file that
-goes straight back in through `--defaults`.
+**Ya da görüntüleyicide düzenle.** Hepsi `yerkon view` içinde,
+gruplanmış ve her birinin altında neyi etkilediği yazılı olarak görünür.
+Birini değiştir, her şey canlı yeniden kurulsun: direk yüksekliğini 25
+m'den 40 m'ye çıkar, panel önce sorar, sonra sahnedeki menzil halkası
+5,52 km'den 6,98 km'ye büyür. Bir saha maliyetini değiştir, hemen
+uygulanır, çünkü bir fiyat hiçbir fiziği oynatmaz. Elle düzenlenen bir
+değer, ona bir kaynak vermedikçe varsayım kalır — bu ayrım, keşfetmek ile
+raporlamak arasındaki farktır. **Dosyaya yaz**, elindekini `--defaults`
+ile doğrudan geri giren bir dosya olarak dışarı yazar.
 
-It moves the answers, too. At a mast cost of 8500 TL existing signs still
-win; at 5000 TL masts take over at 17 anchors for 264906 TL. The
-break-even the costing predicts at 6588 TL is something you can walk up
-to from either side by editing one line.
+Cevapları da oynatır. 8500 TL direk maliyetinde mevcut levhalar hâlâ
+kazanır; 5000 TL'de direkler 17 direkle 264906 TL'ye devralır.
+Maliyetlendirmenin 6588 TL'de öngördüğü başabaş noktasına tek bir satırı
+düzenleyerek iki taraftan da yürüyebilirsin.
 
-## Siting
+## Yerleşim araması
 
 ```bash
 yerkon site --corridor 12000 --tolerance 5
 ```
 
-Searches for the least expensive deployment that meets a target, using
-the structures the corridor already carries and building only where none
-stands. Every candidate is a deployment somebody could build, scored by
-the same link budget and priced by the same bill of materials the table
-uses.
+Bir hedefi karşılayan en az masraflı yerleşimi arar; koridorun zaten
+taşıdığı yapıları kullanır ve yalnızca hiçbiri yokken inşa eder. Her aday
+birinin gerçekten kurabileceği bir yerleşimdir, tablonun kullandığı aynı
+link bütçesiyle puanlanır ve aynı malzeme listesiyle fiyatlandırılır.
 
-Over 8 km of rolling ground at a 5 m ranging tolerance, with signs
-standing every 250 m:
+Tepeli zemin üzerinde 8 km'de, 5 m menzil toleransıyla, her 250 m'de bir
+levha dururken:
 
-| Deployment | Anchors | CAPEX | Corridor covered |
+| Yerleşim | Direk | CAPEX | Kapsanan koridor |
 |---|---|---|---|
-| Existing roadside signs every 600 m | 21 | 274736 TL | %96,7 |
-| Existing roadside signs every 500 m | 25 | 327067 TL | %96,7 |
-| Purpose-built 25 m masts every 800 m | 16 | 1529323 TL | %96,7 |
+| Mevcut yol levhaları, her 600 m | 21 | 274736 TL | %96,7 |
+| Mevcut yol levhaları, her 500 m | 25 | 327067 TL | %96,7 |
+| Amaca özel 25 m direk, her 800 m | 16 | 1529323 TL | %96,7 |
 
-**The signs win by five and a half times**, despite reaching 1,66 km
-against a mast's 5,52 km. Height buys range, and range is not what is
-scarce — money is, and a sign that already stands costs a thirty-fourth
-of a mast that does not. That is the mixed-mounting strategy arrived at
-by search rather than by assertion, and it inverts the intuition the
-range figures give (ADR-0015).
+**Levhalar beş buçuk kat kazanıyor**, üstelik direğin 5,52 km'sine karşı
+1,66 km'ye erişirken. Yükseklik menzil satın alır ve kıt olan menzil
+değildir — para kıttır, ve zaten duran bir levha, durmayan bir direğin
+otuz dörtte birine mal olur. Bu, iddia edilerek değil aranarak varılan
+karışık montaj stratejisidir ve menzil değerlerinin verdiği sezgiyi ters
+çevirir (ADR-0015).
 
-The search refuses, too. A tolerance under the radio's own ~2,94 m
-measurement floor is not a siting problem, and no arrangement of anchors
-meets it, so nothing is returned rather than the best of a bad set.
+Arama reddeder de. Telsizin kendi ~2,94 m'lik ölçüm tabanının altındaki
+bir tolerans bir yerleşim sorunu değildir ve hiçbir direk düzeni onu
+karşılamaz; dolayısıyla kötü bir kümenin en iyisi yerine hiçbir şey
+döner.
 
-What it cannot do is invent a survey. Which structures stand where is
-configuration, and the defaults are an assumption about a typical stretch
-of Turkish highway.
+Yapamayacağı şey bir etüt uydurmaktır. Hangi yapının nerede durduğu
+yapılandırmadır ve varsayılanlar tipik bir Türk karayolu kesimi hakkında
+bir varsayımdır.
 
-## The table
+## Tablo
 
 ```bash
 yerkon table
@@ -306,217 +311,203 @@ yerkon table
 | YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,81 | 2,96 | 8,25 | %100,00 | 0,02 | 4453423 | 849511 |
 | YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,02 | 7,65 | 109,84 | %93,39 | 273,97 | 456748 | 89443 |
 
-Every row stands on **real Ankara ground**, fetched once from the
-Copernicus 30 m DEM and committed inside the package, so a clone
-reproduces these numbers with no network (ADR-0008). The town is Kızılay,
-three kilometres on a side, rising and falling 91 m across it. The open
-country is the Polatlı plain, twenty kilometres on a side and 486 m of
-relief. The tunnel is a real 2 km alignment through the mountains at
-Kızılcahamam, falling 1,79 % between portals whose elevations are the
-mountain's.
+Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
+DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir
+klon bu sayıları ağa hiç çıkmadan yeniden üretir (ADR-0008). Şehir
+Kızılay'dır: bir kenarı üç kilometre, üzerinde 91 m iniş çıkışla. Açık
+arazi Polatlı ovasıdır: bir kenarı yirmi kilometre, 486 m rölyefle. Tünel
+Kızılcahamam'daki dağların içinden geçen gerçek bir 2 km'lik güzergâhtır;
+yükseklikleri dağın kendisine ait iki portal arasında %1,79 düşüyor.
 
-Nothing anywhere is flat, and that is a decision rather than a detail —
-see ADR-0021. The reflecting ground varies from patch to patch too, at
-two or three scales with its own seed per row (ADR-0026); what that work
-turned up is that **a slope had been counted as roughness**, by a factor
-of forty, which switched the coherent reflection off everywhere that was
-not level. Corrected, the table moved by less than seed noise: the old
-model reached the same place by the wrong route. Each row also carries two units sharing the air, which is
-why the update rate is half what one unit would see; and only the tunnel
-is a corridor, which the addendum to ADR-0014 explains.
+Hiçbir yerde hiçbir şey düz değildir ve bu bir ayrıntı değil bir karardır
+— ADR-0021'e bak. Yansıtıcı zemin de yamadan yamaya değişir, iki ya da üç
+ölçekte ve satır başına kendi tohumuyla (ADR-0026); o çalışmanın ortaya
+çıkardığı şey, **bir eğimin kırk kat pürüz sayılmış olmasıydı** — bu da
+eşevreli yansımayı düz olmayan her yerde kapatıyordu. Düzeltilince tablo
+tohum gürültüsünden az oynadı: eski model aynı yere yanlış yoldan
+varıyormuş. Her satır ayrıca havayı paylaşan iki birim taşır; güncelleme
+hızının tek bir birimin göreceğinin yarısı olmasının sebebi budur. Ve
+yalnızca tünel bir koridordur, ki bunu ADR-0014'ün eki açıklar.
 
-The OPEX column is the one the report leaves empty for all four rows. It
-comes from an inventory of named recurring items rather than a percentage
-of capital (ADR-0006), and like every cost figure here it rests mostly on
-rates nobody supplied — the command prints that share alongside.
+OPEX sütunu raporun dört satır için de boş bıraktığı sütundur. Sermayenin
+bir yüzdesi olarak değil, adlandırılmış yinelenen kalemlerden oluşan bir
+envanterden gelir (ADR-0006) ve buradaki her maliyet değeri gibi
+çoğunlukla kimsenin vermediği oranlara dayanır — komut bu payı yanında
+yazdırır.
 
-Three things the table will not do without saying so:
+Tablonun söylemeden yapmayacağı üç şey:
 
-**The tunnel's cost per km² is not comparable to the other rows.** A bore
-12 m wide over 2 km is 0,024 km², so dividing by it produces a large
-number by arithmetic rather than by judgement. On cost per route
-kilometre the tunnel is 53441 TL. The other two rows serve areas rather
-than lines, so their route kilometres are the length of a test journey
-and no cost per kilometre is quoted for them at all.
+**Tünelin km² başına maliyeti diğer satırlarla karşılaştırılabilir
+değildir.** 2 km boyunca 12 m genişliğinde bir tünel 0,024 km²'dir, yani
+buna bölmek büyük bir sayıyı yargıyla değil aritmetikle üretir. Güzergâh
+kilometresi başına maliyette tünel 53441 TL'dir. Diğer iki satır çizgiye
+değil alana hizmet eder, dolayısıyla güzergâh kilometreleri bir test
+yolculuğunun uzunluğudur ve onlar için kilometre başına maliyet hiç
+verilmez.
 
-**The service area is where a position is available**, not where a packet
-arrives. For the rural region those are 671,75 and 1188,00 km², a factor
-of 1,8, and the notes print both every time (ADR-0012).
+**Hizmet alanı, bir konumun alınabildiği yerdir**, bir paketin ulaştığı
+yer değil. Kırsal bölge için bunlar 671,75 ve 1188,00 km²'dir, 1,8 kat, ve
+notlar her seferinde ikisini de yazdırır (ADR-0012).
 
-**Rural availability is decided by terrain, and by the length of a
-round.** Not one rural link fails for distance — every single failure
-would close if the ground were taken away — so more masts are the wrong
-instinct. What was wrong was the round: eight anchors polled over ground
-that blocks half of them yields about four replies, exactly what a cold
-fix needs and nothing spare. Polling twelve took the row from 82,3 % to
-89,6 % for no capital at all, costing a third of the update rate and
-0,4 m of horizontal error. Getting past 90 % does cost money: about twice
-the mast capital, either as more masts or taller ones. ADR-0022 has the
-priced curve, and the two things that were tried and did not work.
+**Kırsal kullanılabilirliğe arazi ve bir turun uzunluğu karar verir.**
+Tek bir kırsal bağlantı bile mesafe yüzünden düşmez — her bir başarısızlık
+zemin kaldırılsa kapanırdı — yani daha çok direk yanlış içgüdüdür. Yanlış
+olan turdu: yarısını engelleyen bir zemin üzerinde yoklanan sekiz direk
+yaklaşık dört yanıt verir, ki bu da soğuk bir sabitlemenin gerektirdiğinin
+tam kendisidir, yedeksiz. On ikiyi yoklamak satırı hiç sermaye harcamadan
+%82,3'ten %89,6'ya çıkardı; karşılığında güncelleme hızının üçte birini ve
+0,4 m yatay hatayı verdi. %90'ı geçmek para tutuyor: kabaca direk
+sermayesinin iki katı, ya daha çok direk ya daha uzun direk olarak.
+ADR-0022 fiyatlandırılmış eğriyi ve denenip işe yaramayan iki şeyi tutar.
 
-**VPE is what the geometry supports**, with no height constraint
-anywhere. Tens of metres in the open, under seven in the tunnel where the
-anchors surround the receiver rather than lining up beside it (ADR-0011).
+**VPE geometrinin desteklediği kadardır**, hiçbir yerde yükseklik kısıtı
+yoktur. Açıkta onlarca metre, tünelde yedinin altı — orada direkler
+alıcının yanına dizilmek yerine onu çevreler (ADR-0011).
 
-## Choosing a deployment
+## Bir yerleşim seçmek
 
 ```bash
-yerkon options                       # what is on hand
-yerkon options rural-dense           # one of them in full
-yerkon table --option rural-dense    # run the table against it
+yerkon options                       # elde ne var
+yerkon options rural-dense           # birini tam olarak
+yerkon table --option rural-dense    # tabloyu ona karşı koş
 ```
 
-Every number that shapes a deployment lives in `defaults.toml` alongside
-the physics — anchor spacing, site extent, stagger, anchors polled per
-round, ranging tolerance, bore width. So an **option** is just a short
-list of edits to that file plus the reason somebody made them, and a new
-one costs a file rather than a code change (ADR-0023). Options compose
-with `--defaults`, so real quotations and a denser grid survive together.
+Bir yerleşimi şekillendiren her sayı fizikle birlikte `defaults.toml`
+içinde durur — direk aralığı, saha uzunluğu, kaydırma, tur başına
+yoklanan direk, menzil toleransı, tünel genişliği. Dolayısıyla bir
+**seçenek**, o dosyaya yapılan kısa bir düzenleme listesi artı birinin
+bunu yapma gerekçesinden ibarettir ve yenisi bir kod değişikliğine değil
+bir dosyaya mal olur (ADR-0023). Seçenekler `--defaults` ile birleşir,
+böylece gerçek teklifler ve daha sık bir ızgara birlikte yaşar.
 
-Four ship, and the first two are there together on purpose:
+Beş tanesi paketle gelir, ve ilk ikisi bilerek birlikte durur:
 
-| option | what it is |
+| seçenek | nedir |
 |---|---|
-| `rural-dense` | 49 masts at 3 km, 30 m tall — the cheapest way past 90 % |
-| `rural-tall` | The same 33 masts, 10 m taller — loses at equal money, wins per site |
-| `urban-dense` | Anchors on every lighting column rather than every other |
-| `rural-hard-ground` | The Gölbaşı hills: what this design costs where it was not meant to go |
-| | *(this one shipped broken and did nothing — see ADR-0027)* |
-| `tunnel-precise` | 120 m brackets — HPE P50 1,81 m → 0,48 m for 23000 TL. Found by the solver |
+| `rural-dense` | 3 km'de 49 direk, 30 m boyunda — %90'ı geçmenin en ucuz yolu |
+| `rural-tall` | Aynı 33 direk, 10 m daha uzun — eşit parada kaybeder, saha başına kazanır |
+| `urban-dense` | Her iki aydınlatma direğinden birine değil, hepsine direk |
+| `rural-hard-ground` | Gölbaşı tepeleri: bu tasarım gitmesi düşünülmeyen yerde neye mal olur |
+| | *(bu, hiçbir şey yapmayan bozuk bir hâlde gönderilmişti — ADR-0027'ye bak)* |
+| `tunnel-precise` | 120 m askı aralığı — HPE P50 1,81 m → 0,48 m, 23000 TL'ye. Çözücü buldu |
 
-Which of the first two is right depends on whether money or site access
-is the scarce thing, and this project does not have the figures to say.
-So it ships both rather than picking.
+İlk ikisinden hangisinin doğru olduğu, kıt olanın para mı saha erişimi mi
+olduğuna bağlıdır ve bu projenin bunu söyleyecek değerleri yok. Bu yüzden
+birini seçmek yerine ikisini de gönderiyor.
 
-### Searching for a new one
+### Yenisini aramak
 
 ```bash
 yerkon solve --scenario tunnel --availability 0.99 --hpe-p50 1.0 --save tunnel-precise
 ```
 
-Searches arrangements against a target, and saves the cheapest that meets
-it as a named option. Every candidate is a full simulation against real
-ground — slow, and its answers agree with the table by construction.
+Düzenleri bir hedefe karşı arar ve onu karşılayanların en ucuzunu
+adlandırılmış bir seçenek olarak kaydeder. Her aday gerçek zemine karşı
+tam bir benzetimdir — yavaş, ve cevapları kuruluş gereği tabloyla uyuşur.
 
-It found something nobody had tried, because trying it used to mean
-editing a literal: **120 m bracket spacing takes the tunnel row from
-1,81 m to 0,48 m** at the fiftieth percentile. Seventeen anchors instead
-of fourteen, 23000 TL more, in the row whose cost per square kilometre is
-already the largest in the table by three orders of magnitude.
+Kimsenin denemediği bir şey buldu, çünkü denemek eskiden bir sabiti
+düzenlemek demekti: **120 m askı aralığı tünel satırını ellinci
+yüzdelikte 1,81 m'den 0,48 m'ye indiriyor.** On dört yerine on yedi
+direk, 23000 TL fazla; üstelik kilometrekare başına maliyeti tabloda
+zaten üç mertebe önde olan satırda.
 
-Two things it refuses. If nothing meets the target it returns nothing
-rather than the best of a bad set, because a search that hands back its
-least-bad failure needs checking by hand every time. And if the settings
-already meet the target it says so instead of saving an option that
-changes nothing.
+Reddettiği iki şey var. Hedefi hiçbir şey karşılamıyorsa kötü bir kümenin
+en iyisi yerine hiçbir şey döndürür, çünkü en az kötü başarısızlığını geri
+veren bir arama her seferinde elle denetlenmek zorundadır. Ve ayarlar
+hedefi zaten karşılıyorsa, hiçbir şeyi değiştirmeyen bir seçenek
+kaydetmek yerine bunu söyler.
 
-`--vary KEY=A,B,C` searches any figure in the settings file, not just the
-short default list per scenario.
+`--vary KEY=A,B,C` ayar dosyasındaki her değeri arar, senaryo başına
+kısa varsayılan listeyi değil.
 
-## Handing it over
+## Teslim
 
 ```bash
-yerkon deliver --into docs/teslim          # everything
-yerkon deliver --into docs/teslim --no-budget   # just the table, quickly
+yerkon deliver --into docs/teslim               # her şey
+yerkon deliver --into docs/teslim --no-budget   # yalnız tablo, hızlıca
 ```
 
-Four Markdown files, because they answer different questions and get read
-by different people:
+Dört Markdown dosyası; çünkü farklı soruları cevaplarlar ve farklı
+kişiler tarafından okunurlar:
 
-| file | what is in it |
+| dosya | içinde ne var |
 |---|---|
-| `tablo.md` | the four rows, the ground each stands on, and the notes |
-| `hata-butcesi.md` | what each error source was worth, and what removing it takes |
-| `sayilar.md` | every figure, what it affects, and what it rests on — with design choices kept apart from placeholders |
-| `secenekler.md` | the deployments that could be built instead |
+| `tablo.md` | dört satır, her birinin üzerinde durduğu zemin ve notlar |
+| `hata-butcesi.md` | her hata kaynağı neye değdi ve kaldırmak ne gerektiriyor |
+| `sayilar.md` | her değer, neyi etkilediği ve neye dayandığı — tasarım kararları vekillerden ayrı tutularak |
+| `secenekler.md` | bunun yerine kurulabilecek yerleşimler |
 
-Every file carries the date and the figure count it was made from, so a
-delivered table can be reconciled with the repository a month later. The
-error budget is skippable because it is by far the slowest part.
+Her dosya tarihini ve kaç değerden üretildiğini taşır, böylece teslim
+edilmiş bir tablo bir ay sonra depoyla karşılaştırılabilir. Hata bütçesi
+atlanabilir, çünkü açık ara en yavaş kısım odur.
 
-## Where the error came from
+## Hata nereden geldi
 
 ```bash
 yerkon budget
 ```
 
-An accuracy figure nobody can act on is half a result. This re-runs each
-scenario with one error source silenced at a time — seven sources,
-sixteen runs each — and reports what every one of them was worth
-(ADR-0020). It is the same engine the table uses, so it cannot disagree
-with it.
+Kimsenin üzerine iş yapamayacağı bir hassasiyet değeri yarım bir
+sonuçtur. Bu, her senaryoyu tek seferde bir hata kaynağı susturularak
+yeniden koşar — yedi kaynak, her biri için on altı koşu — ve her birinin
+neye değdiğini bildirir (ADR-0020). Tablonun kullandığı motorun
+kendisidir, dolayısıyla onunla çelişemez.
 
-```
-Tünel — HPE P50 1,77 m, P95 2,99 m; bir menzilin σ'sı 0,10 m, geometri çarpanı ×17,7
+İki sütun, çünkü farklı soruları cevaplarlar. **Tek başına**, o kaynak
+tek olsaydı kalacak hatadır. **Kalkarsa**, o gidip diğerlerinin hepsi
+kalırsa bütün hatanın ineceği yerdir — her zaman daha küçük tasarruf,
+çünkü hatalar kareli toplanır, ve ikisinden yalnızca o bir satın alma
+kararıdır.
 
-  Hata kaynağı           Tek başına  Kalkarsa  Kazanç  Çare
-  ---------------------  ----------  --------  ------  -----------------------------------
-  Direk konum ölçümü           1,78      0,17    1,61  direkleri GNSS ile daha iyi ölçmek
-  Donanım ölçüm tabanı         0,18      1,79   -0,02  daha iyi bir modül
-  Dalga formu gürültüsü        0,12      1,79   -0,01  daha yüksek güç, daha yakın direk
-  Saat kayması                 0,10      1,78    0,00  TCXO ya da çift taraflı TWR
-  Fazladan yol (engel)         0,09      1,77    0,00  direği yükseltmek
-  Kaybolan alışveriş           0,09      1,77    0,00  daha temiz kanal
-  Tur içi hareket              0,00      1,79   -0,02  daha kısa tur
-  Model artığı                 0,09                    hiçbir kaynak açık değilken kalan
-```
+Tünel, her donanım ölçütüne göre çalışmadaki en hassas yerleşimdir ve
+üçünün en az hassası olarak çıkar. Dağılım nedenini söyler: tüneli bir
+menzilin sigmasını on sekizle çarpar ve en sert çarptığı şey direk etüt
+hatasıdır — ortalamayla asla kaybolmayan tek terim. Ona daha iyi bir
+telsiz almak hiçbir şey satın almaz; askılarını düzgün ölçmek onu 1,77
+m'den 0,17 m'ye indirir.
 
-Two columns, because they answer different questions. **Tek başına** is
-the error if that source were the only one. **Kalkarsa** is what the
-whole error falls to if it goes away and every other stays — always the
-smaller saving, because errors add in quadrature, and the only one of the
-two that is a purchase decision.
+Açık yolda sıralama tersine döner. Şehirde modülün kendi ölçüm tabanı
+1,13 m, etüt hatası 0,09 m eder; kırsalda dalga formu gürültüsü 2,10 m ile
+tabanın 1,51 m'sinin önüne geçer, çünkü kırsal bir bağlantı kilometrelerce
+uzundur ve sınır mesafeyle yükselir. İkisinin geometri çarpanı *birin
+altındadır* — 0,6 ve 0,5 — yani üzerinde bir süzgeç koşan bir alan, tek
+bir menzilden daha iyi çıkar. O sayı, koridor çerçevesinin gizlediği şeyin
+niceliksel hâlidir.
 
-The tunnel is the most accurate deployment in the study by every hardware
-measure and comes out the least accurate of the three. The dissection
-says why: its bore multiplies one range's sigma by eighteen, and what it
-multiplies hardest is the anchor survey error, the one term that never
-averages out. Buying a better radio for it buys nothing; surveying its
-brackets properly takes it from 1,77 m to 0,17 m.
+Tablonun bir satırı ancak zemin ölçülebilir olunca ölçülebilir oldu.
+**Fazladan yol** — bir sinyalin bir engelin üzerinden kat ettiği ek
+mesafe — üç senaryonun ikisi düz bir düzlemin üzerinde dururken her yerde
+tam 0,00 m okuyordu; terim küçük olduğu için değil, bir düzlem hiçbir
+şeyi engelleyemediği için. Gerçek Ankara'da kırsalda 0,42 m, şehirde 0,11
+m, tünelde 0,09 m. ADR-0021'e bak.
 
-On the open road the ranking inverts. In town the module's own
-measurement floor is worth 1,13 m and the survey error 0,09 m; in the
-country the waveform noise dominates at 2,10 m against the floor's
-1,51 m, because a rural link is kilometres long and the bound rises with
-distance. The geometry multiplier for both is *below one* — 0,6 and 0,5 —
-so an area with a filter running across it comes out better than a single
-range. That number is the quantitative form of what the corridor framing
-had been hiding.
+## Bir saha getirmek
 
-One row of the table only became measurable when the ground did.
-**Fazladan yol** — the extra distance a signal travels over an
-obstruction — read exactly 0,00 m everywhere while two of the three
-scenarios stood on a level plane, not because the term is small but
-because a plane cannot obstruct anything. On real Ankara it is 0,42 m in
-the country, 0,11 m in town and 0,09 m in the bore. See ADR-0021.
-
-## Fetching a site
-
-Real ground, once, into a cache. Everything else runs offline against it
-(ADR-0008).
+Gerçek zemin, bir kez, bir önbelleğe. Geri kalan her şey ona karşı
+çevrimdışı koşar (ADR-0008).
 
 ```bash
 yerkon fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 \
              --into sites/ankara-o20 --spacing 30
 ```
 
-Three sources are tried in turn and the first that answers wins:
+Sırayla üç kaynak denenir ve ilk cevap veren kazanır:
 
-1. a GeoTIFF you already have, if you pass `--geotiff`;
-2. the **Copernicus 30 m** tiles in public object storage, which need no
-   key, have no rate limit, and cover a whole degree square in one file.
-   Tiles are cached under `sites/_tiles`, so a second site in the same
-   square costs nothing;
-3. a public query service, which is slower, coarser, and limited to a
-   thousand calls a day. It is the fallback, not the plan.
+1. `--geotiff` ile verirsen elindeki bir GeoTIFF;
+2. genel nesne depolamasındaki **Copernicus 30 m** paftaları — anahtar
+   istemez, hız sınırı yoktur ve tam bir derecelik kareyi tek dosyada
+   kapsar. Paftalar `sites/_tiles` altında önbelleğe alınır, böylece aynı
+   karedeki ikinci bir saha hiçbir şeye mal olmaz;
+3. daha yavaş, daha kaba ve günde bin çağrıyla sınırlı bir genel sorgu
+   servisi. Bu yedektir, plan değil.
 
-Buildings come from OpenStreetMap alongside. If they cannot be fetched
-the site records that nobody looked, rather than implying open ground.
+Binalar yanında OpenStreetMap'ten gelir. Getirilemezlerse saha, açık
+arazi olduğunu ima etmek yerine kimsenin bakmadığını kaydeder.
 
-## Changing a setting
+## Bir ayarı değiştirmek
 
-Settings are not independent, so an edit shows what it drags with it and
-asks once (ADR-0009):
+Ayarlar bağımsız değildir, dolayısıyla bir düzenleme neyi beraberinde
+sürüklediğini gösterir ve bir kez sorar (ADR-0009):
 
 ```console
 $ yerkon design --mounting sign
@@ -534,254 +525,254 @@ Which also changes:
 Apply all of that? [y/N]
 ```
 
-The consequences are computed by the same link budget the simulation runs
-on, not by a list of rules kept alongside it, and a test enforces that.
+Sonuçlar, yanında tutulan bir kural listesiyle değil benzetimin üzerinde
+koştuğu link bütçesinin kendisiyle hesaplanır ve bunu bir test zorlar.
 
-## What a deployment actually delivers
+## Bir yerleşim gerçekte ne veriyor
 
-A corridor study — not one of the table's rows, two of which are areas.
-24 km over rolling ground, anchors staggered either side on 25 m masts, a
-vehicle at 100 km/h, no height constraint:
+Bir koridor çalışması — tablonun satırlarından biri değil; ikisi alandır.
+Tepeli zemin üzerinde 24 km, 25 m direklerde iki yana kaydırmalı direkler,
+100 km/sa bir araç, yükseklik kısıtı yok:
 
-| Anchor spacing | Anchors | HPE p50 | HPE p95 | Availability | Reached | Served |
+| Direk aralığı | Direk | HPE p50 | HPE p95 | Kullanılabilirlik | Ulaşılan | Hizmet |
 |---|---|---|---|---|---|---|
 | 1500 m | 17 | 2,64 m | 9,58 m | 1,000 | 445,2 km² | 75,2 km² |
 | 2000 m | 13 | 3,11 m | 10,46 m | 0,984 | 447,2 km² | 57,2 km² |
 | 3000 m | 9 | 4,69 m | 17,05 m | 0,981 | 409,0 km² | 15,2 km² |
 | 4000 m | 7 | 5,22 m | 22,82 m | 0,972 | 392,5 km² | 15,2 km² |
 
-Reached is ground where a packet arrives. Served is ground where four
-anchors are in reach at once, which is what a position needs. They differ
-by a factor of twenty-six at 4 km spacing, and quoting the first as
-coverage would understate cost per km² by the same factor (ADR-0012).
+Ulaşılan, bir paketin vardığı zemindir. Hizmet, aynı anda dört direğin
+erişimde olduğu zemindir — bir konumun gerektirdiği budur. 4 km aralıkta
+yirmi altı kat farklıdırlar ve birincisini kapsama diye vermek km² başına
+maliyeti aynı katsayıyla olduğundan az gösterirdi (ADR-0012).
 
-So spacing is a geometry question, not a range question. Four kilometres
-is well inside a mast's 5,5 km usable range and still leaves a receiver
-one anchor short of a fix for most of the corridor.
+Dolayısıyla aralık bir menzil sorusu değil bir geometri sorusudur. Dört
+kilometre, bir direğin 5,5 km'lik kullanılabilir menzilinin epey içindedir
+ve yine de koridorun çoğunda alıcıyı bir sabitlemeye bir direk uzakta
+bırakır.
 
-## What it costs, and what that rests on
+## Neye mal oluyor ve bu neye dayanıyor
 
-Thirteen anchors over 24 km, on a service area of 57,2 km²:
+24 km üzerinde on üç direk, 57,2 km²'lik bir hizmet alanında:
 
-| | 13 masts (25 m) | 13 lighting columns (12 m) |
+| | 13 direk (25 m) | 13 aydınlatma direği (12 m) |
 |---|---|---|
-| Anchor units | 14074,84 TL | 14074,84 TL |
-| Structures and installation | 1105000,00 TL | 39000,00 TL |
-| Standalone power | 123500,00 TL | 0,00 TL |
-| **Capital** | **1242574,84 TL** | **53074,84 TL** |
-| Operating, per year | 51516,85 TL | 25834,84 TL |
-| Radios as a share of capital | 1,1 % | 26,5 % |
+| Direk birimleri | 14074,84 TL | 14074,84 TL |
+| Yapılar ve montaj | 1105000,00 TL | 39000,00 TL |
+| Bağımsız enerji | 123500,00 TL | 0,00 TL |
+| **Sermaye** | **1242574,84 TL** | **53074,84 TL** |
+| İşletme, yıllık | 51516,85 TL | 25834,84 TL |
+| Telsizlerin sermayedeki payı | %1,1 | %26,5 |
 
-The bill of materials — the only sourced part of any of this — is about
-one percent of the cost of a mast-based network. What a deployment costs
-is decided by what the anchors are bolted to and whether mains power
-reaches them, not by which radio is inside.
+Malzeme listesi — bütün bunların kaynağı belli tek kısmı — direk tabanlı
+bir ağın maliyetinin yaklaşık yüzde biridir. Bir yerleşimin neye mal
+olduğuna, içindeki telsizin hangisi olduğu değil, direklerin neye
+cıvatalandığı ve şebeke elektriğinin onlara ulaşıp ulaşmadığı karar
+verir.
 
-That is why the deployment mixes structures, and why every costing prints
-the share of itself that rests on figures nobody supplied. For the table
-above that share is 99 %: the site costs and every operating rate are
-order-of-magnitude placeholders carrying `ASSUMPTION` provenance and a
-note saying so (ADR-0006). They are configuration, and the numbers move
-when they are sourced.
+Yerleşimin yapıları karıştırmasının ve her maliyetlendirmenin kendisinin
+kimsenin vermediği değerlere dayanan payını yazdırmasının sebebi budur.
+Yukarıdaki tablo için o pay %99'dur: saha maliyetleri ve bütün işletme
+oranları, `ASSUMPTION` kaynağı ve bunu söyleyen bir not taşıyan mertebe
+düzeyinde vekillerdir (ADR-0006). Bunlar yapılandırmadır ve kaynak
+bulununca sayılar oynar.
 
-## What the link budget already says
+## Link bütçesinin zaten söyledikleri
 
-Using only the parts the report names, at the power Turkey allows, over
-open ground with the receiver on a vehicle roof at 1,5 m:
+Yalnızca raporun adını verdiği parçalarla, Türkiye'nin izin verdiği güçte,
+açık zemin üzerinde, alıcı araç tavanında 1,5 m'de:
 
-| Link | Margin | Ranging sigma |
+| Bağlantı | Pay | Menzil sigması |
 |---|---|---|
-| 5 km, 25 m mast | 14,8 dB | 4,10 m |
-| 10 km, 25 m mast | 2,7 dB | 16,41 m |
-| 5 km, 35 m mast | 17,7 dB | 2,94 m |
-| 10 km, 35 m mast | 5,7 dB | 11,72 m |
-| 15 km, 35 m mast | does not close | — |
+| 5 km, 25 m direk | 14,8 dB | 4,10 m |
+| 10 km, 25 m direk | 2,7 dB | 16,41 m |
+| 5 km, 35 m direk | 17,7 dB | 2,94 m |
+| 10 km, 35 m direk | 5,7 dB | 11,72 m |
+| 15 km, 35 m direk | kapanmıyor | — |
 
-Every one of those links closes, and that is the least interesting thing
-about them. Closing is not the constraint; **precision** is. A link with
-33 dB in hand still measures distance to sixteen metres, because the
-ranging bound falls off with signal-to-noise ratio long after the packet
-is still being decoded.
+Bunların hepsi kapanır ve haklarındaki en ilgisiz şey budur. Kısıt
+kapanma değil **hassasiyettir**. Elinde 33 dB olan bir bağlantı bile
+mesafeyi on altı metreye ölçer, çünkü menzil sınırı, paket hâlâ çözülmeye
+devam ederken çoktan sinyal-gürültü oranıyla birlikte düşmeye başlar.
 
-The gap is a factor of two, not the factor of seven this project claimed
-for a fortnight. The link budget was adding the 30,1 dB despreading gain
-and then testing against a threshold that already assumed it, so links
-"closed" 24 dB below the part's own sensitivity. Writing a simulation of
-the receiver is what caught it: nothing demodulates at −20 dB after
-correlation, because there is no peak to find. Corrected, the SX1280
-closes to 11,7 km and ranges usefully to 5,52 km (ADR-0017). The usable
-range did not move — only the overstated half.
+Fark iki kattır; bu projenin iki hafta boyunca iddia ettiği yedi kat
+değil. Link bütçesi 30,1 dB yayma kazancını ekliyor, sonra da onu zaten
+varsayan bir eşiğe karşı sınıyordu; yani bağlantılar parçanın kendi
+hassasiyetinin 24 dB altında "kapanıyordu". Alıcının bir benzetimini
+yazmak bunu yakaladı: ilinti sonrası −20 dB'de hiçbir şey çözülmez, çünkü
+bulunacak bir tepe yoktur. Düzeltildikten sonra SX1280 11,7 km'ye kadar
+kapanır ve 5,52 km'ye kadar işe yarar biçimde ölçer (ADR-0017).
+Kullanılabilir menzil oynamadı — yalnızca abartılmış yarısı oynadı.
 
-Height is what buys range. Solving for the distance at which ranging
-sigma reaches 5 m, over open ground:
+Menzili satın alan şey yüksekliktir. Menzil sigmasının 5 m'ye ulaştığı
+mesafeyi açık zemin üzerinde çözersek:
 
-| Mounted on | Height | Usable range |
+| Monte edildiği yer | Yükseklik | Kullanılabilir menzil |
 |---|---|---|
-| Roadside sign | 3 m | 1,66 km |
-| Sign gantry | 6 m | 2,51 km |
-| Billboard | 10 m | 3,47 km |
-| Lighting column | 12 m | 3,83 km |
-| Purpose-built mast | 25 m | 5,52 km |
-| Tower | 35 m | 6,53 km |
+| Yol levhası | 3 m | 1,66 km |
+| Levha portalı | 6 m | 2,51 km |
+| Pano | 10 m | 3,47 km |
+| Aydınlatma direği | 12 m | 3,83 km |
+| Amaca özel direk | 25 m | 5,52 km |
+| Kule | 35 m | 6,53 km |
 
-The 5 to 10 km requirement is therefore met from purpose-built masts and
-not from existing roadside furniture. Signs and gantries are worth using
-where they happen to sit, but a network built only from them needs
-anchors every two to three kilometres.
+Dolayısıyla 5–10 km gereksinimi amaca özel direklerden karşılanır, mevcut
+yol donanımından değil. Levhalar ve portallar durdukları yerde kullanmaya
+değer, ama yalnızca onlardan kurulan bir ağın her iki üç kilometrede bir
+direğe ihtiyacı olur.
 
-Two further consequences, both testable claims in `tests/test_rf.py`:
+`tests/test_rf.py` içinde sınanabilir iki sonuç daha:
 
-The rural module's 27 dBm amplifier buys nothing in Turkey, because the
-band caps radiated power by density and the cap binds at 12,1 dBm at this
-bandwidth. Both anchor radios therefore radiate the same power and reach
-the same distance. Under the American rules, which cap conducted power
-instead, the same amplifier is worth about 18 dB.
+Kırsal modülün 27 dBm yükselticisi Türkiye'de hiçbir şey satın almaz,
+çünkü band yayılan gücü yoğunlukla sınırlar ve sınır bu bant genişliğinde
+12,1 dBm'de bağlar. Dolayısıyla iki direk telsizi de aynı gücü yayar ve
+aynı mesafeye erişir. İletilen gücü sınırlayan Amerikan kuralları altında
+aynı yükseltici yaklaşık 18 dB değerindedir.
 
-A narrowband radio does not deliver centimetres at short range. The
-waveform bound says 2 cm at 100 m; the part measures about 3 m. The model
-reports the larger of the two.
+Dar bantlı bir telsiz kısa mesafede santimetre vermez. Dalga formu sınırı
+100 m'de 2 cm der; parça yaklaşık 3 m ölçer. Model ikisinin büyüğünü
+bildirir.
 
-## What sharing the air costs
+## Havayı paylaşmak neye mal oluyor
 
-A deployment serves traffic, not one vehicle, and the units queue at the
-same anchors. A round is every unit's exchanges laid end to end, so a
-second unit does not halve the work — it doubles the wait:
+Bir yerleşim tek bir araca değil trafiğe hizmet eder ve birimler aynı
+direklerde kuyruğa girer. Bir tur, her birimin alışverişlerinin uç uca
+dizilmesidir; dolayısıyla ikinci bir birim işi yarıya indirmez —
+beklemeyi ikiye katlar:
 
-| | One unit | Two units |
+| | Tek birim | İki birim |
 |---|---|---|
-| Round, 16 urban anchors | 509 ms | 1018 ms |
-| Fixes per unit per second | 1,96 | 0,98 |
-| Rounds attempted over a journey | 179 | 178 |
+| Tur, 16 şehir içi direk | 509 ms | 1018 ms |
+| Birim başına saniyedeki sabitleme | 1,96 | 0,98 |
+| Yolculuk boyunca denenen tur | 179 | 178 |
 
-The last row is the finding. The total number of fixes the network
-produces barely moves, because the air was already fully spent; what
-changes is how it is divided. Urban HPE at the median went from 3,35 m
-with one unit to 5,06 m with two, since each filter now coasts twice as
-long between updates. The earlier figure described a network with one
-customer.
+Bulgu son satırdır. Ağın ürettiği toplam sabitleme sayısı neredeyse hiç
+oynamaz, çünkü hava zaten tamamen harcanmıştı; değişen, nasıl
+bölüşüldüğüdür. Şehir içi HPE medyanda tek birimle 3,35 m'den iki birimle
+5,06 m'ye çıktı, çünkü her süzgeç artık güncellemeler arasında iki katı
+kadar boşta süzülüyor. Önceki değer tek müşterisi olan bir ağı
+anlatıyordu.
 
-Both receivers in the bill of materials carry an SX1280 *and* a DWM3000,
-which is what lets one unit range against town anchors on the road and
-tunnel anchors inside a bore without changing. A unit ranges against
-every anchor it shares a waveform with and ignores the rest — so a unit
-carrying only the spread module simply does not see the tunnel anchors.
-ADR-0014 records all of this.
+Malzeme listesindeki iki alıcı da hem bir SX1280 *hem* bir DWM3000
+taşır; bir birimin yolda şehir direkleriyle, tünelin içinde tünel
+direkleriyle hiçbir şey değiştirmeden ölçmesini sağlayan budur. Bir birim,
+dalga formunu paylaştığı her direkle ölçer ve gerisini yok sayar — yani
+yalnızca yayılı modülü taşıyan bir birim tünel direklerini hiç görmez.
+ADR-0014 bunların hepsini kaydeder.
 
-## What the exchange adds on top
+## Alışveriş üste ne ekliyor
 
-A range is not read off a link budget. Two radios trade frames, and at
-SF10 a frame lasts 15,8 ms. In single-sided ranging the difference
-between the two clocks multiplies that whole reply delay:
+Bir menzil bir link bütçesinden okunmaz. İki telsiz çerçeve alışverişi
+yapar ve SF10'da bir çerçeve 15,8 ms sürer. Tek yönlü ölçümde iki saat
+arasındaki fark, o bütün yanıt gecikmesini çarpar:
 
-| Clock offset | Single-sided error | Double-sided error |
+| Saat kayması | Tek yönlü hata | Çift yönlü hata |
 |---|---|---|
-| 10 ppm, uncorrected | 24,1 m | 0,3 mm |
-| 0,0793 ppm, measured after correction | 0,19 m | 0,003 mm |
+| 10 ppm, düzeltilmemiş | 24,1 m | 0,3 mm |
+| 0,0793 ppm, düzeltme sonrası ölçülmüş | 0,19 m | 0,003 mm |
 
-Twenty-four metres is eight times the largest error ever measured on the
-part, so the published measurements are themselves evidence that the
-frequency-offset estimate every receiver already makes is doing the
-ranging work too. Without it, ranging on this radio does not function.
+Yirmi dört metre, parça üzerinde şimdiye kadar ölçülen en büyük hatanın
+sekiz katıdır; yani yayımlanmış ölçümlerin kendisi, her alıcının zaten
+yaptığı frekans kayması kestiriminin ölçüm işini de yaptığının kanıtıdır.
+O olmadan bu telsizde ölçüm işlemez.
 
-**That residual has been measured**, and it is the one figure in this
-project that is no longer a guess. `matlab/yerkon_clock_residual.m` puts
-it at **0,0793 ppm** — six times better than the 0,5 that stood in for
-it (ADR-0018).
+**O artık ölçüldü** ve bu, projede artık tahmin olmayan tek değerdir.
+`matlab/yerkon_clock_residual.m` onu **0,0793 ppm** koyuyor — yerine
+geçtiği 0,5'ten altı kat iyi (ADR-0018).
 
-The measurement also says what limits it, which the guess could not. The
-residual barely improves with signal: 30 dB more buys a factor of two,
-where noise-limited would buy thirty. Run with no noise at all the same
-estimator gives 0,0164–0,0643 ppm depending only on where the peak falls
-between FFT bins, matching the measured plateau to four decimals. **The
-floor is the peak interpolator, not the channel** — which means it does
-not average down over repeated exchanges, and a finer interpolator would
-lower it.
+Ölçüm, tahminin söyleyemediği şeyi de söylüyor: onu neyin sınırladığını.
+Artık sinyalle neredeyse hiç iyileşmiyor: 30 dB fazlası iki kat satın
+alıyor, gürültüyle sınırlı olsa otuz kat alırdı. Hiç gürültü olmadan
+koşulduğunda aynı kestirici, yalnızca tepenin FFT gözleri arasında nereye
+düştüğüne bağlı olarak 0,0164–0,0643 ppm veriyor; bu da ölçülen platoyla
+dört basamağa kadar uyuşuyor. **Taban kanal değil tepe aradeğerleyicisi**
+— yani tekrarlanan alışverişlerde ortalamayla azalmıyor ve daha ince bir
+aradeğerleyici onu düşürürdü.
 
-One design decision changed with it. At 0,5 ppm the impulse radio's
-single-sided clock term was 10 cm against a 10 cm floor, so double-sided
-ranging earned its third frame. Measured, that term is 1,6 cm and the
-floor swallows it. **The tunnel deployment is single-sided now**: a third
-less air time, 0,72 m at P95 instead of 1,00, and half again as many
-fixes.
+Bununla birlikte bir tasarım kararı değişti. 0,5 ppm'de darbeli telsizin
+tek yönlü saat terimi 10 cm'lik bir tabana karşı 10 cm'di, yani çift
+yönlü ölçüm üçüncü çerçevesini hak ediyordu. Ölçülmüş hâliyle o terim 1,6
+cm ve taban onu yutuyor. **Tünel yerleşimi artık tek yönlü**: üçte bir az
+hava süresi, P95'te 1,00 yerine 0,72 m ve bir buçuk katı sabitleme.
 
-It models no phase noise, no multipath and no drift during the exchange,
-so read it as a floor.
+Faz gürültüsü, çok yolluluk ve alışveriş sırasında sürüklenme
+modellenmiyor; dolayısıyla bunu bir taban olarak oku.
 
-Air time is now a quantity the study can spend, and it buys less than it
-looks:
+Hava süresi artık çalışmanın harcayabileceği bir niceliktir ve göründüğünden
+azını satın alır:
 
-| | SX1280 at SF10 | DWM3000 |
+| | SF10'da SX1280 | DWM3000 |
 |---|---|---|
-| Ranging frame | 15,75 ms | 1,06 ms |
-| Double-sided exchange | 47,86 ms | 3,77 ms |
-| Ranges per second | 20,9 | 265,1 |
+| Ölçüm çerçevesi | 15,75 ms | 1,06 ms |
+| Çift yönlü alışveriş | 47,86 ms | 3,77 ms |
+| Saniyedeki menzil | 20,9 | 265,1 |
 
-A round against six anchors on the SX1280 therefore takes 239 ms, during
-which a vehicle at 100 km/h travels 6,7 m — more than twice the 2,94 m
-ranging error beside it. The ranges in one round are not simultaneous and
-cannot be solved as though they were. That is a conclusion about the
-estimator, reached before the estimator was written, and it is why the
-receiver uses a filter rather than a snapshot trilateration.
+Dolayısıyla SX1280'de altı direğe karşı bir tur 239 ms sürer; bu sürede
+100 km/sa giden bir araç 6,7 m yol alır — yanındaki 2,94 m'lik menzil
+hatasının iki katından fazla. Bir turdaki menziller eşzamanlı değildir ve
+öyleymiş gibi çözülemez. Bu, kestirici yazılmadan önce varılmış, kestirici
+hakkında bir sonuçtur ve alıcının anlık üçgenleme yerine bir süzgeç
+kullanmasının sebebidir.
 
-## Three errors that are not noise
+## Gürültü olmayan üç hata
 
-A filter given enough noisy ranges converges on the truth. Real systems
-do not behave that way, because their worst errors are not noise
+Yeterince gürültülü menzil verilen bir süzgeç gerçeğe yakınsar. Gerçek
+sistemler böyle davranmaz, çünkü en kötü hataları gürültü değildir
 (ADR-0019).
 
-**A blocked path measures long.** The signal goes over the obstacle and
-the range times that detour: `h²/2 · (1/d₁ + 1/d₂)`, which is centimetres
-for a gentle rise on a long link and ten metres for a ridge across a
-short one. Always positive, so it never averages away.
+**Engellenmiş bir yol uzun ölçer.** Sinyal engelin üzerinden gider ve
+menzil o sapmayı zamanlar: `h²/2 · (1/d₁ + 1/d₂)` — uzun bir bağlantıda
+yumuşak bir yükselti için santimetreler, kısa bir bağlantıda enine bir
+sırt için on metre. Her zaman pozitiftir, yani ortalamayla asla
+kaybolmaz.
 
-**A survey error is a property of an installation**, drawn once per
-anchor and held. The estimator is told the surveyed position and treats
-it as exact.
+**Bir etüt hatası bir kurulumun özelliğidir**, direk başına bir kez
+çekilir ve tutulur. Kestiriciye ölçülmüş konum söylenir ve onu kesin
+sayar.
 
-**A lost packet produces nothing** — interference in a shared band, a
-collision, a fade. 2,4 GHz is the same band as wireless networking, which
-is why the town figure is 15 % against 5 % on the open road and 0 in a
-bore.
+**Kaybolan bir paket hiçbir şey üretmez** — paylaşımlı bir bantta
+girişim, bir çakışma, bir sönümleme. 2,4 GHz kablosuz ağlarla aynı
+banttır; şehir değerinin açık yoldaki %5'e karşı %15 ve tünelde 0 olmasının
+sebebi budur.
 
-The survey error is the one that changed an answer:
+Bir cevabı değiştiren, etüt hatası oldu:
 
-| Anchor survey error | Tunnel HPE P50 |
+| Direk etüt hatası | Tünel HPE P50 |
 |---|---|
 | 0,00 m | 0,24 m |
 | 0,05 m | 0,68 m |
 | 0,15 m | 1,76 m |
 | 0,30 m | 3,14 m |
 
-**You cannot position better than you surveyed the anchors**, and on a
-corridor you cannot get within ten times as well — the geometry that
-leaves the vertical unobservable amplifies a survey error by about the
-same factor. The tunnel's sub-metre figure had been resting on perfectly
-known anchors.
+**Direkleri ölçtüğünden daha iyi konumlanamazsın** ve bir koridorda on
+katı kadar bile yaklaşamazsın — düşeyi gözlenemez bırakan geometri, bir
+etüt hatasını aşağı yukarı aynı katsayıyla büyütür. Tünelin metre altı
+değeri, kusursuz bilinen direklerin üzerinde duruyormuş.
 
-The road rows barely moved, which is the same finding from the other
-side: a spread radio ranges to about 3 m and 15 cm of survey error
-vanishes underneath it. The floor is in every deployment and binds only
-where everything else is better than it.
+Yol satırları neredeyse hiç oynamadı; bu da aynı bulgunun diğer
+tarafıdır: yayılı bir telsiz yaklaşık 3 m'ye ölçer ve 15 cm'lik etüt
+hatası onun altında kaybolur. Taban her yerleşimde vardır ve yalnızca
+diğer her şeyin ondan iyi olduğu yerde bağlar.
 
-## What the estimator gets
+## Kestirici ne alıyor
 
-A receiver driving past six anchors at 100 km/h, ranged round after round
-over 17 s, with no height constraint:
+100 km/sa ile altı direğin yanından geçen bir alıcı, 17 s boyunca tur tur
+ölçülmüş, yükseklik kısıtı yok:
 
-| | Snapshot per round | Filter |
+| | Tur başına anlık | Süzgeç |
 |---|---|---|
 | HPE p50 | 5,20 m | 1,46 m |
 | HPE p95 | 6,42 m | 2,55 m |
 | VPE p50 | 51,90 m | 23,41 m |
 
-The snapshot is worse because it blames eight metres of vehicle motion on
-the ranges. The filter knows the measurements happened 48 ms apart and
-does not.
+Anlık olan daha kötüdür, çünkü sekiz metrelik araç hareketini menzillerin
+üstüne yıkar. Süzgeç ölçümlerin 48 ms arayla olduğunu bilir ve yıkmaz.
 
-The vertical is bad for a different reason, and no amount of filtering
-fixes it. Twenty-two metres of mounting-height spread against four
-kilometres of baseline is no spread at all, so every range is very nearly
-horizontal and the height barely enters the arithmetic. Mixing signs at
-3 m with masts at 25 m makes no measurable difference. VPE in the tens of
-metres is the true answer for a network of roadside anchors, and ADR-0011
-records why it is reported rather than constrained away.
+Düşey başka bir sebeple kötüdür ve hiçbir süzgeçleme onu düzeltmez. Dört
+kilometrelik bir taban çizgisine karşı yirmi iki metrelik montaj
+yüksekliği yayılımı hiç yayılım değildir; dolayısıyla her menzil neredeyse
+tamamen yataydır ve yükseklik aritmetiğe zar zor girer. 3 m'deki
+levhalarla 25 m'deki direkleri karıştırmak ölçülebilir bir fark yaratmaz.
+Onlarca metrelik VPE, yol kenarı direklerinden oluşan bir ağ için gerçek
+cevaptır ve ADR-0011 neden kısıtlanıp yok edilmek yerine bildirildiğini
+kaydeder.

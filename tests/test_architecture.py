@@ -234,3 +234,26 @@ def test_nothing_that_ships_stands_on_flat_ground():
         "these build a level surface instead of standing on real or rolling "
         "ground: {}".format(", ".join(offenders))
     )
+
+
+def test_no_test_writes_to_a_path_only_one_operating_system_has():
+    """This project is developed on Linux and run on Windows.
+
+    `docs/WINDOWS.md` exists because somebody runs it there, and a test
+    that writes to a literal `/tmp` passes here and fails there with a
+    FileNotFoundError that says nothing about what it was testing. pytest
+    hands every test a `tmp_path` of its own; there is no reason to name
+    a directory.
+    """
+    import re
+
+    tests = SRC.parent.parent / "tests"
+    offenders = []
+    for path in sorted(tests.glob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        for found in re.finditer(r'"(/tmp|/home|/var|/usr|[A-Z]:\\\\)[^"]*"', text):
+            offenders.append("{}: {}".format(path.name, found.group(0)))
+    assert not offenders, (
+        "these name a directory only one operating system has; ask for the "
+        "`tmp_path` fixture instead: {}".format(", ".join(offenders))
+    )

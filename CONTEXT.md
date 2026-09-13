@@ -1,73 +1,81 @@
-# YERKON simulation context
+# YERKON benzetiminin bağlamı
 
-This repository estimates what a terrestrial positioning network built from
-the YERKON hardware would actually deliver, and what it would cost. Its
-single output is the YERKON block of the comparison table on page 15 of the
-YERKON report: four rows, ten columns, every number traceable to either a
-datasheet, a published measurement, or a stated assumption.
+Bu depo, YERKON donanımından kurulan karasal bir konumlandırma ağının
+gerçekte ne vereceğini ve neye mal olacağını kestirir. Tek çıktısı, YERKON
+raporunun 15. sayfasındaki karşılaştırma tablosunun YERKON bloğudur: dört
+satır, on sütun; her sayı ya bir veri sayfasına, ya yayımlanmış bir ölçüme
+ya da açıkça söylenmiş bir varsayıma kadar izlenebilir.
 
-## Glossary
+## Sözlük
 
-Use these terms exactly. Where a term is ambiguous in the report, this file
-picks one meaning and the code follows it.
+Bu terimleri tam olarak böyle kullan. Raporda belirsiz kalan bir terim için
+bu dosya bir anlam seçer ve kod ona uyar.
 
-**Anchor**: a fixed transmitter at a surveyed position. The report calls
-these "yayın birimi". Three product variants exist and they are not
-interchangeable, because each carries a different radio.
+Her terimin başlığında **kodun kullandığı İngilizce ad** durur; kod
+İngilizcedir ve bu dosyanın işi tam olarak Türkçe raporla o adlar arasında
+köprü olmaktır. Parantez içindeki Türkçe karşılık, raporun ve arayüzün
+kullandığıdır.
 
-**Receiver**: the moving unit whose position is being estimated. The report
-calls these "alıcı". Two product variants: pedestrian and road vehicle.
+**Anchor** (direk, raporda *yayın birimi*): ölçülmüş bir konumda duran
+sabit verici. Üç ürün çeşidi vardır ve birbirinin yerine geçmezler, çünkü
+her biri farklı bir telsiz taşır.
 
-**Link**: an ordered pair of radios that could exchange a ranging packet at
-a given instant. A link either closes or it does not, and the same
-calculation that decides this also sets the quality of any measurement it
-carries. There is no separate "maximum range" constant anywhere in this
-codebase; range is an outcome, not an input. See ADR-0002.
+**Receiver** (alıcı): konumu kestirilen hareketli birim. İki ürün çeşidi:
+yaya ve kara aracı.
 
-**Observation**: what the receiver's estimator is allowed to see. Never
-contains truth. A range observation carries a measured distance, the
-anchor's surveyed position, a timestamp and a variance. If a quantity is
-not in an Observation, the estimator cannot use it. See ADR-0003.
+**Link** (bağlantı): belirli bir anda bir ölçüm paketi alışverişi
+yapabilecek, sıralı bir telsiz çifti. Bir bağlantı ya kapanır ya kapanmaz;
+ve buna karar veren hesabın kendisi, taşıdığı ölçümün kalitesini de
+belirler. Bu kod tabanının hiçbir yerinde ayrı bir "azami menzil" sabiti
+yoktur; menzil bir girdi değil, bir sonuçtur. ADR-0002'ye bak.
 
-**Truth**: the simulated physical state. Only the world and the sensor
-models may read it. The estimator may not.
+**Observation** (gözlem): alıcının kestiricisinin görmesine izin verilen
+şey. Asla gerçeği içermez. Bir menzil gözlemi ölçülmüş bir mesafe,
+direğin ölçülmüş konumu, bir zaman damgası ve bir varyans taşır. Bir
+büyüklük bir Observation içinde değilse kestirici onu kullanamaz.
+ADR-0003'e bak.
 
-**Fix**: one position estimate, with its covariance.
+**Truth** (gerçek): benzetilen fiziksel durum. Yalnızca dünya ve algılayıcı
+modelleri onu okuyabilir. Kestirici okuyamaz.
 
-**Deployment**: a set of anchors placed along or across a **Site**, plus
-the receiver product used there. This is the thing that has a cost.
+**Fix** (sabitleme): bir konum kestirimi, kovaryansıyla birlikte.
 
-**Site**: the physical place: terrain, roads, tunnels, buildings. Roads
-have grade, so a receiver's height varies along them. Nothing in this
-codebase fixes a road to a constant elevation. See ADR-0004.
+**Deployment** (yerleşim): bir **Site** boyunca ya da üzerine yerleştirilmiş
+bir direk kümesi, artı orada kullanılan alıcı ürünü. Maliyeti olan şey
+budur.
 
-**Service area**: the ground area over which a deployment is claimed to
-work, in km². It is the ground on which *enough anchors are reachable to
-produce a position*, swept over the real terrain rather than drawn as a
-corridor strip. This makes the km² denominator mean what it means in the
-GNSS rows of the comparison table.
+**Site** (saha): fiziksel yer: arazi, yollar, tüneller, binalar. Yolların
+eğimi vardır, dolayısıyla bir alıcının yüksekliği yol boyunca değişir. Bu
+kod tabanında hiçbir şey bir yolu sabit bir yüksekliğe sabitlemez.
+ADR-0004'e bak.
 
-The ground merely *reached* by at least one anchor is a different and much
-larger number, and it is reported alongside so the two are never confused:
-with anchors every 4 km on 25 m masts, one anchor reaches 392,5 km² and
-four reach 15,2 km². See ADR-0012. Cost per route kilometre is reported
-alongside as well, for corridor deployments.
+**Service area** (hizmet alanı): bir yerleşimin çalıştığı iddia edilen
+zemin alanı, km² cinsinden. *Bir konum üretmeye yetecek kadar direğin
+erişilebilir olduğu* zemindir; bir koridor şeridi olarak çizilmez, gerçek
+arazi üzerinde taranır. Karşılaştırma tablosunun GNSS satırlarındaki km²
+paydasının anlamına uymasını sağlayan budur.
 
-**Scenario**: a Deployment plus a set of receiver journeys plus the
-evaluation settings. One scenario produces one table row.
+Yalnızca *ulaşılan* zemin — en az bir direğin eriştiği — bambaşka ve çok
+daha büyük bir sayıdır; ikisinin asla karıştırılmaması için yan yana
+bildirilir: 25 m direklerde her 4 km'de bir direkle, bir direk 392,5 km²'ye,
+dört direk 15,2 km²'ye erişir. ADR-0012'ye bak. Koridor yerleşimleri için
+güzergâh kilometresi başına maliyet de yanında bildirilir.
 
-**Weighted row**: the fourth table row. It is not a separate simulation. It
-combines the raw per-fix error samples of the three scenarios under fixed
-weights and recomputes the percentiles from the combined sample. Averaging
-three P95 values does not produce a P95, so this codebase does not do that.
-See ADR-0005.
+**Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
+artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 
-## Products
+**Weighted row** (ağırlıklı satır): tablonun dördüncü satırı. Ayrı bir
+benzetim değildir. Üç senaryonun sabitleme başına ham hata örneklerini sabit
+ağırlıklar altında birleştirir ve yüzdelikleri birleşik örnekten yeniden
+hesaplar. Üç P95 değerinin ortalaması bir P95 üretmez, dolayısıyla bu kod
+tabanı bunu yapmaz. ADR-0005'e bak.
 
-From the report's bill of materials, page 14. Prices are the 100-unit tier
-in Turkish lira, dated 6 September 2026.
+## Ürünler
 
-| Product | Radio | Unit price |
+Raporun 14. sayfasındaki malzeme listesinden. Fiyatlar 100 birimlik
+kademede, Türk lirası, 6 Eylül 2026 tarihli.
+
+| Ürün | Telsiz | Birim fiyat |
 |---|---|---|
 | Şehir içi yayın birimi | SX1280 + 2,4 GHz anten | 1366,07 |
 | Kırsal yayın birimi | E28-2G4M27S | 1082,68 |
@@ -75,24 +83,25 @@ in Turkish lira, dated 6 September 2026.
 | Yaya alıcısı | SX1280 + DWM3000 + ESP32-S3 + BNO085 | 3117,74 |
 | Kara aracı alıcısı | SX1280 + DWM3000 + STM32 + BNO085 | 4002,29 |
 
-Named antennas in the same bill of materials: RF Solutions LAMBDA80-24S and
-Inventek W24P-U. These are the stock antennas and the link budget uses their
-published gain. No antenna is assumed better than the one in the report.
+Aynı malzeme listesinde adı geçen antenler: RF Solutions LAMBDA80-24S ve
+Inventek W24P-U. Bunlar stok antenlerdir ve link bütçesi onların yayımlanmış
+kazancını kullanır. Hiçbir antenin rapordakinden iyi olduğu varsayılmaz.
 
-## What the table columns mean
+## Tablo sütunları ne demek
 
-**HPE, VPE**: horizontal and vertical position error, in metres, at the
-stated percentile, over the evaluated journeys.
+**HPE, VPE**: yatay ve düşey konum hatası, metre cinsinden, belirtilen
+yüzdelikte, değerlendirilen yolculuklar üzerinden.
 
-**Kullanılabilirlik**: the fraction of attempted fixes that produced a valid
-position. This measures the modelled failure causes only, which are link
-closure, packet loss and solver failure. It is not a service availability
-figure and must not be read against the GNSS rows as though it were.
+**Kullanılabilirlik**: denenen sabitlemelerin geçerli bir konum üretenlerinin
+oranı. Yalnızca modellenen başarısızlık sebeplerini ölçer: bağlantı
+kapanması, paket kaybı ve çözücü başarısızlığı. Bir hizmet kullanılabilirliği
+değeri değildir ve GNSS satırlarına karşı öyleymiş gibi okunmamalıdır.
 
-**Alan**: service area as defined above.
+**Alan**: yukarıda tanımlandığı gibi hizmet alanı.
 
-**CAPEX**: anchor hardware cost divided by service area. Hardware only. The
-report's own scope note lists what is excluded.
+**CAPEX**: direk donanım maliyetinin hizmet alanına bölümü. Yalnızca
+donanım. Raporun kendi kapsam notu neyin dışarıda bırakıldığını listeler.
 
-**OPEX**: annual running cost per km². The report leaves this empty. This
-codebase fills it from a stated inventory of recurring items. See ADR-0006.
+**OPEX**: km² başına yıllık işletme maliyeti. Rapor bunu boş bırakır. Bu kod
+tabanı onu, yinelenen kalemlerden oluşan açıkça belirtilmiş bir envanterden
+doldurur. ADR-0006'ya bak.

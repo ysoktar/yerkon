@@ -1,177 +1,182 @@
-# Handoff
+# Devir
 
-What is built, what is next, and what is still undecided. Written so that
-another session, or another model, can pick this up without reading the
-whole history.
+Ne kurulmuş, sırada ne var ve neye hâlâ karar verilmemiş. Başka bir
+oturumun ya da başka bir modelin bütün geçmişi okumadan devralabilmesi
+için yazıldı.
 
-Read `CONTEXT.md` first for the vocabulary and `docs/adr/` for the
-decisions. Neither is optional: most of the mistakes this project has
-already made were mistakes of vocabulary, and each ADR records one of
-them.
+Önce sözlük için `CONTEXT.md`'yi, kararlar için `docs/adr/` altını oku.
+İkisi de isteğe bağlı değil: bu projenin şimdiye kadar yaptığı hataların
+çoğu sözcük hatasıydı ve her ADR bunlardan birini kaydediyor.
 
-## The single deliverable
+## Tek teslimat
 
-The YERKON block of the comparison table on page 15 of the report: four
-rows (urban, rural, tunnel, weighted), ten columns. Every number traceable
-to a datasheet, a published measurement, or a stated assumption.
+Raporun 15. sayfasındaki karşılaştırma tablosunun YERKON bloğu: dört satır
+(şehir içi, kırsal, tünel, ağırlıklı), on sütun. Her sayı bir veri
+sayfasına, yayımlanmış bir ölçüme ya da açıkça söylenmiş bir varsayıma
+kadar izlenebilir.
 
-The report leaves the OPEX column empty for all four rows. Filling it is
-in scope; the rates are modular configuration and will be researched
-later (ADR-0006).
+Rapor OPEX sütununu dört satır için de boş bırakıyor. Doldurmak kapsam
+içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
+(ADR-0006).
 
-## Standing constraints
+## Değişmeyen kısıtlar
 
-- **Range.** At least 5 km, target 5 to 10 km, evaluated out to 15 km,
-  using only the modules the report's bill of materials names, with their
-  stock antenna. No better antenna is assumed.
-- **Roads have grade.** Nothing fixes a receiver to a constant height
-  (ADR-0004).
-- **The estimator is fusion, without a height constraint.**
-- **Service area is the real area the anchors reach**, not the corridor
-  strip.
-- **Mounting is mixed**: existing roadside furniture (signs, gantries,
-  billboards) alongside purpose-built masts.
-- **A corridor carries more than one of everything**: several anchor
-  modules on several mountings, and several units of different kinds
-  sharing the air (ADR-0014).
-- **Numbers use a comma decimal mark and no thousands separator.**
-- **Changing one thing that forces another needs confirmation**, shown as
-  a panel listing every value that would change, answered with a single
-  y/n for the whole batch. Both the CLI and the app render the same panel
-  (ADR-0009). Built.
+- **Menzil.** En az 5 km, hedef 5–10 km, 15 km'ye kadar değerlendirilmiş;
+  yalnızca raporun malzeme listesinin adını verdiği modüllerle ve onların
+  stok anteniyle. Daha iyi bir anten varsayılmıyor.
+- **Yolların eğimi vardır.** Hiçbir şey bir alıcıyı sabit bir yüksekliğe
+  sabitlemez (ADR-0004).
+- **Kestirici, yükseklik kısıtı olmayan bir tümleştirmedir.**
+- **Hizmet alanı, direklerin eriştiği gerçek alandır**, koridor şeridi
+  değil.
+- **Montaj karışıktır**: mevcut yol donanımı (levhalar, portallar, panolar)
+  ile amaca özel direkler bir arada.
+- **Bir koridor her şeyden birden fazlasını taşır**: birkaç montaj üzerinde
+  birkaç direk modülü ve havayı paylaşan farklı türden birkaç birim
+  (ADR-0014).
+- **Sayılar virgüllü ondalık ayırıcı kullanır, binlik ayırıcı kullanmaz.**
+- **Bir şeyi değiştirmek başka bir şeyi zorluyorsa onay gerekir**;
+  değişecek her değeri listeleyen bir panel olarak gösterilir ve bütün küme
+  için tek bir evet/hayır ile cevaplanır. Hem komut satırı hem uygulama
+  aynı paneli çizer (ADR-0009). Kuruldu.
+- **İki dil, yan yana.** Türkçe ve İngilizce; hiçbiri diğerinin çevirisi
+  değil. Değerler, geometri ve her sonuç ikisinde aynıdır (ADR-0035).
 
-## Built
+## Kurulmuş olanlar
 
-| Module | What it owns |
+| Modül | Neyin sahibi |
 |---|---|
-| `evidence.py` | `Sourced` and `Provenance`, so a datasheet figure and a guess do not look alike |
-| `hardware.py` | the modules the report names, with their published figures |
-| `regulatory.py` | what each region's rules allow: Turkey, Europe, the United States, licensed |
-| `rf.py` | the link budget |
-| `world.py` | terrain, graded road alignments, mounting structures, and the patchwork that makes reflecting ground vary from place to place |
-| `site/` | real ground and buildings, fetched once into a cache, plus four fetched Ankara areas shipped inside the package |
-| `observation.py` | the one type the estimator may see, importing nothing |
-| `ranging.py` | the two-way exchange, its clocks, and what it costs in air time |
-| `estimator.py` | ranges into positions, seeing nothing else |
-| `evaluate.py` | journeys, per-fix error samples, availability, served area |
-| `cost.py` | CAPEX from the bill of materials, OPEX from an inventory |
-| `scenarios.py` | the three deployments the table describes, as configuration |
-| `report.py` | the four rows, the ten columns, and the notes under them |
-| `terms.py` | the seven named error sources, so each can be switched off |
-| `budget.py` | the dissection: what each source was worth, by re-running |
-| `siting.py` | the search for the cheapest deployment that meets a target |
-| `settings.py` | every figure the report did not supply, and every number that shapes a deployment, from `defaults.toml` |
-| `options.py` | named deployment options: a short list of edits and why |
-| `solve.py` | the search for the cheapest arrangement meeting a target |
-| `parallel.py` | independent runs spread over the machine's cores |
-| `deliver.py` | the whole study written out as Markdown |
-| `calibrate.py` | a MATLAB measurement read back as a default |
-| `viewer/` | the local web app: state, scene, server, its own renderer, and every verb the command line has (`tasks.py`, `jobs.py`) |
-| `design.py` | the settings a person chooses, and what they imply |
-| `proposal.py` | the confirmation panel: one edit, one y/n, every consequence shown |
-| `numbers.py` | comma decimal mark, no thousands separator |
-| `cli.py` | the `fetch`, `design`, `table`, `view`, `site`, `budget`, `defaults` and `calibrate` verbs |
+| `evidence.py` | `Sourced` ve `Provenance`; bir veri sayfası değeri ile bir tahmin birbirine benzemesin diye |
+| `hardware.py` | raporun adını verdiği modüller, yayımlanmış değerleriyle |
+| `regulatory.py` | her bölgenin kurallarının izin verdiği: Türkiye, Avrupa, Amerika, lisanslı |
+| `rf.py` | link bütçesi |
+| `world.py` | arazi, eğimli yol güzergâhları, montaj yapıları ve yansıtıcı zemini yerden yere değiştiren yama örgüsü |
+| `site/` | bir kez önbelleğe getirilen gerçek zemin ve binalar, artı paketin içinde gelen dört Ankara sahası |
+| `observation.py` | kestiricinin görebileceği tek tip; hiçbir şey import etmez |
+| `ranging.py` | çift yönlü alışveriş, saatleri ve hava süresinde maliyeti |
+| `estimator.py` | menzilleri konuma çevirir, başka hiçbir şey görmez |
+| `evaluate.py` | yolculuklar, sabitleme başına hata örnekleri, kullanılabilirlik, hizmet alanı |
+| `cost.py` | malzeme listesinden CAPEX, envanterden OPEX |
+| `scenarios.py` | tablonun anlattığı üç yerleşim, yapılandırma olarak |
+| `report.py` | dört satır, on sütun ve altlarındaki notlar |
+| `terms.py` | adlandırılmış yedi hata kaynağı; her biri kapatılabilsin diye |
+| `budget.py` | dağılım: her kaynağın neye değdiği, yeniden koşarak |
+| `siting.py` | bir hedefi karşılayan en ucuz yerleşimin aranması |
+| `settings.py` | raporun vermediği her değer ve bir yerleşimi şekillendiren her sayı, `defaults.toml`'dan |
+| `options.py` | adlandırılmış yerleşim seçenekleri: kısa bir düzenleme listesi ve gerekçesi |
+| `solve.py` | bir hedefi karşılayan en ucuz düzenin aranması |
+| `parallel.py` | bağımsız koşuların makinenin çekirdeklerine yayılması |
+| `deliver.py` | bütün çalışmanın Markdown olarak yazılması |
+| `calibrate.py` | bir MATLAB ölçümünün varsayılan olarak geri okunması |
+| `language.py` | iki dil: projenin kendi kurduğu cümleler, ikisinde de |
+| `viewer/` | yerel web uygulaması: durum, sahne, sunucu, kendi çizicisi ve komut satırının her fiili (`tasks.py`, `jobs.py`) |
+| `design.py` | birinin seçtiği ayarlar ve neyi ima ettikleri |
+| `proposal.py` | onay paneli: bir düzenleme, bir evet/hayır, her sonuç gösterilmiş |
+| `numbers.py` | virgüllü ondalık ayırıcı, binlik ayırıcı yok |
+| `cli.py` | `fetch`, `design`, `table`, `view`, `site`, `budget`, `defaults` ve `calibrate` fiilleri |
 
-`tests/test_architecture.py` inspects imports so the estimator cannot
-reach the truth. It is a test, not a convention, on purpose.
+`tests/test_architecture.py` import'ları denetler, böylece kestirici gerçeğe
+erişemez. Bilerek bir kural değil, bir testtir.
 
-### The one module the study turns on
+### Çalışmanın üzerinde döndüğü tek modül
 
-`rf.py` decides two different things from one calculation: whether a link
-closes, and how precisely it can measure. Keeping them together is what
-makes range an outcome rather than a constant (ADR-0002), and separating
-them is the change most likely to quietly break this project.
+`rf.py` tek bir hesaptan iki ayrı şeye karar verir: bir bağlantının
+kapanıp kapanmadığına ve ne kadar hassas ölçebildiğine. İkisini bir arada
+tutmak, menzili bir sabit değil bir sonuç yapan şeydir (ADR-0002); ayırmak
+ise bu projeyi sessizce bozma ihtimali en yüksek değişikliktir.
 
-The distinction that ADR-0007 exists to protect: **reaching is not
-ranging.** A link at 15 km still has 29 dB in hand and still measures
-distance to twenty-six metres. Anything that reports link closure as
-though it were coverage is wrong.
+ADR-0007'nin korumak için var olduğu ayrım: **erişmek ölçmek değildir.**
+15 km'deki bir bağlantının elinde hâlâ 29 dB vardır ve mesafeyi hâlâ yirmi
+altı metreye ölçer. Bağlantı kapanmasını kapsama gibi bildiren her şey
+yanlıştır.
 
-## What is left
+## Geriye kalanlar
 
-Everything on the original list is built. What remains is measurement,
-not code.
+Özgün listedeki her şey kuruldu. Kalan kod değil, ölçüm.
 
-1. **The figures.** All of them are in `src/yerkon/defaults.toml`
-   with what each affects and, where it was measured, what doubling it
-   does. Run `yerkon defaults --full` for the work list. The mast cost
-   is the most consequential: the siting search says existing signs beat
-   masts by five and a half times, and the break-even is 6588 TL.
-2. ~~**The residual clock offset after frequency correction.**~~ Done:
-   measured at 0,0793 ppm on 2026-09-10 (ADR-0018), and it is the one
-   figure in the file that is not a guess. What is left of it is a
-   bench: the simulation covers additive noise and not phase noise,
-   multipath or drift during the exchange.
-3. **The implementation floor**, 2,94 m, needs a bench and not a
-   simulation. One chip at 1625 kHz is 184 m of flight, so a waveform
-   simulation says 18 m and contradicts a measurement for a reason
-   already understood. The SX1280's ranging timing does not come from
-   the symbol correlation; it comes from an undocumented mechanism
-   inside the part.
-4. **What structures actually stand where.** The siting search's answer
-   moves with the survey, and the defaults are an assumption about a
-   typical stretch of Turkish highway.
-5. **Buildings, and the roads themselves.** OpenStreetMap was
-   unreachable from the machine that fetched the ground, so none of the
-   four Ankara sites carries a building footprint or a road alignment.
-   Two consequences, both conservative: the urban row's obstruction comes
-   from a clutter figure per kilometre rather than from the buildings
-   that are actually there, and every rural journey is a rectangle over
-   the ground rather than a road that follows it. A real alignment would
-   raise the rural figures, because roads run where the links do. One
-   `yerkon fetch` from a machine that can reach Overpass fixes both.
-   It is now the largest single thing standing between the rural row and
-   a better number: at 89,6 % availability the remaining failures are
-   ground in the way, and a journey that follows a road instead of a
-   rectangle over open country would avoid much of it (ADR-0022).
-6. **How well the anchors can actually be surveyed.** `yerkon budget`
-   makes this the single most consequential figure for the tunnel row:
-   at the assumed 0,15 m it is worth 1,84 m of position error there,
-   against 0,17 m for everything else combined, because the bore's
-   geometry multiplies one range's sigma by eighteen and a survey error
-   never averages out. In town it is worth 0,09 m and does not matter.
-   One number, two opposite answers, and only a real survey settles it.
+1. **Değerler.** Hepsi `src/yerkon/defaults.toml` içinde; her birinin neyi
+   etkilediği ve ölçülmüş olanlarda iki katına çıkarmanın ne yaptığı
+   yazılı. İş listesi için `yerkon defaults --full`. En sonuçlu olanı direk
+   maliyeti: yerleşim araması mevcut levhaların direkleri beş buçuk kat
+   yendiğini söylüyor ve başabaş noktası 6588 TL.
+2. ~~**Frekans düzeltmesinden sonra kalan saat kayması.**~~ Yapıldı:
+   2026-09-10'da 0,0793 ppm ölçüldü (ADR-0018) ve dosyadaki tahmin olmayan
+   tek değer o. Ondan geriye kalan bir tezgâh: benzetim toplanır gürültüyü
+   kapsıyor; faz gürültüsünü, çok yolluluğu ve alışveriş sırasında
+   sürüklenmeyi kapsamıyor.
+3. **Uygulama tabanı**, 2,94 m, bir benzetim değil bir tezgâh istiyor. 1625
+   kHz'de tek bir çip 184 m uçuştur, yani bir dalga formu benzetimi 18 m der
+   ve bir ölçümle, sebebi zaten anlaşılmış biçimde çelişir. SX1280'in ölçüm
+   zamanlaması sembol ilintisinden gelmiyor; parçanın içindeki belgesiz bir
+   mekanizmadan geliyor.
+4. **Hangi yapının gerçekte nerede durduğu.** Yerleşim aramasının cevabı
+   etütle birlikte oynuyor ve varsayılanlar tipik bir Türk karayolu kesimi
+   hakkında bir varsayım.
+5. **Binalar ve yolların kendisi.** Zemini getiren makineden OpenStreetMap'e
+   erişilemedi, dolayısıyla dört Ankara sahasının hiçbiri bir bina taban
+   alanı ya da bir yol güzergâhı taşımıyor. İki sonucu var, ikisi de
+   ihtiyatlı yönde: şehir içi satırın engeli gerçekten orada olan
+   binalardan değil kilometre başına bir engel kaybı değerinden geliyor ve
+   her kırsal yolculuk, zemini izleyen bir yol değil zeminin üzerinde bir
+   dikdörtgen. Gerçek bir güzergâh kırsal değerleri yükseltirdi, çünkü
+   yollar bağlantıların geçtiği yerden geçer. Overpass'a erişebilen bir
+   makineden tek bir `yerkon fetch` ikisini de çözer. Bu artık kırsal satır
+   ile daha iyi bir sayı arasında duran en büyük tek şey: %89,6
+   kullanılabilirlikte kalan başarısızlıklar yoldaki zemindir ve açık arazi
+   üzerindeki bir dikdörtgen yerine bir yolu izleyen bir yolculuk bunun
+   çoğundan kaçınırdı (ADR-0022).
+6. **Direklerin gerçekte ne kadar iyi ölçülebileceği.** `yerkon budget`
+   bunu tünel satırı için en sonuçlu tek değer yapıyor: varsayılan 0,15
+   m'de orada 1,84 m konum hatasına değiyor, diğer her şeyin toplamı olan
+   0,17 m'ye karşı; çünkü tünelin geometrisi bir menzilin sigmasını on
+   sekizle çarpıyor ve bir etüt hatası ortalamayla asla kaybolmuyor. Şehirde
+   0,09 m'ye değiyor ve önemi yok. Tek bir sayı, iki zıt cevap; ve bunu
+   yalnızca gerçek bir etüt çözer.
 
-## Open questions
+## Açık sorular
 
-- **OPEX rates and site costs.** Every one is an order-of-magnitude
-  placeholder marked `ASSUMPTION`, and together they are 99 % of a
-  costing. The mast figure of 85000 TL is the most consequential: it
-  decides whether purpose-built masts or existing roadside furniture
-  win, and that decision is worth more than everything the radio
-  choice affects.
-- **The residual clock offset after frequency correction**, half a part
-  per million, is the least supported number in the ranging model. It
-  decides whether single-sided ranging is usable on the slow radio, and
-  it is the first thing worth measuring.
-- **The multipath channel and the implementation floor** want calibrating
-  against MATLAB. The floor is currently one published measurement per
-  radio, and the model now says most of it is clock rather than timing
-  resolution, which the same measurement could confirm or refute. The
-  dissection raises the stakes: the SX1280's 2,94 m floor is the largest
-  single contributor to both the urban row (1,14 m of 1,62 m) and the
-  weighted row, so what that number really is decides what the whole
-  table says about the open road.
+- **OPEX oranları ve saha maliyetleri.** Her biri `ASSUMPTION` işaretli,
+  mertebe düzeyinde bir vekil ve birlikte bir maliyetlendirmenin %99'unu
+  ediyorlar. 85000 TL'lik direk değeri en sonuçlusu: amaca özel direklerin
+  mi mevcut yol donanımının mı kazanacağına o karar veriyor ve bu karar,
+  telsiz seçiminin etkilediği her şeyden daha değerli.
+- **Frekans düzeltmesinden sonra kalan saat kayması**, milyonda yarım
+  parça, ölçüm modelindeki en az desteklenen sayıydı. Yavaş telsizde tek
+  yönlü ölçümün kullanılabilir olup olmadığına o karar veriyor ve ölçülmeye
+  değer ilk şeydi.
+- **Çok yollu kanal ve uygulama tabanı** MATLAB'a karşı kalibrasyon
+  istiyor. Taban şu anda telsiz başına yayımlanmış tek bir ölçüm ve model
+  artık bunun çoğunun zamanlama çözünürlüğü değil saat olduğunu söylüyor;
+  aynı ölçüm bunu doğrulayabilir ya da çürütebilir. Dağılım bahsi
+  yükseltiyor: SX1280'in 2,94 m'lik tabanı hem şehir içi satırın (1,62
+  m'nin 1,14 m'si) hem ağırlıklı satırın en büyük tek katkısı, dolayısıyla
+  o sayının gerçekte ne olduğu bütün tablonun açık yol hakkında ne
+  söylediğine karar veriyor.
 
-## What this project has already got wrong
+## Bu projenin şimdiye kadar yanlış yaptıkları
 
-Kept because each one is a mistake worth not repeating.
+Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
 
-- Free-space path loss for near-ground links understated loss by 13 to
-  34 dB and produced a "10 km with 50 dB to spare" claim. Two-ray ground
-  reflection replaced it (ADR-0007).
-- "Use the widest bandwidth" was wrong. Position error is U-shaped in
-  bandwidth, because a wide channel resolves multipath into separate
-  peaks and a peak detector picks the strongest, which in a blocked
-  channel is a reflection.
-- A stateful RNG shared across scenarios contaminated every swept
-  comparison in the old repository's documentation.
-- Cramér-Rao alone claimed 2 cm from a narrowband radio at 100 m against
-  about 3 m measured. The model now reports the larger of the bound and
-  the measured floor.
-- LAMBDA80-24S is the SX1280 module, not an antenna. The antenna is the
-  Inventek W24P-U.
-- Earth bulge is the midpoint sag `d₁d₂/(2kR)`, not the tangent-plane
-  form, which overstated the clearance needed at 15 km by four times.
-- "I cannot download elevation data here" was wrong, concluded from three
-  hosts. Copernicus tiles come straight from public object storage.
+- Zemine yakın bağlantılar için serbest uzay yol kaybı, kaybı 13–34 dB
+  eksik gösterdi ve "50 dB payla 10 km" iddiasını üretti. Yerine iki ışınlı
+  zemin yansıması geçti (ADR-0007).
+- "En geniş bant genişliğini kullan" yanlıştı. Konum hatası bant
+  genişliğinde U biçimlidir, çünkü geniş bir kanal çok yolluluğu ayrı
+  tepelere çözer ve bir tepe dedektörü en güçlüsünü seçer — engellenmiş bir
+  kanalda o da bir yansımadır.
+- Senaryolar arasında paylaşılan durumlu bir rastgele sayı üreteci, eski
+  deponun belgelerindeki her taranmış karşılaştırmayı kirletti.
+- Tek başına Cramér-Rao, 100 m'de dar bantlı bir telsizden 2 cm iddia
+  ediyordu; ölçülen yaklaşık 3 m. Model artık sınır ile ölçülen tabanın
+  büyüğünü bildiriyor.
+- LAMBDA80-24S bir anten değil, SX1280 modülüdür. Anten Inventek
+  W24P-U'dur.
+- Dünya tümseği, teğet düzlem biçimi değil orta nokta çökmesi
+  `d₁d₂/(2kR)`'dir; teğet düzlem biçimi 15 km'de gereken açıklığı dört kat
+  fazla gösteriyordu.
+- "Buradan yükseklik verisi indiremem" yanlıştı; üç sunucuya bakılarak
+  çıkarılmıştı. Copernicus karoları doğrudan genel nesne depolamasından
+  geliyor.
+- Konumsal `{}` ile iki dil: Türkçe cümle toplamı önce sayar, İngilizce
+  varsayımı önce sayar ve biri sessizce diğerinin sayılarını alır. İki
+  alanı olan ilk cümlede aldı da (ADR-0035).
