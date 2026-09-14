@@ -37,6 +37,14 @@ export const SAY = {
     en: "With no measured ground chosen, the hills come from the three "
         + "figures below. Nowhere is flat, so there is no flat option.",
   },
+  "ground.bore.note": {
+    tr: "Bir tünel tepenin içinden geçer, üzerinden değil: tabanı iki "
+        + "portal arasındaki düz çizgidir. Aşağıdaki üç değer, zemin "
+        + "seçilmiş olsun ya da olmasın, bu satırda okunmaz.",
+    en: "A bore goes through the hill rather than over it: its floor is "
+        + "the straight line between two portals. The three figures below "
+        + "go unread on this row, measured ground or not.",
+  },
   "ground.real.note": {
     tr: "Ölçülmüş bir zemin kendi rölyefini, kendi pürüzünü ve kendi "
         + "engellerini getirir, bu yüzden aşağıdaki üç değer uygulanmaz.",

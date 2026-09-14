@@ -390,14 +390,7 @@ function drawSites() {
   select.onchange = () => edit({ site: select.value }, false)
     .catch(e => flash(e.message, true));
 
-  // A fetched grid brings its own relief and its own roughness, so the
-  // three sliders under it stop meaning anything. Saying so beats
-  // leaving them looking live.
   const real = Boolean(state.site);
-  for (const id of ["relief_m", "hill_spacing_m", "roughness_m"]) {
-    const input = document.getElementById(id);
-    if (input) input.disabled = real;
-  }
   const note = document.getElementById("ground-note");
   if (note) {
     note.textContent = real
@@ -405,13 +398,79 @@ function drawSites() {
         || say("ground.none")
       : say("ground.none");
   }
-  // Say that the three sliders stopped applying, beside the three
-  // sliders, rather than leaving them greyed out with no reason given.
-  const modelled = document.getElementById("modelled-note");
-  if (modelled) {
-    modelled.textContent = say(
-      real ? "ground.real.note" : "ground.modelled.note");
+  lockDeadKnobs();
+}
+
+/* The three modelled-hill figures, and whether this state reads them.
+ *
+ * `ViewState.terrain` builds a bore from its portals and a fetched site
+ * from its grid; either way these three go unread. A control that looks
+ * live and changes nothing is worse than no control (ADR-0024).
+ */
+const MODELLED_HILLS = ["relief_m", "hill_spacing_m", "roughness_m"];
+
+function whyDead(key) {
+  if (!MODELLED_HILLS.includes(key)) return null;
+  // The bore first: on the tunnel row both are true, and the reason the
+  // figures go unread there is the bore rather than the mountain.
+  if (state.bore) return "ground.bore.note";
+  if (state.site) return "ground.real.note";
+  return null;
+}
+
+/* Grey what this arrangement does not read, and say why beside it.
+ *
+ * Every knob is two inputs — a slider and the exact number beside it —
+ * and disabling only the slider left the number box live, so measured
+ * ground could still be given a relief by typing one. The whole knob is
+ * locked and greyed here, from the state rather than from whichever
+ * handler last ran, so it holds on a reload, a row change and a
+ * language change alike.
+ */
+function lockDeadKnobs() {
+  let reason = null;
+  for (const key of MODELLED_HILLS) {
+    const why = whyDead(key);
+    reason = reason || why;
+    for (const input of knobInputs(key)) input.disabled = Boolean(why);
+    const knob = knobOf(key);
+    if (knob) {
+      knob.classList.toggle("dead", Boolean(why));
+      // On the label rather than on the inputs: a disabled input does
+      // not raise the events a tooltip waits for, so a title set there
+      // is a reason nobody can read.
+      knob.title = why ? say(why) : "";
+    }
   }
+  const modelled = document.getElementById("modelled-note");
+  if (modelled) modelled.textContent = say(reason || "ground.modelled.note");
+}
+
+/* Leave room under the pinned header for anything scrolled to.
+ *
+ * `scrollIntoView` puts an element at the top of the scroll box, which
+ * is behind the rows and the search once those are pinned — so opening
+ * a step scrolled its own heading out of sight. Measured rather than
+ * written down, because the header is two rows of text and its height
+ * moves with the font.
+ */
+function keepClearOfTheHeader() {
+  const panel = document.getElementById("panel");
+  const top = document.getElementById("top");
+  if (panel && top) {
+    panel.style.scrollPaddingTop = `${Math.round(top.offsetHeight) + 8}px`;
+  }
+}
+
+/* Both halves of a knob: the slider and the exact number beside it. */
+function knobInputs(key) {
+  return [document.getElementById(key), document.getElementById(key + "-num")]
+    .filter(Boolean);
+}
+
+function knobOf(key) {
+  const input = document.getElementById(key);
+  return input ? input.closest("label.knob") : null;
 }
 
 function drawRuns() {
@@ -2128,6 +2187,7 @@ async function refreshScene() {
   }
   drawTabs();
   drawLanguages();
+  keepClearOfTheHeader();
   drawSites();
   document.getElementById("terrain-note").textContent = say("terrain.note", {
     ground: latest.terrain.description, anchors: latest.anchors.length,

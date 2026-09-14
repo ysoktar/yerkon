@@ -21,17 +21,24 @@
   <h1>YERKON</h1>
   <p class="sub" id="terrain-note">—</p>
 
-  <nav id="tabs"></nav>
+  <!--
+    Which row, what to search for, and which language belong to the whole
+    panel rather than to the step that happens to be open, so they stay
+    pinned while the steps scroll under them.
+  -->
+  <div id="top">
+    <nav id="tabs"></nav>
 
-  <div class="find">
-    <input type="search" id="find" data-say-placeholder="find.placeholder"
-           autocomplete="off">
-    <button id="find-clear" class="quiet" data-say-title="find.clear">✕</button>
-    <!--
-      Both languages at once rather than a menu: there are two, and a
-      two-item menu costs a click to find out what is in it.
-    -->
-    <nav id="languages"></nav>
+    <div class="find">
+      <input type="search" id="find" data-say-placeholder="find.placeholder"
+             autocomplete="off">
+      <button id="find-clear" class="quiet" data-say-title="find.clear">✕</button>
+      <!--
+        Both languages at once rather than a menu: there are two, and a
+        two-item menu costs a click to find out what is in it.
+      -->
+      <nav id="languages"></nav>
+    </div>
   </div>
   <p class="hint no-hits" id="find-empty" data-say="find.empty" hidden></p>
 

@@ -185,3 +185,8 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   dizgilere yazılmıştı; İngilizce bir satır, biri sayfayı değiştirene
   kadar sıradan koddan ayırt edilemiyor. Artık bir sınama `tell`'e sabit
   dizgi verilmesini reddediyor (ADR-0035).
+- Ölçülmüş zemin seçilince kilitlenen üç değerin yalnızca sürgüsü
+  kilitleniyordu; yanındaki sayı kutusu canlı kalıyordu. Gri bir
+  sürgünün altında canlı bir kutu, üç durumun en kötüsü: kilidin
+  sebebini gösteriyor ve kilidi tutmuyor. Aynı üç değer tünel satırında
+  da hiç okunmuyor ve orada hiç kilitlenmemişti (ADR-0036).

@@ -1407,6 +1407,91 @@ def test_a_hidden_row_is_actually_hidden():
     assert "[hidden] { display: none !important; }" in style
 
 
+def read_markup():
+    import pathlib
+
+    return (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/index.html"
+    ).read_text(encoding="utf-8")
+
+
+def read_style():
+    import pathlib
+
+    return (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "src/yerkon/viewer/static/style.css"
+    ).read_text(encoding="utf-8")
+
+
+def test_both_halves_of_a_knob_are_named_the_same_way():
+    """A knob is a slider and the exact number beside it.
+
+    Locking one of them is worse than locking neither: measured ground
+    could still be given a relief by typing it into the box under a
+    greyed slider. `knobInputs` reaches the second half by `id + "-num"`,
+    so a knob that breaks the naming convention would be half-locked and
+    look right.
+    """
+    import re
+
+    markup = read_markup()
+    knobs = re.findall(
+        r'<label class="knob".*?</label>', markup, re.S)
+    assert len(knobs) >= 4, "this stopped matching the panel"
+    for knob in knobs:
+        sliders = re.findall(r'type="range" id="([\w]+)"', knob)
+        numbers = re.findall(r'type="number" id="([\w-]+)"', knob)
+        assert len(sliders) == 1 and len(numbers) == 1, knob[:80]
+        assert numbers[0] == sliders[0] + "-num", (
+            "{} is the other half of {} but is not named for it"
+            .format(numbers[0], sliders[0])
+        )
+
+
+def test_the_figures_a_row_does_not_read_are_locked_rather_than_live():
+    """ADR-0024: a control that looks live and does nothing is worse than
+    no control.
+
+    `ViewState.terrain` reads the three modelled-hill figures only when
+    no site is named and the row is not a bore. Both cases were drawn
+    live, so a measured hill could be given a different height and
+    nothing would happen.
+    """
+    application = read_app_js()
+    assert 'const MODELLED_HILLS = ["relief_m", "hill_spacing_m", "roughness_m"];' \
+        in application
+    reasons = application[application.index("function whyDead("):]
+    reasons = reasons[: reasons.index("\n}")]
+    assert "state.bore" in reasons, "a bore reads none of them either"
+    assert "state.site" in reasons
+
+
+def test_the_rows_and_the_language_do_not_scroll_away():
+    """They belong to the panel, not to the step that happens to be open.
+
+    Left in the flow they scrolled off with step one, so by the time
+    somebody was working in the figures neither the rows nor the language
+    could be clicked without scrolling all the way back up.
+    """
+    import re
+
+    markup = read_markup()
+    top = markup[markup.index('<div id="top">'):]
+    top = top[: top.index("</div>\n\n")]
+    assert 'id="tabs"' in top
+    assert 'id="languages"' in top
+
+    style = read_style()
+    pinned = style[style.index("#top {"):]
+    pinned = pinned[: pinned.index("}")]
+    assert "position: sticky" in pinned
+
+    # And anything scrolled to must land under it rather than behind it.
+    assert "scrollPaddingTop" in read_app_js()
+
+
 def test_every_key_the_settings_file_uses_has_a_name_in_the_panel():
     """`clock.crystal.residual_ppm` is what goes in the file and what
     somebody editing the file needs; it is not a name. Seventy-two of

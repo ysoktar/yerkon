@@ -125,6 +125,29 @@ Ve ağ, sahanın oranları ne olursa olsun sabit yüze kırktı; yani yirmi
 kilometreye yirmi kilometre bir yönde her 460 m'de, diğer yönde her 1100
 m'de örnekleniyordu: zemin çizgi çizgi çıkıyordu.
 
+### Okunmayan değerler kilitli (bu bozuktu)
+
+**Zemin**'den ölçülmüş bir yer seç. *Tepe yüksekliği*, *tepe aralığı* ve
+*yüzey pürüzü* griye döner ve artık değişmez — sürgüsü de yanındaki sayı
+kutusu da. Eskiden yalnızca sürgü kilitleniyordu; kutuya 700 yazmak
+kabul ediliyor, ekranda görünüyor ve hiçbir şeyi değiştirmiyordu, çünkü
+zemin ölçülmüştü (ADR-0036).
+
+**Tünel** sekmesinde zemini *Modellenmiş*'e çevir: üçü kilitli kalır. Bir
+tünel tepenin içinden geçer, üzerinden değil; tabanı iki portal
+arasındaki düz çizgidir ve bu üç değer o satırda hiç okunmaz. Bu hiç
+doğru çizilmemişti.
+
+*Engel kaybı* kilitlenmez ve kilitlenmemeli: ölçülmüş zemin bina ve ağaç
+getirmez, o yüzden o değer hâlâ okunuyor.
+
+### Satırlar ve dil artık kaçmıyor (bu da bozuktu)
+
+Sekmeler ile TR/EN panelin tepesine sabitlendi. Beşinci adımı aç, yetmiş
+iki değerin içine kadar kaydır: ikisi de yerinde duruyor. Eskiden
+kaydırıp gidiyorlardı, yani satır değiştirmek için önce başa dönmek
+gerekiyordu. Sonuç zaten alta sabitliydi; üst uç atlanmıştı.
+
 ### Sahanın iki sürgüsü
 
 **En** ve **Boy** alt alta duruyor ve eskiden tamamen farklı şeyler
@@ -287,8 +310,8 @@ hiçbir şeyin okumadığı bir değeri değiştiriyordu.
 
 ## Nereden itiraz etmeli
 
-- `docs/adr/` — otuz beş karar, her biri neye mal olduğuyla. Son olanlar
-  0030–0035.
+- `docs/adr/` — otuz altı karar, her biri neye mal olduğuyla. Son olanlar
+  0030–0036.
 - `src/yerkon/defaults.toml` — yetmiş iki değer. Otuz beşi hâlâ vekil;
   85000 TL'deki direk maliyeti, direklerin mi mevcut yol donanımının mı
   kazanacağına karar veren değer.

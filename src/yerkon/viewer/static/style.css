@@ -224,6 +224,24 @@ label.tick input { width: auto; }
 
 /* The three rows, as tabs. Each keeps its own prepared deployment. */
 
+/* Pinned, like the result at the other end of the panel.
+ *
+ * The rows and the language belong to the whole panel rather than to
+ * whichever step is open, and they used to scroll away with step one:
+ * by the time somebody was working in the figures they could not reach
+ * either without scrolling all the way back up. `#top` carries the
+ * panel's own background so the steps pass behind it.
+ */
+#top {
+  position: sticky;
+  top: -16px;
+  z-index: 3;
+  margin: 0 -18px;
+  padding: 16px 18px 0;
+  background: var(--paper);
+  box-shadow: 0 8px 16px -12px rgba(18, 24, 31, 0.4);
+}
+
 #tabs {
   display: flex;
   gap: 4px;
@@ -352,12 +370,19 @@ label.knob > input.num {
   font-variant-numeric: tabular-nums;
 }
 
-label.knob > input:disabled { opacity: 0.45; }
+label.knob > input:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* A knob this arrangement does not read. Greyed whole rather than only
+ * on the slider: the number beside it is the other half of the same
+ * control, and a live-looking box under a greyed slider is the worst of
+ * the three states. The note under the step says which reason. */
+label.knob.dead { color: #97a2ad; }
+label.knob.dead > output { color: #97a2ad; }
 
 
 /* ---------- finding one setting among a hundred ---------- */
 
-.find { display: flex; gap: 6px; margin: 0 0 4px; }
+.find { display: flex; gap: 6px; margin: 0 0 4px; padding-bottom: 8px; }
 
 .find input {
   flex: 1;
