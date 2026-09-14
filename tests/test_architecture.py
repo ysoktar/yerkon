@@ -257,3 +257,57 @@ def test_no_test_writes_to_a_path_only_one_operating_system_has():
         "these name a directory only one operating system has; ask for the "
         "`tmp_path` fixture instead: {}".format(", ".join(offenders))
     )
+
+
+def test_nothing_stands_on_ground_that_was_never_measured():
+    """ADR-0037. A fetched grid stops where the fetch stopped.
+
+    `Site.height_at` clamps past its edge rather than raising, which is
+    right for a link path grazing the boundary and wrong for a
+    deployment: past the edge the clamp extrudes the boundary row into a
+    plane, and a plane is the most favourable ground this model can draw
+    (ADR-0021). Ten of the urban row's forty six anchors and five of the
+    rural row's thirty three used to stand there, and the rural ones
+    were carrying the far leg of its circuit.
+
+    A bore is exempt and says so: it goes through the hill rather than
+    over it, so its floor is a line between two portals and its length is
+    checked where those are read.
+    """
+    from yerkon.scenarios import SITES, catalogue
+    from yerkon.settings import DEFAULTS
+    from yerkon.site.cache import SiteCache
+
+    rows = catalogue(DEFAULTS)
+    for name in ("urban", "rural"):
+        fetched_name = DEFAULTS.text("{}.site".format(name))
+        if not fetched_name:
+            continue
+        site = SiteCache(SITES / fetched_name).load()
+        outside = [
+            anchor.identifier
+            for anchor in rows[name].scenario.deployment.anchors
+            if not (0.0 <= anchor.position_m[0] <= site.width_m
+                    and 0.0 <= anchor.position_m[1] <= site.height_m)
+        ]
+        assert not outside, (
+            "{} anchors stand past the {} grid ({:.0f} x {:.0f} m): {}"
+            .format(name, fetched_name, site.width_m, site.height_m,
+                    ", ".join(outside))
+        )
+
+
+def test_a_row_may_not_be_given_more_ground_than_was_fetched():
+    """The rule itself, on the one function that holds it.
+
+    Modelled ground has no edge, so it is left alone; a corridor's zero
+    width is a line rather than a narrow area and stays zero.
+    """
+    from yerkon.scenarios import SITES, fits_on
+    from yerkon.site.cache import SiteCache
+
+    site = SiteCache(SITES / "kizilay").load()
+    assert fits_on(None, 40_000.0, 40_000.0) == (40_000.0, 40_000.0)
+    assert fits_on(site, 40_000.0, 40_000.0) == (site.width_m, site.height_m)
+    assert fits_on(site, 1_000.0, 0.0) == (1_000.0, 0.0)
+    assert fits_on(site, 1_000.0, 500.0) == (1_000.0, 500.0)

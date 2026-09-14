@@ -30,6 +30,7 @@ from yerkon.scenarios import (
     _straight_road,
     catalogue,
     fetched,
+    fits_on,
     tunnel_ground,
 )
 from yerkon.language import DEFAULT_LANGUAGE, say
@@ -429,8 +430,35 @@ class ViewState:
             )
         return replace(self, **cleaned)
 
+    def measured(self):
+        """The ground fetched for this row, or nothing where it is modelled."""
+        return fetched(self.site) if self.site else None
+
+    def on_measured_ground(self) -> "ViewState":
+        """This state, with the site no larger than the ground measured.
+
+        A fetched grid stops where the fetch stopped. `Site.height_at`
+        clamps past its edge rather than raising, which is right for a
+        link path grazing the boundary and wrong for a deployment: the
+        clamp extrudes the edge row into a plane, and a plane is the most
+        favourable ground this model can draw (ADR-0021). So a site
+        longer or wider than the ground under it puts anchors on a number
+        nobody measured, and this brings it in (ADR-0037).
+
+        A bore is not bounded here. It goes through the hill rather than
+        over it, so its floor is a line between two portals and its
+        length is checked against the mountain where the portals are read
+        (`tunnel_ground`).
+        """
+        if self.bore:
+            return self
+        length, width = fits_on(self.measured(), self.corridor_m, self.width_m)
+        if (length, width) == (self.corridor_m, self.width_m):
+            return self
+        return replace(self, corridor_m=length, width_m=width)
+
     def within_site(self) -> "ViewState":
-        """This state, with every anchor run brought inside the site.
+        """This state, with everything standing on it brought inside it.
 
         The site's width already shapes the anchors directly — a grid
         runs from the road out to it — but its length did not, because a
@@ -438,13 +466,20 @@ class ViewState:
         moved the deployment and the other moved nothing, which is not a
         distinction either of them makes on screen.
 
-        Only the length slider calls this. Typing an end into a run is a
-        person being explicit about that run, and clipping it under them
-        would be answering a question they did not ask.
+        The site itself is brought inside the measured ground first, so
+        that shortening for that reason clips the runs the same way
+        shortening by hand does.
+
+        Only the length slider, the width slider and the ground picker
+        call this. Typing an end into a run is a person being explicit
+        about that run, and clipping it under them would be answering a
+        question they did not ask.
         """
-        length = max(self.corridor_m, 0.0)
-        clipped = tuple(run.within(length) for run in self.runs)
-        return self if clipped == self.runs else replace(self, runs=clipped)
+        bounded = self.on_measured_ground()
+        length = max(bounded.corridor_m, 0.0)
+        clipped = tuple(run.within(length) for run in bounded.runs)
+        return bounded if clipped == bounded.runs else replace(
+            bounded, runs=clipped)
 
     def as_json(self) -> dict:
         out = {}
@@ -474,7 +509,17 @@ def from_scenario(name: str) -> ViewState:
     arrangements. What is shared is the thing that matters: the module,
     the mounting, the spacing and the shape each mode uses — a town and a
     stretch of open country are areas, and only a bore is a line.
+
+    Each row is written as the extent it wants and then brought inside
+    the ground fetched for it, rather than with the measurement written
+    into the literal: 2970 by 2940 is what kizilay came back as, and a
+    figure like that belongs to the fetch rather than to the code
+    (ADR-0037).
     """
+    return _template(name).within_site()
+
+
+def _template(name: str) -> ViewState:
     if name == "urban":
         return ViewState(
             scenario="urban", corridor_m=3000.0, width_m=3000.0,

@@ -242,30 +242,50 @@ def test_the_rural_round_polls_more_anchors_than_a_fix_needs():
 
 
 @pytest.mark.slow
-def test_a_longer_rural_round_buys_availability_on_every_seed():
+def test_how_long_a_rural_round_runs_cannot_be_settled_on_one_seed():
     """The check the neighbour list failed, applied to what replaced it.
 
     A change measured on one seed is a change measured on nothing: the
     ordering trick this replaced gave +2,57 points on the first seed it
-    was tried on and −1,24 on the third. This one is positive on all of
-    them, and the test says so rather than trusting the run that
-    happened to be shipped.
+    was tried on and −1,24 on the third. Polling twelve anchors instead
+    of eight replaced it and was recorded as worth 5,5 points free.
+
+    On fetched ground only (ADR-0037) that claim is gone. Eight beats
+    ten on one seed and loses to it on the other, by more than the gap
+    the twelve was credited with. This pins the reversal rather than the
+    winner, because there is no winner to pin: anybody who reads a
+    ranking out of one seed here is reading noise, and `yerkon solve`
+    over more seeds is what would settle it.
     """
     from dataclasses import replace
 
     from yerkon.evaluate import run_scenario
+    from yerkon.parallel import spread
 
     base = CHOICES["rural"].scenario
-    for seed in (202, 404):
-        longer = replace(base, seed=seed)
-        shorter = replace(
-            longer,
-            deployment=replace(longer.deployment, max_anchors_per_round=8),
+
+    def polling(seed, anchors):
+        return replace(
+            replace(base, seed=seed),
+            deployment=replace(base.deployment, max_anchors_per_round=anchors),
         )
-        assert (
-            run_scenario(longer).availability
-            > run_scenario(shorter).availability
-        ), seed
+
+    runs = spread(run_scenario, [
+        polling(seed, anchors)
+        for seed in (202, 404) for anchors in (8, 10)
+    ])
+    got = {
+        (seed, anchors): run.availability
+        for (seed, anchors), run in zip(
+            [(s, a) for s in (202, 404) for a in (8, 10)], runs)
+    }
+    reversed_somewhere = (
+        (got[(202, 8)] > got[(202, 10)]) != (got[(404, 8)] > got[(404, 10)])
+    )
+    assert reversed_somewhere, (
+        "eight against ten now orders the same way on both seeds, so the "
+        "round length may be measurable after all: {}".format(got)
+    )
 
 
 # --- The figures reaching both ends of a link -----------------------------

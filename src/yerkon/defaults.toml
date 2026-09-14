@@ -813,22 +813,30 @@ unit = "anchors"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Sekiz değil on iki, \
-çünkü gerçek rölyefte yoklananın yarısı hiç cevap vermiyor: sekiz deneme \
-yaklaşık dört yanıt verir, ki bu da soğuk bir konum için gerekenin tam \
-kendisidir, yedeksiz. 5,5 puan kullanılabilirlik ve güncelleme hızının \
-üçte biri değerinde (ADR-0022)."""
-note_en = """How many anchors a unit polls before it is fixed. Twelve rather than \
-eight, because half of what is polled over real relief never answers: \
-eight attempts yield about four replies, exactly what a cold fix needs \
-with nothing spare. Worth 5,5 points of availability and a third of the \
-update rate (ADR-0022)."""
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Altı çok az: \
+gerçek rölyefte yoklananın yarısı hiç cevap vermiyor, dolayısıyla altı \
+deneme yaklaşık üç yanıt verir ve bir konum dört istiyor — iki tohumda \
+da %65'te kalıyor. Sekizin üstünde tercih ölçülemiyor: yalnızca \
+indirilmiş zemin üzerinde koşulduğundan beri (ADR-0037) sıralama tohumla \
+birlikte dönüyor — sekiz bir tohumda onu geçiyor, ötekinde ona \
+kaybediyor — ve komşu değerler arasındaki fark tohumlar arasındaki kadar. \
+On iki, tek bir tohumla değiştirmemek için duruyor; bunu çözecek olan \
+daha çok tohumla `yerkon solve` (ADR-0022, ADR-0023)."""
+note_en = """How many anchors a unit polls before it is fixed. Six is too few: \
+half of what is polled over real relief never answers, so six attempts \
+yield about three replies where a fix wants four, and both seeds sit at \
+65 %. Above eight the choice cannot be measured: since this has run on \
+fetched ground only (ADR-0037) the ordering turns with the seed — eight \
+beats ten on one and loses to it on the other — and neighbouring values \
+differ by as much as the seeds do. Twelve stands because changing it on \
+one seed is the mistake this project already made; more seeds through \
+`yerkon solve` is what settles it (ADR-0022, ADR-0023)."""
 affects = """kırsal satırın kullanılabilirliğini, güncelleme hızını ve yatay hatasını"""
 affects_en = "the rural row's availability, update rate and horizontal error"
-sensitivity = """on altı, 0,8 puan daha getirir ve getirdiğinden çok güncelleme hızı \
-götürür"""
-sensitivity_en = """sixteen buys another 0,8 points and costs more update rate than it \
-returns"""
+sensitivity = """altının altında çöküyor; sekiz ile on altı arasında iki tohumda \
+%69 ile %75 arasında geziniyor ve sıralama sabit değil"""
+sensitivity_en = """it collapses below six; between eight and sixteen it wanders \
+between 69 % and 75 % over two seeds and the ordering does not hold"""
 
 [values."rural.accept_sigma_m"]
 value = 30.0

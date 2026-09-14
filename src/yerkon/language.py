@@ -191,6 +191,23 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "model, so these figures come from the same engine the table "
               "does (ADR-0023).",
     },
+    # -- why the confirmation panel says a figure has to move ------------
+    "panel.past_the_site": {
+        "tr": "sahanın ucunu geçen bir direk, hiçbir şeyin modellemediği "
+              "zeminde durur ve hiçbir birim oradan geçmez",
+        "en": "an anchor past the end of the site stands on ground nothing "
+              "models and nothing drives past",
+    },
+    "panel.past_the_measurement": {
+        "tr": "bir saha, kendisi için indirilen zeminden büyük olamaz; "
+              "kenarın ötesinde yalnızca sınır satırının bir düzleme "
+              "uzatılmışı vardır",
+        "en": "a site is no larger than the ground fetched for it; past the "
+              "edge there is only the boundary row extruded into a plane",
+    },
+    "panel.site_length": {"tr": "Sahanın boyu", "en": "The site's length"},
+    "panel.site_width": {"tr": "Sahanın eni", "en": "The site's width"},
+    "panel.ground": {"tr": "Zemin", "en": "Ground"},
     # -- what a long task says while it runs -------------------------------
     #
     # These are the lines the page shows while a job is going. They are

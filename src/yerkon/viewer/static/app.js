@@ -128,6 +128,8 @@ const WORDS = {
     anchor_height_m: ["Direk yüksekliği",
                       "montaj yapısı direğin ne kadar yükseldiğini belirliyor"],
     corridor_m: ["Sahanın boyu", ""],
+    width_m: ["Sahanın eni", ""],
+    site: ["Zemin", ""],
     from_m: ["Grubun başlangıcı",
              "sahanın dışında kalan direk hiçbir şeyin modellemediği "
              + "zeminde durur"],
@@ -145,6 +147,8 @@ const WORDS = {
   // this only names the two the page adds.
   en: {
     corridor_m: ["The site's length", ""],
+    width_m: ["The site's width", ""],
+    site: ["Ground", ""],
     from_m: ["The group's start",
              "an anchor past the end of the site stands on ground nothing "
              + "models and nothing drives past"],
@@ -387,7 +391,11 @@ function drawSites() {
   const entries = [["", say("ground.modelled")]]
     .concat(SITES.map(name => [name, say("ground.real", { site: name })]));
   select.innerHTML = options(entries, state.site || "");
-  select.onchange = () => edit({ site: select.value }, false)
+  // Through the panel: a smaller fetch cannot hold a larger site, so
+  // choosing ground can pull the length, the width and the anchor runs
+  // in with it, and that is a change somebody should see first
+  // (ADR-0009, ADR-0037).
+  select.onchange = () => edit({ site: select.value }, true)
     .catch(e => flash(e.message, true));
 
   const real = Boolean(state.site);
@@ -427,6 +435,26 @@ function whyDead(key) {
  * handler last ran, so it holds on a reload, a row change and a
  * language change alike.
  */
+/* A site is no larger than the ground fetched for it.
+ *
+ * The engine refuses it either way and the panel says so, but a slider
+ * that runs to forty kilometres over a three kilometre fetch invites the
+ * refusal rather than showing the limit. Where the ground is modelled
+ * there is no edge, so the slider goes back to its full travel.
+ */
+function capSlidersToTheGround() {
+  const measured = latest && latest.terrain && latest.terrain.measured_m;
+  for (const [key, reach] of [["corridor_m", 0], ["width_m", 1]]) {
+    const slider = document.getElementById(key);
+    if (!slider) continue;
+    const full = slider.dataset.fullMax || slider.max;
+    slider.dataset.fullMax = full;
+    slider.max = measured
+      ? Math.min(Number(full), Math.round(measured[reach]))
+      : full;
+  }
+}
+
 function lockDeadKnobs() {
   let reason = null;
   for (const key of MODELLED_HILLS) {
@@ -2188,6 +2216,7 @@ async function refreshScene() {
   drawTabs();
   drawLanguages();
   keepClearOfTheHeader();
+  capSlidersToTheGround();
   drawSites();
   document.getElementById("terrain-note").textContent = say("terrain.note", {
     ground: latest.terrain.description, anchors: latest.anchors.length,

@@ -340,6 +340,30 @@ def fetched(name: str) -> Optional["Site"]:
     return cache.load() if cache.exists else None
 
 
+def fits_on(site: Optional["Site"], length_m: float,
+            width_m: float = 0.0) -> tuple[float, float]:
+    """A site's length and width, brought inside the ground measured.
+
+    `Site.height_at` clamps outside its grid rather than raising, because
+    a link path can graze the edge and a hard failure there would be
+    less useful than the nearest known ground. That is right for a
+    grazing path and wrong for a deployment: past the edge the clamp
+    extrudes the boundary row into a plane, and a plane is the most
+    favourable ground this model can draw and the least like anywhere a
+    receiver will be (ADR-0021). An anchor standing there is standing on
+    a number nobody measured.
+
+    A width of zero is a corridor rather than an area and stays zero:
+    there is nothing to bring in.
+    """
+    if site is None:
+        return length_m, width_m
+    return (
+        min(length_m, site.width_m),
+        width_m if width_m <= 0.0 else min(width_m, site.height_m),
+    )
+
+
 def _patched(terrain: Terrain, settings: Settings, row: str) -> Terrain:
     """Give a terrain ground that is not the same everywhere.
 
@@ -476,8 +500,14 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     # Every number that shapes a deployment comes from the settings file,
     # so one file changes every figure in the table and the viewer can
     # move any of them while it is running (ADR-0023).
-    URBAN_M = settings.number("urban.extent_m")
-    URBAN_ROAD = _circuit(URBAN_M, URBAN_M, URBAN_TERRAIN, inset_m=300.0,
+    # Asked for in the settings, then brought inside the ground that was
+    # actually fetched. Ten of forty six urban anchors used to stand past
+    # the edge of the measured grid, on the plane the clamp extrudes
+    # there (ADR-0037).
+    URBAN_X, URBAN_Y = fits_on(
+        fetched(settings.text("urban.site")),
+        settings.number("urban.extent_m"), settings.number("urban.extent_m"))
+    URBAN_ROAD = _circuit(URBAN_X, URBAN_Y, URBAN_TERRAIN, inset_m=300.0,
                           step_m=150.0)
 
     URBAN = Deployed(
@@ -486,7 +516,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             terrain=URBAN_TERRAIN,
             deployment=Deployment(
                 anchors=_anchors_over(
-                    URBAN_M, URBAN_M,
+                    URBAN_X, URBAN_Y,
                     settings.number("urban.anchor_spacing_m"),
                     mounting["lighting_column"], URBAN_TERRAIN,
                     radio=module["sx1280"], prefix="C",
@@ -526,8 +556,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
 
     RURAL_TERRAIN = rural_ground(settings)
 
-    RURAL_M = settings.number("rural.extent_m")
-    RURAL_ROAD = _circuit(RURAL_M, RURAL_M, RURAL_TERRAIN, inset_m=2000.0)
+    RURAL_X, RURAL_Y = fits_on(
+        fetched(settings.text("rural.site")),
+        settings.number("rural.extent_m"), settings.number("rural.extent_m"))
+    RURAL_ROAD = _circuit(RURAL_X, RURAL_Y, RURAL_TERRAIN, inset_m=2000.0)
 
     RURAL = Deployed(
         scenario=Scenario(
@@ -535,7 +567,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             terrain=RURAL_TERRAIN,
             deployment=Deployment(
                 anchors=_anchors_over(
-                    RURAL_M, RURAL_M,
+                    RURAL_X, RURAL_Y,
                     settings.number("rural.anchor_spacing_m"),
                     mounting["tall_mast"], RURAL_TERRAIN,
                     radio=module["e28"], prefix="M",

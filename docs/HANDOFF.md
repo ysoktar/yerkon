@@ -148,8 +148,8 @@ yanlıştır.
   istiyor. Taban şu anda telsiz başına yayımlanmış tek bir ölçüm ve model
   artık bunun çoğunun zamanlama çözünürlüğü değil saat olduğunu söylüyor;
   aynı ölçüm bunu doğrulayabilir ya da çürütebilir. Dağılım bahsi
-  yükseltiyor: SX1280'in 2,94 m'lik tabanı hem şehir içi satırın (1,62
-  m'nin 1,14 m'si) hem ağırlıklı satırın en büyük tek katkısı, dolayısıyla
+  yükseltiyor: SX1280'in 2,94 m'lik tabanı hem şehir içi satırın (1,79
+  m'nin 1,22 m'si) hem ağırlıklı satırın en büyük tek katkısı, dolayısıyla
   o sayının gerçekte ne olduğu bütün tablonun açık yol hakkında ne
   söylediğine karar veriyor.
 
@@ -185,6 +185,16 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   dizgilere yazılmıştı; İngilizce bir satır, biri sayfayı değiştirene
   kadar sıradan koddan ayırt edilemiyor. Artık bir sınama `tell`'e sabit
   dizgi verilmesini reddediyor (ADR-0035).
+- "Tur başına on iki direk yoklamak 5,5 puan eder" bulgusu, kısmen
+  ölçülmemiş zeminin ürünüymüş. Yalnızca indirilmiş zemin üzerinde
+  sekizin üstündeki sıralama tohumla dönüyor ve komşu değerler
+  arasındaki fark tohumlar arasındaki kadar (ADR-0037). Bunu, tek tohuma
+  güvenmemek için yazılmış bir sınama yakaladı.
+- Hazır gelen satırlar, altlarında indirilmiş ızgaradan büyüktü: şehir
+  içinde 46 direğin 10'u, kırsalda 33'ün 5'i ölçülen zeminin dışında
+  duruyordu. `height_at` kenarın dışında kırptığı için hata yükselmiyor,
+  sınır satırı bir düzleme uzuyor ve düzlem üzerinde her link kapanıyordu.
+  Kırsal kullanılabilirliğin on yedi puanı oradan geliyormuş (ADR-0037).
 - Ölçülmüş zemin seçilince kilitlenen üç değerin yalnızca sürgüsü
   kilitleniyordu; yanındaki sayı kutusu canlı kalıyordu. Gri bir
   sürgünün altında canlı bir kutu, üç durumun en kötüsü: kilidin

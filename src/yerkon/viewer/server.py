@@ -45,7 +45,7 @@ from yerkon.viewer.tasks import (
     table as table_task,
     target_from,
 )
-from yerkon.language import chosen as language_chosen
+from yerkon.language import chosen as language_chosen, say
 from yerkon.viewer.state import (
     CASCADING,
     MODES,
@@ -142,7 +142,7 @@ def cascades(state: ViewState, changes: dict) -> Optional[dict]:
     because it moves all of them and a person should see all of it.
     """
     if not any(
-        name in CASCADING or name in ("runs", "overrides", "corridor_m")
+        name in CASCADING or name in ("runs", "overrides") or name in CAN_SHRINK
         for name in changes
     ):
         return None
@@ -186,8 +186,17 @@ def cascades(state: ViewState, changes: dict) -> Optional[dict]:
     }
 
 
+#: Edits that can pull the study in, and so go through the panel.
+#:
+#: The length and the width because a person moved them; the ground
+#: because a smaller fetch cannot hold a larger site (ADR-0037). An edit
+#: to a run's own ends is not here: that is a person being explicit about
+#: that run.
+CAN_SHRINK = ("corridor_m", "width_m", "site")
+
+
 def _shortened(state: ViewState, proposed: ViewState, changes: dict):
-    """What shortening the site does to the anchor runs standing on it.
+    """What shrinking the site does to the anchor runs standing on it.
 
     The site's width already shapes the anchors — a grid runs from the
     road out to it — and its length did not, because a run carries its
@@ -195,17 +204,49 @@ def _shortened(state: ViewState, proposed: ViewState, changes: dict):
     anchors somebody placed, which is exactly the kind of change ADR-0009
     exists for: it is proposed with every figure it moves and waits for a
     yes.
+
+    Choosing ground is the same kind of change arriving from the other
+    side: a site is no larger than the grid fetched for it, so picking a
+    smaller place pulls the length and the width in with it.
     """
-    if "corridor_m" not in changes:
+    if not any(name in CAN_SHRINK for name in changes):
         return
     settled = proposed.within_site()
+    key = next(name for name in CAN_SHRINK if name in changes)
     asked = {
-        "key": "corridor_m",
-        "label": "site length",
-        "before": state.corridor_m,
-        "after": proposed.corridor_m,
+        "key": key,
+        "label": say({"corridor_m": "panel.site_length",
+                      "width_m": "panel.site_width",
+                      "site": "panel.ground"}[key], state.language),
+        "before": getattr(state, key),
+        "after": getattr(proposed, key),
         "because": "",
     }
+    # What the measured ground did to the site itself, before anything
+    # standing on it moved.
+    bounds = [
+        {
+            "key": field,
+            "label": field,
+            "before": getattr(proposed, field),
+            "after": getattr(settled, field),
+            "because": say("panel.past_the_measurement", state.language),
+        }
+        for field in ("corridor_m", "width_m")
+        if getattr(proposed, field) != getattr(settled, field)
+    ]
+    if bounds:
+        yield {
+            "run": "",
+            "asked": [asked],
+            "follows": bounds,
+            "panel": "{} {}; {}".format(
+                asked["label"], _said(asked["before"], asked["after"]),
+                ", ".join("{} {}".format(one["key"],
+                                         _said(one["before"], one["after"]))
+                          for one in bounds),
+            ),
+        }
     for before, after in zip(proposed.runs, settled.runs):
         follows = [
             {
@@ -213,8 +254,7 @@ def _shortened(state: ViewState, proposed: ViewState, changes: dict):
                 "label": field,
                 "before": getattr(before, field),
                 "after": getattr(after, field),
-                "because": "an anchor past the end of the site stands on "
-                           "ground nothing models and nothing drives past",
+                "because": say("panel.past_the_site", state.language),
             }
             for field in ("from_m", "to_m")
             if getattr(before, field) != getattr(after, field)
@@ -225,8 +265,9 @@ def _shortened(state: ViewState, proposed: ViewState, changes: dict):
             "run": before.identifier,
             "asked": [asked],
             "follows": follows,
-            "panel": "site length {:.0f} -> {:.0f} m; {} run {}".format(
-                state.corridor_m, proposed.corridor_m, before.identifier,
+            "panel": "{} {}; {} run {}".format(
+                asked["label"], _said(asked["before"], asked["after"]),
+                before.identifier,
                 ", ".join(
                     "{} {:.0f} -> {:.0f}".format(
                         change["key"], change["before"], change["after"])
@@ -234,6 +275,13 @@ def _shortened(state: ViewState, proposed: ViewState, changes: dict):
                 ),
             ),
         }
+
+
+def _said(before, after) -> str:
+    """`3000 -> 2940 m`, or `kizilay -> golbasi` when it is a name."""
+    if isinstance(before, (int, float)) and isinstance(after, (int, float)):
+        return "{:.0f} -> {:.0f} m".format(before, after)
+    return "{} -> {}".format(before or "modelled", after or "modelled")
 
 
 def _change(change) -> dict:
@@ -437,10 +485,10 @@ class Handler(BaseHTTPRequestHandler):
     def _apply(self, changes: dict) -> dict:
         state = self.session.read()
         settled = state.merged(changes)
-        if "corridor_m" in changes:
-            # Whatever the panel just showed and got a yes for. Only the
-            # length slider clips: typing an end into a run is a person
-            # being explicit about that run.
+        if any(name in CAN_SHRINK for name in changes):
+            # Whatever the panel just showed and got a yes for. A run's
+            # own ends are not in that list: typing one is a person being
+            # explicit about that run.
             settled = settled.within_site()
         return {"state": self.session.write(settled).as_json()}
 

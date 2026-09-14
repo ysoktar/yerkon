@@ -141,6 +141,26 @@ doğru çizilmemişti.
 *Engel kaybı* kilitlenmez ve kilitlenmemeli: ölçülmüş zemin bina ve ağaç
 getirmez, o yüzden o değer hâlâ okunuyor.
 
+### Çalışma yalnızca indirilen bölgede (bu bozuktu)
+
+Bir yer indir, sonra **Boy**'u ya da **En**'i indirdiğin kutudan büyük
+yapmayı dene: sürgü artık o kadar ileri gitmiyor, kutuya yazarsan da
+onay paneli sayıyı geri getiriyor ve neyin kımıldadığını gösteriyor.
+Daha küçük bir **Zemin** seçmek de aynı kapıdan geçiyor: boy, en ve direk
+dizileri onunla birlikte içeri çekiliyor.
+
+Sebebi şu: `height_at` ızgarasının dışında kenara kırpar. Sınıra değip
+geçen bir link yolu için doğru, bir direk için değil — kenarın ötesinde
+kırpma, sınır satırını bir düzleme uzatır ve düzlem bu modelin
+çizebileceği en elverişli zemindir. Hazır satırlarda da oluyordu: şehir
+içinde 46 direğin 10'u, kırsalda 33'ün 5'i ölçülen ızgaranın dışında
+duruyordu (ADR-0037).
+
+Bu tabloyu kımıldattı; sayılar ADR-0037'de yan yana. En çarpıcısı kırsal
+kullanılabilirlik: **%89,50 → %72,64**. Kaybolan on yedi puanın tamamı,
+ölçülen zeminin 140 m ötesinde duran ve turun uzak kolunu besleyen tek
+bir mast sırasından geliyor.
+
 ### Satırlar ve dil artık kaçmıyor (bu da bozuktu)
 
 Sekmeler ile TR/EN panelin tepesine sabitlendi. Beşinci adımı aç, yetmiş
@@ -270,10 +290,13 @@ bundan önce dört dakikaydı, şimdi yetmiş saniye.
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 1,62 m | 4,52 m | %99,41 |
-| Kırsal | 2,69 m | 10,89 m | %89,50 |
+| Şehir içi | 1,79 m | 4,79 m | %97,62 |
+| Kırsal | 3,13 m | 14,60 m | %72,64 |
 | Tünel | 1,77 m | 2,99 m | %100,00 |
-| Ağırlıklı | 1,93 m | 7,22 m | %93,44 |
+| Ağırlıklı | 2,08 m | 9,73 m | %82,67 |
+
+Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
+zeminde duran bir mast sırasıydı.
 
 ### Kendin denemeye değer beş bulgu
 
@@ -284,16 +307,33 @@ en sert çarptığı şey direk etüt hatası — ortalamayla asla kaybolmayan t
 terim. Askıları düzgün ölçmek o satırı 1,77 m'den 0,17 m'ye indiriyor.
 Daha iyi bir telsiz hiçbir şey satın almıyor.
 
-**Kırsal kullanılabilirlik bir tur boyu sorunu, bir direk sorunu değil.**
-Tek bir kırsal bağlantı bile mesafe yüzünden düşmüyor — her başarısızlık
-yoldaki zemin. Tur başına sekiz yerine on iki direk yoklamak 5,5 puan
-değerinde ve hiç sermayeye mal olmuyor. On dokuz fazladan direk daha azını
-satın alıyor.
+**Tur boyunun ne ettiği artık ölçülemiyor, ve bu bir bulgu.** Tek bir
+kırsal bağlantı bile mesafe yüzünden düşmüyor — her başarısızlık yoldaki
+zemin; orası değişmedi. Değişen, "sekiz yerine on iki direk yoklamak 5,5
+puan eder" cümlesi: yalnızca indirilmiş zemin üzerinde koşulduğundan beri
+(ADR-0037) iki tohum üzerinde ölçüm şöyle:
 
-**İki kırsal seçenek de artık kötü bir değer ve notları bunu söylüyor.**
-Varsayılan %82,26'da dururken yazılmışlardı; tur boyu düzeltmesi onu
-bedelsiz %89,50'ye çıkardı ve satın aldıklarının çoğu onunla gitti.
-`rural-dense`, 3,4 milyon liraya 1,9 puan.
+| tur başına | tohum 202 | tohum 404 |
+|---|---|---|
+| 6 | %65,50 | %65,47 |
+| 8 | %73,41 | %69,94 |
+| 10 | %69,23 | **%74,75** |
+| 12 | %72,64 | %72,19 |
+| 16 | **%74,33** | %72,51 |
+
+Altı açıkça az: yoklananın yarısı cevap vermiyor, altı deneme üç yanıt
+veriyor ve bir konum dört istiyor. Sekizin üstünde sıralama tohumla
+dönüyor ve komşu değerler arasındaki fark tohumlar arasındaki kadar. On
+iki, tek bir tohumla değiştirmemek için duruyor — bu projenin bir kez
+yaptığı hata tam olarak buydu. Bir sınama artık kazananı değil, dönüşün
+kendisini sabitliyor.
+
+**İki kırsal seçeneğin notları bir kez daha eskidi ve bu, denemeye
+değer olanın ta kendisi.** Varsayılan %82,26'da dururken yazılmışlardı;
+tur boyu düzeltmesi onu bedelsiz %89,50'ye çıkardı ve satın aldıklarının
+çoğu onunla gitti. ADR-0037 ise varsayılanı %72,64'e indirdi — daha küçük
+zeminde daha sık bir ızgaranın yeniden değerli olup olmadığı açık bir
+soru. `yerkon solve` ile kendin sor; notlarına güvenme.
 
 **Bir eğim kırk kat pürüz sayılıyordu.** %12 eğimde model, zeminin 7 cm'ye
 kadar düz olduğu yerde 2,8 m pürüz bildiriyordu. Bunu düzeltmek — ve
@@ -310,8 +350,8 @@ hiçbir şeyin okumadığı bir değeri değiştiriyordu.
 
 ## Nereden itiraz etmeli
 
-- `docs/adr/` — otuz altı karar, her biri neye mal olduğuyla. Son olanlar
-  0030–0036.
+- `docs/adr/` — otuz yedi karar, her biri neye mal olduğuyla. Son olanlar
+  0030–0037.
 - `src/yerkon/defaults.toml` — yetmiş iki değer. Otuz beşi hâlâ vekil;
   85000 TL'deki direk maliyeti, direklerin mi mevcut yol donanımının mı
   kazanacağına karar veren değer.

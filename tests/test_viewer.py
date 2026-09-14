@@ -911,6 +911,83 @@ def test_a_run_with_no_rows_says_so():
 
 
 
+def test_choosing_smaller_ground_brings_the_site_in_with_it():
+    """A site is no larger than the grid fetched for it (ADR-0037).
+
+    And it arrives through the panel, because it moves anchors somebody
+    placed: the same rule the length slider already followed, reaching
+    the state from the other side.
+    """
+    from yerkon.viewer.server import cascades
+    from yerkon.viewer.state import from_scenario
+
+    rural = from_scenario("rural")
+    assert rural.corridor_m > 3000.0
+
+    found = cascades(rural, {"site": "kizilay"})
+    assert found, "picking a smaller place said nothing"
+    moved = {
+        one["key"]
+        for group in found["groups"] for one in group["follows"]
+    }
+    assert {"corridor_m", "width_m"} <= moved, moved
+
+    settled = rural.merged({"site": "kizilay"}).within_site()
+    assert settled.corridor_m == 2970.0 and settled.width_m == 2940.0
+    assert max(run.to_m for run in settled.runs) <= settled.corridor_m
+
+
+def test_the_panel_says_why_in_the_language_on_screen():
+    """The reason a figure has to move is prose the engine writes.
+
+    It was English literals in `_shortened`, so a Turkish reader
+    confirming a change read the label in Turkish and the reason for it
+    in English (ADR-0035).
+    """
+    from yerkon.viewer.server import cascades
+    from yerkon.viewer.state import from_scenario
+
+    said = {}
+    for language in ("tr", "en"):
+        rural = from_scenario("rural").merged({"language": language})
+        found = cascades(rural, {"site": "kizilay"})
+        said[language] = {
+            one["because"]
+            for group in found["groups"] for one in group["follows"]
+        } | {group["asked"][0]["label"] for group in found["groups"]}
+        assert all(said[language]), "a reason came back empty"
+    assert not (said["tr"] & said["en"]), (
+        "these read the same in both: {}".format(said["tr"] & said["en"])
+    )
+
+
+def test_a_row_opens_on_the_ground_it_was_fetched_for():
+    """Written as the extent it wants, then brought inside the fetch.
+
+    2970 by 2940 is what kizilay came back as, and a measurement like
+    that belongs to the fetch rather than to a literal in the code.
+    """
+    from yerkon.viewer.state import MODES, from_scenario
+
+    for name in MODES:
+        state = from_scenario(name)
+        assert state == state.within_site(), name
+
+
+def test_a_bore_is_not_bounded_by_the_mountain_around_it():
+    """It goes through the hill rather than over it.
+
+    Its floor is the line between two portals, so the grid's width is
+    not a limit on it — `tunnel_ground` checks the length where it reads
+    the portals.
+    """
+    from yerkon.viewer.state import from_scenario
+
+    tunnel = from_scenario("tunnel")
+    stretched = tunnel.merged({"corridor_m": 100_000.0})
+    assert stretched.on_measured_ground().corridor_m == 100_000.0
+
+
 def test_a_blank_target_field_is_not_a_bar_of_zero():
     """An empty box means "I do not care", not "must be at least nothing".
 

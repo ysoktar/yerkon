@@ -261,6 +261,13 @@ def scene(state: ViewState) -> dict:
             # What ground is on hand, found rather than listed, so a
             # fourth `yerkon fetch` appears in the menu on its own.
             "sites": list(fetched_sites()),
+            # How far the fetch actually reached, so the sliders cannot
+            # offer a site larger than the ground under it (ADR-0037).
+            # Absent where the ground is modelled, which has no edge.
+            "measured_m": (
+                [measured.width_m, measured.height_m]
+                if (measured := state.measured()) is not None else None
+            ),
         },
         # What the model actually offers. Hardcoded in the page before,
         # and it had drifted: the tunnel bracket was missing entirely, so
