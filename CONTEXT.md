@@ -73,6 +73,12 @@ ve düşey yoldan gözlenebilir değildir (ADR-0011). Bir sıra hâlindeki
 direkler enine yönde seyreltmeyi sonsuza götürür; bu, kapsamanın
 göremediği şeydir.
 
+**Aerial** (hava görüntüsü): sahanın uydu fotoğrafı, zemine giydirilir.
+Benzetimin hiçbir yerinde okunmaz — link bütçesi bir tarlanın ne renk
+olduğunu umursamaz — yani çizilir ve o kadar. Hazır bir karo adresi yok:
+hangi servisi kullanacağına ve koşullarına kullanan karar verir.
+ADR-0041'e bak.
+
 **Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
 artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 

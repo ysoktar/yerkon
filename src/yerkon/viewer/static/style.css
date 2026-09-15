@@ -376,8 +376,11 @@ label.knob > input:disabled { opacity: 0.45; cursor: not-allowed; }
  * on the slider: the number beside it is the other half of the same
  * control, and a live-looking box under a greyed slider is the worst of
  * the three states. The note under the step says which reason. */
-label.knob.dead { color: #97a2ad; }
-label.knob.dead > output { color: #97a2ad; }
+/* A control this arrangement does not read (ADR-0036). On the label
+   rather than on the input, because a disabled input raises none of the
+   events a tooltip waits for and the reason has to be readable. */
+label.dead { color: #97a2ad; }
+label.dead > output { color: #97a2ad; }
 
 
 /* ---------- finding one setting among a hundred ---------- */

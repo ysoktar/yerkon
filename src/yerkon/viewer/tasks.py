@@ -319,10 +319,12 @@ def fetch(state: ViewState, payload: dict) -> Callable:
     def work(tell: Tell) -> dict:
         from yerkon.site.cache import SiteCache
         from yerkon.site.fetch import (
+            DEFAULT_ZOOM,
             CopernicusElevation,
             OpenStreetMapBuildings,
             OvertureBuildings,
             ServiceElevation,
+            TileImagery,
             build_site,
         )
         from yerkon.site.model import BoundingBox, box_around, read_point
@@ -358,6 +360,18 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         spacing = float(payload.get("spacing_m") or 30.0)
         want_buildings = bool(payload.get("buildings", True))
 
+        # The photograph, only where somebody named a tile server.
+        #
+        # No default address, on purpose. Every provider has terms and
+        # most want a key, so shipping one would be accepting somebody
+        # else's terms on behalf of whoever runs this (ADR-0041).
+        tiles = str(payload.get("imagery_url", "")).strip()
+        imagery = TileImagery(
+            url_template=tiles,
+            zoom=int(payload.get("imagery_zoom") or DEFAULT_ZOOM),
+            cache_directory=str(SITES / "_tiles"),
+        ) if tiles else None
+
         tell(say("task.fetch.fetching", state.language,
                  south=decimal_comma(bounds.south, 4),
                  west=decimal_comma(bounds.west, 4),
@@ -377,6 +391,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
                 OvertureBuildings(cache_directory=str(SITES / "_tiles")),
                 OpenStreetMapBuildings(),
             ) if want_buildings else (),
+            imagery_source=imagery,
         )
         SiteCache(SITES / name).save(site)
 
@@ -396,6 +411,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             "relief_m": round(site.relief_m, 1),
             "roughness_m": round(site.roughness_m(), 2),
             "buildings": site.manifest.building_count,
+            "aerial": site.aerial is not None,
             "notes": list(site.manifest.notes),
         }
 

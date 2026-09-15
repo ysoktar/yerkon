@@ -155,6 +155,43 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "tr": "{value} bir boylam değil; boylam -180 ile 180 arasındadır.",
         "en": "{value} is not a longitude; it runs from -180 to 180.",
     },
+    "site.needs_pillow": {
+        "tr": "Hava görüntüsü Pillow paketini gerektirir: "
+              "pip install \"yerkon[sites]\"",
+        "en": "Aerial imagery needs Pillow: pip install \"yerkon[sites]\"",
+    },
+    "site.no_imagery_url": {
+        "tr": "Hava görüntüsü için bir karo adresi verilmedi. Sağlayıcıyı "
+              "sen seçiyorsun: her birinin kendi koşulları var ve çoğu "
+              "anahtar istiyor. Örnekler docs/TRY-IT.md içinde.",
+        "en": "No tile URL given for the imagery. You choose the provider: "
+              "each has its own terms and most want a key. Examples are in "
+              "docs/TRY-IT.md.",
+    },
+    "site.too_many_tiles": {
+        "tr": "{tiles} karo, {zoom} yakınlıkta — sınır {most}. Daha düşük "
+              "bir yakınlık ya da daha küçük bir kutu seç.",
+        "en": "{tiles} tiles at zoom {zoom}, and the limit is {most}. Pick a "
+              "lower zoom or a smaller box.",
+    },
+    "site.no_tiles": {
+        # No name in it: the note that carries this to a person already
+        # names the source, and "aerial imagery unreachable: aerial
+        # imagery returned no tiles" is a sentence nobody wrote on
+        # purpose.
+        "tr": "hiçbir karo dönmedi. Adres şablonunu, anahtarı ve ağı "
+              "denetle.",
+        "en": "no tiles came back at all. Check the URL template, the key "
+              "and the network.",
+    },
+    "site.aerial": {
+        # Pre-formatted by the caller rather than `:.2f` here, because
+        # this project writes a comma decimal mark and a format spec
+        # would write a dot. The neighbouring elevation phrase gets away
+        # with `:.0f` only because no separator ever shows.
+        "tr": "{source} kaynağından hava görüntüsü, {resolution_m} m/piksel",
+        "en": "aerial imagery from {source} at {resolution_m} m/pixel",
+    },
     "site.needs_pyarrow": {
         "tr": "Overture erişimi pyarrow paketini gerektirir: "
               "pip install \"yerkon[sites]\"",

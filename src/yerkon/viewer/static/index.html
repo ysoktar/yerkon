@@ -71,11 +71,33 @@
         <input type="number" id="fetch-spacing" value="30" step="10"></label>
       <label class="tick"><input type="checkbox" id="fetch-buildings" checked>
         <span data-say="fetch.buildings"></span></label>
+      <!--
+        No address shipped in the box. Every tile provider has terms and
+        most want a key, so a default here would be accepting somebody
+        else's terms on behalf of whoever runs this (ADR-0041). Left
+        empty the fetch simply brings no photograph.
+      -->
+      <label><span data-say="fetch.imagery"></span>
+        <input type="text" id="fetch-imagery"
+               placeholder="https://…/{z}/{x}/{y}.png"></label>
+      <label><span data-say="fetch.imagery.zoom"></span>
+        <input type="number" id="fetch-imagery-zoom" value="17" min="1" max="20" step="1"></label>
+      <p class="hint" data-say="fetch.imagery.note"></p>
       <div class="row"><button id="run-fetch" class="quiet" data-say="fetch.go"></button></div>
       <div id="fetch-out"></div>
     </details>
 
     <p class="hint" id="modelled-note" data-say="ground.modelled.note"></p>
+
+    <!--
+      Drawn, never read. The photograph colours the ground and nothing
+      else: a link budget does not care what colour a field is. Greyed
+      where the fetched site has none, because a tick that changes
+      nothing is not a tick (ADR-0036).
+    -->
+    <label class="tick" id="photo-tick" data-find="uydu fotoğraf hava görüntüsü harita satellite aerial photograph imagery">
+      <input type="checkbox" id="show-photo" checked>
+      <span data-say="ground.photo"></span></label>
 
     <label class="knob" data-find="tepe yükseklik rölyef relief modellenmiş">
       <span data-say="knob.relief"></span><output id="relief-out"></output>

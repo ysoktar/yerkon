@@ -61,6 +61,32 @@ export const SAY = {
     en: "Measured ground brings its own relief, its own roughness and its "
         + "own obstructions, so the three figures below stop applying.",
   },
+  "ground.photo": { tr: "Uydu görüntüsünü zemine giydir",
+                    en: "Drape the photograph over the ground" },
+  "ground.photo.from": { tr: "Kaynak: {source}", en: "From {source}" },
+  "ground.photo.none": {
+    tr: "Bu yer fotoğrafsız getirilmiş. Yeni bir yer getirirken karo "
+        + "adresi verilirse görüntü de iner.",
+    en: "This place was fetched without one. Give a tile address when "
+        + "fetching somewhere new and the photograph comes with it.",
+  },
+  "ground.photo.modelled": {
+    tr: "Modellenmiş zeminin fotoğrafı yoktur: orası hiçbir yer değil.",
+    en: "Modelled ground has no photograph: it is nowhere.",
+  },
+  "fetch.imagery": { tr: "Uydu karo adresi (isteğe bağlı)",
+                     en: "Tile address for the photograph (optional)" },
+  "fetch.imagery.zoom": { tr: "Karo yakınlığı", en: "Tile zoom" },
+  "fetch.imagery.note": {
+    tr: "Boş bırakılırsa fotoğraf indirilmez; zemin düz renk çizilir. "
+        + "Her sağlayıcının kendi koşulları var, bu yüzden buraya hazır "
+        + "bir adres konmuyor — kullanacağınız servisin koşullarını siz "
+        + "kabul edersiniz. 17 yakınlığı Ankara'da yaklaşık 0,92 m/piksel.",
+    en: "Left empty, no photograph is downloaded and the ground is drawn "
+        + "in flat colour. Every provider has its own terms, so no "
+        + "address ships here — the terms you accept are yours. Zoom 17 "
+        + "is about 0,92 m per pixel in Ankara.",
+  },
   "fetch.open": { tr: "Yeni bir yer getir", en: "Fetch somewhere new" },
   "fetch.note": {
     tr: "Ankara ya da başka bir yer. Ağ kullanan tek şey budur; bir kez "

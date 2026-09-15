@@ -11,6 +11,8 @@ instant, the sweep takes seconds, and the run takes longer still.
 
 from __future__ import annotations
 
+from typing import Optional
+from urllib.parse import quote
 
 import numpy as np
 
@@ -127,6 +129,28 @@ def drawable(terrain, west: float, east: float,
             max(south, bottom), min(north, top))
 
 
+def _aerial(state: ViewState, measured) -> Optional[dict]:
+    """Where the site's photograph is and what ground it covers.
+
+    Nothing where none was fetched, and the page greys its switch: a
+    control that does nothing is not a control (ADR-0036).
+
+    The address carries the site's name so that the browser caches one
+    picture per site and changing ground fetches the new one, rather than
+    both sites sharing an address and whichever loaded first winning.
+    """
+    if measured is None or measured.aerial is None:
+        return None
+    west, south, east, north = measured.aerial_extent_m
+    return {
+        "url": "/api/aerial.png?site={}".format(quote(state.site)),
+        "extent_m": [west, south, east, north],
+        "metres_per_pixel": measured.aerial.metres_per_pixel,
+        "source": measured.aerial.source,
+        "zoom": measured.aerial.zoom,
+    }
+
+
 def scene(state: ViewState) -> dict:
     """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
@@ -240,6 +264,13 @@ def scene(state: ViewState) -> dict:
                 0 if measured is None or measured.buildings is None
                 else len(measured.buildings)
             ),
+            # The photograph, as a place to fetch it from rather than as
+            # colours in this payload. A mesh node is three bytes of
+            # colour and there are twenty-two thousand of them, so
+            # sending the picture pixel by pixel would put a quarter of a
+            # megabyte on the wire on every drag, to say what one PNG the
+            # browser caches says once.
+            "aerial": _aerial(state, measured),
         },
         # What the model actually offers. Hardcoded in the page before,
         # and it had drifted: the tunnel bracket was missing entirely, so

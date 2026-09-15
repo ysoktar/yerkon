@@ -44,11 +44,13 @@ import sys
 
 from yerkon.site.cache import SiteCache
 from yerkon.site.fetch import (
+    DEFAULT_ZOOM,
     CopernicusElevation,
     GeoTiffElevation,
     OpenStreetMapBuildings,
     OvertureBuildings,
     ServiceElevation,
+    TileImagery,
     Unreachable,
     build_site,
 )
@@ -181,6 +183,23 @@ def fetch(argv: list[str] | None = None) -> int:
         "--tile-cache", default="sites/_tiles",
         help="where Copernicus tiles are kept (default: %(default)s)",
     )
+    parser.add_argument(
+        "--imagery",
+        help=(
+            "a slippy-map tile address like "
+            "'https://example/{z}/{x}/{y}.png', to drape an aerial "
+            "photograph over the ground in the viewer. Nothing in the "
+            "simulation reads it. No address is shipped: every provider "
+            "has its own terms, and the terms you accept are yours."
+        ),
+    )
+    parser.add_argument(
+        "--imagery-zoom", type=int, default=DEFAULT_ZOOM,
+        help=(
+            "tile zoom for --imagery (default: %(default)s, about "
+            "0.9 m per pixel in Ankara)"
+        ),
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -224,6 +243,9 @@ def fetch(argv: list[str] | None = None) -> int:
     if not args.no_buildings:
         print("  features: Overture Maps, then OpenStreetMap (each tried "
               "in turn until one answers)")
+    if args.imagery:
+        print("  photograph: {} at zoom {}".format(
+            args.imagery, args.imagery_zoom))
 
     # What the query service would cost, and only when it is the source
     # that will actually be asked. A GeoTIFF or a Copernicus tile answers
@@ -246,6 +268,11 @@ def fetch(argv: list[str] | None = None) -> int:
                 OvertureBuildings(cache_directory=str(SITES / "_tiles")),
                 OpenStreetMapBuildings(),
             ),
+            imagery_source=TileImagery(
+                url_template=args.imagery,
+                zoom=args.imagery_zoom,
+                cache_directory=args.tile_cache,
+            ) if args.imagery else None,
         )
     except Unreachable as error:
         print("\nNothing answered.\n  {}".format(error), file=sys.stderr)

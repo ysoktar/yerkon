@@ -51,7 +51,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `regulatory.py` | her bölgenin kurallarının izin verdiği: Türkiye, Avrupa, Amerika, lisanslı |
 | `rf.py` | link bütçesi |
 | `world.py` | arazi, eğimli yol güzergâhları, montaj yapıları ve yansıtıcı zemini yerden yere değiştiren yama örgüsü |
-| `site/` | bir kez önbelleğe getirilen gerçek zemin ve binalar, artı paketin içinde gelen dört Ankara sahası |
+| `site/` | bir kez önbelleğe getirilen gerçek zemin, binalar ve (istenirse) hava fotoğrafı, artı paketin içinde gelen dört Ankara sahası |
 | `observation.py` | kestiricinin görebileceği tek tip; hiçbir şey import etmez |
 | `ranging.py` | çift yönlü alışveriş, saatleri ve hava süresinde maliyeti |
 | `estimator.py` | menzilleri konuma çevirir, başka hiçbir şey görmez |
@@ -61,6 +61,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `report.py` | dört satır, on sütun ve altlarındaki notlar |
 | `terms.py` | adlandırılmış yedi hata kaynağı; her biri kapatılabilsin diye |
 | `budget.py` | dağılım: her kaynağın neye değdiği, yeniden koşarak |
+| `layout.py` | direklerin nereye konulacağı: sekiz adlandırılmış yöntem, tek dikiş `place(plan, ground)` |
 | `siting.py` | bir hedefi karşılayan en ucuz yerleşimin aranması |
 | `settings.py` | raporun vermediği her değer ve bir yerleşimi şekillendiren her sayı, `defaults.toml`'dan |
 | `options.py` | adlandırılmış yerleşim seçenekleri: kısa bir düzenleme listesi ve gerekçesi |
@@ -112,19 +113,23 @@ yanlıştır.
 4. **Hangi yapının gerçekte nerede durduğu.** Yerleşim aramasının cevabı
    etütle birlikte oynuyor ve varsayılanlar tipik bir Türk karayolu kesimi
    hakkında bir varsayım.
-5. **Binalar ve yolların kendisi.** Zemini getiren makineden OpenStreetMap'e
-   erişilemedi, dolayısıyla dört Ankara sahasının hiçbiri bir bina taban
-   alanı ya da bir yol güzergâhı taşımıyor. İki sonucu var, ikisi de
-   ihtiyatlı yönde: şehir içi satırın engeli gerçekten orada olan
-   binalardan değil kilometre başına bir engel kaybı değerinden geliyor ve
-   her kırsal yolculuk, zemini izleyen bir yol değil zeminin üzerinde bir
-   dikdörtgen. Gerçek bir güzergâh kırsal değerleri yükseltirdi, çünkü
-   yollar bağlantıların geçtiği yerden geçer. Overpass'a erişebilen bir
-   makineden tek bir `yerkon fetch` ikisini de çözer. Bu artık kırsal satır
-   ile daha iyi bir sayı arasında duran en büyük tek şey: %89,6
-   kullanılabilirlikte kalan başarısızlıklar yoldaki zemindir ve açık arazi
-   üzerindeki bir dikdörtgen yerine bir yolu izleyen bir yolculuk bunun
-   çoğundan kaçınırdı (ADR-0022).
+5. **Yolların kendisi.** Binalar halledildi: Overpass bu ağdan
+   erişilemiyor ama Overture Maps aynı veriyi genel bir nesne deposundan
+   veriyor ve dört Ankara sahası da artık bina taşıyor — şehir içi satırın
+   engeli artık gerçekten orada duran 5 231 binadan geliyor, kilometre
+   başına bir engel kaybı değerinden değil (ADR-0038).
+
+   **Yol güzergâhı hâlâ yok**, ve tek başına kalan en büyük şey bu: her
+   kırsal yolculuk, zemini izleyen bir yol değil zeminin üzerinde bir
+   dikdörtgen tur. Gerçek bir güzergâh kırsal değerleri yükseltirdi, çünkü
+   yollar bağlantıların geçtiği yerden geçer: %89,6 kullanılabilirlikte
+   kalan başarısızlıklar yoldaki zemindir ve bir yolu izleyen bir yolculuk
+   bunun çoğundan kaçınırdı (ADR-0022). Overture'ın `transportation`
+   katmanı binalarla aynı yoldan gelebilir; yol kenarı donanımına
+   yerleştiren yerleştirme yöntemleri de o veriyi bekliyor (ADR-0040).
+
+   Zeminin *fotoğrafı* ayrı bir şey ve geldi (ADR-0041) — ama yalnızca
+   çiziliyor, hiçbir sayıya girmiyor.
 6. **Direklerin gerçekte ne kadar iyi ölçülebileceği.** `yerkon budget`
    bunu tünel satırı için en sonuçlu tek değer yapıyor: varsayılan 0,15
    m'de orada 1,84 m konum hatasına değiyor, diğer her şeyin toplamı olan
@@ -213,3 +218,12 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   sürgünün altında canlı bir kutu, üç durumun en kötüsü: kilidin
   sebebini gösteriyor ve kilidi tutmuyor. Aynı üç değer tünel satırında
   da hiç okunmuyor ve orada hiç kilitlenmemişti (ADR-0036).
+- Bir sınama kalıntısı depoya işlenmişti: `site/places/probe`, yükseklik
+  kaynağı `fake`, getirilme zamanı `now`. Zemin listesinde dört gerçek
+  getirmenin yanında, onlardan ayırt edilemeden duruyordu. Uydurma bir
+  ölçümü gerçek olanların arasına koymak, bu projenin kaçınmak için
+  kurulduğu tam olarak o şey (ADR-0001); silindi (ADR-0041).
+- Gri gösterme kuralı yalnızca `label.knob.dead` idi, dolayısıyla yeni
+  eklenen bir onay kutusu `dead` sınıfını alıyor, sebebini de taşıyor,
+  ama rengi değişmiyordu: kilitli ama kilitli görünmeyen bir denetim.
+  Kural artık `label.dead` (ADR-0036).

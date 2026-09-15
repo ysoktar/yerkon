@@ -16,6 +16,7 @@ import datetime
 import io
 import json
 import math
+import os
 import pathlib
 import re
 import time
@@ -26,7 +27,14 @@ from typing import Optional, Protocol
 import numpy as np
 
 from yerkon.language import say
-from yerkon.site.model import BoundingBox, Buildings, Site, SiteManifest
+from yerkon.numbers import decimal_comma
+from yerkon.site.model import (
+    Aerial,
+    BoundingBox,
+    Buildings,
+    Site,
+    SiteManifest,
+)
 
 DEFAULT_TIMEOUT_S = 30.0
 
@@ -56,6 +64,38 @@ class ElevationSource(Protocol):
 # --- GeoTIFF on disk ------------------------------------------------------
 
 
+def _rasterio():
+    """rasterio, with GDAL able to find the files it complains about.
+
+    On some Windows wheels GDAL is initialised before rasterio points it
+    at its own bundled data directory, and every read then prints
+    `Warning 3: Cannot find gdalvrt.xsd (GDAL_DATA is not defined)` to a
+    terminal somebody is trying to read a fetch in. The data is right
+    there inside the installed package; only the variable is missing.
+
+    Set rather than overwritten: somebody who has pointed GDAL_DATA at a
+    system GDAL meant it.
+    """
+    try:
+        import rasterio
+        from rasterio.warp import transform as warp_transform
+    except ImportError as error:
+        raise Unreachable(
+            "Reading a GeoTIFF needs rasterio. Install it with "
+            "`pip install rasterio`."
+        ) from error
+
+    if not os.environ.get("GDAL_DATA"):
+        bundled = pathlib.Path(rasterio.__file__).parent / "gdal_data"
+        if bundled.is_dir():
+            os.environ["GDAL_DATA"] = str(bundled)
+    if not os.environ.get("PROJ_LIB") and not os.environ.get("PROJ_DATA"):
+        bundled = pathlib.Path(rasterio.__file__).parent / "proj_data"
+        if bundled.is_dir():
+            os.environ["PROJ_LIB"] = str(bundled)
+    return rasterio, warp_transform
+
+
 @dataclass
 class GeoTiffElevation:
     """Ground from a raster someone downloaded.
@@ -81,14 +121,7 @@ class GeoTiffElevation:
     fill_gaps: bool = True
 
     def grid_for(self, bounds: BoundingBox, spacing_m: float) -> ElevationGrid:
-        try:
-            import rasterio
-            from rasterio.warp import transform as warp_transform
-        except ImportError as error:
-            raise Unreachable(
-                "Reading a GeoTIFF needs rasterio. Install it with "
-                "`pip install rasterio`."
-            ) from error
+        rasterio, warp_transform = _rasterio()
 
         if not pathlib.Path(self.path).exists():
             raise Unreachable(
@@ -933,6 +966,172 @@ class _RangeFile(io.RawIOBase):
         return data
 
 
+# --- A photograph of the ground -------------------------------------------
+#
+# Slippy-map tiles: the `{z}/{x}/{y}` scheme every web map serves, where
+# zoom doubles the resolution each step and the world is one tile at zoom
+# nought. Nothing here is specific to a provider, because which one a
+# person may use is a question about their account and their network
+# rather than about this project.
+
+#: Zoom to fetch at when nobody says. Seventeen is about 1,2 m a pixel at
+#: the equator and finer towards the poles — enough to see a building and
+#: not so much that a 12 km site is thousands of tiles.
+DEFAULT_ZOOM = 17
+
+#: How many tiles to ask for at once. The wait is the network, not a
+#: core, and one at a time makes a city-sized fetch take an hour.
+DEFAULT_AT_ONCE = 4
+
+#: Refuse rather than start, past this many tiles. At zoom 17 a 12 km box
+#: is about 2 500 tiles; ten thousand is somebody who has left the zoom
+#: at 19 over a region.
+MOST_TILES = 10_000
+
+
+def tile_of(latitude: float, longitude: float, zoom: int) -> tuple[int, int]:
+    """Which tile covers this point, in the usual slippy-map numbering."""
+    count = 2 ** zoom
+    x = int((longitude + 180.0) / 360.0 * count)
+    radians = math.radians(latitude)
+    y = int((1.0 - math.asinh(math.tan(radians)) / math.pi) / 2.0 * count)
+    return min(max(x, 0), count - 1), min(max(y, 0), count - 1)
+
+
+def tile_bounds(x: int, y: int, zoom: int) -> BoundingBox:
+    """The ground one tile covers."""
+    count = 2 ** zoom
+
+    def latitude_at(row: int) -> float:
+        return math.degrees(
+            math.atan(math.sinh(math.pi * (1.0 - 2.0 * row / count))))
+
+    return BoundingBox(
+        west=x / count * 360.0 - 180.0,
+        east=(x + 1) / count * 360.0 - 180.0,
+        north=latitude_at(y),
+        south=latitude_at(y + 1),
+    )
+
+
+@dataclass
+class TileImagery:
+    """A photograph of the site, stitched from a web map's tiles.
+
+    The URL is given rather than chosen here. Every provider worth using
+    has terms, most want a key, and which of them somebody may reach is a
+    fact about their network — this project has no business picking one
+    on their behalf, and a hardcoded default would be a provider's terms
+    accepted by whoever ran the command rather than by whoever wrote it.
+    `docs/TRY-IT.md` lists the usual templates; the person chooses.
+
+    Tiles are cached on disk beside the Copernicus ones, so a second site
+    in the same place costs nothing, and fetched a few at a time because
+    the wait is the network.
+    """
+
+    url_template: str = ""
+    name: str = "aerial imagery"
+    zoom: int = DEFAULT_ZOOM
+    at_once: int = DEFAULT_AT_ONCE
+    cache_directory: str = "sites/_tiles"
+    #: Sent on every request. Most tile servers refuse an unnamed client,
+    #: and refusing back is the polite half of the arrangement.
+    user_agent: str = "yerkon/1.0 (terrestrial PNT study)"
+
+    def image_for(self, bounds: BoundingBox) -> Aerial:
+        try:
+            from PIL import Image
+        except ImportError as error:
+            raise Unreachable(say("site.needs_pillow")) from error
+        if not self.url_template:
+            raise Unreachable(say("site.no_imagery_url"))
+
+        west, north = tile_of(bounds.north, bounds.west, self.zoom)
+        east, south = tile_of(bounds.south, bounds.east, self.zoom)
+        columns, rows = east - west + 1, south - north + 1
+        if columns * rows > MOST_TILES:
+            raise Unreachable(say(
+                "site.too_many_tiles", None,
+                tiles=columns * rows, most=MOST_TILES, zoom=self.zoom))
+
+        wanted = [(x, y) for y in range(north, south + 1)
+                  for x in range(west, east + 1)]
+        with ThreadPoolExecutor(self.at_once) as pool:
+            fetched = dict(pool.map(self._one_tile, wanted))
+
+        first = next((image for image in fetched.values() if image is not None),
+                     None)
+        if first is None:
+            raise Unreachable(say("site.no_tiles"))
+        side = first.size[0]
+
+        sheet = Image.new("RGB", (columns * side, rows * side), (128, 128, 128))
+        for (x, y), image in fetched.items():
+            if image is not None:
+                sheet.paste(image.convert("RGB"),
+                            ((x - west) * side, (y - north) * side))
+
+        covered = BoundingBox(
+            west=tile_bounds(west, north, self.zoom).west,
+            north=tile_bounds(west, north, self.zoom).north,
+            east=tile_bounds(east, south, self.zoom).east,
+            south=tile_bounds(east, south, self.zoom).south,
+        )
+        return Aerial(
+            pixels=np.asarray(sheet, dtype=np.uint8),
+            bounds=covered,
+            source="{} z{}".format(self.name, self.zoom),
+            zoom=self.zoom,
+        )
+
+    def _one_tile(self, at: tuple[int, int]):
+        """One tile, from disk if it is there and from the server if not.
+
+        A tile that will not come back is a hole in the picture rather
+        than a failed fetch: a missing square of ground is obvious on
+        screen and losing the whole photograph over one of them is not
+        what anybody wants.
+        """
+        from PIL import Image
+
+        x, y = at
+        cached = (pathlib.Path(self.cache_directory)
+                  / "aerial" / str(self.zoom) / str(x) / "{}.png".format(y))
+        if cached.exists():
+            try:
+                return at, Image.open(cached)
+            except Exception:              # noqa: BLE001 — a half-written file
+                cached.unlink(missing_ok=True)
+
+        url = (self.url_template
+               .replace("{z}", str(self.zoom))
+               .replace("{x}", str(x))
+               .replace("{y}", str(y)))
+        try:
+            import requests
+        except ImportError as error:
+            raise Unreachable(say("site.needs_requests")) from error
+        try:
+            response = requests.get(
+                url, headers={"User-Agent": self.user_agent},
+                timeout=DEFAULT_TIMEOUT_S)
+            response.raise_for_status()
+            body = response.content
+        except Exception:                  # noqa: BLE001
+            return at, None
+
+        cached.parent.mkdir(parents=True, exist_ok=True)
+        part = cached.with_suffix(".part")
+        part.write_bytes(body)
+        part.replace(cached)
+        try:
+            return at, Image.open(cached)
+        except Exception:                  # noqa: BLE001
+            cached.unlink(missing_ok=True)
+            return at, None
+
+
 def _parse_height(raw: Optional[str]) -> Optional[float]:
     if raw is None:
         return None
@@ -961,6 +1160,7 @@ def build_site(
     spacing_m: float = 30.0,
     elevation_sources: tuple[ElevationSource, ...] = (),
     buildings_sources: tuple = (),
+    imagery_source=None,
 ) -> Site:
     """Fetch a site, using whatever is reachable.
 
@@ -1014,10 +1214,23 @@ def build_site(
             notes.append(say("site.unreachable", None,
                               name=source.name, error=error))
 
+    aerial: Optional[Aerial] = None
+    if imagery_source is not None:
+        try:
+            aerial = imagery_source.image_for(bounds)
+            notes.append(say(
+                "site.aerial", None, source=aerial.source,
+                resolution_m=decimal_comma(aerial.metres_per_pixel, 2)))
+        except Unreachable as error:
+            notes.append(say("site.unreachable", None,
+                              name=getattr(imagery_source, "name", "imagery"),
+                              error=error))
+
     return Site(
         bounds=bounds,
         elevation_grid_m=grid.values_m,
         grid_spacing_m=grid.spacing_m,
+        aerial=aerial,
         manifest=SiteManifest(
             elevation_source=grid.source,
             elevation_resolution_m=grid.resolution_m,

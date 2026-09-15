@@ -1182,6 +1182,11 @@ function wireControls() {
     edit({ overrides: {} }, true).catch(e => flash(e.message, true));
   };
 
+  document.getElementById("show-photo").onchange = event => {
+    showPhotograph = event.target.checked;
+    render();
+  };
+
   document.getElementById("only-assumed").onchange = event => {
     onlyAssumed = event.target.checked;
     drawFigures();
@@ -1226,6 +1231,93 @@ let detail = null;
 
 function drawnTerrain() {
   return detail || terrainData;
+}
+
+/* The aerial photograph of the fetched ground, once it has arrived.
+ *
+ * Fetched as a picture and read once into an offscreen canvas, not sent
+ * as colours with the scene: the mesh is twenty-two thousand nodes, and
+ * putting three bytes of colour on each of them would be a quarter of a
+ * megabyte on the wire every time somebody drags the camera, to say what
+ * one cached PNG says once.
+ *
+ * Null until it loads and null where no site has one, and the painter
+ * falls back to the olive it has always drawn — so the ground is never
+ * waiting on a picture to appear.
+ */
+let photograph = null;
+let photographUrl = "";
+let showPhotograph = true;
+
+function aerialOf() {
+  return (latest && latest.terrain && latest.terrain.aerial) || null;
+}
+
+/* Load the site's photograph, or drop the one in hand where there is none.
+ *
+ * Keyed on the address, so a redraw does not refetch and changing ground
+ * does. The pixels are read out of the canvas once, here, rather than
+ * per quad per frame: `getImageData` is a round trip to the compositor
+ * and four thousand of them a frame is not a frame.
+ */
+function loadPhotograph() {
+  const aerial = aerialOf();
+  if (!aerial) {
+    photograph = null;
+    photographUrl = "";
+    return;
+  }
+  if (aerial.url === photographUrl) return;
+  photographUrl = aerial.url;
+  photograph = null;
+
+  const picture = new Image();
+  picture.onload = () => {
+    // Another site's picture may have been asked for while this one was
+    // in flight; the last one asked for is the one that belongs.
+    if (photographUrl !== aerial.url) return;
+    const sheet = document.createElement("canvas");
+    sheet.width = picture.naturalWidth;
+    sheet.height = picture.naturalHeight;
+    const pen = sheet.getContext("2d", { willReadFrequently: true });
+    pen.drawImage(picture, 0, 0);
+    let pixels;
+    try {
+      pixels = pen.getImageData(0, 0, sheet.width, sheet.height).data;
+    } catch {
+      // A canvas the browser considers tainted. Same ground, no picture.
+      photograph = null;
+      return;
+    }
+    photograph = draw.photoSampler(
+      pixels, sheet.width, sheet.height, aerial.extent_m);
+    render();
+  };
+  picture.onerror = () => { if (photographUrl === aerial.url) photograph = null; };
+  picture.src = aerial.url;
+}
+
+/* The photograph the painter should use this frame, if any. */
+function drawnPhotograph() {
+  return showPhotograph ? photograph : null;
+}
+
+/* Grey the tick where this ground has no photograph, and say why.
+ *
+ * Modelled ground never has one; fetched ground has one only where the
+ * fetch was given a tile server to ask (ADR-0036, and the same shape as
+ * `lockDeadKnobs`).
+ */
+function lockPhotographTick() {
+  const tick = document.getElementById("photo-tick");
+  const box = document.getElementById("show-photo");
+  if (!tick || !box) return;
+  const aerial = aerialOf();
+  box.disabled = !aerial;
+  tick.classList.toggle("dead", !aerial);
+  tick.title = aerial
+    ? say("ground.photo.from", { source: aerial.source || "—" })
+    : say(state.site ? "ground.photo.none" : "ground.photo.modelled");
 }
 
 /* The mesh's height at a point, between its samples as well as on them.
@@ -1341,7 +1433,7 @@ function paintScene() {
   const bias = meshCell();
 
   const items = [
-    ...draw.groundFaces(view, drawnTerrain(), light),
+    ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
     ...draw.cellFaces(view, sweepData, groundAt, bias),
     ...draw.masts(view, latest.anchors, colourOf),
     ...draw.polyline(
@@ -2240,6 +2332,8 @@ function wireTasks() {
         size_km: Number(document.getElementById("fetch-size").value),
         spacing_m: spacing === "" ? null : Number(spacing),
         buildings: document.getElementById("fetch-buildings").checked,
+        imagery_url: document.getElementById("fetch-imagery").value.trim(),
+        imagery_zoom: Number(document.getElementById("fetch-imagery-zoom").value),
       },
     }, "fetch-out", drawFetched);
   };
@@ -2318,6 +2412,11 @@ async function refreshScene() {
     ground: latest.terrain.description, anchors: latest.anchors.length,
   });
   terrainData = latest.terrain;
+  // The photograph of the ground, where the fetch brought one. Asked for
+  // here beside the mesh and for the same reason: both describe the site
+  // this scene just became.
+  loadPhotograph();
+  lockPhotographTick();
   // The finer mesh described the ground before this edit. Dropped rather
   // than kept, or a change of site leaves the old hill drawn in the
   // middle of the new one.

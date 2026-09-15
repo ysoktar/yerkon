@@ -237,6 +237,57 @@ class Buildings:
 
 
 @dataclass(frozen=True)
+class Aerial:
+    """A photograph of the site, north up, in whatever it was fetched at.
+
+    Stored as plain pixels with the box they cover rather than as tiles,
+    because every question asked of it afterwards is "what colour is the
+    ground here" and a tile index would have to be walked to answer it.
+
+    It carries its own bounds because a fetch asks for whole tiles and
+    gets back slightly more ground than the box it wanted; cropping to
+    the box exactly would throw away resolution for no reason, and
+    pretending the extra is not there would put the picture half a
+    street off.
+    """
+
+    pixels: np.ndarray
+    bounds: BoundingBox
+    source: str = ""
+    zoom: int = 0
+
+    def __post_init__(self) -> None:
+        if self.pixels.ndim != 3 or self.pixels.shape[2] != 3:
+            raise ValueError("aerial pixels are rows by columns by RGB")
+
+    @property
+    def metres_per_pixel(self) -> float:
+        _, per_lon = self.bounds.metres_per_degree()
+        return (self.bounds.east - self.bounds.west) * per_lon / max(
+            self.pixels.shape[1], 1)
+
+    def sample(self, longitudes: np.ndarray, latitudes: np.ndarray) -> np.ndarray:
+        """The colour at each of these points, as rows of RGB.
+
+        Nearest pixel rather than interpolated: this is a photograph, and
+        a blend of a roof and the road beside it is a colour neither of
+        them is. Points outside what was fetched clamp to the edge, the
+        same thing the elevation does and for the same reason (ADR-0037
+        keeps anything that matters inside).
+        """
+        rows, columns = self.pixels.shape[0], self.pixels.shape[1]
+        across = max(self.bounds.east - self.bounds.west, 1e-12)
+        down = max(self.bounds.north - self.bounds.south, 1e-12)
+        x = (np.asarray(longitudes, dtype=float) - self.bounds.west) / across
+        # Rows run north to south, which is how an image is stored and
+        # the opposite of how latitude runs.
+        y = (self.bounds.north - np.asarray(latitudes, dtype=float)) / down
+        column = np.clip((x * columns).astype(int), 0, columns - 1)
+        row = np.clip((y * rows).astype(int), 0, rows - 1)
+        return self.pixels[row, column]
+
+
+@dataclass(frozen=True)
 class SiteManifest:
     """Where every piece of a site came from.
 
@@ -286,6 +337,13 @@ class Site:
     grid_spacing_m: float
     manifest: SiteManifest
     buildings: Optional[Buildings] = None
+    #: A photograph of the ground, where one was fetched.
+    #:
+    #: Nothing in the simulation reads it — a link budget does not care
+    #: what colour a field is — so it is drawn and nothing else. Said
+    #: plainly because a picture that looks like data invites being read
+    #: as data.
+    aerial: Optional[Aerial] = None
 
     def __post_init__(self) -> None:
         if self.elevation_grid_m.ndim != 2:
@@ -300,6 +358,42 @@ class Site:
     @property
     def height_m(self) -> float:
         return (self.elevation_grid_m.shape[0] - 1) * self.grid_spacing_m
+
+    def colours_at(self, xs_m, ys_m):
+        """What the photograph shows at these local-metre points, or None.
+
+        The conversion from metres lives here because the site is what
+        knows where its origin is; the picture knows only longitude and
+        latitude.
+        """
+        if self.aerial is None:
+            return None
+        per_lat, per_lon = self.bounds.metres_per_degree()
+        return self.aerial.sample(
+            self.bounds.west + np.asarray(xs_m, dtype=float) / per_lon,
+            self.bounds.south + np.asarray(ys_m, dtype=float) / per_lat,
+        )
+
+    @property
+    def aerial_extent_m(self):
+        """Where the photograph sits in this site's metres, or nothing.
+
+        A fetch asks for a box and gets back whole tiles, so the picture
+        is a little larger than the site and hangs off every edge: west
+        and south come back negative. Handed out as it is rather than
+        cropped, because a drawer that knows the real corners can place
+        it exactly, and one that is handed a lie cannot.
+        """
+        if self.aerial is None:
+            return None
+        per_lat, per_lon = self.bounds.metres_per_degree()
+        box = self.aerial.bounds
+        return (
+            (box.west - self.bounds.west) * per_lon,
+            (box.south - self.bounds.south) * per_lat,
+            (box.east - self.bounds.west) * per_lon,
+            (box.north - self.bounds.south) * per_lat,
+        )
 
     def height_at(self, x: float, y: float) -> float:
         """Ground elevation at a point, bilinear between grid nodes.

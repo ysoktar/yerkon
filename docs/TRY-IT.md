@@ -310,6 +310,35 @@ okuma. İlk cevap veren kazanır, cevap vermeyen künyeye yazılır
 dizin sürüm başına diske yazılır, yani ikinci bölge bu bir dakikayı
 ödemez.
 
+**Fotoğraf** (isteğe bağlı): bir uydu/harita karo adresi verirsen zemin
+düz renk yerine gerçek görüntüsüyle çizilir.
+
+```bash
+yerkon fetch --centre 37.8716,32.4847 --size 12 --into konya \
+  --imagery 'https://kullandigin-servis/{z}/{x}/{y}.png'
+```
+
+Sayfadaki **Yeni bir yer getir** kutusunda da aynı iki alan var: karo
+adresi ve yakınlık. Boş bırakırsan fotoğraf inmez, başka hiçbir şey
+değişmez.
+
+Kutuda hazır bir adres **yok** ve olmayacak: her sağlayıcının kendi
+koşulları var, çoğu anahtar istiyor, ve buraya bir adres koymak bu
+projeyi koşturan kişinin adına başkasının koşullarını kabul etmek
+olurdu. Hangi servisi kullanacağına ve koşullarına sen karar verirsin
+(ADR-0041).
+
+Yakınlık 17, Ankara'da piksel başına yaklaşık **0,92 m** — bir binayı
+görecek kadar ince, bir şehir on binlerce karo etmeyecek kadar kaba. Bir
+karo eksik gelirse orası gri bir kare olur; hiçbiri gelmezse bu bir hata
+olarak söylenir, çünkü genellikle yanlış adres ya da eksik anahtar
+demektir.
+
+Fotoğraf **yalnızca çizilir**. Benzetimin hiçbir yeri onu okumaz: link
+bütçesi bir tarlanın ne renk olduğunu umursamaz. Silsen yayımlanan
+hiçbir sayı değişmez. Zemin adımındaki **Uydu görüntüsünü zemine giydir**
+kutusu onu kapatıp açar ve fotoğrafı olmayan bir zeminde gri durur.
+
 ### Getirdikten sonra ne değişir
 
 Bunları bilmeden bakarsan sayıların "yanlış" göründüğü yerler:
@@ -324,6 +353,9 @@ Bunları bilmeden bakarsan sayıların "yanlış" göründüğü yerler:
   Ölçülmüş zemin kendi rölyefini ve kendi pürüzünü getirir.
 - **Alan sütunu küçülebilir.** Kapsama taraması da ölçümün dışına
   çıkmıyor, dolayısıyla hizmet alanı sahadan büyük çıkamaz.
+- **Fotoğraf sahanın dışına taşar.** Getirme kutu ister, tam karo alır.
+  Kırpılmıyor: gerçek köşeler çizime olduğu gibi veriliyor, yoksa resim
+  yarım sokak kayardı.
 
 ### Bir bölge eklemek neyi sınamaz
 

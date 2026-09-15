@@ -13,11 +13,20 @@ from typing import Optional
 
 import numpy as np
 
-from yerkon.site.model import BoundingBox, Buildings, Site, SiteManifest
+from yerkon.site.model import (
+    Aerial,
+    BoundingBox,
+    Buildings,
+    Site,
+    SiteManifest,
+)
 
 MANIFEST_NAME = "manifest.json"
 ELEVATION_NAME = "elevation.npy"
 BUILDINGS_NAME = "buildings.npz"
+#: The photograph, as a picture rather than as an array: it is
+#: one, it compresses like one, and somebody can open it.
+AERIAL_NAME = "aerial.png"
 
 
 class SiteCache:
@@ -43,12 +52,36 @@ class SiteCache:
                 height_m=site.buildings.height_m,
             )
 
+        if site.aerial is not None:
+            from PIL import Image
+
+            Image.fromarray(site.aerial.pixels, "RGB").save(
+                self.directory / AERIAL_NAME, optimize=True)
+        else:
+            # Fetched again without one, over a site that had one. The
+            # manifest would already say there is no photograph, so
+            # nothing would read it — but the viewer serves this file by
+            # name, and a file on disk is a thing that can be served.
+            (self.directory / AERIAL_NAME).unlink(missing_ok=True)
+
         payload = {
             "bounds": {
                 "south": site.bounds.south, "west": site.bounds.west,
                 "north": site.bounds.north, "east": site.bounds.east,
             },
             "grid_spacing_m": site.grid_spacing_m,
+            # What the picture covers, which is whole tiles and so a
+            # little more than the box that was asked for.
+            "aerial": None if site.aerial is None else {
+                "bounds": {
+                    "south": site.aerial.bounds.south,
+                    "west": site.aerial.bounds.west,
+                    "north": site.aerial.bounds.north,
+                    "east": site.aerial.bounds.east,
+                },
+                "source": site.aerial.source,
+                "zoom": site.aerial.zoom,
+            },
             "manifest": {
                 "elevation_source": site.manifest.elevation_source,
                 "elevation_resolution_m": site.manifest.elevation_resolution_m,
@@ -80,6 +113,20 @@ class SiteCache:
                 radius_m=stored["radius_m"], height_m=stored["height_m"],
             )
 
+        aerial: Optional[Aerial] = None
+        aerial_path = self.directory / AERIAL_NAME
+        if aerial_path.exists() and payload.get("aerial"):
+            from PIL import Image
+
+            stored = payload["aerial"]
+            aerial = Aerial(
+                pixels=np.asarray(Image.open(aerial_path).convert("RGB"),
+                                  dtype=np.uint8),
+                bounds=BoundingBox(**stored["bounds"]),
+                source=stored.get("source", ""),
+                zoom=int(stored.get("zoom", 0)),
+            )
+
         raw = payload["manifest"]
         return Site(
             bounds=BoundingBox(**payload["bounds"]),
@@ -94,4 +141,5 @@ class SiteCache:
                 notes=tuple(raw["notes"]),
             ),
             buildings=buildings,
+            aerial=aerial,
         )

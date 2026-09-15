@@ -23,6 +23,7 @@ import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Optional
+from urllib.parse import parse_qs, urlparse
 
 from yerkon.design import Design
 from yerkon.proposal import propose
@@ -46,6 +47,8 @@ from yerkon.viewer.tasks import (
     target_from,
 )
 from yerkon.language import chosen as language_chosen, say
+from yerkon.scenarios import SITES
+from yerkon.site.cache import AERIAL_NAME
 from yerkon.viewer.state import (
     CASCADING,
     MODES,
@@ -336,6 +339,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(
                 lambda: listed(self.session.read().settings())
             )
+        if path == "/api/aerial.png":
+            return self._aerial()
         if path == "/api/job":
             return self._json(self._job)
         self.send_error(404)
@@ -508,6 +513,33 @@ class Handler(BaseHTTPRequestHandler):
             "Content-Disposition", 'attachment; filename="defaults.toml"'
         )
         self.send_header("Content-Length", str(len(payload)))
+        self.end_headers()
+        self.wfile.write(payload)
+
+    def _aerial(self) -> None:
+        """The site's photograph, straight off the disk the fetch wrote it to.
+
+        Named by the caller rather than read from the session, so that
+        the browser can cache it: a picture whose address is the same for
+        every site is a picture the browser hands back for the wrong one.
+        The name is a single path segment or nothing doing — it arrives
+        from a query string, and a query string is somewhere a person can
+        type `../../etc/passwd`.
+        """
+        asked = parse_qs(urlparse(self.path).query).get("site", [""])[0]
+        if not asked or asked != pathlib.Path(asked).name or asked.startswith("."):
+            return self.send_error(404)
+        picture = SITES / asked / AERIAL_NAME
+        if not picture.exists():
+            return self.send_error(404)
+        payload = picture.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", "image/png")
+        self.send_header("Content-Length", str(len(payload)))
+        # A fetch rewrites the file, and the address does not change with
+        # it, so the browser is told to ask again rather than to trust
+        # what it has.
+        self.send_header("Cache-Control", "no-cache")
         self.end_headers()
         self.wfile.write(payload)
 

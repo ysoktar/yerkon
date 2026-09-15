@@ -155,7 +155,57 @@ function face(view, corners, colour, alpha, grow = 0, bias = 0) {
   return { screen, colour, alpha, depth: depth / all - bias, kind: "face" };
 }
 
-export function groundFaces(view, terrain, light) {
+/* What colour a photograph shows at a point in the site's own metres.
+ *
+ * `pixels` is a flat RGBA run as `getImageData` hands it over, and
+ * `extent` is where the picture's corners fall in those metres — which
+ * is not the site's own extent: a fetch asks for a box and gets back
+ * whole tiles, so the picture hangs off every edge.
+ *
+ * Nearest pixel rather than blended, the same choice `Aerial.sample`
+ * makes on the other side and for the same reason: a mix of a roof and
+ * the road beside it is a colour neither of them is.
+ *
+ * Outside the picture it answers null rather than clamping, unlike the
+ * elevation. A path grazing the boundary needs the nearest known ground
+ * to keep a link budget honest; ground with no photograph over it needs
+ * to be drawn as ground with no photograph over it, and clamping would
+ * smear the edge row of pixels out across the countryside instead.
+ */
+export function photoSampler(pixels, width, height, extent) {
+  const [west, south, east, north] = extent;
+  const across = Math.max(east - west, 1e-9);
+  const down = Math.max(north - south, 1e-9);
+  return {
+    colourAt(x, y) {
+      const u = (x - west) / across;
+      const v = (north - y) / down;           // rows run north to south
+      if (u < 0 || u >= 1 || v < 0 || v >= 1) return null;
+      const at = ((Math.floor(v * height) * width) + Math.floor(u * width)) * 4;
+      return [pixels[at], pixels[at + 1], pixels[at + 2]];
+    },
+  };
+}
+
+/* The olive this project has always drawn bare ground in. */
+const BARE = [126, 146, 104];
+
+/* The ground, one quad per mesh cell, shaded by which way it faces.
+ *
+ * `photo`, where a site was fetched with one, is the aerial photograph:
+ * each quad takes the colour of the ground under its own middle instead
+ * of the olive, and the same shading is applied on top so that a hill
+ * still reads as a hill rather than as a flat picture.
+ *
+ * One colour per quad rather than the picture mapped across each of
+ * them: this painter fills flat polygons, and drawing a slice of an
+ * image through four thousand of them with a transform apiece is a
+ * different renderer. It costs less than it sounds like — the mesh
+ * follows the camera, so the quads over a street are metres across and
+ * the photograph comes through at the resolution somebody is looking at
+ * it from (`ground` in scene.py).
+ */
+export function groundFaces(view, terrain, light, photo) {
   const { xs, ys, heights } = terrain;
   const out = [];
   for (let row = 0; row < ys.length - 1; row++) {
@@ -170,9 +220,12 @@ export function groundFaces(view, terrain, light) {
         sub(corners[1], corners[0]), sub(corners[3], corners[0]),
       ));
       const lit = 0.45 + 0.55 * Math.max(0, dot(normal, light));
+      const ink = (photo && photo.colourAt(
+        (xs[column] + xs[column + 1]) / 2, (ys[row] + ys[row + 1]) / 2,
+      )) || BARE;
       const painted = face(
         view, corners,
-        `rgb(${Math.round(126 * lit)},${Math.round(146 * lit)},${Math.round(104 * lit)})`,
+        `rgb(${Math.round(ink[0] * lit)},${Math.round(ink[1] * lit)},${Math.round(ink[2] * lit)})`,
         1, 0.6,
       );
       if (painted) out.push(painted);
