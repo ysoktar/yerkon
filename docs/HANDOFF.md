@@ -74,6 +74,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `design.py` | birinin seçtiği ayarlar ve neyi ima ettikleri |
 | `proposal.py` | onay paneli: bir düzenleme, bir evet/hayır, her sonuç gösterilmiş |
 | `numbers.py` | virgüllü ondalık ayırıcı, binlik ayırıcı yok |
+| `routes.py` | alıcının sürdüğü şekil: yedi güzergâh, tek dikiş `trace(trip, course)` |
 | `presets.py` | adlandırılmış düzenlemeler: bir sekmenin tamamı, kaydedilip geri yüklenen |
 | `viewer/static/map.js` | yer seçici: kayan harita, serbest çizilen kutu, ad araması |
 | `cli.py` | `fetch`, `design`, `table`, `view`, `site`, `budget`, `defaults` ve `calibrate` fiilleri |

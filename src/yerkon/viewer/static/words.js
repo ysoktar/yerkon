@@ -75,6 +75,11 @@ export const SAY = {
     en: "Modelled ground has no photograph: it is nowhere.",
   },
   // -- named arrangements --------------------------------------------
+  "unit.route": { tr: "Güzergâh", en: "Route" },
+  "route.no_road": {
+    tr: "Bu zemin yol geometrisi taşımıyor.",
+    en: "This ground carries no road geometry.",
+  },
   "preset.load": { tr: "Yükle", en: "Load" },
   "preset.save": { tr: "Kaydet", en: "Save" },
   "preset.drop": { tr: "Sil", en: "Delete" },

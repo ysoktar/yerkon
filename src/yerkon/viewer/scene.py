@@ -22,6 +22,7 @@ from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import LANGUAGES, LANGUAGE_NAMES, say
 from yerkon.layout import FEWEST_FOR_A_FIX, METHODS as LAYOUT_METHODS
+from yerkon.routes import METHODS as ROUTE_METHODS
 from yerkon.viewer.state import (
     _lowest_unit,
     closure_of,
@@ -305,6 +306,21 @@ def scene(state: ViewState) -> dict:
             "layouts": [
                 [name, say("layout." + name, state.language)]
                 for name in LAYOUT_METHODS
+            ],
+            # Routes a unit can drive. The empty one first, because it is
+            # what every unit did before there was a choice and is still
+            # the honest default: the site's own shape.
+            "routes": (
+                [["", say("route.site", state.language)]]
+                + [[name, say("route." + name, state.language)]
+                   for name in ROUTE_METHODS]
+            ),
+            # Which routes this ground can actually carry. The real road
+            # needs road geometry a fetch has not brought yet, and a
+            # control that does nothing is not a control (ADR-0036).
+            "routes_live": [
+                name for name in ROUTE_METHODS
+                if name != "road" or bool(state.course().road)
             ],
             "mountings": [
                 [key, "{} ({:.0f} m)".format(

@@ -26,8 +26,6 @@ from yerkon.ranging import SCHEMES
 from yerkon.scenarios import (
     Deployed,
     SITES,
-    _circuit,
-    _straight_road,
     catalogue,
     fetched,
     fits_on,
@@ -36,12 +34,14 @@ from yerkon.scenarios import (
 from yerkon.design import Design, REGION_CHOICES
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import DEFAULT_LANGUAGE, say
+from yerkon.routes import Course, Trip, trace
 from yerkon.layout import Ground as LayoutGround, Plan, place
 from yerkon.settings import Settings, defaults_in
 from yerkon.world import (
     Anchor,
     Road,
     Terrain,
+    graded_alignment,
     mountings,
     rolling_terrain,
     terrain_from_site,
@@ -260,6 +260,15 @@ class UnitPlan:
     antenna_height_m: float = 1.5
     #: Which modules it carries. Both, for either receiver in the bill.
     radios: tuple = ("sx1280", "dwm3000")
+    #: Which route it drives, by name (`yerkon.routes`).
+    #:
+    #: Empty means the site's own shape, which is what every unit did
+    #: before there was a choice: a line down a corridor, a circuit over
+    #: an area. Kept as the default so an arrangement saved before this
+    #: existed loads as the arrangement it was (ADR-0043), and last in
+    #: the field list because a field added in the middle shifts every
+    #: positional argument after it (ADR-0035).
+    route: str = ""
 
     def as_json(self) -> dict:
         return {
@@ -443,24 +452,71 @@ class ViewState:
                 )
         return tuple(placed)
 
-    def road(self, terrain: Terrain) -> Road:
-        """The route the units take: a line down a corridor, a circuit over an area."""
-        if self.width_m <= 0.0:
-            return _straight_road(self.corridor_m, terrain)
-        return _circuit(
-            self.corridor_m, self.width_m, terrain,
-            inset_m=min(self.corridor_m, self.width_m) * 0.1,
-            step_m=max(min(self.corridor_m, self.width_m) / 20.0, 50.0),
+    def course(self) -> Course:
+        """The ground a journey runs over, for `yerkon.routes`."""
+        measured = self.measured()
+        return Course(
+            length_m=self.corridor_m,
+            width_m=self.width_m,
+            # Empty until a fetch brings road geometry, which greys the
+            # `road` route rather than offering one that cannot be drawn
+            # (ADR-0036, ADR-0045).
+            road=getattr(measured, "roads_m", ()) or (),
         )
 
+    def road(self, terrain: Terrain, route: str = "") -> Road:
+        """The route a unit takes, as a road with its own alignment.
+
+        The site's own shape by default — a line down a corridor, a
+        circuit over an area — which is what every unit drove before
+        there was a choice. A named route overrides it.
+
+        This is also the spine anchors are placed along, and that is
+        asked for without a route on purpose: where the anchors go is a
+        fact about the site, not about which pattern one receiver was
+        told to drive (ADR-0045).
+        """
+        shape = route or ("line" if self.width_m <= 0.0 else "circuit")
+        centreline = trace(
+            Trip(method=shape, step_m=self._route_step_m()), self.course())
+        return Road(
+            centreline_m=centreline,
+            terrain=terrain,
+            surface_m=graded_alignment(list(centreline), terrain),
+        )
+
+    def _route_step_m(self) -> float:
+        """How finely a route is sampled.
+
+        Fine enough to be a shape, coarse enough that a forty kilometre
+        site is not ten thousand points. The figures are the ones the two
+        shapes this replaced already used — 500 m down a corridor, a
+        twentieth of the shorter side over an area — so a unit that names
+        no route drives exactly the road it drove before there was a
+        choice, point for point.
+        """
+        if self.width_m <= 0.0:
+            return 500.0
+        return max(min(self.corridor_m, self.width_m) / 20.0, 50.0)
+
     def receivers(self, terrain: Terrain) -> tuple[Receiver, ...]:
-        road = self.road(terrain)
+        """Each unit on its own route.
+
+        Built per unit rather than once, because a unit that drives a
+        lawnmower over a town and one that runs the ring road are asking
+        different questions of the same anchors — and a single road for
+        all of them was an arrangement rather than a choice (ADR-0045).
+        """
         _, radio_of = self.catalogues()
+        roads = {}
+        for unit in self.units:
+            if unit.route not in roads:
+                roads[unit.route] = self.road(terrain, unit.route)
         return tuple(
             Receiver(
                 identifier=unit.identifier,
                 journey=Journey(
-                    road=road,
+                    road=roads[unit.route],
                     speed_m_s=unit.speed_km_h / 3.6,
                     duration_s=max(self.journey_s, 5.0),
                     start_m=unit.start_m,

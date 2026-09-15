@@ -155,6 +155,21 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "tr": "{value} bir boylam değil; boylam -180 ile 180 arasındadır.",
         "en": "{value} is not a longitude; it runs from -180 to 180.",
     },
+    # -- routes a receiver drives (ADR-0045) -------------------------------
+    "route.site": { "tr": "Sahanın kendi şekli", "en": "The site's own shape" },
+    "route.line": { "tr": "Düz çizgi", "en": "A straight line" },
+    "route.out-and-back": { "tr": "Gidiş-dönüş", "en": "Out and back" },
+    "route.circuit": { "tr": "Çevre turu", "en": "A circuit" },
+    "route.figure-eight": { "tr": "Sekiz çizme", "en": "A figure of eight" },
+    "route.lawnmower": { "tr": "Tarama (biçerdöver)", "en": "Lawnmower passes" },
+    "route.waypoints": { "tr": "Rastgele duraklar", "en": "Random waypoints" },
+    "route.road": { "tr": "Gerçek yol", "en": "The real road" },
+    "route.no_road": {
+        "tr": "Bu zemin yol geometrisi taşımıyor, o yüzden gerçek yol "
+              "çizilemiyor. Getirmenin yolları da alması gerekir.",
+        "en": "This ground carries no road geometry, so the real road "
+              "cannot be drawn. A fetch has to bring roads too.",
+    },
     "deployment.no_anchors": {
         "tr": "Direk yok: ya her dizi hiç yerleştirmiyor ya da hepsi "
               "silinmiş. `manual` yerleşimi bilerek hiç koymaz — elle "

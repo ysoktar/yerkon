@@ -100,6 +100,12 @@ atılanı tutuyor, %3'e. Hata bir kestirimdir: saat kayması, paket kaybı ve
 gerçekten oradan geçen bir alıcı yoktur — yayımlanan sayı koşudan gelir.
 ADR-0044'e bak.
 
+**Route** (güzergâh): bir alıcının sürdüğü şekil. Yedi tane, alıcı
+başına seçilir: düz çizgi, gidiş-dönüş, çevre turu, sekiz çizme, tarama
+(boustrophedon), rastgele duraklar (Johnson ve Maltz 1996) ve gerçek yol.
+Hepsi tek bir dikişten geçer: `trace(trip, course)`. Direklerin dizildiği
+omurga bundan etkilenmez. ADR-0045'e bak.
+
 **Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
 artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 

@@ -239,6 +239,27 @@ istemek yeni bilgi getirmez, daha seyreği tepeleri yumuşatır. Satır kaç
 nokta olacağını söylüyor: 3 km'de 10 000, 12 km'de 160 000. Yüz binlerin
 üstü dakikalar ve kimsenin istemediği bir dosya demek.
 
+### Hangi alıcı hangi yolda
+
+Her alıcı kartında bir **Güzergâh** seçici var — alıcı başına, çünkü
+şehrin içini tarayan bir etüt aracı ile çevre yolunu dönen bir kamyonet
+aynı direklere farklı sorular sorar.
+
+| Güzergâh | Ne için |
+|---|---|
+| **Sahanın kendi şekli** | Varsayılan: koridorda düz çizgi, alanda çevre turu. Bu var olmadan önce herkesin sürdüğü yol, nokta nokta aynı. |
+| **Düz çizgi** | Koridorun kendisi. Enine geometrisi hiç değişmez — bu yüzden tek seçenek değil (ADR-0011). |
+| **Gidiş-dönüş** | Bir etüt aracının bir koridoru gerçekte sürdüğü şekil. Her nokta bir kez her yöne bakarak gözlenir. |
+| **Çevre turu** | Kenardan dolaş, ortadan geç. |
+| **Sekiz çizme** | Alıcıların denemede sürüldüğü desen: kendini keser, araç her yöne girer. |
+| **Tarama** | Boustrophedon — uçlarda dönen paralel geçişler. Alanı kenarından değil içinden örnekler. |
+| **Rastgele duraklar** | Random waypoint (Johnson ve Maltz, 1996). Tohumlu, yani aynı yolculuk iki kez gelir. Bilinen kusuru var: aracı sahanın ortasına kenarlarından çok daha sık koyar. |
+| **Gerçek yol** | Getirmenin getirdiği yol geometrisi. Şimdilik **gri** — getirme henüz yol almıyor. |
+
+Direklerin dizildiği omurga bundan etkilenmez: direğin nereye
+dikileceği sahanın bir olgusu, bir alıcıya hangi deseni sürmesi
+söylendiğinin değil.
+
 ### Zemin neyi gösteriyor
 
 Sol üstteki efsanenin başındaki açılır liste, zeminin üzerine boyanan

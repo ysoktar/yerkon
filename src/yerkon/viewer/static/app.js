@@ -31,6 +31,8 @@ let CHOICES = {};
  * roadside sign instead. */
 let RADIOS = [];
 let LAYOUTS = [];
+let ROUTES = [];
+let ROUTES_LIVE = [];
 /* The methods that search rather than lay a lattice down. They read a
  * bar and a budget instead of a spacing, so the card shows different
  * figures for them. */
@@ -670,6 +672,7 @@ function drawUnits() {
     card.className = "card";
     card.dataset.find = `alıcı receiver ${unit.identifier} ${unit.kind} `
       + `hız anten modül başlangıç speed antenna module start `
+      + `güzergâh yol rota route path ${unit.route || ""} `
       + `${unit.radios.join(" ")}`;
 
     const head = document.createElement("header");
@@ -697,6 +700,26 @@ function drawUnits() {
     select.onchange = () => change({ kind: select.value });
     wrap.appendChild(select);
     card.appendChild(wrap);
+
+    // Which route this one drives. Per unit, because a van running the
+    // ring road and a survey vehicle mowing the town are asking
+    // different questions of the same anchors (ADR-0045).
+    const where = document.createElement("label");
+    where.textContent = say("unit.route");
+    const route = document.createElement("select");
+    route.innerHTML = options(ROUTES, unit.route || "");
+    // A route this ground cannot carry is offered greyed rather than
+    // hidden, so somebody can see it exists and why it is not available
+    // (ADR-0036).
+    for (const option of route.options) {
+      if (option.value && !ROUTES_LIVE.includes(option.value)) {
+        option.disabled = true;
+        option.title = say("route.no_road");
+      }
+    }
+    route.onchange = () => change({ route: route.value });
+    where.appendChild(route);
+    card.appendChild(where);
 
     const pair = document.createElement("div");
     pair.className = "pair";
@@ -2825,6 +2848,8 @@ async function refreshScene() {
     MOUNTINGS = latest.choices.mountings;
     RADIOS = latest.choices.radios;
     LAYOUTS = latest.choices.layouts || [];
+    ROUTES = latest.choices.routes || [];
+    ROUTES_LIVE = latest.choices.routes_live || [];
     TABS = latest.choices.modes;
     LANGUAGES = latest.choices.languages || [];
     for (const [name, label] of TABS) MODE_LABEL[name] = label;
