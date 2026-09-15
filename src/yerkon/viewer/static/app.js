@@ -228,8 +228,35 @@ function showConfirm(changes, cascades) {
   document.getElementById("confirm").hidden = false;
 }
 
+/* One sentence and a yes/no, through the same sheet as the diff.
+ *
+ * Loading an arrangement is a change like any other and deserves the
+ * same "here is what will happen, say yes" (ADR-0009) — but it replaces
+ * a whole tab rather than moving three figures, and a sheet listing
+ * forty rows says less than one sentence does. Same sheet, same buttons,
+ * so there is one thing to recognise rather than two.
+ */
+let pendingPlainly = null;
+
+function askPlainly(sentence) {
+  return new Promise(resolve => {
+    const body = document.getElementById("confirm-body");
+    body.innerHTML = "";
+    const line = document.createElement("p");
+    line.textContent = sentence;
+    body.appendChild(line);
+    pendingPlainly = resolve;
+    document.getElementById("confirm").hidden = false;
+  });
+}
+
 document.getElementById("confirm-yes").onclick = async () => {
   document.getElementById("confirm").hidden = true;
+  if (pendingPlainly) {
+    const answer = pendingPlainly;
+    pendingPlainly = null;
+    return answer(true);
+  }
   const changes = pendingChanges;
   pendingChanges = null;
   await apply(changes);
@@ -237,6 +264,11 @@ document.getElementById("confirm-yes").onclick = async () => {
 
 document.getElementById("confirm-no").onclick = () => {
   document.getElementById("confirm").hidden = true;
+  if (pendingPlainly) {
+    const answer = pendingPlainly;
+    pendingPlainly = null;
+    return answer(false);
+  }
   pendingChanges = null;
   fillControls();          // put the control back where it was
   flash(say("confirm.nothing"));
@@ -1151,13 +1183,24 @@ function wireControls() {
     const used = new Set(state.runs.map(r => r.identifier));
     const identifier = [...letters].find(l => !used.has(l)) || "Z";
     const last = state.runs[state.runs.length - 1];
+    // Never past the end of the site.
+    //
+    // This used to reach a flat 3000 m whatever the site was, so on
+    // Kızılay — 2970 m of measured ground — a new group put its last
+    // column thirty metres past the edge. Nothing raised: the terrain
+    // clamps outside itself, so the anchors simply stood on the boundary
+    // row extruded into a plane (ADR-0037). It showed up as an
+    // arrangement that was saved with twelve anchors and loaded with
+    // nine, because loading brings a site inside its measured ground.
+    const edge = Math.max(state.corridor_m, 0);
+    const start = last ? Math.min(last.to_m + 500, edge) : 0;
     edit({ runs: state.runs.concat([{
       identifier,
       radio: last ? last.radio : "sx1280",
       mounting: last ? last.mounting : "mast",
       stagger_m: last ? last.stagger_m : 0,
-      from_m: last ? last.to_m + 500 : 0,
-      to_m: last ? last.to_m + 3000 : 3000,
+      from_m: start,
+      to_m: Math.min(last ? last.to_m + 3000 : 3000, edge),
       spacing_m: last ? last.spacing_m : 1000,
       offset_m: last ? last.offset_m : 100,
     }]) }, false).catch(e => flash(e.message, true));
@@ -1183,6 +1226,7 @@ function wireControls() {
   };
 
   wireMap();
+  wirePresets();
 
   document.getElementById("show-photo").onchange = event => {
     showPhotograph = event.target.checked;
@@ -1904,12 +1948,18 @@ function showNumbers(drawn, result) {
   }
 
   rows.push([say("result.units"), (drawn.units || []).length]);
-  rows.push([say("result.round"), `${tr(drawn.round_s * 1000, 0)} ms`]);
-  rows.push([say("result.rate"), `${tr(1 / Math.max(drawn.round_s, 1e-9))} /s`]);
+  // A dash for what does not exist, rather than a number computed from
+  // nothing. An arrangement with no anchors has no round and no covered
+  // ground, and printing "0 ms" and a billion fixes a second states
+  // both as findings (ADR-0043).
+  const round = drawn.round_s;
+  rows.push([say("result.round"),
+             round ? `${tr(round * 1000, 0)} ms` : NOTHING]);
+  rows.push([say("result.rate"), round ? `${tr(1 / round)} /s` : NOTHING]);
 
   if (sweepData) {
-    rows.push([say("result.served"), `${tr(sweepData.served_km2)} km²`]);
-    rows.push([say("result.reached"), `${tr(sweepData.reached_km2)} km²`]);
+    rows.push([say("result.served"), area(sweepData.served_km2)]);
+    rows.push([say("result.reached"), area(sweepData.reached_km2)]);
   }
   if (result) {
     rows.push([say("result.hpe50"), `${tr(result.hpe_p50_m)} m`]);
@@ -2349,6 +2399,97 @@ function wireTasks() {
   document.getElementById("frame-all").onclick = frameEverything;
 }
 
+/* What the panel prints where there is no number to print.
+ *
+ * An em dash rather than a zero: zero is an answer, and "no anchors
+ * reach anywhere because there are no anchors" is not one.
+ */
+const NOTHING = "—";
+
+function area(km2) {
+  return Number.isFinite(km2) ? `${tr(km2)} km²` : NOTHING;
+}
+
+/* ---------- named arrangements ---------- */
+
+/* Which arrangements this tab can be loaded from. */
+let PRESETS = [];
+
+function wirePresets() {
+  const pick = document.getElementById("preset-pick");
+  if (!pick) return;
+
+  document.getElementById("preset-load").onclick = async () => {
+    const name = pick.value;
+    if (!name) return;
+    const shown = PRESETS.find(p => p.name === name);
+    const yes = await askPlainly(
+      say("preset.replaces", { name: (shown && shown.label) || name }));
+    if (!yes) return;
+    try {
+      await ask("/api/preset/load", { name });
+      await refreshScene();
+      fillControls();
+      await loadFigures();
+      scheduleSweep();
+      // The name box follows what was loaded, so the usual next act —
+      // change something, save it under a new name — starts from the
+      // name it came from rather than from an empty box.
+      document.getElementById("preset-name").value =
+        (shown && !shown.shipped) ? name : "";
+      flash(say("preset.loaded", { name: (shown && shown.label) || name }));
+    } catch (error) { flash(error.message, true); }
+  };
+
+  document.getElementById("preset-save").onclick = async () => {
+    const name = document.getElementById("preset-name").value.trim();
+    if (!name) { flash(say("preset.needs_name"), true); return; }
+    // The two shipped ones are how somebody gets back to a known
+    // starting point, so they are not writable — and saying so beats
+    // accepting the name and quietly not shadowing them.
+    if (PRESETS.some(p => p.shipped && p.name === name)) {
+      flash(say("preset.shipped_kept", { name }), true);
+      return;
+    }
+    try {
+      const { path } = await ask("/api/preset/save", { name });
+      await drawPresets(name);
+      flash(say("preset.saved", { name, path }));
+    } catch (error) { flash(error.message, true); }
+  };
+
+  document.getElementById("preset-drop").onclick = async () => {
+    const name = pick.value;
+    const shown = PRESETS.find(p => p.name === name);
+    if (!name) return;
+    if (shown && shown.shipped) {
+      flash(say("preset.shipped_kept", { name: shown.label }), true);
+      return;
+    }
+    if (!await askPlainly(say("preset.sure_drop", { name }))) return;
+    try {
+      await ask("/api/preset/delete", { name });
+      await drawPresets();
+      flash(say("preset.dropped", { name }));
+    } catch (error) { flash(error.message, true); }
+  };
+}
+
+/* Redraw the picker from the engine's own list. */
+async function drawPresets(keep) {
+  const pick = document.getElementById("preset-pick");
+  if (!pick) return;
+  try {
+    const { presets } = await ask("/api/presets");
+    PRESETS = presets || [];
+  } catch (error) { return; }
+  const wanted = keep || pick.value;
+  pick.innerHTML = options(
+    PRESETS.map(p => [p.name, p.label]),
+    PRESETS.some(p => p.name === wanted) ? wanted : "",
+  );
+}
+
 /* ---------- the map somebody picks ground on ---------- */
 
 /* The picker, and the box it last had.
@@ -2606,6 +2747,7 @@ async function refreshScene() {
     drawWords();
   }
   drawTabs();
+  drawPresets();
   drawLanguages();
   keepClearOfTheHeader();
   capSlidersToTheGround();

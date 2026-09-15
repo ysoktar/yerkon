@@ -263,9 +263,28 @@ def _anchor_mix(deployment) -> str:
     )
 
 
-def footnotes(results: Sequence[Result], rows: Sequence[Row]) -> str:
-    """What the table rests on, printed with it rather than beside it."""
+def footnotes(results: Sequence[Result], rows: Sequence[Row],
+              arrangements: Sequence = ()) -> str:
+    """What the table rests on, printed with it rather than beside it.
+
+    `arrangements` are the saved presets that drove rows, where any did
+    (`yerkon table --preset`). Named here because the moment a printed
+    row can come from a file somebody saved, "which file, and which
+    version of it" is part of what the row rests on — a preset edited
+    between two runs would otherwise print two different tables with
+    identical provenance (ADR-0001, ADR-0043).
+    """
     lines = ["Notes:"]
+    for arrangement in arrangements:
+        lines.append("  {}".format(arrangement.describe()))
+    if arrangements:
+        lines.append(
+            "    A saved arrangement is not a shipped scenario. These rows "
+            "rest on somebody's stored file rather than on `scenarios.py`, "
+            "and the twelve characters after each name are a hash of its "
+            "contents: two runs that print the same hash ran the same "
+            "arrangement."
+        )
     for result in results:
         row = result.row()
         if row.reached_km2 is not None:

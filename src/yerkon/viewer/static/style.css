@@ -625,3 +625,30 @@ i.prov.assumption { background: var(--warn); }
     repeating-linear-gradient(0deg, #e6ecf2 0 39px, #dbe3ea 39px 40px),
     repeating-linear-gradient(90deg, #e6ecf2 0 39px, #dbe3ea 39px 40px);
 }
+
+
+/* ---------- named arrangements ---------- */
+
+#presets {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+}
+
+#presets select { margin-top: 0; font-size: 12px; }
+#presets .row { margin: 0; }
+#presets button { font-size: 11px; padding: 5px 8px; }
+
+#presets input[type=text] {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 12px;
+}

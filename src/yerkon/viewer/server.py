@@ -48,6 +48,7 @@ from yerkon.viewer.tasks import (
     target_from,
 )
 from yerkon.language import chosen as language_chosen, say
+from yerkon.presets import Preset, PresetStore, UnknownPreset, offered
 from yerkon.scenarios import SITES
 from yerkon.site.cache import AERIAL_NAME
 from yerkon.viewer.state import (
@@ -58,6 +59,34 @@ from yerkon.viewer.state import (
 )
 
 STATIC = pathlib.Path(__file__).parent / "static"
+
+#: Where saved arrangements are kept, as a one-item list so `--presets`
+#: can replace it without two copies of the answer (ADR-0043). The
+#: working directory by default, beside `defaults.toml`: it is the thing
+#: a person keeps with the study rather than inside the installation.
+PRESETS = [PresetStore("presets")]
+
+
+def _preset_label(preset, language: str) -> str:
+    """What to call it in the picker.
+
+    The two shipped ones are keys and get a translated label; a saved one
+    is called whatever the person called it, in whatever they called it.
+    """
+    if preset.source == "shipped":
+        return say("preset.{}".format(preset.name), language)
+    return preset.name
+
+
+def _find_preset(name: str, state) -> "Preset":
+    for preset in offered(state.scenario, PRESETS[0], from_scenario):
+        if preset.name == name:
+            return preset
+    raise UnknownPreset(say(
+        "preset.unknown", state.language, name=name,
+        known=", ".join(p.name for p in offered(
+            state.scenario, PRESETS[0], from_scenario)),
+        directory=str(PRESETS[0].directory)))
 
 
 class Session:
@@ -342,6 +371,8 @@ class Handler(BaseHTTPRequestHandler):
             )
         if path == "/api/aerial.png":
             return self._aerial()
+        if path == "/api/presets":
+            return self._json(self._presets)
         if path == "/api/job":
             return self._json(self._job)
         self.send_error(404)
@@ -364,6 +395,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(lambda: self._mode(body.get("mode", "rural")))
         if path == "/api/language":
             return self._json(lambda: self._language(body.get("language")))
+        if path == "/api/preset/load":
+            return self._json(lambda: self._load_preset(body.get("name", "")))
+        if path == "/api/preset/save":
+            return self._json(lambda: self._save_preset(body.get("name", "")))
+        if path == "/api/preset/delete":
+            return self._json(lambda: self._drop_preset(body.get("name", "")))
         if path == "/api/reset":
             return self._json(
                 lambda: {"state": self.session.reset().as_json()}
@@ -517,6 +554,72 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(payload)
 
+    # -- named arrangements (ADR-0043) -------------------------------------
+
+    def _presets(self) -> dict:
+        """What this tab can be loaded from, and what it is showing."""
+        state = self.session.read()
+        return {
+            "showing": self.session.showing,
+            "presets": [
+                {
+                    "name": preset.name,
+                    "label": _preset_label(preset, state.language),
+                    "mode": preset.mode,
+                    "shipped": preset.source == "shipped",
+                    "digest": preset.digest,
+                }
+                for preset in offered(state.scenario, PRESETS[0], from_scenario)
+            ],
+        }
+
+    def _load_preset(self, name: str) -> dict:
+        """Put a saved arrangement into this tab, and nothing into the others.
+
+        `scenario` and `language` are not taken from the file. The row a
+        tab runs as is decided by the tab, and the language by the
+        session — an arrangement saved on the rural row and loaded into
+        the urban one is somebody looking at it there on purpose, and it
+        should not silently turn the urban tab into a rural row.
+        """
+        preset = _find_preset(name, self.session.read())
+        carried = {
+            key: value for key, value in (preset.state or {}).items()
+            if key not in ("scenario", "language")
+        }
+        state = self.session.read().merged(carried)
+        # `on_measured_ground` and not `within_site`.
+        #
+        # The first is a correctness rule: a site cannot be larger than
+        # the ground somebody measured, or anchors stand on a number
+        # nobody took (ADR-0037). The second clips each run to the site,
+        # and this project has already decided a run's own typed end is
+        # the person being explicit about that run (`_apply` says so).
+        # Clipping here and not there would make one arrangement mean two
+        # different things depending on whether it came from a file —
+        # which is how an arrangement saved with twelve anchors came back
+        # with nine.
+        self.session.write(state.on_measured_ground())
+        return {"state": self.session.read().as_json(), "loaded": preset.name}
+
+    def _save_preset(self, name: str) -> dict:
+        """Save this tab under a name, which may be one already in use.
+
+        Overwriting is allowed on purpose: "save as" over the name you
+        just loaded is how somebody iterates, and refusing it would send
+        them to the file manager to delete a file first.
+        """
+        state = self.session.read()
+        preset = Preset(name=str(name).strip(), mode=state.scenario,
+                        state=state.as_json())
+        path = PRESETS[0].write(preset)
+        return {"saved": preset.name, "path": str(path),
+                "digest": preset.digest}
+
+    def _drop_preset(self, name: str) -> dict:
+        PRESETS[0].remove(str(name).strip())
+        return {"removed": str(name).strip()}
+
     def _aerial(self) -> None:
         """The site's photograph, straight off the disk the fetch wrote it to.
 
@@ -585,6 +688,7 @@ def serve(
     open_browser: bool = True,
     state: Optional[ViewState] = None,
     map_tiles: Optional[str] = None,
+    presets: Optional[str] = None,
 ) -> None:
     """Run until interrupted.
 
@@ -597,6 +701,8 @@ def serve(
     # deliberate no map, which is a different thing and has to survive.
     if map_tiles is not None:
         MAP_TILES[0] = map_tiles
+    if presets is not None:
+        PRESETS[0] = PresetStore(presets)
     server = ThreadingHTTPServer((host, port), Handler)
     address = "http://{}:{}/".format(host, port)
     print("YERKON viewer on {}".format(address))

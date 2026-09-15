@@ -74,6 +74,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `design.py` | birinin seçtiği ayarlar ve neyi ima ettikleri |
 | `proposal.py` | onay paneli: bir düzenleme, bir evet/hayır, her sonuç gösterilmiş |
 | `numbers.py` | virgüllü ondalık ayırıcı, binlik ayırıcı yok |
+| `presets.py` | adlandırılmış düzenlemeler: bir sekmenin tamamı, kaydedilip geri yüklenen |
 | `viewer/static/map.js` | yer seçici: kayan harita, serbest çizilen kutu, ad araması |
 | `cli.py` | `fetch`, `design`, `table`, `view`, `site`, `budget`, `defaults` ve `calibrate` fiilleri |
 
@@ -238,3 +239,17 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   eklenen bir onay kutusu `dead` sınıfını alıyor, sebebini de taşıyor,
   ama rengi değişmiyordu: kilitli ama kilitli görünmeyen bir denetim.
   Kural artık `label.dead` (ADR-0036).
+- "Direk yok" hatası `anchors()` içindeydi, yani üzerinde hiçbir şey
+  olmayan bir sekme *çizilemiyordu* — ve üzerine bir şey kurulacak boş
+  sayfa tam olarak budur. Hata doğruydu, katmanı yanlıştı: çizmek boşu
+  kabul eder, bir sayı üretmek etmez (ADR-0043).
+- Bir düzenleme 12 direkle kaydedilip 9 ile geri geldi. Altından iki
+  hata çıktı: yükleme `within_site()` uygulayıp geri getirmek yerine
+  sessizce düzeltiyordu, ve "Grup ekle" sahanın uzunluğuna bakmadan
+  3000 m'ye uzanan bir dizi kuruyordu — Kızılay 2970 m, yani son sütun
+  sahanın dışındaydı ve hiçbir şey yükselmiyordu, çünkü arazi kendi
+  dışında kırpar (ADR-0037). İkisi de düzeldi.
+- Yazdığım ilk yuvarlak-gidiş sınaması sunucunun kodunu değil, benim
+  kopyaladığım mantığı sınıyordu — yani sunucudaki bir gerilemeyi
+  göremezdi. Gerçek işleyiciden geçecek şekilde yeniden yazıldı, ve
+  yakaladığını hatayı kasten geri koyarak denedim.

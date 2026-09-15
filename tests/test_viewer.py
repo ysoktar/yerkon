@@ -183,10 +183,29 @@ def test_a_removed_anchor_is_gone():
     assert "M0" not in identifiers and "M1" not in identifiers
 
 
-def test_removing_every_anchor_is_refused_rather_than_crashing_later():
+def test_an_arrangement_with_nothing_in_it_draws_but_will_not_run():
+    """Where the refusal lives, which moved once and matters (ADR-0043).
+
+    It used to be in `anchors`, so a tab with nothing in it could not
+    even be drawn — which made an empty arrangement, the blank sheet
+    somebody builds one on, impossible to load. Drawing nothing is fine.
+    Reporting a positioning row for a network with no transmitters is
+    not, so the refusal is where a number would be produced.
+    """
+    from yerkon.viewer.scene import scene, sweep
+
     state = a_state(removed=tuple("M{}".format(i) for i in range(40)))
-    with pytest.raises(ValueError, match="no anchors"):
-        state.anchors(state.terrain())
+    assert state.anchors(state.terrain()) == ()
+    assert scene(state)["anchors"] == []
+    assert sweep(state)["counts"] == []
+
+    for produces_a_number in (
+        lambda: state.deployment(state.terrain()),
+        state.scenario_object,
+        state.deployed,
+    ):
+        with pytest.raises(ValueError, match="Direk yok|No anchors"):
+            produces_a_number()
 
 
 def test_a_state_survives_a_round_trip_through_json():

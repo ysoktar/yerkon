@@ -441,12 +441,6 @@ class ViewState:
                     Anchor(identifier, (float(x), float(y)), mounting,
                            terrain, radio=radio)
                 )
-        if not placed:
-            raise ValueError(
-                "no anchors: every run either places none or has had them "
-                "all removed. The `manual` layout places none on purpose — "
-                "drag anchors in, or choose another method."
-            )
         return tuple(placed)
 
     def road(self, terrain: Terrain) -> Road:
@@ -481,8 +475,25 @@ class ViewState:
         )
 
     def deployment(self, terrain: Terrain) -> Deployment:
+        """This tab as something that can be evaluated.
+
+        Refuses an arrangement with nothing in it, which `anchors` used
+        to do and should not have: a tab with no anchors is perfectly
+        drawable — it is the blank sheet an empty arrangement starts
+        from (ADR-0043) — and merely has no result to report. A
+        positioning network with no transmitters produces no position,
+        so the refusal belongs where a number would be produced rather
+        than where a picture is.
+
+        `Deployment` refuses an empty one too, and says "a deployment
+        needs anchors". Said here first because the person reading it is
+        looking at a viewer and wants to know what to do about it.
+        """
+        anchors = self.anchors(terrain)
+        if not anchors:
+            raise ValueError(say("deployment.no_anchors", self.language))
         return Deployment(
-            anchors=self.anchors(terrain),
+            anchors=anchors,
             receivers=self.receivers(terrain),
             scheme=SCHEMES[self.scheme],
             region=chosen(REGION_CHOICES, self.region, "region"),

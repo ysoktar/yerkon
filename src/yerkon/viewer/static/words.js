@@ -74,6 +74,37 @@ export const SAY = {
     tr: "Modellenmiş zeminin fotoğrafı yoktur: orası hiçbir yer değil.",
     en: "Modelled ground has no photograph: it is nowhere.",
   },
+  // -- named arrangements --------------------------------------------
+  "preset.load": { tr: "Yükle", en: "Load" },
+  "preset.save": { tr: "Kaydet", en: "Save" },
+  "preset.drop": { tr: "Sil", en: "Delete" },
+  "preset.name": { tr: "Bu düzenlemenin adı…", en: "Name this arrangement…" },
+  "preset.replaces": {
+    tr: "{name} yüklenecek. Bu sekmedeki her şeyin yerine geçer: zemin, "
+        + "sahanın boyu ve eni, bütün direk dizileri ve alıcılar, elle "
+        + "taşınmış ve silinmiş direkler, ve elle değiştirilmiş bütün "
+        + "değerler. Diğer sekmelere dokunulmaz.",
+    en: "{name} will be loaded. It replaces everything in this tab: the "
+        + "ground, the site's length and width, every anchor run and "
+        + "receiver, anchors moved and deleted by hand, and every figure "
+        + "edited by hand. No other tab is touched.",
+  },
+  "preset.saved": { tr: "{name} kaydedildi → {path}",
+                    en: "Saved {name} → {path}" },
+  "preset.dropped": { tr: "{name} silindi", en: "Deleted {name}" },
+  "preset.loaded": { tr: "{name} yüklendi", en: "Loaded {name}" },
+  "preset.needs_name": {
+    tr: "Kaydetmek için bir ad yaz. Hazır gelenlerin üzerine yazılmaz.",
+    en: "Type a name to save under. The shipped ones are not overwritten.",
+  },
+  "preset.shipped_kept": {
+    tr: "{name} hazır gelen bir düzenleme; silinmez ve üzerine yazılmaz. "
+        + "Farklı bir ad yaz.",
+    en: "{name} is a shipped arrangement; it is not deleted or overwritten. "
+        + "Type a different name.",
+  },
+  "preset.sure_drop": { tr: "{name} silinsin mi? Dosyası diskten kalkar.",
+                        en: "Delete {name}? Its file goes from the disk." },
   "fetch.map.open": { tr: "Haritadan seç…", en: "Pick it on a map…" },
   "fetch.map.search": { tr: "Yer ara: Konya, Bolu Dağı, D100…",
                         en: "Search a place: Konya, Bolu Dağı, D100…" },

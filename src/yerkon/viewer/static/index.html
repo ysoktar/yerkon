@@ -42,6 +42,21 @@
   </div>
   <p class="hint no-hits" id="find-empty" data-say="find.empty" hidden></p>
 
+  <!--
+    Named arrangements. Under the tabs because that is what it is about:
+    which arrangement this tab is showing. One per tab, separately —
+    loading one replaces this tab and touches no other (ADR-0043).
+  -->
+  <div id="presets">
+    <select id="preset-pick"></select>
+    <button id="preset-load" class="quiet" data-say="preset.load"></button>
+    <div class="row">
+      <input type="text" id="preset-name" data-say-placeholder="preset.name">
+      <button id="preset-save" class="quiet" data-say="preset.save"></button>
+      <button id="preset-drop" class="quiet" data-say="preset.drop"></button>
+    </div>
+  </div>
+
   <details class="step" id="step-place" open>
     <summary><span class="n">1</span><span class="what" data-say="step.place"></span>
       <span class="now" id="sum-place">—</span></summary>

@@ -239,6 +239,42 @@ istemek yeni bilgi getirmez, daha seyreği tepeleri yumuşatır. Satır kaç
 nokta olacağını söylüyor: 3 km'de 10 000, 12 km'de 160 000. Yüz binlerin
 üstü dakikalar ve kimsenin istemediği bir dosya demek.
 
+### Düzenlemeler: bir sekmeyi kaydedip geri yüklemek
+
+Sekmelerin üstündeki çubuk, o sekmenin hangi **düzenlemeyi** gösterdiğini
+söyler. Bir düzenleme sekme hakkındaki her şeydir: zemin, sahanın boyu ve
+eni, bütün direk dizileri ve alıcılar, elle taşıdığın ve sildiğin
+direkler, ve elle değiştirdiğin bütün değerler.
+
+Her satır için ikisi hazır gelir:
+
+- **Varsayılan** — satırın sevk edildiği hâli.
+- **Boş** — o satırın *kendi zemini*, üzerinde hiçbir şey yokken. Şehir
+  içi boş düzenlemesi Kızılay'ın üzerinde sıfır direkle açılır, çünkü
+  şehir içi düzenlemesi kuracaksan şehir içi zemininde kurarsın.
+
+Boş olanı yükleyip **Grup ekle** ile kendi dizilerini kur, alıcıları koy,
+değerleri değiştir; sonra alt satırdaki kutuya bir ad yazıp **Kaydet**.
+Dosya, komutu koşturduğun klasördeki `presets/` içine yazılır — yani
+`defaults.toml` gibi, etütle birlikte tutulur ve depoya işlenebilir.
+Başka bir yer istersen `yerkon view --presets KLASÖR`.
+
+Yüklemek o sekmenin yerine geçer ve **diğer sekmelere dokunmaz**; onay
+paneli ne olacağını tek cümlede söyler. Hazır gelen ikisi silinmez ve
+üzerlerine yazılmaz — her zaman bilinen bir başlangıca dönebilirsin.
+
+Kaydettiğin bir düzenleme **tabloyu da sürebilir**:
+
+```bash
+yerkon table --only rural --preset sikdirek
+```
+
+Bunun bir bedeli var ve künyeye giriyor: yazdırdığın satır artık senin
+kaydettiğin bir dosyaya dayanıyor, o yüzden notlarda düzenlemenin adı,
+yolu ve **içeriğinin hash'i** yazar. Aynı hash'i basan iki koşu aynı
+düzenlemeyi koşturmuştur; `konya` diye bir düzenlemeyi arada
+değiştirdiysen hash değişir ve iki tablo birbirine karışmaz (ADR-0043).
+
 ### Haritadan seçmek
 
 Merkez kutusunun altındaki **Haritadan seç…** düğmesi haritayı tam ekran

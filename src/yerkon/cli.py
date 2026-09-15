@@ -497,6 +497,20 @@ def table(argv: list[str] | None = None) -> int:
     _add_defaults_flag(parser)
     _add_option_flag(parser)
     parser.add_argument(
+        "--preset", action="append", metavar="NAME",
+        help=(
+            "run a saved arrangement instead of the shipped scenario for "
+            "its row; repeat the flag for several. Each one's name and a "
+            "hash of its contents are printed with the table, because a "
+            "row that rests on a file somebody saved has to say which "
+            "file and which version of it."
+        ),
+    )
+    parser.add_argument(
+        "--presets", default="presets", metavar="DIR",
+        help="where saved arrangements are kept (default: %(default)s)",
+    )
+    parser.add_argument(
         "--weight", action="append", metavar="NAME=SHARE",
         help=(
             "journey mix for the weighted row, for example --weight "
@@ -516,10 +530,21 @@ def table(argv: list[str] | None = None) -> int:
     from yerkon.scenarios import catalogue
 
     available = catalogue(settings) if settings else SCENARIO_CHOICES
-    chosen = (
-        tuple(available[name] for name in args.only)
-        if args.only else tuple(available.values())
-    )
+    # The keys travel beside the rows, because a row's own `name` is a
+    # sentence in whichever language the run is in — matching a saved
+    # arrangement on it would work in Turkish and quietly stop working
+    # in English.
+    keys = list(args.only) if args.only else list(available)
+    chosen = tuple(available[name] for name in keys)
+
+    # A saved arrangement replaces the row it belongs to rather than
+    # adding one: the table has four rows and always did, and a preset
+    # is a different answer to the same row's question.
+    try:
+        chosen, arrangements = _with_presets(keys, chosen, args)
+    except (ValueError, LookupError) as error:
+        print(error, file=sys.stderr)
+        return 2
 
     print("Running {} scenario{}{} on {} processes.".format(
         len(chosen), "" if len(chosen) == 1 else "s",
@@ -536,8 +561,47 @@ def table(argv: list[str] | None = None) -> int:
     print(as_markdown(rows) if args.markdown else as_text(rows))
     if not args.no_notes:
         print()
-        print(footnotes(results, rows))
+        print(footnotes(results, rows, arrangements))
     return 0
+
+
+def _with_presets(keys: list, chosen: tuple, args) -> tuple:
+    """Swap in each named arrangement for the row it belongs to.
+
+    The viewer is imported here and nowhere else in this command,
+    because turning a stored arrangement back into something the table
+    can run is exactly what `ViewState` is for and there is no second
+    way to do it that would not be a copy of it.
+    """
+    if not args.preset:
+        return chosen, ()
+
+    from yerkon.presets import PresetStore
+    from yerkon.viewer.state import ViewState
+
+    store = PresetStore(args.presets)
+    by_name = {}
+    used = []
+    for name in args.preset:
+        preset = store.read(name)
+        state = ViewState().merged(preset.state)
+        # The row it runs as is the one it was saved from. A preset that
+        # names no mode would otherwise land on whichever row happened
+        # to be first, which is a silent wrong answer.
+        by_name[preset.mode] = state.deployed()
+        used.append(preset)
+
+    swapped = [by_name.get(key, row) for key, row in zip(keys, chosen)]
+    missing = sorted(set(by_name) - set(keys))
+    if missing:
+        raise ValueError(
+            "this table has no {} row, so the arrangement saved for it has "
+            "nothing to replace. Rows here: {}. An arrangement runs as the "
+            "row it was saved from.".format(
+                ", ".join(missing), ", ".join(keys),
+            )
+        )
+    return tuple(swapped), tuple(used)
 
 
 def _weights(pairs: list[str] | None) -> dict[str, float] | None:
@@ -576,6 +640,13 @@ def view(argv: list[str] | None = None) -> int:
         help="print the address instead of opening it",
     )
     parser.add_argument(
+        "--presets", default=None, metavar="DIR",
+        help=(
+            "where saved arrangements are kept (default: presets, in the "
+            "directory the command is run from)"
+        ),
+    )
+    parser.add_argument(
         "--map-tiles",
         help=(
             "tile address for the place picker's map, as "
@@ -599,7 +670,7 @@ def view(argv: list[str] | None = None) -> int:
 
     try:
         serve(host=args.host, port=args.port, open_browser=not args.no_browser,
-              map_tiles=args.map_tiles)
+              map_tiles=args.map_tiles, presets=args.presets)
     except OSError as error:
         print(
             "Could not listen on {}:{} ({}). Another viewer may already be "

@@ -85,6 +85,14 @@ Merkez artı boyut yalnızca kare tarif eder; kutunun dört köşesi
 merkezi elle yazmak ya da boyut sürgüsüne dokunmak çizilmiş kutuyu
 düşürür. ADR-0042'ye bak.
 
+**Preset** (düzenleme): bir sekme hakkındaki her şey, adıyla kaydedilmiş.
+Zemin, sahanın boyu ve eni, bütün diziler ve alıcılar, elle taşınmış ve
+silinmiş direkler, elle değiştirilmiş değerler. Her satır için
+*varsayılan* ve *boş* hazır gelir; gerisi `presets/` klasörüne yazılır.
+`yerkon table --preset` ile yayımlanan bir satırı da sürebilir — o zaman
+künye düzenlemenin adını, yolunu ve içerik hash'ini yazar, çünkü
+`konya` iki koşu arasında değişebilir. ADR-0043'e bak.
+
 **Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
 artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 

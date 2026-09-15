@@ -162,7 +162,14 @@ def _aerial(state: ViewState, measured) -> Optional[dict]:
 def scene(state: ViewState) -> dict:
     """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
-    deployment = state.deployment(terrain)
+    # An empty arrangement is drawable and not evaluable (ADR-0043), so
+    # the thing that refuses to be empty is built only when there is
+    # something in it. What it is still asked for — who can hear whom,
+    # how long a round takes — is real engine logic and stays there
+    # rather than being written out a second time here.
+    anchors_here = state.anchors(terrain)
+    receivers_here = state.receivers(terrain)
+    deployment = state.deployment(terrain) if anchors_here else None
     mounting_of, radio_of = state.catalogues()
 
     # The route the units actually take, not a line drawn along x. Over
@@ -185,7 +192,7 @@ def scene(state: ViewState) -> dict:
     # the edge of it into nothing. The site is what is drawn, and the
     # route is half of the site.
     margin = sweep_margin_m(state)
-    seen = [a.position_m[:2] for a in deployment.anchors]
+    seen = [a.position_m[:2] for a in anchors_here]
     seen += [(point[0], point[1]) for point in route]
     west, east = min(p[0] for p in seen), max(p[0] for p in seen)
     south, north = min(p[1] for p in seen), max(p[1] for p in seen)
@@ -212,7 +219,7 @@ def scene(state: ViewState) -> dict:
             run_of[identifier] = run.identifier
 
     anchors = []
-    for anchor in deployment.anchors:
+    for anchor in anchors_here:
         x, y = anchor.ground_position_m
         run_id = run_of.get(anchor.identifier, "")
         anchors.append({
@@ -234,7 +241,7 @@ def scene(state: ViewState) -> dict:
     ]
 
     units = []
-    for unit in deployment.receivers:
+    for unit in receivers_here:
         trail = [
             unit.journey.position_at(at_s)
             for at_s in np.linspace(0.0, unit.journey.duration_s, 40)
@@ -242,7 +249,8 @@ def scene(state: ViewState) -> dict:
         units.append({
             "id": unit.identifier,
             "kind": unit.product,
-            "hears": len(deployment.anchors_heard_by(unit)),
+            "hears": 0 if deployment is None
+                     else len(deployment.anchors_heard_by(unit)),
             "radios": [radio.part for radio in unit.radios],
             "at": list(unit.journey.position_at(0.0)),
             "trail": [list(point) for point in trail],
@@ -331,7 +339,14 @@ def scene(state: ViewState) -> dict:
             }
             for run in state.runs
         ],
-        "round_s": deployment.round_duration_s(),
+        # Absent rather than zero.
+        #
+        # Zero looked safer and was not: the panel divides by it to get
+        # fixes a second, and an empty arrangement printed "1000000000,00
+        # /s" — a number that looks like a finding and is a division by
+        # nothing. There is no round when there is nothing to take a turn
+        # at, and the panel draws a dash for what does not exist.
+        "round_s": None if deployment is None else deployment.round_duration_s(),
         "assumed": len(state.settings().assumed),
         "assumed_total": len(state.settings().entries),
         "state": state.as_json(),
@@ -399,6 +414,16 @@ def figures(state: ViewState) -> dict:
 def sweep(state: ViewState) -> dict:
     """How many anchors reach each cell of the ground. Seconds, not milliseconds."""
     terrain = state.terrain()
+    # An arrangement with nothing in it reaches nowhere, which is an
+    # answer rather than an error: this paints an overlay on a picture,
+    # and a blank sheet is a picture (ADR-0043). The refusal belongs to
+    # the run, which is where a number would be published.
+    if not state.anchors(terrain):
+        # Said rather than left out. A missing key and a key that says
+        # "there is no such number" read the same to a page that checks,
+        # and differently to one that does not.
+        return {"xs": [], "ys": [], "counts": [], "resolution_m": state.sweep_m,
+                "served_km2": None, "reached_km2": None}
     deployment = state.deployment(terrain)
 
     grid = coverage_grid(

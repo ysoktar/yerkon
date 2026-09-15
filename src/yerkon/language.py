@@ -155,6 +155,45 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "tr": "{value} bir boylam değil; boylam -180 ile 180 arasındadır.",
         "en": "{value} is not a longitude; it runs from -180 to 180.",
     },
+    "deployment.no_anchors": {
+        "tr": "Direk yok: ya her dizi hiç yerleştirmiyor ya da hepsi "
+              "silinmiş. `manual` yerleşimi bilerek hiç koymaz — elle "
+              "direk sürükle ya da başka bir yöntem seç. (Boş bir düzenleme "
+              "çizilebilir; koşturulamaz.)",
+        "en": "No anchors: every run either places none or has had them all "
+              "removed. The `manual` layout places none on purpose — drag "
+              "anchors in, or choose another method. (An empty arrangement "
+              "can be drawn; it cannot be run.)",
+    },
+    # -- named arrangements (ADR-0043) ------------------------------------
+    "preset.bad_name": {
+        "tr": "{name!r} bir düzenleme adı değil: harf ya da rakamla başlar, "
+              "içinde harf, rakam, tire ve alt çizgi olur.",
+        "en": "{name!r} is not an arrangement name: it starts with a letter "
+              "or a digit and holds letters, digits, dashes and underscores.",
+    },
+    "preset.unknown": {
+        "tr": "{directory} içinde {name!r} diye bir düzenleme yok. "
+              "Olanlar: {known}",
+        "en": "No arrangement called {name!r} in {directory}. "
+              "There are: {known}",
+    },
+    "preset.unreadable": {
+        "tr": "{path} okunamadı: {error}",
+        "en": "{path} could not be read: {error}",
+    },
+    "preset.incomplete": {
+        "tr": "{source} bir düzenleme değil; eksik olan: {missing}",
+        "en": "{source} is not an arrangement; it is missing: {missing}",
+    },
+    "preset.from": {
+        "tr": "{mode} satırı {name!r} düzenlemesinden koştu "
+              "({source}, içerik {digest})",
+        "en": "the {mode} row ran from the arrangement {name!r} "
+              "({source}, contents {digest})",
+    },
+    "preset.default": {"tr": "Varsayılan", "en": "Default"},
+    "preset.empty": {"tr": "Boş", "en": "Empty"},
     "site.needs_pillow": {
         "tr": "Hava görüntüsü Pillow paketini gerektirir: "
               "pip install \"yerkon[sites]\"",
