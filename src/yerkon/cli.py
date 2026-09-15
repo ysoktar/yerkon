@@ -46,6 +46,7 @@ from yerkon.site.fetch import (
     CopernicusElevation,
     GeoTiffElevation,
     OpenStreetMapBuildings,
+    OvertureBuildings,
     ServiceElevation,
     Unreachable,
     build_site,
@@ -64,6 +65,7 @@ from yerkon.parallel import workers
 from yerkon.report import as_breakdown, as_markdown, as_text, build, footnotes
 from yerkon.scenarios import (
     CHOICES as SCENARIO_CHOICES,
+    SITES,
     fetched,
 )
 from yerkon.viewer.state import fetched_sites
@@ -131,7 +133,8 @@ def fetch(argv: list[str] | None = None) -> int:
         ", then ".join(source.name for source in sources)
     ))
     if not args.no_buildings:
-        print("  features: OpenStreetMap")
+        print("  features: Overture Maps, then OpenStreetMap (each tried "
+              "in turn until one answers)")
 
     # What the query service would cost, and only when it is the source
     # that will actually be asked. A GeoTIFF or a Copernicus tile answers
@@ -150,7 +153,10 @@ def fetch(argv: list[str] | None = None) -> int:
             bounds,
             spacing_m=args.spacing,
             elevation_sources=tuple(sources),
-            buildings_source=None if args.no_buildings else OpenStreetMapBuildings(),
+            buildings_sources=() if args.no_buildings else (
+                OvertureBuildings(cache_directory=str(SITES / "_tiles")),
+                OpenStreetMapBuildings(),
+            ),
         )
     except Unreachable as error:
         print("\nNothing answered.\n  {}".format(error), file=sys.stderr)

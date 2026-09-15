@@ -61,6 +61,16 @@ class Terrain:
     micro_roughness_m: float = 0.0
     description: str = ""
     patches: Optional["Patchwork"] = None
+    #: How far this ground was measured, as (west, south, east, north) in
+    #: local metres, or nothing where it was modelled and has no edge.
+    #:
+    #: Fetched ground stops where the fetch stopped and `height_at`
+    #: clamps past it, which is right for a path grazing the boundary and
+    #: wrong for anything that stands or is counted out there (ADR-0037).
+    #: Last in the field list on purpose: a field added in the middle
+    #: shifts every positional argument after it, and this project has
+    #: been caught by that once (ADR-0035).
+    extent_m: Optional[tuple[float, float, float, float]] = None
 
     def __post_init__(self) -> None:
         if self.clutter_loss_db_per_km < 0.0:
@@ -477,12 +487,7 @@ class Fetched:
         buildings = self.site.buildings
         if buildings is None or buildings.is_empty:
             return ground
-        inside = (
-            (x - buildings.centre_x_m) ** 2 + (y - buildings.centre_y_m) ** 2
-        ) <= buildings.radius_m**2
-        if not inside.any():
-            return ground
-        return ground + float(buildings.height_m[inside].max())
+        return ground + buildings.tallest_at(x, y)
 
 
 def flat_terrain(
@@ -526,12 +531,23 @@ def terrain_from_site(
     Folding buildings into the elevation rather than handling them
     separately keeps one answer to "how high is the obstacle here", which
     is the only question the link budget asks.
+
+    Which is also why a site that brings its own buildings is charged no
+    blanket clutter loss. That figure is a stand-in for obstruction the
+    terrain cannot show; where the terrain shows it, charging both counts
+    the same buildings twice. Measured over Kızılay, where footprints
+    cover forty per cent of the ground: buildings alone put the urban row
+    at 2,14 m and 99,8 % available, the old blanket 30 dB/km alone at
+    1,79 m and 97,6 %, and the two together at 3,22 m and 71,2 % — a row
+    made bad by arithmetic rather than by anything in Ankara (ADR-0038).
     """
+    has_buildings = site.buildings is not None and not site.buildings.is_empty
     return Terrain(
         elevation_m=Fetched(site),
-        clutter_loss_db_per_km=clutter_loss_db_per_km,
+        clutter_loss_db_per_km=0.0 if has_buildings else clutter_loss_db_per_km,
         micro_roughness_m=site.roughness_m(),
         description=site.manifest.describe(language),
+        extent_m=(0.0, 0.0, site.width_m, site.height_m),
     )
 
 
@@ -590,6 +606,11 @@ def bore_terrain(
         elevation_m=Sloping(entry_elevation_m, exit_elevation_m, length_m),
         clutter_loss_db_per_km=0.0,
         micro_roughness_m=micro_roughness_m,
+        # A bore is real between its portals and nowhere else, so its
+        # floor stops there rather than running on flat past the mouth.
+        # Across it there is no edge to state: `Sloping` never reads y,
+        # so the model says nothing either way (ADR-0038).
+        extent_m=(0.0, -math.inf, length_m, math.inf),
         description=description or say(
             "terrain.bore", language,
             length_m=length_m, grade=decimal_comma(100.0 * grade),

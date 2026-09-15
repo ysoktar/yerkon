@@ -13,9 +13,13 @@ nothing downstream mistakes absent data for open ground.
 from __future__ import annotations
 
 import datetime
+import io
+import json
 import math
 import pathlib
+import re
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Optional, Protocol
 
@@ -598,6 +602,337 @@ class OpenStreetMapBuildings:
         )
 
 
+#: Where Overture publishes, and what to read out of it.
+#:
+#: Public object storage, no key and no account, the same kind of place
+#: the Copernicus tiles come from. Overture's buildings theme is built
+#: from OpenStreetMap plus the Microsoft and Google machine-learned
+#: footprint sets, so this is the OpenStreetMap data with more of the
+#: world filled in rather than a different survey.
+OVERTURE_BUCKET = "https://overturemaps-us-west-2.s3.amazonaws.com/"
+OVERTURE_THEME = "theme=buildings/type=building/"
+
+
+@dataclass
+class OvertureBuildings:
+    """Building footprints and heights from Overture Maps.
+
+    The same answer as `OpenStreetMapBuildings` by a different road, and
+    the reason it exists is that the road matters: Overpass is a query
+    service that many networks refuse, and this is a range read against
+    public object storage. Where one is blocked the other usually is not
+    (ADR-0038).
+
+    It is also better data. Overpass was asked for centres, so a footprint
+    had to be assumed from the height; every Overture row carries the
+    footprint's own bounding box, so the radius is measured. Height is
+    still mostly missing — 641 of 50 687 rows around Kızılay carry one and
+    2 051 more carry a storey count — so the same three-way fallback
+    applies and the manifest still counts which of the three each building
+    used.
+
+    Finding the rows is the whole trick. The theme is a quarter of a
+    terabyte in 512 files, but it is sorted spatially and every row group
+    carries its own bounding box in the parquet footer. Reading the 512
+    footers costs about a minute and finds, for a city-sized box, five row
+    groups in three files — four megabytes to actually read.
+    """
+
+    bucket: str = OVERTURE_BUCKET
+    name: str = "Overture Maps"
+    release: str = ""
+    storey_height_m: float = DEFAULT_STOREY_HEIGHT_M
+    default_height_m: float = DEFAULT_BUILDING_HEIGHT_M
+    #: How many footers to read at once. The work is waiting on the
+    #: network rather than on a core, and one at a time is fifteen
+    #: minutes.
+    at_once: int = 32
+    cache_directory: Optional[str] = None
+
+    def buildings_for(self, bounds: BoundingBox) -> tuple[Buildings, tuple[str, ...]]:
+        reader = _OvertureReader(self)
+        rows = reader.rows_in(bounds)
+
+        per_lat, per_lon = bounds.metres_per_degree()
+        xs, ys, radii, heights = [], [], [], []
+        from_height_tag = from_levels = from_default = 0
+
+        for xmin, ymin, xmax, ymax, height, floors in rows:
+            if height is not None and height > 0.0:
+                from_height_tag += 1
+            elif floors is not None and floors > 0:
+                height = floors * self.storey_height_m
+                from_levels += 1
+            else:
+                height = self.default_height_m
+                from_default += 1
+
+            longitude, latitude = (xmin + xmax) / 2.0, (ymin + ymax) / 2.0
+            xs.append((longitude - bounds.west) * per_lon)
+            ys.append((latitude - bounds.south) * per_lat)
+            # Measured rather than assumed: half the mean side of the
+            # footprint's own box. A circle of that area is the shape the
+            # link budget asks about, and the box is what the file holds.
+            across_m = (xmax - xmin) * per_lon
+            along_m = (ymax - ymin) * per_lat
+            radii.append(max(2.0, (across_m + along_m) / 4.0))
+            heights.append(height)
+
+        notes = (
+            say("site.heights_tagged", None,
+                tagged=from_height_tag, levels=from_levels,
+                defaulted=from_default, default_m=self.default_height_m),
+            say("site.footprints_measured", None, release=reader.release),
+        )
+        return (
+            Buildings(
+                centre_x_m=np.array(xs), centre_y_m=np.array(ys),
+                radius_m=np.array(radii), height_m=np.array(heights),
+            ),
+            notes,
+        )
+
+
+class _OvertureReader:
+    """The range reads and the row-group index behind `OvertureBuildings`.
+
+    Split out because the source itself is the two paragraphs above and
+    this is plumbing: an HTTP file object, a listing, a footer scan and a
+    cache of what the scan found.
+    """
+
+    def __init__(self, source: "OvertureBuildings"):
+        self.source = source
+        self.release = source.release or self._latest_release()
+
+    # -- the bucket -------------------------------------------------------
+
+    def _get(self, url: str, headers: Optional[dict] = None) -> bytes:
+        try:
+            import requests
+        except ImportError as error:
+            raise Unreachable(say("site.needs_requests")) from error
+        try:
+            response = requests.get(
+                url, headers=headers or {}, timeout=DEFAULT_TIMEOUT_S * 4)
+            response.raise_for_status()
+            return response.content
+        except Exception as error:
+            raise Unreachable(
+                say("site.no_answer", None, name=self.source.name, error=error)
+            ) from error
+
+    def _latest_release(self) -> str:
+        body = self._get(
+            self.source.bucket
+            + "?list-type=2&delimiter=/&prefix=release/").decode("utf-8", "replace")
+        found = sorted(set(re.findall(r"<Prefix>release/([^/<]+)/</Prefix>", body)))
+        if not found:
+            raise Unreachable(
+                say("site.no_answer", None, name=self.source.name,
+                    error="the bucket listed no release")
+            )
+        return found[-1]
+
+    def _parts(self) -> list:
+        prefix = "release/{}/{}".format(self.release, OVERTURE_THEME)
+        body = self._get(
+            self.source.bucket + "?list-type=2&prefix="
+            + prefix.replace("=", "%3D")).decode("utf-8", "replace")
+        keys = re.findall(r"<Key>([^<]+\.parquet)</Key>", body)
+        if not keys:
+            raise Unreachable(
+                say("site.no_answer", None, name=self.source.name,
+                    error="release {} holds no building files".format(self.release))
+            )
+        return keys
+
+    # -- reading ----------------------------------------------------------
+
+    def rows_in(self, bounds: BoundingBox) -> list:
+        try:
+            import pyarrow.parquet as pq
+        except ImportError as error:
+            raise Unreachable(say("site.needs_pyarrow")) from error
+
+        keys = self._parts()
+        wanted = self._row_groups_over(keys, bounds, pq)
+        rows = []
+        for index, groups in wanted:
+            handle = _RangeFile(self.source.bucket + keys[index],
+                                self.source.name)
+            table = pq.ParquetFile(handle).read_row_groups(
+                groups, columns=["bbox", "height", "num_floors"])
+            box = table.column("bbox").combine_chunks()
+            xmin = box.field("xmin").to_numpy()
+            xmax = box.field("xmax").to_numpy()
+            ymin = box.field("ymin").to_numpy()
+            ymax = box.field("ymax").to_numpy()
+            # A row group is a whole tile of the world; only some of its
+            # rows are over this site.
+            inside = np.where(
+                (xmin <= bounds.east) & (xmax >= bounds.west)
+                & (ymin <= bounds.north) & (ymax >= bounds.south)
+            )[0]
+            height = table.column("height").to_pylist()
+            floors = table.column("num_floors").to_pylist()
+            for row in inside:
+                rows.append((float(xmin[row]), float(ymin[row]),
+                             float(xmax[row]), float(ymax[row]),
+                             height[row], floors[row]))
+        return rows
+
+    def _row_groups_over(self, keys, bounds: BoundingBox, pq) -> list:
+        """Which row groups of which files could hold this box.
+
+        Read from the parquet footers, in parallel because every one of
+        them is a wait on the network rather than work for a core. Cached
+        under the release, so the second fetch of a nearby place pays
+        nothing: the index is what the box is tested against.
+        """
+        index = self._index(keys, pq)
+        found = []
+        for position, groups in index.items():
+            hit = [
+                group for group, (x0, y0, x1, y1) in groups
+                if x0 <= bounds.east and x1 >= bounds.west
+                and y0 <= bounds.north and y1 >= bounds.south
+            ]
+            if hit:
+                found.append((int(position), hit))
+        return sorted(found)
+
+    def _index(self, keys, pq) -> dict:
+        cached = self._cached_index()
+        if cached is not None:
+            return cached
+
+        def extents(position: int):
+            handle = _RangeFile(self.source.bucket + keys[position],
+                                self.source.name)
+            meta = pq.ParquetFile(handle).metadata
+            first = meta.row_group(0)
+            at = {
+                first.column(column).path_in_schema: column
+                for column in range(first.num_columns)
+            }
+            out = []
+            for group in range(meta.num_row_groups):
+                row_group = meta.row_group(group)
+                out.append((group, (
+                    row_group.column(at["bbox.xmin"]).statistics.min,
+                    row_group.column(at["bbox.ymin"]).statistics.min,
+                    row_group.column(at["bbox.xmax"]).statistics.max,
+                    row_group.column(at["bbox.ymax"]).statistics.max,
+                )))
+            return position, out
+
+        index = {}
+        with ThreadPoolExecutor(self.source.at_once) as pool:
+            for position, groups in pool.map(extents, range(len(keys))):
+                index[position] = groups
+        self._store_index(index)
+        return index
+
+    def _index_path(self) -> Optional[pathlib.Path]:
+        if not self.source.cache_directory:
+            return None
+        return (pathlib.Path(self.source.cache_directory)
+                / "overture-{}-buildings.json".format(self.release))
+
+    def _cached_index(self) -> Optional[dict]:
+        path = self._index_path()
+        if path is None or not path.exists():
+            return None
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        return {int(k): [(g, tuple(b)) for g, b in v] for k, v in raw.items()}
+
+    def _store_index(self, index: dict) -> None:
+        path = self._index_path()
+        if path is None:
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(
+            {str(k): [[g, list(b)] for g, b in v] for k, v in index.items()}),
+            encoding="utf-8")
+
+
+class _RangeFile(io.RawIOBase):
+    """A read-only file over HTTP range requests.
+
+    Parquet reads its footer from the end and then seeks to the row
+    groups it wants, so a file object that fetches only the bytes asked
+    for turns a five hundred megabyte object into four megabytes of
+    traffic.
+    """
+
+    def __init__(self, url: str, source_name: str):
+        self.url = url
+        self.source_name = source_name
+        self.position = 0
+        self.size = int(self._head()["Content-Length"])
+
+    def _requests(self):
+        try:
+            import requests
+        except ImportError as error:
+            raise Unreachable(say("site.needs_requests")) from error
+        return requests
+
+    def _head(self):
+        try:
+            response = self._requests().head(self.url, timeout=DEFAULT_TIMEOUT_S)
+            response.raise_for_status()
+            return response.headers
+        except Unreachable:
+            raise
+        except Exception as error:
+            raise Unreachable(
+                say("site.no_answer", None, name=self.source_name, error=error)
+            ) from error
+
+    def readable(self) -> bool:
+        return True
+
+    def seekable(self) -> bool:
+        return True
+
+    def seek(self, offset: int, whence: int = io.SEEK_SET) -> int:
+        if whence == io.SEEK_SET:
+            self.position = offset
+        elif whence == io.SEEK_CUR:
+            self.position += offset
+        else:
+            self.position = self.size + offset
+        return self.position
+
+    def tell(self) -> int:
+        return self.position
+
+    def read(self, size: int = -1) -> bytes:
+        if size is None or size < 0:
+            size = self.size - self.position
+        if size <= 0:
+            return b""
+        last = min(self.position + size, self.size) - 1
+        try:
+            response = self._requests().get(
+                self.url,
+                headers={"Range": "bytes={}-{}".format(self.position, last)},
+                timeout=DEFAULT_TIMEOUT_S * 4,
+            )
+            response.raise_for_status()
+            data = response.content
+        except Unreachable:
+            raise
+        except Exception as error:
+            raise Unreachable(
+                say("site.no_answer", None, name=self.source_name, error=error)
+            ) from error
+        self.position += len(data)
+        return data
+
+
 def _parse_height(raw: Optional[str]) -> Optional[float]:
     if raw is None:
         return None
@@ -625,12 +960,18 @@ def build_site(
     bounds: BoundingBox,
     spacing_m: float = 30.0,
     elevation_sources: tuple[ElevationSource, ...] = (),
-    buildings_source: Optional[OpenStreetMapBuildings] = None,
+    buildings_sources: tuple = (),
 ) -> Site:
     """Fetch a site, using whatever is reachable.
 
     Elevation sources are tried in order and the first that answers wins,
     so callers put the local GeoTIFF first and the services after it.
+    Buildings work the same way and for a sharper reason: Overpass is a
+    query service many networks refuse outright, and Overture is a range
+    read against public object storage. Which of the two answers is a
+    property of the network rather than of the place, so both are offered
+    and the first that answers wins (ADR-0038).
+
     Buildings are fetched alongside and their absence is recorded rather
     than treated as open ground.
 
@@ -660,14 +1001,18 @@ def build_site(
 
     buildings: Optional[Buildings] = None
     feature_source: Optional[str] = None
-    if buildings_source is not None:
+    for source in buildings_sources:
         try:
-            buildings, building_notes = buildings_source.buildings_for(bounds)
-            feature_source = buildings_source.name
+            buildings, building_notes = source.buildings_for(bounds)
+            feature_source = source.name
             notes.extend(building_notes)
+            break
         except Unreachable as error:
+            # Recorded rather than swallowed: a site with no buildings
+            # because nothing answered and a site with no buildings
+            # because there are none are different pieces of evidence.
             notes.append(say("site.unreachable", None,
-                              name=buildings_source.name, error=error))
+                              name=source.name, error=error))
 
     return Site(
         bounds=bounds,

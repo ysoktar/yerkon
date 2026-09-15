@@ -417,7 +417,17 @@ function drawSites() {
  */
 const MODELLED_HILLS = ["relief_m", "hill_spacing_m", "roughness_m"];
 
+/* Every figure whose knob this arrangement might not read. */
+const CAN_GO_UNREAD = MODELLED_HILLS.concat(["clutter_db_per_km"]);
+
 function whyDead(key) {
+  if (key === "clutter_db_per_km") {
+    // A blanket loss per kilometre stands in for obstruction the terrain
+    // cannot show. Where the fetch brought buildings the terrain shows
+    // it, and charging both counts the same buildings twice (ADR-0038).
+    const built = latest && latest.terrain && latest.terrain.buildings;
+    return built ? "ground.buildings.note" : null;
+  }
   if (!MODELLED_HILLS.includes(key)) return null;
   // The bore first: on the tunnel row both are true, and the reason the
   // figures go unread there is the bore rather than the mountain.
@@ -456,10 +466,8 @@ function capSlidersToTheGround() {
 }
 
 function lockDeadKnobs() {
-  let reason = null;
-  for (const key of MODELLED_HILLS) {
+  for (const key of CAN_GO_UNREAD) {
     const why = whyDead(key);
-    reason = reason || why;
     for (const input of knobInputs(key)) input.disabled = Boolean(why);
     const knob = knobOf(key);
     if (knob) {
@@ -471,7 +479,12 @@ function lockDeadKnobs() {
     }
   }
   const modelled = document.getElementById("modelled-note");
-  if (modelled) modelled.textContent = say(reason || "ground.modelled.note");
+  if (modelled) {
+    // The note under step one speaks for the three hill figures; the
+    // clutter knob carries its own reason on itself.
+    const hills = whyDead("relief_m");
+    modelled.textContent = say(hills || "ground.modelled.note");
+  }
 }
 
 /* Leave room under the pinned header for anything scrolled to.

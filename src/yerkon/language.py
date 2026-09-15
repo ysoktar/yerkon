@@ -127,6 +127,17 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "tr": "{name} cevap vermedi: {error}",
         "en": "{name} did not answer: {error}",
     },
+    "site.footprints_measured": {
+        "tr": "Taban alanları, her binanın kendi sınır kutusundan ölçüldü "
+              "({release} sürümü); yükseklikten çıkarılmadı.",
+        "en": "Footprints are measured from each building's own bounding "
+              "box (release {release}), not implied by height.",
+    },
+    "site.needs_pyarrow": {
+        "tr": "Overture erişimi pyarrow paketini gerektirir: "
+              "pip install \"yerkon[sites]\"",
+        "en": "Overture access needs pyarrow: pip install \"yerkon[sites]\"",
+    },
     "site.needs_requests": {
         "tr": "OpenStreetMap erişimi requests paketini gerektirir.",
         "en": "OpenStreetMap access needs requests.",

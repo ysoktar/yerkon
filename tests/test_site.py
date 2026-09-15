@@ -226,7 +226,8 @@ def test_missing_buildings_do_not_stop_a_fetch():
             raise Unreachable("rate limited")
 
     site = build_site(
-        ANKARA, elevation_sources=(FakeElevation(),), buildings_source=DeadBuildings()
+        ANKARA, elevation_sources=(FakeElevation(),),
+        buildings_sources=(DeadBuildings(),)
     )
     assert site.buildings is None
     assert not site.manifest.has_buildings
@@ -801,3 +802,148 @@ def test_a_raster_reports_nothing_where_it_covers_nothing(tmp_path):
     grid = GeoTiffElevation(str(path), fill_gaps=False).grid_for(ANKARA, spacing_m=500.0)
 
     assert np.isnan(grid.values_m).all(), "ANKARA lies a whole degree west"
+
+
+# --- Overture, the other road to the same buildings ------------------------
+
+
+def test_a_site_that_brings_buildings_is_charged_no_blanket_clutter():
+    """ADR-0038. Two models of the same obstruction is one too many.
+
+    `clutter_loss_db_per_km` stands in for what the terrain cannot show.
+    Where the fetch brought footprints the terrain shows it, and charging
+    both put the urban row at 71 % available and 3,22 m — worse than
+    either model alone, from arithmetic rather than from Ankara.
+    """
+    import numpy as np
+
+    from yerkon.site.model import Buildings, BoundingBox, Site, SiteManifest
+    from yerkon.world import terrain_from_site
+
+    def a_site(buildings):
+        return Site(
+            bounds=BoundingBox(south=39.9, west=32.8, north=39.91, east=32.81),
+            elevation_grid_m=np.zeros((4, 4)) + 900.0,
+            grid_spacing_m=30.0,
+            manifest=SiteManifest(
+                elevation_source="test", elevation_resolution_m=30.0,
+                fetched_at="now",
+                feature_source=None if buildings is None else "test",
+                building_count=0 if buildings is None else len(buildings),
+            ),
+            buildings=buildings,
+        )
+
+    bare = terrain_from_site(a_site(None), clutter_loss_db_per_km=30.0)
+    assert bare.clutter_loss_db_per_km == 30.0
+
+    built = terrain_from_site(
+        a_site(Buildings(
+            centre_x_m=np.array([50.0]), centre_y_m=np.array([50.0]),
+            radius_m=np.array([10.0]), height_m=np.array([12.0]),
+        )),
+        clutter_loss_db_per_km=30.0,
+    )
+    assert built.clutter_loss_db_per_km == 0.0
+
+
+def test_finding_what_stands_at_a_point_does_not_read_the_whole_town():
+    """A link budget asks sixty-five times a path, for every link.
+
+    Over Kızılay's five thousand footprints the array pass that answered
+    it stopped the table finishing. The index has to give the same answer
+    as the scan it replaced, on points inside a footprint and outside
+    one.
+    """
+    import numpy as np
+
+    from yerkon.site.model import Buildings
+
+    rng = np.random.default_rng(7)
+    count = 400
+    buildings = Buildings(
+        centre_x_m=rng.uniform(0, 2000, count),
+        centre_y_m=rng.uniform(0, 2000, count),
+        radius_m=rng.uniform(4, 30, count),
+        height_m=rng.uniform(3, 40, count),
+    )
+
+    def by_scanning(x, y):
+        inside = ((x - buildings.centre_x_m) ** 2
+                  + (y - buildings.centre_y_m) ** 2) <= buildings.radius_m ** 2
+        return float(buildings.height_m[inside].max()) if inside.any() else 0.0
+
+    hits = 0
+    for x, y in zip(rng.uniform(-100, 2100, 600), rng.uniform(-100, 2100, 600)):
+        want = by_scanning(x, y)
+        assert buildings.tallest_at(float(x), float(y)) == want, (x, y)
+        hits += want > 0.0
+    assert hits > 20, "this stopped testing points that land on a roof"
+
+
+def test_the_index_is_rebuilt_rather_than_shipped_to_a_worker():
+    """ADR-0025 spreads scenarios across processes by pickling them."""
+    import pickle
+
+    import numpy as np
+
+    from yerkon.site.model import Buildings
+
+    buildings = Buildings(
+        centre_x_m=np.array([10.0, 80.0]), centre_y_m=np.array([10.0, 80.0]),
+        radius_m=np.array([5.0, 5.0]), height_m=np.array([7.0, 9.0]),
+    )
+    assert buildings.tallest_at(10.0, 10.0) == 7.0
+    again = pickle.loads(pickle.dumps(buildings))
+    assert "_cells" not in again.__dict__
+    assert again.tallest_at(80.0, 80.0) == 9.0
+
+
+def test_overture_is_read_from_object_storage_rather_than_a_query_service():
+    """ADR-0038. Which of the two answers is a property of the network.
+
+    Overpass is a query service many networks refuse outright; Overture
+    is a range read against a public bucket, the same kind of place the
+    Copernicus tiles come from. The point of the second source is that
+    road, so this pins it rather than the parsing.
+    """
+    from yerkon.site.fetch import OVERTURE_BUCKET, OvertureBuildings
+
+    source = OvertureBuildings()
+    assert OVERTURE_BUCKET.startswith("https://")
+    assert "s3" in OVERTURE_BUCKET
+    assert source.bucket == OVERTURE_BUCKET
+    assert "overpass" not in source.bucket.lower()
+
+
+def test_both_building_sources_are_offered_and_the_first_that_answers_wins():
+    """A site with no buildings because nothing answered and one with no
+    buildings because there are none are different evidence, so every
+    refusal is recorded on the way past."""
+    import numpy as np
+
+    from yerkon.site.fetch import Unreachable, build_site
+    from yerkon.site.model import Buildings
+
+    class Refuses:
+        name = "first"
+
+        def buildings_for(self, bounds):
+            raise Unreachable("no")
+
+    class Answers:
+        name = "second"
+
+        def buildings_for(self, bounds):
+            return Buildings(
+                centre_x_m=np.array([1.0]), centre_y_m=np.array([1.0]),
+                radius_m=np.array([2.0]), height_m=np.array([5.0]),
+            ), ("a note",)
+
+    site = build_site(
+        ANKARA, elevation_sources=(FakeElevation(),),
+        buildings_sources=(Refuses(), Answers()),
+    )
+    assert site.manifest.feature_source == "second"
+    assert site.manifest.building_count == 1
+    assert any("first" in note for note in site.manifest.notes)

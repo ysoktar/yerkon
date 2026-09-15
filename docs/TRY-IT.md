@@ -202,11 +202,18 @@ düz değil ve düz bir düzlem, bu modelin çizebileceği en tarafsız değil e
 elverişli zemin.
 
 **Yeni bir yer getir** başka her yeri getirir: bir sınır kutusu, bir
-ızgara aralığı ve OpenStreetMap'e bina sorulup sorulmayacağı. Paketin
-saha klasörüne yazar, böylece seçicide hemen belirir — ve bir rapor satırı
-sonra onun üzerinde durabilir (aşağıda `rural.site`). *Doğrulayamadığım
-tek kısım bu: çalıştığım kum havuzu OpenStreetMap'i engelliyor. Yükseklik
-yarısı, dört Ankara sahasının geldiği yolun aynısı.*
+ızgara aralığı ve bina istenip istenmediği. Paketin saha klasörüne yazar,
+böylece seçicide hemen belirir — ve bir rapor satırı sonra onun üzerinde
+durabilir (aşağıda `rural.site`).
+
+Binalar artık **iki kaynaktan** isteniyor, sırayla: önce Overture Maps,
+sonra OpenStreetMap. Overture, OpenStreetMap artı Microsoft ve Google'ın
+makineyle çıkarılmış taban alanlarından kurulur — başka bir ölçüm değil,
+aynı verinin daha doldurulmuş hâli. Önemli olan yol: Overpass bir sorgu
+servisi ve pek çok ağ onu reddediyor (benimki de ediyor), Overture ise
+Copernicus karolarının geldiği türden bir nesne deposundan menzilli
+okuma. İlk cevap veren kazanır, cevap vermeyen künyeye yazılır
+(ADR-0038).
 
 ### Üç sekme, üçü birden tutuluyor
 
@@ -290,13 +297,14 @@ bundan önce dört dakikaydı, şimdi yetmiş saniye.
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 1,79 m | 4,79 m | %97,62 |
-| Kırsal | 3,13 m | 14,60 m | %72,64 |
+| Şehir içi | 2,14 m | 5,36 m | %99,79 |
+| Kırsal | 3,11 m | 15,09 m | %72,75 |
 | Tünel | 1,77 m | 2,99 m | %100,00 |
-| Ağırlıklı | 2,08 m | 9,73 m | %82,67 |
+| Ağırlıklı | 2,37 m | 9,76 m | %83,36 |
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
-zeminde duran bir mast sırasıydı.
+zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79
+m diyordu; aradaki fark, artık gerçekten orada duran 5 231 bina.
 
 ### Kendin denemeye değer beş bulgu
 
@@ -350,17 +358,23 @@ hiçbir şeyin okumadığı bir değeri değiştiriyordu.
 
 ## Nereden itiraz etmeli
 
-- `docs/adr/` — otuz yedi karar, her biri neye mal olduğuyla. Son olanlar
-  0030–0037.
+- `docs/adr/` — otuz sekiz karar, her biri neye mal olduğuyla. Son olanlar
+  0030–0038.
 - `src/yerkon/defaults.toml` — yetmiş iki değer. Otuz beşi hâlâ vekil;
   85000 TL'deki direk maliyeti, direklerin mi mevcut yol donanımının mı
   kazanacağına karar veren değer.
 - `yerkon defaults --full` hepsini, her birinin neyi etkilediğiyle
   yazdırır.
 
-Buradan yapamadığım iki şey, varsayılmak yerine yazıldı: OpenStreetMap
-kum havuzumdan erişilemiyor, dolayısıyla hiçbir saha bina ya da yol
-geometrisi taşımıyor — bu da şehir içi engeli kilometre başına bir engel
-kaybı değeri, her kırsal yolculuğu da zemini izleyen bir yol yerine
-zeminin üzerinde bir dikdörtgen yapıyor. İkisi de sayıları ihtiyatlı
-tarafta tutuyor.
+Buradan yapamadığım şey, varsayılmak yerine yazıldı: Overpass kum
+havuzumdan erişilemiyor, dolayısıyla OpenStreetMap yolu denenmiş değil —
+kaydedilmiş bir Overpass yanıtına karşı sınanıyor ve orada duruyor.
+Binalar Overture'dan geldi ve dört saha da onları taşıyor. Yol
+geometrisi hâlâ yok: her kırsal yolculuk, zemini izleyen bir yol yerine
+zeminin üzerinde bir dikdörtgen.
+
+Bir şey de ölçülmedi ve öyle yazıldı: Copernicus bir **yüzey** modelidir,
+çıplak toprak değil, yani 30 m adımda binaları bir ölçüde zaten içerir.
+Overture yüksekliklerini üzerine katlamak bina yüksekliğini kısmen iki
+kez sayıyor olabilir. Ne kadarını söyleyecek olan aynı bölgenin çıplak
+toprak modeliyle karşılaştırılması ve o yapılmadı (ADR-0038).

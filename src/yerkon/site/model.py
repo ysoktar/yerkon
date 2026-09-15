@@ -73,6 +73,61 @@ class Buildings:
     def is_empty(self) -> bool:
         return len(self) == 0
 
+    # --- Finding the few that matter -------------------------------------
+    #
+    # A link budget asks "what stands here" at sixty-five points along
+    # every path, for every link, for every fix. Testing all of them each
+    # time is an array pass over the whole town: with the 5 231 buildings
+    # Kızılay brought, the table stopped finishing. A uniform grid of
+    # cells turns each question into a look at the handful whose footprint
+    # reaches that cell.
+    #
+    # Built on first use rather than in `__post_init__`, because most
+    # sites are loaded and never asked, and kept out of the pickle so a
+    # worker rebuilds it instead of receiving it (ADR-0025).
+
+    def __getstate__(self) -> dict:
+        state = dict(self.__dict__)
+        state.pop("_cells", None)
+        state.pop("_cell_m", None)
+        return state
+
+    def _index(self) -> tuple:
+        cells = self.__dict__.get("_cells")
+        if cells is not None:
+            return cells, self.__dict__["_cell_m"]
+
+        # Wide enough that a typical footprint touches one cell or four,
+        # narrow enough that a cell holds few buildings.
+        cell_m = max(float(np.median(self.radius_m)) * 4.0, 20.0)
+        cells: dict = {}
+        for index in range(len(self)):
+            x, y, r = (float(self.centre_x_m[index]),
+                       float(self.centre_y_m[index]),
+                       float(self.radius_m[index]))
+            for column in range(int((x - r) // cell_m), int((x + r) // cell_m) + 1):
+                for row in range(int((y - r) // cell_m), int((y + r) // cell_m) + 1):
+                    cells.setdefault((column, row), []).append(index)
+        packed = {key: np.array(value, dtype=int) for key, value in cells.items()}
+        object.__setattr__(self, "_cells", packed)
+        object.__setattr__(self, "_cell_m", cell_m)
+        return packed, cell_m
+
+    def tallest_at(self, x: float, y: float) -> float:
+        """The tallest roof over this point, or zero where there is none."""
+        if self.is_empty:
+            return 0.0
+        cells, cell_m = self._index()
+        near = cells.get((int(x // cell_m), int(y // cell_m)))
+        if near is None:
+            return 0.0
+        inside = (
+            (x - self.centre_x_m[near]) ** 2 + (y - self.centre_y_m[near]) ** 2
+        ) <= self.radius_m[near] ** 2
+        if not inside.any():
+            return 0.0
+        return float(self.height_m[near][inside].max())
+
     def tallest_along(
         self,
         a: tuple[float, float, float],
@@ -95,12 +150,7 @@ class Buildings:
         best_height = 0.0
         best_fraction = 0.5
         for fraction, x, y in zip(fractions, xs, ys):
-            inside = (
-                (x - self.centre_x_m) ** 2 + (y - self.centre_y_m) ** 2
-            ) <= self.radius_m**2
-            if not inside.any():
-                continue
-            height = float(self.height_m[inside].max())
+            height = self.tallest_at(float(x), float(y))
             if height > best_height:
                 best_height, best_fraction = height, float(fraction)
         return best_height, best_fraction

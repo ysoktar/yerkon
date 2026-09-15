@@ -37,6 +37,16 @@ export const SAY = {
     en: "With no measured ground chosen, the hills come from the three "
         + "figures below. Nowhere is flat, so there is no flat option.",
   },
+  "ground.buildings.note": {
+    tr: "Bu zemin kendi binalarını getiriyor, dolayısıyla engel arazinin "
+        + "içinde. Kilometre başına bir kayıp, arazinin gösteremediği "
+        + "engelin yerine geçer; ikisini birden saymak aynı binaları iki "
+        + "kez saymaktır.",
+    en: "This ground brings its own buildings, so the obstruction is in "
+        + "the terrain. A loss per kilometre stands in for obstruction the "
+        + "terrain cannot show; charging both counts the same buildings "
+        + "twice.",
+  },
   "ground.bore.note": {
     tr: "Bir tünel tepenin içinden geçer, üzerinden değil: tabanı iki "
         + "portal arasındaki düz çizgidir. Aşağıdaki üç değer, zemin "

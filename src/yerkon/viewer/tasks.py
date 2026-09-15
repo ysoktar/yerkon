@@ -321,6 +321,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         from yerkon.site.fetch import (
             CopernicusElevation,
             OpenStreetMapBuildings,
+            OvertureBuildings,
             ServiceElevation,
             build_site,
         )
@@ -355,9 +356,10 @@ def fetch(state: ViewState, payload: dict) -> Callable:
                 CopernicusElevation(cache_directory=str(SITES / "_tiles")),
                 ServiceElevation(),
             ),
-            buildings_source=(
-                OpenStreetMapBuildings() if want_buildings else None
-            ),
+            buildings_sources=(
+                OvertureBuildings(cache_directory=str(SITES / "_tiles")),
+                OpenStreetMapBuildings(),
+            ) if want_buildings else (),
         )
         SiteCache(SITES / name).save(site)
 

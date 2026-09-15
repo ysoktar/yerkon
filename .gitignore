@@ -6,3 +6,4 @@ node_modules/
 dist/
 *.egg-info/
 sites/_tiles/
+src/yerkon/site/ankara/_tiles/

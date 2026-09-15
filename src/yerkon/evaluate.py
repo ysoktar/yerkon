@@ -549,16 +549,21 @@ def coverage_grid(
     the sweep is the slowest thing in the project.
     """
     positions = [anchor.position_m for anchor in deployment.anchors]
-    xs = np.arange(
-        min(p[0] for p in positions) - margin_m,
-        max(p[0] for p in positions) + margin_m,
-        resolution_m,
-    )
-    ys = np.arange(
-        min(p[1] for p in positions) - margin_m,
-        max(p[1] for p in positions) + margin_m,
-        resolution_m,
-    )
+    west = min(p[0] for p in positions) - margin_m
+    east = max(p[0] for p in positions) + margin_m
+    south = min(p[1] for p in positions) - margin_m
+    north = max(p[1] for p in positions) + margin_m
+    # The margin is there so that ground reached from the edge anchors is
+    # counted. Where the terrain was measured it also runs off the end of
+    # the grid, and past the end `height_at` clamps: cells of served
+    # ground that nobody surveyed. The urban row reported 31,72 km² of
+    # service over a site 8,73 km² in size before this (ADR-0037).
+    if terrain.extent_m is not None:
+        left, bottom, right, top = terrain.extent_m
+        west, east = max(west, left), min(east, right)
+        south, north = max(south, bottom), min(north, top)
+    xs = np.arange(west, east, resolution_m)
+    ys = np.arange(south, north, resolution_m)
 
     anchors = deployment.terminals()
     # Ground is served for a unit carrying whatever the deployment's

@@ -73,6 +73,7 @@ def ground(
     over the ground actually on screen.
     """
     terrain = state.terrain()
+    west, east, south, north = drawable(terrain, west, east, south, north)
     columns, rows = mesh_shape(east - west, north - south)
     xs = np.linspace(west, east, columns)
     ys = np.linspace(south, north, rows)
@@ -163,6 +164,30 @@ def sweep_margin_m(state: ViewState) -> float:
     return max(widest * 3.0, 4000.0)
 
 
+def drawable(terrain, west: float, east: float,
+             south: float, north: float) -> tuple:
+    """A window on the ground, with anything unmeasured trimmed off it.
+
+    The mesh is drawn a sweep's margin past everything on screen, so that
+    coverage is never painted over ground that is not there. Where the
+    ground is measured that margin runs off the edge of the grid, and
+    past the edge `height_at` clamps: the boundary row extruded into a
+    plane. Over kizilay that was a 10,7 km sheet around a 3,0 km site —
+    ninety-two per cent of the ground on screen invented, drawn in the
+    same green as the hills that were real (ADR-0038).
+
+    Asked of the terrain rather than of the site, because the terrain is
+    what knows how far it is real: modelled ground has no edge, and a
+    bore is a line between two portals rather than a surface, so neither
+    is trimmed.
+    """
+    if terrain.extent_m is None:
+        return west, east, south, north
+    left, bottom, right, top = terrain.extent_m
+    return (max(west, left), min(east, right),
+            max(south, bottom), min(north, top))
+
+
 def scene(state: ViewState) -> dict:
     """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
@@ -193,11 +218,11 @@ def scene(state: ViewState) -> dict:
     seen += [(point[0], point[1]) for point in route]
     west, east = min(p[0] for p in seen), max(p[0] for p in seen)
     south, north = min(p[1] for p in seen), max(p[1] for p in seen)
-    columns, rows = mesh_shape(
-        east - west + 2 * margin, north - south + 2 * margin
-    )
-    xs = np.linspace(west - margin, east + margin, columns)
-    ys = np.linspace(south - margin, north + margin, rows)
+    west, east, south, north = drawable(
+        terrain, west - margin, east + margin, south - margin, north + margin)
+    columns, rows = mesh_shape(east - west, north - south)
+    xs = np.linspace(west, east, columns)
+    ys = np.linspace(south, north, rows)
     heights = [[terrain.height_at(float(x), float(y)) for x in xs] for y in ys]
 
     # One reach per run, because a UWB bracket and a mast on the same
@@ -267,6 +292,14 @@ def scene(state: ViewState) -> dict:
             "measured_m": (
                 [measured.width_m, measured.height_m]
                 if (measured := state.measured()) is not None else None
+            ),
+            # How many buildings the fetch brought. Where there are any,
+            # the blanket clutter figure is not charged — the obstruction
+            # is in the ground itself — so the page has to grey it rather
+            # than leave a slider that moves nothing (ADR-0036, ADR-0038).
+            "buildings": (
+                0 if measured is None or measured.buildings is None
+                else len(measured.buildings)
             ),
         },
         # What the model actually offers. Hardcoded in the page before,

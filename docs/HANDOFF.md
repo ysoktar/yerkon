@@ -190,6 +190,12 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   sekizin üstündeki sıralama tohumla dönüyor ve komşu değerler
   arasındaki fark tohumlar arasındaki kadar (ADR-0037). Bunu, tek tohuma
   güvenmemek için yazılmış bir sınama yakaladı.
+- Sahalar bina taşımıyordu ve sebep model değil ağdı: Overpass bir sorgu
+  servisi ve buradaki ağ onu reddediyor. Overture Maps aynı veriyi genel
+  nesne deposundan veriyor ve o açık; dördü de artık bina taşıyor
+  (ADR-0038). Engel bir kere daha iki kez sayılıyordu — gerçek binalar
+  *artı* kilometre başına 30 dB — ve ikisi birlikte şehir içi satırı
+  %71'e indiriyordu; tek başına hiçbiri indirmiyor.
 - Hazır gelen satırlar, altlarında indirilmiş ızgaradan büyüktü: şehir
   içinde 46 direğin 10'u, kırsalda 33'ün 5'i ölçülen zeminin dışında
   duruyordu. `height_at` kenarın dışında kırptığı için hata yükselmiyor,

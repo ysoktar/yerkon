@@ -524,3 +524,38 @@ def test_a_survey_error_is_the_same_for_every_measurement_to_one_anchor():
     once = run_scenario(precise_scenario(0.4, seed=11))
     again = run_scenario(precise_scenario(0.4, seed=11))
     assert np.array_equal(once.horizontal_error_m, again.horizontal_error_m)
+
+
+def test_the_coverage_sweep_stops_where_the_measurement_stops():
+    """ADR-0037, applied to the column it decides.
+
+    The sweep runs a margin past the anchors so ground reached from the
+    edge ones is counted. Over measured ground that margin runs off the
+    grid, and past the grid `height_at` clamps — cells of served ground
+    nobody surveyed. The urban row reported 31,72 km² of service over a
+    site 8,73 km² in size.
+    """
+    import numpy as np
+
+    from yerkon.evaluate import coverage_grid
+    from yerkon.scenarios import catalogue
+    from yerkon.settings import DEFAULTS
+
+    deployed = catalogue(DEFAULTS)["urban"]
+    terrain = deployed.scenario.terrain
+    assert terrain.extent_m is not None, "the urban row stands on a fetch"
+    left, bottom, right, top = terrain.extent_m
+
+    grid = coverage_grid(
+        deployed.scenario.deployment, terrain,
+        resolution_m=500.0, margin_m=12_000.0, count_up_to=1,
+    )
+    assert grid.xs.min() >= left and grid.xs.max() <= right
+    assert grid.ys.min() >= bottom and grid.ys.max() <= top
+
+
+def test_modelled_ground_has_no_edge_for_the_sweep_to_stop_at():
+    """It is a function, not a grid, so it answers everywhere."""
+    from yerkon.world import rolling_terrain
+
+    assert rolling_terrain(amplitude_m=40.0, wavelength_m=800.0).extent_m is None

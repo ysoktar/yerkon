@@ -485,13 +485,19 @@ provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
 note = """Yüksekliğin aşamadığı binalar, bitki örtüsü ve trafiğin soğurması. Otuz, \
-2,4 GHz'de yoğun yapılı alanlar için yayımlanmış aralığın ortasıdır."""
+2,4 GHz'de yoğun yapılı alanlar için yayımlanmış aralığın ortasıdır. \
+Yalnızca binasız zeminde işlenir: bir zemin kendi taban alanlarını \
+getiriyorsa engel arazinin içindedir ve ikisini birden saymak aynı \
+binaları iki kez saymaktır (ADR-0038)."""
 note_en = """Absorption by buildings, vegetation and traffic that height does not \
 clear. Thirty is the middle of the published range for dense built-up \
-areas at 2,4 GHz."""
-affects = """şehir içi bir direğin ne kadar uzağa eriştiğini, dolayısıyla şehir içi \
-satırın tamamını"""
-affects_en = """how far an urban anchor reaches, and therefore the urban row entirely"""
+areas at 2,4 GHz. Charged only where the ground brings no buildings: \
+where it brings its own footprints the obstruction is in the terrain, and \
+charging both counts the same buildings twice (ADR-0038)."""
+affects = """binasız zeminde şehir içi bir direğin ne kadar uzağa eriştiğini; \
+dört Ankara sahası bina taşıdığı için yayımlanan satırlarda okunmuyor"""
+affects_en = """how far an urban anchor reaches over ground with no buildings; the four \
+Ankara sites carry them, so it goes unread in the published rows"""
 
 [values."ranging.anchor_survey_sigma_m"]
 value = 0.15
