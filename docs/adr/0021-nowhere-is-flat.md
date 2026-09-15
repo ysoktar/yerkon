@@ -42,7 +42,7 @@ değerin bir mertebe üstü.
 
 Ankara'yı getir, paketle gönder ve asla bir düzleme düşme.
 
-Paketin içine, `src/yerkon/site/ankara/` altına üç `yerkon fetch` koşumu
+Paketin içine, `src/yerkon/site/places/` altına üç `yerkon fetch` koşumu
 işlendi: şehir için `kizilay`, açık arazi için `golbasi`, tünelin içinden
 geçtiği dağ için `kizilcahamam`. Toplamı bir megabayt. ADR-0008 zaten bir
 önbellek klasörünün kendi kendine yeten bir eser olduğunu söylüyordu; proje

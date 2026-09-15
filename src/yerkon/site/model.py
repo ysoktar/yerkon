@@ -43,6 +43,32 @@ class BoundingBox:
         return per_latitude, per_longitude
 
 
+def box_around(latitude: float, longitude: float, size_km: float) -> BoundingBox:
+    """A square box of that many kilometres, centred on a point.
+
+    What somebody reading a map actually has is a pin and a sense of how
+    much ground around it, not four decimal degrees. A degree of
+    longitude is shorter than a degree of latitude everywhere but the
+    equator, so the two half-widths differ and a box computed as if they
+    did not comes out as a rectangle nobody asked for.
+    """
+    if size_km <= 0.0:
+        raise ValueError("a box is some kilometres across")
+    if not -90.0 < latitude < 90.0:
+        raise ValueError("latitude out of range")
+    half_m = size_km * 500.0
+    per_latitude = 111_132.92 - 559.82 * math.cos(2 * math.radians(latitude))
+    per_longitude = 111_412.84 * math.cos(math.radians(latitude))
+    if per_longitude <= 0.0:
+        raise ValueError("a square box has no meaning at the pole")
+    return BoundingBox(
+        south=latitude - half_m / per_latitude,
+        north=latitude + half_m / per_latitude,
+        west=longitude - half_m / per_longitude,
+        east=longitude + half_m / per_longitude,
+    )
+
+
 @dataclass(frozen=True)
 class Buildings:
     """Footprints with heights, in local metres.

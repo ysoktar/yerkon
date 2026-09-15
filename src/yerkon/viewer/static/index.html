@@ -55,16 +55,17 @@
       <summary data-say="fetch.open"></summary>
       <p class="hint" data-say="fetch.note"></p>
       <label><span data-say="fetch.name"></span> <input type="text" id="fetch-name" placeholder="ör. izmir"></label>
-      <div class="pair">
-        <label><span data-say="fetch.south"></span> <input type="number" id="fetch-south" step="0.0001"
-                            placeholder="39,9115"></label>
-        <label><span data-say="fetch.west"></span> <input type="number" id="fetch-west" step="0.0001"
-                           placeholder="32,8194"></label>
-        <label><span data-say="fetch.north"></span> <input type="number" id="fetch-north" step="0.0001"
-                            placeholder="39,9385"></label>
-        <label><span data-say="fetch.east"></span> <input type="number" id="fetch-east" step="0.0001"
-                           placeholder="32,8546"></label>
-      </div>
+      <!--
+        A centre and a size, not four corners: what somebody looking at a
+        map has is a pin and a sense of how much ground around it. Any map
+        gives the pin by right-clicking it.
+      -->
+      <label><span data-say="fetch.centre"></span>
+        <input type="text" id="fetch-centre" placeholder="39,9250  32,8370"></label>
+      <label class="knob"><span data-say="fetch.size"></span><output id="fetch-size-out"></output>
+        <input type="range" id="fetch-size" min="1" max="40" step="1" value="3">
+        <input type="number" id="fetch-size-num" class="num" step="1"></label>
+      <p class="hint" id="fetch-box">—</p>
       <label><span data-say="fetch.spacing"></span>
         <input type="number" id="fetch-spacing" value="30" step="10"></label>
       <label class="tick"><input type="checkbox" id="fetch-buildings" checked>

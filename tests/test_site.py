@@ -947,3 +947,75 @@ def test_both_building_sources_are_offered_and_the_first_that_answers_wins():
     assert site.manifest.feature_source == "second"
     assert site.manifest.building_count == 1
     assert any("first" in note for note in site.manifest.notes)
+
+
+# --- Adding a region, for somebody who has not done it before -------------
+
+
+def test_a_box_is_given_as_a_centre_and_a_size():
+    """What somebody reading a map has is a pin and a size, not four
+    decimal degrees.
+
+    A degree of longitude is shorter than a degree of latitude
+    everywhere but the equator, so a box computed as if they matched
+    comes out as a rectangle nobody asked for.
+    """
+    from yerkon.site.model import box_around
+
+    box = box_around(37.8716, 32.4847, 12.0)
+    per_lat, per_lon = box.metres_per_degree()
+    assert (box.east - box.west) * per_lon == pytest.approx(12_000.0, rel=0.01)
+    assert (box.north - box.south) * per_lat == pytest.approx(12_000.0, rel=0.01)
+    assert box.centre[0] == pytest.approx(37.8716, abs=1e-6)
+    assert box.centre[1] == pytest.approx(32.4847, abs=1e-6)
+
+    with pytest.raises(ValueError):
+        box_around(37.0, 32.0, 0.0)
+
+
+def test_a_bare_name_is_fetched_where_the_viewer_looks(tmp_path):
+    """The mistake this exists to stop: the fetch reports success and the
+    site never appears.
+
+    `--into konya` used to mean a directory called konya beside wherever
+    the shell happened to be, which is not the one place `fetched()` and
+    the ground picker read.
+    """
+    import pathlib
+
+    from yerkon.cli import _site_directory
+    from yerkon.scenarios import SITES
+
+    assert _site_directory("konya") == SITES / "konya"
+    assert _site_directory("sites/konya") == pathlib.Path("sites/konya")
+    elsewhere = tmp_path / "konya"
+    assert _site_directory(str(elsewhere)) == elsewhere
+
+
+def test_a_fetch_takes_a_centre_and_a_size_or_four_edges_but_not_both():
+    """Both together describe two different boxes, and picking one
+    silently is how somebody fetches ground they did not ask for."""
+    import argparse
+
+    from yerkon.cli import _box_from
+
+    def asked(**changes):
+        fields = dict(centre=None, size=None, south=None, west=None,
+                      north=None, east=None)
+        fields.update(changes)
+        return argparse.Namespace(**fields)
+
+    middle = _box_from(asked(centre="37.8716,32.4847", size=6.0))
+    assert middle.centre[0] == pytest.approx(37.8716, abs=1e-6)
+
+    edges = _box_from(asked(south=39.91, west=32.81, north=39.94, east=32.85))
+    assert edges.south == 39.91
+
+    with pytest.raises(ValueError, match="either"):
+        _box_from(asked(centre="37.8,32.4", size=6.0, south=39.9))
+    with pytest.raises(ValueError, match="needs"):
+        _box_from(asked(centre="37.8,32.4"))
+    with pytest.raises(ValueError, match="LAT,LON"):
+        _box_from(asked(centre="somewhere", size=6.0))
+    with pytest.raises(ValueError, match="all four"):
+        _box_from(asked(south=39.9))

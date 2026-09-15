@@ -58,22 +58,30 @@ Tek satır. PowerShell'de satır bölmek istersen sonuna ters tırnak koy,
 ters bölü değil.
 
 ```powershell
-yerkon fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 --into sites/ankara-o20 --spacing 30
+yerkon fetch --centre 39.9250,32.8370 --size 12 --into ankara-o20
 ```
 
-Bölmek istersen:
+Merkezi herhangi bir haritada sağ tıklayıp alabilirsin; `--size`
+kilometre cinsinden kutunun boyu. `--into ankara-o20` gibi çıplak bir ad
+paketin kendi saha klasörüne yazar, yani zemin seçicisinde hemen belirir.
+
+Bölmek istersen (PowerShell'de ters tırnak, ters bölü değil):
 
 ```powershell
-yerkon fetch --south 39.85 --west 32.70 `
-             --north 39.98 --east 33.05 `
-             --into sites/ankara-o20 --spacing 30
+yerkon fetch --centre 39.9250,32.8370 `
+             --size 12 --spacing 30 `
+             --into ankara-o20
 ```
+
+Dört köşeyi elinde tutuyorsan `--south --west --north --east` de
+çalışıyor; ikisini birlikte vermek iki farklı kutu tarif ettiği için
+reddediliyor.
 
 `yerkon` komutu bulunamıyorsa ortam etkin değildir ya da
 `pip install -e` çalışmamıştır. Ortamı etkinleştirmeden de çalışır:
 
 ```powershell
-python -m yerkon.cli fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 --into sites/ankara-o20
+python -m yerkon.cli fetch --centre 39.9250,32.8370 --size 12 --into ankara-o20
 ```
 
 Elle bir şey indirmen gerekmiyor. Komut yüksekliği Copernicus 30 m
@@ -85,7 +93,7 @@ Zaten indirilmiş bir rasterin varsa onu öne koyabilirsin. Ağ hiç
 gerekmez:
 
 ```powershell
-yerkon fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 --into sites/ankara-o20 --geotiff C:\Users\yavuz\Downloads\N39E032.tif
+yerkon fetch --centre 39.9250,32.8370 --size 12 --into ankara-o20 --geotiff C:\Users\yavuz\Downloads\N39E032.tif
 ```
 
 Karo önbelleğini başka yere koymak istersen `--tile-cache`, Copernicus'u

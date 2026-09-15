@@ -500,9 +500,13 @@ Real ground, once, into a cache. Everything else runs offline against it
 (ADR-0008).
 
 ```bash
-yerkon fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 \
-             --into sites/ankara-o20 --spacing 30
+yerkon fetch --centre 39.9250,32.8370 --size 12 --into ankara-o20
 ```
+
+Read the centre off any map by right-clicking it; `--size` is how many
+kilometres across. A bare name writes into the package's own site folder,
+which is where the ground picker looks. Four edges still work if you
+already hold a box: `--south --west --north --east`.
 
 Three sources are tried in turn and the first that answers wins:
 

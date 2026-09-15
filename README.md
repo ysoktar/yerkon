@@ -487,9 +487,13 @@ Gerçek zemin, bir kez, bir önbelleğe. Geri kalan her şey ona karşı
 çevrimdışı koşar (ADR-0008).
 
 ```bash
-yerkon fetch --south 39.85 --west 32.70 --north 39.98 --east 33.05 \
-             --into sites/ankara-o20 --spacing 30
+yerkon fetch --centre 39.9250,32.8370 --size 12 --into ankara-o20
 ```
+
+Merkezi herhangi bir haritada sağ tıklayarak al; `--size` kilometre
+cinsinden kutunun boyu. Çıplak bir ad paketin kendi saha klasörüne yazar,
+yani zemin seçicisinde hemen belirir. Dört köşeyi elinde tutuyorsan
+`--south --west --north --east` de çalışıyor.
 
 Sırayla üç kaynak denenir ve ilk cevap veren kazanır:
 

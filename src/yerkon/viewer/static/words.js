@@ -73,6 +73,15 @@ export const SAY = {
   "fetch.west": { tr: "Batı", en: "West" },
   "fetch.north": { tr: "Kuzey", en: "North" },
   "fetch.east": { tr: "Doğu", en: "East" },
+  "fetch.centre": { tr: "Merkez (enlem, boylam)", en: "Centre (lat, lon)" },
+  "fetch.size": { tr: "Kutunun boyu", en: "Box across" },
+  "fetch.size.out": { tr: "{km} km", en: "{km} km" },
+  "fetch.box": {
+    tr: "{km} × {km} km, {points} ızgara noktası. Merkezi haritada sağ "
+        + "tıklayarak alabilirsin.",
+    en: "{km} × {km} km, {points} grid points. Right-click a map to read "
+        + "the centre off it.",
+  },
   "fetch.spacing": { tr: "Izgara aralığı (m)", en: "Grid spacing (m)" },
   "fetch.buildings": { tr: "OpenStreetMap binalarını da getir",
                        en: "Fetch OpenStreetMap buildings too" },

@@ -1201,14 +1201,14 @@ unit = "fetched site"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/ankara/` \
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/places/` \
 altındaki klasör adıyla. Ankara'nın merkezi, bir kenarı üç kilometre, \
 üzerinde doksan bir metre iniş çıkışla. Boş bırakılırsa modellenmiş \
 zemine düşer; o da tepelidir ve asla düz değildir (ADR-0021). `yerkon \
 fetch`'in yazdığı her şey — görüntüleyiciden yazdıkları dâhil — buraya \
 gelebilir."""
 note_en = """Which fetched ground this row stands on, by directory name under \
-`src/yerkon/site/ankara/`. Ankara's centre, three kilometres on a side, \
+`src/yerkon/site/places/`. Ankara's centre, three kilometres on a side, \
 rising and falling ninety-one metres across it. Empty falls back to \
 modelled terrain, which is rolling and never flat (ADR-0021). Anything \
 `yerkon fetch` writes — including from the viewer — can go here."""
@@ -1225,7 +1225,7 @@ unit = "fetched site"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/ankara/` \
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/places/` \
 altındaki klasör adıyla. Ankara'nın batısındaki, şehirlerarası yolların \
 geçtiği Polatlı ovası. Bunu `golbasi` yaparsan aynı yerleşim 907 m \
 rölyefin üzerine oturur; tasarlanmadığı arazide neye mal olduğu budur. \
@@ -1233,7 +1233,7 @@ Boş bırakılırsa modellenmiş zemine düşer; o da tepelidir ve asla düz \
 değildir (ADR-0021). `yerkon fetch`'in yazdığı her şey — \
 görüntüleyiciden yazdıkları dâhil — buraya gelebilir."""
 note_en = """Which fetched ground this row stands on, by directory name under \
-`src/yerkon/site/ankara/`. The Polatlı plain west of Ankara, where the \
+`src/yerkon/site/places/`. The Polatlı plain west of Ankara, where the \
 intercity roads run. Set this to `golbasi` to stand the same deployment \
 on 907 m of relief instead, which is what it costs in terrain it was not \
 designed for. Empty falls back to modelled terrain, which is rolling and \
@@ -1252,14 +1252,14 @@ unit = "fetched site"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/ankara/` \
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/places/` \
 altındaki klasör adıyla. Tünelin içinden geçtiği dağ. Yalnızca iki \
 portal yüksekliği kullanılır, çünkü bir tünel tepenin üzerinden değil \
 içinden geçer. Boş bırakılırsa modellenmiş zemine düşer; o da tepelidir \
 ve asla düz değildir (ADR-0021). `yerkon fetch`'in yazdığı her şey — \
 görüntüleyiciden yazdıkları dâhil — buraya gelebilir."""
 note_en = """Which fetched ground this row stands on, by directory name under \
-`src/yerkon/site/ankara/`. The mountain the bore goes through. Only its \
+`src/yerkon/site/places/`. The mountain the bore goes through. Only its \
 two portal elevations are used, because a tunnel goes through a hill \
 rather than over it. Empty falls back to modelled terrain, which is \
 rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — \

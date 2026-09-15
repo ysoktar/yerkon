@@ -2139,11 +2139,23 @@ function drawFetched(result, host) {
   const use = document.createElement("button");
   use.className = "quiet";
   use.textContent = say("fetched.use");
-  use.onclick = () => edit({ site: result.name }, false)
+  // Through the panel, like the ground picker beside it: a place smaller
+  // than the row standing on it pulls the length, the width and the
+  // anchor runs in, and that is a change somebody should see first
+  // (ADR-0009, ADR-0037). This button used to skip it, which made the
+  // likeliest path — fetch, then use it — the one that resized a site
+  // without saying so.
+  use.onclick = () => edit({ site: result.name }, true)
     .then(() => { framed = false; return refreshScene(); })
     .then(() => fillControls())
     .catch(e => flash(e.message, true));
   host.appendChild(use);
+
+  // And list it in the ground picker straight away. The engine finds
+  // what has been fetched on every scene, so one refresh is enough —
+  // without it a fetch reports success and the place it wrote is
+  // nowhere on screen until something else happens to refresh.
+  refreshScene().catch(e => flash(e.message, true));
 }
 
 function wireTasks() {
@@ -2183,23 +2195,58 @@ function wireTasks() {
       with_budget: document.getElementById("deliver-budget").checked,
     }, "task-out", drawDelivered);
 
+  wireFetchBox();
   document.getElementById("run-fetch").onclick = () => {
-    const box = id => {
-      const raw = document.getElementById(id).value;
-      return raw === "" ? null : Number(raw);
-    };
+    const spacing = document.getElementById("fetch-spacing").value;
     watch("fetch", {
       where: {
         name: document.getElementById("fetch-name").value.trim(),
-        south: box("fetch-south"), west: box("fetch-west"),
-        north: box("fetch-north"), east: box("fetch-east"),
-        spacing_m: box("fetch-spacing"),
+        centre: document.getElementById("fetch-centre").value.trim(),
+        size_km: Number(document.getElementById("fetch-size").value),
+        spacing_m: spacing === "" ? null : Number(spacing),
         buildings: document.getElementById("fetch-buildings").checked,
       },
     }, "fetch-out", drawFetched);
   };
 
   document.getElementById("frame-all").onclick = frameEverything;
+}
+
+/* What the fetch is about to ask for, before it asks.
+ *
+ * A size and a spacing are two numbers whose product is the work, and a
+ * spacing left at 30 m over a region rather than a town is minutes of
+ * sampling and a file nobody wants. Said here rather than discovered.
+ */
+function wireFetchBox() {
+  const size = document.getElementById("fetch-size");
+  const number = document.getElementById("fetch-size-num");
+  const shown = document.getElementById("fetch-size-out");
+  const note = document.getElementById("fetch-box");
+  const spacing = document.getElementById("fetch-spacing");
+  if (!size || !note) return;
+
+  const redraw = () => {
+    const km = Number(size.value);
+    const step = Math.max(Number(spacing.value) || 30, 1);
+    const side = Math.floor((km * 1000) / step);
+    if (shown) shown.textContent = say("fetch.size.out", { km });
+    if (number && document.activeElement !== number) number.value = km;
+    note.textContent = say("fetch.box", {
+      km, points: (side * side).toLocaleString("tr-TR"),
+    });
+    note.classList.toggle("no-hits", side * side > 4000000);
+  };
+
+  size.oninput = redraw;
+  spacing.oninput = redraw;
+  if (number) {
+    number.oninput = () => {
+      const km = Number(number.value);
+      if (Number.isFinite(km) && km > 0) { size.value = km; redraw(); }
+    };
+  }
+  redraw();
 }
 
 /* ---------- the loop ---------- */

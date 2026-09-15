@@ -325,7 +325,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             ServiceElevation,
             build_site,
         )
-        from yerkon.site.model import BoundingBox
+        from yerkon.site.model import BoundingBox, box_around
 
         name = str(payload.get("name", "")).strip()
         if not name or not name.replace("-", "").replace("_", "").isalnum():
@@ -334,10 +334,23 @@ def fetch(state: ViewState, payload: dict) -> Callable:
                 "underscores; got {!r}".format(name)
             )
 
-        bounds = BoundingBox(
-            south=float(payload["south"]), west=float(payload["west"]),
-            north=float(payload["north"]), east=float(payload["east"]),
-        )
+        # A centre and a size, because that is what somebody reading a
+        # map has: a pin and a sense of how much ground around it. Four
+        # edges still work for a box somebody already holds, and the
+        # arithmetic lives in one place rather than once here and once in
+        # the page.
+        if payload.get("centre"):
+            latitude, longitude = (
+                float(part)
+                for part in str(payload["centre"]).replace(" ", "").split(",")
+            )
+            bounds = box_around(latitude, longitude,
+                                float(payload.get("size_km") or 3.0))
+        else:
+            bounds = BoundingBox(
+                south=float(payload["south"]), west=float(payload["west"]),
+                north=float(payload["north"]), east=float(payload["east"]),
+            )
         spacing = float(payload.get("spacing_m") or 30.0)
         want_buildings = bool(payload.get("buildings", True))
 

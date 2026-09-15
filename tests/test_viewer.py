@@ -961,6 +961,41 @@ def test_the_panel_says_why_in_the_language_on_screen():
     )
 
 
+def test_every_way_of_choosing_ground_goes_through_the_panel():
+    """The picker was sent through it and the button beside it was not.
+
+    Fetch, then "use this ground", is the likeliest path somebody takes
+    with a new region, and it was the one that resized their site without
+    saying so (ADR-0037).
+    """
+    import re
+
+    application = read_app_js()
+    chosen = re.findall(r"edit\(\s*\{\s*site:[^)]*?\)", application, re.S)
+    assert len(chosen) >= 2, "this stopped matching the ways to choose ground"
+    for call in chosen:
+        assert re.search(r"\},\s*true\)", " ".join(call.split())), call[:90]
+
+
+def test_a_fetched_place_is_listed_without_waiting_for_something_else():
+    """It reported success and the place it wrote was nowhere on screen.
+
+    The engine finds what has been fetched on every scene, so the fetch
+    result asking for one refresh is what puts the new ground in the
+    picker.
+    """
+    application = read_app_js()
+    drawn = application[application.index("function drawFetched("):]
+    drawn = drawn[: drawn.index("\nfunction ")]
+    # Not the one inside the "use this ground" handler: that refreshes
+    # when somebody chooses the place, which is exactly the waiting this
+    # is about. What matters is a refresh when the fetch lands.
+    without_the_button = drawn.replace(
+        drawn[drawn.index("use.onclick"):drawn.index("host.appendChild(use);")],
+        "")
+    assert "refreshScene()" in without_the_button
+
+
 def test_a_row_opens_on_the_ground_it_was_fetched_for():
     """Written as the extent it wants, then brought inside the fetch.
 
@@ -1518,7 +1553,7 @@ def test_both_halves_of_a_knob_are_named_the_same_way():
         r'<label class="knob".*?</label>', markup, re.S)
     assert len(knobs) >= 4, "this stopped matching the panel"
     for knob in knobs:
-        sliders = re.findall(r'type="range" id="([\w]+)"', knob)
+        sliders = re.findall(r'type="range" id="([\w-]+)"', knob)
         numbers = re.findall(r'type="number" id="([\w-]+)"', knob)
         assert len(sliders) == 1 and len(numbers) == 1, knob[:80]
         assert numbers[0] == sliders[0] + "-num", (

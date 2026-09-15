@@ -288,7 +288,7 @@ def _unit(identifier, road, speed_m_s, duration_s, start_m=0.0,
 #: point of ADR-0008 — a cache directory is a self-contained artefact, so
 #: anybody who clones this repository gets the same ground and therefore
 #: the same numbers, with no network.
-SITES = pathlib.Path(__file__).resolve().parent / "site" / "ankara"
+SITES = pathlib.Path(__file__).resolve().parent / "site" / "places"
 
 #: Which fetched site each row stands on.
 #:

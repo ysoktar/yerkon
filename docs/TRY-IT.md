@@ -10,10 +10,20 @@ pip install -e ".[dev]"
 ```
 
 Buradaki hiçbir şey ağ gerektirmiyor. Tablonun üzerinde durduğu zemin
-paketin içinde işlenmiş durumda.
+paketin içinde işlenmiş durumda. Tek istisnası **kendi bölgeni eklemek**;
+onun için `pip install -e ".[dev,sites]"` gerekiyor ve o bölüm aşağıda.
 
 Windows'taysan `docs/WINDOWS.md`'ye bak: PowerShell 5.1 üç yerde bash'ten
 ayrılıyor ve üçü de bu komutları kırıyor.
+
+**Acelen varsa:**
+
+| ne istiyorsun | nereye git |
+|---|---|
+| gönderilen sayıları görmek | [Tablo](#tablo) |
+| resmi görmek, sayıları oynatmak | [Buradan başla: uygulama](#buradan-başla-uygulama) |
+| **kendi bölgende sayı üretmek** | [Kendi bölgeni ekle](#kendi-bölgeni-ekle) |
+| neyin yanlış olduğunu bulmak | [Nereden itiraz etmeli](#nereden-itiraz-etmeli) |
 
 ---
 
@@ -192,7 +202,7 @@ Ankara yeri geliyor:
 
 | saha | nedir |
 |---|---|
-| `kizilay` | şehir — 3 km'de 91 m rölyef |
+| `kizilay` | şehir — 3 km'de 91 m rölyef, 5 231 bina |
 | `polatli` | şehirlerarası yolların geçtiği bozkır — 20 km'de 486 m |
 | `golbasi` | tepeler — 20 km'de 907 m |
 | `kizilcahamam` | tünelin içinden geçtiği dağ |
@@ -201,19 +211,133 @@ Ne seçicide ne de rölyef sürgüsünde **düz bir seçenek var**. Hiçbir yer
 düz değil ve düz bir düzlem, bu modelin çizebileceği en tarafsız değil en
 elverişli zemin.
 
-**Yeni bir yer getir** başka her yeri getirir: bir sınır kutusu, bir
-ızgara aralığı ve bina istenip istenmediği. Paketin saha klasörüne yazar,
-böylece seçicide hemen belirir — ve bir rapor satırı sonra onun üzerinde
-durabilir (aşağıda `rural.site`).
+---
 
-Binalar artık **iki kaynaktan** isteniyor, sırayla: önce Overture Maps,
-sonra OpenStreetMap. Overture, OpenStreetMap artı Microsoft ve Google'ın
-makineyle çıkarılmış taban alanlarından kurulur — başka bir ölçüm değil,
+## Kendi bölgeni ekle
+
+Buradaki dört yer Ankara çünkü rapor Ankara'yı soruyor. Sorduğun yer
+başkaysa onu getir; dört sahanın geldiği yolun aynısı ve ağa dokunan tek
+şey bu.
+
+### Sayfadan (önerilen)
+
+**1 YER → Yeni bir yer getir**, sonra üç şey:
+
+| alan | ne yazılır |
+|---|---|
+| **Ad** | klasör adı olacak: `konya`, `izmir-ring`. Harf, rakam, tire. |
+| **Merkez** | `37.8716, 32.4847` — herhangi bir haritada ilgilendiğin noktaya **sağ tıkla**, koordinat çıkar, yapıştır. |
+| **Kutunun boyu** | kaç kilometre. Sürgünün altındaki satır kaç ızgara noktası edeceğini söyler. |
+
+Dört köşe girmiyorsun: haritaya bakan birinin elinde bir iğne ve "şu
+kadar etraf" vardır, dört ondalık derece değil. Kutu merkezden kare
+olarak kuruluyor — boylam derecesi enlem derecesinden kısa olduğu için
+ikisi eşit alınsa kimsenin istemediği bir dikdörtgen çıkardı.
+
+**Izgara aralığı** 30 m'de bırak. Copernicus zaten 30 m; daha sıkını
+istemek yeni bilgi getirmez, daha seyreği tepeleri yumuşatır. Satır kaç
+nokta olacağını söylüyor: 3 km'de 10 000, 12 km'de 160 000. Yüz binlerin
+üstü dakikalar ve kimsenin istemediği bir dosya demek.
+
+**Getir**'e bas. İlerleme kütüğü akar — bu iş için birkaç dakika normal.
+Bittiğinde yer **hemen Zemin listesinde** belirir; sonucun altındaki
+**bu zemini kullan** düğmesi satırı onun üzerine oturtur ve onay
+panelinden geçer, çünkü daha küçük bir yer sahanın boyunu, enini ve direk
+dizilerini içeri çeker (ADR-0037).
+
+Sonra **6 ÇALIŞTIR → Simülasyonu çalıştır**. Bulgular artık senin
+zeminin.
+
+### Komut satırından
+
+```bash
+yerkon fetch --centre 37.8716,32.4847 --size 12 --into konya
+```
+
+`--into konya` gibi **çıplak bir ad**, paketin kendi saha klasörüne
+yazar — `fetched()` ile zemin seçicisinin baktığı tek yer orası. İçinde
+eğik çizgi olan bir şey yol sayılır ve olduğu gibi kullanılır. (Bu ikisi
+eskiden aynıydı: `--into konya` kabuğun bulunduğu yere yazıyordu, komut
+başarıyla dönüyordu ve saha hiçbir yerde görünmüyordu.)
+
+Komut ne getireceğini önce söyler — kaç km, kaç ızgara noktası — ve
+bittiğinde bulguya giden iki adımı adıyla yazar.
+
+Dört köşeyi zaten elinde tutuyorsan `--south --west --north --east` hâlâ
+çalışıyor. İkisini birlikte vermek iki farklı kutu tarif ettiği için
+reddediliyor.
+
+### Baştan sona bir örnek
+
+Konya, 12 km, iki komut:
+
+```bash
+yerkon fetch --centre 37.8716,32.4847 --size 12 --into konya
+# 11970 x 11940 m, engebe 334 m; Overture'dan 91 689 bina
+
+# defaults.toml'u kopyala, rural.site = "konya" yap, sonra:
+yerkon table --only rural --defaults konya.toml
+```
+
+Çıkan satır:
+
+| | HPE P50 | HPE P95 | Kullanılabilirlik | Alan |
+|---|---|---|---|---|
+| Kırsal, Polatlı'da | 3,11 m | 15,09 m | %72,75 | 218,75 km² |
+| Kırsal, Konya'da | **2,59 m** | **7,62 m** | **%100,00** | 62,50 km² |
+
+Aynı yerleşim, aynı direkler, aynı telsizler — başka zemin. Polatlı'nın
+20 km'de 486 m engebesi bağlantıları kesiyor; Konya ovası kesmiyor. Tablo
+bunu sana söyleyemezdi, çünkü tabloda yalnızca Polatlı var. Kendi
+bölgeni eklemenin bütün anlamı bu.
+
+### Ne getiriliyor
+
+**Zemin**: Copernicus DEM 30 m, doğrudan genel nesne deposundan. Karo
+başına yüz megabayt ve diske alınıyor, yani aynı derece karesindeki
+ikinci bir yer bedava.
+
+**Binalar**: sırayla iki kaynak — önce Overture Maps, sonra
+OpenStreetMap. Overture, OpenStreetMap artı Microsoft ve Google'ın
+makineyle çıkarılmış taban alanlarından kurulur: başka bir ölçüm değil,
 aynı verinin daha doldurulmuş hâli. Önemli olan yol: Overpass bir sorgu
 servisi ve pek çok ağ onu reddediyor (benimki de ediyor), Overture ise
 Copernicus karolarının geldiği türden bir nesne deposundan menzilli
 okuma. İlk cevap veren kazanır, cevap vermeyen künyeye yazılır
 (ADR-0038).
+
+İlk indirme Overture'ın 512 dosyasının künyesini tarar — bir dakika. O
+dizin sürüm başına diske yazılır, yani ikinci bölge bu bir dakikayı
+ödemez.
+
+### Getirdikten sonra ne değişir
+
+Bunları bilmeden bakarsan sayıların "yanlış" göründüğü yerler:
+
+- **Saha, indirdiğin kutudan büyük olamaz.** Kutu 5 km ise saha 5 km.
+  Sürgüler o sınırın ötesini sunmaz; ötesinde ölçüm yok, yalnızca sınır
+  satırının bir düzleme uzatılmışı var (ADR-0037).
+- **Zemin bina getiriyorsa engel kaybı sürgüsü griye döner.** Engel artık
+  arazinin içinde; ikisini birden saymak aynı binaları iki kez saymak
+  olurdu (ADR-0038).
+- **Tepe yüksekliği, tepe aralığı ve yüzey pürüzü de griye döner.**
+  Ölçülmüş zemin kendi rölyefini ve kendi pürüzünü getirir.
+- **Alan sütunu küçülebilir.** Kapsama taraması da ölçümün dışına
+  çıkmıyor, dolayısıyla hizmet alanı sahadan büyük çıkamaz.
+
+### Bir bölge eklemek neyi sınamaz
+
+Getirdiğin zemin gerçek, ama **yol geometrisi yok**: kırsal yolculuk
+zemini izleyen bir yol değil, zeminin üzerinde bir dikdörtgen tur. Ve
+Copernicus bir **yüzey** modeli, çıplak toprak değil — 30 m adımda
+binaları bir ölçüde zaten içeriyor, dolayısıyla Overture yüksekliklerini
+üzerine katlamak bina yüksekliğini kısmen iki kez sayıyor olabilir. Ne
+kadarını söyleyecek olan aynı bölgenin çıplak toprak modeliyle
+karşılaştırılması ve o yapılmadı (ADR-0038).
+
+---
+
+## Uygulamanın geri kalanı
 
 ### Üç sekme, üçü birden tutuluyor
 
@@ -358,8 +482,8 @@ hiçbir şeyin okumadığı bir değeri değiştiriyordu.
 
 ## Nereden itiraz etmeli
 
-- `docs/adr/` — otuz sekiz karar, her biri neye mal olduğuyla. Son olanlar
-  0030–0038.
+- `docs/adr/` — otuz dokuz karar, her biri neye mal olduğuyla. Son olanlar
+  0030–0039.
 - `src/yerkon/defaults.toml` — yetmiş iki değer. Otuz beşi hâlâ vekil;
   85000 TL'deki direk maliyeti, direklerin mi mevcut yol donanımının mı
   kazanacağına karar veren değer.

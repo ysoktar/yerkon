@@ -46,7 +46,7 @@ bu olmadan bir aralık `"3000"` dizgisi olarak saklanır ve her yerde
 `3000` ile eşit çıkmazdı.
 
 `urban.site`, `rural.site` ve `tunnel.site` artık yanlarındaki aralıklar
-gibi DESIGN figürleridir. `src/yerkon/site/ankara/` altındaki dizin
+gibi DESIGN figürleridir. `src/yerkon/site/places/` altındaki dizin
 adlarını taşırlar; boş olması modellenmiş arazi demektir. `yerkon fetch`
 neyi yazarsa — görüntüleyiciden yazdıkları dahil — birine girebilir.
 

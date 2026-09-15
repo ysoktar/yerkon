@@ -39,6 +39,7 @@ question in the same words. See ADR-0001 and ADR-0009.
 from __future__ import annotations
 
 import argparse
+import pathlib
 import sys
 
 from yerkon.site.cache import SiteCache
@@ -71,7 +72,66 @@ from yerkon.scenarios import (
 from yerkon.viewer.state import fetched_sites
 from yerkon.proposal import OUTCOME_LABELS, confirm, show_outcome
 from yerkon.terms import NAMES as SOURCE_NAMES
-from yerkon.site.model import BoundingBox
+from yerkon.site.model import BoundingBox, box_around
+
+
+#: Grid points past which a fetch is worth warning about rather than
+#: just doing. Four thousand a side; the shipped sites are a tenth of it.
+BIG_GRID = 16_000_000
+
+
+def _site_directory(into: str) -> pathlib.Path:
+    """Where `--into` writes.
+
+    A bare name goes into the package's own site folder, which is the one
+    place `fetched()` and the viewer's ground picker look. Writing a
+    fetch somewhere they cannot see it is the mistake this exists to stop:
+    the fetch reports success and the site never appears.
+
+    Anything with a separator is a path and is honoured as one, so a
+    scratch directory outside the package still works.
+    """
+    if "/" in into or "\\" in into or pathlib.Path(into).is_absolute():
+        return pathlib.Path(into)
+    return SITES / into
+
+
+def _box_from(args) -> BoundingBox:
+    """The area to fetch, from a centre and a size or from four edges.
+
+    Centre and size first, because that is what somebody reading a map
+    has: a pin and a sense of how much around it. Four edges stay, for a
+    box somebody already holds.
+    """
+    corners = (args.south, args.west, args.north, args.east)
+    if args.centre is not None or args.size is not None:
+        if any(corner is not None for corner in corners):
+            raise ValueError(
+                "give either --centre with --size, or the four edges. Both "
+                "together describe two different boxes."
+            )
+        if args.centre is None or args.size is None:
+            raise ValueError("--centre needs --size, and --size needs --centre")
+        try:
+            latitude, longitude = (
+                float(part) for part in str(args.centre).replace(" ", "").split(",")
+            )
+        except ValueError:
+            raise ValueError(
+                "--centre reads as LAT,LON, for example 37.8716,32.4847"
+            ) from None
+        if args.size <= 0.0:
+            raise ValueError("--size is in kilometres across, so it is positive")
+        return box_around(latitude, longitude, args.size)
+
+    if any(corner is None for corner in corners):
+        raise ValueError(
+            "give --centre with --size, or all four of --south --west "
+            "--north --east"
+        )
+    return BoundingBox(
+        south=args.south, west=args.west, north=args.north, east=args.east
+    )
 
 
 def fetch(argv: list[str] | None = None) -> int:
@@ -82,13 +142,28 @@ def fetch(argv: list[str] | None = None) -> int:
             "the only command that uses the network; runs read the cache."
         ),
     )
-    parser.add_argument("--south", type=float, required=True)
-    parser.add_argument("--west", type=float, required=True)
-    parser.add_argument("--north", type=float, required=True)
-    parser.add_argument("--east", type=float, required=True)
+    parser.add_argument(
+        "--centre", metavar="LAT,LON",
+        help=(
+            "middle of the area, as you would read it off a map: "
+            "--centre 37.8716,32.4847. Use with --size."
+        ),
+    )
+    parser.add_argument(
+        "--size", type=float, metavar="KM",
+        help="how many kilometres across, centred on --centre (square)",
+    )
+    parser.add_argument("--south", type=float)
+    parser.add_argument("--west", type=float)
+    parser.add_argument("--north", type=float)
+    parser.add_argument("--east", type=float)
     parser.add_argument(
         "--into", required=True,
-        help="cache directory to write, for example sites/ankara-o20",
+        help=(
+            "where to write it. A bare name like `konya` goes into the "
+            "package's own site folder, which is where the viewer looks; "
+            "anything with a separator is taken as a path."
+        ),
     )
     parser.add_argument(
         "--spacing", type=float, default=30.0,
@@ -115,9 +190,13 @@ def fetch(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    bounds = BoundingBox(
-        south=args.south, west=args.west, north=args.north, east=args.east
-    )
+    try:
+        bounds = _box_from(args)
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 2
+
+    into = _site_directory(args.into)
 
     sources = []
     if args.geotiff:
@@ -126,9 +205,26 @@ def fetch(argv: list[str] | None = None) -> int:
         sources.append(CopernicusElevation(cache_directory=args.tile_cache))
     sources.append(ServiceElevation())
 
+    per_lat, per_lon = bounds.metres_per_degree()
+    across_km = (bounds.east - bounds.west) * per_lon / 1000.0
+    along_km = (bounds.north - bounds.south) * per_lat / 1000.0
+    nodes = int(across_km * 1000 / args.spacing) * int(along_km * 1000 / args.spacing)
+
     print("Fetching {:.4f},{:.4f} to {:.4f},{:.4f} at {:.0f} m".format(
         bounds.south, bounds.west, bounds.north, bounds.east, args.spacing
     ))
+    print("  {:.1f} x {:.1f} km, {:,} grid points".format(
+        across_km, along_km, nodes))
+    # A grid this size is minutes of sampling and a site file nobody
+    # wants, and the usual cause is a spacing left at 30 m over a region
+    # rather than a town. Said before the work rather than after it.
+    if nodes > BIG_GRID:
+        print("  that is a large grid. {:.0f} m spacing would make it "
+              "{:,} points.".format(
+                  args.spacing * 4,
+                  int(across_km * 1000 / (args.spacing * 4))
+                  * int(along_km * 1000 / (args.spacing * 4))),
+              file=sys.stderr)
     print("  ground: {} (each tried in turn until one answers)".format(
         ", then ".join(source.name for source in sources)
     ))
@@ -167,15 +263,37 @@ def fetch(argv: list[str] | None = None) -> int:
         )
         return 1
 
-    SiteCache(args.into).save(site)
+    SiteCache(into).save(site)
 
-    print("\nWrote {}".format(args.into))
+    print("\nWrote {}".format(into))
     print("  {}".format(site.manifest.describe()))
     print("  {:.0f} x {:.0f} m, relief {:.0f} m, roughness {:.2f} m".format(
         site.width_m, site.height_m, site.relief_m, site.roughness_m()
     ))
     for note in site.manifest.notes:
         print("  note: {}".format(note))
+
+    # A fetch on its own is ground nobody has asked anything of. These
+    # are the two steps between it and a row of the table, named rather
+    # than left to be found.
+    name = pathlib.Path(into).name
+    if _site_directory(name) == pathlib.Path(into):
+        from yerkon.settings import DEFAULT_FILE
+
+        print("\nTo get findings out of it:")
+        print("  yerkon view   then step 1 Ground -> {}, then step 6 Run"
+              .format(name))
+        print("  or: copy {}, set one of urban.site / rural.site / "
+              "tunnel.site to \"{}\", and".format(DEFAULT_FILE, name))
+        print("      yerkon table --defaults <that file>")
+        print("\nA row standing on it is brought inside these {:.1f} x "
+              "{:.1f} km, because that is as far as the fetch reached "
+              "(ADR-0037).".format(
+                  site.width_m / 1000.0, site.height_m / 1000.0))
+    else:
+        print("\nWritten outside the package's site folder, so the viewer "
+              "will not list it. Pass a bare name like `--into {}` to put "
+              "it where the ground picker looks.".format(name))
     return 0
 
 
