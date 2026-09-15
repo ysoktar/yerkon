@@ -30,6 +30,11 @@ let CHOICES = {};
  * tunnel row uses could not be chosen and its dropdown quietly showed a
  * roadside sign instead. */
 let RADIOS = [];
+let LAYOUTS = [];
+/* The methods that search rather than lay a lattice down. They read a
+ * bar and a budget instead of a spacing, so the card shows different
+ * figures for them. */
+const SEARCHES = ["greedy-coverage", "greedy-dop", "k-cover"];
 let MOUNTINGS = [];
 let TABS = [];
 let LANGUAGES = [];
@@ -556,14 +561,44 @@ function drawRuns() {
       card.appendChild(wrap);
     }
 
+    // How this run is laid out. A lattice reads a spacing; a search
+    // reads a bar to clear and a budget. Both sets stay on the run, so
+    // switching the dropdown and switching back does not lose what was
+    // set under the other one.
+    const how = document.createElement("label");
+    how.textContent = say("run.method");
+    const method = document.createElement("select");
+    method.innerHTML = options(LAYOUTS, run.method || "grid");
+    method.onchange = () => change({ method: method.value });
+    how.appendChild(method);
+    card.appendChild(how);
+
+    if (SEARCHES.includes(run.method)) {
+      const bar = document.createElement("div");
+      bar.className = "pair";
+      if (run.method === "greedy-dop") {
+        bar.appendChild(number(say("run.target_dop"), run.target_dop, 0.1,
+          v => change({ target_dop: v })));
+      }
+      if (run.method === "k-cover") {
+        bar.appendChild(number(say("run.cover_k"), run.cover_k, 1,
+          v => change({ cover_k: v })));
+      }
+      bar.appendChild(number(say("run.most"), run.most, 5,
+        v => change({ most: v })));
+      card.appendChild(bar);
+    }
+
     const pair = document.createElement("div");
     pair.className = "pair";
     pair.appendChild(number(say("run.from"), run.from_m, 100,
       v => change({ from_m: v })));
     pair.appendChild(number(say("run.to"), run.to_m, 100,
       v => change({ to_m: v })));
-    pair.appendChild(number(say("run.spacing"), run.spacing_m, 50,
-      v => change({ spacing_m: v })));
+    if (!SEARCHES.includes(run.method)) {
+      pair.appendChild(number(say("run.spacing"), run.spacing_m, 50,
+        v => change({ spacing_m: v })));
+    }
     pair.appendChild(number(say("run.offset"), run.offset_m, 10,
       v => change({ offset_m: v })));
     if (state.width_m > 0) {
@@ -2261,6 +2296,7 @@ async function refreshScene() {
   if (latest.choices) {
     MOUNTINGS = latest.choices.mountings;
     RADIOS = latest.choices.radios;
+    LAYOUTS = latest.choices.layouts || [];
     TABS = latest.choices.modes;
     LANGUAGES = latest.choices.languages || [];
     for (const [name, label] of TABS) MODE_LABEL[name] = label;

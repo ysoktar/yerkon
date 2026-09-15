@@ -354,6 +354,48 @@ direkler bir yolun kenarına dizilir ve birimler düz gider; sıfırın
 üstünde kaydırmalı bir ızgaraya yayılır ve birimler bir tur atar. Şehir
 içi ve kırsal alan olarak, tünel çizgi olarak açılır.
 
+### Yerleştirme yöntemi (bu yeni)
+
+Her direk grubunun kartında artık bir **Yerleştirme** listesi var. Sekiz
+yöntem, dört aile — ve amaç birer tane verip geçmek değil: bir yöntemin
+ne yaptığı ancak yanında başkası varken görülüyor.
+
+| aile | yöntem | ne yapar |
+|---|---|---|
+| kafes | **Kare ızgara** | bugüne kadarki tek yöntem; her şeyin karşılaştırıldığı taban |
+| kafes | **Altıgen kafes** | bir alanı en az direkle örter (Kershner, 1939) |
+| kafes | **Yol boyunca** | güzergâh üzerinde, iki yanda dönüşümlü |
+| kafes | **Çevre** | yalnızca sahanın kenarında |
+| arama | **En çok zemin örten** | klasik kapsama açgözlüsü (MCLP) |
+| arama | **En iyi geometri** | seyreltmeye (HDOP) göre seçer |
+| arama | **Her noktaya yeter direk** | k-örtme; bir konum üç menzil ister |
+| — | **Elle** | hiçbiri; boştan başla |
+
+**Denemeye değer olan şu.** Şehir içi sekmesinde listeyi sırayla değiştir
+ve **Direk sayısı** ile **Konum sıklığı**na bak:
+
+| yöntem | direk | tur süresi | konum sıklığı |
+|---|---|---|---|
+| Kare ızgara | 36 | 509 ms | 1,96 /s |
+| Altıgen kafes | 42 | 509 ms | 1,96 /s |
+| **En iyi geometri** | **3** | 191 ms | 5,24 /s |
+| **En çok zemin örten** | **1** | 64 ms | 15,72 /s |
+
+Kapsamaya göre seçen arama **tek bir direk** koyuyor. Yanlış değil:
+Kızılay'da bir direğin erişimi 3825 m ve saha 2970 m, yani bir tanesi
+gerçekten bütün sahayı örtüyor. Ama bir direkle hiçbir yerde konum
+alınamaz — bir konum üç menzil ister. Geometriye göre seçen arama üçünü
+koyuyor ve her yerde konum çıkıyor.
+
+Kapsama, haberleşme ağının ölçütü. Konumlandırma ağının ölçütü geometri.
+İkisini yan yana koymak bu farkı iddia etmek yerine ölçülebilir yapıyor
+(ADR-0040).
+
+**Arama yöntemlerinde sürgüler değişiyor:** aralık yerine bir çıta
+(*Hedef HDOP*, varsayılan 2) ve bir bütçe (*En çok direk*). Arama çıtada
+duruyor, bütçede değil — çıtası olmayan bir arama kendisine verilen
+bütçeyi döndürür, çünkü bir direk daha her zaman biraz iyileştirir.
+
 ### Her sayı, canlı
 
 **Varsayılan değerler** paneli artık eskiden kodda birer sabit olan *on
@@ -482,8 +524,8 @@ hiçbir şeyin okumadığı bir değeri değiştiriyordu.
 
 ## Nereden itiraz etmeli
 
-- `docs/adr/` — otuz dokuz karar, her biri neye mal olduğuyla. Son olanlar
-  0030–0039.
+- `docs/adr/` — kırk karar, her biri neye mal olduğuyla. Son olanlar
+  0030–0040.
 - `src/yerkon/defaults.toml` — yetmiş iki değer. Otuz beşi hâlâ vekil;
   85000 TL'deki direk maliyeti, direklerin mi mevcut yol donanımının mı
   kazanacağına karar veren değer.

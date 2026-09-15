@@ -18,8 +18,13 @@ from yerkon.cost import DEFAULT_RATES, price
 from yerkon.design import Design, REGION_CHOICES, chosen
 from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
-from yerkon.language import LANGUAGES, LANGUAGE_NAMES
+from yerkon.language import LANGUAGES, LANGUAGE_NAMES, say
+from yerkon.layout import METHODS as LAYOUT_METHODS
 from yerkon.viewer.state import (
+    _lowest_unit,
+    closure_of,
+    design_of,
+    reach_of,
     mode_labels,
     ViewState,
     fetched_sites,
@@ -84,72 +89,6 @@ def ground(
             [terrain.height_at(float(x), float(y)) for x in xs] for y in ys
         ],
     }
-
-
-def design_of(state: ViewState, run=None) -> Design:
-    """One anchor run's settings, as the confirmation panel understands them.
-
-    The panel talks about a radio on a mounting at a tolerance, and a
-    corridor now carries more than one of those, so it is asked about one
-    run at a time and the panel says which.
-    """
-    run = run or (state.runs[0] if state.runs else None)
-    # From the state's own catalogues, so that editing a mounting height
-    # or a noise figure by hand moves what the panel says it moves.
-    mounting_of, radio_of = state.catalogues()
-    return Design(
-        region=chosen(REGION_CHOICES, state.region, "region"),
-        anchor_radio=chosen(radio_of, run.radio if run else "sx1280", "radio"),
-        mounting=chosen(
-            mounting_of, run.mounting if run else "mast", "mounting"
-        ),
-        receiver_height_m=_lowest_unit(state),
-        # From the ground the simulation will actually stand on, not
-        # from the slider. A fetched grid brings its own roughness and
-        # ignores that slider, so reading it here would draw a reach
-        # ring the run does not agree with — and nothing on screen
-        # would say which of the two was the deployment.
-        surface_roughness_m=state.terrain().micro_roughness_m,
-        target_ranging_sigma_m=state.tolerance_m,
-    )
-
-
-def _lowest_unit(state: ViewState) -> float:
-    """The worst case among the units, which is the one range is quoted for."""
-    if not state.units:
-        return 1.5
-    return min(unit.antenna_height_m for unit in state.units)
-
-
-def reach_of(state: ViewState, run) -> float:
-    """How far one run's anchors range within tolerance, over open ground.
-
-    A flat-ground figure, drawn as a ring. Real terrain moves it either
-    way and the sweep is what actually decides coverage; the ring is an
-    intuition, not a claim.
-    """
-    design = design_of(state, run)
-    anchor = Terminal(
-        design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m)
-    )
-    receiver = Terminal(
-        design.anchor_radio, design.antenna, (0.0, 0.0, design.receiver_height_m)
-    )
-    return usable_range_m(
-        anchor, receiver, design.anchor_radio,
-        target_sigma_m=state.tolerance_m, region=design.region,
-    )
-
-
-def closure_of(state: ViewState, run) -> float:
-    design = design_of(state, run)
-    anchor = Terminal(
-        design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m)
-    )
-    receiver = Terminal(
-        design.anchor_radio, design.antenna, (0.0, 0.0, design.receiver_height_m)
-    )
-    return closure_range_m(anchor, receiver, region=design.region)
 
 
 def sweep_margin_m(state: ViewState) -> float:
@@ -307,6 +246,13 @@ def scene(state: ViewState) -> dict:
         # the one mounting the tunnel row uses could not be chosen and
         # its dropdown silently showed a roadside sign instead.
         "choices": {
+            # Named here rather than in the page, like every other list
+            # the engine owns: a method that exists can be chosen and one
+            # that does not cannot be offered (ADR-0028).
+            "layouts": [
+                [name, say("layout." + name, state.language)]
+                for name in LAYOUT_METHODS
+            ],
             "mountings": [
                 [key, "{} ({:.0f} m)".format(
                     option.kind.title(), float(option.height_m.value))]

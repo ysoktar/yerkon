@@ -185,7 +185,7 @@ def test_a_removed_anchor_is_gone():
 
 def test_removing_every_anchor_is_refused_rather_than_crashing_later():
     state = a_state(removed=tuple("M{}".format(i) for i in range(40)))
-    with pytest.raises(ValueError, match="every anchor has been removed"):
+    with pytest.raises(ValueError, match="no anchors"):
         state.anchors(state.terrain())
 
 
@@ -720,13 +720,21 @@ def test_width_turns_a_line_of_anchors_into_a_grid():
 
     Seven positions along by seven across is forty-nine anchors; the same
     run with no width is the seven along it started as.
+
+    Forty-six rather than forty-nine once the rows are staggered: the
+    shifted rows lose their last anchor to the edge of the site, because
+    nothing stands past what was measured (ADR-0037).
     """
     area = an_area()
     corridor = area.merged({"width_m": 0.0})
     terrain = area.terrain()
 
     assert len(corridor.anchors(terrain)) == 7
-    assert len(area.anchors(terrain)) == 49
+    square = area.merged({
+        "runs": tuple({**run.as_json(), "stagger_m": 0.0} for run in area.runs)
+    })
+    assert len(square.anchors(terrain)) == 49
+    assert len(area.anchors(terrain)) == 46
 
 
 def test_an_area_is_driven_round_and_across_rather_than_straight():
@@ -753,16 +761,22 @@ def test_a_staggered_row_is_offset_and_an_unstaggered_one_is_not():
     alternate rows shift along.
     """
     terrain = an_area().terrain()
-    staggered = {a.position_m[0] for a in an_area().anchors(terrain)}
+    staggered = {round(a.position_m[0]) for a in an_area().anchors(terrain)}
     square = {
-        a.position_m[0]
+        round(a.position_m[0])
         for a in an_area().merged({
             "runs": tuple(
                 {**run.as_json(), "stagger_m": 0.0} for run in an_area().runs
             )
         }).anchors(terrain)
     }
-    assert len(staggered) == 2 * len(square)
+    # Every unstaggered position, and a shifted one half a spacing along
+    # between each pair of them. The last shifted one would stand past
+    # the site, so it is not there (ADR-0037).
+    assert square < staggered
+    assert sorted(staggered - square) == [
+        position + 250 for position in sorted(square)[:-1]
+    ]
 
 
 def test_only_the_bore_is_a_line():

@@ -33,7 +33,10 @@ from yerkon.scenarios import (
     fits_on,
     tunnel_ground,
 )
+from yerkon.design import Design, REGION_CHOICES
+from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import DEFAULT_LANGUAGE, say
+from yerkon.layout import Ground as LayoutGround, Plan, place
 from yerkon.settings import Settings, defaults_in
 from yerkon.world import (
     Anchor,
@@ -59,6 +62,83 @@ def fetched_sites() -> tuple[str, ...]:
     ))
 
 
+# --- What a run's anchors are, in the vocabulary the model uses -----------
+#
+# These read nothing but the state, so they live beside it rather than in
+# the scene that used to hold them. The searching layouts need the same
+# reach the reach ring is drawn from, and two ways of working out one
+# number is how a picture and a run come to disagree with nothing on
+# screen to say which is the deployment.
+
+
+def design_of(state: ViewState, run=None) -> Design:
+    """One anchor run's settings, as the confirmation panel understands them.
+
+    The panel talks about a radio on a mounting at a tolerance, and a
+    corridor now carries more than one of those, so it is asked about one
+    run at a time and the panel says which.
+    """
+    run = run or (state.runs[0] if state.runs else None)
+    # From the state's own catalogues, so that editing a mounting height
+    # or a noise figure by hand moves what the panel says it moves.
+    mounting_of, radio_of = state.catalogues()
+    return Design(
+        region=chosen(REGION_CHOICES, state.region, "region"),
+        anchor_radio=chosen(radio_of, run.radio if run else "sx1280", "radio"),
+        mounting=chosen(
+            mounting_of, run.mounting if run else "mast", "mounting"
+        ),
+        receiver_height_m=_lowest_unit(state),
+        # From the ground the simulation will actually stand on, not
+        # from the slider. A fetched grid brings its own roughness and
+        # ignores that slider, so reading it here would draw a reach
+        # ring the run does not agree with — and nothing on screen
+        # would say which of the two was the deployment.
+        surface_roughness_m=state.terrain().micro_roughness_m,
+        target_ranging_sigma_m=state.tolerance_m,
+    )
+
+
+def _lowest_unit(state: ViewState) -> float:
+    """The worst case among the units, which is the one range is quoted for."""
+    if not state.units:
+        return 1.5
+    return min(unit.antenna_height_m for unit in state.units)
+
+
+def reach_of(state: ViewState, run) -> float:
+    """How far one run's anchors range within tolerance, over open ground.
+
+    A flat-ground figure, drawn as a ring. Real terrain moves it either
+    way and the sweep is what actually decides coverage; the ring is an
+    intuition, not a claim.
+    """
+    design = design_of(state, run)
+    anchor = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m)
+    )
+    receiver = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.receiver_height_m)
+    )
+    return usable_range_m(
+        anchor, receiver, design.anchor_radio,
+        target_sigma_m=state.tolerance_m, region=design.region,
+    )
+
+
+def closure_of(state: ViewState, run) -> float:
+    design = design_of(state, run)
+    anchor = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.anchor_height_m)
+    )
+    receiver = Terminal(
+        design.anchor_radio, design.antenna, (0.0, 0.0, design.receiver_height_m)
+    )
+    return closure_range_m(anchor, receiver, region=design.region)
+
+
+
+
 #: A group of anchors of one kind, laid over part of the site.
 #:
 #: A site does not carry one kind of anchor, so the viewer does not model
@@ -80,43 +160,78 @@ class AnchorRun:
     #: receiver can see on one of two lines through it, which is a worse
     #: arrangement than anything anybody would build.
     stagger_m: float = 0.0
+    #: Which method lays this run out. See `yerkon.layout`.
+    #:
+    #: The square lattice by default, because that is what this project
+    #: shipped before there was a choice and every other method is read
+    #: against it.
+    method: str = "grid"
+    #: What the searching methods read. Unused by the lattices, and kept
+    #: here rather than in a second record so that switching methods on a
+    #: dropdown does not lose what somebody set under the other one.
+    most: int = 60
+    cover_k: int = 3
+    target_dop: float = 2.0
+    #: How far an anchor of this kind reaches, in metres.
+    #:
+    #: Supplied rather than worked out here: a run must not do its own
+    #: link budget (ADR-0009), and the searching methods need a number to
+    #: score discs against. The viewer passes what the budget said.
+    reach_m: float = 0.0
 
-    def anchors(self, terrain: Terrain, catalogues=None, width_m: float = 0.0) -> list:
-        """Where this run's anchors stand.
+    def anchors(self, terrain: Terrain, catalogues=None, width_m: float = 0.0,
+                route=(), furniture=()) -> list:
+        """Where this run's anchors stand, by whichever method it names.
 
-        Along a line when the site has no width, and over a staggered
-        grid when it has. The two produce entirely different geometry
-        for a receiver — a line leaves the cross-track direction barely
-        observable and an area does not — which is why the viewer can
-        show both rather than assuming one (ADR-0014).
+        A thin adapter over `yerkon.layout`: this turns a run into that
+        module's `Plan` and `Ground` and names the results. The geometry
+        lives there because a corridor, a lattice and a search are the
+        same question asked three ways, and because the answer is worth
+        testing without a viewer, a terrain or a catalogue in the way.
         """
         mounting_of, radio_of = catalogues or (MOUNTING_CHOICES, RADIO_CHOICES)
-        mounting = chosen(mounting_of, self.mounting, "mounting")
+        fallback = chosen(mounting_of, self.mounting, "mounting")
         radio = chosen(radio_of, self.radio, "radio")
-        spacing = max(self.spacing_m, 25.0)
-        along = np.arange(self.from_m, max(self.to_m, self.from_m) + 1.0, spacing)
 
-        if width_m <= 0.0:
-            return [
-                (
-                    "{}{}".format(self.identifier, index),
-                    (float(x), self.offset_m if index % 2 == 0 else -self.offset_m),
-                    mounting,
-                    radio,
-                )
-                for index, x in enumerate(along)
-            ]
-
+        start = self.from_m
+        length = max(self.to_m, self.from_m) - start
+        spots = place(
+            Plan(
+                method=self.method or "grid",
+                spacing_m=max(self.spacing_m, 25.0),
+                offset_m=self.offset_m,
+                stagger_m=self.stagger_m,
+                most=int(self.most),
+                cover_k=int(self.cover_k),
+                target_dop=self.target_dop,
+                mounting=self.mounting,
+            ),
+            LayoutGround(
+                length_m=length,
+                width_m=max(width_m, 0.0),
+                reach_m=self.reach_m or max(self.spacing_m, 25.0) * 1.5,
+                route=tuple((x - start, y) for x, y in route),
+                furniture=tuple(
+                    replace(spot, x_m=spot.x_m - start) for spot in furniture
+                ),
+            ),
+        )
         out = []
-        for row, y in enumerate(np.arange(0.0, width_m + 1.0, spacing)):
-            shift = self.stagger_m if row % 2 else 0.0
-            for x in along:
-                out.append((
-                    "{}{}".format(self.identifier, len(out)),
-                    (float(x) + shift, float(y) + self.offset_m),
-                    mounting,
-                    radio,
-                ))
+        for index, spot in enumerate(spots):
+            # A spot that landed on a structure already standing keeps
+            # that structure; anything this run put down itself is bolted
+            # to what the run says (ADR-0015).
+            standing = (
+                chosen(mounting_of, spot.mounting, "mounting")
+                if spot.mounting and spot.mounting in mounting_of
+                else fallback
+            )
+            out.append((
+                "{}{}".format(self.identifier, index),
+                (spot.x_m + start, spot.y_m),
+                standing,
+                radio,
+            ))
         return out
 
     def within(self, length_m: float) -> "AnchorRun":
@@ -308,10 +423,16 @@ class ViewState:
     def anchors(self, terrain: Terrain) -> tuple[Anchor, ...]:
         """Every run's anchors, with anything dragged or deleted applied."""
         catalogues = self.catalogues()
+        route = tuple(
+            (float(x), float(y)) for x, y in self.road(terrain).centreline_m
+        )
         placed = []
         for run in self.runs:
-            for identifier, ground, mounting, radio in run.anchors(
-                terrain, catalogues, self.width_m
+            # The reach the ring is drawn from, so a search scores its
+            # candidates against the same disc a person is looking at.
+            reaching = replace(run, reach_m=run.reach_m or reach_of(self, run))
+            for identifier, ground, mounting, radio in reaching.anchors(
+                terrain, catalogues, self.width_m, route=route
             ):
                 if identifier in self.removed:
                     continue
@@ -321,7 +442,11 @@ class ViewState:
                            terrain, radio=radio)
                 )
         if not placed:
-            raise ValueError("every anchor has been removed")
+            raise ValueError(
+                "no anchors: every run either places none or has had them "
+                "all removed. The `manual` layout places none on purpose — "
+                "drag anchors in, or choose another method."
+            )
         return tuple(placed)
 
     def road(self, terrain: Terrain) -> Road:

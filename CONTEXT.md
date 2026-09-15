@@ -61,6 +61,18 @@ bildirilir: 25 m direklerde her 4 km'de bir direkle, bir direk 392,5 km²'ye,
 dört direk 15,2 km²'ye erişir. ADR-0012'ye bak. Koridor yerleşimleri için
 güzergâh kilometresi başına maliyet de yanında bildirilir.
 
+**Layout** (yerleştirme): direklerin nereye konulacağına karar veren
+adlandırılmış yöntem. Kafesler (kare, altıgen, koridor, çevre),
+aramalar (kapsama, geometri, k-örtme) ve elle. Hepsi tek bir dikişten
+geçer: `place(plan, ground)`. ADR-0040'a bak.
+
+**Dilution** (seyreltme, HDOP): direk geometrisinin menzil hatasını ne
+kadar büyüttüğü. İki bilinmeyen için — x ve y — çünkü iki yollu menzil
+ölçümü mesafeyi doğrudan ölçer, saat kayması durumda yoktur (ADR-0010)
+ve düşey yoldan gözlenebilir değildir (ADR-0011). Bir sıra hâlindeki
+direkler enine yönde seyreltmeyi sonsuza götürür; bu, kapsamanın
+göremediği şeydir.
+
 **Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
 artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 

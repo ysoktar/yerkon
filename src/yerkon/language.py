@@ -202,6 +202,49 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "model, so these figures come from the same engine the table "
               "does (ADR-0023).",
     },
+    # -- the named ways of laying anchors out ------------------------------
+    #
+    # Each one says what it does rather than what it is called, because
+    # "hex" means nothing to somebody who has not read the module and
+    # "the fewest anchors that cover an area" means everything.
+    "layout.grid": {
+        "tr": "Kare ızgara — kaydırmalı satırlar",
+        "en": "Square grid — staggered rows",
+    },
+    "layout.hex": {
+        "tr": "Altıgen kafes — bir alanı en az direkle örter",
+        "en": "Hexagonal lattice — fewest anchors to cover an area",
+    },
+    "layout.corridor": {
+        "tr": "Yol boyunca — iki yanda dönüşümlü",
+        "en": "Along the route — alternating sides",
+    },
+    "layout.perimeter": {
+        "tr": "Çevre — yalnızca sahanın kenarında",
+        "en": "Perimeter — round the edge of the site only",
+    },
+    "layout.greedy-coverage": {
+        "tr": "Arama: en çok zemini örten (klasik kapsama)",
+        "en": "Search: most ground covered (the coverage classic)",
+    },
+    "layout.greedy-dop": {
+        "tr": "Arama: en iyi geometri (konum için doğru ölçüt)",
+        "en": "Search: best geometry (the right score for a fix)",
+    },
+    "layout.k-cover": {
+        "tr": "Arama: her noktaya yeter sayıda direk",
+        "en": "Search: enough anchors over every point",
+    },
+    "layout.manual": {
+        "tr": "Elle — hiçbiri; boştan başla",
+        "en": "By hand — none; start from empty",
+    },
+    "layout.needs_map": {
+        "tr": "Bu yöntem yol kenarındaki yapıları kullanır; bu zemin "
+              "getirilmiş yol verisi taşımıyor.",
+        "en": "This method uses the structures beside the road, and this "
+              "ground carries no fetched road data.",
+    },
     # -- why the confirmation panel says a figure has to move ------------
     "panel.past_the_site": {
         "tr": "sahanın ucunu geçen bir direk, hiçbir şeyin modellemediği "
