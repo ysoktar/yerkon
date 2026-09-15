@@ -25,6 +25,11 @@ import numpy as np
 
 from yerkon.estimator import DEFAULT_MANOEUVRE_M_S2, TrackingFilter, trilaterate
 from yerkon.hardware import Antenna, Radio, SX1280, W24P_U
+# A leaf: `layout` imports nothing from this package, so reading its
+# geometry here adds no cycle and no path to a receiver's true
+# position. Dilution is the same arithmetic whether it is scoring a
+# candidate mast or colouring a cell (ADR-0040, ADR-0044).
+from yerkon.layout import DILUTION_CEILING, dilution_at
 from yerkon.observation import RangeObservation
 from yerkon.ranging import (
     CRYSTAL,
@@ -497,11 +502,23 @@ def _fix_from(
 
 @dataclass(frozen=True)
 class CoverageGrid:
-    """How many anchors reach each cell of a swept grid.
+    """What each cell of a swept grid gets, by four readings of it.
 
     The count rather than a yes or no, because one anchor and four
     anchors mean entirely different things and a boolean would throw
     away the distinction ADR-0012 exists to make.
+
+    The other three used to be computed and discarded. The sweep runs a
+    full link budget for every anchor at every cell — that is what makes
+    it the slowest thing in the project — and then kept one bit of it.
+    Keeping the rest costs the bookkeeping and nothing else, and it is
+    the difference between a picture of where packets arrive and a
+    picture of what a position there would actually be worth (ADR-0044).
+
+    Every layer but `counts` is NaN where there is nothing to report:
+    no anchor reaches, or too few for a fix. NaN rather than zero,
+    because zero decibels of margin and zero dilution are both answers
+    and neither of them is "nothing here".
     """
 
     #: Anchors in reach at each cell, indexed [row, column].
@@ -510,6 +527,18 @@ class CoverageGrid:
     xs: np.ndarray
     ys: np.ndarray
     resolution_m: float
+    #: Margin of the strongest link reaching this cell, in dB. This is
+    #: the signal question: is there anything audible here, and by how
+    #: much. NaN where nothing reaches.
+    margin_db: Optional[np.ndarray] = None
+    #: Typical ranging sigma among the anchors that reach, in metres —
+    #: the median rather than the best, because a fix uses several and
+    #: the best one flatters it. NaN where nothing reaches.
+    sigma_m: Optional[np.ndarray] = None
+    #: Horizontal dilution of precision from the geometry of the anchors
+    #: that reach. NaN where fewer than three do, because there is no
+    #: dilution until there is a fix (ADR-0040).
+    dilution: Optional[np.ndarray] = None
 
     @property
     def cell_km2(self) -> float:
@@ -517,6 +546,25 @@ class CoverageGrid:
 
     def area_reached_by(self, anchors: int) -> float:
         return float(np.count_nonzero(self.counts >= anchors)) * self.cell_km2
+
+    @property
+    def error_m(self) -> Optional[np.ndarray]:
+        """What a fix at each cell would be worth, in metres.
+
+        Ranging sigma times dilution: the standard reading of what
+        geometry does to a range error, and the same two quantities the
+        published HPE column is made of.
+
+        An estimate from geometry, not a simulation. It has no clock
+        drift, no packet loss, no solver that failed to settle, and no
+        receiver actually driving through. `yerkon table` has all four,
+        and this must not be read as agreeing with it (ADR-0001) — it is
+        a picture of which ground is hard, drawn from what the sweep
+        already knows.
+        """
+        if self.sigma_m is None or self.dilution is None:
+            return None
+        return self.sigma_m * self.dilution
 
 
 @dataclass(frozen=True)
@@ -572,6 +620,9 @@ def coverage_grid(
     # matching module.
     radios = _sweep_radios(deployment)
     counts = np.zeros((ys.size, xs.size), dtype=int)
+    margins = np.full((ys.size, xs.size), np.nan)
+    sigmas = np.full((ys.size, xs.size), np.nan)
+    dilutions = np.full((ys.size, xs.size), np.nan)
 
     for row, y in enumerate(ys):
         for column, x in enumerate(xs):
@@ -580,22 +631,60 @@ def coverage_grid(
                 terrain.height_at(float(x), float(y)) + receiver_height_m,
             )
             reached = 0
+            # What the link budget said, rather than only whether it
+            # closed. The budget is run either way; this keeps it.
+            best_margin = -math.inf
+            reaching_sigmas = []
+            reaching_at = []
             for _, anchor in anchors:
                 radio = audible(anchor, radios)
                 if radio is None:
                     continue
                 receiver = Terminal(radio, deployment.antenna, here)
                 if math.dist(anchor.position_m, here) < 1.0:
+                    # Standing on the anchor. No budget to run and no
+                    # direction to it either, so it counts towards the
+                    # fix and contributes no geometry.
                     reached += 1
-                elif _reaches(
-                    anchor, receiver, terrain, deployment, target_sigma_m
-                ):
-                    reached += 1
+                else:
+                    budget = evaluate_link(
+                        anchor, receiver,
+                        obstruction=terrain.obstruction_between(
+                            anchor.position_m, receiver.position_m),
+                        region=deployment.region,
+                    )
+                    if budget.closes:
+                        best_margin = max(best_margin, budget.margin_db)
+                        # Asked only of a link that closes: one that does
+                        # not has no ranging precision, and `rf` refuses
+                        # to invent one rather than returning a large
+                        # number somebody could read as a result.
+                        sigma = ranging_sigma_m(budget, anchor.radio)
+                        if sigma <= target_sigma_m:
+                            reached += 1
+                            reaching_sigmas.append(sigma)
+                            reaching_at.append(anchor.position_m)
                 if reached >= count_up_to:
                     break
             counts[row, column] = reached
+            if best_margin > -math.inf:
+                margins[row, column] = best_margin
+            if reaching_sigmas:
+                sigmas[row, column] = float(np.median(reaching_sigmas))
+            dilutions[row, column] = dilution_at(
+                (float(x), float(y)),
+                [(p[0], p[1]) for p in reaching_at],
+                math.inf,
+            )
 
-    return CoverageGrid(counts=counts, xs=xs, ys=ys, resolution_m=resolution_m)
+    # The ceiling is what "no fix here" looks like inside the dilution
+    # module, and NaN is what it looks like everywhere else in this
+    # grid. Converted once rather than asking every reader to know both.
+    dilutions[dilutions >= DILUTION_CEILING] = np.nan
+
+    return CoverageGrid(counts=counts, xs=xs, ys=ys, resolution_m=resolution_m,
+                        margin_db=margins, sigma_m=sigmas,
+                        dilution=dilutions)
 
 
 def _sweep_radios(deployment: Deployment) -> tuple[Radio, ...]:

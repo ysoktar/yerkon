@@ -339,6 +339,12 @@ function drawWords() {
   }
   CHOICES = choicesNow();
   KINDS = kindsNow();
+  // Built in code rather than from `data-say`, so they do not come along
+  // with the loops above and have to be redrawn by name. The thing that
+  // goes wrong with two languages is translating nine tenths of
+  // something and nobody noticing the tenth (ADR-0035).
+  wireLayers();
+  drawLegend();
   document.documentElement.lang = speaks();
 
   // The gestures, as one line. Built rather than written into the markup
@@ -1227,6 +1233,8 @@ function wireControls() {
 
   wireMap();
   wirePresets();
+  wireLayers();
+  drawLegend();
 
   document.getElementById("show-photo").onchange = event => {
     showPhotograph = event.target.checked;
@@ -1481,7 +1489,7 @@ function paintScene() {
 
   const items = [
     ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
-    ...draw.cellFaces(view, sweepData, groundAt, bias),
+    ...draw.cellFaces(view, sweepData, groundAt, bias, shownLayer),
     ...draw.masts(view, latest.anchors, colourOf),
     ...draw.polyline(
       view,
@@ -2399,6 +2407,89 @@ function wireTasks() {
   document.getElementById("frame-all").onclick = frameEverything;
 }
 
+/* ---------- what the ground overlay reads ---------- */
+
+/* Which of the sweep's four readings is painted. */
+let shownLayer = "anchors";
+
+const LAYERS = ["anchors", "margin_db", "dilution", "error_m"];
+
+/* How each band's range is written, in the layer's own units. */
+const BAND_UNITS = {
+  anchors: v => `${v}`,
+  margin_db: v => `${decimal(v, 0)} dB`,
+  dilution: v => decimal(v, 1),
+  error_m: v => `${decimal(v, 1)} m`,
+};
+
+function wireLayers() {
+  const pick = document.getElementById("layer-pick");
+  if (!pick) return;
+  pick.innerHTML = options(LAYERS.map(k => [k, say(`layer.${k}`)]), shownLayer);
+  pick.onchange = () => {
+    shownLayer = pick.value;
+    drawLegend();
+    render();
+  };
+}
+
+/* The four bands, written out with the engine's own thresholds.
+ *
+ * Filled from the sweep rather than from a copy here, so the colour on
+ * the ground and the number beside it cannot drift apart. Blank until a
+ * sweep has arrived, because until then there are no thresholds to
+ * quote — the bar the error bands are multiples of is this row's own
+ * tolerance and moves with it.
+ */
+function drawLegend() {
+  const host = document.getElementById("legend-bands");
+  const pick = document.getElementById("layer-pick");
+  if (!host) return;
+  if (pick && pick.value !== shownLayer) pick.value = shownLayer;
+  if (pick) pick.title = say(`layer.${shownLayer}.note`);
+
+  const edges = sweepData && sweepData.bands && sweepData.bands[shownLayer];
+  host.innerHTML = "";
+  if (!edges) return;
+
+  const unit = BAND_UNITS[shownLayer] || (v => `${v}`);
+  const rising = draw.RISING[shownLayer] !== false;
+  // Read off the same function the ground is painted with, rather than
+  // written out again: a legend that describes bands the painter does
+  // not use is worse than no legend.
+  for (let band = draw.BANDS.length - 1; band >= 0; band--) {
+    const row = document.createElement("span");
+    const swatch = document.createElement("i");
+    swatch.style.background = draw.BANDS[band];
+    const text = document.createElement("span");
+    text.textContent = bandRange(band, edges, rising, unit);
+    row.append(swatch, text);
+    host.appendChild(row);
+  }
+  const note = document.createElement("p");
+  note.className = "note";
+  note.textContent = say("legend.nothing");
+  host.appendChild(note);
+}
+
+/* What a band covers, said in the layer's units.
+ *
+ * Derived from the same edges and the same direction the painter uses,
+ * so a change to one is a change to both.
+ */
+function bandRange(band, edges, rising, unit) {
+  if (rising) {
+    const low = edges[band];
+    const high = band + 1 < edges.length ? edges[band + 1] : null;
+    return high === null ? `≥ ${unit(low)}` : `${unit(low)} – ${unit(high)}`;
+  }
+  const index = draw.BANDS.length - 1 - band;
+  if (index >= edges.length) return `> ${unit(edges[edges.length - 1])}`;
+  const high = edges[index];
+  const low = index > 0 ? edges[index - 1] : null;
+  return low === null ? `≤ ${unit(high)}` : `${unit(low)} – ${unit(high)}`;
+}
+
 /* What the panel prints where there is no number to print.
  *
  * An em dash rather than a zero: zero is an answer, and "no anchors
@@ -2786,6 +2877,10 @@ function scheduleSweep() {
     try {
       flash(say("busy.sweep"));
       sweepData = await ask("/api/sweep");
+      // The bands travel with the sweep, so the legend is redrawn with
+      // it: the error bands are multiples of this row's own tolerance
+      // and move when that does.
+      drawLegend();
       render();
       showNumbers(latest, null);
       flash("");

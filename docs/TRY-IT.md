@@ -239,6 +239,36 @@ istemek yeni bilgi getirmez, daha seyreği tepeleri yumuşatır. Satır kaç
 nokta olacağını söylüyor: 3 km'de 10 000, 12 km'de 160 000. Yüz binlerin
 üstü dakikalar ve kimsenin istemediği bir dosya demek.
 
+### Zemin neyi gösteriyor
+
+Sol üstteki efsanenin başındaki açılır liste, zeminin üzerine boyanan
+örtünün **neyi okuduğunu** seçer. Dördü de aynı taramadan gelir:
+
+- **Kaç direk erişiyor** — üçü bir konum için en az, dördüncüsü onu
+  denetler.
+- **Sinyal marjı** — en güçlü bağlantının çalışmayı bırakmasına ne kadar
+  kaldığı. 6 dB'nin altı ince, 20 dB rahat.
+- **Geometri (HDOP)** — direk dizilişinin menzil hatasını kaç katına
+  çıkardığı. Bir sıra hâlindeki direkler enine yönde bunu sonsuza
+  götürür; ADR-0011'i çalıştırmadan görebileceğin yer burası.
+- **Beklenen konum hatası** — menzil sigması × geometri, **bu satırın
+  kendi toleransının katlarıyla** renklendirilmiş. Yani renk, "çıtayı
+  karşılıyor mu" sorusunun cevabı; toleransı oynatırsan resim onunla
+  oynar.
+
+Dört bant var, sürekli bir renk geçişi yok: taranmış bir ızgara o kadar
+bilgi taşımıyor ve gradyandan sınır okumak yanıltır. Efsanedeki sayılar
+motorun kendi eşikleri — sayfada ikinci bir kopya yok.
+
+**Boyanmayan yer, hiçbir direğin erişmediği yerdir.** Sıfır değil, yok:
+sıfır dB marj kılpayı kapanan bir bağlantıdır, hiç erişmemek başka şey.
+
+Son katman bir **kestirimdir, benzetim değildir**: içinde saat kayması,
+paket kaybı, oturmayan bir çözücü ya da gerçekten oradan geçen bir alıcı
+yok. Yayımlanan sayı **Simülasyonu çalıştır**'dan gelir (ADR-0001). Yine
+de birbirlerini tutarlar — kırsal zeminde kestirimin ortancası 3,02 m,
+yayımlanan HPE P50 3,11 m.
+
 ### Düzenlemeler: bir sekmeyi kaydedip geri yüklemek
 
 Sekmelerin üstündeki çubuk, o sekmenin hangi **düzenlemeyi** gösterdiğini

@@ -384,6 +384,44 @@ export const SAY = {
   "scene.tilts": { tr: "eğer", en: "tilts" },
   "scene.frames": { tr: "her şeyi çerçeveler", en: "frames everything" },
   "scene.frame": { tr: "Çerçevele", en: "Frame" },
+  // -- what the ground overlay reads (ADR-0044) ------------------------
+  "layer.anchors": { tr: "Kaç direk erişiyor", en: "Anchors in reach" },
+  "layer.margin_db": { tr: "Sinyal marjı", en: "Signal margin" },
+  "layer.dilution": { tr: "Geometri (HDOP)", en: "Geometry (HDOP)" },
+  "layer.error_m": { tr: "Beklenen konum hatası", en: "Expected position error" },
+  "layer.anchors.note": {
+    tr: "Bir hücreye kaç direğin eriştiği. Üçü bir konum için en az; "
+        + "dördüncüsü onu denetler.",
+    en: "How many anchors reach a cell. Three is the fewest that gives a "
+        + "position; a fourth checks it.",
+  },
+  "layer.margin_db.note": {
+    tr: "En güçlü bağlantının çalışmayı bırakmasına ne kadar kaldığı. "
+        + "6 dB'nin altı ince, 20 dB rahat.",
+    en: "How much the strongest link has to spare before it stops "
+        + "working. Under 6 dB is thin; 20 dB is comfortable.",
+  },
+  "layer.dilution.note": {
+    tr: "Direk geometrisinin menzil hatasını kaç katına çıkardığı. Bir "
+        + "sıra hâlindeki direkler enine yönde bunu sonsuza götürür "
+        + "(ADR-0011).",
+    en: "How much the anchors' geometry multiplies a ranging error. "
+        + "Anchors in a line take it to infinity across that line "
+        + "(ADR-0011).",
+  },
+  "layer.error_m.note": {
+    tr: "Menzil sigması × geometri. Bu satırın kendi toleransının "
+        + "katlarıyla renklendiriliyor. Bir kestirim, bir benzetim "
+        + "değil: saat kayması, paket kaybı ve gerçekten oradan geçen "
+        + "bir alıcı yok. Yayımlanan sayı 'Simülasyonu çalıştır'dan "
+        + "gelir (ADR-0001).",
+    en: "Ranging sigma times geometry, coloured in multiples of this "
+        + "row's own tolerance. An estimate and not a simulation: no "
+        + "clock drift, no lost packets, no receiver actually driving "
+        + "through. The published number comes from the run (ADR-0001).",
+  },
+  "legend.nothing": { tr: "boyanmayan yer: hiçbir direk erişmiyor",
+                      en: "unpainted: no anchor reaches" },
   "legend.served": { tr: "Konum alınabilen alan (≥4 direk)",
                      en: "Ground with a position (≥4 anchors)" },
   "legend.reached": { tr: "Paketin ulaştığı alan (≥1 direk)",

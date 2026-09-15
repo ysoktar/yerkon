@@ -234,9 +234,54 @@ export function groundFaces(view, terrain, light, photo) {
   return out;
 }
 
-export function cellFaces(view, sweep, groundAt, bias = 0) {
+/* Four colours, worst to best.
+ *
+ * Four and no more. A continuous ramp looks like more information than a
+ * swept grid holds and invites reading a boundary off a gradient; the
+ * question a person asks of this picture is which band ground falls in.
+ */
+export const BANDS = [
+  "rgb(191,86,58)",     // won't do
+  "rgb(216,178,74)",    // thin
+  "rgb(141,176,65)",    // fair
+  "rgb(47,158,87)",     // comfortable
+];
+
+/* Which band a value falls in, or -1 for "there is no value here".
+ *
+ * `rising` says which way is better: more anchors and more margin are
+ * better, while more dilution and more metres of error are worse, and
+ * one function for both keeps the two from drifting apart.
+ *
+ * A rising layer is sent four thresholds — the first is the floor below
+ * which nothing is painted — and a falling one three, because "nothing
+ * here" reaches it as a null rather than as a small number.
+ */
+export function bandOf(value, edges, rising) {
+  if (value === null || value === undefined || Number.isNaN(value)) return -1;
+  if (rising) {
+    if (value < edges[0]) return -1;        // below the first edge is nothing
+    for (let i = edges.length - 1; i >= 1; i--) {
+      if (value >= edges[i]) return i;
+    }
+    return 0;
+  }
+  for (let i = 0; i < edges.length; i++) {
+    if (value <= edges[i]) return BANDS.length - 1 - i;
+  }
+  return 0;
+}
+
+//: Which layers read better as they grow.
+export const RISING = { anchors: true, margin_db: true,
+                        dilution: false, error_m: false };
+
+export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors") {
   if (!sweep) return [];
-  const { xs, ys, counts, resolution_m: size } = sweep;
+  const { xs, ys, resolution_m: size } = sweep;
+  const values = (sweep.layers && sweep.layers[layer]) || sweep.counts;
+  const edges = (sweep.bands && sweep.bands[layer]) || [1, 3, 4, 6];
+  const rising = RISING[layer] !== false;
   const half = size / 2;
   // Over the ground it describes, by its own half-width and the mesh
   // cell under it: both surfaces sort at the depth of their middles and
@@ -245,11 +290,11 @@ export function cellFaces(view, sweep, groundAt, bias = 0) {
   const out = [];
   for (let row = 0; row < ys.length; row++) {
     for (let column = 0; column < xs.length; column++) {
-      const count = counts[row][column];
-      if (count < 1) continue;
-      // Two bands only, because the distinction that matters is between
-      // ground a packet reaches and ground where a position exists.
-      const served = count >= 4;
+      const band = bandOf(values[row][column], edges, rising);
+      // Ground with no number is left as ground. Painting it would say
+      // "nothing reaches here" in the same visual language as "something
+      // reaches here badly", and those are different facts.
+      if (band < 0) continue;
       const x = xs[column];
       const y = ys[row];
       // On the ground, not above it.
@@ -265,8 +310,10 @@ export function cellFaces(view, sweep, groundAt, bias = 0) {
         view,
         [[x - half, y - half, z], [x + half, y - half, z],
          [x + half, y + half, z], [x - half, y + half, z]],
-        served ? "rgb(47,158,87)" : "rgb(216,178,74)",
-        served ? 0.5 : 0.26,
+        BANDS[band],
+        // The better the ground, the more solidly it is stated. The
+        // faint end is where the picture is least certain anyway.
+        0.26 + 0.08 * band,
         0, over,
       );
       if (painted) out.push(painted);

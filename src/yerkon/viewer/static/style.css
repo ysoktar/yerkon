@@ -652,3 +652,19 @@ i.prov.assumption { background: var(--warn); }
   font: inherit;
   font-size: 12px;
 }
+
+/* The legend's own chooser and its four bands. */
+#legend select {
+  width: 100%;
+  margin: 0 0 6px;
+  padding: 3px 4px;
+  font-size: 11px;
+}
+#legend-bands { display: grid; gap: 3px; margin-bottom: 5px; }
+#legend-bands span { display: flex; align-items: center; gap: 7px; }
+#legend-bands i {
+  display: inline-block; width: 11px; height: 11px;
+  border-radius: 2px; flex: 0 0 auto;
+}
+#legend .note { max-width: 260px; color: #61707e; font-size: 10px;
+  line-height: 1.35; margin: 2px 0 5px; }

@@ -55,7 +55,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `observation.py` | kestiricinin görebileceği tek tip; hiçbir şey import etmez |
 | `ranging.py` | çift yönlü alışveriş, saatleri ve hava süresinde maliyeti |
 | `estimator.py` | menzilleri konuma çevirir, başka hiçbir şey görmez |
-| `evaluate.py` | yolculuklar, sabitleme başına hata örnekleri, kullanılabilirlik, hizmet alanı |
+| `evaluate.py` | yolculuklar, sabitleme başına hata örnekleri, kullanılabilirlik, hizmet alanı, ve taramanın dört okuması (sayım, marj, geometri, beklenen hata) |
 | `cost.py` | malzeme listesinden CAPEX, envanterden OPEX |
 | `scenarios.py` | tablonun anlattığı üç yerleşim, yapılandırma olarak |
 | `report.py` | dört satır, on sütun ve altlarındaki notlar |

@@ -306,9 +306,14 @@
   <button id="frame-all" class="quiet" data-say="scene.frame"></button>
 </div>
 
+<!--
+  The legend, and what the ground overlay is reading.
+  The four bands are filled in from the engine's own thresholds, so the
+  colours and the numbers beside them cannot disagree (ADR-0044).
+-->
 <div id="legend">
-  <span><i class="served"></i><span data-say="legend.served"></span></span>
-  <span><i class="reached"></i><span data-say="legend.reached"></span></span>
+  <select id="layer-pick" title=""></select>
+  <div id="legend-bands"></div>
   <span><i class="reach"></i><span data-say="legend.reach"></span></span>
   <span><i class="unit"></i><span data-say="legend.unit"></span></span>
 </div>

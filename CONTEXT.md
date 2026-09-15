@@ -93,6 +93,13 @@ silinmiş direkler, elle değiştirilmiş değerler. Her satır için
 künye düzenlemenin adını, yolunu ve içerik hash'ini yazar, çünkü
 `konya` iki koşu arasında değişebilir. ADR-0043'e bak.
 
+**Coverage layers** (örtü katmanları): aynı taramanın dört okuması —
+kaç direk erişiyor, sinyal marjı (dB), geometri (HDOP), ve beklenen konum
+hatası (menzil sigması × geometri). Link bütçesi zaten koşuyordu; bunlar
+atılanı tutuyor, %3'e. Hata bir kestirimdir: saat kayması, paket kaybı ve
+gerçekten oradan geçen bir alıcı yoktur — yayımlanan sayı koşudan gelir.
+ADR-0044'e bak.
+
 **Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
 artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 

@@ -21,7 +21,7 @@ from yerkon.design import Design, REGION_CHOICES, chosen
 from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import LANGUAGES, LANGUAGE_NAMES, say
-from yerkon.layout import METHODS as LAYOUT_METHODS
+from yerkon.layout import FEWEST_FOR_A_FIX, METHODS as LAYOUT_METHODS
 from yerkon.viewer.state import (
     _lowest_unit,
     closure_of,
@@ -423,7 +423,8 @@ def sweep(state: ViewState) -> dict:
         # "there is no such number" read the same to a page that checks,
         # and differently to one that does not.
         return {"xs": [], "ys": [], "counts": [], "resolution_m": state.sweep_m,
-                "served_km2": None, "reached_km2": None}
+                "served_km2": None, "reached_km2": None,
+                "layers": {}, "bands": _bands(state)}
     deployment = state.deployment(terrain)
 
     grid = coverage_grid(
@@ -442,6 +443,59 @@ def sweep(state: ViewState) -> dict:
         "resolution_m": grid.resolution_m,
         "reached_km2": grid.area_reached_by(1),
         "served_km2": grid.area_reached_by(4),
+        # Four readings of the same sweep. The link budget behind them
+        # is run either way — keeping its answer rather than reducing it
+        # to a boolean costs about three percent (ADR-0044).
+        "layers": {
+            "anchors": grid.counts.tolist(),
+            "margin_db": _sendable(grid.margin_db),
+            "dilution": _sendable(grid.dilution),
+            "error_m": _sendable(grid.error_m),
+        },
+        "bands": _bands(state),
+    }
+
+
+def _sendable(layer) -> list:
+    """A float grid as JSON, with `null` where there is no number.
+
+    NaN is not JSON. `json.dumps` writes it as a bare `NaN`, which is not
+    in the specification, which `JSON.parse` refuses, and which would
+    therefore turn one unreachable cell into a page that stopped
+    updating.
+    """
+    if layer is None:
+        return []
+    return [[None if value != value else float(value) for value in row]
+            for row in layer]
+
+
+#: Where each layer's colours change.
+#:
+#: Four bands and no more. A continuous ramp looks like more information
+#: than a swept grid contains and invites reading a boundary off a
+#: gradient; these are the thresholds somebody would actually name.
+#:
+#: A layer that reads better as it grows takes **four** thresholds: the
+#: first is the floor below which there is nothing worth painting, and
+#: the other three split what is left. A layer that reads worse as it
+#: grows takes **three**, because "nothing here" arrives as a null rather
+#: than as a small number — there is no dilution at all until three
+#: anchors reach, and no error to estimate without one.
+#:
+#: The margins are the usual link-design ones — under 6 dB is thin, 20 dB
+#: is comfortable. The dilutions are the GNSS convention, where under 2
+#: is what "good geometry" means (ADR-0040 uses the same figure as its
+#: default bar). The errors are multiples of *this row's own tolerance*,
+#: because the question this project asks is whether ground meets the
+#: bar, not how it scores against an abstract scale (ADR-0015).
+def _bands(state: ViewState) -> dict:
+    bar = max(state.tolerance_m, 0.1)
+    return {
+        "anchors": [1, FEWEST_FOR_A_FIX, 4, 6],
+        "margin_db": [0.0, 6.0, 12.0, 20.0],
+        "dilution": [1.5, 2.0, 4.0],
+        "error_m": [bar, bar * 2.0, bar * 4.0],
     }
 
 
