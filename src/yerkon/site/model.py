@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -41,6 +42,59 @@ class BoundingBox:
         per_latitude = 111_132.92 - 559.82 * math.cos(2 * math.radians(latitude))
         per_longitude = 111_412.84 * math.cos(math.radians(latitude))
         return per_latitude, per_longitude
+
+
+def read_point(text: str, language: Optional[str] = None) -> tuple[float, float]:
+    """A latitude and longitude, written the several ways people write them.
+
+    Somebody adding a region right-clicks a map and pastes what it gives
+    them, and what it gives them depends on the map and on the locale.
+    This project writes every other number with a comma for a decimal
+    mark (ADR-0035), so a Turkish reader typing a coordinate by hand
+    writes `39,9250 32,8370` — which a reader that split on commas would
+    see as four numbers. It did, and it crashed.
+
+    So: whitespace separates the two when there is any, and a comma is
+    then a decimal mark. With no whitespace, two comma-separated pieces
+    are a pair with decimal points, and four are a pair with decimal
+    commas. Anything else is refused rather than guessed at, because
+    guessing here fetches ground somewhere nobody asked about.
+    """
+    # A comma touching whitespace is separating the two numbers; a comma
+    # between digits is a decimal mark. `39.9250, 32.8370` and
+    # `39,9250 32,8370` are both common and they disagree about what a
+    # comma is, so which one it is here is decided by what is beside it.
+    spaced = re.sub(r",(?=\s)|(?<=\s),", " ", str(text or "").replace(";", " "))
+    cleaned = " ".join(spaced.split())
+    if not cleaned:
+        raise ValueError(say("point.none", language))
+
+    if " " in cleaned:
+        pieces = [piece.replace(",", ".") for piece in cleaned.split(" ")]
+    else:
+        parts = cleaned.split(",")
+        if len(parts) == 2:
+            pieces = parts
+        elif len(parts) == 4:
+            pieces = [".".join(parts[:2]), ".".join(parts[2:])]
+        else:
+            pieces = [cleaned]
+
+    if len(pieces) != 2:
+        raise ValueError(say("point.unreadable", language, text=text))
+    try:
+        latitude, longitude = (float(piece) for piece in pieces)
+    except ValueError:
+        raise ValueError(
+            say("point.unreadable", language, text=text)) from None
+
+    if not -90.0 <= latitude <= 90.0:
+        raise ValueError(
+            say("point.not_a_latitude", language, value=latitude))
+    if not -180.0 <= longitude <= 180.0:
+        raise ValueError(
+            say("point.not_a_longitude", language, value=longitude))
+    return latitude, longitude
 
 
 def box_around(latitude: float, longitude: float, size_km: float) -> BoundingBox:

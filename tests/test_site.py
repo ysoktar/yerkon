@@ -1015,7 +1015,63 @@ def test_a_fetch_takes_a_centre_and_a_size_or_four_edges_but_not_both():
         _box_from(asked(centre="37.8,32.4", size=6.0, south=39.9))
     with pytest.raises(ValueError, match="needs"):
         _box_from(asked(centre="37.8,32.4"))
-    with pytest.raises(ValueError, match="LAT,LON"):
+    with pytest.raises(ValueError, match="enlem"):
         _box_from(asked(centre="somewhere", size=6.0))
     with pytest.raises(ValueError, match="all four"):
         _box_from(asked(south=39.9))
+
+
+def test_a_coordinate_reads_the_several_ways_people_write_one():
+    """Somebody adding a region pastes what a map gave them, and what a
+    map gives them depends on the map and on the locale.
+
+    This project writes every other number with a comma for a decimal
+    mark (ADR-0035), so `39,9250 32,8370` is what a Turkish reader types
+    — and a reader that split on commas saw four numbers and crashed. It
+    did: the page's own placeholder was in that form.
+    """
+    from yerkon.site.model import read_point
+
+    ankara = (39.925, 32.837)
+    for written in (
+        "39,9250 32,8370",       # comma decimals, as this project writes them
+        "39.9250, 32.8370",      # what most maps copy out
+        "39.9250 32.8370",
+        "39,9250, 32,8370",
+        "39,9250,32,8370",       # commas doing both jobs at once
+        " 39.9250 ; 32.8370 ",
+        "39.9250,32.8370",
+    ):
+        assert read_point(written) == pytest.approx(ankara), written
+
+
+def test_a_centre_nobody_typed_says_what_to_type_rather_than_raising_a_key():
+    """It fell through to four corners the page had stopped sending, so
+    pressing Fetch with the box empty raised `KeyError: 'south'` in a
+    background thread and the page showed nothing useful."""
+    from yerkon.site.model import read_point
+
+    for nothing in ("", "   ", None):
+        with pytest.raises(ValueError, match="Merkez girilmedi"):
+            read_point(nothing)
+
+    with pytest.raises(ValueError, match="enlem"):
+        read_point("nerede burası")
+    with pytest.raises(ValueError, match="-90"):
+        read_point("200, 10")
+    with pytest.raises(ValueError, match="-180"):
+        read_point("39,9250 200,0")
+
+
+def test_the_fetch_task_refuses_an_empty_centre_in_the_page_s_language():
+    """The message is the one thing a person sees when they get it wrong."""
+    from yerkon.viewer.state import from_scenario
+    from yerkon.viewer.tasks import fetch
+
+    turkish = from_scenario("urban")
+    with pytest.raises(ValueError, match="Merkez girilmedi"):
+        fetch(turkish, {"name": "x"})(lambda line: None)
+
+    english = turkish.merged({"language": "en"})
+    with pytest.raises(ValueError, match="No centre given"):
+        fetch(english, {"name": "x", "centre": ""})(lambda line: None)

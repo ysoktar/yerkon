@@ -226,7 +226,7 @@ başkaysa onu getir; dört sahanın geldiği yolun aynısı ve ağa dokunan tek
 | alan | ne yazılır |
 |---|---|
 | **Ad** | klasör adı olacak: `konya`, `izmir-ring`. Harf, rakam, tire. |
-| **Merkez** | `37.8716, 32.4847` — herhangi bir haritada ilgilendiğin noktaya **sağ tıkla**, koordinat çıkar, yapıştır. |
+| **Merkez** | `39,9250 32,8370` ya da `39.9250, 32.8370` — herhangi bir haritada ilgilendiğin noktaya **sağ tıkla**, koordinat çıkar, yapıştır. İkisi de olur: bir virgülün ayırıcı mı ondalık mı olduğuna yanındaki boşluk karar verir. |
 | **Kutunun boyu** | kaç kilometre. Sürgünün altındaki satır kaç ızgara noktası edeceğini söyler. |
 
 Dört köşe girmiyorsun: haritaya bakan birinin elinde bir iğne ve "şu

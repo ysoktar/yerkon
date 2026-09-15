@@ -133,6 +133,28 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Footprints are measured from each building's own bounding "
               "box (release {release}), not implied by height.",
     },
+    "point.none": {
+        "tr": "Merkez girilmedi. Haritada yere sağ tıklayıp koordinatı "
+              "yapıştır, örneğin 39,9250 32,8370",
+        "en": "No centre given. Right-click the place on a map and paste "
+              "what it gives you, for example 39.9250, 32.8370",
+    },
+    "point.unreadable": {
+        "tr": "{text!r} bir enlem ve boylam olarak okunmuyor. 39,9250 "
+              "32,8370 ya da 39.9250, 32.8370 gibi yaz.",
+        "en": "{text!r} does not read as a latitude and a longitude. Write "
+              "them as 39,9250 32,8370 or 39.9250, 32.8370",
+    },
+    "point.not_a_latitude": {
+        "tr": "{value} bir enlem değil; enlem -90 ile 90 arasındadır. "
+              "Önce enlem yazılır.",
+        "en": "{value} is not a latitude; it runs from -90 to 90. Latitude "
+              "comes first.",
+    },
+    "point.not_a_longitude": {
+        "tr": "{value} bir boylam değil; boylam -180 ile 180 arasındadır.",
+        "en": "{value} is not a longitude; it runs from -180 to 180.",
+    },
     "site.needs_pyarrow": {
         "tr": "Overture erişimi pyarrow paketini gerektirir: "
               "pip install \"yerkon[sites]\"",

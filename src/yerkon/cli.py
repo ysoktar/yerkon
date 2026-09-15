@@ -72,7 +72,7 @@ from yerkon.scenarios import (
 from yerkon.viewer.state import fetched_sites
 from yerkon.proposal import OUTCOME_LABELS, confirm, show_outcome
 from yerkon.terms import NAMES as SOURCE_NAMES
-from yerkon.site.model import BoundingBox, box_around
+from yerkon.site.model import BoundingBox, box_around, read_point
 
 
 #: Grid points past which a fetch is worth warning about rather than
@@ -112,14 +112,7 @@ def _box_from(args) -> BoundingBox:
             )
         if args.centre is None or args.size is None:
             raise ValueError("--centre needs --size, and --size needs --centre")
-        try:
-            latitude, longitude = (
-                float(part) for part in str(args.centre).replace(" ", "").split(",")
-            )
-        except ValueError:
-            raise ValueError(
-                "--centre reads as LAT,LON, for example 37.8716,32.4847"
-            ) from None
+        latitude, longitude = read_point(args.centre)
         if args.size <= 0.0:
             raise ValueError("--size is in kilometres across, so it is positive")
         return box_around(latitude, longitude, args.size)

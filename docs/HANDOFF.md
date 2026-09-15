@@ -190,6 +190,13 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   sekizin üstündeki sıralama tohumla dönüyor ve komşu değerler
   arasındaki fark tohumlar arasındaki kadar (ADR-0037). Bunu, tek tohuma
   güvenmemek için yazılmış bir sınama yakaladı.
+- Merkez kutusunu boş bırakıp Getir'e basmak, arka planda
+  `KeyError: 'south'` veriyordu: sayfa dört köşe göndermeyi bırakmıştı
+  ama görev hâlâ onlara düşüyordu. Daha kötüsü, kutunun kendi örnek
+  yazısı `39,9250 32,8370` idi — virgüllü ondalık, yani ayırıcıyı
+  virgülden arayan okuyucu dört sayı görüyordu. Yani *doğru* yazan da
+  çöküyordu. Artık bir virgülün ayırıcı mı ondalık mı olduğuna yanındaki
+  boşluk karar veriyor, ve yazım hatası yığın izi değil cümle üretiyor.
 - Sahalar bina taşımıyordu ve sebep model değil ağdı: Overpass bir sorgu
   servisi ve buradaki ağ onu reddediyor. Overture Maps aynı veriyi genel
   nesne deposundan veriyor ve o açık; dördü de artık bina taşıyor

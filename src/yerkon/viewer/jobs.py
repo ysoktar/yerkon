@@ -88,6 +88,14 @@ class Jobs:
         def run() -> None:
             try:
                 outcome = work(say)
+            except ValueError as refused:
+                # Something the person typed. The page says what to type
+                # instead; a traceback in the terminal would suggest the
+                # program broke, and it did not.
+                with self._lock:
+                    job.error = str(refused) or refused.__class__.__name__
+                    job.done = True
+                return
             except Exception as trouble:            # noqa: BLE001
                 # Whatever went wrong belongs on the page rather than in a
                 # terminal the person may not be looking at. The traceback

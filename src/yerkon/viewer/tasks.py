@@ -325,7 +325,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             ServiceElevation,
             build_site,
         )
-        from yerkon.site.model import BoundingBox, box_around
+        from yerkon.site.model import BoundingBox, box_around, read_point
 
         name = str(payload.get("name", "")).strip()
         if not name or not name.replace("-", "").replace("_", "").isalnum():
@@ -339,18 +339,22 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         # edges still work for a box somebody already holds, and the
         # arithmetic lives in one place rather than once here and once in
         # the page.
-        if payload.get("centre"):
-            latitude, longitude = (
-                float(part)
-                for part in str(payload["centre"]).replace(" ", "").split(",")
-            )
-            bounds = box_around(latitude, longitude,
-                                float(payload.get("size_km") or 3.0))
-        else:
+        corners = ("south", "west", "north", "east")
+        if all(payload.get(corner) is not None for corner in corners):
             bounds = BoundingBox(
                 south=float(payload["south"]), west=float(payload["west"]),
                 north=float(payload["north"]), east=float(payload["east"]),
             )
+        else:
+            # `read_point` refuses an empty or unreadable centre with a
+            # sentence. It used to fall through to the four corners, which
+            # the page stopped sending when it started asking for a centre
+            # — so pressing Fetch with the box empty raised KeyError in a
+            # background thread and the page showed nothing useful.
+            latitude, longitude = read_point(payload.get("centre"),
+                                             state.language)
+            bounds = box_around(latitude, longitude,
+                                float(payload.get("size_km") or 3.0))
         spacing = float(payload.get("spacing_m") or 30.0)
         want_buildings = bool(payload.get("buildings", True))
 
