@@ -74,6 +74,39 @@ export const SAY = {
     tr: "Modellenmiş zeminin fotoğrafı yoktur: orası hiçbir yer değil.",
     en: "Modelled ground has no photograph: it is nowhere.",
   },
+  "fetch.map.open": { tr: "Haritadan seç…", en: "Pick it on a map…" },
+  "fetch.map.search": { tr: "Yer ara: Konya, Bolu Dağı, D100…",
+                        en: "Search a place: Konya, Bolu Dağı, D100…" },
+  "fetch.map.find": { tr: "Ara", en: "Search" },
+  "fetch.map.draw": { tr: "Kutu çiz", en: "Draw a box" },
+  "fetch.map.take": { tr: "Bu alanı al", en: "Take this ground" },
+  "fetch.map.close": { tr: "Vazgeç", en: "Cancel" },
+  "fetch.map.span": { tr: "{across} × {along} km · {points} ızgara noktası",
+                      en: "{across} × {along} km · {points} grid points" },
+  "fetch.map.hint": {
+    tr: "Sürükle: kaydır · Tekerlek: yakınlaş · Kutuyu taşı, köşelerinden "
+        + "çek · Shift+sürükle ya da Kutu çiz: sıfırdan kutu",
+    en: "Drag to pan · Wheel to zoom · Move the box, drag its corners · "
+        + "Shift-drag or Draw a box to start a new one",
+  },
+  "fetch.map.picked": { tr: "Haritadan: {across} × {along} km",
+                        en: "From the map: {across} × {along} km" },
+  "fetch.map.credit": { tr: "© OpenStreetMap katkıda bulunanları",
+                        en: "© OpenStreetMap contributors" },
+  "fetch.map.none": {
+    tr: "Harita karosu adresi verilmedi (--map-tiles), o yüzden altta "
+        + "harita yok. Kutuyu yine de çizebilir ve alabilirsin.",
+    en: "No map tile address was given (--map-tiles), so there is no map "
+        + "underneath. The box can still be drawn and taken.",
+  },
+  "fetch.map.searching": { tr: "Aranıyor…", en: "Searching…" },
+  "fetch.map.nothing": { tr: "Bu ada uyan bir yer bulunamadı.",
+                         en: "Nothing here matches that name." },
+  "fetch.map.offline": {
+    tr: "Arama servisine ulaşılamadı. Yeri elle bulup kutuyu çizebilirsin.",
+    en: "The search service did not answer. Find the place by hand and "
+        + "draw the box.",
+  },
   "fetch.imagery": { tr: "Uydu karo adresi (isteğe bağlı)",
                      en: "Tile address for the photograph (optional)" },
   "fetch.imagery.zoom": { tr: "Karo yakınlığı", en: "Tile zoom" },
@@ -403,6 +436,18 @@ let speaking = "tr";
 
 export function speak(language) { speaking = language; }
 export function speaks() { return speaking; }
+
+/* A number as this project writes one: comma for the decimal mark, no
+ * thousands separator (ADR-0035).
+ *
+ * Here beside `say` because the decimal mark is a fact about a language,
+ * not about a slider. The page had four copies of
+ * `.toFixed(n).replace(".", ",")` written out by hand, which is three
+ * more places for one of them to be forgotten.
+ */
+export function decimal(value, places = 1) {
+  return Number(value).toFixed(places).replace(".", ",");
+}
 
 /* One phrase, with what it was given put where that language puts it.
  *

@@ -30,6 +30,7 @@ from yerkon.proposal import propose
 from yerkon.viewer.jobs import Jobs
 from yerkon.options import read as read_option
 from yerkon.viewer.scene import (
+    MAP_TILES,
     design_of,
     figures,
     ground,
@@ -315,7 +316,7 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         if path in ("/", "/index.html"):
             return self._file("index.html", "text/html; charset=utf-8")
-        if path in ("/app.js", "/draw.js", "/words.js"):
+        if path in ("/app.js", "/draw.js", "/words.js", "/map.js"):
             return self._file(path.lstrip("/"), "text/javascript; charset=utf-8")
         if path == "/favicon.ico":
             self.send_response(204)
@@ -583,6 +584,7 @@ def serve(
     port: int = 8765,
     open_browser: bool = True,
     state: Optional[ViewState] = None,
+    map_tiles: Optional[str] = None,
 ) -> None:
     """Run until interrupted.
 
@@ -591,6 +593,10 @@ def serve(
     is written to be exposed.
     """
     Handler.session = Session(state)
+    # None means "whatever the engine ships with"; an empty string is a
+    # deliberate no map, which is a different thing and has to survive.
+    if map_tiles is not None:
+        MAP_TILES[0] = map_tiles
     server = ThreadingHTTPServer((host, port), Handler)
     address = "http://{}:{}/".format(host, port)
     print("YERKON viewer on {}".format(address))

@@ -74,6 +74,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `design.py` | birinin seçtiği ayarlar ve neyi ima ettikleri |
 | `proposal.py` | onay paneli: bir düzenleme, bir evet/hayır, her sonuç gösterilmiş |
 | `numbers.py` | virgüllü ondalık ayırıcı, binlik ayırıcı yok |
+| `viewer/static/map.js` | yer seçici: kayan harita, serbest çizilen kutu, ad araması |
 | `cli.py` | `fetch`, `design`, `table`, `view`, `site`, `budget`, `defaults` ve `calibrate` fiilleri |
 
 `tests/test_architecture.py` import'ları denetler, böylece kestirici gerçeğe
@@ -223,6 +224,16 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   getirmenin yanında, onlardan ayırt edilemeden duruyordu. Uydurma bir
   ölçümü gerçek olanların arasına koymak, bu projenin kaçınmak için
   kurulduğu tam olarak o şey (ADR-0001); silindi (ADR-0041).
+
+  **Sayfayı sınayan için tuzak:** `Getir` düğmesine tarayıcıdan basmak
+  gerçekten getirir ve paketin `site/places/` klasörüne gerçekten yazar
+  — bu tasarım gereği (ADR-0039), çünkü çıplak bir ad oraya yazmasa yer
+  zemin listesinde görünmez. Yani bir kullanıcı fetch'i ile bir sınama
+  artığı diskte aynı şeye benziyor, ve bunu bir sınamayla yasaklamak
+  kullanıcının normal akışını kırardı. İşlemeden önce `git status`
+  okumak; ya da sayfayı sınarken `/api/run` isteğini kesip ne
+  gönderildiğine bakmak, ki o zaten daha iyi bir sınama — soru
+  Copernicus'un ne cevapladığı değil, panelin ne sorduğu.
 - Gri gösterme kuralı yalnızca `label.knob.dead` idi, dolayısıyla yeni
   eklenen bir onay kutusu `dead` sınıfını alıyor, sebebini de taşıyor,
   ama rengi değişmiyordu: kilitli ama kilitli görünmeyen bir denetim.

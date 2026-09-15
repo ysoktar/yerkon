@@ -23,7 +23,8 @@ where = ["src"]
 "yerkon.viewer" = ["static/*"]
 # Fetched Ankara ground. A megabyte, and the reason an install reproduces
 # the table's numbers with no network (ADR-0008, ADR-0021).
-"yerkon.site" = ["places/*/*.npy", "places/*/*.npz", "places/*/*.json"]
+"yerkon.site" = ["places/*/*.npy", "places/*/*.npz", "places/*/*.json",
+                 "places/*/*.png"]
 # Named deployment options, shipped and saved. See `yerkon options`.
 "yerkon" = ["defaults.toml", "options/*.toml"]
 

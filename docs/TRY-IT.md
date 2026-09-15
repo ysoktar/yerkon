@@ -239,6 +239,34 @@ istemek yeni bilgi getirmez, daha seyreği tepeleri yumuşatır. Satır kaç
 nokta olacağını söylüyor: 3 km'de 10 000, 12 km'de 160 000. Yüz binlerin
 üstü dakikalar ve kimsenin istemediği bir dosya demek.
 
+### Haritadan seçmek
+
+Merkez kutusunun altındaki **Haritadan seç…** düğmesi haritayı tam ekran
+açar. Orada:
+
+- **Sürükle** kaydırır, **tekerlek** imlecin durduğu yere yakınlaştırır.
+- **Yer ara** kutusuna Konya, Bolu Dağı, D100 yazıp Enter'a bas: çıkan
+  adaylardan birine tıklayınca harita oraya gider. ("Konya" hem il hem
+  ilçe hem şehir; hangisini kastettiğini yalnızca sen bilirsin, o yüzden
+  ilk sonucu seçip geçmiyor.)
+- **Kutu senin çizdiğin şekil.** Dört köşesinden çek, gövdesinden tutup
+  taşı, **Kutu çiz** ya da Shift+sürükle ile sıfırdan çiz. Kare olmak
+  zorunda değil — istediğin zemin çoğu zaman bir vadi ya da bir yol
+  kesimi, yani uzun kenarı olan bir şey.
+- Üstteki çubuk kaç km × kaç km ve **kaç ızgara noktası** olduğunu kutuyu
+  çizerken söyler. Bir kutuyu sürüklemek ucuz; 40 km'lik bir kutu 30 m
+  adımda bir buçuk milyon örnek demek.
+- **Bu alanı al** kutuyu panele geçirir ve getirme onun dört köşesini
+  kullanır.
+
+Aynı anda yalnızca biri geçerlidir: merkezi elle yazarsan ya da boyut
+sürgüsüne dokunursan çizdiğin kutu düşer ve panel ne yazıyorsa o gider
+(ADR-0042). Harita da panelde yazan yerde açılır.
+
+Harita karoları OpenStreetMap'ten gelir. Kendi karo sunucun varsa
+`yerkon view --map-tiles 'https://…/{z}/{x}/{y}.png'`; hiç ağı olmayan
+bir makinede `--map-tiles ""` deyip haritasız da kutu çizebilirsin.
+
 **Getir**'e bas. İlerleme kütüğü akar — bu iş için birkaç dakika normal.
 Bittiğinde yer **hemen Zemin listesinde** belirir; sonucun altındaki
 **bu zemini kullan** düğmesi satırı onun üzerine oturtur ve onay
@@ -265,7 +293,7 @@ bittiğinde bulguya giden iki adımı adıyla yazar.
 
 Dört köşeyi zaten elinde tutuyorsan `--south --west --north --east` hâlâ
 çalışıyor. İkisini birlikte vermek iki farklı kutu tarif ettiği için
-reddediliyor.
+reddediliyor. Sayfadaki harita da tam olarak bu dört köşeyi gönderir.
 
 ### Baştan sona bir örnek
 

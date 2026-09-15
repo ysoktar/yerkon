@@ -10,7 +10,7 @@
  * else applies immediately.
  */
 
-import { say, speak, speaks } from "/words.js";
+import { decimal, say, speak, speaks } from "/words.js";
 
 /* The choices whose names are this page's to give.
  *
@@ -245,13 +245,13 @@ document.getElementById("confirm-no").onclick = () => {
 /* ---------- controls ---------- */
 
 const UNITS = {
-  corridor_m: v => `${(v / 1000).toFixed(1).replace(".", ",")} km`,
-  width_m: v => (v > 0 ? `${(v / 1000).toFixed(1).replace(".", ",")} km` : "koridor"),
+  corridor_m: v => `${decimal(v / 1000, 1)} km`,
+  width_m: v => (v > 0 ? `${decimal(v / 1000, 1)} km` : "koridor"),
   relief_m: v => (v > 0 ? `${v} m` : "düz"),
   hill_spacing_m: v => `${v} m`,
-  roughness_m: v => `${Number(v).toFixed(2).replace(".", ",")} m`,
+  roughness_m: v => `${decimal(v, 2)} m`,
   clutter_db_per_km: v => `${v} dB/km`,
-  tolerance_m: v => `${Number(v).toFixed(1).replace(".", ",")} m`,
+  tolerance_m: v => `${decimal(v, 1)} m`,
   journey_s: v => `${v} s`,
   sweep_m: v => `${v} m`,
 };
@@ -1182,6 +1182,8 @@ function wireControls() {
     edit({ overrides: {} }, true).catch(e => flash(e.message, true));
   };
 
+  wireMap();
+
   document.getElementById("show-photo").onchange = event => {
     showPhotograph = event.target.checked;
     render();
@@ -1206,6 +1208,7 @@ function wireControls() {
 /* ---------- the scene ---------- */
 
 import * as draw from "/draw.js";
+import * as pick from "/map.js";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -2334,11 +2337,185 @@ function wireTasks() {
         buildings: document.getElementById("fetch-buildings").checked,
         imagery_url: document.getElementById("fetch-imagery").value.trim(),
         imagery_zoom: Number(document.getElementById("fetch-imagery-zoom").value),
+        // A box drawn on the map goes as its four corners, because it is
+        // whatever shape somebody dragged and a centre with one size can
+        // only say "square". Absent, the centre and the size decide, the
+        // way they did before there was a map.
+        ...(pickedBox || {}),
       },
     }, "fetch-out", drawFetched);
   };
 
   document.getElementById("frame-all").onclick = frameEverything;
+}
+
+/* ---------- the map somebody picks ground on ---------- */
+
+/* The picker, and the box it last had.
+ *
+ * Kept after the sheet closes so that reopening it returns to the same
+ * ground rather than to Ankara: somebody who takes a box, reads the
+ * grid-point count and decides it is too big wants to come back to the
+ * box they drew, not to the start.
+ */
+let picker = null;
+let pickedBox = null;
+let MAP_TILES = "";
+
+function wireMap() {
+  const sheet = document.getElementById("map-sheet");
+  const open = document.getElementById("open-map");
+  if (!sheet || !open) return;
+
+  open.onclick = () => {
+    sheet.hidden = false;
+    document.getElementById("map-credit").textContent = MAP_TILES
+      ? `${say("fetch.map.hint")} · ${say("fetch.map.credit")}`
+      : say("fetch.map.none");
+    if (!picker) {
+      picker = new pick.Picker(document.getElementById("map-canvas"), {
+        url: MAP_TILES,
+        centre: startingPoint(),
+        sizeKm: Number(document.getElementById("fetch-size").value) || 3,
+        onChange: showSpan,
+      });
+    }
+    // No address at all is a deliberate choice somebody made with
+    // `--map-tiles ""`, on a machine with no way out. The box can still
+    // be dragged over an empty ground; saying so beats a grey rectangle
+    // that looks like a map that failed.
+    document.getElementById("map-canvas").classList.toggle(
+      "mapless", !MAP_TILES);
+    // A centre typed by hand since the map was last open is where the
+    // map should open. Without this, somebody types Konya, presses the
+    // map button and is shown Ankara with a box on it — the panel saying
+    // one thing and the map another, which is the same disagreement the
+    // slider and the box had.
+    if (!pickedBox) {
+      const typed = startingPoint();
+      if (typed.typed) {
+        picker.goTo(typed.lat, typed.lon,
+                    Math.max(picker.zoom, 12));
+      }
+    }
+    // The map was built while its container was hidden, so it measured
+    // nothing. Redrawn now that it has a size.
+    picker.draw();
+    showSpan(picker.state());
+  };
+
+  const shut = () => { sheet.hidden = true; };
+  document.getElementById("map-close").onclick = shut;
+
+  document.getElementById("map-draw").onclick = event => {
+    picker.drawing = !picker.drawing;
+    event.target.classList.toggle("on", picker.drawing);
+    picker.host.classList.toggle("drawing", picker.drawing);
+  };
+
+  document.getElementById("map-take").onclick = () => {
+    const { box, span } = picker.state();
+    pickedBox = box;
+    // The centre box is filled too, in this project's own decimal mark,
+    // so the panel still shows where the ground is and a person can
+    // still edit it by hand (ADR-0039).
+    document.getElementById("fetch-centre").value =
+      `${decimal((box.south + box.north) / 2, 5)} `
+      + `${decimal((box.west + box.east) / 2, 5)}`;
+    const note = document.getElementById("fetch-picked");
+    note.hidden = false;
+    note.textContent = say("fetch.map.picked", {
+      across: decimal(span.across, 2), along: decimal(span.along, 2),
+    });
+    shut();
+  };
+
+  // Typing a centre by hand drops the drawn box.
+  //
+  // Otherwise the panel shows one place and the fetch goes to another:
+  // the corners outrank the centre on the wire, so a box drawn an hour
+  // ago would quietly beat what somebody just typed. This is the same
+  // class of bug as the fetch that crashed on an empty centre — the page
+  // and the task disagreeing about which field decides.
+  document.getElementById("fetch-centre").addEventListener("input", () => {
+    pickedBox = null;
+    document.getElementById("fetch-picked").hidden = true;
+  });
+
+  const find = () => lookForPlace();
+  document.getElementById("map-find").onclick = find;
+  document.getElementById("map-search").addEventListener("keydown", event => {
+    if (event.key === "Enter") { event.preventDefault(); find(); }
+  });
+}
+
+/* Where the map opens: whatever is in the centre box, else Ankara.
+ *
+ * `read_point` on the other side accepts several ways of writing a
+ * point; this only has to recognise the one it wrote itself, and fall
+ * back rather than argue.
+ */
+function startingPoint() {
+  const typed = document.getElementById("fetch-centre").value.trim();
+  const numbers = typed.replace(/,(?=\s)|(?<=\s),/g, " ")
+    .replace(/,/g, ".").split(/[\s;]+/).map(Number).filter(Number.isFinite);
+  if (numbers.length === 2 && Math.abs(numbers[0]) <= 90) {
+    return { lat: numbers[0], lon: numbers[1], typed: true };
+  }
+  // Ankara, because this is where the four sites that ship with it are
+  // and because a map has to open somewhere.
+  return { lat: 39.925, lon: 32.837, typed: false };
+}
+
+/* How much ground is selected and what it will cost to sample.
+ *
+ * The grid-point count is the honest number here: a box is cheap to
+ * drag and a 40 km one at 30 m spacing is one and a half million
+ * samples. Said while the box is being drawn rather than after.
+ */
+function showSpan(state) {
+  const shown = document.getElementById("map-span");
+  if (!shown) return;
+  const step = Math.max(Number(document.getElementById("fetch-spacing").value)
+    || 30, 1);
+  const points = Math.floor(state.span.across * 1000 / step)
+    * Math.floor(state.span.along * 1000 / step);
+  shown.textContent = say("fetch.map.span", {
+    across: decimal(state.span.across, 2),
+    along: decimal(state.span.along, 2),
+    points: points.toLocaleString("tr-TR"),
+  });
+  shown.classList.toggle("no-hits", points > 4000000);
+}
+
+async function lookForPlace() {
+  const typed = document.getElementById("map-search").value.trim();
+  const hits = document.getElementById("map-hits");
+  if (!typed) { hits.hidden = true; return; }
+  hits.hidden = false;
+  hits.textContent = say("fetch.map.searching");
+  try {
+    const found = await pick.lookUp(typed, speaks());
+    hits.textContent = "";
+    if (!found.length) { hits.textContent = say("fetch.map.nothing"); return; }
+    for (const place of found) {
+      const row = document.createElement("button");
+      row.innerHTML = "";
+      const name = document.createElement("span");
+      name.textContent = place.name;
+      const where = document.createElement("span");
+      where.className = "where";
+      where.textContent = ` · ${place.kind}`;
+      row.append(name, where);
+      row.onclick = () => {
+        picker.goTo(place.lat, place.lon, Math.max(picker.zoom, 12));
+        hits.hidden = true;
+      };
+      hits.append(row);
+    }
+  } catch (error) {
+    hits.textContent = say("fetch.map.offline");
+  }
 }
 
 /* What the fetch is about to ask for, before it asks.
@@ -2367,12 +2544,34 @@ function wireFetchBox() {
     note.classList.toggle("no-hits", side * side > 4000000);
   };
 
-  size.oninput = redraw;
-  spacing.oninput = redraw;
+  /* Reaching for the size slider drops a box drawn on the map.
+   *
+   * The two describe the same thing and only one of them can be in
+   * force: the corners outrank the size on the wire, so without this the
+   * slider would move, the hint under it would change, and the fetch
+   * would go and get the box from twenty minutes ago. A control that
+   * appears to do something and does not is the thing ADR-0036 is about.
+   */
+  const bySlider = () => {
+    if (pickedBox) {
+      pickedBox = null;
+      document.getElementById("fetch-picked").hidden = true;
+      if (picker) picker.setSquare(Number(size.value) || 3);
+    }
+    redraw();
+  };
+
+  size.oninput = bySlider;
+  spacing.oninput = () => {
+    redraw();
+    // The map's own count is per spacing too, and it is on screen while
+    // this is being typed if the sheet is open.
+    if (picker) showSpan(picker.state());
+  };
   if (number) {
     number.oninput = () => {
       const km = Number(number.value);
-      if (Number.isFinite(km) && km > 0) { size.value = km; redraw(); }
+      if (Number.isFinite(km) && km > 0) { size.value = km; bySlider(); }
     };
   }
   redraw();
@@ -2387,6 +2586,9 @@ async function refreshScene() {
   // its own list, so a place fetched while this is running turns up on
   // the next refresh.
   SITES = latest.terrain.sites || [];
+  // Named by the engine, like every other list the page draws from, so
+  // `--map-tiles` reaches the picker without a second copy anywhere.
+  if (latest.map_tiles !== undefined) MAP_TILES = latest.map_tiles;
   if (latest.choices) {
     MOUNTINGS = latest.choices.mountings;
     RADIOS = latest.choices.radios;

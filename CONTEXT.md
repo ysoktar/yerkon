@@ -79,6 +79,12 @@ olduğunu umursamaz — yani çizilir ve o kadar. Hazır bir karo adresi yok:
 hangi servisi kullanacağına ve koşullarına kullanan karar verir.
 ADR-0041'e bak.
 
+**Place picker** (yer seçici): getirilecek zemini haritada çizme.
+Merkez artı boyut yalnızca kare tarif eder; kutunun dört köşesi
+çekilebilir ve getirme o köşeleri alır. Aynı anda yalnızca biri geçerli:
+merkezi elle yazmak ya da boyut sürgüsüne dokunmak çizilmiş kutuyu
+düşürür. ADR-0042'ye bak.
+
 **Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
 artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 

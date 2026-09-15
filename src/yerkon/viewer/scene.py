@@ -129,6 +129,14 @@ def drawable(terrain, west: float, east: float,
             max(south, bottom), min(north, top))
 
 
+#: The map the place picker draws, as a one-item list so that `--map-tiles`
+#: can replace it without the page and the server disagreeing about which
+#: copy is real. OpenStreetMap's own tiles by default: picking a place is
+#: the handful of tiles their policy describes as ordinary use, unlike
+#: draping a city (ADR-0041, ADR-0042).
+MAP_TILES = ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]
+
+
 def _aerial(state: ViewState, measured) -> Optional[dict]:
     """Where the site's photograph is and what ground it covers.
 
@@ -272,6 +280,12 @@ def scene(state: ViewState) -> dict:
             # browser caches says once.
             "aerial": _aerial(state, measured),
         },
+        # Where the map picker fetches its tiles. Named by the engine
+        # rather than written into the page, so `--map-tiles` can point
+        # it at a self-hosted server — or at nothing, on a machine with
+        # no way out, where the picker then says so instead of showing a
+        # grey rectangle (ADR-0042).
+        "map_tiles": MAP_TILES[0],
         # What the model actually offers. Hardcoded in the page before,
         # and it had drifted: the tunnel bracket was missing entirely, so
         # the one mounting the tunnel row uses could not be chosen and

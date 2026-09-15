@@ -575,6 +575,14 @@ def view(argv: list[str] | None = None) -> int:
         "--no-browser", action="store_true",
         help="print the address instead of opening it",
     )
+    parser.add_argument(
+        "--map-tiles",
+        help=(
+            "tile address for the place picker's map, as "
+            "'{z}/{x}/{y}'. Defaults to OpenStreetMap. Pass an empty "
+            "string to draw no map, on a machine with no way out."
+        ),
+    )
     _add_defaults_flag(parser)
     _add_option_flag(parser)
     args = parser.parse_args(argv)
@@ -590,7 +598,8 @@ def view(argv: list[str] | None = None) -> int:
     from yerkon.viewer import serve
 
     try:
-        serve(host=args.host, port=args.port, open_browser=not args.no_browser)
+        serve(host=args.host, port=args.port, open_browser=not args.no_browser,
+              map_tiles=args.map_tiles)
     except OSError as error:
         print(
             "Could not listen on {}:{} ({}). Another viewer may already be "

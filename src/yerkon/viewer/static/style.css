@@ -482,3 +482,146 @@ i.prov.assumption { background: var(--warn); }
   border-color: var(--accent);
   color: #fff;
 }
+
+
+/* ---------- the map somebody picks ground on ---------- */
+
+#map-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+#map-sheet[hidden] { display: none; }
+
+.map-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.map-bar input[type=search] {
+  flex: 1;
+  min-width: 120px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.map-bar button { flex: 0 0 auto; }
+.map-bar button.on { background: var(--accent); color: #fff;
+  border-color: var(--accent); }
+
+/* What is about to be fetched, in the bar rather than discovered after:
+   a size and a spacing are two numbers whose product is the work. */
+.map-span {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: #4a5560;
+  white-space: nowrap;
+}
+.map-span.no-hits { color: var(--warn); }
+
+#map-hits {
+  max-height: 200px;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+#map-hits[hidden] { display: none; }
+#map-hits button {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  border: none;
+  border-bottom: 1px solid #eef1f4;
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+#map-hits button:hover { background: #eef3fb; }
+#map-hits .where { color: #8a97a3; font-size: 11px; }
+
+#map-canvas { flex: 1; position: relative; }
+
+.map {
+  position: relative;
+  overflow: hidden;
+  background: #dfe7ee;
+  cursor: grab;
+  touch-action: none;          /* the gestures are ours, not the page's */
+  user-select: none;
+}
+.map.dragging { cursor: grabbing; }
+.map.drawing { cursor: crosshair; }
+
+.map-tiles { position: absolute; inset: 0; }
+
+.map-tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 256px;
+  height: 256px;
+  /* Not draggable: a map is dragged, and the browser's own image drag
+     would fight every pan. */
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+.map-tile.missing { visibility: hidden; }
+
+/* The ground about to be fetched. Filled faintly rather than outlined
+   only, because an outline on a busy map reads as one more road. */
+.map-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 2px solid var(--accent);
+  background: rgba(31, 111, 235, 0.12);
+  box-shadow: 0 0 0 9999px rgba(18, 24, 31, 0.28);
+  cursor: move;
+}
+
+.map-grip {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--accent);
+  border-radius: 3px;
+  background: #fff;
+}
+.map-grip.nw { top: -8px; left: -8px; cursor: nwse-resize; }
+.map-grip.ne { top: -8px; right: -8px; cursor: nesw-resize; }
+.map-grip.se { bottom: -8px; right: -8px; cursor: nwse-resize; }
+.map-grip.sw { bottom: -8px; left: -8px; cursor: nesw-resize; }
+
+.map-credit {
+  margin: 0;
+  padding: 4px 12px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+  color: #61707e;
+  font-size: 11px;
+}
+.map-credit a { color: #61707e; }
+
+/* No tile address given, deliberately. Ruled rather than blank, so it
+   reads as ground with no map on it and not as a map that failed. */
+#map-canvas.mapless {
+  background:
+    repeating-linear-gradient(0deg, #e6ecf2 0 39px, #dbe3ea 39px 40px),
+    repeating-linear-gradient(90deg, #e6ecf2 0 39px, #dbe3ea 39px 40px);
+}
