@@ -1075,3 +1075,53 @@ def test_the_fetch_task_refuses_an_empty_centre_in_the_page_s_language():
     english = turkish.merged({"language": "en"})
     with pytest.raises(ValueError, match="No centre given"):
         fetch(english, {"name": "x", "centre": ""})(lambda line: None)
+
+
+# --- What this install can fetch with (ADR-0051) --------------------------
+
+
+def test_an_install_knows_which_packages_it_is_short_of():
+    """None of the three is a dependency of this package, on purpose:
+    every number in the table is reproducible from the ground shipped
+    inside it, with no network and no GDAL (ADR-0008). So the question
+    is real on any machine, and it has to be answerable before a fetch
+    is started rather than at the end of one."""
+    import importlib.util
+
+    from yerkon.site import fetch as fetching
+
+    assert fetching.FETCH_NEEDS == ("rasterio", "requests", "pyarrow")
+
+    real = importlib.util.find_spec
+    try:
+        importlib.util.find_spec = (
+            lambda name, *rest, **kw: None
+            if name.split(".")[0] in ("rasterio", "pyarrow") else real(name, *rest, **kw)
+        )
+        assert fetching.missing_for_a_fetch() == ("rasterio", "pyarrow")
+
+        # A package that is installed but broken answers "there", and
+        # says so itself when it is used.
+        def angry(name, *rest, **kw):
+            raise ValueError("__spec__ is not set")
+
+        importlib.util.find_spec = angry
+        assert fetching.missing_for_a_fetch() == fetching.FETCH_NEEDS
+    finally:
+        importlib.util.find_spec = real
+
+    # And on a machine that has them, nothing is reported short.
+    assert fetching.missing_for_a_fetch() == ()
+
+
+def test_a_missing_package_says_so_in_the_language_on_screen():
+    """These sentences name a command somebody has to type, and they
+    were the one part of a fetch still written only in English."""
+    from yerkon.language import say
+
+    for key in ("site.needs_rasterio", "site.needs_requests",
+                "site.needs_pyarrow"):
+        for language in ("tr", "en"):
+            said = say(key, language)
+            assert said and "pip install" in said, (key, language)
+        assert say(key, "tr") != say(key, "en")

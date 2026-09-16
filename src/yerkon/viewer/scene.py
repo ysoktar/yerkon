@@ -23,6 +23,7 @@ from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import LANGUAGES, LANGUAGE_NAMES, say
 from yerkon.layout import FEWEST_FOR_A_FIX, METHODS as LAYOUT_METHODS
 from yerkon.routes import METHODS as ROUTE_METHODS, drivable
+from yerkon.site.fetch import missing_for_a_fetch
 from yerkon.viewer.state import (
     _lowest_unit,
     closure_of,
@@ -168,7 +169,8 @@ def scene(state: ViewState) -> dict:
     # something in it. What it is still asked for — who can hear whom,
     # how long a round takes — is real engine logic and stays there
     # rather than being written out a second time here.
-    anchors_here = state.anchors(terrain)
+    standing = state.placed(terrain)
+    anchors_here = tuple(anchor for _, anchor in standing)
     receivers_here = state.receivers(terrain)
     deployment = state.deployment(terrain) if anchors_here else None
     mounting_of, radio_of = state.catalogues()
@@ -208,16 +210,17 @@ def scene(state: ViewState) -> dict:
     # corridor do not cover remotely the same ground.
     reach = {run.identifier: reach_of(state, run) for run in state.runs}
     closure = {run.identifier: closure_of(state, run) for run in state.runs}
-    # Asked with the site's width, or a run over an area reports the
-    # handful of anchors a line would have held: the rest come back with
-    # no run, so they are drawn in no colour, given no reach ring, and
-    # counted on no card. Thirty of thirty-six, in the rural mode.
-    run_of = {}
-    for run in state.runs:
-        for identifier, _, _, _ in run.anchors(
-            terrain, (mounting_of, radio_of), state.width_m
-        ):
-            run_of[identifier] = run.identifier
+    # Read off the placement rather than worked out by placing again.
+    #
+    # This used to call `run.anchors` a second time to see which run had
+    # produced which anchor, and a second call is a second question: it
+    # went without the route a corridor follows, without the structures
+    # a search bolts to and without the reach measured over this ground,
+    # so it recognised six of the twenty-six anchors a corridor placed
+    # and fifty-two of the sixty `greedy-dop` placed. The rest were
+    # drawn in no colour, given no reach ring and counted on no card
+    # (ADR-0049).
+    run_of = {anchor.identifier: run_id for run_id, anchor in standing}
 
     anchors = []
     for anchor in anchors_here:
@@ -340,6 +343,10 @@ def scene(state: ViewState) -> dict:
             # else it offers: the page should never hold a second list
             # that can drift from the engine's.
             "languages": [[name, LANGUAGE_NAMES[name]] for name in LANGUAGES],
+            # What this install cannot fetch with, so the page can say so
+            # before somebody picks a place rather than after it has
+            # gone looking for one (ADR-0036, ADR-0051).
+            "fetch_missing": list(missing_for_a_fetch()),
         },
         "road": road,
         "anchors": anchors,

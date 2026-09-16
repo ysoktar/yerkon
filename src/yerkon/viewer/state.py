@@ -148,6 +148,54 @@ REACH_SHARE = 0.9
 #: change of ground is a different question rather than a stale one.
 _REACHES: dict = {}
 
+#: How many placements are kept at once.
+#:
+#: Each is a few hundred anchors, so the limit is not about the size of
+#: any one answer: it is that a session left open for an afternoon
+#: should not grow a dictionary for an afternoon.
+PLACEMENTS_KEPT = 12
+
+#: Anchors already placed this process, keyed by what placed them.
+#:
+#: A search is not cheap. `greedy-dop` scores every candidate against
+#: every cell for every anchor it adds, which over Kızılay's two hundred
+#: and thirty-two mountable structures is nine seconds — and the page
+#: asks for a scene and then a sweep, and the scene placed a second time
+#: on its own, so one press of a dropdown paid for it three times over
+#: while showing the previous arrangement's numbers throughout.
+_PLACED: dict = {}
+
+
+def _placement_key(state: ViewState, terrain: Terrain) -> tuple:
+    """Everything an anchor's position depends on, and nothing else.
+
+    A key that is too wide costs a recomputation; one that is too narrow
+    hands back anchors for a site that is no longer on screen. So it is
+    written as the state itself minus the three fields that cannot move
+    an anchor — which language it reads in, how long a journey lasts,
+    how fine the sweep is — rather than as a list of the fields that
+    can: a field added later is then in the key by being a field, not by
+    somebody remembering to add it (ADR-0035).
+
+    The ground is asked directly rather than taken on trust from the
+    state, because `anchors` is handed a terrain and a caller is free to
+    hand it one the state would not have built.
+    """
+    asked = state.as_json()
+    for name in ("language", "journey_s", "sweep_m"):
+        asked.pop(name, None)
+    # A unit's route and its speed are not an anchor's business. Its
+    # antenna height is: the reach every run is placed against is quoted
+    # to the lowest one.
+    asked["units"] = sorted(unit.antenna_height_m for unit in state.units)
+    return (
+        json.dumps(asked, sort_keys=True, default=str),
+        round(terrain.height_at(0.0, 0.0), 6),
+        round(terrain.height_at(1000.0, 0.0), 6),
+        round(terrain.height_at(0.0, 1000.0), 6),
+        round(getattr(terrain, "micro_roughness_m", 0.0), 6),
+    )
+
 
 def measured_reach_m(state: ViewState, run) -> float:
     """How far this run's anchors reach *on this ground*, by sampling it.
@@ -180,6 +228,10 @@ def measured_reach_m(state: ViewState, run) -> float:
         round(state.roughness_m, 4), round(state.clutter_db_per_km, 3),
         round(state.tolerance_m, 4), state.seed, state.region,
         run.radio, run.mounting,
+        # The reach is quoted to the lowest antenna on the site, so
+        # raising a receiver's antenna asks a different question. Left
+        # out, it was answered with the previous one.
+        round(_lowest_unit(state), 4),
         json.dumps(state.overrides, sort_keys=True, default=str),
     )
     if remember in _REACHES:
@@ -574,6 +626,34 @@ class ViewState:
 
     def anchors(self, terrain: Terrain) -> tuple[Anchor, ...]:
         """Every run's anchors, with anything dragged or deleted applied."""
+        return tuple(anchor for _, anchor in self.placed(terrain))
+
+    def placed(self, terrain: Terrain) -> tuple[tuple[str, Anchor], ...]:
+        """The same anchors, each beside the run that put it there.
+
+        Which run an anchor came from is known here and nowhere else: a
+        search decides where its anchors go by reading the route, the
+        structures already standing and the reach measured over this
+        ground, so working it out again anywhere else means running the
+        search again with whatever arguments that caller happened to
+        have. The scene did exactly that, and over Kızılay it recognised
+        fifty-two of the sixty anchors it was drawing — the other eight
+        were drawn in no colour, given no reach ring and counted on no
+        card (ADR-0049).
+        """
+        remember = _placement_key(self, terrain)
+        if remember in _PLACED:
+            return _PLACED[remember]
+
+        answer = self._place(terrain)
+        # Oldest out. A session that drags a slider all afternoon should
+        # not grow a dictionary all afternoon.
+        while len(_PLACED) >= PLACEMENTS_KEPT:
+            _PLACED.pop(next(iter(_PLACED)))
+        _PLACED[remember] = answer
+        return answer
+
+    def _place(self, terrain: Terrain) -> tuple[tuple[str, Anchor], ...]:
         catalogues = self.catalogues()
         route = tuple(
             (float(x), float(y)) for x, y in self.road(terrain).centreline_m
@@ -599,10 +679,11 @@ class ViewState:
                 if identifier in self.removed:
                     continue
                 x, y = self.moved.get(identifier, ground)
-                placed.append(
+                placed.append((
+                    run.identifier,
                     Anchor(identifier, (float(x), float(y)), mounting,
-                           terrain, radio=radio)
-                )
+                           terrain, radio=radio),
+                ))
         return tuple(placed)
 
     def course(self) -> Course:

@@ -508,6 +508,12 @@ export const SAY = {
   // -- what the engine is doing -------------------------------------------
   "busy.sweep": { tr: "Kapsama taranıyor…", en: "Sweeping coverage…" },
   "busy.working": { tr: "Çalışıyor…", en: "Working…" },
+  "fetch.cannot": {
+    tr: "Bu kurulum saha indiremiyor: {missing} eksik. Kurmak için: "
+        + "pip install -e \".[dev,sites]\" — Windows'ta docs/WINDOWS.md.",
+    en: "This install cannot fetch ground: {missing} missing. Install with: "
+        + "pip install -e \".[dev,sites]\" — on Windows see docs/WINDOWS.md.",
+  },
   "say.refused": { tr: "motor kabul etmedi", en: "the engine refused" },
 };
 

@@ -13,6 +13,7 @@ nothing downstream mistakes absent data for open ground.
 from __future__ import annotations
 
 import datetime
+import importlib.util
 import io
 import json
 import math
@@ -66,6 +67,37 @@ class ElevationSource(Protocol):
 # --- GeoTIFF on disk ------------------------------------------------------
 
 
+#: What a fetch needs installed that a plain install does not bring.
+#:
+#: Ground arrives as a GeoTIFF and is read with rasterio, everything
+#: travels over HTTP with requests, and buildings, roads and structures
+#: are GeoParquet read with pyarrow. None of the three is a dependency
+#: of the package on purpose: every number in the table is reproducible
+#: from the ground shipped inside it, with no network and no GDAL
+#: (ADR-0008). That is worth keeping and it is not worth finding out
+#: about at the end of a fetch (ADR-0051).
+FETCH_NEEDS = ("rasterio", "requests", "pyarrow")
+
+
+def missing_for_a_fetch() -> tuple[str, ...]:
+    """Which of them this install has not got.
+
+    Asked rather than imported: importing rasterio costs most of a
+    second and loads GDAL, and the question here is only whether it is
+    there. A package that is installed but broken answers "there", and
+    then says so itself when it is actually used.
+    """
+    missing = []
+    for name in FETCH_NEEDS:
+        try:
+            found = importlib.util.find_spec(name) is not None
+        except (ImportError, ValueError):
+            found = False
+        if not found:
+            missing.append(name)
+    return tuple(missing)
+
+
 def _rasterio():
     """rasterio, with GDAL able to find the files it complains about.
 
@@ -82,10 +114,7 @@ def _rasterio():
         import rasterio
         from rasterio.warp import transform as warp_transform
     except ImportError as error:
-        raise Unreachable(
-            "Reading a GeoTIFF needs rasterio. Install it with "
-            "`pip install rasterio`."
-        ) from error
+        raise Unreachable(say("site.needs_rasterio")) from error
 
     if not os.environ.get("GDAL_DATA"):
         bundled = pathlib.Path(rasterio.__file__).parent / "gdal_data"
@@ -262,7 +291,7 @@ class CopernicusElevation:
             try:
                 import requests as http
             except ImportError as error:
-                raise Unreachable("Fetching a tile needs requests.") from error
+                raise Unreachable(say("site.needs_requests")) from error
 
         name = copernicus_tile_name(latitude, longitude)
         url = "{}/{}/{}.tif".format(self.bucket, name, name)
@@ -416,7 +445,7 @@ class ServiceElevation:
         try:
             import requests
         except ImportError as error:
-            raise Unreachable("The elevation service needs requests.") from error
+            raise Unreachable(say("site.needs_requests")) from error
 
         per_lat, per_lon = bounds.metres_per_degree()
         columns = max(int((bounds.east - bounds.west) * per_lon / spacing_m), 2)

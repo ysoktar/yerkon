@@ -1842,3 +1842,239 @@ def test_the_page_says_why_a_number_came_back_smaller():
 
     words = (STATIC / "words.js").read_text(encoding="utf-8")
     assert '"site.clipped"' in words
+
+
+# --- Which group placed an anchor (ADR-0049) ------------------------------
+
+
+@pytest.mark.parametrize("method", ["corridor", "greedy-coverage",
+                                    "greedy-dop", "k-cover"])
+def test_every_anchor_drawn_belongs_to_the_group_that_placed_it(method):
+    """The card's count is the anchors on screen, not a second guess.
+
+    The scene used to work out which run produced which anchor by
+    placing again, and a second placement is a second question: it went
+    without the route a corridor follows, without the structures a
+    search bolts on to and without the reach measured over this ground.
+    Over Kızılay it recognised six of a corridor's twenty-six and
+    fifty-two of `greedy-dop`'s sixty; the rest were drawn in no colour,
+    given no reach ring and counted on no card.
+    """
+    from dataclasses import replace
+
+    from yerkon.viewer.scene import scene
+    from yerkon.viewer.state import from_scenario
+
+    state = from_scenario("urban")
+    drawn = scene(replace(state, runs=tuple(
+        replace(run, method=method) for run in state.runs)))
+
+    assert drawn["anchors"], method
+    homeless = [a["id"] for a in drawn["anchors"] if not a["run"]]
+    assert not homeless, (method, len(homeless))
+    assert sum(run["count"] for run in drawn["runs"]) == len(drawn["anchors"])
+
+
+def test_two_groups_are_told_apart_rather_than_merged():
+    """Carrying the run through must not hand every anchor to the first
+    one: the colour on screen and the count on the card are per group."""
+    from dataclasses import replace
+
+    from yerkon.viewer.scene import scene
+    from yerkon.viewer.state import from_scenario
+
+    state = from_scenario("rural")
+    one = state.runs[0]
+    two = replace(state, runs=(
+        replace(one, identifier="A", from_m=0.0, to_m=8000.0),
+        replace(one, identifier="B", from_m=12000.0, to_m=20000.0),
+    ))
+    drawn = scene(two)
+    counted = {run["identifier"]: run["count"] for run in drawn["runs"]}
+    assert counted["A"] and counted["B"]
+    assert counted["A"] + counted["B"] == len(drawn["anchors"])
+    # And each anchor is where its own run put it.
+    east = [a["x"] for a in drawn["anchors"] if a["run"] == "B"]
+    assert min(east) >= 12000.0 - 1e-6
+
+
+# --- Placing once for an arrangement, not once per request ----------------
+
+
+def test_the_same_arrangement_is_not_placed_twice():
+    """`greedy-dop` scores every candidate against every cell for every
+    anchor it adds — nine seconds over Kızılay. The page asks for a
+    scene and then a sweep, and the scene placed a second time on its
+    own, so one press of a dropdown paid for it three times over while
+    showing the previous arrangement's numbers throughout.
+    """
+    from dataclasses import replace
+
+    from yerkon.viewer.state import from_scenario
+
+    state = replace(from_scenario("urban"))
+    terrain = state.terrain()
+    first = state.placed(terrain)
+    assert state.placed(terrain) is first, "asked again, placed again"
+    # A state that differs only in something no anchor reads is the same
+    # question.
+    assert replace(state, language="en").placed(terrain) is first
+
+
+@pytest.mark.parametrize("change", [
+    {"width_m": 1000.0},
+    {"spacing_m": 900.0},
+    {"removed": ("C0",)},
+    {"moved": {"C1": (10.0, 10.0)}},
+    {"tolerance_m": 1.0},
+])
+def test_what_is_remembered_is_what_placing_again_would_say(change):
+    """The hazard of keeping an answer is handing it back after the
+    question changed.
+
+    So each of these is asked twice: once against a dictionary holding
+    the arrangement it was edited from, and once against an empty one.
+    A key too narrow to notice the edit returns the first arrangement's
+    anchors for the second arrangement, and the two disagree.
+    """
+    from dataclasses import replace
+
+    from yerkon.viewer import state as state_module
+    from yerkon.viewer.state import from_scenario
+
+    # A search, so that the reach a tolerance moves is read rather than
+    # carried past: a lattice never asks how far its anchors reach.
+    state = from_scenario("urban")
+    state = replace(state, runs=tuple(
+        replace(run, method="greedy-coverage", most=20) for run in state.runs))
+    terrain = state.terrain()
+
+    spacing = change.pop("spacing_m", None)
+    edited = replace(state, **change)
+    if spacing is not None:
+        edited = replace(edited, runs=tuple(
+            replace(run, method="grid", spacing_m=spacing)
+            for run in edited.runs))
+
+    state.placed(terrain)                      # something to be stale with
+    remembered = _standing(edited.placed(terrain))
+    state_module._PLACED.clear()
+    assert remembered == _standing(edited.placed(terrain))
+    assert remembered != _standing(state.placed(terrain)), (
+        "this edit is meant to move an anchor, or it tests nothing")
+
+
+def _standing(placed):
+    return [(run, anchor.identifier, anchor.ground_position_m)
+            for run, anchor in placed]
+
+
+def test_raising_a_receivers_antenna_asks_the_reach_again():
+    """The measured reach is quoted to the lowest antenna on the site,
+    so a taller receiver is a different reach — and a search reads that
+    reach to decide where anchors go. Left out of what the answer is
+    remembered by, it came back with the shorter one."""
+    from dataclasses import replace
+
+    from yerkon.viewer.state import from_scenario, measured_reach_m
+
+    state = from_scenario("urban")
+    low = measured_reach_m(state, state.runs[0])
+    taller = replace(state, units=tuple(
+        replace(unit, antenna_height_m=8.0) for unit in state.units))
+    assert measured_reach_m(taller, taller.runs[0]) > low
+
+
+# --- A number being worked out is not the last number (ADR-0050) ----------
+
+
+def test_the_panel_has_a_third_state_for_a_number_it_is_working_out():
+    """A dash and a blank are both taken: a dash says there is nothing
+    to report, and an empty row moves everything under it. Switching
+    from the town to the country left the country's anchor count beside
+    the town's covered ground for as long as the sweep took, and nothing
+    on screen said which arrangement either number belonged to.
+
+    Read off the file rather than run, because `app.js` is the page
+    itself — it reaches for `document` as it loads. The behaviour is
+    walked in a browser instead, and `docs/TRY-IT.md` says how.
+    """
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert 'const WORKING = "…";' in page
+    assert "function showNumbers(drawn, result, pending)" in page
+    assert "${pending ? WORKING : value}" in page
+    # The moment the old areas stop being true, not the moment the new
+    # ones arrive.
+    assert "sweepData = null;" in page
+    assert "sweepData ? area(sweepData.served_km2) : WORKING" in page
+
+
+def test_a_wait_worth_noticing_is_the_only_one_reported():
+    """Most edits are milliseconds. A panel that blanks itself on every
+    drag of a slider is harder to read than one that never does, so the
+    marker waits before it appears — and the wait is the scene, which
+    every path goes through."""
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert "const PATIENCE_MS = 400;" in page
+    scene = page[page.index("async function refreshScene()"):]
+    scene = scene[:scene.index("\n}\n")]
+    assert "setTimeout(" in scene and "PATIENCE_MS" in scene
+    assert "clearTimeout(slow)" in scene
+
+
+def test_a_simulation_outlives_the_sweep_that_lands_after_it():
+    """Pressing Run while coverage was still being scanned showed an
+    answer that vanished a second later: the sweep redrew the panel
+    without it. A sweep does not invalidate a simulation — the same
+    arrangement is being measured two ways — and an edit does."""
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert "let simulated = null;" in page
+    assert "showNumbers(latest, simulated);" in page
+    assert page.count("simulated = null;") >= 1
+    assert "showNumbers(latest, null);" in page, (
+        "an edit still has to clear it")
+
+
+# --- An install that cannot fetch says so first (ADR-0051) ----------------
+
+
+def test_the_engine_says_what_this_install_cannot_fetch_with():
+    """Named by the engine like every other list the page draws from, so
+    there is no second copy to drift."""
+    from yerkon.viewer.scene import scene
+    from yerkon.viewer.state import from_scenario
+
+    choices = scene(from_scenario("urban"))["choices"]
+    assert "fetch_missing" in choices
+    assert isinstance(choices["fetch_missing"], list)
+    # This machine has them, or the suite could not have fetched Kızılay.
+    assert choices["fetch_missing"] == []
+
+
+def test_the_fetch_panel_is_greyed_rather_than_offered_and_then_refused():
+    """A name typed, a box dragged on a map, a fetch started, and then a
+    sentence about a Python package is the wrong order. A control that
+    cannot do anything is not a control (ADR-0036)."""
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert "function sayIfItCannotFetch(" in page
+    assert "FETCH_MISSING = latest.choices.fetch_missing || [];" in page
+    # Both the button that starts a fetch and the one that picks the
+    # place it would fetch.
+    said = page[page.index("function sayIfItCannotFetch("):]
+    said = said[:said.index("\n}\n")]
+    assert "run-fetch" in said and "open-map" in said
+    assert "button.disabled = short" in said
+
+    # And it is actually reached: the site list is drawn on every
+    # refresh, which is where the panel learns what it can do.
+    sites = page[page.index("function drawSites("):]
+    assert "sayIfItCannotFetch();" in sites[:sites.index("\n}\n")]
+
+    assert "fetch-cannot" in (STATIC / "index.html").read_text(encoding="utf-8")
+    words = (STATIC / "words.js").read_text(encoding="utf-8")
+    phrase = words[words.index('"fetch.cannot"'):][:700]
+    # The sentence names a command somebody has to type, so each
+    # language names it.
+    for half in ("tr:", "en:"):
+        assert half in phrase, half
+        assert "pip install -e" in phrase[phrase.index(half):][:300], half

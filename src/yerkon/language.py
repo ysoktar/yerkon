@@ -264,12 +264,21 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     "site.needs_pyarrow": {
         "tr": "Overture erişimi pyarrow paketini gerektirir: "
-              "pip install \"yerkon[sites]\"",
-        "en": "Overture access needs pyarrow: pip install \"yerkon[sites]\"",
+              "pip install -e \".[dev,sites]\"",
+        "en": "Overture access needs pyarrow: "
+              "pip install -e \".[dev,sites]\"",
+    },
+    "site.needs_rasterio": {
+        "tr": "GeoTIFF okumak rasterio paketini gerektirir: "
+              "pip install -e \".[dev,sites]\"",
+        "en": "Reading a GeoTIFF needs rasterio: "
+              "pip install -e \".[dev,sites]\"",
     },
     "site.needs_requests": {
-        "tr": "OpenStreetMap erişimi requests paketini gerektirir.",
-        "en": "OpenStreetMap access needs requests.",
+        "tr": "Ağdan veri çekmek requests paketini gerektirir: "
+              "pip install -e \".[dev,sites]\"",
+        "en": "Fetching over the network needs requests: "
+              "pip install -e \".[dev,sites]\"",
     },
     "site.no_elevation": {
         "tr": "Hiçbir yükseklik kaynağı cevap vermedi.\n  {detail}",

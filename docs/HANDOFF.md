@@ -185,6 +185,24 @@ yanlıştır.
   o sayının gerçekte ne olduğu bütün tablonun açık yol hakkında ne
   söylediğine karar veriyor.
 
+## Sayfanın gerçekten yürünmesinden çıkanlar
+
+Üç ayrı hata, birer birer tarayıcıda bulundu (`yerkon view`, her yöntem,
+her güzergâh, ayarlar, simülasyon, harita):
+
+- **Kart "6 direk" diyordu, sahnede 26 direk vardı.** Sahne bir direğin
+  hangi gruba ait olduğunu yerleştirmeyi ikinci kez çalıştırarak
+  buluyordu, ve ikinci çağrıda yol da yapılar da ölçülen menzil de
+  yoktu. Tanınmayanlar renksiz, halkasız, sayılmadan duruyordu
+  (ADR-0049). Aynı düzeltme `greedy-dop`'un sahne başına iki kez
+  aranmasını da bitirdi: 21,8 s → 9,3 s, ikinci seferde 0,1 s.
+- **Panel çalışırken bir önceki düzenlemenin sayılarını gösteriyordu.**
+  Şehirden kırsala geçişte 36 direk ile 219 km² yan yana duruyordu
+  (ADR-0050). Artık hesaplanan bir sayı `…`, olmayan bir sayı `—`.
+- **`pip install -e ".[dev]"` ile kurulan bir kopya saha indiremiyor**
+  ama sayfa bunu ancak kutu çizilip getirme başlatıldıktan sonra
+  söylüyordu (ADR-0051). Artık panel baştan söylüyor ve komutu veriyor.
+
 ## Bu projenin şimdiye kadar yanlış yaptıkları
 
 Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.

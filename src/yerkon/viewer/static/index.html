@@ -68,6 +68,13 @@
     <details id="fetch-panel" data-find="getir indir yeni yer openstreetmap
                                         copernicus enlem boylam kutu">
       <summary data-say="fetch.open"></summary>
+      <!--
+        Said before a place is picked rather than after a fetch has gone
+        looking for one: the packages this needs are not dependencies of
+        the package, because the table is reproducible from the ground
+        shipped inside it with no network at all (ADR-0008, ADR-0051).
+      -->
+      <p class="hint no-hits" id="fetch-cannot" hidden></p>
       <p class="hint" data-say="fetch.note"></p>
       <label><span data-say="fetch.name"></span> <input type="text" id="fetch-name" placeholder="ör. izmir"></label>
       <!--

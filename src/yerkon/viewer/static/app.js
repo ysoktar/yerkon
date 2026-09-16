@@ -33,6 +33,10 @@ let RADIOS = [];
 let LAYOUTS = [];
 let ROUTES = [];
 let ROUTES_LIVE = [];
+/* Packages a fetch needs that this install has not got. Named by the
+ * engine, like every other list here, so the page never holds a second
+ * copy that can drift from it. */
+let FETCH_MISSING = [];
 /* The methods that search rather than lay a lattice down. They read a
  * bar and a budget instead of a spacing, so the card shows different
  * figures for them. */
@@ -102,6 +106,20 @@ async function edit(changes, cascading) {
   }
   await apply(changes);
 }
+
+/* The last simulation, while it still describes what is on screen.
+ *
+ * Kept rather than passed straight to the panel: a sweep landing after
+ * a run used to redraw the numbers without it, so pressing Run while
+ * coverage was still being scanned showed an answer that vanished a
+ * second later. An edit does invalidate it, and clears it.
+ */
+let simulated = null;
+
+/* Long enough that a slider drag never flickers, short enough that a
+ * search — nine seconds over Kızılay — never looks like a finished
+ * answer. */
+const PATIENCE_MS = 400;
 
 async function apply(changes) {
   const { state: updated } = await ask("/api/apply", { changes });
@@ -451,7 +469,33 @@ function drawSites() {
         || say("ground.none")
       : say("ground.none");
   }
+  sayIfItCannotFetch();
   lockDeadKnobs();
+}
+
+
+/* An install that cannot fetch says so before a place is picked.
+ *
+ * The three packages a fetch needs are not dependencies of this one, on
+ * purpose: the table is reproducible from the ground shipped inside the
+ * package, with no network and no GDAL (ADR-0008). What was wrong was
+ * finding that out at the end — a name typed, a box dragged on a map, a
+ * fetch started, and then a sentence about a Python package. A control
+ * that cannot do anything is not a control (ADR-0036, ADR-0051).
+ */
+function sayIfItCannotFetch() {
+  const note = document.getElementById("fetch-cannot");
+  const go = document.getElementById("run-fetch");
+  const map = document.getElementById("open-map");
+  const short = FETCH_MISSING.length > 0;
+  if (note) {
+    note.hidden = !short;
+    if (short) note.textContent = say("fetch.cannot",
+                                      { missing: FETCH_MISSING.join(", ") });
+  }
+  // Left in place and disabled rather than hidden, so somebody can see
+  // what this page would do on a machine that has them.
+  for (const button of [go, map]) if (button) button.disabled = short;
 }
 
 /* The three modelled-hill figures, and whether this state reads them.
@@ -1999,7 +2043,7 @@ function frameEverything() {
 const tr = (value, places = 2) =>
   Number(value).toFixed(places).replace(".", ",");
 
-function showNumbers(drawn, result) {
+function showNumbers(drawn, result, pending) {
   const list = document.getElementById("numbers");
   const rows = [];
 
@@ -2026,10 +2070,12 @@ function showNumbers(drawn, result) {
              round ? `${tr(round * 1000, 0)} ms` : NOTHING]);
   rows.push([say("result.rate"), round ? `${tr(1 / round)} /s` : NOTHING]);
 
-  if (sweepData) {
-    rows.push([say("result.served"), area(sweepData.served_km2)]);
-    rows.push([say("result.reached"), area(sweepData.reached_km2)]);
-  }
+  // Both rows are always here, because a row that comes and goes moves
+  // everything under it and reads as a change in the answer.
+  rows.push([say("result.served"),
+             sweepData ? area(sweepData.served_km2) : WORKING]);
+  rows.push([say("result.reached"),
+             sweepData ? area(sweepData.reached_km2) : WORKING]);
   if (result) {
     rows.push([say("result.hpe50"), `${tr(result.hpe_p50_m)} m`]);
     rows.push([say("result.hpe95"), `${tr(result.hpe_p95_m)} m`]);
@@ -2043,8 +2089,13 @@ function showNumbers(drawn, result) {
     rows.push([warn, `%${tr(result.assumed_share * 100, 0)}`]);
   }
 
+  // While the engine is working these rows describe the arrangement
+  // before the edit, so they are not shown as if they described this
+  // one. The names stay, because a panel whose rows come and go moves
+  // under the reader.
   list.innerHTML = rows.map(([name, value]) =>
-    `<dt>${name}</dt><dd${name === warn ? ' class="warn"' : ""}>${value}</dd>`
+    `<dt>${name}</dt><dd${name === warn ? ' class="warn"' : ""}>`
+    + `${pending ? WORKING : value}</dd>`
   ).join("");
 }
 
@@ -2558,6 +2609,18 @@ function bandRange(band, edges, rising, unit) {
  */
 const NOTHING = "—";
 
+/* A number that is being worked out right now.
+ *
+ * Three states rather than two. A dash says there is nothing to report
+ * — an arrangement with no anchors has no round and no covered ground.
+ * This says the opposite: there is something to report and it is not
+ * known yet, so the panel must not go on showing the answer to the
+ * arrangement before this edit. Switching from the town to the country
+ * left the country's anchor count beside the town's covered area for as
+ * long as the sweep took (ADR-0050).
+ */
+const WORKING = "…";
+
 function area(km2) {
   return Number.isFinite(km2) ? `${tr(km2)} km²` : NOTHING;
 }
@@ -2873,7 +2936,19 @@ function wireFetchBox() {
 /* ---------- the loop ---------- */
 
 async function refreshScene() {
-  latest = await ask("/api/scene");
+  // Only if it actually takes a moment: most scenes are milliseconds,
+  // and a panel that blinks on every drag is harder to read than one
+  // that does not. A search over a real town is nine seconds, and for
+  // all nine the panel used to show the arrangement before the edit.
+  const slow = setTimeout(() => {
+    if (latest) showNumbers(latest, simulated, true);
+    flash(say("busy.working"));
+  }, PATIENCE_MS);
+  try {
+    latest = await ask("/api/scene");
+  } finally {
+    clearTimeout(slow);
+  }
   state = latest.state;
   // The server finds what ground has been fetched; the page never keeps
   // its own list, so a place fetched while this is running turns up on
@@ -2888,6 +2963,7 @@ async function refreshScene() {
     LAYOUTS = latest.choices.layouts || [];
     ROUTES = latest.choices.routes || [];
     ROUTES_LIVE = latest.choices.routes_live || [];
+    FETCH_MISSING = latest.choices.fetch_missing || [];
     TABS = latest.choices.modes;
     LANGUAGES = latest.choices.languages || [];
     for (const [name, label] of TABS) MODE_LABEL[name] = label;
@@ -2928,6 +3004,9 @@ async function refreshScene() {
     framed = true;
   }
   render();
+  // The arrangement changed, so the last simulation described something
+  // else.
+  simulated = null;
   showNumbers(latest, null);
 }
 
@@ -2935,6 +3014,10 @@ let sweepTimer = null;
 function scheduleSweep() {
   sweepData = null;
   render();
+  // Said the moment the old areas stop being true, rather than when the
+  // new ones arrive: the two are seconds apart and in between the panel
+  // was showing this arrangement's anchors beside the last one's ground.
+  if (latest) showNumbers(latest, simulated);
   clearTimeout(sweepTimer);
   sweepTimer = setTimeout(async () => {
     try {
@@ -2945,7 +3028,7 @@ function scheduleSweep() {
       // and move when that does.
       drawLegend();
       render();
-      showNumbers(latest, null);
+      showNumbers(latest, simulated);
       flash("");
     } catch (error) { flash(error.message, true); }
   }, 250);
@@ -2959,7 +3042,8 @@ async function runSimulation() {
     const result = await ask("/api/simulate");
     sweepData = sweepData || { served_km2: result.served_km2,
                                reached_km2: result.reached_km2 };
-    showNumbers(latest, result);
+    simulated = result;
+    showNumbers(latest, simulated);
   } catch (error) {
     flash(error.message, true);
   } finally {

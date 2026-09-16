@@ -221,6 +221,16 @@ başkaysa onu getir; dört sahanın geldiği yolun aynısı ve ağa dokunan tek
 
 ### Sayfadan (önerilen)
 
+**Kurulumun indirebiliyor mu?** `pip install -e ".[dev]"` indirmeye
+yetmez: yükseklik bir GeoTIFF olarak geliyor (`rasterio`), her şey HTTP
+üzerinden (`requests`), binalar ve yollar GeoParquet (`pyarrow`). Üçü de
+bilerek bağımlılık değil — tablo, paketin içinde sevk edilen zeminden
+ağsız üretilebiliyor (ADR-0008). Eksikse panel **kutuyu çizdirmeden
+önce** söylüyor ve düğmeler kapalı duruyor (ADR-0051):
+
+> Bu kurulum saha indiremiyor: rasterio, pyarrow eksik. Kurmak için:
+> `pip install -e ".[dev,sites]"` — Windows'ta docs/WINDOWS.md.
+
 **1 YER → Yeni bir yer getir**, sonra üç şey:
 
 | alan | ne yazılır |
@@ -536,24 +546,38 @@ ne yaptığı ancak yanında başkası varken görülüyor.
 | — | **Elle** | hiçbiri; boştan başla |
 
 **Denemeye değer olan şu.** Şehir içi sekmesinde listeyi sırayla değiştir
-ve **Direk sayısı** ile **Konum sıklığı**na bak:
+ve **Direk sayısı** ile **Konum alınabilen alan**a bak:
 
-| yöntem | direk | tur süresi | konum sıklığı |
-|---|---|---|---|
-| Kare ızgara | 36 | 509 ms | 1,96 /s |
-| Altıgen kafes | 42 | 509 ms | 1,96 /s |
-| **En iyi geometri** | **3** | 191 ms | 5,24 /s |
-| **En çok zemin örten** | **1** | 64 ms | 15,72 /s |
+| yöntem | direk | konum alınabilen alan |
+|---|---|---|
+| Kare ızgara | 36 | 8,92 km² |
+| Altıgen kafes | 42 | 8,96 km² |
+| Yol boyunca | 26 | 8,72 km² |
+| Çevre | 22 | 8,44 km² |
+| **En çok zemin örten** | **27** | 8,68 km² |
+| **En iyi geometri** | **60** | 9,00 km² |
+| **Her noktaya yeter direk** | **60** | 9,00 km² |
 
-Kapsamaya göre seçen arama **tek bir direk** koyuyor. Yanlış değil:
-Kızılay'da bir direğin erişimi 3825 m ve saha 2970 m, yani bir tanesi
-gerçekten bütün sahayı örtüyor. Ama bir direkle hiçbir yerde konum
-alınamaz — bir konum üç menzil ister. Geometriye göre seçen arama üçünü
-koyuyor ve her yerde konum çıkıyor.
+(Tur süresi yedisinde de 509 ms: bir tur, sahadaki toplam direği değil,
+tur başına yoklananı okur.)
 
 Kapsama, haberleşme ağının ölçütü. Konumlandırma ağının ölçütü geometri.
 İkisini yan yana koymak bu farkı iddia etmek yerine ölçülebilir yapıyor
-(ADR-0040).
+(ADR-0040). Farkın en çıplak göründüğü yer Kızılay değil: **zemini
+Gölbaşı yapıp** "En çok zemin örten"i seç — üç direk koyuyor ve konum
+alınabilen alan **0,00 km²**. Bir direk bütün sahayı "örtebilir" ve
+üzerinde hiçbir yerde konum alınamaz, çünkü bir konum üç menzil ister.
+
+**Arama yavaş olabilir, ve artık bunu söylüyor.** "En iyi geometri"
+eklediği her direk için her adayı her hücreye karşı puanlıyor; Kızılay'ın
+232 monte edilebilir yapısı üzerinde bu dokuz saniye. O dokuz saniye
+boyunca panelin her satırı `…` ve durum çubuğu "Çalışıyor…" diyor — eski
+düzenlemenin sayıları değil (ADR-0050). Aynı düzenlemeyi ikinci kez
+seçersen anında geliyor; yerleştirme hatırlanıyor (ADR-0049).
+
+**Kartın üstündeki sayı ekrandaki direklerdir.** Bu bozuktu: "Yol
+boyunca" 26 direk dikip kartta 6 yazıyordu, "En iyi geometri" 60 dikip
+52 yazıyordu, ve sayılmayanlar renksiz ve halkasız duruyordu (ADR-0049).
 
 **Arama yöntemlerinde sürgüler değişiyor:** aralık yerine bir çıta
 (*Hedef HDOP*, varsayılan 2) ve bir bütçe (*En çok direk*). Arama çıtada
