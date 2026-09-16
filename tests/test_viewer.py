@@ -1,6 +1,7 @@
 """The viewer's engine half: state, scene, and what needs confirming."""
 
 import json
+import pathlib
 
 import pytest
 
@@ -14,6 +15,10 @@ from yerkon.viewer.state import (
     ViewState,
     from_scenario,
 )
+
+#: The page itself. A few things below are about markup and wiring rather
+#: than about the engine, because that is where they went wrong.
+STATIC = pathlib.Path(__file__).resolve().parents[1] / "src/yerkon/viewer/static"
 
 
 def a_mixed_corridor():
@@ -1764,3 +1769,76 @@ def test_asking_for_a_row_that_does_not_exist_refuses_rather_than_defaulting():
         from_scenario("mixed")
     with pytest.raises(ValueError, match="no row called"):
         from_scenario("")
+
+
+# --- The site's own extent (ADR-0048) ------------------------------------
+
+
+def test_the_extent_knobs_can_reach_the_ground_that_was_actually_fetched():
+    """A fetch comes back at whatever the grid came back at, not at a
+    round number: Kızılay is 2970 by 2940.
+
+    The slider's step has to be fine enough to land there, or the browser
+    rounds the handle down and it sits at 2500 beside a box reading 2970
+    — the handle saying one thing and the site being another.
+    """
+    import re
+
+    page = (STATIC / "index.html").read_text(encoding="utf-8")
+    from yerkon.viewer.state import fetched_sites
+    from yerkon.scenarios import fetched
+
+    for key in ("corridor_m", "width_m"):
+        for tag in re.findall(r"<input[^>]*id=\"{}(?:-num)?\"[^>]*>".format(key),
+                              page):
+            step = re.search(r'step="([0-9.]+)"', tag)
+            assert step, tag
+            assert float(step.group(1)) <= 10.0, (key, tag)
+
+    # And the step divides what the shipped ground actually measures, so
+    # every one of these sites can be asked for in full.
+    for name in fetched_sites():
+        site = fetched(name)
+        for measured in (site.width_m, site.height_m):
+            assert round(measured) % 10 == 0, (name, measured)
+
+
+def test_both_halves_of_an_extent_knob_carry_the_same_ceiling():
+    """A cap on the slider alone is the knob this project has been caught
+    by twice: once a greyed slider beside a live box, and once a capped
+    slider beside a box that took anything (ADR-0036)."""
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    capping = page.split("function capSlidersToTheGround()")[1].split("\n}")[0]
+    assert "knobInputs(key)" in capping, (
+        "the cap has to reach both the slider and the number beside it"
+    )
+    assert ".max = cap" in capping
+
+
+def test_a_site_cannot_be_asked_for_larger_than_the_ground_under_it():
+    """The engine's half of the same rule. The page returns the box to
+    what is in force; this is what "in force" means (ADR-0037)."""
+    from yerkon.viewer.state import fetched_sites
+
+    name = fetched_sites()[0]
+    asked = a_state(site=name).merged({"corridor_m": 90_000.0,
+                                       "width_m": 90_000.0})
+    held = asked.on_measured_ground()
+    measured = held.measured()
+
+    assert held.corridor_m <= measured.width_m + 1e-6
+    assert held.width_m <= measured.height_m + 1e-6
+    assert held.corridor_m < 90_000.0, "it was clipped rather than accepted"
+
+
+def test_the_page_says_why_a_number_came_back_smaller():
+    """A box that springs back with no explanation reads as the page
+    having lost the keypress. Beside the knobs rather than in the status
+    line, which the sweep's own message overwrites a second later."""
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert "function sayIfClipped(" in page
+    assert "site-clipped" in page
+    assert "site-clipped" in (STATIC / "index.html").read_text(encoding="utf-8")
+
+    words = (STATIC / "words.js").read_text(encoding="utf-8")
+    assert '"site.clipped"' in words

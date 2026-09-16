@@ -264,6 +264,12 @@ Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.
   eklenen bir onay kutusu `dead` sınıfını alıyor, sebebini de taşıyor,
   ama rengi değişmiyordu: kilitli ama kilitli görünmeyen bir denetim.
   Kural artık `label.dead` (ADR-0036).
+- Saha boyu/eni sürgüleri 500'er metre adımlıydı, ama bir getirme
+  yuvarlak sayıyla gelmiyor: Kızılay 2970 m. Tarayıcı ızgaraya düşmeyen
+  değeri aşağı yuvarladığı için **sürgü 2500'de, kutu 2970'te** duruyordu
+  — kolun iki yarısı farklı şey söylüyordu, ki bu projede üçüncü kez
+  (ADR-0048). Adım 10 m oldu; tavan da artık kolun iki yarısına birden
+  konuyor.
 - "Direk yok" hatası `anchors()` içindeydi, yani üzerinde hiçbir şey
   olmayan bir sekme *çizilemiyordu* — ve üzerine bir şey kurulacak boş
   sayfa tam olarak budur. Hata doğruydu, katmanı yanlıştı: çizmek boşu

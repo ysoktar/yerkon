@@ -497,6 +497,28 @@ function whyDead(key) {
  * refusal rather than showing the limit. Where the ground is modelled
  * there is no edge, so the slider goes back to its full travel.
  */
+/* Why a number came back smaller than the one that was typed.
+ *
+ * Beside the knobs rather than in the status line, which is for what is
+ * happening now: the sweep's own message replaced this one about a
+ * second after it appeared, so the explanation was there and gone.
+ */
+function sayIfClipped(name, asked) {
+  const note = document.getElementById("site-clipped");
+  if (!note) return;
+  const exact = document.getElementById(name + "-num");
+  const ceiling = exact ? Number(exact.max) : NaN;
+  if (!["corridor_m", "width_m"].includes(name)
+      || !Number.isFinite(ceiling) || ceiling <= 0 || asked <= ceiling) {
+    note.hidden = true;
+    return;
+  }
+  note.hidden = false;
+  note.textContent = say("site.clipped", {
+    asked: decimal(asked / 1000, 2), held: decimal(ceiling / 1000, 2),
+  });
+}
+
 function capSlidersToTheGround() {
   const measured = latest && latest.terrain && latest.terrain.measured_m;
   for (const [key, reach] of [["corridor_m", 0], ["width_m", 1]]) {
@@ -504,9 +526,14 @@ function capSlidersToTheGround() {
     if (!slider) continue;
     const full = slider.dataset.fullMax || slider.max;
     slider.dataset.fullMax = full;
-    slider.max = measured
-      ? Math.min(Number(full), Math.round(measured[reach]))
+    const cap = measured
+      ? String(Math.min(Number(full), Math.round(measured[reach])))
       : full;
+    // Both halves, not just the slider. A cap on one of them is the
+    // knob this project has already been caught by twice: a greyed
+    // slider beside a live box, and now a capped slider beside a box
+    // that accepts anything (ADR-0036, ADR-0048).
+    for (const half of knobInputs(key)) half.max = cap;
   }
 }
 
@@ -1192,7 +1219,10 @@ function wireControls() {
     // While the handle is moving, only the page follows. The engine is
     // asked once, when it is let go, because a sweep takes seconds.
     slider.oninput = () => showKnob(name, slider.value);
-    slider.onchange = () => send(slider.value);
+    slider.onchange = () => {
+      sayIfClipped(name, Number(slider.value));
+      send(slider.value);
+    };
     if (exact) {
       // The number may say what the slider cannot reach — a corridor of
       // 42 km, a tolerance of 0,05 m. The slider then sits at its end
@@ -1203,7 +1233,15 @@ function wireControls() {
         if (said) said.textContent = UNITS[name](Number(exact.value));
         slider.value = exact.value;
       };
-      exact.onchange = () => send(exact.value);
+      exact.onchange = () => {
+        // `fillControls` puts the box back to what is in force once the
+        // edit lands, so a number the ground cannot hold returns to the
+        // ground's own. Said as well as shown: a box that springs back
+        // with no explanation reads as the page having lost the keypress
+        // rather than as the site being what it is (ADR-0037).
+        sayIfClipped(name, Number(exact.value));
+        send(exact.value);
+      };
     }
   }
 

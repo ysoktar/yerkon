@@ -140,16 +140,30 @@
       <span class="now" id="sum-site">—</span></summary>
 
     <p class="hint" data-say="site.rows"></p>
+    <!--
+      Ten metres, not five hundred.
+      A fetch comes back at whatever the grid came back at — Kızılay is
+      2970 m — and a coarse step cannot land there, so the browser rounded
+      the handle down and the slider read 2500 beside a box reading 2970.
+      The handle said one thing and the site was another (ADR-0048).
+    -->
     <label class="knob" data-find="boy koridor uzunluk saha">
       <span data-say="knob.length"></span><output id="corridor-out"></output>
-      <input type="range" id="corridor_m" min="500" max="40000" step="500"
+      <input type="range" id="corridor_m" min="500" max="40000" step="10"
              data-cascades>
-      <input type="number" id="corridor_m-num" class="num" step="500"></label>
+      <input type="number" id="corridor_m-num" class="num" step="10"></label>
     <label class="knob" data-find="en genişlik alan koridor saha">
       <span data-say="knob.width"></span><output id="width-out"></output>
-      <input type="range" id="width_m" min="0" max="40000" step="500"
+      <input type="range" id="width_m" min="0" max="40000" step="10"
              data-cascades>
-      <input type="number" id="width_m-num" class="num" step="500"></label>
+      <input type="number" id="width_m-num" class="num" step="10"></label>
+    <!--
+      Why a number came back smaller than the one that was typed. Beside
+      the knobs rather than in the status line: the status line is for
+      what is happening now and the sweep overwrites it a moment later,
+      which left the explanation on screen for about a second (ADR-0048).
+    -->
+    <p class="hint no-hits" id="site-clipped" hidden></p>
     <p class="hint" data-say="site.shape"></p>
   </details>
 

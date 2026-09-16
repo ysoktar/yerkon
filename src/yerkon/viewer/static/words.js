@@ -75,6 +75,12 @@ export const SAY = {
     en: "Modelled ground has no photograph: it is nowhere.",
   },
   // -- named arrangements --------------------------------------------
+  "site.clipped": {
+    tr: "{asked} km istendi, {held} km tutuldu: saha getirilen zeminden "
+        + "büyük olamaz. Daha büyüğü için o yeri yeniden getir.",
+    en: "Asked for {asked} km, held at {held} km: a site cannot be larger "
+        + "than the ground fetched for it. Fetch that place again for more.",
+  },
   "unit.route": { tr: "Güzergâh", en: "Route" },
   "route.no_road": {
     tr: "Bu zemin yol geometrisi taşımıyor.",

@@ -475,7 +475,9 @@ Bunları bilmeden bakarsan sayıların "yanlış" göründüğü yerler:
 
 - **Saha, indirdiğin kutudan büyük olamaz.** Kutu 5 km ise saha 5 km.
   Sürgüler o sınırın ötesini sunmaz; ötesinde ölçüm yok, yalnızca sınır
-  satırının bir düzleme uzatılmışı var (ADR-0037).
+  satırının bir düzleme uzatılmışı var (ADR-0037). Yanındaki kutuya daha
+  büyüğünü yazarsan yürürlükteki değere döner ve kolların altında sebebi
+  yazar.
 - **Zemin bina getiriyorsa engel kaybı sürgüsü griye döner.** Engel artık
   arazinin içinde; ikisini birden saymak aynı binaları iki kez saymak
   olurdu (ADR-0038).
