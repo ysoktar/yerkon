@@ -69,15 +69,50 @@ METHODS = (
     "manual",
 )
 
-#: How many anchors a horizontal fix needs before dilution means
-#: anything. Two ranges put a receiver on one of two points; three is
-#: the first count with a unique answer.
+#: How many anchors it takes before *dilution* means anything.
+#:
+#: Three, because `dilution_at` inverts a two-by-two geometry matrix:
+#: two unknowns, x and y, since two-way ranging measures distance
+#: directly and leaves no clock column (ADR-0010) and the vertical is
+#: not observable from a road (ADR-0011). Two ranges put a receiver on
+#: one of two points; three is the first count with a unique answer.
+#:
+#: This is a property of the arithmetic below it and not a policy. What
+#: a *deployment* needs is the next constant, and conflating the two is
+#: what made a search stop at three.
 FEWEST_FOR_A_FIX = 3
+
+#: How many anchors have to reach a place before it counts as served.
+#:
+#: Four, which is what the rest of this project already requires and
+#: refuses to go below: `coverage()` and `siting.Requirement` both raise
+#: "fewer than four ranges cannot place a point", and the published area
+#: column is `area_reached_by(4)`. The estimator solves three unknowns
+#: without a height constraint, so a fourth range is what makes the
+#: system determined rather than exactly determined with nothing left
+#: over to check it.
+#:
+#: The searches used `FEWEST_FOR_A_FIX` for this and it was wrong: a
+#: search would declare itself finished at a count its own estimator
+#: cannot produce a position from. On Kızılay that put four anchors in
+#: the corners of the site, where no point saw all four, and the service
+#: area came out at 0,08 km² against a lattice's 8,92 (ADR-0047).
+ENOUGH_TO_BE_SERVED = 4
 
 #: Dilution past which the geometry is reported as useless rather than
 #: as a number. A horizontal dilution of twenty turns a 3 m range error
 #: into 60 m, and beyond that the arithmetic stops being informative.
 DILUTION_CEILING = 20.0
+
+
+#: The methods that choose where to put an anchor by scoring candidates
+#: against a reach disc, rather than laying one out on a lattice.
+#:
+#: Named here because what the disc should be differs: a lattice never
+#: reads it, and a search treats it as a hard edge, so a search wants the
+#: reach measured on the ground it is on rather than the open-ground
+#: figure a ring is drawn from (ADR-0047).
+SEARCHES = ("greedy-coverage", "greedy-dop", "k-cover")
 
 
 @dataclass(frozen=True)
@@ -146,7 +181,7 @@ class Plan:
     #: rather than a target.
     most: int = 60
     #: How many anchors `k-cover` insists reach every cell.
-    cover_k: int = FEWEST_FOR_A_FIX
+    cover_k: int = ENOUGH_TO_BE_SERVED
     #: The dilution `greedy-dop` stops at.
     #:
     #: Cheapest that meets, not best — the rule this project already
@@ -406,14 +441,21 @@ def _fixable_then_dilution(cells: np.ndarray, anchors: np.ndarray,
     over cells of how many more anchors each still needs — and that is
     what makes the search start. Dilution is undefined until three
     anchors reach a cell, and "cells that can be fixed" is zero until
-    three overlap, so either of those alone would rate the first two
-    picks identically and the search would stop before it began.
-    Sightings fall with the very first anchor, and once nothing is short
-    the dilution takes over.
+    four overlap, so either of those alone would rate the first picks
+    identically and the search would stop before it began. Sightings
+    fall with the very first anchor, and once nothing is short the
+    dilution takes over.
+
+    What counts as "not short" is `ENOUGH_TO_BE_SERVED`, which is four:
+    the number the published area column counts and the number this
+    project refuses to go below elsewhere. It used to be three — the
+    minimum for the dilution arithmetic — and a search that stopped
+    there stopped at a count its own estimator cannot fix from
+    (ADR-0047).
     """
     seen, dilution = _seen_and_dilution(cells, anchors, reach_m)
-    short = int(np.maximum(FEWEST_FOR_A_FIX - seen, 0).sum())
-    enough = seen >= FEWEST_FOR_A_FIX
+    short = int(np.maximum(ENOUGH_TO_BE_SERVED - seen, 0).sum())
+    enough = seen >= ENOUGH_TO_BE_SERVED
     mean = float(dilution[enough].mean()) if enough.any() else DILUTION_CEILING
     return short, mean
 

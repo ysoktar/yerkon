@@ -227,3 +227,101 @@ def _cells(ground: Ground, across: int = 30) -> np.ndarray:
     ys = np.linspace(0.0, max(ground.width_m, 1.0), across)
     grid_x, grid_y = np.meshgrid(xs, ys)
     return np.column_stack([grid_x.ravel(), grid_y.ravel()])
+
+
+# --- Two numbers that were one, and the bug that made (ADR-0047) ---------
+
+
+def test_dilution_and_being_served_are_two_different_thresholds():
+    """Three is a property of the arithmetic; four is what a deployment
+    needs.
+
+    `dilution_at` inverts a two-by-two matrix — x and y, with no clock
+    column (ADR-0010) and no observable vertical (ADR-0011) — so three
+    ranges is where it starts meaning anything. But the estimator solves
+    three unknowns, `coverage()` and `siting.Requirement` both refuse
+    fewer than four ranges in those words, and the published area column
+    is `area_reached_by(4)`.
+
+    The searches used the first for the second, so one would declare
+    itself finished at a count its own estimator cannot fix from.
+    """
+    import inspect
+
+    from yerkon.evaluate import coverage
+    from yerkon.layout import ENOUGH_TO_BE_SERVED
+
+    assert FEWEST_FOR_A_FIX == 3
+    assert ENOUGH_TO_BE_SERVED > FEWEST_FOR_A_FIX
+
+    # Tied to what the rest of the project demands rather than written
+    # down twice. `coverage` refuses fewer than four in those words, and
+    # a test that read the constant it is testing would move with a bug
+    # in it instead of catching one.
+    assert inspect.signature(coverage).parameters[
+        "anchors_required"].default == ENOUGH_TO_BE_SERVED
+    with pytest.raises(ValueError, match="fewer than four"):
+        coverage(None, None, anchors_required=ENOUGH_TO_BE_SERVED - 1)
+
+
+def test_a_search_keeps_going_until_four_anchors_reach_not_three():
+    """The bug, as a number. With three as the bar, a search over a
+    square site stopped at four anchors in the corners — where no point
+    saw all four — and the service area collapsed."""
+    # Reach larger than the site, which is the condition the bug bites
+    # under and the one Kızılay is in: 3 825 m of reach on 2 970 m of
+    # ground, so a single anchor is audible everywhere and the dilution
+    # bar is met almost at once. Somewhere that needs many anchors
+    # anyway would place enough of them by accident and prove nothing —
+    # the first version of this test did exactly that and passed with
+    # the bug put back on purpose.
+    #
+    # Four is written out rather than read from the constant under test,
+    # for the same reason.
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=3800.0)
+    spots = place(Plan(method="greedy-dop", most=60, target_dop=2.0), ground)
+    cells = _cells(ground, across=25)
+
+    counts = np.zeros(len(cells), dtype=int)
+    for spot in spots:
+        counts += (((cells[:, 0] - spot.x_m) ** 2
+                    + (cells[:, 1] - spot.y_m) ** 2) <= 3800.0 ** 2).astype(int)
+    served = (counts >= 4).mean()
+    assert served > 0.8, (
+        "a search that stops before four anchors reach most of the site "
+        "leaves ground the area column cannot count: {:.0%}".format(served)
+    )
+
+
+def test_k_cover_defaults_to_the_number_the_area_column_counts():
+    """It covered to three, and the column counts four, so an urban
+    k-cover deployment reported nought square kilometres served."""
+    assert Plan().cover_k == 4
+
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=1100.0)
+    spots = place(Plan(method="k-cover", most=120), ground)
+    cells = _cells(ground)
+    counts = np.zeros(len(cells), dtype=int)
+    for spot in spots:
+        counts += (((cells[:, 0] - spot.x_m) ** 2
+                    + (cells[:, 1] - spot.y_m) ** 2) <= 1100.0 ** 2).astype(int)
+    assert (counts >= 4).mean() > 0.95
+
+
+def test_the_geometry_search_still_stops_at_its_bar_rather_than_the_budget():
+    """Raising the sufficiency threshold must not turn "cheapest that
+    meets" into "spend the budget" (ADR-0015, ADR-0023)."""
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=900.0)
+    generous = place(Plan(method="greedy-dop", most=200, target_dop=2.0), ground)
+    assert len(generous) < 200
+
+
+def test_the_number_of_anchors_a_run_covers_to_is_the_engine_s_own():
+    """It was written down a third time, in the viewer, and that copy
+    won: a run carries its own `cover_k` into `place`, so `Plan`'s
+    default never applied. Three places, two answers (ADR-0047)."""
+    from yerkon.layout import ENOUGH_TO_BE_SERVED
+    from yerkon.viewer.state import AnchorRun
+
+    run = AnchorRun("A", "e28", "mast", 0.0, 1000.0, 500.0, 25.0)
+    assert run.cover_k == Plan().cover_k == ENOUGH_TO_BE_SERVED == 4

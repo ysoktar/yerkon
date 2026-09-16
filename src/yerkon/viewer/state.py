@@ -12,6 +12,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from typing import Optional
 
+import json
+import math
 import numpy as np
 
 from yerkon.design import (
@@ -34,7 +36,7 @@ from yerkon.scenarios import (
 from yerkon.design import Design, REGION_CHOICES
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import DEFAULT_LANGUAGE, say
-from yerkon.layout import Spot
+from yerkon.layout import ENOUGH_TO_BE_SERVED, SEARCHES, Spot
 from yerkon.routes import Course, Trip, trace
 from yerkon.layout import Ground as LayoutGround, Plan, place
 from yerkon.settings import Settings, defaults_in
@@ -127,6 +129,121 @@ def reach_of(state: ViewState, run) -> float:
     )
 
 
+#: How many rays the measured reach samples, and how much of them has to
+#: close for a distance to count as reachable.
+#:
+#: Two hundred is enough to place the threshold within a hundred metres
+#: and costs a fraction of a second; a sweep costs seconds. Ninety per
+#: cent because the search treats the disc as a hard edge, so the edge
+#: belongs where links are still reliable rather than where the last one
+#: happened to get through.
+REACH_SAMPLES = 200
+REACH_SHARE = 0.9
+
+#: Measured reaches already worked out this process.
+#:
+#: Two hundred link budgets over real terrain is a fraction of a second
+#: and `anchors` is called on every drag, which is not. Keyed by
+#: everything the answer depends on, so a figure edited by hand or a
+#: change of ground is a different question rather than a stale one.
+_REACHES: dict = {}
+
+
+def measured_reach_m(state: ViewState, run) -> float:
+    """How far this run's anchors reach *on this ground*, by sampling it.
+
+    `reach_of` is a flat-ground figure and says so: "the ring is an
+    intuition, not a claim". That is fine for a ring and wrong for a
+    decision, and the searching layouts were treating it as a hard edge.
+    Over Kızılay it says 3 825 m while the furthest link that closes is
+    1 937 m and half of them fail past a kilometre — 5 231 buildings
+    stand in between. So a search placed four anchors in the corners,
+    believed they covered everything, and served 0,12 km² of the 8,92
+    a lattice serves (ADR-0047).
+
+    Measured rather than derated by a rule: the number that matters is
+    what the link budget does over *these* buildings and *this* relief,
+    and the budget is right there.
+
+    Rays from the middle of the site, because an anchor placed by a
+    search could be anywhere on it and the middle is the least unfair
+    single choice. The answer is a band rather than a distance, so it is
+    reported as the far edge of the last band where enough links still
+    close.
+    """
+    from yerkon.rf import evaluate_link, ranging_sigma_m
+
+    remember = (
+        state.site, state.bore, state.scenario,
+        round(state.corridor_m, 3), round(state.width_m, 3),
+        round(state.relief_m, 3), round(state.hill_spacing_m, 3),
+        round(state.roughness_m, 4), round(state.clutter_db_per_km, 3),
+        round(state.tolerance_m, 4), state.seed, state.region,
+        run.radio, run.mounting,
+        json.dumps(state.overrides, sort_keys=True, default=str),
+    )
+    if remember in _REACHES:
+        return _REACHES[remember]
+
+    terrain = state.terrain()
+    design = design_of(state, run)
+    open_ground = reach_of(state, run)
+    if open_ground <= 0.0:
+        return open_ground
+
+    length = max(state.corridor_m, 1.0)
+    width = max(state.width_m, 0.0)
+    middle = (length / 2.0, width / 2.0)
+    # No further than the ground goes: a ray off the site is a link over
+    # terrain nobody measured (ADR-0037).
+    furthest = min(open_ground, math.hypot(length, width))
+
+    rng = np.random.default_rng(state.seed)
+    bands = 8
+    edges = np.linspace(0.0, furthest, bands + 1)
+    closed = np.zeros(bands, dtype=int)
+    tried = np.zeros(bands, dtype=int)
+
+    for _ in range(REACH_SAMPLES):
+        angle = rng.uniform(0.0, 2.0 * math.pi)
+        far = rng.uniform(edges[1] * 0.2, furthest)
+        x = middle[0] + far * math.cos(angle)
+        y = middle[1] + far * math.sin(angle)
+        if not (0.0 <= x <= length and 0.0 <= y <= max(width, 0.0)):
+            continue
+        band = min(int(far / max(furthest / bands, 1e-9)), bands - 1)
+        tried[band] += 1
+        here = (middle[0], middle[1],
+                terrain.height_at(*middle) + design.anchor_height_m)
+        there = (x, y, terrain.height_at(x, y) + design.receiver_height_m)
+        budget = evaluate_link(
+            Terminal(design.anchor_radio, design.antenna, here),
+            Terminal(design.anchor_radio, design.antenna, there),
+            obstruction=terrain.obstruction_between(here, there),
+            region=design.region,
+        )
+        if budget.closes and ranging_sigma_m(
+            budget, design.anchor_radio
+        ) <= state.tolerance_m:
+            closed[band] += 1
+
+    # The far edge of the last band, counting outward, where enough of
+    # what was tried still closed. A band nobody sampled is not evidence
+    # either way, so it neither extends nor stops the answer.
+    reached = 0.0
+    for band in range(bands):
+        if tried[band] == 0:
+            continue
+        if closed[band] / tried[band] < REACH_SHARE:
+            break
+        reached = float(edges[band + 1])
+    # Somewhere with nothing standing on it measures the open figure
+    # back, and somewhere that blocks everything still has a first band.
+    answer = reached or float(edges[1])
+    _REACHES[remember] = answer
+    return answer
+
+
 def closure_of(state: ViewState, run) -> float:
     design = design_of(state, run)
     anchor = Terminal(
@@ -171,7 +288,14 @@ class AnchorRun:
     #: here rather than in a second record so that switching methods on a
     #: dropdown does not lose what somebody set under the other one.
     most: int = 60
-    cover_k: int = 3
+    #: How many anchors `k-cover` puts over every cell.
+    #:
+    #: The engine's own figure rather than a third copy of it: this said
+    #: 3 while `layout.Plan` said 4, and a run carries its own value into
+    #: `place`, so the default here silently won. An urban k-cover
+    #: deployment covered to three, the area column counts four, and the
+    #: service area came out nought (ADR-0047).
+    cover_k: int = ENOUGH_TO_BE_SERVED
     target_dop: float = 2.0
     #: How far an anchor of this kind reaches, in metres.
     #:
@@ -459,7 +583,15 @@ class ViewState:
         for run in self.runs:
             # The reach the ring is drawn from, so a search scores its
             # candidates against the same disc a person is looking at.
-            reaching = replace(run, reach_m=run.reach_m or reach_of(self, run))
+            # A search treats the disc as a hard edge, so it gets the
+            # reach measured on this ground; a lattice never reads it
+            # and keeps the open-ground figure the ring is drawn from
+            # (ADR-0047).
+            disc = run.reach_m or (
+                measured_reach_m(self, run) if run.method in SEARCHES
+                else reach_of(self, run)
+            )
+            reaching = replace(run, reach_m=disc)
             for identifier, ground, mounting, radio in reaching.anchors(
                 terrain, catalogues, self.width_m, route=route,
                 furniture=standing,
