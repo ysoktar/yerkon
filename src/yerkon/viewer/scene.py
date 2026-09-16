@@ -22,7 +22,7 @@ from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import LANGUAGES, LANGUAGE_NAMES, say
 from yerkon.layout import FEWEST_FOR_A_FIX, METHODS as LAYOUT_METHODS
-from yerkon.routes import METHODS as ROUTE_METHODS
+from yerkon.routes import METHODS as ROUTE_METHODS, drivable
 from yerkon.viewer.state import (
     _lowest_unit,
     closure_of,
@@ -320,7 +320,7 @@ def scene(state: ViewState) -> dict:
             # control that does nothing is not a control (ADR-0036).
             "routes_live": [
                 name for name in ROUTE_METHODS
-                if name != "road" or bool(state.course().road)
+                if name != "road" or drivable(state.course())
             ],
             "mountings": [
                 [key, "{} ({:.0f} m)".format(

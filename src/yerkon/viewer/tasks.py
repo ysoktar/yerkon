@@ -323,6 +323,8 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             CopernicusElevation,
             OpenStreetMapBuildings,
             OvertureBuildings,
+            OvertureFurniture,
+            OvertureRoads,
             ServiceElevation,
             TileImagery,
             build_site,
@@ -391,6 +393,16 @@ def fetch(state: ViewState, payload: dict) -> Callable:
                 OvertureBuildings(cache_directory=str(SITES / "_tiles")),
                 OpenStreetMapBuildings(),
             ) if want_buildings else (),
+            # Roads come with the buildings: they are the same fetch by
+            # the same road, and without them a receiver cannot drive the
+            # real road and a search has no structure to bolt on to
+            # (ADR-0045, ADR-0046).
+            roads_sources=(
+                OvertureRoads(cache_directory=str(SITES / "_tiles")),
+            ) if want_buildings else (),
+            furniture_sources=(
+                OvertureFurniture(cache_directory=str(SITES / "_tiles")),
+            ) if want_buildings else (),
             imagery_source=imagery,
         )
         SiteCache(SITES / name).save(site)
@@ -412,6 +424,8 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             "roughness_m": round(site.roughness_m(), 2),
             "buildings": site.manifest.building_count,
             "aerial": site.aerial is not None,
+            "roads": len(site.roads_m),
+            "furniture": 0 if site.furniture is None else len(site.furniture),
             "notes": list(site.manifest.notes),
         }
 

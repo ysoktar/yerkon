@@ -34,6 +34,7 @@ from yerkon.scenarios import (
 from yerkon.design import Design, REGION_CHOICES
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import DEFAULT_LANGUAGE, say
+from yerkon.layout import Spot
 from yerkon.routes import Course, Trip, trace
 from yerkon.layout import Ground as LayoutGround, Plan, place
 from yerkon.settings import Settings, defaults_in
@@ -429,19 +430,39 @@ class ViewState:
             language=self.language,
         )
 
+    def furniture(self) -> tuple:
+        """Structures a fetch found that an anchor could be bolted to.
+
+        Empty on modelled ground and on a fetch that did not look. Where
+        there are any, the searching layouts score these instead of a
+        lattice: an anchor on a traffic signal that already stands costs
+        the signal nothing, and a purpose-built mast costs eighty-five
+        thousand lira (ADR-0015, ADR-0040).
+        """
+        found = getattr(self.measured(), "furniture", None)
+        if found is None or not len(found):
+            return ()
+        kinds = found.kind or ("column",) * len(found)
+        return tuple(
+            Spot(float(x), float(y), kind)
+            for x, y, kind in zip(found.x_m, found.y_m, kinds)
+        )
+
     def anchors(self, terrain: Terrain) -> tuple[Anchor, ...]:
         """Every run's anchors, with anything dragged or deleted applied."""
         catalogues = self.catalogues()
         route = tuple(
             (float(x), float(y)) for x, y in self.road(terrain).centreline_m
         )
+        standing = self.furniture()
         placed = []
         for run in self.runs:
             # The reach the ring is drawn from, so a search scores its
             # candidates against the same disc a person is looking at.
             reaching = replace(run, reach_m=run.reach_m or reach_of(self, run))
             for identifier, ground, mounting, radio in reaching.anchors(
-                terrain, catalogues, self.width_m, route=route
+                terrain, catalogues, self.width_m, route=route,
+                furniture=standing,
             ):
                 if identifier in self.removed:
                     continue

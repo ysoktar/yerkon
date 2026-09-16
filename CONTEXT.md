@@ -100,6 +100,13 @@ atılanı tutuyor, %3'e. Hata bir kestirimdir: saat kayması, paket kaybı ve
 gerçekten oradan geçen bir alıcı yoktur — yayımlanan sayı koşudan gelir.
 ADR-0044'e bak.
 
+**Furniture** (yol kenarı donanımı): direğin cıvatalanabileceği, zaten
+duran yapılar — trafik ışığı, otobüs durağı, aydınlatma direği. Overture'ın
+altyapı temasından geliyor; Kızılay 232 taşıyor (155 durak, 77 ışık).
+Duvar, bordür, çit ve kamusal sanat aynı temada ve montaj noktası değil,
+o yüzden listede yok. Arayan yerleştirmeler kafes yerine bunları puanlar
+(ADR-0015, ADR-0040). ADR-0046'ya bak.
+
 **Route** (güzergâh): bir alıcının sürdüğü şekil. Yedi tane, alıcı
 başına seçilir: düz çizgi, gidiş-dönüş, çevre turu, sekiz çizme, tarama
 (boustrophedon), rastgele duraklar (Johnson ve Maltz 1996) ve gerçek yol.

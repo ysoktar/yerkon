@@ -49,6 +49,8 @@ from yerkon.site.fetch import (
     GeoTiffElevation,
     OpenStreetMapBuildings,
     OvertureBuildings,
+    OvertureFurniture,
+    OvertureRoads,
     ServiceElevation,
     TileImagery,
     Unreachable,
@@ -176,6 +178,14 @@ def fetch(argv: list[str] | None = None) -> int:
         help="skip OpenStreetMap; the site records that nobody looked",
     )
     parser.add_argument(
+        "--no-roads", action="store_true",
+        help=(
+            "skip road geometry and roadside structures. Without them a "
+            "receiver cannot drive the real road and the placement "
+            "searches have no existing structures to bolt an anchor to."
+        ),
+    )
+    parser.add_argument(
         "--no-copernicus", action="store_true",
         help="skip the Copernicus tiles, leaving only the query service",
     )
@@ -243,6 +253,8 @@ def fetch(argv: list[str] | None = None) -> int:
     if not args.no_buildings:
         print("  features: Overture Maps, then OpenStreetMap (each tried "
               "in turn until one answers)")
+    if not args.no_roads:
+        print("  roads and roadside structures: Overture Maps")
     if args.imagery:
         print("  photograph: {} at zoom {}".format(
             args.imagery, args.imagery_zoom))
@@ -267,6 +279,12 @@ def fetch(argv: list[str] | None = None) -> int:
             buildings_sources=() if args.no_buildings else (
                 OvertureBuildings(cache_directory=str(SITES / "_tiles")),
                 OpenStreetMapBuildings(),
+            ),
+            roads_sources=() if args.no_roads else (
+                OvertureRoads(cache_directory=str(SITES / "_tiles")),
+            ),
+            furniture_sources=() if args.no_roads else (
+                OvertureFurniture(cache_directory=str(SITES / "_tiles")),
             ),
             imagery_source=TileImagery(
                 url_template=args.imagery,

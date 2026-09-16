@@ -6,6 +6,7 @@
     "east": 33.0169
   },
   "grid_spacing_m": 60.0,
+  "aerial": null,
   "manifest": {
     "elevation_source": "Copernicus DEM 30 m \u00d72",
     "elevation_resolution_m": 30.0,
@@ -14,7 +15,9 @@
     "building_count": 26282,
     "notes": [
       "90 bina y\u00fcksekli\u011fi etiketlenmi\u015f, 19 tanesi kat say\u0131s\u0131ndan, 26173 tanesi 9 m varsay\u0131ld\u0131",
-      "Taban alanlar\u0131, her binan\u0131n kendi s\u0131n\u0131r kutusundan \u00f6l\u00e7\u00fcld\u00fc (2026-08-19.0 s\u00fcr\u00fcm\u00fc); y\u00fckseklikten \u00e7\u0131kar\u0131lmad\u0131."
+      "Taban alanlar\u0131, her binan\u0131n kendi s\u0131n\u0131r kutusundan \u00f6l\u00e7\u00fcld\u00fc (2026-08-19.0 s\u00fcr\u00fcm\u00fc); y\u00fckseklikten \u00e7\u0131kar\u0131lmad\u0131.",
+      "Overture Maps kayna\u011f\u0131ndan 5905 yol par\u00e7as\u0131 (2905 residential, 1092 tertiary, 948 service, 484 unclassified)",
+      "Overture Maps kayna\u011f\u0131ndan dire\u011fe uygun 438 yap\u0131 (402 sign, 36 column)"
     ]
   }
 }

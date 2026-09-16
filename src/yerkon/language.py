@@ -209,6 +209,22 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     "preset.default": {"tr": "Varsayılan", "en": "Default"},
     "preset.empty": {"tr": "Boş", "en": "Empty"},
+    "site.roads": {
+        "tr": "{name} kaynağından {count} yol parçası ({classes})",
+        "en": "{count} road segments from {name} ({classes})",
+    },
+    "site.no_roads": {
+        "tr": "{name} bu kutuda sürülecek yol bulamadı",
+        "en": "{name} found no road to drive in this box",
+    },
+    "site.furniture": {
+        "tr": "{name} kaynağından direğe uygun {count} yapı ({kinds})",
+        "en": "{count} mountable structures from {name} ({kinds})",
+    },
+    "site.no_furniture": {
+        "tr": "{name} bu kutuda direğe uygun yapı bulamadı",
+        "en": "{name} found no mountable structure in this box",
+    },
     "site.needs_pillow": {
         "tr": "Hava görüntüsü Pillow paketini gerektirir: "
               "pip install \"yerkon[sites]\"",

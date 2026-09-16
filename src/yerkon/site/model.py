@@ -288,6 +288,47 @@ class Aerial:
 
 
 @dataclass(frozen=True)
+class Furniture:
+    """Structures beside the road that already stand where they stand.
+
+    The point of ADR-0015: an anchor bolted to a traffic signal costs the
+    signal nothing, while a purpose-built mast costs eighty-five thousand
+    lira. The placement searches score these as candidates instead of a
+    lattice where a fetch found any (ADR-0040).
+
+    `kind` is one of this project's own mounting keys, decided by the
+    fetch from what the source called the thing. Stored beside the
+    positions rather than derived later, because which structure a
+    candidate is decides how high the anchor sits and what it costs.
+    """
+
+    x_m: np.ndarray
+    y_m: np.ndarray
+    kind: tuple = ()
+
+    def __post_init__(self) -> None:
+        if self.x_m.shape != self.y_m.shape:
+            raise ValueError("furniture needs an x for every y")
+        if len(self.kind) not in (0, len(self.x_m)):
+            raise ValueError("furniture needs a kind for every structure")
+
+    def __len__(self) -> int:
+        return int(self.x_m.size)
+
+    def counted(self) -> dict:
+        """How many of each kind, for the manifest.
+
+        What was found rather than what was asked for: a place with no
+        traffic signals should say so rather than leave a reader to infer
+        it from an empty list.
+        """
+        out = {}
+        for kind in self.kind:
+            out[kind] = out.get(kind, 0) + 1
+        return out
+
+
+@dataclass(frozen=True)
 class SiteManifest:
     """Where every piece of a site came from.
 
@@ -344,6 +385,11 @@ class Site:
     #: plainly because a picture that looks like data invites being read
     #: as data.
     aerial: Optional[Aerial] = None
+    #: Road centrelines in local metres, one list per road, where a fetch
+    #: brought them. What the `road` route drives along (ADR-0045).
+    roads_m: tuple = ()
+    #: Structures an anchor could be bolted to, where a fetch found any.
+    furniture: Optional[Furniture] = None
 
     def __post_init__(self) -> None:
         if self.elevation_grid_m.ndim != 2:

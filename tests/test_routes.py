@@ -53,16 +53,56 @@ def test_an_area_route_over_a_corridor_becomes_one(method):
 
 
 def test_the_real_road_says_it_is_not_there_rather_than_drawing_nothing():
-    """Greyed in the page, refused in the engine. A fetch has to bring
-    road geometry first (ADR-0036)."""
+    """Greyed in the page, refused in the engine (ADR-0036)."""
     with pytest.raises(ValueError, match="real road"):
         trace(Trip(method="road"), AREA)
 
-    with_road = Course(length_m=3000.0, width_m=2000.0,
-                       road=((0.0, 500.0), (1500.0, 700.0), (3000.0, 400.0)))
+    # A network, not a path: one polyline per segment, split at every
+    # junction, which is how a road actually arrives.
+    with_road = Course(length_m=3000.0, width_m=2000.0, road=(
+        ((0.0, 500.0), (1500.0, 700.0)),
+        ((1500.0, 700.0), (3000.0, 400.0)),
+    ))
     drawn = trace(Trip(method="road", step_m=200.0), with_road)
     assert len(drawn) > 3
-    assert drawn[0] == pytest.approx((0.0, 500.0))
+    # The two segments meet, so the route drives both rather than the
+    # longer one alone.
+    assert max(x for x, _ in drawn) > 2000.0
+
+
+def test_a_network_is_walked_rather_than_driven_in_the_order_it_was_stored():
+    """Segments that do not meet are not one road, and driving the list
+    would teleport a vehicle between them."""
+    apart = Course(length_m=3000.0, width_m=2000.0, road=(
+        ((0.0, 100.0), (900.0, 100.0)),          # one road
+        ((0.0, 1900.0), (2900.0, 1900.0)),       # another, far away
+    ))
+    drawn = trace(Trip(method="road", step_m=100.0), apart)
+    ys = {round(y) for _, y in drawn}
+    assert ys == {1900}, "it drives the longer one, not both"
+
+
+def test_a_road_is_cut_to_the_site_rather_than_pulled_back_to_it():
+    """A road pulled back to the boundary is a road that bends where it
+    does not (ADR-0037)."""
+    over = Course(length_m=1000.0, width_m=1000.0, road=(
+        ((-500.0, 500.0), (200.0, 500.0), (800.0, 500.0), (1800.0, 500.0)),
+    ))
+    drawn = trace(Trip(method="road", step_m=100.0), over)
+    xs = [x for x, _ in drawn]
+    assert min(xs) >= 0.0 and max(xs) <= 1000.0
+    assert min(xs) == pytest.approx(200.0), "the outside point is dropped"
+
+
+def test_a_network_that_never_enters_the_site_is_refused():
+    """Carrying a road network is not the same as having one to drive."""
+    from yerkon.routes import drivable
+
+    elsewhere = Course(length_m=1000.0, width_m=1000.0,
+                       road=(((5000.0, 5000.0), (6000.0, 6000.0)),))
+    assert not drivable(elsewhere)
+    with pytest.raises(ValueError, match="inside the site"):
+        trace(Trip(method="road"), elsewhere)
 
 
 # --- What each shape is for ----------------------------------------------
@@ -247,5 +287,7 @@ def test_the_engine_names_the_routes_and_says_which_this_ground_carries():
     offered = [name for name, _ in choices["routes"]]
     assert offered[0] == "", "the site's own shape comes first"
     assert set(offered[1:]) == set(METHODS)
-    assert "road" not in choices["routes_live"]
-    assert set(choices["routes_live"]) == set(METHODS) - {"road"}
+    # Kızılay's fetch brings 1 638 road segments, so the real road is one
+    # a receiver can drive there. The tunnel row's does not, and the same
+    # list greys it — `test_roads.py` pins that half.
+    assert set(choices["routes_live"]) == set(METHODS)

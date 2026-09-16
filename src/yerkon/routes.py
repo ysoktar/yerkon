@@ -63,8 +63,12 @@ class Course:
 
     length_m: float
     width_m: float
-    #: Real road geometry in local metres, where there is any.
-    road: Sequence[tuple[float, float]] = ()
+    #: The real road network in local metres: one polyline per segment,
+    #: as the fetch found them. A network rather than a path — Kızılay's
+    #: three kilometres square hold 1 638 segments, split at every
+    #: junction — so the `road` route has to make a drivable path out of
+    #: it rather than drive the list.
+    road: Sequence[Sequence[tuple[float, float]]] = ()
 
     @property
     def is_a_line(self) -> bool:
@@ -242,8 +246,98 @@ def _road(trip: Trip, course: Course):
     The only route here that is a measurement rather than a shape. Every
     other one is a pattern somebody would drive; this is where the road
     goes.
+
+    What arrives is a network, not a path: a road is split at every
+    junction, so Kızılay is 1 638 segments and driving the list in the
+    order it was stored would teleport a vehicle between roads that do
+    not meet. This walks the network instead — joining segments that
+    share an end — and drives the longest continuous run it can find.
+
+    Segments are first cut to the site, because a segment whose box
+    overlaps the site can run a long way past it and nothing drives on
+    ground nobody measured (ADR-0037). Cut rather than clamped: a road
+    pulled back to the boundary is a road that bends where it does not.
     """
-    return _along([(float(x), float(y)) for x, y in course.road], trip.step_m)
+    pieces = []
+    for line in course.road:
+        pieces.extend(_within(line, course))
+    if not pieces:
+        raise ValueError(
+            "the road this ground carries does not run inside the site. "
+            "Widen the site, or pick another route."
+        )
+    return _along(_longest_run(pieces), trip.step_m)
+
+
+def drivable(course: Course) -> bool:
+    """Whether the `road` route can actually be made on this ground.
+
+    Carrying a road network is not the same as having one to drive: the
+    tunnel row's fetch brought four segments and none of them runs inside
+    its two-kilometre corridor. The page asks this rather than asking
+    whether the network is empty, because a method offered and then
+    refused is the control that looks live and does nothing (ADR-0036).
+
+    Cheap on purpose — it asks whether any segment has two points on the
+    site, and does not walk the network to find the longest path.
+    """
+    return any(_within(line, course) for line in course.road)
+
+
+def _within(line, course: Course):
+    """The runs of this line that are on the site, as separate pieces."""
+    top = max(course.width_m, 0.0)
+    out, run = [], []
+    for x, y in line:
+        if 0.0 <= x <= course.length_m and 0.0 <= y <= top:
+            run.append((float(x), float(y)))
+        else:
+            if len(run) >= 2:
+                out.append(run)
+            run = []
+    if len(run) >= 2:
+        out.append(run)
+    return out
+
+
+def _longest_run(pieces, join_m: float = 1.0):
+    """The longest drivable path through these segments.
+
+    Greedy: start from the longest piece and keep extending whichever end
+    can be extended, by any segment that begins or finishes where this
+    one does. Greedy rather than exhaustive because the longest path
+    through a graph is NP-hard and this is choosing a test route, not
+    planning a delivery.
+    """
+    remaining = list(pieces)
+    remaining.sort(key=_walked, reverse=True)
+    path = list(remaining.pop(0))
+
+    joined = True
+    while joined and remaining:
+        joined = False
+        for index, piece in enumerate(remaining):
+            for end, points in ((path[-1], piece), (path[-1], piece[::-1])):
+                if math.dist(end, points[0]) <= join_m:
+                    path.extend(points[1:])
+                    remaining.pop(index)
+                    joined = True
+                    break
+            if joined:
+                break
+            for start, points in ((path[0], piece), (path[0], piece[::-1])):
+                if math.dist(start, points[-1]) <= join_m:
+                    path[:0] = points[:-1]
+                    remaining.pop(index)
+                    joined = True
+                    break
+            if joined:
+                break
+    return path
+
+
+def _walked(points) -> float:
+    return sum(math.dist(a, b) for a, b in zip(points, points[1:]))
 
 
 _SHAPES = {

@@ -51,7 +51,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `regulatory.py` | her bölgenin kurallarının izin verdiği: Türkiye, Avrupa, Amerika, lisanslı |
 | `rf.py` | link bütçesi |
 | `world.py` | arazi, eğimli yol güzergâhları, montaj yapıları ve yansıtıcı zemini yerden yere değiştiren yama örgüsü |
-| `site/` | bir kez önbelleğe getirilen gerçek zemin, binalar ve (istenirse) hava fotoğrafı, artı paketin içinde gelen dört Ankara sahası |
+| `site/` | bir kez önbelleğe getirilen gerçek zemin, binalar, yollar, yol kenarı yapıları ve (istenirse) hava fotoğrafı, artı paketin içinde gelen dört Ankara sahası |
 | `observation.py` | kestiricinin görebileceği tek tip; hiçbir şey import etmez |
 | `ranging.py` | çift yönlü alışveriş, saatleri ve hava süresinde maliyeti |
 | `estimator.py` | menzilleri konuma çevirir, başka hiçbir şey görmez |
@@ -122,14 +122,18 @@ yanlıştır.
    engeli artık gerçekten orada duran 5 231 binadan geliyor, kilometre
    başına bir engel kaybı değerinden değil (ADR-0038).
 
-   **Yol güzergâhı hâlâ yok**, ve tek başına kalan en büyük şey bu: her
-   kırsal yolculuk, zemini izleyen bir yol değil zeminin üzerinde bir
-   dikdörtgen tur. Gerçek bir güzergâh kırsal değerleri yükseltirdi, çünkü
-   yollar bağlantıların geçtiği yerden geçer: %89,6 kullanılabilirlikte
-   kalan başarısızlıklar yoldaki zemindir ve bir yolu izleyen bir yolculuk
-   bunun çoğundan kaçınırdı (ADR-0022). Overture'ın `transportation`
-   katmanı binalarla aynı yoldan gelebilir; yol kenarı donanımına
-   yerleştiren yerleştirme yöntemleri de o veriyi bekliyor (ADR-0040).
+   **Yollar da geldi** (ADR-0046): dört saha da yol taşıyor — Kızılay
+   1 638, Gölbaşı 5 905, Polatlı 5 365 parça — ve yol kenarında direğe
+   uygun yapılar da (232 / 438 / 22 / 0). Yani hem gerçek yolu süren
+   güzergâh hem de direği zaten duran bir yapıya cıvatalayan yerleştirme
+   artık koşuyor.
+
+   **Kalan, yayımlanan satırların bunu kullanması.** `scenarios.py`'deki
+   üç satır hâlâ zeminin üzerinde bir dikdörtgen tur sürüyor; gerçek
+   güzergâh görüntüleyicide seçilebiliyor ama tabloyu süren senaryolara
+   girmedi. Kırsalda %89,6 kullanılabilirlikte kalan başarısızlıklar
+   yoldaki zemindir ve bir yolu izleyen yolculuk bunun çoğundan kaçınırdı
+   (ADR-0022) — bu artık bir veri işi değil, bir karar.
 
    Zeminin *fotoğrafı* ayrı bir şey ve geldi (ADR-0041) — ama yalnızca
    çiziliyor, hiçbir sayıya girmiyor.
@@ -140,6 +144,17 @@ yanlıştır.
    sekizle çarpıyor ve bir etüt hatası ortalamayla asla kaybolmuyor. Şehirde
    0,09 m'ye değiyor ve önemi yok. Tek bir sayı, iki zıt cevap; ve bunu
    yalnızca gerçek bir etüt çözer.
+
+7. **Aramanın çıtası ile alan sütununun saydığı şey aynı değil.** Arama
+   `FEWEST_FOR_A_FIX = 3` görüş hedefliyor, alan sütunu `≥4 direk`
+   sayıyor. İkisi de savunulabilir — üç bir konum için en az, dört onu
+   denetler — ama aynı şey olmadıkları için aramayla yerleştirilmiş bir
+   yerleşim alan sütununda kendi inandığından kötü görünüyor: Kızılay'da
+   geometriye göre seçilen dört direk 8,92 km² yerine 0,08 km² hizmet
+   alanı veriyor, çünkü köşelere yayılan dördü her noktadan birden
+   görünmüyor. Arama dörde mi hedeflemeli, alan sütunu üçü mü saymalı,
+   yoksa ikisi ayrı kalıp rapor bunu mu söylemeli — üçü de savunulabilir
+   (ADR-0046).
 
 ## Açık sorular
 

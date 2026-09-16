@@ -425,6 +425,21 @@ okuma. İlk cevap veren kazanır, cevap vermeyen künyeye yazılır
 dizin sürüm başına diske yazılır, yani ikinci bölge bu bir dakikayı
 ödemez.
 
+**Yollar ve yol kenarı yapıları**: Overture'ın ulaşım ve altyapı
+temalarından, binalarla aynı yoldan. İki şeyi açarlar:
+
+- **Gerçek yol güzergâhı** — alıcı zeminin üzerinde bir dikdörtgen tur
+  yerine gerçekten yolu sürer. Ağ her kavşakta bölünmüş gelir (Kızılay
+  1 638 parça), o yüzden güzergâh ağda yürüyüp en uzun sürekli koşuyu
+  bulur.
+- **Zaten duran yapıya yerleştirme** — trafik ışığı, otobüs durağı,
+  aydınlatma direği. Kızılay 232 taşıyor (155 durak, 77 trafik ışığı).
+  Duvar, bordür, çit ve kamusal sanat aynı temada ama montaj noktası
+  değil, o yüzden alınmıyorlar.
+
+İstemezsen `--no-roads`. Bir yerde hiç yoksa künyeye yazılır — Kızılcahamam
+bir dağ ve sıfır yapı taşıyor.
+
 **Fotoğraf** (isteğe bağlı): bir uydu/harita karo adresi verirsen zemin
 düz renk yerine gerçek görüntüsüyle çizilir.
 

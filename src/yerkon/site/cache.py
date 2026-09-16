@@ -17,6 +17,7 @@ from yerkon.site.model import (
     Aerial,
     BoundingBox,
     Buildings,
+    Furniture,
     Site,
     SiteManifest,
 )
@@ -27,6 +28,11 @@ BUILDINGS_NAME = "buildings.npz"
 #: The photograph, as a picture rather than as an array: it is
 #: one, it compresses like one, and somebody can open it.
 AERIAL_NAME = "aerial.png"
+#: Roads and road furniture, as arrays rather than as JSON: Kızılay is
+#: 1 638 lines of a few points each, and a text form of that is a
+#: megabyte to parse where a compressed array is a fraction of it.
+ROADS_NAME = "roads.npz"
+FURNITURE_NAME = "furniture.npz"
 
 
 class SiteCache:
@@ -63,6 +69,29 @@ class SiteCache:
             # nothing would read it — but the viewer serves this file by
             # name, and a file on disk is a thing that can be served.
             (self.directory / AERIAL_NAME).unlink(missing_ok=True)
+
+        roads_path = self.directory / ROADS_NAME
+        if site.roads_m:
+            # One flat array of points and an array of lengths, because
+            # `savez` cannot hold a ragged list and padding 1 638 lines
+            # to the longest would store mostly nothing.
+            flat = np.concatenate([np.asarray(line, dtype=float)
+                                   for line in site.roads_m])
+            np.savez_compressed(
+                roads_path, points=flat,
+                lengths=np.array([len(line) for line in site.roads_m]))
+        else:
+            roads_path.unlink(missing_ok=True)
+
+        furniture_path = self.directory / FURNITURE_NAME
+        if site.furniture is not None:
+            np.savez_compressed(
+                furniture_path,
+                x_m=site.furniture.x_m, y_m=site.furniture.y_m,
+                kind=np.array(site.furniture.kind, dtype=object),
+            )
+        else:
+            furniture_path.unlink(missing_ok=True)
 
         payload = {
             "bounds": {
@@ -127,8 +156,32 @@ class SiteCache:
                 zoom=int(stored.get("zoom", 0)),
             )
 
+        roads = ()
+        roads_path = self.directory / ROADS_NAME
+        if roads_path.exists():
+            stored = np.load(roads_path)
+            points, lengths = stored["points"], stored["lengths"]
+            at = 0
+            lines = []
+            for count in lengths:
+                lines.append(tuple(
+                    (float(x), float(y)) for x, y in points[at:at + count]))
+                at += int(count)
+            roads = tuple(lines)
+
+        furniture = None
+        furniture_path = self.directory / FURNITURE_NAME
+        if furniture_path.exists():
+            stored = np.load(furniture_path, allow_pickle=True)
+            furniture = Furniture(
+                x_m=stored["x_m"], y_m=stored["y_m"],
+                kind=tuple(str(k) for k in stored["kind"]),
+            )
+
         raw = payload["manifest"]
         return Site(
+            roads_m=roads,
+            furniture=furniture,
             bounds=BoundingBox(**payload["bounds"]),
             elevation_grid_m=grid,
             grid_spacing_m=payload["grid_spacing_m"],

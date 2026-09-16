@@ -19,6 +19,7 @@ import math
 import os
 import pathlib
 import re
+import struct
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -32,6 +33,7 @@ from yerkon.site.model import (
     Aerial,
     BoundingBox,
     Buildings,
+    Furniture,
     Site,
     SiteManifest,
 )
@@ -643,7 +645,16 @@ class OpenStreetMapBuildings:
 #: footprint sets, so this is the OpenStreetMap data with more of the
 #: world filled in rather than a different survey.
 OVERTURE_BUCKET = "https://overturemaps-us-west-2.s3.amazonaws.com/"
+#: Where each Overture theme this project reads lives in the bucket.
+#:
+#: The reader below is the same machinery for all of them — a listing, a
+#: footer scan, a row-group index and a range read — and only the path
+#: and the columns differ. Written as a name per theme rather than one
+#: constant, because the buildings path was a constant and a second
+#: theme is how you find out (ADR-0046).
 OVERTURE_THEME = "theme=buildings/type=building/"
+OVERTURE_ROADS = "theme=transportation/type=segment/"
+OVERTURE_INFRASTRUCTURE = "theme=base/type=infrastructure/"
 
 
 @dataclass
@@ -767,8 +778,14 @@ class _OvertureReader:
             )
         return found[-1]
 
+    @property
+    def theme(self) -> str:
+        """Which part of the bucket this source reads. Buildings unless
+        the source says otherwise, because that is what was here first."""
+        return getattr(self.source, "theme", OVERTURE_THEME)
+
     def _parts(self) -> list:
-        prefix = "release/{}/{}".format(self.release, OVERTURE_THEME)
+        prefix = "release/{}/{}".format(self.release, self.theme)
         body = self._get(
             self.source.bucket + "?list-type=2&prefix="
             + prefix.replace("=", "%3D")).decode("utf-8", "replace")
@@ -776,11 +793,40 @@ class _OvertureReader:
         if not keys:
             raise Unreachable(
                 say("site.no_answer", None, name=self.source.name,
-                    error="release {} holds no building files".format(self.release))
+                    error="release {} holds no {} files".format(
+                        self.release, self.theme))
             )
         return keys
 
     # -- reading ----------------------------------------------------------
+
+    def tables_in(self, bounds: BoundingBox, columns: list):
+        """Every row group over this box, as tables, with the rows inside.
+
+        The half of `rows_in` that is not about buildings: find the row
+        groups, read the columns asked for, and say which of their rows
+        actually fall on the site — a row group is a whole tile of the
+        world and only some of it is here.
+        """
+        try:
+            import pyarrow.parquet as pq
+        except ImportError as error:
+            raise Unreachable(say("site.needs_pyarrow")) from error
+
+        keys = self._parts()
+        for index, groups in self._row_groups_over(keys, bounds, pq):
+            handle = _RangeFile(self.source.bucket + keys[index],
+                                self.source.name)
+            table = pq.ParquetFile(handle).read_row_groups(
+                groups, columns=list(columns) + ["bbox"])
+            box = table.column("bbox").combine_chunks()
+            inside = np.where(
+                (box.field("xmin").to_numpy() <= bounds.east)
+                & (box.field("xmax").to_numpy() >= bounds.west)
+                & (box.field("ymin").to_numpy() <= bounds.north)
+                & (box.field("ymax").to_numpy() >= bounds.south)
+            )[0]
+            yield table, box, inside
 
     def rows_in(self, bounds: BoundingBox) -> list:
         try:
@@ -870,8 +916,12 @@ class _OvertureReader:
     def _index_path(self) -> Optional[pathlib.Path]:
         if not self.source.cache_directory:
             return None
+        # Named after the theme as well as the release. Sharing one file
+        # would hand a road scan the buildings' row groups, which is a
+        # wrong answer rather than a slow one.
+        kind = self.theme.split("type=")[-1].strip("/") or "buildings"
         return (pathlib.Path(self.source.cache_directory)
-                / "overture-{}-buildings.json".format(self.release))
+                / "overture-{}-{}.json".format(self.release, kind))
 
     def _cached_index(self) -> Optional[dict]:
         path = self._index_path()
@@ -964,6 +1014,218 @@ class _RangeFile(io.RawIOBase):
             ) from error
         self.position += len(data)
         return data
+
+
+@dataclass
+class OvertureRoads:
+    """Road centrelines from Overture's transportation theme.
+
+    The same machinery as the buildings — a listing, a footer scan, a
+    row-group index, a range read — pointed at a different part of the
+    bucket. Kızılay's three by three kilometres hold 2 596 segments:
+    561 residential, 542 footway, 364 service, 333 primary, 243
+    secondary, and so on down.
+
+    `keep` is which of those count as a road somebody drives. Footways,
+    steps and cycleways are left out by default — a receiver in this
+    study is on a carriageway — but they are a parameter rather than a
+    rule, because a study of pedestrians would want exactly them.
+    """
+
+    bucket: str = OVERTURE_BUCKET
+    name: str = "Overture Maps"
+    theme: str = OVERTURE_ROADS
+    release: str = ""
+    at_once: int = 32
+    cache_directory: Optional[str] = None
+    #: Which classes are a road a vehicle drives on.
+    keep: tuple = ("motorway", "trunk", "primary", "secondary", "tertiary",
+                   "residential", "living_street", "unclassified", "service")
+
+    def roads_for(self, bounds: BoundingBox) -> tuple[tuple, tuple[str, ...]]:
+        reader = _OvertureReader(self)
+        per_lat, per_lon = bounds.metres_per_degree()
+        kept = []
+        classes = {}
+        for table, _, inside in reader.tables_in(
+            bounds, ["geometry", "subtype", "class"]
+        ):
+            shapes = table.column("geometry").to_pylist()
+            subtypes = table.column("subtype").to_pylist()
+            named = table.column("class").to_pylist()
+            for row in inside:
+                if subtypes[row] != "road" or named[row] not in self.keep:
+                    continue
+                classes[named[row]] = classes.get(named[row], 0) + 1
+                for line in lines_in(shapes[row]):
+                    here = [
+                        ((lon - bounds.west) * per_lon,
+                         (lat - bounds.south) * per_lat)
+                        for lon, lat in line
+                    ]
+                    if len(here) >= 2:
+                        kept.append(tuple(here))
+
+        if not kept:
+            return (), (say("site.no_roads", None, name=self.name),)
+        counted = ", ".join(
+            "{} {}".format(count, kind)
+            for kind, count in sorted(classes.items(), key=lambda p: -p[1])[:4]
+        )
+        return tuple(kept), (say("site.roads", None, name=self.name,
+                                 count=len(kept), classes=counted),)
+
+
+#: What a structure beside the road is called here, by what Overture
+#: calls it.
+#:
+#: Only things an anchor could actually be bolted to. A wall, a kerb and
+#: a piece of public art are all in the same theme and none of them is a
+#: mounting point, so none of them is here — the point of ADR-0015 is
+#: that a *structure that already stands* costs nothing, not that
+#: anything in the data does.
+MOUNTABLE = {
+    ("transportation", "traffic_signals"): "column",
+    ("transportation", "street_lamp"): "column",
+    ("transit", "bus_stop"): "sign",
+    ("transportation", "street_sign"): "sign",
+    ("tower", "communication"): "mast",
+}
+
+
+@dataclass
+class OvertureFurniture:
+    """Structures beside the road, from Overture's infrastructure theme.
+
+    Kızılay's three by three kilometres hold 77 traffic signals and 155
+    bus stops among 810 rows — real positions of real poles, which is the
+    difference between scoring a candidate mast against a lattice and
+    scoring it against somewhere a bracket could actually go.
+
+    What is *not* here matters as much: walls, kerbs, fences and public
+    art are in the same theme and are not mounting points. `MOUNTABLE`
+    is the list, and anything outside it is counted and dropped rather
+    than quietly kept.
+    """
+
+    bucket: str = OVERTURE_BUCKET
+    name: str = "Overture Maps"
+    theme: str = OVERTURE_INFRASTRUCTURE
+    release: str = ""
+    at_once: int = 32
+    cache_directory: Optional[str] = None
+
+    def furniture_for(self, bounds: BoundingBox):
+        reader = _OvertureReader(self)
+        per_lat, per_lon = bounds.metres_per_degree()
+        xs, ys, kinds = [], [], []
+        for table, box, inside in reader.tables_in(
+            bounds, ["subtype", "class"]
+        ):
+            subtypes = table.column("subtype").to_pylist()
+            named = table.column("class").to_pylist()
+            # The bounding box rather than the geometry: a pole is a
+            # point and its box is that point, and a shelter's centre is
+            # where the bracket goes as nearly as this study can say.
+            xmin = box.field("xmin").to_numpy()
+            xmax = box.field("xmax").to_numpy()
+            ymin = box.field("ymin").to_numpy()
+            ymax = box.field("ymax").to_numpy()
+            for row in inside:
+                kind = MOUNTABLE.get((subtypes[row], named[row]))
+                if kind is None:
+                    continue
+                lon = (float(xmin[row]) + float(xmax[row])) / 2.0
+                lat = (float(ymin[row]) + float(ymax[row])) / 2.0
+                xs.append((lon - bounds.west) * per_lon)
+                ys.append((lat - bounds.south) * per_lat)
+                kinds.append(kind)
+
+        if not xs:
+            return None, (say("site.no_furniture", None, name=self.name),)
+        found = Furniture(x_m=np.asarray(xs, dtype=float),
+                          y_m=np.asarray(ys, dtype=float),
+                          kind=tuple(kinds))
+        counted = ", ".join("{} {}".format(n, k)
+                            for k, n in sorted(found.counted().items(),
+                                               key=lambda p: -p[1]))
+        return found, (say("site.furniture", None, name=self.name,
+                           count=len(found), kinds=counted),)
+
+
+# --- Reading geometry, without a geometry library -------------------------
+#
+# Overture stores a row's shape as WKB, the binary form every spatial
+# database writes. Decoding a line out of it is a byte order, a type code
+# and a run of doubles; a library to do that would be a dependency with a
+# compiler behind it, which this project has avoided everywhere else it
+# could (ADR-0046).
+
+#: The two WKB type codes a road can be.
+_LINESTRING = 2
+_MULTILINESTRING = 5
+
+#: Flags the type code can carry: a Z or M ordinate, or an SRID.
+_HAS_Z = 0x80000000
+_HAS_M = 0x40000000
+_HAS_SRID = 0x20000000
+
+
+def lines_in(blob: bytes) -> list:
+    """Every line in a WKB geometry, as lists of (longitude, latitude).
+
+    Handles the two shapes a road arrives as — a line and a collection of
+    them — and says so plainly for anything else rather than returning an
+    empty list somebody would read as "no road here".
+
+    Extra ordinates are read and dropped: a road with an elevation in it
+    is still a road, and this project takes height from the terrain.
+    """
+    if not blob:
+        return []
+    order = "<" if blob[0] == 1 else ">"
+    (raw,) = struct.unpack_from(order + "I", blob, 1)
+    at = 5
+    if raw & _HAS_SRID:
+        at += 4
+    ordinates = 2 + (1 if raw & _HAS_Z else 0) + (1 if raw & _HAS_M else 0)
+    kind = raw & 0xFF
+
+    if kind == _LINESTRING:
+        points, _ = _points(blob, at, order, ordinates)
+        return [points] if len(points) >= 2 else []
+    if kind == _MULTILINESTRING:
+        (count,) = struct.unpack_from(order + "I", blob, at)
+        at += 4
+        out = []
+        for _ in range(count):
+            # Each part carries its own byte order and type code.
+            inner = "<" if blob[at] == 1 else ">"
+            (inner_raw,) = struct.unpack_from(inner + "I", blob, at + 1)
+            inner_at = at + 5
+            if inner_raw & _HAS_SRID:
+                inner_at += 4
+            inner_ords = (2 + (1 if inner_raw & _HAS_Z else 0)
+                          + (1 if inner_raw & _HAS_M else 0))
+            points, at = _points(blob, inner_at, inner, inner_ords)
+            if len(points) >= 2:
+                out.append(points)
+        return out
+    raise ValueError(
+        "WKB type {} is not a line. This reads roads, which are lines "
+        "and collections of lines.".format(kind)
+    )
+
+
+def _points(blob: bytes, at: int, order: str, ordinates: int):
+    (count,) = struct.unpack_from(order + "I", blob, at)
+    at += 4
+    step = 8 * ordinates
+    points = [
+        struct.unpack_from(order + "dd", blob, at + index * step)
+        for index in range(count)
+    ]
+    return points, at + count * step
 
 
 # --- A photograph of the ground -------------------------------------------
@@ -1161,6 +1423,8 @@ def build_site(
     elevation_sources: tuple[ElevationSource, ...] = (),
     buildings_sources: tuple = (),
     imagery_source=None,
+    roads_sources: tuple = (),
+    furniture_sources: tuple = (),
 ) -> Site:
     """Fetch a site, using whatever is reachable.
 
@@ -1214,6 +1478,28 @@ def build_site(
             notes.append(say("site.unreachable", None,
                               name=source.name, error=error))
 
+    roads: tuple = ()
+    for source in roads_sources:
+        try:
+            roads, said = source.roads_for(bounds)
+            notes.extend(said)
+            if roads:
+                break
+        except Unreachable as error:
+            notes.append(say("site.unreachable", None,
+                              name=source.name, error=error))
+
+    furniture = None
+    for source in furniture_sources:
+        try:
+            furniture, said = source.furniture_for(bounds)
+            notes.extend(said)
+            if furniture is not None:
+                break
+        except Unreachable as error:
+            notes.append(say("site.unreachable", None,
+                              name=source.name, error=error))
+
     aerial: Optional[Aerial] = None
     if imagery_source is not None:
         try:
@@ -1231,6 +1517,8 @@ def build_site(
         elevation_grid_m=grid.values_m,
         grid_spacing_m=grid.spacing_m,
         aerial=aerial,
+        roads_m=roads,
+        furniture=furniture,
         manifest=SiteManifest(
             elevation_source=grid.source,
             elevation_resolution_m=grid.resolution_m,
