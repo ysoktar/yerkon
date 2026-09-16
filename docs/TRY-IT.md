@@ -306,8 +306,8 @@ sıfır dB marj kılpayı kapanan bir bağlantıdır, hiç erişmemek başka şe
 Son katman bir **kestirimdir, benzetim değildir**: içinde saat kayması,
 paket kaybı, oturmayan bir çözücü ya da gerçekten oradan geçen bir alıcı
 yok. Yayımlanan sayı **Simülasyonu çalıştır**'dan gelir (ADR-0001). Yine
-de birbirlerini tutarlar — kırsal zeminde kestirimin ortancası 3,02 m,
-yayımlanan HPE P50 3,11 m.
+de birbirlerini tutarlar — kırsal zeminde kestirimin ortancası 3,21 m,
+yayımlanan HPE P50 3,63 m.
 
 ### Düzenlemeler: bir sekmeyi kaydedip geri yüklemek
 
@@ -419,6 +419,12 @@ yerkon table --only rural --defaults konya.toml
 |---|---|---|---|---|
 | Kırsal, Polatlı'da | 3,11 m | 15,09 m | %72,75 | 218,75 km² |
 | Kırsal, Konya'da | **2,59 m** | **7,62 m** | **%100,00** | 62,50 km² |
+
+(İkisi de ADR-0053'ten önce ölçüldü, yani ikisi de tek kenarlı kırınımla.
+Karşılaştırma ayakta — aynı yerleşim, başka zemin — ama mutlak sayılar
+tablodakinden eski. Konya sevk edilen sahalardan değil, o yüzden burada
+yeniden ölçemiyorum; kendi getirdiğin zeminle tekrarlarsan ikisi de
+bugünün modeliyle çıkar.)
 
 Aynı yerleşim, aynı direkler, aynı telsizler — başka zemin. Polatlı'nın
 20 km'de 486 m engebesi bağlantıları kesiyor; Konya ovası kesmiyor. Tablo
@@ -660,14 +666,21 @@ bundan önce dört dakikaydı, şimdi yetmiş saniye.
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,14 m | 5,36 m | %99,79 |
-| Kırsal | 3,11 m | 15,09 m | %72,75 |
+| Şehir içi | 2,64 m | 10,14 m | %79,84 |
+| Kırsal | 3,63 m | 29,62 m | %41,87 |
 | Tünel | 1,77 m | 2,99 m | %100,00 |
-| Ağırlıklı | 2,37 m | 9,76 m | %83,36 |
+| Ağırlıklı | 2,75 m | 14,97 m | %58,89 |
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
 zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79
 m diyordu; aradaki fark, artık gerçekten orada duran 5 231 bina.
+
+Ve üçü de **ADR-0053'ten önce daha iyi görünüyordu** — şehir içi %99,79,
+kırsal %72,75, ağırlıklı HPE P95 9,76 m. Aradaki fark kırınımın yoldaki
+en kötü tek nokta üzerinden değil bütün profil üzerinden hesaplanması:
+Kızılay'da bir bağlantının ortanca üç engeli var ve tek kenar bunların
+yalnızca birini sayıyordu. Aynı donanım, aynı direkler, daha dürüst
+yayılım.
 
 ### Kendin denemeye değer beş bulgu
 

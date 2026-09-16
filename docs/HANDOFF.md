@@ -203,6 +203,31 @@ her güzergâh, ayarlar, simülasyon, harita):
   ama sayfa bunu ancak kutu çizilip getirme başlatıldıktan sonra
   söylüyordu (ADR-0051). Artık panel baştan söylüyor ve komutu veriyor.
 
+## Yayılım: bir yol tek bir engel değildir
+
+Kırınım, yoldaki **en kötü tek nokta** üzerinden hesaplanıyordu. Kızılay
+üzerinde ölçtüm: 215 bağlantının yalnızca %14,9'unun açık görüşü var,
+ortancasının **üç** engeli, en kötüsünün on altı. ITU-R P.526-15 4.5.2
+(delta-Bullington) geldi: gerçek profil üzerinde Bullington'ın eşdeğer
+kenarı, artı düz bir dünyanın aynı kurgunun ötesinde götürdüğü kadarı
+(ADR-0053).
+
+Kırınım kaybı ortanca 24,5 → 38,9 dB. Tablo aşağı indi ve **README ile
+TRY-IT güncellendi**: şehir içi HPE P95 5,36 → 10,14 m, kullanılabilirlik
+%99,79 → %79,84, alan 8,93 → 5,69 km²; kırsal %72,75 → %41,87. Tünel
+değişmedi. Ölçülen menzil de değişmedi (478 m), çünkü o sayı zaten gerçek
+binaların arasından ölçülüyordu — değişen aradaki zemin.
+
+Altı sınama yeniden yazıldı, hiçbiri gevşetilmedi. Üçü modelin artık
+haklı olduğu yerlerdeydi (düz zemin kendi eğriliğini engelliyor; yumuşak
+rölyefin yansımaya kazandırdığı 9,8 dB'yi kırınıma geri veriyor;
+4 km aralık artık hiç sabitleme üretmiyor), üçü de artık marjinal kalan
+bir kurgu üzerinde başka bir şeyi ölçmeye çalışıyordu.
+
+Yapılmayan üç şey ADR-0053'ün sonunda: kayıplar hâlâ toplanıyor
+(Tavsiye'nin yapısı serbest uzay + kırınım kurar; ölçtüm, fark küçük),
+gölgeleme yok, ve profil ~19 m aralıkla örnekleniyor.
+
 ## Bu projenin şimdiye kadar yanlış yaptıkları
 
 Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.

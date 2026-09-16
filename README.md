@@ -306,10 +306,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,14 | 5,36 | 72,97 | %99,79 | 8,93 | 17601 | 8154 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,11 | 15,09 | 164,17 | %72,75 | 218,75 | 12235 | 507 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,64 | 10,14 | 72,53 | %79,84 | 5,69 | 27624 | 12798 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,63 | 29,62 | 230,34 | %41,87 | 167,00 | 16026 | 664 |
 | YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,77 | 2,99 | 6,71 | %100,00 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,37 | 9,76 | 118,61 | %83,36 | 91,97 | 459037 | 89231 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,75 | 14,97 | 156,83 | %58,89 | 69,65 | 465564 | 91616 |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir
@@ -328,6 +328,18 @@ tohum gürültüsünden az oynadı: eski model aynı yere yanlış yoldan
 varıyormuş. Her satır ayrıca havayı paylaşan iki birim taşır; güncelleme
 hızının tek bir birimin göreceğinin yarısı olmasının sebebi budur. Ve
 yalnızca tünel bir koridordur, ki bunu ADR-0014'ün eki açıklar.
+
+Yayılım iki ayrı mekanizma taşır ve ikisi aynı şey değildir. **İki ışınlı
+zemin yansıması** düz zeminde bile çalışır: doğrudan ışınla zeminden
+yansıyan ışın kırılma mesafesinin (4·h₁·h₂/λ) ötesinde ters fazda gelip
+birbirini götürür, ve kırılma mesafesi iki antenin yüksekliğiyle doğrusal
+olduğu için alçak montaj pahalıdır (ADR-0007). **Kırınım** ise yola bir
+şey girdiğinde çalışır ve artık yoldaki en kötü tek nokta üzerinden değil,
+bütün profil üzerinden hesaplanır: ITU-R P.526-15 4.5.2, delta-Bullington
+(ADR-0053). Kızılay'da bir bağlantının ortanca üç engeli var, en
+kötüsünün on altı; tek bir bıçak sırtı bunların yalnızca birini sayıyordu.
+Zeminin yüzeyi çatıları da içerir, yani binalar ayrıca bir katsayı olarak
+değil, engel olarak sayılır (ADR-0046).
 
 OPEX sütunu raporun dört satır için de boş bıraktığı sütundur. Sermayenin
 bir yüzdesi olarak değil, adlandırılmış yinelenen kalemlerden oluşan bir

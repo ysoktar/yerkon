@@ -305,10 +305,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,14 | 5,36 | 72,97 | %99,79 | 8,93 | 17601 | 8154 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,11 | 15,09 | 164,17 | %72,75 | 218,75 | 12235 | 507 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,64 | 10,14 | 72,53 | %79,84 | 5,69 | 27624 | 12798 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,63 | 29,62 | 230,34 | %41,87 | 167,00 | 16026 | 664 |
 | YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,77 | 2,99 | 6,71 | %100,00 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,37 | 9,76 | 118,61 | %83,36 | 91,97 | 459037 | 89231 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,75 | 14,97 | 156,83 | %58,89 | 69,65 | 465564 | 91616 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone
@@ -328,6 +328,19 @@ not level. Corrected, the table moved by less than seed noise: the old
 model reached the same place by the wrong route. Each row also carries two units sharing the air, which is
 why the update rate is half what one unit would see; and only the tunnel
 is a corridor, which the addendum to ADR-0014 explains.
+
+Propagation carries two separate mechanisms and they are not the same
+thing. **Two-ray ground reflection** acts even over level ground: past
+the breakpoint (4·h₁·h₂/λ) the direct ray and the ground-reflected ray
+arrive in opposition and cancel, and because that breakpoint is linear
+in both antenna heights, low mounting is expensive (ADR-0007).
+**Diffraction** acts when something rises into the path, and it is now
+worked out over the whole profile rather than over its worst single
+point: ITU-R P.526-15 4.5.2, delta-Bullington (ADR-0053). Over Kızılay
+the median link has three obstacles blocking it and the worst has
+sixteen; one knife edge counted one of them. The surface a profile
+reports includes roofs, so buildings are counted as obstacles rather
+than as a coefficient (ADR-0046).
 
 The OPEX column is the one the report leaves empty for all four rows. It
 comes from an inventory of named recurring items rather than a percentage

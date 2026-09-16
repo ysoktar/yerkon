@@ -191,7 +191,17 @@ def test_relief_is_a_trade_rather_than_a_help():
     gentle_share, gentle_sigma = sweep(rolling_terrain(10.0, 2000.0, seed=3))
     rugged_share, rugged_sigma = sweep(rolling_terrain(80.0, 2000.0, seed=11))
 
-    assert flat_share == 1.0, "level ground blocks nothing"
+    # Level ground blocks nothing but its own curve, and that is not
+    # nothing: at ten kilometres a 2 m antenna's first Fresnel zone is
+    # into the bulge, and the Recommendation's method charges six
+    # decibels for it where a single knife edge over the worst point
+    # read half a decibel (ADR-0053). One link of twenty-nine, and it is
+    # the farthest.
+    assert flat_share >= 28 / 29, flat_share
+    assert flat_share < 1.0, (
+        "a plane is still a curved plane: if this passes, the curvature "
+        "has stopped being counted"
+    )
     assert gentle_sigma < flat_sigma, "the links that survive relief are better"
     assert rugged_share < gentle_share / 2.0, "rugged ground closes almost nothing"
     assert rugged_sigma > flat_sigma, "and what it leaves is worse"
@@ -235,10 +245,41 @@ def test_gentle_relief_helps_by_aiming_the_cancelling_ray_away():
     assert aimed_fraction(
         distance_m, gentle_ground.reflection_tilt_rad, 2.45e9) < 0.01
 
-    assert gentle_db < flat_db - 3.0, (
-        "undulation should be worth several decibels: flat {:.1f}, "
-        "gentle {:.1f}".format(flat_db, gentle_db)
+    # The claim is about the reflection, so it is measured on the
+    # reflection: with nothing in the way, gentle ground costs ten
+    # decibels less than a plane, because the tilted patch aims the
+    # cancelling ray past the receiver instead of into it.
+    from dataclasses import replace
+
+    def without_anything_in_the_way(terrain, obstruction):
+        anchor = Anchor("m", (0.0, 0.0), TALL_MAST, terrain)
+        return evaluate_link(
+            Terminal(E28_2G4M27S, W24P_U, anchor.position_m),
+            Terminal(SX1280, W24P_U, (
+                distance_m, 0.0, terrain.height_at(distance_m, 0.0) + 2.0)),
+            obstruction=replace(obstruction, profile=(),
+                                peak_terrain_m=-1e6),
+        ).path_loss_db
+
+    flat_reflection = without_anything_in_the_way(flat_terrain(), flat_ground)
+    gentle_reflection = without_anything_in_the_way(
+        rolling_terrain(10.0, 2000.0, seed=3), gentle_ground)
+    assert gentle_reflection < flat_reflection - 3.0, (
+        "the aiming should be worth several decibels: flat {:.1f}, gentle "
+        "{:.1f}".format(flat_reflection, gentle_reflection)
     )
     # And it is the aiming that does it, not the roughness: the patch is
     # smooth enough that scattering alone would leave the ray intact.
     assert gentle_ground.surface_roughness_m < 5.0
+
+    # What the hills give back, they also take: those same hills stand in
+    # the path. Counted one edge at a time this link came out ahead
+    # overall; counted over the whole profile the way ITU-R P.526 counts
+    # it, the diffraction costs more than the aiming saves at six
+    # kilometres (ADR-0053). Both halves are real and the net is a trade,
+    # which is what the test above this one is named for.
+    assert gentle_db > flat_db, (
+        "flat {:.1f}, gentle {:.1f}".format(flat_db, gentle_db))
+    assert gentle_db - gentle_reflection > flat_db - flat_reflection, (
+        "the hills that aim the reflection away are the hills in the way"
+    )

@@ -144,6 +144,9 @@ class Terrain:
         )
 
         return Obstruction(
+            # The whole ground, not just its worst point: the link
+            # budget works diffraction out over all of it (ADR-0053).
+            profile=tuple(profile),
             peak_terrain_m=worst_ground,
             peak_at_fraction=worst_fraction,
             clutter_loss_db=self.clutter_loss_db_per_km * distance_m / 1000.0,

@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Sequence
 
 from yerkon.hardware import SPEED_OF_LIGHT_M_S, Antenna, Radio
 from yerkon.regulatory import TURKEY, SpectrumRule
@@ -97,6 +97,15 @@ class Obstruction:
 
     ``clutter_loss_db`` is everything the elevation model does not carry:
     buildings, vegetation, traffic.
+
+    ``profile`` is the whole ground between the two ends, as (fraction
+    along the path, surface height) pairs — the surface, so over a
+    fetched site a roof is what it reports (ADR-0046). Diffraction is
+    worked out from this rather than from the single worst point,
+    because a path across a town is not one obstacle: over Kızılay the
+    median link has three edges blocking it (ADR-0053). Empty for an
+    obstruction somebody built by hand, and then the single peak above
+    stands in for it.
     """
 
     peak_terrain_m: float = 0.0
@@ -106,6 +115,7 @@ class Obstruction:
     surface_roughness_m: float = 0.0
     reflection_tilt_rad: float = 0.0
     reflection_at_fraction: float = 0.5
+    profile: tuple = ()
 
     def __post_init__(self) -> None:
         if not 0.0 < self.peak_at_fraction < 1.0:
@@ -372,10 +382,235 @@ def diffraction_loss_db(clearance_m: float, fresnel_radius_m: float) -> float:
     """
     if fresnel_radius_m <= 0.0:
         return 0.0
-    v = -clearance_m * math.sqrt(2.0) / fresnel_radius_m
+    # The same J(v) the whole-profile method is built from, said once
+    # (ITU-R P.526-15 equation 31).
+    return knife_edge_db(-clearance_m * math.sqrt(2.0) / fresnel_radius_m)
+
+
+# --- Diffraction over the whole profile (ITU-R P.526-15 4.5) -------------
+#
+# One knife edge is one obstacle, and a path across a town is not one
+# obstacle. Measured over Kızılay at 6 m to 1,5 m: of 215 links between
+# 200 m and 1,2 km, only 15 % have a clear line of sight, the median has
+# three separate edges blocking it, and the worst has sixteen. Taking
+# the single worst of those and ignoring the rest is optimistic exactly
+# where this project's urban row lives (ADR-0053).
+#
+# The method is the Recommendation's, not an invention here: Bullington's
+# equivalent edge over the real profile, plus whatever a smooth earth of
+# the same length would have cost beyond the same construction. The
+# second term is what stops a long, gently curving path from coming back
+# clear when the earth itself is the obstacle.
+
+
+#: Effective earth radius in kilometres, for the standard atmosphere.
+#: Refraction bends a ray downward, which is worth about a third more
+#: radius than the geometric one.
+EFFECTIVE_EARTH_KM = FOUR_THIRDS_EARTH * EARTH_RADIUS_M / 1000.0
+
+#: Ground constants for the spherical-earth term, ITU-R P.527 "medium
+#: dry ground": relative permittivity and conductivity in S/m. Land
+#: rather than sea, because this project sites anchors beside roads.
+GROUND_PERMITTIVITY = 22.0
+GROUND_CONDUCTIVITY_S_M = 0.003
+
+
+def knife_edge_db(v: float) -> float:
+    """Loss over a single edge, by the Fresnel parameter ``v``.
+
+    ITU-R P.526-15 equation (31), the approximation to the Fresnel
+    integral that every one of these methods is built from. Zero below
+    -0,78, where the edge is clear of the zone that matters.
+    """
     if v <= -0.78:
         return 0.0
     return 6.9 + 20.0 * math.log10(math.sqrt((v - 0.1) ** 2 + 1.0) + v - 0.1)
+
+
+def bullington_db(
+    profile: Sequence[tuple[float, float]],
+    tx_height_m: float,
+    rx_height_m: float,
+    distance_m: float,
+    frequency_hz: float,
+    curved: bool = True,
+) -> float:
+    """Loss over the whole profile, as one equivalent edge.
+
+    ITU-R P.526-15 4.5.1. Bullington's construction: take the steepest
+    line from each end to anything in between, and where those two lines
+    cross is a single edge that stands for the lot. It is the oldest of
+    the multiple-edge methods and it is the one the Recommendation
+    builds on, because the alternatives that add each edge separately
+    (Epstein-Peterson, Deygout) over-count when the edges are close
+    together or of similar height — which over a town they always are.
+
+    ``profile`` is (fraction along the path, surface height in metres),
+    the same pairs the terrain hands out, and the surface includes
+    whatever stands on it: over a fetched site a roof is the surface,
+    which is why this sees buildings without being told about them.
+
+    The empirical term at the end is the Recommendation's own, and it is
+    what separates this from a bare knife edge: a path that is only just
+    obstructed pays a little more than the single-edge answer, and one
+    that is deeply obstructed pays up to ten decibels more.
+    """
+    if distance_m <= 0.0:
+        return 0.0
+    wavelength_m = SPEED_OF_LIGHT_M_S / frequency_hz
+    span_km = distance_m / 1000.0
+    # Curvature enters as a correction to each profile height rather than
+    # as a separate obstacle: over 20 km the earth itself rises 23 m into
+    # the path, which is more than most of Ankara's buildings.
+    bulge = ((lambda km: 500.0 * km * (span_km - km) / EFFECTIVE_EARTH_KM)
+             if curved else (lambda km: 0.0))
+
+    inner = [(fraction * span_km, height) for fraction, height in profile
+             if 0.0 < fraction < 1.0]
+    if not inner:
+        return 0.0
+
+    straight = (rx_height_m - tx_height_m) / span_km
+    from_tx = max(((height + bulge(km) - tx_height_m) / km)
+                  for km, height in inner)
+
+    def over(km: float, height: float) -> float:
+        sight = (tx_height_m * (span_km - km) + rx_height_m * km) / span_km
+        return (height + bulge(km) - sight) * math.sqrt(
+            0.002 * span_km / (wavelength_m * km * (span_km - km)))
+
+    from_rx = max(((height + bulge(km) - rx_height_m) / (span_km - km))
+                  for km, height in inner)
+    # Exactly grazing: the two steepest lines are parallel and never
+    # cross, so there is no equivalent edge to put anywhere and the
+    # answer is the worst single intrusion — which is the same thing the
+    # clear-path branch works out.
+    if from_tx < straight or abs(from_tx + from_rx) < 1e-12:
+        # Nothing rises above the line between the ends, so the worst
+        # intrusion into the zone is the edge that stands for the path.
+        worst = max(over(km, height) for km, height in inner)
+    else:
+        crossing_km = ((rx_height_m - tx_height_m + from_rx * span_km)
+                       / (from_tx + from_rx))
+        if not 0.0 < crossing_km < span_km:
+            return 0.0
+        sight = ((tx_height_m * (span_km - crossing_km)
+                  + rx_height_m * crossing_km) / span_km)
+        worst = (tx_height_m + from_tx * crossing_km - sight) * math.sqrt(
+            0.002 * span_km / (wavelength_m * crossing_km
+                               * (span_km - crossing_km)))
+
+    plain = knife_edge_db(worst)
+    return plain + (1.0 - math.exp(-plain / 6.0)) * (10.0 + 0.02 * span_km)
+
+
+def spherical_earth_db(
+    distance_m: float, tx_height_m: float, rx_height_m: float,
+    frequency_hz: float,
+) -> float:
+    """Loss over a smooth earth of this length, in dB.
+
+    ITU-R P.526-15 4.2, the first term of the residue series. Nothing
+    obstructs this path; the earth's own curve does. It is what a long
+    link over open water or flat steppe actually pays, and it is here
+    because the construction above cannot see it: a smooth profile has
+    no edge to put an equivalent edge at.
+    """
+    span_km = distance_m / 1000.0
+    ghz = frequency_hz / 1e9
+    if span_km <= 0.0 or ghz <= 0.0:
+        return 0.0
+
+    # Horizontal polarisation, which is what these antennas are: the
+    # vertical case differs by a factor this K does not carry.
+    k = 0.036 * (EFFECTIVE_EARTH_KM * ghz) ** (-1.0 / 3.0) * (
+        (GROUND_PERMITTIVITY - 1.0) ** 2
+        + (18.0 * GROUND_CONDUCTIVITY_S_M / ghz) ** 2
+    ) ** (-0.25)
+    beta = ((1.0 + 1.6 * k ** 2 + 0.67 * k ** 4)
+            / (1.0 + 4.5 * k ** 2 + 1.53 * k ** 4))
+
+    x = 21.88 * beta * (ghz / EFFECTIVE_EARTH_KM ** 2) ** (1.0 / 3.0) * span_km
+    if x < 1.6:
+        distance_term = -20.0 * math.log10(x) - 5.6488 * x ** 1.425
+    else:
+        distance_term = 11.0 + 10.0 * math.log10(x) - 17.6 * x
+
+    def height_term(height_m: float) -> float:
+        y = 0.9575 * beta * (ghz ** 2 / EFFECTIVE_EARTH_KM) ** (
+            1.0 / 3.0) * max(height_m, 0.0)
+        if y > 2.0:
+            return 17.6 * math.sqrt(y - 1.1) - 5.0 * math.log10(y - 1.1) - 8.0
+        gained = 20.0 * math.log10(y + 0.1 * y ** 3) if y > 0.0 else -99.0
+        # The Recommendation's floor: below it the height contributes
+        # nothing that can be told from nothing.
+        return max(gained, 2.0 + 20.0 * math.log10(k))
+
+    loss = -distance_term - height_term(tx_height_m) - height_term(rx_height_m)
+    return max(loss, 0.0)
+
+
+def smooth_earth_heights_m(
+    profile: Sequence[tuple[float, float]], distance_m: float,
+    tx_height_m: float, rx_height_m: float,
+) -> tuple[float, float]:
+    """The two ends of the smooth earth this profile sits on.
+
+    ITU-R P.452-16 equations (165) and (166): a least-squares line
+    through the terrain, which is the surface the spherical-earth term
+    is measured above. Held at or below the ground under each terminal,
+    because a fitted line that rises above the ground it was fitted to
+    would lift an antenna off its own mounting.
+    """
+    span_km = distance_m / 1000.0
+    points = [(fraction * span_km, height) for fraction, height in profile]
+    if len(points) < 2 or span_km <= 0.0:
+        return (0.0, 0.0)
+
+    first = second = 0.0
+    for (km_a, height_a), (km_b, height_b) in zip(points, points[1:]):
+        step = km_b - km_a
+        first += step * (height_b + height_a)
+        second += step * (height_b * (2.0 * km_b + km_a)
+                          + height_a * (km_b + 2.0 * km_a))
+    at_tx = (2.0 * first * span_km - second) / span_km ** 2
+    at_rx = (second - first * span_km) / span_km ** 2
+    return (min(at_tx, points[0][1], tx_height_m),
+            min(at_rx, points[-1][1], rx_height_m))
+
+
+def delta_bullington_db(
+    profile: Sequence[tuple[float, float]],
+    tx_height_m: float,
+    rx_height_m: float,
+    distance_m: float,
+    frequency_hz: float,
+) -> float:
+    """Diffraction loss over this ground, in dB.
+
+    ITU-R P.526-15 4.5.2. Two Bullington constructions and a smooth
+    earth: the real profile's answer, plus however much a smooth earth
+    of the same length would have cost over the same construction. The
+    difference is the *delta*, and it is what keeps a long path over
+    gentle ground from coming back clear when the horizon is the thing
+    in the way.
+
+    Heights are metres in the profile's own datum, which for a fetched
+    site is metres above sea level with roofs folded in (ADR-0046).
+    """
+    on_the_ground = bullington_db(profile, tx_height_m, rx_height_m,
+                                  distance_m, frequency_hz)
+    at_tx, at_rx = smooth_earth_heights_m(profile, distance_m,
+                                          tx_height_m, rx_height_m)
+    above_tx = max(tx_height_m - at_tx, 0.0)
+    above_rx = max(rx_height_m - at_rx, 0.0)
+
+    flat = [(fraction, 0.0) for fraction, _ in profile]
+    on_a_smooth_earth = bullington_db(flat, above_tx, above_rx,
+                                      distance_m, frequency_hz)
+    curving = spherical_earth_db(distance_m, above_tx, above_rx,
+                                 frequency_hz)
+    return on_the_ground + max(curving - on_a_smooth_earth, 0.0)
 
 
 def regulatory_eirp_limit_dbm(
@@ -456,7 +691,16 @@ def evaluate_link(
     fresnel_m = first_fresnel_radius_m(distance_m, frequency_hz, fraction)
     required_m = FRESNEL_CLEARANCE_FRACTION * fresnel_m
 
-    diffraction_db = diffraction_loss_db(clearance_m, fresnel_m)
+    # Over the whole profile where there is one, and over the single
+    # worst point where there is not. The Recommendation's method needs
+    # ground to walk along; an Obstruction built by hand from two
+    # numbers has none, and one edge is then the honest reading of what
+    # it says (ADR-0053).
+    if obstruction.profile:
+        diffraction_db = delta_bullington_db(
+            obstruction.profile, tx[2], rx[2], distance_m, frequency_hz)
+    else:
+        diffraction_db = diffraction_loss_db(clearance_m, fresnel_m)
 
     # Two effects, and they are not the same one. Ground reflection acts
     # even over perfectly flat ground, because the reflected ray cancels

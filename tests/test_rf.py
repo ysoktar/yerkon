@@ -400,3 +400,167 @@ def test_the_link_budget_reports_the_detour_it_implies():
     )
     assert clear.excess_path_m == 0.0
     assert blocked.excess_path_m > 0.0
+
+
+# --- Diffraction over the whole profile (ADR-0053) ------------------------
+
+
+def a_plain(height_m=0.0, samples=64):
+    """A profile at one height, which is what a plane looks like."""
+    return tuple((i / samples, height_m) for i in range(samples + 1))
+
+
+def test_one_edge_on_the_line_of_sight_costs_the_classic_six_decibels():
+    """ITU-R P.526-15 equation (31) at v = 0, which every one of these
+    methods is built from and which the single-edge function already
+    used. Shared rather than written twice."""
+    from yerkon.rf import knife_edge_db
+
+    assert knife_edge_db(0.0) == pytest.approx(6.0, abs=0.1)
+    assert knife_edge_db(-0.78) == 0.0, "clear of the zone that matters"
+    assert knife_edge_db(-5.0) == 0.0
+    assert knife_edge_db(3.0) > knife_edge_db(1.0) > knife_edge_db(0.0)
+
+    # And the older, single-point function is the same J(v), reached
+    # through a clearance and a Fresnel radius instead of through v.
+    zone = first_fresnel_radius_m(1000.0, 2450e6)
+    assert diffraction_loss_db(0.0, zone) == pytest.approx(knife_edge_db(0.0))
+
+
+def test_two_edges_cost_more_than_the_worse_one_alone():
+    """The whole reason for the change. A path across a town is not one
+    obstacle: over Kızılay at 6 m to 1,5 m, of 215 links between 200 m
+    and 1,2 km only 15 % are clear, the median has three edges blocking
+    it and the worst has sixteen. Taking the worst of those and
+    forgetting the rest is optimistic exactly where the urban row is.
+    """
+    from yerkon.rf import bullington_db
+
+    one = list(a_plain())
+    one[20] = (20 / 64, 8.0)
+    two = list(one)
+    two[44] = (44 / 64, 8.0)
+
+    alone = bullington_db(tuple(one), 6.0, 1.5, 1000.0, 2450e6, curved=False)
+    both = bullington_db(tuple(two), 6.0, 1.5, 1000.0, 2450e6, curved=False)
+    assert both > alone + 1.0, (alone, both)
+
+
+def test_a_path_with_nothing_in_it_pays_almost_nothing():
+    from yerkon.rf import bullington_db, delta_bullington_db
+
+    high = a_plain(0.0)
+    assert bullington_db(high, 60.0, 60.0, 1000.0, 2450e6) < 0.5
+    assert delta_bullington_db(high, 60.0, 60.0, 1000.0, 2450e6) < 1.0
+
+
+def test_a_grazing_path_is_answered_rather_than_divided_by_zero():
+    """The two steepest lines are parallel and never cross, so there is
+    no equivalent edge to place. It is a real arrangement — an obstacle
+    exactly on the line between the ends — and it used to raise."""
+    from yerkon.rf import bullington_db
+
+    grazing = list(a_plain())
+    grazing[32] = (0.5, 3.75)           # the midpoint of a 6 m -> 1,5 m line
+    said = bullington_db(tuple(grazing), 6.0, 1.5, 1000.0, 2450e6,
+                         curved=False)
+    assert said > 6.0, "an edge on the line is not a clear path"
+    assert math.isfinite(said)
+
+
+def test_a_smooth_earth_still_gets_in_the_way_over_a_long_path():
+    """What the equivalent-edge construction cannot see: a profile with
+    no edge in it has no edge to stand for, and over twenty kilometres
+    the thing in the way is the planet. ITU-R P.526-15 4.2."""
+    from yerkon.rf import bullington_db, delta_bullington_db, spherical_earth_db
+
+    flat = a_plain()
+    assert bullington_db(flat, 25.0, 1.5, 20_000.0, 2450e6) < 12.0
+    far = delta_bullington_db(flat, 25.0, 1.5, 20_000.0, 2450e6)
+    assert far > 15.0, far
+
+    # It grows with distance and shrinks with height, both of which are
+    # the whole point of a mast.
+    assert (spherical_earth_db(30_000.0, 25.0, 1.5, 2450e6)
+            > spherical_earth_db(20_000.0, 25.0, 1.5, 2450e6))
+    assert (spherical_earth_db(20_000.0, 50.0, 1.5, 2450e6)
+            < spherical_earth_db(20_000.0, 25.0, 1.5, 2450e6))
+    assert spherical_earth_db(500.0, 6.0, 1.5, 2450e6) < 1.0
+
+
+def test_the_delta_never_takes_loss_away():
+    """It is `max(smooth earth - the same construction over a smooth
+    earth, 0)`, so the real profile's answer is a floor."""
+    from yerkon.rf import bullington_db, delta_bullington_db
+
+    rough = list(a_plain())
+    rough[16] = (0.25, 12.0)
+    rough[40] = (40 / 64, 7.0)
+    for distance_m in (800.0, 5000.0, 20_000.0):
+        over_ground = bullington_db(tuple(rough), 20.0, 1.5, distance_m, 2450e6)
+        with_delta = delta_bullington_db(tuple(rough), 20.0, 1.5, distance_m,
+                                         2450e6)
+        assert with_delta >= over_ground - 1e-9, distance_m
+
+
+def test_the_budget_reads_the_ground_when_it_is_given_some():
+    """And falls back to the single worst point when it is not: an
+    Obstruction built by hand out of two numbers has no ground to walk
+    along, and one edge is then the honest reading of what it says."""
+    from dataclasses import replace
+
+    ridge = list(a_plain())
+    ridge[24] = (24 / 64, 30.0)
+    ridge[40] = (40 / 64, 30.0)
+    carried = Obstruction(peak_terrain_m=30.0, peak_at_fraction=24 / 64,
+                          profile=tuple(ridge))
+
+    over_ground = evaluate_link(mast(25.0), vehicle(2000.0),
+                                obstruction=carried)
+    one_point = evaluate_link(mast(25.0), vehicle(2000.0),
+                              obstruction=replace(carried, profile=()))
+    assert over_ground.diffraction_loss_db > one_point.diffraction_loss_db
+    assert one_point.diffraction_loss_db > 0.0, "the single edge still works"
+
+
+def test_real_ground_is_read_from_the_terrain_rather_than_summarised():
+    """The terrain hands the whole profile to the budget, so the roofs a
+    fetched site folds into its surface are edges this counts."""
+    from yerkon.viewer.state import from_scenario
+
+    state = from_scenario("urban")
+    ground = state.terrain()
+    here = (300.0, 1500.0, ground.height_at(300.0, 1500.0) + 6.0)
+    there = (1500.0, 1500.0, ground.height_at(1500.0, 1500.0) + 1.5)
+    obstruction = ground.obstruction_between(here, there)
+
+    assert len(obstruction.profile) > 32, "the ground travels with it"
+    assert obstruction.profile[0][0] == 0.0
+    assert obstruction.profile[-1][0] == pytest.approx(1.0)
+
+
+def test_the_construction_is_the_recommendation_s_arithmetic():
+    """One edge, worked by hand against ITU-R P.526-15 4.5.1.
+
+    A single obstacle is the case where Bullington's construction must
+    land on the obstacle itself, so the answer is checkable without the
+    construction: v from the Fresnel parameter, J(v) from equation (31),
+    and the Recommendation's own empirical term on top.
+    """
+    from yerkon.rf import bullington_db, knife_edge_db
+
+    wavelength_m = 299792458.0 / 2450e6
+    above_the_line = 30.0 - (25.0 + 2.0) / 2.0
+    v = above_the_line * math.sqrt(
+        2.0 / wavelength_m * 2000.0 / (1000.0 * 1000.0))
+    plain = knife_edge_db(v)
+    by_hand = plain + (1.0 - math.exp(-plain / 6.0)) * (10.0 + 0.02 * 2.0)
+
+    profile = [(i / 64, 0.0) for i in range(65)]
+    profile[32] = (0.5, 30.0)
+    said = bullington_db(tuple(profile), 25.0, 2.0, 2000.0, 2450e6,
+                         curved=False)
+
+    assert v == pytest.approx(2.983, abs=0.001)
+    assert said == pytest.approx(by_hand, abs=0.01)
+    assert said == pytest.approx(32.17, abs=0.05)
