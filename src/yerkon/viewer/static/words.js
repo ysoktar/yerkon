@@ -131,6 +131,7 @@ export const SAY = {
     en: "Drag to pan · Wheel to zoom · Move the box, drag its corners · "
         + "Shift-drag or Draw a box to start a new one",
   },
+  "fetch.map.drop": { tr: "Bırak", en: "Drop" },
   "fetch.map.picked": { tr: "Haritadan: {across} × {along} km",
                         en: "From the map: {across} × {along} km" },
   "fetch.map.credit": { tr: "© OpenStreetMap katkıda bulunanları",
@@ -177,6 +178,12 @@ export const SAY = {
   "fetch.centre": { tr: "Merkez (enlem, boylam)", en: "Centre (lat, lon)" },
   "fetch.size": { tr: "Kutunun boyu", en: "Box across" },
   "fetch.size.out": { tr: "{km} km", en: "{km} km" },
+  "fetch.box.map": {
+    tr: "{points} ızgara noktası — haritadan seçilen kutu. Kolu geri almak "
+        + "için «Bırak».",
+    en: "{points} grid points — the box picked on the map. Press “Drop” to "
+        + "get the slider back.",
+  },
   "fetch.box": {
     tr: "{km} × {km} km, {points} ızgara noktası. Merkezi haritada sağ "
         + "tıklayarak alabilirsin.",

@@ -2078,3 +2078,54 @@ def test_the_fetch_panel_is_greyed_rather_than_offered_and_then_refused():
     for half in ("tr:", "en:"):
         assert half in phrase, half
         assert "pip install -e" in phrase[phrase.index(half):][:300], half
+
+# --- The knob and the map describe one box (ADR-0052) ---------------------
+
+
+def test_the_size_knob_stands_down_while_a_map_box_is_in_force():
+    """A box drawn on a map is a rectangle; the knob holds one number.
+
+    So with 19,31 × 12,33 km taken from the map, the knob went on
+    reading "3 km" and the line under it went on costing that 3 km box
+    at ten thousand grid points — while the fetch was about to take a
+    quarter of a million. The knob is dead there rather than wrong, and
+    the way back is a button that can be seen.
+    """
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    knob = page[page.index("function wireFetchBox("):]
+    knob = knob[:knob.index("\n}\n")]
+    # The exact branch, so that disabling it is a failing test rather
+    # than a passing one: `app.js` is the page itself and reaches for
+    # `document` as it loads, so these read the file. The behaviour is
+    # walked in a browser, and `docs/TRY-IT.md` says how.
+    assert "if (pickedBox && pickedSpan) {" in knob
+    assert "size.disabled = true;" in knob
+    assert "size.disabled = false;" in knob
+    assert 'say("fetch.box.map"' in knob
+    # Taking a box changes what the knob says, and the two are wired in
+    # different places.
+    assert "redrawFetchBox = redraw;" in knob
+    assert page.count("redrawFetchBox()") >= 2
+
+    html = (STATIC / "index.html").read_text(encoding="utf-8")
+    assert "fetch-picked-drop" in html
+    words = (STATIC / "words.js").read_text(encoding="utf-8")
+    for key in ('"fetch.box.map"', '"fetch.map.drop"'):
+        assert key in words, key
+
+
+def test_one_box_costs_one_number_wherever_it_is_said():
+    """The map's own bar says how many ground samples a box costs while
+    it is being dragged, and the panel says it again under the knob. Two
+    spellings of one piece of arithmetic is how the same box came to
+    read 9 900 points on the map and 10 000 in the panel."""
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    picker = (STATIC / "map.js").read_text(encoding="utf-8")
+    # It lives beside the other box arithmetic, which is the half that
+    # node can run: `tests/test_map.py` pins what it answers.
+    assert "export function gridPoints(acrossKm, alongKm, stepM)" in picker
+    assert "function gridPoints(" not in page, "not a second copy"
+    assert page.count("pick.gridPoints(") >= 3, "used everywhere it is said"
+    # And nobody works it out a second time by hand.
+    assert "Math.floor(state.span.across" not in page
+    assert "side * side" not in page

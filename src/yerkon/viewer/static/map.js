@@ -119,6 +119,24 @@ export function boxSpanKm(box) {
   };
 }
 
+/* How many ground samples a box of this size costs, at this spacing.
+ *
+ * Here rather than in the page, because the number is said in two
+ * places — in the map's bar while a box is being dragged, and under the
+ * size knob in the panel — and two spellings of one piece of arithmetic
+ * is how the same box came to read 9 900 points on the map and 10 000
+ * in the panel (ADR-0052).
+ *
+ * Floored rather than rounded, and independently on each side: this is
+ * what `build_site` will actually lay down, and a rectangle is not a
+ * square however close it looks after two decimal places.
+ */
+export function gridPoints(acrossKm, alongKm, stepM) {
+  const step = Math.max(stepM || 30, 1);
+  return Math.floor((acrossKm * 1000) / step)
+    * Math.floor((alongKm * 1000) / step);
+}
+
 // --- The map --------------------------------------------------------------
 
 /* A pannable, zoomable map inside `host`, with a box drawn on it.

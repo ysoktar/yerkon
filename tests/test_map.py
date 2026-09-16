@@ -191,3 +191,41 @@ def test_the_gesture_hint_and_the_credit_are_in_both_languages():
                 "fetch.map.take", "fetch.map.draw"):
         assert '"{}"'.format(key) in words, key
     assert "OpenStreetMap" in words
+
+
+# --- One box, one cost (ADR-0052) ----------------------------------------
+
+
+@node
+@pytest.mark.parametrize("across_km,along_km,step_m,expected", [
+    (3.0, 3.0, 30.0, 100 * 100),
+    (15.84, 9.94, 30.0, 528 * 331),
+    (19.31, 12.33, 30.0, 643 * 411),
+    (3.0, 3.0, 40.0, 75 * 75),
+    (1.0, 1.0, 0.0, 33 * 33),          # a spacing of nothing is not nothing
+])
+def test_a_box_costs_the_same_number_wherever_it_is_said(
+        across_km, along_km, step_m, expected):
+    """Said twice on screen — in the map's bar while a box is dragged,
+    and under the size knob in the panel — and it was worked out twice,
+    so the same box read 9 900 points on the map and 10 000 in the
+    panel. One function now, and this is what it says."""
+    got = run_in_node(
+        "console.log(JSON.stringify(map.gridPoints({}, {}, {})))".format(
+            across_km, along_km, step_m))
+    assert got == expected
+
+
+@node
+def test_the_count_is_what_the_fetch_will_actually_lay_down():
+    """Floored on each side independently, against the Python that does
+    the laying: a rectangle is not a square however close the two
+    numbers look after two decimal places."""
+    across_km, along_km, step_m = 15.84, 9.94, 30.0
+    said = run_in_node(
+        "console.log(JSON.stringify(map.gridPoints({}, {}, {})))".format(
+            across_km, along_km, step_m))
+    by_hand = (int(across_km * 1000 // step_m)) * (int(along_km * 1000 // step_m))
+    assert said == by_hand
+    assert said != int(across_km * 1000 // step_m) ** 2, (
+        "a square would be the wrong answer for this box")

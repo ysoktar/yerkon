@@ -87,7 +87,13 @@
                placeholder="39,9250 32,8370"></label>
       <div class="row"><button id="open-map" class="quiet"
         data-say="fetch.map.open"></button></div>
-      <p class="hint" id="fetch-picked" hidden></p>
+      <!--
+        The box a map hands over is a rectangle and the size knob holds
+        one number, so while there is one the knob stands down and this
+        line carries the way back (ADR-0052).
+      -->
+      <p class="hint" id="fetch-picked" hidden><span id="fetch-picked-what"></span>
+        <button id="fetch-picked-drop" class="quiet" data-say="fetch.map.drop"></button></p>
       <label class="knob"><span data-say="fetch.size"></span><output id="fetch-size-out"></output>
         <input type="range" id="fetch-size" min="1" max="40" step="1" value="3">
         <input type="number" id="fetch-size-num" class="num" step="1"></label>

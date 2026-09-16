@@ -2716,6 +2716,13 @@ async function drawPresets(keep) {
  */
 let picker = null;
 let pickedBox = null;
+/* How big that box is, which the size knob cannot say: a box drawn on a
+ * map is a rectangle and the knob holds one number. */
+let pickedSpan = null;
+/* Redraws the size knob and the line under it. Held here because taking
+ * a box from the map changes what both of them say, and the map sheet
+ * and the knob are wired in two different places. */
+let redrawFetchBox = () => {};
 let MAP_TILES = "";
 
 function wireMap() {
@@ -2772,6 +2779,7 @@ function wireMap() {
   document.getElementById("map-take").onclick = () => {
     const { box, span } = picker.state();
     pickedBox = box;
+    pickedSpan = span;
     // The centre box is filled too, in this project's own decimal mark,
     // so the panel still shows where the ground is and a person can
     // still edit it by hand (ADR-0039).
@@ -2780,9 +2788,13 @@ function wireMap() {
       + `${decimal((box.west + box.east) / 2, 5)}`;
     const note = document.getElementById("fetch-picked");
     note.hidden = false;
-    note.textContent = say("fetch.map.picked", {
-      across: decimal(span.across, 2), along: decimal(span.along, 2),
-    });
+    document.getElementById("fetch-picked-what").textContent =
+      say("fetch.map.picked", {
+        across: decimal(span.across, 2), along: decimal(span.along, 2),
+      });
+    // The knob and its line describe the box that will be fetched, and
+    // that is now this one.
+    redrawFetchBox();
     shut();
   };
 
@@ -2795,7 +2807,9 @@ function wireMap() {
   // and the task disagreeing about which field decides.
   document.getElementById("fetch-centre").addEventListener("input", () => {
     pickedBox = null;
+    pickedSpan = null;
     document.getElementById("fetch-picked").hidden = true;
+    redrawFetchBox();
   });
 
   const find = () => lookForPlace();
@@ -2832,10 +2846,8 @@ function startingPoint() {
 function showSpan(state) {
   const shown = document.getElementById("map-span");
   if (!shown) return;
-  const step = Math.max(Number(document.getElementById("fetch-spacing").value)
-    || 30, 1);
-  const points = Math.floor(state.span.across * 1000 / step)
-    * Math.floor(state.span.along * 1000 / step);
+  const points = pick.gridPoints(state.span.across, state.span.along,
+    Number(document.getElementById("fetch-spacing").value));
   shown.textContent = say("fetch.map.span", {
     across: decimal(state.span.across, 2),
     along: decimal(state.span.along, 2),
@@ -2888,16 +2900,44 @@ function wireFetchBox() {
   const spacing = document.getElementById("fetch-spacing");
   if (!size || !note) return;
 
+  const label = size.closest("label");
+
   const redraw = () => {
-    const km = Number(size.value);
     const step = Math.max(Number(spacing.value) || 30, 1);
-    const side = Math.floor((km * 1000) / step);
+
+    /* A box drawn on a map outranks this knob, so while there is one the
+     * knob does not describe anything.
+     *
+     * It used to go on reading "3 km" beside a note saying the map had
+     * handed over 19,31 × 12,33 km, and the hint under it went on
+     * costing the 3 km box at ten thousand grid points when the fetch
+     * was about to take a quarter of a million. Two halves of one
+     * control saying different things is the thing this project keeps
+     * catching (ADR-0036, ADR-0048, ADR-0052).
+     */
+    if (pickedBox && pickedSpan) {
+      const points = pick.gridPoints(pickedSpan.across, pickedSpan.along, step);
+      if (shown) shown.textContent = NOTHING;
+      if (label) label.classList.add("dead");
+      size.disabled = true;
+      if (number) { number.disabled = true; number.value = ""; }
+      note.textContent = say("fetch.box.map",
+                             { points: points.toLocaleString("tr-TR") });
+      note.classList.toggle("no-hits", points > 4000000);
+      return;
+    }
+
+    const km = Number(size.value);
+    const points = pick.gridPoints(km, km, step);
     if (shown) shown.textContent = say("fetch.size.out", { km });
+    if (label) label.classList.remove("dead");
+    size.disabled = false;
+    if (number) number.disabled = false;
     if (number && document.activeElement !== number) number.value = km;
     note.textContent = say("fetch.box", {
-      km, points: (side * side).toLocaleString("tr-TR"),
+      km, points: points.toLocaleString("tr-TR"),
     });
-    note.classList.toggle("no-hits", side * side > 4000000);
+    note.classList.toggle("no-hits", points > 4000000);
   };
 
   /* Reaching for the size slider drops a box drawn on the map.
@@ -2911,12 +2951,24 @@ function wireFetchBox() {
   const bySlider = () => {
     if (pickedBox) {
       pickedBox = null;
+      pickedSpan = null;
       document.getElementById("fetch-picked").hidden = true;
       if (picker) picker.setSquare(Number(size.value) || 3);
     }
     redraw();
   };
 
+  redrawFetchBox = redraw;
+  const letGo = document.getElementById("fetch-picked-drop");
+  if (letGo) {
+    letGo.onclick = () => {
+      pickedBox = null;
+      pickedSpan = null;
+      document.getElementById("fetch-picked").hidden = true;
+      if (picker) picker.setSquare(Number(size.value) || 3);
+      redraw();
+    };
+  }
   size.oninput = bySlider;
   spacing.oninput = () => {
     redraw();

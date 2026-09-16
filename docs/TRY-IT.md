@@ -244,6 +244,15 @@ kadar etraf" vardır, dört ondalık derece değil. Kutu merkezden kare
 olarak kuruluyor — boylam derecesi enlem derecesinden kısa olduğu için
 ikisi eşit alınsa kimsenin istemediği bir dikdörtgen çıkardı.
 
+**Haritadan kutu alırsan kol çekilir.** Serbest çizilen bir kutu
+dikdörtgendir ve "Kutunun boyu" tek bir sayı tutar, dolayısıyla kutu
+yürürlükteyken kol kapanıyor ve `—` gösteriyor; altındaki satır gerçek
+kutunun kaç ızgara noktası ettiğini veriyor — haritanın kendi
+çubuğundaki sayıyla birebir aynı. Kolu geri almak için "Haritadan…"
+satırının yanındaki **Bırak**. Bu bozuktu: kol 3 km demeye devam ediyor,
+altındaki satır 10.000 nokta diyordu, oysa getirilecek kutu 264.273
+noktaydı (ADR-0052).
+
 **Izgara aralığı** 30 m'de bırak. Copernicus zaten 30 m; daha sıkını
 istemek yeni bilgi getirmez, daha seyreği tepeleri yumuşatır. Satır kaç
 nokta olacağını söylüyor: 3 km'de 10 000, 12 km'de 160 000. Yüz binlerin
