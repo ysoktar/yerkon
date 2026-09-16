@@ -390,6 +390,10 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "an anchor past the end of the site stands on ground nothing "
               "models and nothing drives past",
     },
+    "panel.filled_the_ground": {
+        "tr": "saha, getirilen zeminin tamamıydı ve öyle kalıyor",
+        "en": "the site was the whole of its ground and stays so",
+    },
     "panel.past_the_measurement": {
         "tr": "bir saha, kendisi için indirilen zeminden büyük olamaz; "
               "kenarın ötesinde yalnızca sınır satırının bir düzleme "

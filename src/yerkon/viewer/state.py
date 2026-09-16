@@ -883,6 +883,46 @@ class ViewState:
             return self
         return replace(self, corridor_m=length, width_m=width)
 
+    def on_new_ground(self, before: "ViewState") -> "ViewState":
+        """This state after being put on different ground.
+
+        Clipping only ever makes a site smaller (ADR-0037), which is
+        right when the ground shrinks under it and leaves it behind when
+        the ground grows. Fetch nineteen kilometres by twelve, press
+        Use, and the site was still the three kilometres of the town it
+        had been on: one and a half per cent of what had just been
+        downloaded, with no sign that anything had been left out
+        (ADR-0054).
+
+        So a site that was the whole of its ground becomes the whole of
+        the new ground, and a site somebody had deliberately made
+        smaller than its ground keeps the size they gave it. A corridor
+        stays a corridor: it takes the new length and no width, because
+        a width of nothing is the thing that makes it one.
+
+        Modelled ground has no measured extent to have filled, so
+        arriving from it keeps the numbers and lets the clip decide.
+        """
+        if self.bore or self.site == before.site:
+            return self
+        ground = self.measured()
+        if ground is None:
+            return self
+
+        was = before.measured()
+        if was is None:
+            return self
+        filled = (before.corridor_m >= was.width_m - 1e-6
+                  and (before.width_m <= 0.0
+                       or before.width_m >= was.height_m - 1e-6))
+        if not filled:
+            return self
+        return replace(
+            self,
+            corridor_m=float(ground.width_m),
+            width_m=0.0 if before.width_m <= 0.0 else float(ground.height_m),
+        )
+
     def within_site(self) -> "ViewState":
         """This state, with everything standing on it brought inside it.
 

@@ -2129,3 +2129,80 @@ def test_one_box_costs_one_number_wherever_it_is_said():
     # And nobody works it out a second time by hand.
     assert "Math.floor(state.span.across" not in page
     assert "side * side" not in page
+
+# --- Naming ground the site has to follow (ADR-0054) ----------------------
+
+
+def test_a_site_that_filled_its_ground_fills_the_new_ground_too():
+    """Clipping only ever makes a site smaller, which is right when the
+    ground shrinks under it and leaves it behind when the ground grows.
+    Fetch nineteen kilometres by twelve, press Use, and the site was
+    still the three kilometres of the town it had been on — one and a
+    half per cent of what had just been downloaded."""
+    from yerkon.viewer.state import from_scenario
+
+    town = from_scenario("urban")
+    assert town.site == "kizilay"
+    small = town.measured()
+    assert (town.corridor_m, town.width_m) == (small.width_m, small.height_m)
+
+    moved = town.merged({"site": "polatli"}).on_new_ground(town).within_site()
+    plain = moved.measured()
+    assert moved.corridor_m == pytest.approx(plain.width_m)
+    assert moved.width_m == pytest.approx(plain.height_m)
+    assert moved.corridor_m > town.corridor_m * 5
+
+
+def test_a_site_somebody_made_smaller_keeps_the_size_they_gave_it():
+    """The rule is about a site that was the whole of its ground, and
+    that is a fact about the site rather than a wish about it."""
+    from yerkon.viewer.state import from_scenario
+
+    town = from_scenario("urban")
+    chosen = town.merged({"corridor_m": 1000.0, "width_m": 800.0})
+    moved = chosen.merged({"site": "polatli"}).on_new_ground(chosen)
+    assert (moved.corridor_m, moved.width_m) == (1000.0, 800.0)
+
+
+def test_a_corridor_stays_a_corridor_on_new_ground():
+    """A width of nothing is the thing that makes it one, so it takes
+    the new length and keeps the nothing."""
+    from yerkon.viewer.state import from_scenario
+
+    town = from_scenario("urban")
+    line = town.merged({"width_m": 0.0})
+    moved = line.merged({"site": "polatli"}).on_new_ground(line)
+    assert moved.width_m == 0.0
+    assert moved.corridor_m == pytest.approx(moved.measured().width_m)
+
+
+def test_ground_that_is_not_measured_moves_nothing():
+    """A bore goes through the hill rather than over it, and modelled
+    ground has no measured extent to have filled."""
+    from yerkon.viewer.state import from_scenario
+
+    bore = from_scenario("tunnel")
+    assert bore.merged({"site": "polatli"}).on_new_ground(bore).corridor_m \
+        == bore.corridor_m
+
+    modelled = from_scenario("urban").merged({"site": "", "corridor_m": 4000.0})
+    stayed = modelled.merged({"site": "polatli"}).on_new_ground(modelled)
+    assert stayed.corridor_m == 4000.0, "nothing was filled, so nothing fills"
+
+
+def test_the_panel_says_the_site_grew_and_says_why():
+    """Two different things happen when ground is named and they are not
+    the same sentence: a site can be brought in because the ground under
+    it stops, or opened out because it was the whole of it."""
+    from yerkon.viewer.server import cascades
+    from yerkon.viewer.state import from_scenario
+
+    town = from_scenario("urban")
+    found = cascades(town, {"site": "polatli"})
+    assert found, "naming ground is a change the panel has to show"
+    grew = [follow for group in found["groups"] for follow in group["follows"]
+            if follow["key"] in ("corridor_m", "width_m")]
+    assert grew, "the panel has to show what the site did"
+    for follow in grew:
+        assert follow["after"] > follow["before"]
+        assert "tamam" in follow["because"], follow["because"]

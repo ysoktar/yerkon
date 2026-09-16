@@ -244,7 +244,9 @@ def _shortened(state: ViewState, proposed: ViewState, changes: dict):
     """
     if not any(name in CAN_SHRINK for name in changes):
         return
-    settled = proposed.within_site()
+    # Naming new ground can make the site bigger as well as smaller, and
+    # the panel is where both are said before either happens (ADR-0054).
+    settled = proposed.on_new_ground(state).within_site()
     key = next(name for name in CAN_SHRINK if name in changes)
     asked = {
         "key": key,
@@ -263,7 +265,15 @@ def _shortened(state: ViewState, proposed: ViewState, changes: dict):
             "label": field,
             "before": getattr(proposed, field),
             "after": getattr(settled, field),
-            "because": say("panel.past_the_measurement", state.language),
+            # Two different things happen here and they are not the same
+            # sentence: a site can be brought in because the ground under
+            # it stops, or opened out because it was the whole of its
+            # ground and the new ground is bigger.
+            "because": say(
+                "panel.filled_the_ground"
+                if getattr(settled, field) > getattr(proposed, field)
+                else "panel.past_the_measurement",
+                state.language),
         }
         for field in ("corridor_m", "width_m")
         if getattr(proposed, field) != getattr(settled, field)
@@ -527,7 +537,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _apply(self, changes: dict) -> dict:
         state = self.session.read()
-        settled = state.merged(changes)
+        settled = state.merged(changes).on_new_ground(state)
         if any(name in CAN_SHRINK for name in changes):
             # Whatever the panel just showed and got a yes for. A run's
             # own ends are not in that list: typing one is a person being
