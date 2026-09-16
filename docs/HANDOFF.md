@@ -145,16 +145,25 @@ yanlıştır.
    0,09 m'ye değiyor ve önemi yok. Tek bir sayı, iki zıt cevap; ve bunu
    yalnızca gerçek bir etüt çözer.
 
-7. **Aramanın çıtası ile alan sütununun saydığı şey aynı değil.** Arama
-   `FEWEST_FOR_A_FIX = 3` görüş hedefliyor, alan sütunu `≥4 direk`
-   sayıyor. İkisi de savunulabilir — üç bir konum için en az, dört onu
-   denetler — ama aynı şey olmadıkları için aramayla yerleştirilmiş bir
-   yerleşim alan sütununda kendi inandığından kötü görünüyor: Kızılay'da
-   geometriye göre seçilen dört direk 8,92 km² yerine 0,08 km² hizmet
-   alanı veriyor, çünkü köşelere yayılan dördü her noktadan birden
-   görünmüyor. Arama dörde mi hedeflemeli, alan sütunu üçü mü saymalı,
-   yoksa ikisi ayrı kalıp rapor bunu mu söylemeli — üçü de savunulabilir
-   (ADR-0046).
+7. ~~**Aramanın çıtası ile alan sütununun saydığı şey aynı değil.**~~
+   Yapıldı (ADR-0047). Üç ayrı hataydı: arama 2B seyreltmenin alt
+   sınırını (üç) bir yerleşimin gereksinimi (dört) yerine kullanıyordu;
+   aynı sayı `AnchorRun.cover_k` içinde üçüncü kez yazılıydı ve o kopya
+   kazanıyordu; ve arama, `reach_of`'un kendi belgesinin "bir iddia
+   değil" dediği düz arazi rakamına karar verdiriyordu. Kızılay'da
+   0,08 km² olan hizmet alanı **8,60 km²** oldu; Gölbaşı şehir içinde
+   arama artık **23 direkle 41,24 km²** veriyor, ızgaranın 36 direkle
+   verdiği 29,64'ten iyi.
+
+   Ondan geriye iki şey kaldı. **`greedy-coverage` hâlâ işe yaramaz bir
+   yerleşim üretebiliyor** — Gölbaşı şehir içinde üç direkle 0,00 km².
+   Bu MCLP'nin tanımı ve ADR-0040 zaten bunu söylemek için var, ama
+   arayüzde seçilebilen bir seçenek olarak duruyor. Ve **arama çıtasına
+   ulaşamadığında bunu söylemiyor**: Kızılay'da 478 m'lik bir diskle
+   HDOP ≤ 2 hiç karşılanmıyor, arama adayları tükenene kadar gidiyor
+   (232 direk — sahadaki monte edilebilir yapı sayısı), ve dışarıdan
+   çıtasını karşılayıp duran bir aramadan ayırt edilemiyor. ADR-0023'ün
+   uyardığı şey tam olarak bu.
 
 ## Açık sorular
 

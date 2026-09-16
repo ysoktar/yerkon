@@ -66,6 +66,12 @@ adlandırılmış yöntem. Kafesler (kare, altıgen, koridor, çevre),
 aramalar (kapsama, geometri, k-örtme) ve elle. Hepsi tek bir dikişten
 geçer: `place(plan, ground)`. ADR-0040'a bak.
 
+**Measured reach** (zeminde ölçülen menzil): bir aramanın adaylarını
+puanladığı disk, üzerinde durduğu zeminde ölçülerek. `reach_of` düz arazi
+rakamıdır ve kendi belgesi "bir iddia değil" der — bir halka için doğru,
+bir karar için yanlış. Kızılay'da halka 3825 m, ölçülen 478 m. Kafesler
+diski okumaz, yalnızca aramalar (`layout.SEARCHES`). ADR-0047'ye bak.
+
 **Dilution** (seyreltme, HDOP): direk geometrisinin menzil hatasını ne
 kadar büyüttüğü. İki bilinmeyen için — x ve y — çünkü iki yollu menzil
 ölçümü mesafeyi doğrudan ölçer, saat kayması durumda yoktur (ADR-0010)
