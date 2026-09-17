@@ -3067,8 +3067,21 @@ async function refreshScene() {
 }
 
 let sweepTimer = null;
+/* Which sweep the page is waiting for.
+ *
+ * Cancelling the timer only stops a sweep that has not been asked for
+ * yet. One already in flight arrives whenever the engine finishes it,
+ * and `/api/sweep` answers about the state the server held when it
+ * picked the request up — so switching rows while one was running put
+ * the country's covered ground in the tunnel's panel: 164,25 km²
+ * against fourteen anchors in a bore. The number was real and it was
+ * somebody else's (ADR-0050).
+ */
+let sweepWanted = 0;
+
 function scheduleSweep() {
   sweepData = null;
+  const mine = ++sweepWanted;
   render();
   // Said the moment the old areas stop being true, rather than when the
   // new ones arrive: the two are seconds apart and in between the panel
@@ -3078,7 +3091,11 @@ function scheduleSweep() {
   sweepTimer = setTimeout(async () => {
     try {
       flash(say("busy.sweep"));
-      sweepData = await ask("/api/sweep");
+      const swept = await ask("/api/sweep");
+      // Anything but the newest answer is an answer to a question the
+      // page has stopped asking.
+      if (mine !== sweepWanted) return;
+      sweepData = swept;
       // The bands travel with the sweep, so the legend is redrawn with
       // it: the error bands are multiples of this row's own tolerance
       // and move when that does.
@@ -3086,7 +3103,9 @@ function scheduleSweep() {
       render();
       showNumbers(latest, simulated);
       flash("");
-    } catch (error) { flash(error.message, true); }
+    } catch (error) {
+      if (mine === sweepWanted) flash(error.message, true);
+    }
   }, 250);
 }
 

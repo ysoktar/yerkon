@@ -55,6 +55,27 @@ değişimi de ayar yüklemesi de.
 biçimde ölçülüyor. Geçersiz kılan bir düzenlemedir, ve o zaten
 `refreshScene` içinde siliniyor.
 
+## Ek: geç gelen cevap
+
+Bu ADR bir sayının *hesaplanırken* nasıl gösterileceğiyle ilgiliydi.
+Aynı ailenin ikinci yarısı sonradan çıktı: **hesaplanan cevabın artık
+sorulmayan soruya ait olması.**
+
+Zamanlayıcıyı iptal etmek yalnızca henüz sorulmamış bir taramayı
+durdurur. Uçuştaki bir tarama motor bitirdiğinde geliyor, ve
+`/api/sweep` isteği aldığı andaki duruma göre cevap veriyor. Bir tarama
+sürerken satır değiştirince kırsalın kapsadığı zemin tünelin paneline
+indi: bir delikteki on dört direğin yanında **164,25 km²**. Sayı
+gerçekti ve başkasınındı.
+
+Dört çekirdek meşgulken bir kez görüldü — kırsalın taraması orada pencere
+açacak kadar uzun sürüyor. Sonrasında cevabı sayfaya dönerken elde
+tutarak kesin olarak yürünüyor.
+
+Her tarama isteği bir sıra numarası taşıyor; sayfanın beklediği numara
+değilse cevap atılıyor. Hata mesajı da öyle: kimsenin beklemediği bir
+taramanın hatası da kimsenin sorusuna ait değil.
+
 ## Sonuçlar
 
 Tarayıcıda, Kızılay üzerinde:

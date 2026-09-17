@@ -2206,3 +2206,32 @@ def test_the_panel_says_the_site_grew_and_says_why():
     for follow in grew:
         assert follow["after"] > follow["before"]
         assert "tamam" in follow["because"], follow["because"]
+
+# --- An answer to a question the page has stopped asking (ADR-0050) -------
+
+
+def test_a_sweep_that_arrives_late_is_not_this_row_s_ground():
+    """Cancelling the timer only stops a sweep that has not been asked
+    for yet. One already in flight arrives whenever the engine finishes
+    it, and `/api/sweep` answers about the state the server held when it
+    picked the request up — so switching rows while one was running put
+    the country's covered ground in the tunnel's panel: 164,25 km²
+    against fourteen anchors in a bore.
+
+    Seen once with four cores busy, where the country's sweep takes long
+    enough for the window to open wide. Walked deterministically since,
+    by holding that answer on its way back to the page.
+    """
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert "let sweepWanted = 0;" in page
+
+    sweep = page[page.index("function scheduleSweep()"):]
+    sweep = sweep[:sweep.index("\n}\n")]
+    assert "const mine = ++sweepWanted;" in sweep
+    assert "if (mine !== sweepWanted) return;" in sweep
+    # Assigned after the check rather than before it, or the guard would
+    # be reading a variable the stale answer had already overwritten.
+    assert sweep.index("if (mine !== sweepWanted) return;") < sweep.index(
+        "sweepData = swept;")
+    # And a failed sweep nobody is waiting for does not flash either.
+    assert "if (mine === sweepWanted) flash(error.message, true);" in sweep
