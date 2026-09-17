@@ -643,7 +643,7 @@ seçenek olarak kaydetsin.
 ## Terminalden
 
 ```bash
-yerkon table                  # dört satır              dakikalar
+yerkon table                  # dört satır              ~3 dk 50 sn
 yerkon budget                 # hata dağılımı           ~4 dk
 yerkon budget --only tunnel   #                         ~45 sn
 yerkon options                # adlandırılmış yerleşimler
@@ -657,11 +657,12 @@ yerkon defaults --full        # her değer ve neye dayandığı
 Her şey makinenin ayırabildiği kadar çekirdekte koşar — sahip olduğundan
 bir eksik, böylece görüntüleyici kullanılabilir kalır. `yerkon table` bir
 ara dört dakikaydı, paralelleştirilince yetmiş saniyeye indi, ve
-gölgeleme geldiğinde tekrar çıktı: her satır **sekiz gölge dizilişi**
-üzerinden koşuyor, çünkü tek bir çekiliş kırsal satırın 95. yüzdeliğini
-14,6 ile 279,6 m arasında herhangi bir yere koyuyor (ADR-0055). Hızlı
-olsun istersen `site.shadow_draws` değerini 1 yap: tek çekiliş, eski
-süre, ve yayımlanamayacak bir yüzdelik.
+gölgeleme geldiğinde tekrar çıktı — dört çekirdekte **3 dk 50 sn**:
+her satır **sekiz gölge dizilişi** üzerinden koşuyor, çünkü tek bir
+çekiliş kırsal satırın 95. yüzdeliğini 14,6 ile 279,6 m arasında
+herhangi bir yere koyuyor (ADR-0055). Hızlı olsun istersen
+`site.shadow_draws` değerini 1 yap: tek çekiliş, yetmiş saniye, ve
+yayımlanamayacak bir yüzdelik.
 
 ---
 

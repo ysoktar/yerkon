@@ -552,7 +552,8 @@ kalan sabitleme sayısı az ve yüzdelik bir kuyruk. Yüzdelik onun yerine \
 budur; bu proje aynı reddi ağırlıklı satır için bir kez veriyor \
 (ADR-0005). Bir yazmak havuzlamayı kapatır. Sekiz, kuyruğun oturduğu \
 yer: bir çekilişte 279,6 m, üçte 32,0, sekizden yirmi dörde kadar 24 ile \
-26 m arası. Tabloyu iki dakikadan on dakikaya çıkarıyor."""
+26 m arası. Dört çekirdekte tabloyu yetmiş saniyeden 3 dk 50 sn'ye \
+çıkarıyor."""
 note_en = """How many arrangements of shadows a row is run over. One run is one draw, \
 and for the rural row one draw decided a published figure: eight of them \
 put its ninety-fifth percentile anywhere between 14,6 m and 279,6 m, \
@@ -561,8 +562,8 @@ percentile is a tail. The percentile is taken over the draws' samples \
 together instead, which is what a percentile is — this project already \
 refuses the other way once, for the weighted row (ADR-0005). One \
 switches pooling off. Eight is where the tail settles: 279,6 m on one \
-draw, 32,0 over three, and 24 to 26 m from eight through twenty-four. It \
-takes the table from two minutes to ten."""
+draw, 32,0 over three, and 24 to 26 m from eight through twenty-four. On \
+four cores it takes the table from seventy seconds to 3 min 50 s."""
 affects = """yayımlanan yüzdeliklerin tek bir gölge dizilişine ne kadar bağlı olduğunu"""
 affects_en = """how much the published percentiles depend on one arrangement of shadows"""
 sensitivity = """kırsal satırda belirleyici: bir çekilişte 279,6 m, sekizin havuzunda \

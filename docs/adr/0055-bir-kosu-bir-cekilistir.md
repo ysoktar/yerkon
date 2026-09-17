@@ -104,8 +104,10 @@ bağlantıların yarısı çıtanın altına geçiyor. Eşiğin yakınında otur
 kalabalık bir nüfus varsa, yayılım onları kurtarıyor. Bu tam olarak
 kapsamanın neden bir yüzdeyle verildiği.
 
-`yerkon table` iki dakikadan on dakikaya çıktı. Sınamalar etkilenmedi,
-çünkü `run` hâlâ tek çekiliş.
+`yerkon table` dört çekirdekte yetmiş saniyeden **3 dk 50 sn**'ye çıktı
+(boş makinede ölçüldü; sekiz çekilişin kendisi on bir dakika işlemci
+zamanı, paralelleştirilmiş hâli bu). Sınamalar etkilenmedi, çünkü `run`
+hâlâ tek çekiliş.
 
 ### Bir sınama üçüncü kez yazıldı, ve bu sefer doğru şeyi söylüyor
 
