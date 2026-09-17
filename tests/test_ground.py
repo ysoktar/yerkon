@@ -250,56 +250,53 @@ def test_how_long_a_rural_round_runs_cannot_be_settled_on_one_seed():
     was tried on and −1,24 on the third. Polling twelve anchors instead
     of eight replaced it and was recorded as worth 5,5 points free.
 
-    On fetched ground only (ADR-0037) that claim is gone. Eight beats
-    ten on one seed and loses to it on the other, by more than the gap
-    the twelve was credited with. This pins the reversal rather than the
-    winner, because there is no winner to pin: anybody who reads a
-    ranking out of one seed here is reading noise, and `yerkon solve`
-    over more seeds is what would settle it.
+    On fetched ground only (ADR-0037) that claim is gone, and since
+    shadowing arrived (ADR-0055) it is gone in a way that no longer
+    needs a lucky pair of seeds to show. Over eight seeds, polling ten
+    anchors beats polling eight on five of them and loses on three; it
+    is ahead by 0,008 of availability on average, and the spread from
+    seed to seed is 0,020. **The effect is a quarter of the noise it is
+    measured in.**
 
-    Measured over six seeds since diffraction is worked out along the
-    whole profile (ADR-0053): ten takes five of them and eight takes
-    one, by about a point and a half of availability either way. So
-    there is a direction now — polling more anchors helps when fewer of
-    them are reachable, which is what harsher propagation means — and it
-    is still not a thing one seed can tell you. The pair below is one of
-    each, and that is the point: seeds 202 and 404, which this test used
-    to run on, now agree with each other and would have read as a
-    settled answer.
+    So the test is that, rather than a reversal: a reversal is one
+    sample of the same fact and it stops appearing every time the model
+    moves, which is how this test came to be rewritten twice. What does
+    not move is that a difference smaller than the scatter cannot be
+    read off one run of either.
     """
+    import statistics
     from dataclasses import replace
 
     from yerkon.evaluate import run_scenario
     from yerkon.parallel import spread
 
     base = CHOICES["rural"].scenario
+    seeds = (202, 404, 606, 808)
 
-    def polling(seed, anchors):
-        return replace(
+    runs = spread(run_scenario, [
+        replace(
             replace(base, seed=seed),
             deployment=replace(base.deployment, max_anchors_per_round=anchors),
         )
-
-    runs = spread(run_scenario, [
-        polling(seed, anchors)
-        for seed in (808, 1010) for anchors in (8, 10)
+        for seed in seeds for anchors in (8, 10)
     ])
     got = {
         (seed, anchors): run.availability
         for (seed, anchors), run in zip(
-            [(s, a) for s in (808, 1010) for a in (8, 10)], runs)
+            [(s, a) for s in seeds for a in (8, 10)], runs)
     }
-    reversed_somewhere = (
-        (got[(808, 8)] > got[(808, 10)]) != (got[(1010, 8)] > got[(1010, 10)])
+
+    gaps = [got[(seed, 10)] - got[(seed, 8)] for seed in seeds]
+    scatter = max(
+        statistics.pstdev([got[(seed, anchors)] for seed in seeds])
+        for anchors in (8, 10)
     )
-    assert reversed_somewhere, (
-        "eight against ten now orders the same way on both seeds, so the "
-        "round length may be measurable after all: {}".format(got)
+    assert abs(statistics.mean(gaps)) < scatter, (
+        "the round length may be measurable after all: ten is ahead by "
+        "{:+.4f} against a seed-to-seed spread of {:.4f} — {}".format(
+            statistics.mean(gaps), scatter, got)
     )
-    # And the gap either way is small enough that one seed decides
-    # nothing: a point and a half against a spread of five.
-    gaps = [abs(got[(seed, 8)] - got[(seed, 10)]) for seed in (808, 1010)]
-    assert max(gaps) < 0.05, got
+    assert scatter > 0.005, "a scatter this small would make the bar meaningless"
 
 
 # --- The figures reaching both ends of a link -----------------------------

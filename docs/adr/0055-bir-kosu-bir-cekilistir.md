@@ -107,6 +107,24 @@ kapsamanın neden bir yüzdeyle verildiği.
 `yerkon table` iki dakikadan on dakikaya çıktı. Sınamalar etkilenmedi,
 çünkü `run` hâlâ tek çekiliş.
 
+### Bir sınama üçüncü kez yazıldı, ve bu sefer doğru şeyi söylüyor
+
+`test_how_long_a_rural_round_runs_cannot_be_settled_on_one_seed` bir tur
+başına sekiz direk yoklamakla on direk yoklamak arasındaki sıralamanın
+**bir tohumdan okunamayacağını** iddia ediyor. İddiayı iki tohumda bir
+ters dönüşle çiviliyordu, ve model her oynadığında o ters dönüş
+kayboluyordu: ADR-0053'te bir kez, gölgeleme gelince bir kez daha.
+
+Ters dönüş, olgunun bir örneği; olgu değil. Sekiz tohumda ölçtüm:
+
+| on kaç tohumda önde | ortalama fark | tohumdan tohuma yayılım |
+|---|---|---|
+| 5/8 | +0,008 | 0,020 |
+
+**Etki, içinde ölçüldüğü gürültünün dörtte biri.** Sınama artık bunu
+söylüyor — bir çift tohum aramıyor — ve modelin bir dahaki oynayışında
+kendiliğinden ayakta kalıyor.
+
 ## Yapılmayanlar
 
 **Sayfa havuzlamıyor.** Görüntüleyici tek çekiliş gösteriyor — canlı bir
