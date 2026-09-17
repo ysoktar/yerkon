@@ -643,7 +643,7 @@ seçenek olarak kaydetsin.
 ## Terminalden
 
 ```bash
-yerkon table                  # dört satır              ~70 sn
+yerkon table                  # dört satır              dakikalar
 yerkon budget                 # hata dağılımı           ~4 dk
 yerkon budget --only tunnel   #                         ~45 sn
 yerkon options                # adlandırılmış yerleşimler
@@ -655,8 +655,13 @@ yerkon defaults --full        # her değer ve neye dayandığı
 ```
 
 Her şey makinenin ayırabildiği kadar çekirdekte koşar — sahip olduğundan
-bir eksik, böylece görüntüleyici kullanılabilir kalır. `yerkon table`
-bundan önce dört dakikaydı, şimdi yetmiş saniye.
+bir eksik, böylece görüntüleyici kullanılabilir kalır. `yerkon table` bir
+ara dört dakikaydı, paralelleştirilince yetmiş saniyeye indi, ve
+gölgeleme geldiğinde tekrar çıktı: her satır **sekiz gölge dizilişi**
+üzerinden koşuyor, çünkü tek bir çekiliş kırsal satırın 95. yüzdeliğini
+14,6 ile 279,6 m arasında herhangi bir yere koyuyor (ADR-0055). Hızlı
+olsun istersen `site.shadow_draws` değerini 1 yap: tek çekiliş, eski
+süre, ve yayımlanamayacak bir yüzdelik.
 
 ---
 
@@ -666,14 +671,18 @@ bundan önce dört dakikaydı, şimdi yetmiş saniye.
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,64 m | 10,14 m | %79,84 |
-| Kırsal | 3,63 m | 29,62 m | %41,87 |
-| Tünel | 1,77 m | 2,99 m | %100,00 |
-| Ağırlıklı | 2,75 m | 14,97 m | %58,89 |
+| Şehir içi | 2,56 m | 9,32 m | %80,95 |
+| Kırsal | 3,64 m | 23,74 m | %47,46 |
+| Tünel | 1,86 m | 3,03 m | %99,97 |
+| Ağırlıklı | 2,69 m | 12,93 m | %62,60 |
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
 zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79
 m diyordu; aradaki fark, artık gerçekten orada duran 5 231 bina.
+
+Bu satırlar **sekiz gölge dizilişinin havuzu** — tek bir koşu tek bir
+çekiliştir ve kırsal satırda tek çekiliş 95. yüzdeliği 14,6 m ile
+279,6 m arasında herhangi bir yere koyuyordu (ADR-0055).
 
 Ve üçü de **ADR-0053'ten önce daha iyi görünüyordu** — şehir içi %99,79,
 kırsal %72,75, ağırlıklı HPE P95 9,76 m. Aradaki fark kırınımın yoldaki

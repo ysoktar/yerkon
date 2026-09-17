@@ -46,6 +46,7 @@ from yerkon.world import (
     mountings,
     patchwork,
     MountingOption,
+    Shadowing,
     Road,
     Terrain,
     graded_alignment,
@@ -91,6 +92,15 @@ class Deployed:
     #: itself: its length times its width. It is a smaller number than a
     #: sweep would give, and the true one.
     confined_width_m: Optional[float] = None
+    #: How many arrangements of shadows this row is run over.
+    #:
+    #: One run is one draw (ADR-0055), and for the rural row one draw
+    #: decided a published figure: eight of them put its ninety-fifth
+    #: percentile anywhere between 14,6 m and 279,6 m. The percentile is
+    #: taken over the draws' samples together instead, which is what a
+    #: percentile is. One means no pooling, which is what every caller
+    #: that does not ask for it gets.
+    shadow_draws: int = 1
 
     @property
     def serves_a_corridor(self) -> bool:
@@ -364,7 +374,7 @@ def fits_on(site: Optional["Site"], length_m: float,
     )
 
 
-def _patched(terrain: Terrain, settings: Settings, row: str) -> Terrain:
+def varying(terrain: Terrain, settings: Settings, row: str) -> Terrain:
     """Give a terrain ground that is not the same everywhere.
 
     The site's roughness stays its typical figure — the patchwork is
@@ -374,6 +384,16 @@ def _patched(terrain: Terrain, settings: Settings, row: str) -> Terrain:
     measurement seed so a run can hold the landscape and vary the noise,
     or the reverse.
     """
+    # Everything the ground model does not carry, as a spread around what
+    # it does (ADR-0055). Attached here rather than in each constructor
+    # because it is a fact about the place rather than about how the
+    # elevation was arrived at, so a fetched grid and a modelled hill
+    # want the same one.
+    terrain = replace(terrain, shadowing=Shadowing(
+        sigma_db=settings.number("site.shadow_sigma_db"),
+        correlation_m=settings.number("site.shadow_correlation_m"),
+        seed=int(settings.number("site.shadow_seed")),
+    ))
     spread = settings.number("{}.ground_roughness_spread".format(row))
     if spread <= 0.0:
         return terrain
@@ -398,11 +418,11 @@ def urban_ground(settings: Settings, clutter_db_per_km: float) -> Terrain:
     """
     site = fetched(settings.text("urban.site"))
     if site is not None:
-        return _patched(
+        return varying(
             terrain_from_site(site, clutter_loss_db_per_km=clutter_db_per_km),
             settings, "urban",
         )
-    return _patched(rolling_terrain(
+    return varying(rolling_terrain(
         amplitude_m=settings.number("site.urban_relief_m"),
         wavelength_m=settings.number("site.urban_relief_wavelength_m"),
         clutter_loss_db_per_km=clutter_db_per_km,
@@ -415,8 +435,8 @@ def rural_ground(settings: Settings) -> Terrain:
     """The same, over open country, where the relief is an order larger."""
     site = fetched(settings.text("rural.site"))
     if site is not None:
-        return _patched(terrain_from_site(site), settings, "rural")
-    return _patched(rolling_terrain(
+        return varying(terrain_from_site(site), settings, "rural")
+    return varying(rolling_terrain(
         amplitude_m=settings.number("site.rural_relief_m"),
         wavelength_m=settings.number("site.rural_relief_wavelength_m"),
         micro_roughness_m=0.4,
@@ -449,7 +469,7 @@ def tunnel_ground(
     # clamping would spread a real fall over an unreal distance, so that
     # case takes the measured gradient instead.
     if site is not None and entry_x + length_m <= site.width_m:
-        return _patched(bore_terrain(
+        return varying(bore_terrain(
             entry_elevation_m=site.height_at(entry_x, entry_y),
             exit_elevation_m=site.height_at(entry_x + length_m, entry_y),
             length_m=length_m,
@@ -459,7 +479,7 @@ def tunnel_ground(
             ),
         ), settings, "tunnel")
     grade = settings.number("site.tunnel_grade")
-    return _patched(bore_terrain(
+    return varying(bore_terrain(
         entry_elevation_m=0.0,
         exit_elevation_m=-grade * length_m,
         length_m=length_m,
@@ -493,6 +513,8 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     # and the thing deciding whether the packet arrived did not.
     both = (module["sx1280"], module["dwm3000"])
     clutter = settings.number("site.urban_clutter_db_per_km")
+    # How many arrangements of shadows each row is run over (ADR-0055).
+    draws = max(int(settings.number("site.shadow_draws")), 1)
 
 
     URBAN_TERRAIN = urban_ground(settings, clutter)
@@ -549,6 +571,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         technology="Karasal PNT (SX1280/LoRa TWR)",
         coverage_margin_m=1500.0,
         coverage_resolution_m=100.0,
+        shadow_draws=draws,
     )
 
 
@@ -611,6 +634,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         technology="Karasal PNT (E28-SX1280 TWR)",
         coverage_margin_m=8000.0,
         coverage_resolution_m=500.0,
+        shadow_draws=draws,
     )
 
 
@@ -674,6 +698,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         environment="İç + dış",
         technology="Karasal PNT (UWB/DWM3000 TWR)",
         confined_width_m=settings.number("tunnel.width_m"),
+        shadow_draws=draws,
     )
 
 

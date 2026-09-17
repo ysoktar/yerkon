@@ -276,3 +276,44 @@ def test_running_the_block_twice_gives_the_same_table():
     first = as_markdown(build((TUNNEL,))[1])
     again = as_markdown(build((TUNNEL,))[1])
     assert first == again
+
+
+# --- The sweep and the journey converge at different rates (ADR-0055) -----
+
+
+def test_the_sweep_is_run_fewer_times_than_the_journey():
+    """Measured rather than assumed. An area is an average over
+    thousands of cells and settles at once — over Kızılay three draws
+    give 6,19, 6,32 and 6,28 km². A ninety-fifth percentile is a tail
+    and settles slowly: the rural row's went 279,6 m on one draw, 32,0
+    over five, and sits at 24 to 26 m only from eight onwards. Sweeping
+    eight times would double what the table costs to answer a question
+    that was already answered.
+    """
+    from yerkon.report import AREA_DRAWS, draws_of
+    from yerkon.scenarios import CHOICES
+
+    urban = CHOICES["urban"]
+    assert AREA_DRAWS < urban.shadow_draws
+    assert len(draws_of(urban)[:AREA_DRAWS]) == AREA_DRAWS
+
+
+def test_a_row_with_no_shadows_to_draw_is_still_a_row():
+    """A deployment can name eight draws over ground that has no
+    shadowing on it — a hand-built one, or a settings file with the
+    spread set to zero. Then there is one arrangement and every draw is
+    that one, rather than an index past the end of a list."""
+    from dataclasses import replace
+
+    from yerkon.report import draws_of, run
+    from yerkon.scenarios import CHOICES
+
+    urban = CHOICES["urban"]
+    bare = replace(urban, scenario=replace(
+        urban.scenario, terrain=replace(urban.scenario.terrain,
+                                        shadowing=None)))
+    assert bare.shadow_draws > 1 and len(draws_of(bare)) == 1
+    first = run(bare, draw=0, with_area=False).samples.percentile(50)[0]
+    for draw in (3, 7, 99):
+        assert run(bare, draw=draw,
+                   with_area=False).samples.percentile(50)[0] == first

@@ -116,6 +116,11 @@ class Obstruction:
     reflection_tilt_rad: float = 0.0
     reflection_at_fraction: float = 0.5
     profile: tuple = ()
+    #: How much this particular link differs from the median the rest of
+    #: this describes, in dB. Positive is more loss, and it is a fact
+    #: about this link rather than a draw, so the same receiver at the
+    #: same spot meets the same shadow every round (ADR-0055).
+    shadow_db: float = 0.0
 
     def __post_init__(self) -> None:
         if not 0.0 < self.peak_at_fraction < 1.0:
@@ -719,7 +724,8 @@ def evaluate_link(
         tilt_rad=obstruction.reflection_tilt_rad,
         reflection_at=obstruction.reflection_at_fraction,
     )
-    path_loss_db = spread_db + diffraction_db + obstruction.clutter_loss_db
+    path_loss_db = (spread_db + diffraction_db + obstruction.clutter_loss_db
+                    + obstruction.shadow_db)
 
     received_dbm = eirp_dbm + rx_gain - path_loss_db
     noise_dbm = (

@@ -18,7 +18,7 @@ first stopped, and every swept comparison it published was contaminated.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Optional, Sequence
 
 import numpy as np
@@ -296,6 +296,43 @@ class Samples:
             float(np.percentile(self.horizontal_error_m, share)),
             float(np.percentile(self.vertical_error_m, share)),
         )
+
+
+def pooled(draws: Sequence[Samples], name: str) -> Samples:
+    """One set of samples from several draws of the same arrangement.
+
+    Shadowing makes a run one draw: the same deployment over the same
+    ground, with the vans and hedges and building corners the model does
+    not carry arranged one way rather than another (ADR-0055). Measured
+    over eight draws, the rural row's ninety-fifth percentile came out
+    anywhere between 14,6 m and 279,6 m — because at that availability
+    the surviving fixes are few and the percentile is a tail.
+
+    A percentile is a statement about a population, so it is taken over
+    the population: the draws' own samples together, rather than an
+    average of eight percentiles, which is not a percentile of anything.
+    This project already refuses that averaging once, for the weighted
+    row (ADR-0005); the same refusal applies here.
+    """
+    if not draws:
+        raise ValueError("nothing to pool")
+    if len(draws) == 1:
+        return replace(draws[0], name=name)
+    produced = [d for d in draws if d.produced]
+    return Samples(
+        name=name,
+        horizontal_error_m=(np.concatenate([d.horizontal_error_m for d in produced])
+                            if produced else np.array([])),
+        vertical_error_m=(np.concatenate([d.vertical_error_m for d in produced])
+                          if produced else np.array([])),
+        attempted=sum(d.attempted for d in draws),
+        lost_links=sum(d.lost_links for d in draws),
+        attempted_links=sum(d.attempted_links for d in draws),
+        median_range_sigma_m=(
+            float(np.median([d.median_range_sigma_m for d in draws]))
+            if draws else 0.0
+        ),
+    )
 
 
 def combine(weighted: Sequence[tuple[Samples, float]], name: str) -> Samples:

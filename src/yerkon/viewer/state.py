@@ -32,6 +32,7 @@ from yerkon.scenarios import (
     fetched,
     fits_on,
     tunnel_ground,
+    varying,
 )
 from yerkon.design import Design, REGION_CHOICES
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
@@ -581,6 +582,24 @@ class ViewState:
         most favourable ground this project can draw and the least like
         anywhere a receiver will actually be (ADR-0021).
         """
+        return self._varying(self._even_ground())
+
+    def _varying(self, ground: Terrain) -> Terrain:
+        """The same ground, with what it is not the same about.
+
+        Ground that varies from patch to patch (ADR-0026) and a spread
+        around what the model carries (ADR-0055) are facts about a place
+        rather than about how its elevation was arrived at, so they are
+        attached here for every kind of ground at once — and through the
+        same function the table's own rows go through, because a page
+        and a run disagreeing about which ground the deployment stands
+        on is the thing this project keeps catching.
+        """
+        row = self.scenario if self.scenario in ("urban", "rural", "tunnel") \
+            else "urban"
+        return varying(ground, self.settings(), row)
+
+    def _even_ground(self) -> Terrain:
         if self.bore:
             return tunnel_ground(
                 self.settings(), max(self.corridor_m, 100.0), self.site,

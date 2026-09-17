@@ -283,3 +283,119 @@ def test_gentle_relief_helps_by_aiming_the_cancelling_ray_away():
     assert gentle_db - gentle_reflection > flat_db - flat_reflection, (
         "the hills that aim the reflection away are the hills in the way"
     )
+
+
+# --- What the ground model does not carry (ADR-0055) ----------------------
+
+
+def test_a_shadow_is_a_fact_about_a_place_rather_than_a_draw():
+    """The same rule as the ground's own roughness and the survey error
+    before it (ADR-0019): a receiver ranging to the same anchor from the
+    same spot meets the same shadow every time. Drawn as noise it would
+    average away over a round and the whole effect would vanish."""
+    from yerkon.world import Shadowing
+
+    field = Shadowing(sigma_db=6.0, correlation_m=50.0)
+    once = field.between((0.0, 0.0), (317.0, 211.0))
+    assert once == field.between((0.0, 0.0), (317.0, 211.0))
+    assert once != 0.0
+
+
+def test_the_spread_is_the_figure_it_was_given():
+    """Interpolating between four independent corners narrows the spread
+    unless it is renormalised — and narrows it by a different amount in
+    the middle of a cell than at its corner, which would make the width
+    a function of where you stood."""
+    import statistics
+
+    from yerkon.world import Shadowing
+
+    field = Shadowing(sigma_db=6.0, correlation_m=50.0)
+    corners = [field.between((0.0, 0.0), (x * 50.0, y * 50.0))
+               for x in range(50) for y in range(50)]
+    middles = [field.between((0.0, 0.0), (x * 50.0 + 25.0, y * 50.0 + 25.0))
+               for x in range(50) for y in range(50)]
+    assert statistics.pstdev(corners) == pytest.approx(6.0, abs=0.4)
+    assert statistics.pstdev(middles) == pytest.approx(6.0, abs=0.4)
+    assert abs(statistics.mean(corners)) < 0.6
+
+
+def test_a_shadow_lasts_as_far_as_it_is_told_to():
+    """A step is not an independent draw, or it would average away over
+    a round. Gudmundson's measurements put it at tens of metres."""
+    from yerkon.world import Shadowing
+
+    import statistics
+
+    field = Shadowing(sigma_db=6.0, correlation_m=50.0)
+    walk = [field.between((0.0, 0.0), (x * 5.0, 0.0)) for x in range(3000)]
+
+    def alike(step):
+        """How much two points that far apart agree, from -1 to 1."""
+        first, second = walk[:-step], walk[step:]
+        return statistics.correlation(first, second)
+
+    # Measured over a walk rather than asserted on one pair: two
+    # independent draws agree by chance often enough that a single
+    # comparison tests nothing.
+    assert alike(1) > 0.9, "five metres is the same shadow"
+    assert 0.6 < alike(5) < 0.9, "twenty-five is halfway to another"
+    assert 0.15 < alike(10) < 0.45, (
+        "fifty — the figure it was given — is most of the way there")
+    assert abs(alike(20)) < 0.15, "a hundred is another shadow"
+    assert abs(alike(200)) < 0.15, "and so is a kilometre"
+
+
+def test_two_anchors_at_one_spot_are_shadowed_separately():
+    """The case that costs a fix: standing still, some anchors are
+    behind something and others are not. One field over the site would
+    shadow them together and never produce it."""
+    from yerkon.world import Shadowing
+
+    field = Shadowing(sigma_db=6.0, correlation_m=50.0)
+    where = (700.0, 300.0)
+    assert (field.between((0.0, 0.0), where)
+            != field.between((4000.0, 0.0), where))
+
+
+def test_another_arrangement_of_shadows_is_another_answer():
+    from yerkon.world import Shadowing
+
+    where = (700.0, 300.0)
+    first = Shadowing(sigma_db=6.0, correlation_m=50.0, seed=1)
+    second = Shadowing(sigma_db=6.0, correlation_m=50.0, seed=2)
+    assert first.between((0.0, 0.0), where) != second.between((0.0, 0.0), where)
+
+
+def test_no_spread_is_no_shadow():
+    from yerkon.world import Shadowing
+
+    assert Shadowing(sigma_db=0.0).between((0.0, 0.0), (500.0, 0.0)) == 0.0
+    with pytest.raises(ValueError, match="magnitude"):
+        Shadowing(sigma_db=-1.0)
+    with pytest.raises(ValueError, match="a shadow has a size"):
+        Shadowing(sigma_db=6.0, correlation_m=0.0)
+
+
+def test_the_ground_hands_the_shadow_to_the_link_budget():
+    """Through the obstruction, beside the clutter it sits next to: the
+    terrain knows both ends of the path and the budget assembles the
+    decibels."""
+    from dataclasses import replace
+
+    from yerkon.rf import Terminal, evaluate_link
+    from yerkon.hardware import E28_2G4M27S, W24P_U
+    from yerkon.world import Shadowing, rolling_terrain
+
+    plain = rolling_terrain(40.0, 3000.0)
+    shadowed = replace(plain, shadowing=Shadowing(sigma_db=6.0))
+    here, there = (0.0, 0.0, 25.0), (900.0, 0.0, 2.0)
+
+    assert plain.obstruction_between(here, there).shadow_db == 0.0
+    said = shadowed.obstruction_between(here, there).shadow_db
+    assert said != 0.0
+
+    tx, rx = Terminal(E28_2G4M27S, W24P_U, here), Terminal(E28_2G4M27S, W24P_U, there)
+    with_it = evaluate_link(tx, rx, obstruction=shadowed.obstruction_between(here, there))
+    without = evaluate_link(tx, rx, obstruction=plain.obstruction_between(here, there))
+    assert with_it.path_loss_db == pytest.approx(without.path_loss_db + said)

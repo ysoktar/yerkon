@@ -478,6 +478,119 @@ carries in its last frame. The preamble dominates either way."""
 affects = "hava süresini, dolayısıyla her birimin ne sıklıkta konumlandığını"
 affects_en = "air time, and therefore how often each unit is fixed"
 
+[values."site.shadow_sigma_db"]
+value = 6.0
+unit = "dB"
+provenance = "ASSUMPTION"
+source = "bu proje, yayımlanan aralığın ortası"
+source_en = "this project, the middle of the published range"
+note = """Aynı anten, aynı mesafe, aynı görünen zemin — ve ölçülen kayıp aynı \
+değil. Kaldırımdaki kamyonet, iki örnek arasına düşen bina köşesi, bir \
+sıra ağaç, modelin yuvarladığı o bir kat. Model ortancayı taşır, bu da \
+etrafındaki yayılımı; desibel cinsinden normal olduğu için log-normal \
+sönümleme denir. Yayımlanan karasal modellerin hepsinde bir tane var ve \
+2 GHz civarında 4 ile 8 dB arasında veriliyor (3GPP TR 38.901'in senaryo \
+başına gölge sönümlemesi; ITU-R P.1546 ve P.1812'nin konum \
+değişkenliği). Altı, o aralığın ortası — bir ölçüm değil, adı konmuş bir \
+varsayım. Sıfır yazmak onu kapatır ve modeli her hücrenin ya geçtiği ya \
+kaldığı hâline döndürür."""
+note_en = """The same antenna, the same distance, ground that looks the same — and \
+the loss is not the same. A van at the kerb, a building corner that \
+falls between two profile samples, a row of trees, the one storey this \
+rounded off. The model carries the median and this is the spread around \
+it; normal in decibels, which is why it is called log-normal fading. \
+Every published terrestrial model has one, and around 2 GHz they give 4 \
+to 8 dB (3GPP TR 38.901's per-scenario shadow fading; ITU-R P.1546 and \
+P.1812 as location variability). Six is the middle of that range — a \
+named assumption rather than a measurement. Zero switches it off and \
+returns the model to one where every cell either passes or does not."""
+affects = """her bağlantının kapanıp kapanmadığını, dolayısıyla kullanılabilirlik ve \
+alan sütunlarını"""
+affects_en = """whether each link closes, and so the availability and area columns"""
+sensitivity = """kapsama kenarını bir çizgiden bir geçişe çeviriyor: altı desibellik bir \
+yayılım, ortanca kaybın tam çıtada olduğu her yerde bağlantıların \
+yarısını kaybettiriyor"""
+sensitivity_en = """it turns the coverage edge from a line into a gradient: six decibels of \
+spread loses half the links anywhere the median loss sits exactly on the \
+bar"""
+
+[values."site.shadow_correlation_m"]
+value = 50.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "bu proje, Gudmundson'ın ölçümlerinin mertebesinde"
+source_en = "this project, the order of Gudmundson's measurements"
+note = """Bir alıcının, gölgesi başka bir şey olana kadar ne kadar yol gitmesi \
+gerektiği. Sıfır olsaydı her adım bağımsız bir çekiliş olurdu ve bir tur \
+boyunca ortalamaya giderdi — oysa gölge bir yer hakkında bir olgudur, \
+bir gürültü değil (ADR-0019). Gudmundson'ın ölçümleri şehirde onlarca \
+metre veriyor; elli, o mertebede yuvarlak bir sayı."""
+note_en = """How far a receiver travels before its shadow is something else. At zero \
+every step would be an independent draw and would average away over a \
+round — but a shadow is a fact about a place rather than noise \
+(ADR-0019). Gudmundson's measurements put it at tens of metres in a \
+town; fifty is a round number of that order."""
+affects = """gölgelemenin bir tur boyunca ortalamaya gidip gitmediğini"""
+affects_en = """whether shadowing averages away over a round"""
+sensitivity = """korelasyon mesafesi tur başına alınan menzil sayısının altına inerse \
+etki kaybolur, üstünde kalırsa tamamı kalır"""
+sensitivity_en = """below the ground a round covers the effect disappears; above it, all of \
+it stays"""
+
+[values."site.shadow_draws"]
+value = 8.0
+unit = "draws"
+provenance = "DESIGN"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Bir satırın kaç gölge dizilişi üzerinden koşturulacağı. Bir koşu bir \
+çekiliştir ve kırsal satırda tek bir çekiliş yayımlanan bir sayıya karar \
+veriyordu: sekiz çekiliş onun 95. yüzdeliğini 14,6 m ile 279,6 m \
+arasında herhangi bir yere koyuyor, çünkü o kullanılabilirlikte hayatta \
+kalan sabitleme sayısı az ve yüzdelik bir kuyruk. Yüzdelik onun yerine \
+çekilişlerin örnekleri birlikte alınarak hesaplanıyor — yüzdelik zaten \
+budur; bu proje aynı reddi ağırlıklı satır için bir kez veriyor \
+(ADR-0005). Bir yazmak havuzlamayı kapatır. Sekiz, kuyruğun oturduğu \
+yer: bir çekilişte 279,6 m, üçte 32,0, sekizden yirmi dörde kadar 24 ile \
+26 m arası. Tabloyu iki dakikadan on dakikaya çıkarıyor."""
+note_en = """How many arrangements of shadows a row is run over. One run is one draw, \
+and for the rural row one draw decided a published figure: eight of them \
+put its ninety-fifth percentile anywhere between 14,6 m and 279,6 m, \
+because at that availability the surviving fixes are few and the \
+percentile is a tail. The percentile is taken over the draws' samples \
+together instead, which is what a percentile is — this project already \
+refuses the other way once, for the weighted row (ADR-0005). One \
+switches pooling off. Eight is where the tail settles: 279,6 m on one \
+draw, 32,0 over three, and 24 to 26 m from eight through twenty-four. It \
+takes the table from two minutes to ten."""
+affects = """yayımlanan yüzdeliklerin tek bir gölge dizilişine ne kadar bağlı olduğunu"""
+affects_en = """how much the published percentiles depend on one arrangement of shadows"""
+sensitivity = """kırsal satırda belirleyici: bir çekilişte 279,6 m, sekizin havuzunda \
+23,7 m"""
+sensitivity_en = """decisive in the rural row: 279,6 m on one draw, 23,7 m over a pool of \
+eight"""
+
+[values."site.shadow_seed"]
+value = 1.0
+unit = "seed"
+provenance = "DESIGN"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Hangi gölge dizilişi olduğu. Bir koşu bir çekiliştir ve tek bir \
+çekilişten okunan sayı hiçbir şeyden okunmuş sayıdır; bu proje bundan \
+bir kez yakalandı. Ölçüm tohumundan ayrı tutuluyor, böylece bir koşu \
+gölgeleri sabit tutup gürültüyü, ya da tersini değiştirebiliyor."""
+note_en = """Which arrangement of shadows this is. One run is one draw and a figure \
+read off one draw is a figure read off nothing, which this project has \
+been caught by once. Kept apart from the measurement seed so a run can \
+hold the shadows and vary the noise, or the reverse."""
+affects = """tablonun tek bir gölge dizilişine ne kadar bağlı olduğunu"""
+affects_en = """how much the table depends on one arrangement of shadows"""
+sensitivity = """satır başına birkaç puan: yayımlanan sayı bir çekiliştir ve tohumu \
+değiştirmek bunu gösterir"""
+sensitivity_en = """a few points per row: the published figure is one draw, and changing \
+this shows it"""
+
 [values."site.urban_clutter_db_per_km"]
 value = 30.0
 unit = "dB/km"

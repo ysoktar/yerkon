@@ -228,6 +228,37 @@ Yapılmayan üç şey ADR-0053'ün sonunda: kayıplar hâlâ toplanıyor
 (Tavsiye'nin yapısı serbest uzay + kırınım kurar; ölçtüm, fark küçük),
 gölgeleme yok, ve profil ~19 m aralıkla örnekleniyor.
 
+## Gölgeleme, ve bir koşunun bir çekiliş olduğu
+
+Model ortancayı taşıyordu ve etrafındaki yayılımı hiç taşımıyordu, yani
+her hücre ya geçiyordu ya kalıyordu. `world.Shadowing` geldi: σ = 6 dB
+(yayımlanan 4–8 dB aralığının ortası, adı konmuş bir varsayım), bir yer
+hakkında bir olgu olarak — aynı noktadan aynı direğe her seferinde aynı
+gölge — ve **bağlantı başına**, çünkü bir noktada kimi direkler bir şeyin
+arkasında, kimileri değil (ADR-0055).
+
+Asıl mesele sonra çıktı: gölgeleme açılınca bir koşu bir çekiliş oldu ve
+**kırsal satırın 95. yüzdeliği sekiz çekilişte 14,6 ile 279,6 m arasında
+geziyordu.** Varsayılan tohum en kötüsünü veriyordu. Yüzdelik artık
+çekilişlerin örnekleri birlikte alınarak hesaplanıyor — sekiz yüzdeliğin
+ortalaması hiçbir şeyin yüzdeliği değil (ADR-0005'in aynısı). Kaç çekiliş
+gerektiği ölçüldü: sekiz. Tarama üç, çünkü alan bir çekilişte zaten
+oturuyor.
+
+`yerkon table` iki dakikadan on dakikaya çıktı. `run` hâlâ tek çekiliş,
+o yüzden sınamalar etkilenmedi.
+
+Tablo yine oynadı ve **bazı sütunlar iyileşti** — yayılım simetriktir ve
+eşiğin yakınında duran kalabalık bir nüfusu kurtarır; kapsamanın neden
+bir yüzdeyle verildiği tam olarak bu. Şehir içi P95 10,14 → 9,32 m,
+kırsal 29,62 → 23,74 m, ağırlıklı 14,97 → 12,93 m. README, README.en ve
+TRY-IT güncellendi.
+
+Ve bir yan bulgu: **sayfanın zemini tablonunkiyle aynı değildi.**
+Görüntüleyici `Patchwork`'ü hiç almıyordu (ADR-0026), yani sayfa bir
+zeminde, tablo başka bir zeminde duruyordu. İkisi artık aynı
+`scenarios.varying()` üzerinden geçiyor.
+
 ## Bu projenin şimdiye kadar yanlış yaptıkları
 
 Her biri tekrarlanmaya değmeyecek bir hata olduğu için tutuluyor.

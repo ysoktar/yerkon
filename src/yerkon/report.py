@@ -17,8 +17,9 @@ ninety-fifth percentile of anything (ADR-0005).
 
 from __future__ import annotations
 
+import math
 import textwrap
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Optional, Sequence
 
 from yerkon.cost import (
@@ -29,7 +30,7 @@ from yerkon.cost import (
     price,
 )
 from yerkon.budget import Dissection
-from yerkon.evaluate import Samples, combine, coverage, run_scenario
+from yerkon.evaluate import Samples, combine, coverage, pooled, run_scenario
 from yerkon.parallel import spread
 from yerkon.numbers import decimal_comma
 from yerkon.scenarios import ALL, Deployed, catalogue, reweighted
@@ -115,27 +116,109 @@ class Result:
         )
 
 
+#: How many arrangements of shadows the coverage sweep is run over.
+#:
+#: Fewer than the journey, because the two converge at completely
+#: different rates and it is measured rather than assumed. An area is an
+#: average over thousands of cells and settles at once: over Kızılay,
+#: three draws give 6,19, 6,32 and 6,28 km². A ninety-fifth percentile
+#: is a tail and settles slowly: the rural row's went 279,6 m on one
+#: draw, 32,0 over five, and only from eight onwards does it sit still
+#: at 24 to 26 m. Running the sweep the same number of times would
+#: double what the table costs to answer a question that was already
+#: answered (ADR-0055).
+AREA_DRAWS = 3
+
+
+def draws_of(deployed: Deployed) -> tuple:
+    """This row once per arrangement of shadows it is run over.
+
+    Each draw is the same deployment over the same ground with the vans
+    and hedges and building corners the model does not carry arranged
+    one way rather than another (ADR-0055). The seeds run upward from
+    the one the settings name, so the first draw is the arrangement a
+    single run would have used.
+    """
+    ground = deployed.scenario.terrain
+    shadowing = getattr(ground, "shadowing", None)
+    how_many = max(int(deployed.shadow_draws), 1)
+    if shadowing is None or shadowing.sigma_db <= 0.0 or how_many == 1:
+        return (deployed.scenario,)
+    return tuple(
+        replace(deployed.scenario, terrain=replace(
+            ground, shadowing=replace(shadowing, seed=shadowing.seed + step)))
+        for step in range(how_many)
+    )
+
+
 def run(
-    deployed: Deployed, rates: Optional[OperatingRates] = None
+    deployed: Deployed, rates: Optional[OperatingRates] = None,
+    draw: int = 0, with_area: bool = True,
 ) -> Result:
-    """Simulate one scenario and price what it took to build it."""
+    """Simulate one arrangement of this scenario and price it.
+
+    One draw, because that is what a simulation is: this is the unit the
+    report pools rather than the pooling itself (ADR-0055). ``draw``
+    picks which arrangement of shadows, and ``with_area`` skips the
+    coverage sweep for the draws whose area is not wanted — an area is
+    an average over thousands of cells and settles at once, where a
+    ninety-fifth percentile is a tail and does not.
+    """
     rates = DEFAULT_RATES if rates is None else rates
-    samples = run_scenario(deployed.scenario)
+    # Against what there is rather than what was asked for: a row can
+    # name eight draws over ground with no shadows to draw, and then
+    # there is one arrangement and every draw is it.
+    scenarios = draws_of(deployed)
+    scenario = scenarios[min(max(draw, 0), len(scenarios) - 1)]
+    samples = run_scenario(scenario)
 
     confined_km2 = deployed.served_km2()
     if confined_km2 is not None:
         area_km2, reached_km2 = confined_km2, None
-    else:
+    elif with_area:
         swept = coverage(
-            deployed.scenario.deployment,
-            deployed.scenario.terrain,
+            scenario.deployment,
+            scenario.terrain,
             resolution_m=deployed.coverage_resolution_m,
             margin_m=deployed.coverage_margin_m,
         )
         area_km2, reached_km2 = swept.fixable_km2, swept.reached_km2
+    else:
+        # This draw is here for its samples. The area is somebody else's
+        # answer and is folded in from the draws that computed one.
+        area_km2, reached_km2 = math.nan, math.nan
 
-    costing = price(deployed.inventory(area_km2), rates)
+    costing = price(deployed.inventory(
+        area_km2 if math.isfinite(area_km2) else 1.0), rates)
     return Result(deployed, samples, costing, area_km2, reached_km2)
+
+
+def folded(draws: Sequence[Result], rates: OperatingRates) -> Result:
+    """Several draws of one row, as the row.
+
+    The samples pool, because a percentile is a statement about a
+    population and this project already refuses to average percentiles
+    once (ADR-0005). The areas average, because an area is an answer per
+    draw rather than a sample. The cost is priced once at the end,
+    against the area the row actually reports.
+    """
+    if not draws:
+        raise ValueError("a row needs a draw")
+    first = draws[0]
+    if len(draws) == 1:
+        return first
+
+    areas = [r.area_km2 for r in draws if math.isfinite(r.area_km2)]
+    reached = [r.reached_km2 for r in draws
+               if r.reached_km2 is not None and math.isfinite(r.reached_km2)]
+    area_km2 = sum(areas) / len(areas) if areas else first.area_km2
+    return Result(
+        first.deployed,
+        pooled([r.samples for r in draws], first.deployed.scenario.name),
+        price(first.deployed.inventory(area_km2), rates),
+        area_km2,
+        sum(reached) / len(reached) if reached else None,
+    )
 
 
 def weighted(results: Sequence[Result]) -> Row:
@@ -205,7 +288,22 @@ def build(
     deployments = reweighted(tuple(deployments), weights)
     # Each row is a journey and a coverage sweep and depends on no other,
     # so the rows are run at the same time (ADR-0025).
-    results = spread(_run_one, [(d, rates) for d in deployments])
+    # Every row, every arrangement of shadows, all at once: the draws of
+    # one row depend on each other no more than the rows do, and there
+    # are four cores rather than three (ADR-0025, ADR-0055).
+    drawn = [len(draws_of(deployed)) for deployed in deployments]
+    jobs = [
+        (deployed, rates, draw, draw < AREA_DRAWS)
+        for deployed, how_many in zip(deployments, drawn)
+        for draw in range(how_many)
+    ]
+    every = spread(_run_one, jobs)
+    results = []
+    at = 0
+    for how_many in drawn:
+        results.append(folded(list(every[at:at + how_many]), rates))
+        at += how_many
+    results = tuple(results)
     rows = tuple(r.row() for r in results)
     if len(results) > 1:
         # A weighted average of one scenario is that scenario, and
@@ -217,9 +315,9 @@ def build(
 
 
 def _run_one(task) -> Result:
-    """One row. Top-level so a worker process can import it."""
-    deployed, rates = task
-    return run(deployed, rates)
+    """One draw of one row. Top-level so a worker process can import it."""
+    deployed, rates, draw, with_area = task
+    return run(deployed, rates, draw=draw, with_area=with_area)
 
 
 def as_markdown(rows: Sequence[Row]) -> str:

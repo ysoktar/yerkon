@@ -305,10 +305,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,64 | 10,14 | 72,53 | %79,84 | 5,69 | 27624 | 12798 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,63 | 29,62 | 230,34 | %41,87 | 167,00 | 16026 | 664 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,77 | 2,99 | 6,71 | %100,00 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,75 | 14,97 | 156,83 | %58,89 | 69,65 | 465564 | 91616 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,56 | 9,32 | 66,42 | %80,95 | 6,26 | 25095 | 11626 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,64 | 23,74 | 237,58 | %47,46 | 162,25 | 16495 | 684 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,86 | 3,03 | 7,65 | %99,97 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,69 | 12,93 | 148,01 | %62,60 | 68,03 | 464488 | 91038 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone

@@ -619,3 +619,79 @@ def test_modelled_ground_has_no_edge_for_the_sweep_to_stop_at():
     from yerkon.world import rolling_terrain
 
     assert rolling_terrain(amplitude_m=40.0, wavelength_m=800.0).extent_m is None
+
+
+# --- One run is one draw (ADR-0055) ---------------------------------------
+
+
+def test_a_percentile_is_taken_over_the_population_not_over_percentiles():
+    """The same refusal this project already makes for the weighted row
+    (ADR-0005), applied to draws of one row.
+
+    Shadowing makes a run one arrangement of the vans and hedges the
+    model does not carry. Over eight of them the rural row's ninety-fifth
+    percentile came out anywhere between 14,6 m and 279,6 m, because at
+    that availability the surviving fixes are few and a percentile is a
+    tail. Averaging eight tails is not a tail of anything.
+    """
+    from yerkon.evaluate import Samples, pooled
+
+    def draw(name, errors):
+        return Samples(name=name,
+                       horizontal_error_m=np.array(errors, dtype=float),
+                       vertical_error_m=np.array(errors, dtype=float) * 2.0,
+                       attempted=len(errors) * 2, lost_links=1,
+                       attempted_links=10, median_range_sigma_m=3.0)
+
+    quiet = [draw("a", list(range(1, 101))) for _ in range(7)]
+    wild = draw("b", list(range(1, 100)) + [5000.0])
+    together = pooled(quiet + [wild], "pooled")
+
+    averaged = sum(d.percentile(95)[0] for d in quiet + [wild]) / 8
+    assert together.percentile(95)[0] < averaged, (
+        "one wild draw must not drag the answer by an eighth of its tail")
+    assert together.produced == 800
+    assert together.attempted == 8 * 200
+    assert together.lost_links == 8 and together.attempted_links == 80
+    # Availability pools too, because it is the same question asked of
+    # more attempts.
+    assert together.availability == pytest.approx(quiet[0].availability)
+
+
+def test_one_draw_pools_to_itself():
+    """So that nothing changes for a caller that asks for no pooling."""
+    from yerkon.evaluate import pooled
+
+    alone = run_scenario(a_scenario(terrain=GENTLE))
+    same = pooled([alone], "alone")
+    assert np.array_equal(same.horizontal_error_m, alone.horizontal_error_m)
+    assert same.attempted == alone.attempted
+
+
+def test_a_row_is_run_over_the_arrangements_of_shadows_it_asks_for():
+    """Seeds running upward from the one the settings name, so the first
+    draw is the arrangement a single run would have used."""
+    from dataclasses import replace
+
+    from yerkon.report import draws_of
+    from yerkon.scenarios import CHOICES
+
+    urban = CHOICES["urban"]
+    assert urban.shadow_draws > 1, "the shipped rows pool"
+    drawn = draws_of(urban)
+    assert len(drawn) == urban.shadow_draws
+    seeds = [one.terrain.shadowing.seed for one in drawn]
+    assert seeds == sorted(seeds) and len(set(seeds)) == len(seeds)
+    assert seeds[0] == urban.scenario.terrain.shadowing.seed
+
+    # And `run` takes one of them rather than all of them: the pooling
+    # is the report's, because a simulation is one arrangement.
+    from yerkon.report import run
+    assert run.__defaults__[1] == 0, "run is one draw by default"
+
+    # Nothing to draw from, nothing drawn.
+    assert len(draws_of(replace(urban, shadow_draws=1))) == 1
+    unshadowed = replace(urban, scenario=replace(
+        urban.scenario, terrain=replace(urban.scenario.terrain,
+                                        shadowing=None)))
+    assert len(draws_of(unshadowed)) == 1

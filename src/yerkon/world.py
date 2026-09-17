@@ -71,6 +71,10 @@ class Terrain:
     #: shifts every positional argument after it, and this project has
     #: been caught by that once (ADR-0035).
     extent_m: Optional[tuple[float, float, float, float]] = None
+    #: How much a link's loss varies from place to place beyond what the
+    #: rest of this carries (ADR-0055). Nothing where it is not modelled,
+    #: and last for the same reason `extent_m` is (ADR-0035).
+    shadowing: Optional["Shadowing"] = None
 
     def __post_init__(self) -> None:
         if self.clutter_loss_db_per_km < 0.0:
@@ -147,6 +151,12 @@ class Terrain:
             # The whole ground, not just its worst point: the link
             # budget works diffraction out over all of it (ADR-0053).
             profile=tuple(profile),
+            # Everything this ground model does not carry, as a spread
+            # around what it does: the first end is the one the field is
+            # indexed by, and every caller passes the anchor first
+            # (ADR-0055).
+            shadow_db=(self.shadowing.between(a, b)
+                       if self.shadowing is not None else 0.0),
             peak_terrain_m=worst_ground,
             peak_at_fraction=worst_fraction,
             clutter_loss_db=self.clutter_loss_db_per_km * distance_m / 1000.0,
@@ -385,6 +395,109 @@ class Patchwork:
             ", ".join("{:.0f} m ±{:.0%}".format(s.size_m, s.spread)
                       for s in self.scales),
         )
+
+
+@dataclass(frozen=True)
+class Shadowing:
+    """How much a link's loss varies from place to place, in dB.
+
+    Two receivers the same distance from the same anchor, over ground
+    that looks the same, do not measure the same loss. A van parked at
+    the kerb, the corner of a building the profile passes between
+    samples, a row of trees, the one storey this model rounded off: the
+    model carries the median and the rest is this. Measured over many
+    locations it is normal in decibels, which is why it is called
+    log-normal fading, and every published terrestrial model carries one
+    — ITU-R P.1546 and P.1812 as location variability, 3GPP TR 38.901 as
+    a shadow-fading standard deviation per scenario.
+
+    Without it every cell either meets the bar or does not, and a
+    coverage edge is drawn as a line where it is a gradient. Real
+    coverage is quoted as a share of locations, and it cannot be quoted
+    that way from a model with no spread in it (ADR-0055).
+
+    Two properties matter as much as the width.
+
+    **It is a fact about a place, not a draw.** A receiver ranging to
+    the same anchor from the same spot meets the same shadow every time,
+    exactly like the ground's own roughness and the survey error before
+    it (ADR-0019). Drawn as noise it would average away over a round and
+    the whole effect would vanish.
+
+    **It is per link, not per place.** Standing at one spot, some
+    anchors are behind something and others are not; a single field over
+    the site would shadow them all together and hide the case that
+    actually costs a fix — three anchors in reach, one of them behind a
+    lorry.
+
+    ``correlation_m`` is how far a receiver travels before the shadow is
+    something else, which Gudmundson's measurements put at tens of
+    metres in a town. Interpolated between corners rather than held in
+    cells, because a receiver crossing a cell boundary would otherwise
+    jump several decibels in one step.
+
+    That interpolation decides the shape of the decorrelation as well as
+    its scale, and the shape is the tent of a bilinear field rather than
+    Gudmundson's exponential: measured along a walk, two points agree
+    0,99 at five metres, 0,73 at twenty-five, 0,28 at the stated fifty,
+    and nothing beyond a hundred. So this figure is the width of the
+    tent rather than the e-folding distance of an exponential, and it is
+    the right order rather than the right curve.
+    """
+
+    sigma_db: float = 0.0
+    correlation_m: float = 50.0
+    #: Which arrangement of shadows this is.
+    #:
+    #: One run is one draw, and a figure read off one draw is a figure
+    #: read off nothing — this project has been caught by that before
+    #: (`test_how_long_a_rural_round_runs_cannot_be_settled_on_one_seed`).
+    #: Kept apart from the measurement seed so a run can hold the
+    #: shadows and vary the noise, or the reverse.
+    seed: int = 0
+
+    def __post_init__(self) -> None:
+        if self.sigma_db < 0.0:
+            raise ValueError("a spread is a magnitude")
+        if self.correlation_m <= 0.0:
+            raise ValueError("a shadow has a size")
+
+    def between(self, anchor: tuple, receiver: tuple) -> float:
+        """Extra loss on this link, in dB. Positive is worse."""
+        if self.sigma_db <= 0.0:
+            return 0.0
+        # Which anchor, to the nearest correlation distance: two anchors
+        # in the same doorway are shadowed by the same doorway.
+        from_x = math.floor(anchor[0] / self.correlation_m)
+        from_y = math.floor(anchor[1] / self.correlation_m)
+
+        at_x = receiver[0] / self.correlation_m
+        at_y = receiver[1] / self.correlation_m
+        west, south = math.floor(at_x), math.floor(at_y)
+        across, along = at_x - west, at_y - south
+
+        total = 0.0
+        variance = 0.0
+        for dx, dy in ((0, 0), (1, 0), (0, 1), (1, 1)):
+            weight = ((across if dx else 1.0 - across)
+                      * (along if dy else 1.0 - along))
+            if weight <= 0.0:
+                continue
+            total += weight * _normal_at(west + dx, south + dy,
+                                         from_x, from_y, self.seed, 0x5AD0)
+            variance += weight * weight
+        # Renormalised, or the interpolation would quietly narrow the
+        # spread to less than the figure it was given — and by a
+        # different amount in the middle of a cell than at its corner.
+        if variance <= 0.0:
+            return 0.0
+        return self.sigma_db * total / math.sqrt(variance)
+
+    def describe(self) -> str:
+        if self.sigma_db <= 0.0:
+            return "no location variability"
+        return "±{:.1f} dB over {:.0f} m (seed {})".format(
+            self.sigma_db, self.correlation_m, self.seed)
 
 
 def patchwork(
