@@ -672,10 +672,10 @@ yayımlanamayacak bir yüzdelik.
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,56 m | 9,32 m | %80,95 |
-| Kırsal | 3,64 m | 23,74 m | %47,46 |
+| Şehir içi | 2,54 m | 9,61 m | %81,23 |
+| Kırsal | 3,36 m | 20,90 m | %47,49 |
 | Tünel | 1,86 m | 3,03 m | %99,97 |
-| Ağırlıklı | 2,69 m | 12,93 m | %62,60 |
+| Ağırlıklı | 2,64 m | 13,31 m | %62,70 |
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
 zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79
@@ -691,6 +691,18 @@ en kötü tek nokta üzerinden değil bütün profil üzerinden hesaplanması:
 Kızılay'da bir bağlantının ortanca üç engeli var ve tek kenar bunların
 yalnızca birini sayıyordu. Aynı donanım, aynı direkler, daha dürüst
 yayılım.
+
+**ADR-0058 kırsal P95'i 23,74 m'den 20,90 m'ye indirdi.** Yayılım o
+karara kadar iki ışınlı yansımayla kırınımı toplayarak aynı yer
+parçasını iki kez faturalandırıyordu; artık büyüğü ödeniyor.
+
+Şehir içi satır ters yöne gitti: 9,32 m'den 9,61 m'ye. Aynı tablodaki
+diğer iki sütun sebebi söylüyor, çünkü ikisi de iyileşti.
+Kullanılabilirlik %80,95'ten %81,23'e, alan 6,26'dan 6,32 km²'ye. Çift
+sayım kalkınca kayıp düşüyor ve eskiden kapanmayan bağlantılar
+kapanıyor; kapanan o bağlantılar en kötüleri, yani kuyruğa giriyorlar.
+Daha çok yerde konum alınıyor ve alınan konumların en kötü %5'i biraz
+daha kötü.
 
 ### Kendin denemeye değer beş bulgu
 

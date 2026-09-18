@@ -53,12 +53,28 @@ def test_every_consequence_says_why_it_follows():
 
 
 def test_the_panel_shows_old_and_new_for_everything_that_moves():
+    """Both sides of every line, in the reading format.
+
+    The ranges are read out of the panel and compared rather than
+    pinned. Pinning them made this a snapshot of the link budget, and
+    every propagation change broke it somewhere far from what it was
+    about: dropping a double-counted loss (ADR-0058) moved the sign from
+    1,66 km to 1,91 and left the mast at 5,52, which says nothing about
+    whether the panel prints both sides.
+    """
+    import re
+
     panel = propose(Design(), mounting=ROADSIDE_SIGN).describe()
 
     assert "tall mast -> roadside sign" in panel
     assert "25,0 m -> 3,0 m" in panel
-    assert "5,52 km -> 1,66 km" in panel
     assert "because" in panel
+
+    ranges = re.search(r"usable range\s+(\d+,\d+) km -> (\d+,\d+) km", panel)
+    assert ranges, panel
+    was, becomes = (float(n.replace(",", ".")) for n in ranges.groups())
+    assert becomes < was, (was, becomes)
+    assert was > 2.0, was
 
 
 def test_a_change_with_no_consequences_says_so_rather_than_going_quiet():

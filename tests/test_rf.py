@@ -523,6 +523,58 @@ def test_the_budget_reads_the_ground_when_it_is_given_some():
     assert one_point.diffraction_loss_db > 0.0, "the single edge still works"
 
 
+def test_one_piece_of_ground_is_charged_once():
+    """ADR-0058. The link pays the larger of the two excesses over free
+    space, not their sum.
+
+    Ground reflection and diffraction describe the same ground doing two
+    things to the same link, and adding them charges the link twice.
+    They also do not happen together: the cancellation two-ray describes
+    needs a direct ray to cancel, and where a ridge blocks the path
+    there is no direct ray.
+
+    Over eight kilometres from a 20 m mast to a 2 m receiver, both cases
+    are worked here. Over the plane the reflection costs 15,7 dB and the
+    curvature 6,1, and the link pays 15,7. Put a 25 m ridge at the
+    midpoint and the diffraction rises to 27,1 while the reflection is
+    unchanged, and the link pays 27,1. Summed it would have paid 42,8.
+    """
+    from yerkon.rf import free_space_path_loss_db, two_ray_path_loss_db
+
+    distance_m = 8000.0
+    clear = Obstruction(peak_terrain_m=0.0, peak_at_fraction=0.5,
+                        profile=a_plain())
+    ridge_profile = list(a_plain())
+    ridge_profile[32] = (0.5, 25.0)
+    blocked = Obstruction(peak_terrain_m=25.0, peak_at_fraction=0.5,
+                          profile=tuple(ridge_profile))
+
+    free_space_db = free_space_path_loss_db(distance_m, 2450e6)
+    reflection_db = two_ray_path_loss_db(
+        distance_m, 20.0, 2.0, 2450e6) - free_space_db
+
+    over_the_plane = evaluate_link(mast(20.0), vehicle(distance_m),
+                                   obstruction=clear)
+    over_the_ridge = evaluate_link(mast(20.0), vehicle(distance_m),
+                                   obstruction=blocked)
+
+    # Both terms are real in both cases, which is what makes the sum
+    # tempting and wrong.
+    assert reflection_db > 10.0, reflection_db
+    assert over_the_plane.diffraction_loss_db > 4.0
+    assert over_the_ridge.diffraction_loss_db > reflection_db
+
+    paid_on_the_plane = over_the_plane.path_loss_db - free_space_db
+    paid_on_the_ridge = over_the_ridge.path_loss_db - free_space_db
+    assert paid_on_the_plane == pytest.approx(reflection_db, abs=0.01)
+    assert paid_on_the_ridge == pytest.approx(
+        over_the_ridge.diffraction_loss_db, abs=0.01)
+
+    # And the sum, which is what this replaced, is a different number.
+    assert paid_on_the_ridge < (
+        reflection_db + over_the_ridge.diffraction_loss_db) - 10.0
+
+
 def test_real_ground_is_read_from_the_terrain_rather_than_summarised():
     """The terrain hands the whole profile to the budget, so the roofs a
     fetched site folds into its surface are edges this counts."""

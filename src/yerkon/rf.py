@@ -714,6 +714,8 @@ def evaluate_link(
     # Heights for the reflection are measured above the surface the
     # reflection actually lands on, which is why a mast on a ridge over a
     # valley behaves like a far taller mast on the flat.
+    #
+    # They are also not both payable at once, which is the next thing.
     surface_m = obstruction.reflection_surface_m
     spread_db = two_ray_path_loss_db(
         distance_m,
@@ -724,7 +726,24 @@ def evaluate_link(
         tilt_rad=obstruction.reflection_tilt_rad,
         reflection_at=obstruction.reflection_at_fraction,
     )
-    path_loss_db = (spread_db + diffraction_db + obstruction.clutter_loss_db
+    # The larger of the two excesses over free space, not their sum.
+    #
+    # Both describe what the same ground does to the same link, and
+    # adding them charges a link twice for one piece of ground. The
+    # cancellation two-ray describes needs a direct ray to cancel; where
+    # something blocks the path there is no direct ray, and the field
+    # that arrives came over the edge. The Recommendation's own
+    # structure builds the loss as free space plus diffraction (ITU-R
+    # P.452, P.1812) and never adds a reflection term on top.
+    #
+    # So: over a clear path the reflection term is the larger and wins,
+    # over a blocked one the diffraction is, and near the boundary the
+    # answer is whichever is worse. Summed, a blocked path at range paid
+    # 65 dB where the two terms were 40 and 25 (ADR-0058).
+    free_space_db = free_space_path_loss_db(distance_m, frequency_hz)
+    path_loss_db = (free_space_db
+                    + max(spread_db - free_space_db, diffraction_db)
+                    + obstruction.clutter_loss_db
                     + obstruction.shadow_db)
 
     received_dbm = eirp_dbm + rx_gain - path_loss_db

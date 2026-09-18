@@ -150,18 +150,27 @@ def test_terrain_cannot_add_signal():
         flat_terrain(clutter_loss_db_per_km=-1.0)
 
 
-def test_relief_is_a_trade_rather_than_a_help():
-    """Flat ground is not the best case, and relief is not simply better.
+def test_relief_costs_more_than_the_reflection_it_weakens():
+    """Flat ground is the best case here, and relief only takes away.
 
-    Perfectly level ground returns a clean cancelling ray, so every link
-    over it is mediocre and every link over it works. Relief scatters
-    that ray and lifts the mast above the reflecting surface, which makes
-    the links that survive markedly better — and it drops the receiver
-    into dips, where the link does not survive at all.
+    Relief does weaken the cancelling reflection. The next test measures
+    that on the reflection alone. But the hills that weaken it stand in
+    the path, and a link pays the larger of the two excesses rather than
+    both (ADR-0058). Over a plane at 3 to 9 km the reflection costs 5,3
+    to 14,8 dB and the curvature 0 to 4,6; over ten metres of undulation
+    the reflection falls to 2,2 to 8,2 dB away from the hills and the
+    diffraction rises to 16 to 26, so the figure a link actually pays is
+    worse than anything the plane charged.
 
-    Measured across a corridor rather than at one distance, because the
-    answer depends on where the receiver is standing and an earlier
-    version of this test rested on a lucky one.
+    This test used to assert the opposite half, that the links surviving
+    relief are better than the links over a plane. That was true while
+    the two losses were added, because relief traded a large reflection
+    term for a smaller diffraction one. Under the larger of the two it
+    is false, and the measurement below is what says so.
+
+    Swept across a corridor and over four seeds, because the answer
+    depends on where the receiver is standing and an earlier version of
+    this test rested on a lucky one.
     """
     import statistics
 
@@ -188,22 +197,46 @@ def test_relief_is_a_trade_rather_than_a_help():
         )
 
     flat_share, flat_sigma = sweep(flat_terrain())
-    gentle_share, gentle_sigma = sweep(rolling_terrain(10.0, 2000.0, seed=3))
+    gentle = [sweep(rolling_terrain(10.0, 2000.0, seed=seed))
+              for seed in (3, 5, 7, 11)]
     rugged_share, rugged_sigma = sweep(rolling_terrain(80.0, 2000.0, seed=11))
 
-    # Level ground blocks nothing but its own curve, and that is not
-    # nothing: at ten kilometres a 2 m antenna's first Fresnel zone is
-    # into the bulge, and the Recommendation's method charges six
-    # decibels for it where a single knife edge over the worst point
-    # read half a decibel (ADR-0053). One link of twenty-nine, and it is
-    # the farthest.
-    assert flat_share >= 28 / 29, flat_share
-    assert flat_share < 1.0, (
-        "a plane is still a curved plane: if this passes, the curvature "
-        "has stopped being counted"
+    # Level ground blocks nothing at these ranges. Its own curve costs
+    # six decibels at ten kilometres, where a single knife edge over the
+    # worst point read half that (ADR-0053), but the reflection over the
+    # same ground costs fifteen, and the larger figure is what the link
+    # pays. So the curvature is counted and does not decide.
+    assert flat_share == 1.0, flat_share
+
+    # Counted, and checkable: the far link's diffraction term is the
+    # curvature and nothing else, because there is nothing else there.
+    level = flat_terrain()
+    far = 10_000.0
+    mast = Anchor("m", (0.0, 0.0), TALL_MAST, level)
+    far_receiver = (far, 0.0, level.height_at(far, 0.0) + 2.0)
+    budget = evaluate_link(
+        Terminal(E28_2G4M27S, W24P_U, mast.position_m),
+        Terminal(SX1280, W24P_U, far_receiver),
+        obstruction=level.obstruction_between(
+            mast.position_m, far_receiver, 200),
     )
-    assert gentle_sigma < flat_sigma, "the links that survive relief are better"
-    assert rugged_share < gentle_share / 2.0, "rugged ground closes almost nothing"
+    assert budget.diffraction_loss_db > 4.0, budget.diffraction_loss_db
+
+    # Relief costs closure at every seed: between a fifth and a quarter
+    # of the corridor stops working, and none of it comes back as a
+    # better link. The four seeds read 1,01, 1,11, 1,19 and 1,49 times
+    # the plane's median sigma, so the nearest is one percent worse and
+    # the worst is half again. The bounds are set either side of that
+    # spread rather than on one seed's figure.
+    shares = [share for share, _ in gentle]
+    sigmas = [sigma for _, sigma in gentle]
+    assert all(0.5 < share < 0.85 for share in shares), shares
+    assert all(sigma > flat_sigma * 0.98 for sigma in sigmas), (
+        sigmas, flat_sigma)
+    assert max(sigmas) > flat_sigma * 1.3, (max(sigmas), flat_sigma)
+
+    # Eighty metres of it closes nothing at all.
+    assert rugged_share == 0.0, rugged_share
     assert rugged_sigma > flat_sigma, "and what it leaves is worse"
 
 

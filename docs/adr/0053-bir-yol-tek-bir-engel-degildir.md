@@ -7,7 +7,7 @@ Kabul edildi.
 ## Bağlam
 
 Model, yoldaki en kötü tek noktayı alıp oraya bir bıçak sırtı koyuyordu.
-Kızılay üzerinde ölçtüm — 6 m direkten 1,5 m alıcıya, 200 m ile 1,2 km
+Kızılay üzerinde ölçtüm, 6 m direkten 1,5 m alıcıya, 200 m ile 1,2 km
 arası 215 bağlantı:
 
 | kaç engel | bağlantıların payı |
@@ -26,7 +26,7 @@ iyimser olmak demek.
 Yönü kesindi, büyüklüğü değildi. İki uç ölçtüm: Bullington'ın eşdeğer
 kenarı tek kenarın ortanca 1,7 dB üstünde, düzeltmesiz Deygout ise
 27,9 dB üstünde. Deygout, kenarlar birbirine yakın ya da benzer
-yükseklikteyken — bir şehirde hep öyledir — fazla sayar; aradaki doğru
+yükseklikteyken, ki bir şehirde hep öyledir, fazla sayar; aradaki doğru
 cevabı veren yöntem Tavsiye'nin kendi yöntemi.
 
 ## Karar
@@ -72,7 +72,7 @@ kırınmıyordu.
 **Ölçülen menzil kımıldamadı** (Kızılay 478 m, Polatlı 690 m). Şaşırtıcı
 değil: o sayı zaten gerçek binaların arasından ölçülüyordu (ADR-0047) ve
 bir bağlantıyı bitiren şey engelin kaç desibel ettiği değil, olup
-olmadığı. Değişen, aradaki zemin: kenardaki — 10 ile 30 dB arası —
+olmadığı. Değişen, aradaki zemin: kenardaki, 10 ile 30 dB arası,
 bağlantılar döndü, ve kapsama ile kullanılabilirliği onlar belirliyor.
 
 ### İki sınama yeniden yazıldı, gevşetilmedi
@@ -80,7 +80,7 @@ bağlantılar döndü, ve kapsama ile kullanılabilirliği onlar belirliyor.
 **"Düz zemin hiçbir şeyi engellemez"** artık doğru değil. Düz zemin
 kendi eğriliğinden başka bir şey engellemiyor, ve o bir şey: on
 kilometrede 2 m'lik bir antenin ilk Fresnel bölgesi tümseğin içinde
-kalıyor ve Tavsiye'nin yöntemi buna altı desibel yazıyor — en kötü
+kalıyor ve Tavsiye'nin yöntemi buna altı desibel yazıyor, en kötü
 noktaya konan tek bir bıçak sırtı yarım desibel yazıyordu. Yirmi dokuz
 bağlantının biri, ve o en uzaktaki.
 
@@ -90,7 +90,8 @@ bağlantının biri, ve o en uzaktaki.
 nişanlıyor. Ama aynı tepeler yolun üstünde duruyor, ve altı kilometrede
 kırınım 5,7 → 11,9 dB oluyor: verdiğinden fazlasını geri alıyor. Sınama
 artık iddiayı yansıma üzerinde ölçüyor ve neti bir takas olarak
-yazıyor — ki bir üstündeki sınamanın adı zaten o.
+yazıyor, ki bir üstündeki sınamanın adı zaten o. (ADR-0058 bu neti
+tekrar ölçtü: büyüğü ödenince takas kalmıyor, rölyef düpedüz maliyet.)
 
 ## Yapılmayanlar
 
@@ -100,7 +101,7 @@ uzay + kırınım kuruyor, iki fazlalığı toplamıyor. Ölçtüm:
 `max(iki ışın fazlası, kırınım)` şehir alanını 5,69 → 5,72 km²,
 kullanılabilirliği %79,84 → %82,05 yapıyor. Fark küçük olduğu için
 yapıyı değiştirmedim; ama çift sayım gerçek ve bir hakemin göreceği
-türden.
+türden. **ADR-0058 bunu yaptı.**
 
 **Gölgeleme yok.** Konum değişkenliği (log-normal, σ ≈ 5,5 dB) hâlâ
 modelde değil, yani her hücre ya geçiyor ya kalıyor. Gerçek kapsama

@@ -270,11 +270,26 @@ def test_closer_anchors_place_the_receiver_better():
 
     Since diffraction is worked out over the whole profile rather than
     over its worst single point (ADR-0053), four kilometres of spacing
-    over this rolling terrain produces no fix whatsoever — every link is
+    over this rolling terrain produces no fix whatsoever: every link is
     behind a hill. That is not a missing answer, it is the strongest
     form of the answer this test is about, so it is scored as worse than
-    any error rather than compared against as a number: NaN is not less
+    any error rather than compared against as a number. NaN is not less
     than anything, including itself.
+
+    The claim is about a wide gap and not about each step, because the
+    walk from one spacing to the next is not monotone. Median error over
+    eight seeds:
+
+        aralık    1000   1500   2000   2500   3000
+        ortanca   2,01   2,52   5,45    yok   6,87
+
+    Nothing is placed at 2500 m on any of the eight, and something is
+    placed again at 3000 m on all eight. That is this fixture's ground
+    rather than a fact about spacing: `ROLLING` has one hill wavelength,
+    3000 m, so a 3000 m spacing puts every anchor at the same point on
+    the hill and a 2500 m spacing spreads them over five different
+    points, some of them troughs. An earlier version of this test
+    asserted the step-by-step order and passed on one arrangement.
     """
     def worst_of(samples):
         median = samples.percentile(50)[0]
@@ -285,10 +300,12 @@ def test_closer_anchors_place_the_receiver_better():
     assert worst_of(close) < worst_of(sparse)
     assert math.isfinite(worst_of(close)), "the close one still works"
 
-    # Growing, over the spacings that still place a receiver at all.
-    placed = [worst_of(run_scenario(a_scenario(spacing_m=metres)))
-              for metres in (1000.0, 1500.0, 2000.0)]
-    assert placed == sorted(placed), placed
+    # The gap that survives the arrangement: a kilometre apart against
+    # three. On the eight seeds the near one wins every time, by 2,0 m
+    # against 6,9 m on the median, and by 1,75 against 6,64 on this one.
+    near = worst_of(run_scenario(a_scenario(spacing_m=1000.0)))
+    far = worst_of(run_scenario(a_scenario(spacing_m=3000.0)))
+    assert near < far / 2.0, (near, far)
 
 
 def test_the_vertical_stays_far_worse_than_the_horizontal():

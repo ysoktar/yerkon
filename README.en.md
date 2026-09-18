@@ -282,7 +282,7 @@ standing every 250 m:
 | Existing roadside signs every 500 m | 25 | 327067 TL | %96,7 |
 | Purpose-built 25 m masts every 800 m | 16 | 1529323 TL | %96,7 |
 
-**The signs win by five and a half times**, despite reaching 1,66 km
+**The signs win by five and a half times**, despite reaching 1,91 km
 against a mast's 5,52 km. Height buys range, and range is not what is
 scarce — money is, and a sign that already stands costs a thirty-fourth
 of a mast that does not. That is the mixed-mounting strategy arrived at
@@ -305,10 +305,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,56 | 9,32 | 66,42 | %80,95 | 6,26 | 25095 | 11626 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,64 | 23,74 | 237,58 | %47,46 | 162,25 | 16495 | 684 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,86 | 3,03 | 7,65 | %99,97 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,69 | 12,93 | 148,01 | %62,60 | 68,03 | 464488 | 91038 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 9,61 | 64,92 | %81,23 | 6,32 | 24857 | 11516 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,36 | 20,90 | 223,84 | %47,49 | 163,08 | 16411 | 680 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,86 | 3,03 | 7,64 | %99,97 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,31 | 143,26 | %62,70 | 68,40 | 464335 | 90981 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone
@@ -342,6 +342,13 @@ sixteen; one knife edge counted one of them. The surface a profile
 reports includes roofs, so buildings are counted as obstacles rather
 than as a coefficient (ADR-0046).
 
+A link pays the larger of the two, not both. They describe the same
+piece of ground doing two things to the same link, so adding them bills
+one piece of ground twice, and the cancellation needs a direct ray to
+cancel, which a blocked path does not have. Eight kilometres, a 20 m
+mast, a 25 m ridge at the midpoint: the reflection costs 15,7 dB, the
+diffraction 27,1, and the link pays 27,1 (ADR-0058).
+
 The OPEX column is the one the report leaves empty for all four rows. It
 comes from an inventory of named recurring items rather than a percentage
 of capital (ADR-0006), and like every cost figure here it rests mostly on
@@ -357,8 +364,8 @@ than lines, so their route kilometres are the length of a test journey
 and no cost per kilometre is quoted for them at all.
 
 **The service area is where a position is available**, not where a packet
-arrives. For the rural region those are 671,75 and 1188,00 km², a factor
-of 1,8, and the notes print both every time (ADR-0012).
+arrives. For the rural region those are 163,08 and 383,33 km², a factor
+of 2,4, and the notes print both every time (ADR-0012).
 
 **Rural availability is decided by terrain, and by the length of a
 round.** Not one rural link fails for distance — every single failure
@@ -547,9 +554,9 @@ You asked to change:
 Which also changes:
   anchor height                         25,0 m -> 3,0 m
     because the mounting structure sets how high the anchor stands
-  usable range                         5,52 km -> 1,66 km
+  usable range                         5,52 km -> 1,91 km
     because range is whatever the link budget allows at the target precision
-  range where the link still decodes  38,93 km -> 15,54 km
+  range where the link still decodes  11,71 km -> 4,06 km
     because the same budget decides where the link stops decoding
 
 Apply all of that? [y/N]
@@ -638,10 +645,10 @@ sigma reaches 5 m, over open ground:
 
 | Mounted on | Height | Usable range |
 |---|---|---|
-| Roadside sign | 3 m | 1,66 km |
-| Sign gantry | 6 m | 2,51 km |
-| Billboard | 10 m | 3,47 km |
-| Lighting column | 12 m | 3,83 km |
+| Roadside sign | 3 m | 1,91 km |
+| Sign gantry | 6 m | 2,70 km |
+| Billboard | 10 m | 3,49 km |
+| Lighting column | 12 m | 3,82 km |
 | Purpose-built mast | 25 m | 5,52 km |
 | Tower | 35 m | 6,53 km |
 

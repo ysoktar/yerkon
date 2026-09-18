@@ -283,7 +283,7 @@ levha dururken:
 | Amaca özel 25 m direk, her 800 m | 16 | 1529323 TL | %96,7 |
 
 **Levhalar beş buçuk kat kazanıyor**, üstelik direğin 5,52 km'sine karşı
-1,66 km'ye erişirken. Yükseklik menzil satın alır ve kıt olan menzil
+1,91 km'ye erişirken. Yükseklik menzil satın alır ve kıt olan menzil
 değildir — para kıttır, ve zaten duran bir levha, durmayan bir direğin
 otuz dörtte birine mal olur. Bu, iddia edilerek değil aranarak varılan
 karışık montaj stratejisidir ve menzil değerlerinin verdiği sezgiyi ters
@@ -306,10 +306,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,56 | 9,32 | 66,42 | %80,95 | 6,26 | 25095 | 11626 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,64 | 23,74 | 237,58 | %47,46 | 162,25 | 16495 | 684 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,86 | 3,03 | 7,65 | %99,97 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,69 | 12,93 | 148,01 | %62,60 | 68,03 | 464488 | 91038 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 9,61 | 64,92 | %81,23 | 6,32 | 24857 | 11516 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,36 | 20,90 | 223,84 | %47,49 | 163,08 | 16411 | 680 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,86 | 3,03 | 7,64 | %99,97 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,31 | 143,26 | %62,70 | 68,40 | 464335 | 90981 |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir
@@ -341,6 +341,13 @@ kötüsünün on altı; tek bir bıçak sırtı bunların yalnızca birini sayı
 Zeminin yüzeyi çatıları da içerir, yani binalar ayrıca bir katsayı olarak
 değil, engel olarak sayılır (ADR-0046).
 
+Bir bağlantı ikisini de ödemez, büyüğünü öder. İkisi de aynı yer
+parçasının aynı bağlantıya yaptığı şeyi anlatıyor; toplamak bir yer
+parçasını iki kez faturalandırmak olur, ve sönümlemenin sönecek bir
+doğrudan ışına ihtiyacı var, ki kesilmiş bir yolda o ışın yok. Sekiz
+kilometre, 20 m direk, ortada 25 m sırt: yansıma 15,7 dB, kırınım 27,1,
+ödenen 27,1 (ADR-0058).
+
 OPEX sütunu raporun dört satır için de boş bıraktığı sütundur. Sermayenin
 bir yüzdesi olarak değil, adlandırılmış yinelenen kalemlerden oluşan bir
 envanterden gelir (ADR-0006) ve buradaki her maliyet değeri gibi
@@ -358,7 +365,7 @@ yolculuğunun uzunluğudur ve onlar için kilometre başına maliyet hiç
 verilmez.
 
 **Hizmet alanı, bir konumun alınabildiği yerdir**, bir paketin ulaştığı
-yer değil. Kırsal bölge için bunlar 671,75 ve 1188,00 km²'dir, 1,8 kat, ve
+yer değil. Kırsal bölge için bunlar 163,08 ve 383,33 km²'dir, 2,4 kat, ve
 notlar her seferinde ikisini de yazdırır (ADR-0012).
 
 **Kırsal kullanılabilirliğe arazi ve bir turun uzunluğu karar verir.**
@@ -533,9 +540,9 @@ You asked to change:
 Which also changes:
   anchor height                         25,0 m -> 3,0 m
     because the mounting structure sets how high the anchor stands
-  usable range                         5,52 km -> 1,66 km
+  usable range                         5,52 km -> 1,91 km
     because range is whatever the link budget allows at the target precision
-  range where the link still decodes  38,93 km -> 15,54 km
+  range where the link still decodes  11,71 km -> 4,06 km
     because the same budget decides where the link stops decoding
 
 Apply all of that? [y/N]
@@ -625,10 +632,10 @@ mesafeyi açık zemin üzerinde çözersek:
 
 | Monte edildiği yer | Yükseklik | Kullanılabilir menzil |
 |---|---|---|
-| Yol levhası | 3 m | 1,66 km |
-| Levha portalı | 6 m | 2,51 km |
-| Pano | 10 m | 3,47 km |
-| Aydınlatma direği | 12 m | 3,83 km |
+| Yol levhası | 3 m | 1,91 km |
+| Levha portalı | 6 m | 2,70 km |
+| Pano | 10 m | 3,49 km |
+| Aydınlatma direği | 12 m | 3,82 km |
 | Amaca özel direk | 25 m | 5,52 km |
 | Kule | 35 m | 6,53 km |
 
