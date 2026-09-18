@@ -369,6 +369,71 @@ def test_a_search_that_cleared_its_bar_says_so():
     assert said.got >= said.wanted
 
 
+def test_a_bar_that_is_met_can_still_serve_nothing():
+    """ADR-0060. The reported case: Gölbaşı, three anchors, 0,00 km².
+
+    `greedy-coverage` asks that a packet arrives, which is one anchor,
+    and a position needs four. Over ground one disc covers, it meets its
+    bar with a single mast and nowhere on the site has four anchors in
+    reach. The bar is not wrong, and reading it as "this works" is, so
+    the bar carries what the arrangement serves whatever it was asked
+    for.
+    """
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=3000.0)
+    plan = Plan(method="greedy-coverage", most=60)
+    spots = place(plan, ground)
+    said = bar_of(plan, ground, spots)
+
+    assert len(spots) == 1, len(spots)
+    assert said.met, "the method got what it asked for"
+    assert said.served_share == 0.0, said.served_share
+
+
+@pytest.mark.parametrize("method", ["greedy-dop", "k-cover"])
+def test_the_searches_that_ask_for_four_serve_the_same_ground(method):
+    """And the figure is the same figure, so the three are comparable.
+
+    Over the site above, both of these place four anchors and every cell
+    has four in reach, against `greedy-coverage`'s one and none.
+    """
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=3000.0)
+    plan = Plan(method=method, most=60, target_dop=2.0, cover_k=4)
+    said = bar_of(plan, ground, place(plan, ground))
+    assert said.met
+    assert said.served_share == 1.0, said.served_share
+
+
+def test_what_a_bar_serves_is_counted_at_four_and_not_at_three():
+    """`FEWEST_FOR_A_FIX` is a property of the dilution matrix and
+    `ENOUGH_TO_BE_SERVED` is what a deployment needs. Conflating them is
+    what put four anchors in the corners of Kızılay (ADR-0047), and the
+    share here counts the second.
+    """
+    import numpy as np
+
+    from yerkon.layout import ENOUGH_TO_BE_SERVED, _field, _within, bar_of
+
+    ground = Ground(length_m=4000.0, width_m=4000.0, reach_m=1500.0)
+    plan = Plan(method="greedy-coverage", most=40)
+    spots = place(plan, ground)
+    said = bar_of(plan, ground, spots)
+
+    cells, _ = _field(plan, ground)
+    seen = np.zeros(len(cells), dtype=int)
+    for spot in spots:
+        seen += _within(cells, np.array([spot.x_m, spot.y_m]),
+                        max(ground.reach_m, 1.0)).astype(int)
+    by_hand = float(np.count_nonzero(seen >= ENOUGH_TO_BE_SERVED)) / len(cells)
+    at_three = float(np.count_nonzero(seen >= 3)) / len(cells)
+
+    assert said.served_share == pytest.approx(by_hand)
+    assert at_three > by_hand, "this arrangement tells the two apart"
+
+
 def test_a_search_that_ran_out_of_budget_says_which():
     """A budget that ran out may clear the bar with a larger one, and a
     search out of candidates will not. They are the same silence from

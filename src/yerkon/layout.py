@@ -491,6 +491,19 @@ class Bar:
     #: Above zero means somewhere cannot be fixed at all, which is a
     #: different failure from geometry that is merely poor.
     short: int = 0
+    #: Share of the search's own cells with `ENOUGH_TO_BE_SERVED`
+    #: anchors in reach, whatever the bar was on.
+    #:
+    #: Carried for every search because a bar being met says the method
+    #: got what it asked for and not that the arrangement works.
+    #: `greedy-coverage` asks that a packet arrives, which is one anchor,
+    #: so over a site its reach covers in one disc it meets its bar with
+    #: a single mast and serves nothing at all (ADR-0060).
+    #:
+    #: Counted over the coarse field the search scored against, so it is
+    #: the proposal's own reading and not the published area, which
+    #: `coverage()` measures against the real budget and terrain.
+    served_share: float = 0.0
 
 
 def bar_of(plan: Plan, ground: Ground,
@@ -515,16 +528,7 @@ def bar_of(plan: Plan, ground: Ground,
         return Bar(name="cells", wanted=1.0, got=0.0, met=False,
                    spent_the_budget=spent)
 
-    if plan.method == "greedy-dop":
-        short, dilution = _fixable_then_dilution(cells, standing, reach)
-        return Bar(
-            name="dilution", wanted=float(plan.target_dop),
-            got=float(dilution),
-            met=short == 0 and dilution <= plan.target_dop,
-            spent_the_budget=spent, short=short,
-        )
-
-    # Counted the way the methods that carry this bar count, which is
+    # Counted the way the methods that carry a reach bar count, which is
     # not the way the dilution arithmetic counts. `_seen_and_dilution`
     # drops an anchor sitting exactly on a cell centre, because the unit
     # vector to it is undefined; for "how many anchors are in reach" it
@@ -534,6 +538,17 @@ def bar_of(plan: Plan, ground: Ground,
     seen = np.zeros(len(cells), dtype=int)
     for point in standing:
         seen += _within(cells, point, reach).astype(int)
+    served = (float(np.count_nonzero(seen >= ENOUGH_TO_BE_SERVED))
+              / float(len(cells)))
+
+    if plan.method == "greedy-dop":
+        short, dilution = _fixable_then_dilution(cells, standing, reach)
+        return Bar(
+            name="dilution", wanted=float(plan.target_dop),
+            got=float(dilution),
+            met=short == 0 and dilution <= plan.target_dop,
+            spent_the_budget=spent, short=short, served_share=served,
+        )
 
     if plan.method == "k-cover":
         wanted = float(max(int(plan.cover_k), 1))
@@ -542,6 +557,7 @@ def bar_of(plan: Plan, ground: Ground,
             name="anchors_in_reach", wanted=wanted, got=fewest,
             met=fewest >= wanted, spent_the_budget=spent,
             short=int(np.maximum(wanted - seen, 0).sum()),
+            served_share=served,
         )
 
     # greedy-coverage asks only that a packet arrives, which is one
@@ -552,6 +568,7 @@ def bar_of(plan: Plan, ground: Ground,
         name="covered_share", wanted=1.0, got=reached,
         met=reached >= 1.0 - 1e-9, spent_the_budget=spent,
         short=int(np.count_nonzero(seen < 1)),
+        served_share=served,
     )
 
 

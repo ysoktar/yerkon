@@ -2347,6 +2347,45 @@ def test_the_button_comes_back_before_the_pooled_pass_finishes():
         '/api/simulate/pooled')
 
 
+def test_the_card_says_what_an_arrangement_serves_even_when_it_met_its_bar():
+    """ADR-0060. "Cleared its bar" read as "this works" and for
+    `greedy-coverage` it does not.
+
+    Walked in a browser over a 1,5 km site with a 6 km reach: one mast,
+    bar met, and the card reads "çıta tutturuldu · ama hiçbir yerde dört
+    direk yok: bu düzenleme konum vermez". A share that rounds to zero
+    is said in words rather than printed as "%0", which would read as a
+    rounding rather than as a finding.
+    """
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    said = (STATIC / "words.js").read_text(encoding="utf-8")
+
+    run = page[page.index("function barSaid("):]
+    run = run[:run.index("\n}\n")]
+    # Said on both paths, met and missed, since either can serve nothing.
+    assert run.count("serves") >= 3, run.count("serves")
+    assert 'say("run.bar.serves_nothing")' in run
+    assert 'say("run.bar.served"' in run
+    assert "share * 100 < 0.5" in run, "a rounded zero is said in words"
+    assert 'if (bar.met) return [say("run.bar.met"), serves]' in run
+
+    assert '"run.bar.served"' in said
+    assert '"run.bar.serves_nothing"' in said
+
+
+def test_the_scene_carries_what_a_search_serves():
+    """The page cannot say it if the scene does not send it."""
+    from yerkon.viewer.scene import _bar_json
+    from yerkon.layout import Ground, Plan, bar_of, place
+
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=3000.0)
+    plan = Plan(method="greedy-coverage", most=60)
+    carried = _bar_json(bar_of(plan, ground, place(plan, ground)))
+    assert carried["met"] is True
+    assert carried["served_share"] == 0.0
+    assert isinstance(carried["served_share"], float)
+
+
 # --- A search that missed its bar says so (ADR-0056) ----------------------
 
 
@@ -2388,7 +2427,7 @@ def test_a_lattice_carries_no_bar_and_a_search_does():
     assert said["name"] == "anchors_in_reach"
     assert said["wanted"] == float(searching.runs[0].cover_k)
     assert set(said) == {"name", "wanted", "got", "met", "spent_the_budget",
-                         "short"}
+                         "short", "served_share"}
 
 
 def test_the_card_says_which_of_the_three_ways_a_search_stopped():

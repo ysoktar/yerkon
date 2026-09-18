@@ -769,7 +769,21 @@ function drawRuns() {
  */
 function barSaid(bar, run) {
   if (!bar) return "";
-  if (bar.met) return say("run.bar.met");
+
+  // What the arrangement serves, whatever the bar was on. Said on every
+  // search, because "cleared its bar" reads as "this works" and for
+  // greedy-coverage it does not: over ground one disc covers it meets
+  // its bar with a single mast and nowhere has the four anchors a
+  // position needs (ADR-0060).
+  // Anything that rounds to zero is said in words rather than printed
+  // as "0 %", which reads as a rounding rather than as a finding. Over
+  // Kızılay greedy-coverage serves 0,36 % of its own cells.
+  const share = bar.served_share;
+  const serves = share === undefined ? ""
+    : (share * 100 < 0.5 ? say("run.bar.serves_nothing")
+                         : say("run.bar.served", { share: tr(share * 100, 0) }));
+
+  if (bar.met) return [say("run.bar.met"), serves].filter(Boolean).join(" · ");
 
   let missed;
   if (bar.name === "dilution" && bar.short > 0) {
@@ -787,9 +801,9 @@ function barSaid(bar, run) {
   }
   // Why it stopped decides whether a larger budget would help, which is
   // the next thing somebody reaching for the budget wants to know.
-  return missed + " · " + say(
+  return [missed, say(
     bar.spent_the_budget ? "run.bar.budget" : "run.bar.candidates",
-    { most: run.most });
+    { most: run.most }), serves].filter(Boolean).join(" · ");
 }
 
 function drawUnits() {

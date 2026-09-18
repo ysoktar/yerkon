@@ -266,6 +266,18 @@ export const SAY = {
   "run.bar.met": {
     tr: "çıta tutturuldu", en: "cleared its bar",
   },
+  // What the arrangement serves, beside what its method asked for. A
+  // bar being met says the method got what it asked for and not that
+  // the deployment works: greedy-coverage asks that a packet arrives,
+  // which is one anchor, and a position needs four (ADR-0060).
+  "run.bar.served": {
+    tr: "dört direğin eriştiği pay %{share}",
+    en: "{share} % has four anchors in reach",
+  },
+  "run.bar.serves_nothing": {
+    tr: "ama hiçbir yerde dört direk yok: bu düzenleme konum vermez",
+    en: "but nowhere has four: this arrangement gives no position",
+  },
   "run.bar.dilution.short": {
     tr: "çıta tutturulamadı: sahanın bir kısmında konum alınamıyor, "
         + "{short} görüş eksik",

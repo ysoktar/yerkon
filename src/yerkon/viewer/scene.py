@@ -193,6 +193,7 @@ def _bar_json(bar) -> Optional[dict]:
         "met": bool(bar.met),
         "spent_the_budget": bool(bar.spent_the_budget),
         "short": int(bar.short),
+        "served_share": float(bar.served_share),
     }
 
 
