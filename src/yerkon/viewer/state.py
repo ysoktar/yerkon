@@ -39,7 +39,7 @@ from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import DEFAULT_LANGUAGE, say
 from yerkon.layout import ENOUGH_TO_BE_SERVED, SEARCHES, Spot
 from yerkon.routes import Course, Trip, trace
-from yerkon.layout import Ground as LayoutGround, Plan, place
+from yerkon.layout import Ground as LayoutGround, Plan, bar_of, place
 from yerkon.settings import Settings, defaults_in
 from yerkon.world import (
     Anchor,
@@ -372,28 +372,8 @@ class AnchorRun:
         radio = chosen(radio_of, self.radio, "radio")
 
         start = self.from_m
-        length = max(self.to_m, self.from_m) - start
-        spots = place(
-            Plan(
-                method=self.method or "grid",
-                spacing_m=max(self.spacing_m, 25.0),
-                offset_m=self.offset_m,
-                stagger_m=self.stagger_m,
-                most=int(self.most),
-                cover_k=int(self.cover_k),
-                target_dop=self.target_dop,
-                mounting=self.mounting,
-            ),
-            LayoutGround(
-                length_m=length,
-                width_m=max(width_m, 0.0),
-                reach_m=self.reach_m or max(self.spacing_m, 25.0) * 1.5,
-                route=tuple((x - start, y) for x, y in route),
-                furniture=tuple(
-                    replace(spot, x_m=spot.x_m - start) for spot in furniture
-                ),
-            ),
-        )
+        plan, ground = self.asked_for(width_m, route, furniture)
+        spots = place(plan, ground)
         out = []
         for index, spot in enumerate(spots):
             # A spot that landed on a structure already standing keeps
@@ -411,6 +391,38 @@ class AnchorRun:
                 radio,
             ))
         return out
+
+    def asked_for(self, width_m: float = 0.0, route=(), furniture=()):
+        """The `Plan` and `Ground` this run hands to `yerkon.layout`.
+
+        Built in one place because two callers need the same pair: the
+        one that places the anchors and the one that asks whether the
+        arrangement cleared the bar. Building it twice is how the scene
+        came to recognise fifty-two of the sixty anchors it was drawing
+        (ADR-0049).
+        """
+        start = self.from_m
+        return (
+            Plan(
+                method=self.method or "grid",
+                spacing_m=max(self.spacing_m, 25.0),
+                offset_m=self.offset_m,
+                stagger_m=self.stagger_m,
+                most=int(self.most),
+                cover_k=int(self.cover_k),
+                target_dop=self.target_dop,
+                mounting=self.mounting,
+            ),
+            LayoutGround(
+                length_m=max(self.to_m, self.from_m) - start,
+                width_m=max(width_m, 0.0),
+                reach_m=self.reach_m or max(self.spacing_m, 25.0) * 1.5,
+                route=tuple((x - start, y) for x, y in route),
+                furniture=tuple(
+                    replace(spot, x_m=spot.x_m - start) for spot in furniture
+                ),
+            ),
+        )
 
     def within(self, length_m: float) -> "AnchorRun":
         """This run, with its ends brought inside a site of that length.
@@ -660,6 +672,19 @@ class ViewState:
         were drawn in no colour, given no reach ring and counted on no
         card (ADR-0049).
         """
+        return self._laid_out(terrain)[0]
+
+    def bars(self, terrain: Terrain) -> dict:
+        """Whether each run cleared what its method was asked for.
+
+        Nothing under a run whose method carries no bar. Measured
+        against the anchors actually standing, so deleting three by hand
+        can take an arrangement back under its bar and say so
+        (ADR-0056).
+        """
+        return self._laid_out(terrain)[1]
+
+    def _laid_out(self, terrain: Terrain) -> tuple:
         remember = _placement_key(self, terrain)
         if remember in _PLACED:
             return _PLACED[remember]
@@ -672,13 +697,14 @@ class ViewState:
         _PLACED[remember] = answer
         return answer
 
-    def _place(self, terrain: Terrain) -> tuple[tuple[str, Anchor], ...]:
+    def _place(self, terrain: Terrain) -> tuple:
         catalogues = self.catalogues()
         route = tuple(
             (float(x), float(y)) for x, y in self.road(terrain).centreline_m
         )
         standing = self.furniture()
-        placed = []
+        placed: list = []
+        bars: dict = {}
         for run in self.runs:
             # The reach the ring is drawn from, so a search scores its
             # candidates against the same disc a person is looking at.
@@ -703,7 +729,19 @@ class ViewState:
                     Anchor(identifier, (float(x), float(y)), mounting,
                            terrain, radio=radio),
                 ))
-        return tuple(placed)
+
+            # Asked of what is standing rather than of what was placed:
+            # the same plan and the same ground the search used, and the
+            # anchors that survived being dragged and deleted.
+            plan, layout_ground = reaching.asked_for(
+                self.width_m, route, standing)
+            here = tuple(
+                Spot(anchor.ground_position_m[0] - run.from_m,
+                     anchor.ground_position_m[1])
+                for run_id, anchor in placed if run_id == run.identifier
+            )
+            bars[run.identifier] = bar_of(plan, layout_ground, here)
+        return tuple(placed), bars
 
     def course(self) -> Course:
         """The ground a journey runs over, for `yerkon.routes`."""

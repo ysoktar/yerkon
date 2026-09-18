@@ -161,6 +161,20 @@ def _aerial(state: ViewState, measured) -> Optional[dict]:
     }
 
 
+def _bar_json(bar) -> Optional[dict]:
+    """One run's bar, as the page reads it. Nothing where there is no bar."""
+    if bar is None:
+        return None
+    return {
+        "name": bar.name,
+        "wanted": float(bar.wanted),
+        "got": float(bar.got),
+        "met": bool(bar.met),
+        "spent_the_budget": bool(bar.spent_the_budget),
+        "short": int(bar.short),
+    }
+
+
 def scene(state: ViewState) -> dict:
     """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
@@ -170,6 +184,7 @@ def scene(state: ViewState) -> dict:
     # how long a round takes — is real engine logic and stays there
     # rather than being written out a second time here.
     standing = state.placed(terrain)
+    bars = state.bars(terrain)
     anchors_here = tuple(anchor for _, anchor in standing)
     receivers_here = state.receivers(terrain)
     deployment = state.deployment(terrain) if anchors_here else None
@@ -359,6 +374,11 @@ def scene(state: ViewState) -> dict:
                 "count": sum(
                     1 for a in anchors if a["run"] == run.identifier
                 ),
+                # Whether the search cleared what it was asked for, or
+                # stopped for one of the two reasons that look the same
+                # from outside (ADR-0056). Nothing under a lattice: a
+                # spacing is not a target.
+                "bar": _bar_json(bars.get(run.identifier)),
             }
             for run in state.runs
         ],

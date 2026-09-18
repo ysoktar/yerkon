@@ -2235,3 +2235,71 @@ def test_a_sweep_that_arrives_late_is_not_this_row_s_ground():
         "sweepData = swept;")
     # And a failed sweep nobody is waiting for does not flash either.
     assert "if (mine === sweepWanted) flash(error.message, true);" in sweep
+
+# --- A search that missed its bar says so (ADR-0056) ----------------------
+
+
+def test_the_bar_travels_with_the_placement_rather_than_being_asked_again():
+    """The same rule as the run an anchor belongs to (ADR-0049): asking
+    a second time means building a second `Plan` and `Ground`, and two
+    of those are never quite the same pair."""
+    from dataclasses import replace
+
+    from yerkon.viewer.state import from_scenario
+
+    state = from_scenario("urban")
+    searching = replace(state, runs=tuple(
+        replace(run, method="greedy-dop") for run in state.runs))
+    terrain = searching.terrain()
+
+    placed = searching.placed(terrain)
+    bars = searching.bars(terrain)
+    assert set(bars) == {run.identifier for run in searching.runs}
+    # Read off the one placement, so asking twice costs nothing and
+    # cannot answer differently.
+    assert searching.bars(terrain) is bars
+    assert searching.placed(terrain) is placed
+
+
+def test_a_lattice_carries_no_bar_and_a_search_does():
+    from dataclasses import replace
+
+    from yerkon.viewer.scene import scene
+    from yerkon.viewer.state import from_scenario
+
+    state = from_scenario("urban")
+    lattice = scene(state)["runs"][0]
+    assert lattice["bar"] is None
+
+    searching = replace(state, runs=tuple(
+        replace(run, method="k-cover") for run in state.runs))
+    said = scene(searching)["runs"][0]["bar"]
+    assert said["name"] == "anchors_in_reach"
+    assert said["wanted"] == float(searching.runs[0].cover_k)
+    assert set(said) == {"name", "wanted", "got", "met", "spent_the_budget",
+                         "short"}
+
+
+def test_the_card_says_which_of_the_three_ways_a_search_stopped():
+    """Cleared it, ran out of budget, or ran out of candidates. Over
+    Kızılay a dilution target of two cannot be met at all, so the search
+    bolted an anchor to every mountable structure it was allowed and
+    read exactly like one that had worked."""
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert "function barSaid(bar, run)" in page
+
+    said = page[page.index("function barSaid(bar, run)"):]
+    said = said[:said.index("\n}\n")]
+    for key in ('"run.bar.met"', '"run.bar.dilution.short"',
+                '"run.bar.dilution"', '"run.bar.anchors_in_reach"',
+                '"run.bar.covered_share"', '"run.bar.budget"',
+                '"run.bar.candidates"'):
+        assert key in said, key
+    # A lattice gets nothing rather than a cheerful nothing.
+    assert "if (!bar) return \"\";" in said
+
+    words = (STATIC / "words.js").read_text(encoding="utf-8")
+    for key in ("run.bar.met", "run.bar.dilution.short", "run.bar.budget"):
+        spot = words.index('"{}"'.format(key))
+        phrase = words[spot:spot + 400]
+        assert "tr:" in phrase and "en:" in phrase, key

@@ -730,9 +730,55 @@ function drawRuns() {
         anchors: found.count, reach: tr(found.reach_m / 1000),
       });
       card.appendChild(note);
+
+      const verdict = barSaid(found.bar, run);
+      if (verdict) {
+        const line = document.createElement("p");
+        line.className = found.bar.met ? "hint" : "hint no-hits";
+        line.style.margin = "2px 0 0";
+        line.textContent = verdict;
+        card.appendChild(line);
+      }
     }
     host.appendChild(card);
   });
+}
+
+/* What a search did against what it was asked for.
+ *
+ * A search stops for one of three reasons and only one of them is a
+ * result: it cleared its bar, it ran out of budget, or nothing left to
+ * add would help. From outside all three look the same, and over
+ * Kızılay a dilution target of two cannot be met at all, so the search
+ * bolted an anchor to every mountable structure on the site and read
+ * exactly like one that had worked (ADR-0056).
+ *
+ * Nothing for a lattice. A spacing is not a target, and reporting one
+ * as met would invent a claim the method never made.
+ */
+function barSaid(bar, run) {
+  if (!bar) return "";
+  if (bar.met) return say("run.bar.met");
+
+  let missed;
+  if (bar.name === "dilution" && bar.short > 0) {
+    missed = say("run.bar.dilution.short", { short: bar.short });
+  } else if (bar.name === "dilution") {
+    missed = say("run.bar.dilution", {
+      got: tr(bar.got), wanted: tr(bar.wanted),
+    });
+  } else if (bar.name === "anchors_in_reach") {
+    missed = say("run.bar.anchors_in_reach", {
+      got: tr(bar.got, 0), wanted: tr(bar.wanted, 0),
+    });
+  } else {
+    missed = say("run.bar.covered_share", { short: bar.short });
+  }
+  // Why it stopped decides whether a larger budget would help, which is
+  // the next thing somebody reaching for the budget wants to know.
+  return missed + " · " + say(
+    bar.spent_the_budget ? "run.bar.budget" : "run.bar.candidates",
+    { most: run.most });
 }
 
 function drawUnits() {

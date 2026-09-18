@@ -325,3 +325,136 @@ def test_the_number_of_anchors_a_run_covers_to_is_the_engine_s_own():
 
     run = AnchorRun("A", "e28", "mast", 0.0, 1000.0, 500.0, 25.0)
     assert run.cover_k == Plan().cover_k == ENOUGH_TO_BE_SERVED == 4
+
+
+# --- What a search was asked for, and where it stopped (ADR-0056) ---------
+
+
+def test_a_lattice_is_not_asked_whether_it_met_anything():
+    """A spacing is not a target. Reporting a grid as having met its bar
+    would invent a claim the method never made."""
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=900.0)
+    for method in ("grid", "hex", "corridor", "perimeter", "manual"):
+        plan = Plan(method=method, spacing_m=700.0)
+        assert bar_of(plan, ground, place(plan, ground)) is None, method
+
+
+@pytest.mark.parametrize("method,bar", [
+    ("greedy-dop", "dilution"),
+    ("k-cover", "anchors_in_reach"),
+    ("greedy-coverage", "covered_share"),
+])
+def test_every_search_says_what_it_was_asked_for(method, bar):
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=3000.0, width_m=3000.0, reach_m=1200.0)
+    plan = Plan(method=method, most=40, target_dop=2.0, cover_k=4)
+    said = bar_of(plan, ground, place(plan, ground))
+    assert said is not None and said.name == bar
+    assert said.wanted > 0.0
+
+
+def test_a_search_that_cleared_its_bar_says_so():
+    """The whole point. Over ground a search can serve, the answer is a
+    result; the three tests below are the three ways it is not."""
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=2000.0, width_m=2000.0, reach_m=2000.0)
+    plan = Plan(method="k-cover", cover_k=1, most=40)
+    spots = place(plan, ground)
+    said = bar_of(plan, ground, spots)
+    assert said.met and said.short == 0
+    assert said.got >= said.wanted
+
+
+def test_a_search_that_ran_out_of_budget_says_which():
+    """A budget that ran out may clear the bar with a larger one, and a
+    search out of candidates will not. They are the same silence from
+    outside, and the next thing a person reaches for differs."""
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=6000.0, width_m=6000.0, reach_m=500.0)
+    plan = Plan(method="k-cover", cover_k=4, most=6)
+    said = bar_of(plan, ground, place(plan, ground))
+    assert not said.met
+    assert said.spent_the_budget
+    assert said.short > 0
+
+
+def test_a_search_out_of_candidates_says_that_instead():
+    """Every candidate taken and the bar still missed: a larger budget
+    buys nothing, and the card must not suggest it would."""
+    from yerkon.layout import bar_of
+
+    # Four structures in one corner, and a site far wider than the
+    # reach: everything that could be placed has been.
+    corner = tuple(Spot(x, y) for x in (50.0, 150.0) for y in (50.0, 150.0))
+    ground = Ground(length_m=8000.0, width_m=8000.0, reach_m=400.0,
+                    furniture=corner)
+    plan = Plan(method="greedy-coverage", most=99)
+    spots = place(plan, ground)
+    said = bar_of(plan, ground, spots)
+    assert len(spots) <= len(corner)
+    assert not said.met and not said.spent_the_budget
+    assert said.short > 0
+
+
+def test_poor_geometry_and_no_geometry_are_different_answers():
+    """`greedy-dop` misses its bar two ways: somewhere cannot be fixed
+    at all, or everywhere can and the geometry is merely poor. The first
+    is a coverage problem and the second is a placement one, so the card
+    says which."""
+    from yerkon.layout import bar_of
+
+    thin = Ground(length_m=9000.0, width_m=9000.0, reach_m=600.0)
+    plan = Plan(method="greedy-dop", most=8, target_dop=2.0)
+    missing = bar_of(plan, thin, place(plan, thin))
+    assert not missing.met and missing.short > 0
+
+    # Everything in reach of everything, and a target no arrangement of
+    # four can beat.
+    tight = Ground(length_m=800.0, width_m=800.0, reach_m=4000.0)
+    fussy = Plan(method="greedy-dop", most=5, target_dop=0.2)
+    poor = bar_of(fussy, tight, place(fussy, tight))
+    assert not poor.met and poor.short == 0
+    assert poor.got > poor.wanted
+
+
+def test_the_bar_is_asked_of_what_is_standing():
+    """Deleting anchors by hand can take an arrangement back under its
+    bar, and then the card has to stop saying it cleared one."""
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=1500.0, width_m=1500.0, reach_m=3000.0)
+    plan = Plan(method="k-cover", cover_k=4, most=40)
+    spots = place(plan, ground)
+    assert len(spots) == 4 and bar_of(plan, ground, spots).met
+
+    fewer = bar_of(plan, ground, spots[:3])
+    assert not fewer.met
+    assert fewer.got == 3.0 and fewer.short > 0
+    assert bar_of(plan, ground, ()).got == 0.0
+
+
+def test_the_bar_counts_the_way_the_search_counts():
+    """`_seen_and_dilution` drops an anchor sitting exactly on a cell
+    centre, because the unit vector to it is undefined and the dilution
+    arithmetic needs one. For "how many anchors are in reach" it is
+    plainly one of them.
+
+    Measured with the geometry count, a k-cover arrangement the search
+    had just declared complete came back one anchor short at every
+    candidate that happened to land on a cell centre, and the card
+    called a finished search unfinished.
+    """
+    from yerkon.layout import bar_of
+
+    ground = Ground(length_m=1500.0, width_m=1500.0, reach_m=3000.0)
+    for wanted in (1, 2, 3, 4):
+        plan = Plan(method="k-cover", cover_k=wanted, most=40)
+        spots = place(plan, ground)
+        said = bar_of(plan, ground, spots)
+        assert said.met, (wanted, said)
+        assert said.got >= wanted

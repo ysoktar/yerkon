@@ -460,6 +460,101 @@ def _fixable_then_dilution(cells: np.ndarray, anchors: np.ndarray,
     return short, mean
 
 
+@dataclass(frozen=True)
+class Bar:
+    """What a search was asked to clear, and where it stopped.
+
+    A search stops for one of three reasons: it cleared its bar, it ran
+    out of budget, or no candidate left would help. Only the first is a
+    result, and from the outside all three look the same. Over Kızılay,
+    a dilution target of two cannot be met with a measured reach of
+    478 m, so the search ran until it had bolted an anchor to every one
+    of the 232 mountable structures on the site and reported them the
+    way it reports an arrangement that worked (ADR-0056).
+
+    Worked out from the spots rather than reported by the search itself,
+    so that `place` keeps the one signature every method shares
+    (ADR-0040) and a hand-edited arrangement can be asked the same
+    question as a searched one.
+    """
+
+    #: Which quantity the bar is on, as a key the page names.
+    name: str
+    wanted: float
+    got: float
+    met: bool
+    #: Whether it placed every anchor it was allowed. A search that hit
+    #: its budget may clear the bar with a larger one; a search that ran
+    #: out of candidates will not.
+    spent_the_budget: bool
+    #: Anchor sightings the site is still short of, where that applies.
+    #: Above zero means somewhere cannot be fixed at all, which is a
+    #: different failure from geometry that is merely poor.
+    short: int = 0
+
+
+def bar_of(plan: Plan, ground: Ground,
+           spots: Sequence[Spot]) -> Optional[Bar]:
+    """Whether this arrangement clears what its method was asked for.
+
+    Nothing for a method that carries no bar. A lattice is a spacing
+    rather than a target, and asking whether a grid "met" anything would
+    invent a claim it never made.
+    """
+    if plan.method not in SEARCHES:
+        return None
+
+    cells, _ = _field(plan, ground)
+    standing = (
+        np.array([[spot.x_m, spot.y_m] for spot in spots], dtype=float)
+        if len(spots) else np.zeros((0, 2))
+    )
+    reach = max(ground.reach_m, 1.0)
+    spent = len(spots) >= max(int(plan.most), 0)
+    if not len(cells):
+        return Bar(name="cells", wanted=1.0, got=0.0, met=False,
+                   spent_the_budget=spent)
+
+    if plan.method == "greedy-dop":
+        short, dilution = _fixable_then_dilution(cells, standing, reach)
+        return Bar(
+            name="dilution", wanted=float(plan.target_dop),
+            got=float(dilution),
+            met=short == 0 and dilution <= plan.target_dop,
+            spent_the_budget=spent, short=short,
+        )
+
+    # Counted the way the methods that carry this bar count, which is
+    # not the way the dilution arithmetic counts. `_seen_and_dilution`
+    # drops an anchor sitting exactly on a cell centre, because the unit
+    # vector to it is undefined; for "how many anchors are in reach" it
+    # is plainly one of them, and using the geometry count here made the
+    # bar disagree with the search by one anchor at every candidate that
+    # happened to land on a cell centre.
+    seen = np.zeros(len(cells), dtype=int)
+    for point in standing:
+        seen += _within(cells, point, reach).astype(int)
+
+    if plan.method == "k-cover":
+        wanted = float(max(int(plan.cover_k), 1))
+        fewest = float(seen.min()) if len(seen) else 0.0
+        return Bar(
+            name="anchors_in_reach", wanted=wanted, got=fewest,
+            met=fewest >= wanted, spent_the_budget=spent,
+            short=int(np.maximum(wanted - seen, 0).sum()),
+        )
+
+    # greedy-coverage asks only that a packet arrives, which is one
+    # anchor and not four: it is the communications question and this
+    # project keeps it to measure the difference (ADR-0040).
+    reached = float(np.count_nonzero(seen >= 1)) / float(len(cells))
+    return Bar(
+        name="covered_share", wanted=1.0, got=reached,
+        met=reached >= 1.0 - 1e-9, spent_the_budget=spent,
+        short=int(np.count_nonzero(seen < 1)),
+    )
+
+
 def dilution_field(cells: np.ndarray, anchors: Sequence[tuple],
                    reach_m: float) -> np.ndarray:
     """Dilution at every one of these points. What the map colours by."""

@@ -247,6 +247,35 @@ export const SAY = {
   "run.stagger": { tr: "Kaydırma (m)", en: "Stagger (m)" },
   "run.drop": { tr: "Grubu kaldır", en: "Remove the group" },
   "run.count": { tr: "{anchors} direk · menzil {reach} km", en: "{anchors} anchors · reach {reach} km" },
+  "run.bar.met": {
+    tr: "çıta tutturuldu", en: "cleared its bar",
+  },
+  "run.bar.dilution.short": {
+    tr: "çıta tutturulamadı: sahanın bir kısmında konum alınamıyor, "
+        + "{short} görüş eksik",
+    en: "did not clear its bar: part of the site cannot be fixed at all, "
+        + "{short} sightings short",
+  },
+  "run.bar.dilution": {
+    tr: "çıta tutturulamadı: HDOP {got}, istenen {wanted}",
+    en: "did not clear its bar: HDOP {got} against {wanted} asked for",
+  },
+  "run.bar.anchors_in_reach": {
+    tr: "çıta tutturulamadı: bir yerde erişimde {got} direk var, "
+        + "istenen {wanted}",
+    en: "did not clear its bar: somewhere has {got} anchors in reach "
+        + "against {wanted} asked for",
+  },
+  "run.bar.covered_share": {
+    tr: "çıta tutturulamadı: {short} hücreye hiçbir direk erişmiyor",
+    en: "did not clear its bar: no anchor reaches {short} cells",
+  },
+  "run.bar.budget": {
+    tr: "bütçe doldu, {most} direk kondu", en: "budget spent, {most} placed",
+  },
+  "run.bar.candidates": {
+    tr: "eklenecek aday kalmadı", en: "nothing left to add would help",
+  },
   "run.least": { tr: "En az bir direk grubu gerekli.",
                  en: "At least one anchor group is needed." },
   "unit.kind": { tr: "Tür", en: "Kind" },
