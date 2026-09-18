@@ -247,6 +247,22 @@ export const SAY = {
   "run.stagger": { tr: "Kaydırma (m)", en: "Stagger (m)" },
   "run.drop": { tr: "Grubu kaldır", en: "Remove the group" },
   "run.count": { tr: "{anchors} direk · menzil {reach} km", en: "{anchors} anchors · reach {reach} km" },
+  "run.disc": {
+    tr: "aramanın kullandığı disk: bu zeminde ölçülen {metres} m",
+    en: "the search placed against {metres} m, measured on this ground",
+  },
+  "run.disc.ceiling": {
+    tr: "aramanın kullandığı disk: {metres} m, ama ölçülemedi — en yakın "
+        + "bantta bile bağlantıların onda biri kapanmıyor, gerçek menzil "
+        + "bunun altında",
+    en: "the search placed against {metres} m, but nothing was measured: "
+        + "even the closest band loses a tenth of its links, so the reach "
+        + "is somewhere below it",
+  },
+  "run.disc.by_hand": {
+    tr: "aramanın kullandığı disk: {metres} m, elle verildi",
+    en: "the search placed against {metres} m, set by hand",
+  },
   "run.bar.met": {
     tr: "çıta tutturuldu", en: "cleared its bar",
   },

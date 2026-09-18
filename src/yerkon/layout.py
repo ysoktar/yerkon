@@ -467,10 +467,10 @@ class Bar:
     A search stops for one of three reasons: it cleared its bar, it ran
     out of budget, or no candidate left would help. Only the first is a
     result, and from the outside all three look the same. Over Kızılay,
-    a dilution target of two cannot be met with a measured reach of
-    478 m, so the search ran until it had bolted an anchor to every one
-    of the 232 mountable structures on the site and reported them the
-    way it reports an arrangement that worked (ADR-0056).
+    a dilution target of two cannot be met with the 239 m this ground
+    measures, so the search spends whatever budget it is given and
+    reports the anchors the way it reports an arrangement that worked
+    (ADR-0056, ADR-0057).
 
     Worked out from the spots rather than reported by the search itself,
     so that `place` keeps the one signature every method shares

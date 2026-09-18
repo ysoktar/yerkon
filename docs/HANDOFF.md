@@ -159,7 +159,7 @@ yanlıştır.
    yerleşim üretebiliyor** — Gölbaşı şehir içinde üç direkle 0,00 km².
    Bu MCLP'nin tanımı ve ADR-0040 zaten bunu söylemek için var, ama
    arayüzde seçilebilen bir seçenek olarak duruyor. Ve **arama çıtasına
-   ulaşamadığında bunu söylemiyor**: Kızılay'da 478 m'lik bir diskle
+   ulaşamadığında bunu söylemiyor**: Kızılay'da o günkü 478 m'lik diskle
    HDOP ≤ 2 hiç karşılanmıyor, arama adayları tükenene kadar gidiyor
    (232 direk — sahadaki monte edilebilir yapı sayısı), ve dışarıdan
    çıtasını karşılayıp duran bir aramadan ayırt edilemiyor. ADR-0023'ün
@@ -215,7 +215,7 @@ kenarı, artı düz bir dünyanın aynı kurgunun ötesinde götürdüğü kadar
 Kırınım kaybı ortanca 24,5 → 38,9 dB. Tablo aşağı indi ve **README ile
 TRY-IT güncellendi**: şehir içi HPE P95 5,36 → 10,14 m, kullanılabilirlik
 %99,79 → %79,84, alan 8,93 → 5,69 km²; kırsal %72,75 → %41,87. Tünel
-değişmedi. Ölçülen menzil de değişmedi (478 m), çünkü o sayı zaten gerçek
+değişmedi. Ölçülen menzil de o gün değişmedi (478 m), çünkü o sayı gerçek
 binaların arasından ölçülüyordu — değişen aradaki zemin.
 
 Altı sınama yeniden yazıldı, hiçbiri gevşetilmedi. Üçü modelin artık

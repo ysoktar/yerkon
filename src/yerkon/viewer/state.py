@@ -138,7 +138,18 @@ def reach_of(state: ViewState, run) -> float:
 #: cent because the search treats the disc as a hard edge, so the edge
 #: belongs where links are still reliable rather than where the last one
 #: happened to get through.
-REACH_SAMPLES = 200
+#: How finely the sampling states an answer, and how much evidence each
+#: band gets.
+#:
+#: Eight bands put the whole answer in one of eight values, and over
+#: Kızılay that made the band 478 m wide: two grounds as different as a
+#: town and open rolling country came back with the identical figure to
+#: a tenth of a metre, because both failed in the same band. Thirty-two
+#: bands and four hundred rays each cost a second over a town and four
+#: through a bore, once per arrangement, and the searches place against
+#: the answer (ADR-0057).
+REACH_BANDS = 32
+RAYS_PER_BAND = 400
 REACH_SHARE = 0.9
 
 #: Measured reaches already worked out this process.
@@ -198,7 +209,29 @@ def _placement_key(state: ViewState, terrain: Terrain) -> tuple:
     )
 
 
+@dataclass(frozen=True)
+class Reach:
+    """How far a run's anchors reach on this ground, and whether that
+    figure is a measurement.
+
+    ``measured`` is false when not even the closest band held enough
+    links to clear the bar. The distance is then the closest band's own
+    far edge, which is a ceiling rather than a reading: the reach is
+    somewhere below it and this sampling cannot say where. Reported as a
+    distance without that flag, it is a number nothing measured, and
+    every search on the site places its anchors against it (ADR-0057).
+    """
+
+    metres: float
+    measured: bool
+
+
 def measured_reach_m(state: ViewState, run) -> float:
+    """The distance alone, for the callers that only place against it."""
+    return reach_on(state, run).metres
+
+
+def reach_on(state: ViewState, run) -> Reach:
     """How far this run's anchors reach *on this ground*, by sampling it.
 
     `reach_of` is a flat-ground figure and says so: "the ring is an
@@ -238,11 +271,12 @@ def measured_reach_m(state: ViewState, run) -> float:
     if remember in _REACHES:
         return _REACHES[remember]
 
+
     terrain = state.terrain()
     design = design_of(state, run)
     open_ground = reach_of(state, run)
     if open_ground <= 0.0:
-        return open_ground
+        return Reach(metres=open_ground, measured=False)
 
     length = max(state.corridor_m, 1.0)
     width = max(state.width_m, 0.0)
@@ -250,49 +284,59 @@ def measured_reach_m(state: ViewState, run) -> float:
     # No further than the ground goes: a ray off the site is a link over
     # terrain nobody measured (ADR-0037).
     furthest = min(open_ground, math.hypot(length, width))
+    edges = np.linspace(0.0, furthest, REACH_BANDS + 1)
 
     rng = np.random.default_rng(state.seed)
-    bands = 8
-    edges = np.linspace(0.0, furthest, bands + 1)
-    closed = np.zeros(bands, dtype=int)
-    tried = np.zeros(bands, dtype=int)
+    here = (middle[0], middle[1],
+            terrain.height_at(*middle) + design.anchor_height_m)
+    # A corridor has no width to aim into. Rays at a random bearing all
+    # land off a site one metre wide, so the tunnel row measured nothing
+    # at all and took the floor instead (ADR-0057).
+    a_line = width <= 0.0
 
-    for _ in range(REACH_SAMPLES):
-        angle = rng.uniform(0.0, 2.0 * math.pi)
-        far = rng.uniform(edges[1] * 0.2, furthest)
-        x = middle[0] + far * math.cos(angle)
-        y = middle[1] + far * math.sin(angle)
-        if not (0.0 <= x <= length and 0.0 <= y <= max(width, 0.0)):
-            continue
-        band = min(int(far / max(furthest / bands, 1e-9)), bands - 1)
-        tried[band] += 1
-        here = (middle[0], middle[1],
-                terrain.height_at(*middle) + design.anchor_height_m)
-        there = (x, y, terrain.height_at(x, y) + design.receiver_height_m)
-        budget = evaluate_link(
-            Terminal(design.anchor_radio, design.antenna, here),
-            Terminal(design.anchor_radio, design.antenna, there),
-            obstruction=terrain.obstruction_between(here, there),
-            region=design.region,
-        )
-        if budget.closes and ranging_sigma_m(
-            budget, design.anchor_radio
-        ) <= state.tolerance_m:
-            closed[band] += 1
-
-    # The far edge of the last band, counting outward, where enough of
-    # what was tried still closed. A band nobody sampled is not evidence
-    # either way, so it neither extends nor stops the answer.
     reached = 0.0
-    for band in range(bands):
-        if tried[band] == 0:
+    for band in range(REACH_BANDS):
+        closed = tried = attempts = 0
+        # Each band gets the same evidence. Drawn across the whole disc,
+        # the outer bands got the fewest rays, because a long ray from
+        # the middle leaves a square site more often than a short one —
+        # and the outer bands are where the answer is decided.
+        while tried < RAYS_PER_BAND and attempts < RAYS_PER_BAND * 12:
+            attempts += 1
+            angle = (rng.choice((0.0, math.pi)) if a_line
+                     else rng.uniform(0.0, 2.0 * math.pi))
+            far = rng.uniform(max(float(edges[band]), 1.0),
+                              float(edges[band + 1]))
+            x = middle[0] + far * math.cos(angle)
+            y = middle[1] + far * math.sin(angle)
+            if not (0.0 <= x <= length and 0.0 <= y <= max(width, 0.0)):
+                continue
+            tried += 1
+            there = (x, y, terrain.height_at(x, y) + design.receiver_height_m)
+            budget = evaluate_link(
+                Terminal(design.anchor_radio, design.antenna, here),
+                Terminal(design.anchor_radio, design.antenna, there),
+                obstruction=terrain.obstruction_between(here, there),
+                region=design.region,
+            )
+            if budget.closes and ranging_sigma_m(
+                budget, design.anchor_radio
+            ) <= state.tolerance_m:
+                closed += 1
+
+        # A band nobody could sample is not evidence either way, so it
+        # neither extends nor stops the answer.
+        if tried == 0:
             continue
-        if closed[band] / tried[band] < REACH_SHARE:
+        if closed / tried < REACH_SHARE:
             break
         reached = float(edges[band + 1])
-    # Somewhere with nothing standing on it measures the open figure
-    # back, and somewhere that blocks everything still has a first band.
-    answer = reached or float(edges[1])
+
+    # Nothing passed, not even the first band. The honest answer is
+    # "shorter than this", and the floor is reported as the ceiling it
+    # is rather than as a distance something measured (ADR-0057).
+    answer = (Reach(metres=reached, measured=True) if reached > 0.0
+              else Reach(metres=float(edges[1]), measured=False))
     _REACHES[remember] = answer
     return answer
 

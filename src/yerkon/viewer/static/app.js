@@ -731,6 +731,17 @@ function drawRuns() {
       });
       card.appendChild(note);
 
+      if (found.disc) {
+        const disc = document.createElement("p");
+        disc.className = found.disc.measured ? "hint" : "hint no-hits";
+        disc.style.margin = "2px 0 0";
+        disc.textContent = say(
+          found.disc.by_hand ? "run.disc.by_hand"
+            : found.disc.measured ? "run.disc" : "run.disc.ceiling",
+          { metres: tr(found.disc.metres, 0) });
+        card.appendChild(disc);
+      }
+
       const verdict = barSaid(found.bar, run);
       if (verdict) {
         const line = document.createElement("p");

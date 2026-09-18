@@ -2303,3 +2303,99 @@ def test_the_card_says_which_of_the_three_ways_a_search_stopped():
         spot = words.index('"{}"'.format(key))
         phrase = words[spot:spot + 400]
         assert "tr:" in phrase and "en:" in phrase, key
+
+
+# --- The disc every search places against (ADR-0057) ----------------------
+
+
+def test_the_reach_is_measured_finely_enough_to_tell_two_grounds_apart():
+    """Eight bands put the whole answer in one of eight values, and over
+    Kızılay the band was 478 m wide. A town with 5 231 buildings and open
+    rolling country came back with the identical figure to a tenth of a
+    metre, because both failed in the same band.
+    """
+    from yerkon.viewer.state import REACH_BANDS, from_scenario, reach_on
+
+    assert REACH_BANDS >= 32
+
+    town = from_scenario("urban")
+    country = from_scenario("rural")
+    here = reach_on(town, town.runs[0])
+    there = reach_on(country, country.runs[0])
+    assert here.metres != there.metres, (here, there)
+    assert here.measured and there.measured
+
+
+def test_a_corridor_is_sampled_along_itself():
+    """Rays at a random bearing all land off a site with no width, so
+    the tunnel row measured nothing at all and took the floor. Every
+    band it can reach now holds evidence."""
+    from yerkon.viewer.state import from_scenario, reach_on
+
+    bore = from_scenario("tunnel")
+    assert bore.width_m <= 0.0, "the tunnel row is a corridor"
+    said = reach_on(bore, bore.runs[0])
+    assert said.measured, "a bore has nothing in the way and should measure"
+    assert said.metres > 100.0, said
+
+
+def test_a_reach_nothing_measured_says_so_rather_than_reporting_a_floor():
+    """`answer = reached or edges[1]` returned the closest band's far
+    edge when no band passed at all, which is a distance nothing
+    measured — and every search on the site places against it."""
+    from dataclasses import replace
+
+    from yerkon.viewer.state import from_scenario, reach_on
+
+    from yerkon.viewer.state import reach_of
+
+    # Ground steep enough that nothing closes, over a flat-ground figure
+    # that knows nothing about it: `reach_of` never reads the terrain.
+    plain = from_scenario("urban").merged(
+        {"site": "", "corridor_m": 4000.0, "width_m": 4000.0})
+    gentle = plain.merged({"relief_m": 400.0, "hill_spacing_m": 1500.0})
+    alps = plain.merged({"relief_m": 900.0, "hill_spacing_m": 900.0})
+    assert reach_of(alps, alps.runs[0]) > 1000.0, "the flat figure is blind"
+
+    nothing = reach_on(alps, alps.runs[0])
+    assert not nothing.measured
+    assert nothing.metres > 0.0, "it is still a ceiling rather than nothing"
+
+    # The same distance, and the two are not the same claim: over gentler
+    # ground the closest band passes, so that figure is a reading.
+    reading = reach_on(gentle, gentle.runs[0])
+    assert reading.measured
+    assert reading.metres == pytest.approx(nothing.metres)
+
+    # And a radio that cannot meet the tolerance anywhere reaches
+    # nothing at all, which is neither a reading nor a ceiling.
+    hopeless = replace(from_scenario("urban"), tolerance_m=0.001)
+    assert reach_on(hopeless, hopeless.runs[0]).metres == 0.0
+
+
+def test_the_card_says_which_disc_the_search_used():
+    """The ring beside it is the open-ground figure and the search uses
+    what this ground measures. Over Kızılay those are 3 825 m and
+    239 m, and only one of them decided where the anchors went."""
+    from dataclasses import replace
+
+    from yerkon.viewer.scene import scene
+    from yerkon.viewer.state import from_scenario
+
+    state = from_scenario("urban")
+    assert scene(state)["runs"][0]["disc"] is None, "a lattice never reads it"
+
+    searching = replace(state, runs=tuple(
+        replace(run, method="greedy-dop") for run in state.runs))
+    drawn = scene(searching)["runs"][0]
+    assert drawn["disc"]["measured"] is True
+    assert drawn["disc"]["by_hand"] is False
+    assert drawn["disc"]["metres"] < drawn["reach_m"] / 2.0
+
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert '"run.disc.ceiling"' in page and '"run.disc.by_hand"' in page
+    words = (STATIC / "words.js").read_text(encoding="utf-8")
+    for key in ("run.disc", "run.disc.ceiling", "run.disc.by_hand"):
+        spot = words.index('"{}"'.format(key))
+        assert "tr:" in words[spot:spot + 420], key
+        assert "en:" in words[spot:spot + 420], key

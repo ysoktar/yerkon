@@ -21,7 +21,11 @@ from yerkon.design import Design, REGION_CHOICES, chosen
 from yerkon.evaluate import coverage_grid, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import LANGUAGES, LANGUAGE_NAMES, say
-from yerkon.layout import FEWEST_FOR_A_FIX, METHODS as LAYOUT_METHODS
+from yerkon.layout import (
+    FEWEST_FOR_A_FIX,
+    METHODS as LAYOUT_METHODS,
+    SEARCHES as LAYOUT_SEARCHES,
+)
 from yerkon.routes import METHODS as ROUTE_METHODS, drivable
 from yerkon.site.fetch import missing_for_a_fetch
 from yerkon.viewer.state import (
@@ -29,6 +33,7 @@ from yerkon.viewer.state import (
     closure_of,
     design_of,
     reach_of,
+    reach_on,
     mode_labels,
     ViewState,
     fetched_sites,
@@ -159,6 +164,18 @@ def _aerial(state: ViewState, measured) -> Optional[dict]:
         "source": measured.aerial.source,
         "zoom": measured.aerial.zoom,
     }
+
+
+def _disc_json(state: ViewState, run) -> Optional[dict]:
+    """The reach a search placed against, and whether it was measured."""
+    if run.method not in LAYOUT_SEARCHES:
+        return None
+    if run.reach_m:
+        # Set by hand, so it is neither measured nor a ceiling.
+        return {"metres": float(run.reach_m), "measured": True, "by_hand": True}
+    reach = reach_on(state, run)
+    return {"metres": float(reach.metres), "measured": bool(reach.measured),
+            "by_hand": False}
 
 
 def _bar_json(bar) -> Optional[dict]:
@@ -379,6 +396,12 @@ def scene(state: ViewState) -> dict:
                 # from outside (ADR-0056). Nothing under a lattice: a
                 # spacing is not a target.
                 "bar": _bar_json(bars.get(run.identifier)),
+                # The disc a search actually placed against, which is
+                # not the ring beside it: the ring is the open-ground
+                # figure and the search uses what this ground measures
+                # (ADR-0047, ADR-0057). Nothing under a lattice, which
+                # never reads it.
+                "disc": _disc_json(state, run),
             }
             for run in state.runs
         ],
