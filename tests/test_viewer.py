@@ -1,6 +1,7 @@
 """The viewer's engine half: state, scene, and what needs confirming."""
 
 import json
+import math
 import pathlib
 
 import pytest
@@ -501,6 +502,71 @@ def test_simulating_from_the_viewer_gives_what_the_table_gives():
     assert result["capex_tl"] > 0.0
     assert result["opex_tl_per_year"] > 0.0
     assert 0.0 < result["assumed_share"] <= 1.0
+
+
+def test_one_press_gives_one_draw_and_says_which():
+    """ADR-0059. The table pools eight and the page used to show one
+    without saying so."""
+    from yerkon.report import draws_of
+
+    state = a_state(journey_s=60.0, sweep_m=1000.0)
+    result = simulate(state)
+    assert result["draws_done"] == 1
+    assert result["draws_wanted"] == len(draws_of(state.deployed()))
+    assert result["draws_wanted"] > 1, "there are shadows to draw"
+
+
+@pytest.mark.slow
+def test_pooling_gives_the_arithmetic_the_table_publishes():
+    """Samples pool and areas average, the way `report.folded` does it.
+
+    Checked against that arithmetic rather than against a pinned number,
+    because the claim is that the page and the table agree and a number
+    copied here would only say they agreed once.
+    """
+    from yerkon.evaluate import pooled as pool_samples
+    from yerkon.report import AREA_DRAWS, draws_of
+    from yerkon.viewer.scene import _DRAWS, pool, run_key
+
+    state = a_state(journey_s=60.0, sweep_m=1000.0)
+    every = pool(state)
+    wanted = len(draws_of(state.deployed()))
+    assert every["draws_done"] == wanted
+    assert math.isfinite(every["hpe_p95_m"]), "this arrangement has to fix"
+
+    # Found by index rather than by the whole key, so a change to which
+    # draws get an area fails the assertion below rather than raising a
+    # KeyError that says nothing about what moved.
+    here = run_key(state, state.terrain())
+    held = {key[1]: value for key, value in _DRAWS.items() if key[0] == here}
+    assert sorted(held) == list(range(wanted)), sorted(held)
+    drawn = [held[index] for index in range(wanted)]
+    together = pool_samples([samples for samples, _ in drawn], "x")
+    assert every["hpe_p95_m"] == pytest.approx(together.percentile(95)[0])
+
+    swept = [areas[0] for _, areas in drawn if math.isfinite(areas[0])]
+    assert len(swept) == min(AREA_DRAWS, wanted), "areas stop where the table's do"
+    assert every["served_km2"] == pytest.approx(sum(swept) / len(swept))
+
+
+@pytest.mark.slow
+def test_the_pooled_answer_is_not_the_first_draw():
+    """Otherwise the row saying eight were pooled says nothing.
+
+    Both figures are checked for being numbers first: an arrangement
+    that fixes nowhere reports NaN at both ends, and NaN differing from
+    NaN would pass this while measuring nothing. An earlier version of
+    this test did exactly that.
+    """
+    from yerkon.viewer.scene import pool
+
+    state = a_state(journey_s=60.0, sweep_m=1000.0)
+    first = simulate(state)
+    every = pool(state)
+    assert math.isfinite(first["hpe_p95_m"]), first["hpe_p95_m"]
+    assert math.isfinite(every["hpe_p95_m"]), every["hpe_p95_m"]
+    assert first["hpe_p95_m"] != every["hpe_p95_m"]
+    assert every["draws_done"] > first["draws_done"]
 
 
 # --- The session ----------------------------------------------------------
@@ -2235,6 +2301,51 @@ def test_a_sweep_that_arrives_late_is_not_this_row_s_ground():
         "sweepData = swept;")
     # And a failed sweep nobody is waiting for does not flash either.
     assert "if (mine === sweepWanted) flash(error.message, true);" in sweep
+
+def test_a_pooled_answer_that_arrives_late_is_not_this_press_s():
+    """The same window the sweep has, held open far wider.
+
+    The pooled pass runs eight draws where the first ran one, so on the
+    open-country row it is minutes rather than seconds. It runs with the
+    button live, because a button dead for three minutes is worse than
+    the wait, and that is what makes the race reachable: press, edit,
+    press again, and the first press's pooled answer lands last
+    (ADR-0059).
+
+    Walked in a browser by holding that answer on its way back to the
+    page, the response rather than the request, since a held request
+    reaches the server later and picks up the newer arrangement instead
+    of racing it. With the guard removed the first press's 6,04 m
+    replaced the arrangement's own 6,83 m; with it in place the 6,83
+    stands.
+    """
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    assert "let simulationWanted = 0;" in page
+
+    run = page[page.index("async function runSimulation()"):]
+    run = run[:run.index("\n}\n")]
+    assert "const mine = ++simulationWanted;" in run
+    # Twice: once for the first draw and once for the pooled pass, since
+    # either can be the one that outlives its press.
+    assert run.count("if (mine !== simulationWanted) return;") >= 2
+    # Checked before the answer is kept, not after.
+    assert run.index("if (mine !== simulationWanted) return;") < run.index(
+        "simulated = first;")
+    assert "if (mine === simulationWanted) flash(error.message, true);" in run
+
+
+def test_the_button_comes_back_before_the_pooled_pass_finishes():
+    """Otherwise it is dead for the length of eight draws.
+
+    The first press's `finally` re-enables it, and the pooled pass is
+    started after that block rather than inside the same `try`.
+    """
+    page = (STATIC / "app.js").read_text(encoding="utf-8")
+    run = page[page.index("async function runSimulation()"):]
+    run = run[:run.index("\n}\n")]
+    assert run.index("button.disabled = false;") < run.index(
+        '/api/simulate/pooled')
+
 
 # --- A search that missed its bar says so (ADR-0056) ----------------------
 

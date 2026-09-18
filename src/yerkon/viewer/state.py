@@ -178,6 +178,25 @@ PLACEMENTS_KEPT = 12
 _PLACED: dict = {}
 
 
+def run_key(state: ViewState, terrain: Terrain) -> tuple:
+    """Everything a simulated run's answer depends on.
+
+    Wider than `_placement_key`, which drops the three fields that cannot
+    move an anchor. A run is driven along a route for a length of time
+    over a sweep of some resolution, so all three are back in: the only
+    field left out is which language the page reads in.
+    """
+    asked = state.as_json()
+    asked.pop("language", None)
+    return (
+        json.dumps(asked, sort_keys=True, default=str),
+        round(terrain.height_at(0.0, 0.0), 6),
+        round(terrain.height_at(1000.0, 0.0), 6),
+        round(terrain.height_at(0.0, 1000.0), 6),
+        round(getattr(terrain, "micro_roughness_m", 0.0), 6),
+    )
+
+
 def _placement_key(state: ViewState, terrain: Terrain) -> tuple:
     """Everything an anchor's position depends on, and nothing else.
 

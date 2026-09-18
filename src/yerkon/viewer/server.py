@@ -34,6 +34,7 @@ from yerkon.viewer.scene import (
     design_of,
     figures,
     ground,
+    pool,
     scene,
     simulate,
     sweep,
@@ -375,6 +376,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(lambda: sweep(self.session.read()))
         if path == "/api/simulate":
             return self._json(lambda: simulate(self.session.read()))
+        # The same arrangement over every draw of the shadows. Asked for
+        # after the first one is on screen, because it costs about twice
+        # as long again and the page should not be blank for it.
+        if path == "/api/simulate/pooled":
+            return self._json(lambda: pool(self.session.read()))
         if path == "/api/options":
             return self._json(
                 lambda: listed(self.session.read().settings())

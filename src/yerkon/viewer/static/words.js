@@ -418,6 +418,16 @@ export const SAY = {
   "result.hpe50": { tr: "HPE P50", en: "HPE P50" },
   "result.hpe95": { tr: "HPE P95", en: "HPE P95" },
   "result.vpe95": { tr: "VPE P95", en: "VPE P95" },
+  "result.draws": { tr: "Gölge çekilişi", en: "Shadow draws" },
+  "result.draws.first": {
+    tr: "{done}/{wanted}, kalanı hesaplanıyor",
+    en: "{done} of {wanted}, the rest are running",
+  },
+  "result.draws.pooled": {
+    tr: "{wanted} çekiliş havuzlandı",
+    en: "{wanted} draws pooled",
+  },
+  "result.pooling": { tr: "Çekilişler havuzlanıyor…", en: "Pooling draws…" },
   "result.availability": { tr: "Kullanılabilirlik", en: "Availability" },
   "result.capex": { tr: "CAPEX", en: "CAPEX" },
   "result.opex": { tr: "OPEX / yıl", en: "OPEX / year" },

@@ -664,6 +664,14 @@ herhangi bir yere koyuyor (ADR-0055). Hızlı olsun istersen
 `site.shadow_draws` değerini 1 yap: tek çekiliş, yetmiş saniye, ve
 yayımlanamayacak bir yüzdelik.
 
+**Sayfa da sekizini havuzluyor, ama önce birini gösteriyor.**
+"Simülasyonu çalıştır"a basınca ilk çekiliş hemen çıkar ve panelde
+üstündeki satır `1/8, kalanı hesaplanıyor` der; kalan yedisi arkada
+koşar ve gelince rakamlar `8 çekiliş havuzlandı` olur (ADR-0059).
+Düğme ilk çekiliş ekrana gelince geri gelir, çünkü havuz geçişi
+kırsalda dakikalar sürüyor. Fark okumaya değer: şehirde 6,92 m'den
+6,04 m'ye, kırsalda 10,02 m'den 14,03 m'ye.
+
 ---
 
 ## Neye bakmalı ve neye mal oldu

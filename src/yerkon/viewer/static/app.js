@@ -2138,6 +2138,17 @@ function showNumbers(drawn, result, pending) {
   rows.push([say("result.reached"),
              sweepData ? area(sweepData.reached_km2) : WORKING]);
   if (result) {
+    // Which of the figures below are still one draw of the shadows. A
+    // single draw put the rural row's P95 anywhere between 9,67 and
+    // 18,75 m, so a number read before the rest land is a sample and
+    // the row above it says which (ADR-0055, ADR-0059).
+    const done = result.draws_done || 1;
+    const wanted = result.draws_wanted || 1;
+    if (wanted > 1) {
+      rows.push([say("result.draws"),
+                 done < wanted ? say("result.draws.first", { done, wanted })
+                               : say("result.draws.pooled", { wanted })]);
+    }
     rows.push([say("result.hpe50"), `${tr(result.hpe_p50_m)} m`]);
     rows.push([say("result.hpe95"), `${tr(result.hpe_p95_m)} m`]);
     rows.push([say("result.vpe95"), `${tr(result.vpe_p95_m)} m`]);
@@ -3166,21 +3177,49 @@ function scheduleSweep() {
   }, 250);
 }
 
+//: Which press of the button the answers on screen belong to.
+//:
+//: The pooled pass runs with the button live again, so a press while
+//: one is in flight leaves two of them running and the older can land
+//: last. Same guard as the sweep's: an answer whose press has been
+//: superseded is dropped rather than shown.
+let simulationWanted = 0;
+
 async function runSimulation() {
   const button = document.getElementById("run");
+  const mine = ++simulationWanted;
   button.disabled = true;
   button.textContent = say("result.running");
+  let first;
   try {
-    const result = await ask("/api/simulate");
-    sweepData = sweepData || { served_km2: result.served_km2,
-                               reached_km2: result.reached_km2 };
-    simulated = result;
+    first = await ask("/api/simulate");
+    if (mine !== simulationWanted) return;
+    sweepData = sweepData || { served_km2: first.served_km2,
+                               reached_km2: first.reached_km2 };
+    simulated = first;
     showNumbers(latest, simulated);
   } catch (error) {
-    flash(error.message, true);
+    if (mine === simulationWanted) flash(error.message, true);
+    return;
   } finally {
-    button.disabled = false;
-    button.textContent = say("result.run");
+    if (mine === simulationWanted) {
+      button.disabled = false;
+      button.textContent = say("result.run");
+    }
+  }
+
+  // One draw of the shadows is on screen. The rest cost about twice as
+  // long again, and on the open-country row that is minutes, so they
+  // run with the button live and replace the figures when they land
+  // (ADR-0059). The row above them says which of the two is showing.
+  if ((first.draws_wanted || 1) <= (first.draws_done || 1)) return;
+  try {
+    const every = await ask("/api/simulate/pooled");
+    if (mine !== simulationWanted) return;
+    simulated = every;
+    showNumbers(latest, simulated);
+  } catch (error) {
+    if (mine === simulationWanted) flash(error.message, true);
   }
 }
 

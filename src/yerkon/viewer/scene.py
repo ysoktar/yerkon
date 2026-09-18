@@ -11,6 +11,7 @@ instant, the sweep takes seconds, and the run takes longer still.
 
 from __future__ import annotations
 
+import math
 from typing import Optional
 from urllib.parse import quote
 
@@ -18,7 +19,7 @@ import numpy as np
 
 from yerkon.cost import DEFAULT_RATES, price
 from yerkon.design import Design, REGION_CHOICES, chosen
-from yerkon.evaluate import coverage_grid, run_scenario
+from yerkon.evaluate import coverage_grid, pooled, run_scenario
 from yerkon.rf import Terminal, closure_range_m, usable_range_m
 from yerkon.language import LANGUAGES, LANGUAGE_NAMES, say
 from yerkon.layout import (
@@ -26,10 +27,13 @@ from yerkon.layout import (
     METHODS as LAYOUT_METHODS,
     SEARCHES as LAYOUT_SEARCHES,
 )
+from yerkon.parallel import spread
+from yerkon.report import AREA_DRAWS, draws_of
 from yerkon.routes import METHODS as ROUTE_METHODS, drivable
 from yerkon.site.fetch import missing_for_a_fetch
 from yerkon.viewer.state import (
     _lowest_unit,
+    run_key,
     closure_of,
     design_of,
     reach_of,
@@ -565,26 +569,53 @@ def _bands(state: ViewState) -> dict:
     }
 
 
-def simulate(state: ViewState) -> dict:
-    """Drive the journey and price the deployment. The slow one."""
-    deployed = state.deployed()
-    samples = run_scenario(deployed.scenario)
+#: Draws already run this process, keyed by what produced them.
+#:
+#: The page asks for one draw and then for the rest, and the rest are
+#: only worth asking for if the first one is not thrown away. Bounded
+#: the way placements are, for the same reason.
+_DRAWS: dict = {}
 
-    terrain = state.terrain()
+#: How many draws are kept at once. Two arrangements' worth of eight,
+#: so moving back to the previous layout does not pay for it again.
+DRAWS_KEPT = 16
+
+
+def _one_draw(job: tuple) -> tuple:
+    """One draw, computed. Runs in a worker process, so it takes only
+    what pickles and reaches for nothing on this side."""
+    state, scenario, with_area = job
+    samples = run_scenario(scenario)
+    if not with_area:
+        return samples, (math.nan, math.nan)
     grid = coverage_grid(
-        state.deployment(terrain), terrain,
+        state.deployment(scenario.terrain), scenario.terrain,
         receiver_height_m=_lowest_unit(state),
         target_sigma_m=state.tolerance_m,
         resolution_m=state.sweep_m,
         margin_m=sweep_margin_m(state),
     )
-    served_km2 = grid.area_reached_by(4)
+    return samples, (grid.area_reached_by(4), grid.area_reached_by(1))
 
+
+def _keep(key: tuple, answer: tuple) -> tuple:
+    """Hold a draw, dropping the oldest once there are too many."""
+    while len(_DRAWS) >= DRAWS_KEPT:
+        _DRAWS.pop(next(iter(_DRAWS)))
+    _DRAWS[key] = answer
+    return answer
+
+
+def _numbers(state: ViewState, deployed, samples, served_km2, reached_km2,
+             done: int, wanted: int) -> dict:
+    """One dictionary of figures, however many draws went into it."""
     costing = price(deployed.inventory(served_km2), DEFAULT_RATES)
     hpe_p50, _ = samples.percentile(50)
     hpe_p95, vpe_p95 = samples.percentile(95)
 
     return {
+        "draws_done": done,
+        "draws_wanted": wanted,
         "hpe_p50_m": hpe_p50,
         "hpe_p95_m": hpe_p95,
         "vpe_p95_m": vpe_p95,
@@ -594,7 +625,7 @@ def simulate(state: ViewState) -> dict:
         "lost_links": samples.lost_links,
         "attempted_links": samples.attempted_links,
         "served_km2": served_km2,
-        "reached_km2": grid.area_reached_by(1),
+        "reached_km2": reached_km2,
         "anchors": len(deployed.scenario.deployment.anchors),
         "capex_tl": costing.capex_tl,
         "opex_tl_per_year": costing.opex_tl_per_year,
@@ -605,3 +636,64 @@ def simulate(state: ViewState) -> dict:
         "round_s": deployed.scenario.deployment.round_duration_s(),
         "units": len(deployed.scenario.deployment.receivers),
     }
+
+
+def simulate(state: ViewState) -> dict:
+    """Drive the journey once and price the deployment. The slow one.
+
+    One draw of the shadows, which is what a simulation is (ADR-0055).
+    The table pools eight of them, so this is the first of eight rather
+    than the answer, and it says so in ``draws_done``: the page shows it
+    at once and asks for the rest (ADR-0050).
+    """
+    deployed = state.deployed()
+    terrain = state.terrain()
+    scenarios = draws_of(deployed)
+    key = (run_key(state, terrain), 0, True)
+    samples, (served_km2, reached_km2) = (
+        _DRAWS[key] if key in _DRAWS
+        else _keep(key, _one_draw((state, scenarios[0], True))))
+    return _numbers(state, deployed, samples, served_km2, reached_km2,
+                    done=1, wanted=len(scenarios))
+
+
+def pool(state: ViewState) -> dict:
+    """The same arrangement over every draw of the shadows.
+
+    What the table publishes, by the same arithmetic (`report.folded`):
+    the samples pool because a percentile is a statement about a
+    population, and the areas average because an area is an answer per
+    draw. Draws already worked out are taken from the store, so the
+    press after `simulate` pays for the rest and not for all of them.
+
+    The areas stop at ``AREA_DRAWS`` the way the table's do. Over
+    Kızılay's eight draws the covered area ran 6,280 to 6,760 km², which
+    is 7,3 % of its mean, where the rural row's ninety-fifth percentile
+    ran 9,67 to 18,75 m, which is 94 %. An area settles and a tail does
+    not.
+    """
+    deployed = state.deployed()
+    terrain = state.terrain()
+    scenarios = draws_of(deployed)
+    if len(scenarios) <= 1:
+        return simulate(state)
+
+    here = run_key(state, terrain)
+    wanted = [(index, index < AREA_DRAWS) for index in range(len(scenarios))]
+    missing = [job for job in wanted if (here, *job) not in _DRAWS]
+    if missing:
+        jobs = [(state, scenarios[index], with_area)
+                for index, with_area in missing]
+        for job, answer in zip(missing, spread(_one_draw, jobs)):
+            _keep((here, *job), answer)
+
+    drawn = [_DRAWS[(here, *job)] for job in wanted]
+    served = [areas[0] for _, areas in drawn if math.isfinite(areas[0])]
+    reached = [areas[1] for _, areas in drawn if math.isfinite(areas[1])]
+    return _numbers(
+        state, deployed,
+        pooled([samples for samples, _ in drawn], deployed.scenario.name),
+        sum(served) / len(served) if served else math.nan,
+        sum(reached) / len(reached) if reached else math.nan,
+        done=len(scenarios), wanted=len(scenarios),
+    )
