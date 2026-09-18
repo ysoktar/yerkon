@@ -672,6 +672,14 @@ Düğme ilk çekiliş ekrana gelince geri gelir, çünkü havuz geçişi
 kırsalda dakikalar sürüyor. Fark okumaya değer: şehirde 6,92 m'den
 6,04 m'ye, kırsalda 10,02 m'den 14,03 m'ye.
 
+**Gölgenin genişliği yolun açık olup olmamasına bağlı.** Yayımlanan
+modellerin hepsi ikisini ayırıyor ve bu proje bir süre tek bir 6 dB
+taşıdı. Artık görüş hattı varken 4 dB, yokken 7,82 (3GPP TR 38.901).
+Hangisinin geçerli olduğuna zemin karar veriyor: iki uç arasındaki düz
+çizgi araziyi ve dünyanın kavisini geçiyorsa açık. Kızılay'da
+bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
+(ADR-0061).
+
 ---
 
 ## Neye bakmalı ve neye mal oldu
@@ -680,10 +688,10 @@ kırsalda dakikalar sürüyor. Fark okumaya değer: şehirde 6,92 m'den
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,54 m | 9,61 m | %81,23 |
-| Kırsal | 3,36 m | 20,90 m | %47,49 |
-| Tünel | 1,86 m | 3,03 m | %99,97 |
-| Ağırlıklı | 2,64 m | 13,31 m | %62,70 |
+| Şehir içi | 2,54 m | 8,78 m | %80,08 |
+| Kırsal | 3,47 m | 31,77 m | %51,80 |
+| Tünel | 1,84 m | 2,93 m | %100,00 |
+| Ağırlıklı | 2,66 m | 14,28 m | %64,99 |
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
 zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79

@@ -306,10 +306,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 9,61 | 64,92 | %81,23 | 6,32 | 24857 | 11516 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,36 | 20,90 | 223,84 | %47,49 | 163,08 | 16411 | 680 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,86 | 3,03 | 7,64 | %99,97 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,31 | 143,26 | %62,70 | 68,40 | 464335 | 90981 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 8,78 | 67,50 | %80,08 | 6,84 | 22968 | 10641 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,47 | 31,77 | 311,08 | %51,80 | 175,67 | 15235 | 632 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,40 | %100,00 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,66 | 14,28 | 166,00 | %64,99 | 73,69 | 462920 | 90524 |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir
@@ -341,7 +341,12 @@ kötüsünün on altı; tek bir bıçak sırtı bunların yalnızca birini sayı
 Zeminin yüzeyi çatıları da içerir, yani binalar ayrıca bir katsayı olarak
 değil, engel olarak sayılır (ADR-0046).
 
-Bir bağlantı ikisini de ödemez, büyüğünü öder. İkisi de aynı yer
+Gölgeleme ikisinin de üstüne ekleniyor ve genişliği yolun açık olup
+olmamasına bağlı: görüş hattı varken 4 dB, yokken 7,82 (3GPP TR 38.901,
+ADR-0061). Kızılay'da bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü,
+tünelde hiçbiri.
+
+Bir bağlantı yansımayla kırınımın ikisini de ödemez, büyüğünü öder. İkisi de aynı yer
 parçasının aynı bağlantıya yaptığı şeyi anlatıyor; toplamak bir yer
 parçasını iki kez faturalandırmak olur, ve sönümlemenin sönecek bir
 doğrudan ışına ihtiyacı var, ki kesilmiş bir yolda o ışın yok. Sekiz
@@ -365,7 +370,7 @@ yolculuğunun uzunluğudur ve onlar için kilometre başına maliyet hiç
 verilmez.
 
 **Hizmet alanı, bir konumun alınabildiği yerdir**, bir paketin ulaştığı
-yer değil. Kırsal bölge için bunlar 163,08 ve 383,33 km²'dir, 2,4 kat, ve
+yer değil. Kırsal bölge için bunlar 175,67 ve 388,17 km²'dir, 2,2 kat, ve
 notlar her seferinde ikisini de yazdırır (ADR-0012).
 
 **Kırsal kullanılabilirliğe arazi ve bir turun uzunluğu karar verir.**
@@ -373,9 +378,15 @@ Tek bir kırsal bağlantı bile mesafe yüzünden düşmez — her bir başarıs
 zemin kaldırılsa kapanırdı — yani daha çok direk yanlış içgüdüdür. Yanlış
 olan turdu: yarısını engelleyen bir zemin üzerinde yoklanan sekiz direk
 yaklaşık dört yanıt verir, ki bu da soğuk bir sabitlemenin gerektirdiğinin
-tam kendisidir, yedeksiz. On ikiyi yoklamak satırı hiç sermaye harcamadan
-%82,3'ten %89,6'ya çıkardı; karşılığında güncelleme hızının üçte birini ve
-0,4 m yatay hatayı verdi. %90'ı geçmek para tutuyor: kabaca direk
+tam kendisidir, yedeksiz. Tur uzunluğunun ne kadar değdiği model
+oynadıkça oynadı ve her seferinde tohumlar üzerinden ölçüldü: gölgeleme
+tek genişlikteyken sekiz tohumda on direk sekizi beşinde yeniyordu,
++0,008 ile, tohumdan tohuma 0,020'lik bir yayılımın içinde, yani
+gürültünün dörtte biri. Gölge genişliği yola göre ayrılınca (ADR-0061)
+geri geldi: bu satırın bağlantılarının beşte dördü kapalı ve onların
+yayılımı 6 dB'den 7,82'ye çıktı, yani daha çoğu çıtanın yakınında
+duruyor. On direk artık sekiz tohumun **sekizinde de** kazanıyor, +0,0227
+ile, 0,0069'luk bir yayılıma karşı. %90'ı geçmek para tutuyor: kabaca direk
 sermayesinin iki katı, ya daha çok direk ya daha uzun direk olarak.
 ADR-0022 fiyatlandırılmış eğriyi ve denenip işe yaramayan iki şeyi tutar.
 

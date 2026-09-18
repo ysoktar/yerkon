@@ -305,10 +305,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 9,61 | 64,92 | %81,23 | 6,32 | 24857 | 11516 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,36 | 20,90 | 223,84 | %47,49 | 163,08 | 16411 | 680 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,86 | 3,03 | 7,64 | %99,97 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,31 | 143,26 | %62,70 | 68,40 | 464335 | 90981 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 8,78 | 67,50 | %80,08 | 6,84 | 22968 | 10641 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,47 | 31,77 | 311,08 | %51,80 | 175,67 | 15235 | 632 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,40 | %100,00 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,66 | 14,28 | 166,00 | %64,99 | 73,69 | 462920 | 90524 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone
@@ -342,7 +342,12 @@ sixteen; one knife edge counted one of them. The surface a profile
 reports includes roofs, so buildings are counted as obstacles rather
 than as a coefficient (ADR-0046).
 
-A link pays the larger of the two, not both. They describe the same
+Shadowing is added on top of both, and its width depends on whether the
+path is clear: 4 dB with line of sight and 7,82 without it (3GPP
+TR 38.901, ADR-0061). Over Kızılay 98,1 % of links are blocked, over
+Polatlı 79,4 %, in the tunnel none.
+
+A link pays the larger of the reflection and the diffraction, not both. They describe the same
 piece of ground doing two things to the same link, so adding them bills
 one piece of ground twice, and the cancellation needs a direct ray to
 cancel, which a blocked path does not have. Eight kilometres, a 20 m
@@ -364,17 +369,22 @@ than lines, so their route kilometres are the length of a test journey
 and no cost per kilometre is quoted for them at all.
 
 **The service area is where a position is available**, not where a packet
-arrives. For the rural region those are 163,08 and 383,33 km², a factor
-of 2,4, and the notes print both every time (ADR-0012).
+arrives. For the rural region those are 175,67 and 388,17 km², a factor
+of 2,2, and the notes print both every time (ADR-0012).
 
 **Rural availability is decided by terrain, and by the length of a
 round.** Not one rural link fails for distance — every single failure
 would close if the ground were taken away — so more masts are the wrong
 instinct. What was wrong was the round: eight anchors polled over ground
 that blocks half of them yields about four replies, exactly what a cold
-fix needs and nothing spare. Polling twelve took the row from 82,3 % to
-89,6 % for no capital at all, costing a third of the update rate and
-0,4 m of horizontal error. Getting past 90 % does cost money: about twice
+fix needs and nothing spare. What the round length is worth has moved as the model
+has, and it is measured over seeds every time: under one shadow spread,
+ten anchors beat eight on five seeds of eight, ahead by 0,008 inside a
+seed-to-seed spread of 0,020, a quarter of the noise. Splitting the
+spread by whether the path is clear (ADR-0061) brought it back, because
+four fifths of this row's links are blocked and their spread went from 6
+to 7,82 dB, so more of them sit near the bar. Ten now wins on **all
+eight** seeds, ahead by 0,0227 against a spread of 0,0069. Getting past 90 % does cost money: about twice
 the mast capital, either as more masts or taller ones. ADR-0022 has the
 priced curve, and the two things that were tried and did not work.
 

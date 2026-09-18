@@ -410,6 +410,83 @@ def test_no_spread_is_no_shadow():
         Shadowing(sigma_db=6.0, correlation_m=0.0)
 
 
+def test_a_blocked_path_is_drawn_against_a_wider_spread():
+    """ADR-0061. Every published model splits these and this one did not.
+
+    3GPP TR 38.901 gives 4 dB with line of sight and 7,82 without it in
+    a street canyon, 4 and 6 in an urban macrocell, 4 and 8 in a rural
+    one. With a direct ray the field arrives along one path; without it
+    the field is a sum over edges and each edge is its own luck.
+    """
+    from yerkon.world import Shadowing
+
+    field = Shadowing(sigma_db=4.0, sigma_obstructed_db=7.82,
+                      correlation_m=50.0, seed=1)
+    assert field.spread_db(False) == 4.0
+    assert field.spread_db(True) == 7.82
+
+    clear = field.between((0.0, 0.0), (500.0, 0.0), obstructed=False)
+    blocked = field.between((0.0, 0.0), (500.0, 0.0), obstructed=True)
+    # The same place, the same luck, a different width. A link that goes
+    # behind a hill must not also get a different draw, or the two
+    # spreads could not be compared at all.
+    assert blocked == pytest.approx(clear * 7.82 / 4.0)
+
+
+def test_one_figure_for_both_is_what_it_carried_before():
+    """ADR-0035. An arrangement saved before the split loads as itself."""
+    from yerkon.world import Shadowing
+
+    field = Shadowing(sigma_db=6.0, correlation_m=50.0, seed=1)
+    assert field.sigma_obstructed_db is None
+    at = ((0.0, 0.0), (500.0, 0.0))
+    assert field.between(*at, obstructed=True) == field.between(*at)
+    assert "clear" not in field.describe()
+
+    with pytest.raises(ValueError, match="magnitude"):
+        Shadowing(sigma_db=4.0, sigma_obstructed_db=-1.0)
+
+
+def test_the_ground_decides_which_spread_a_link_gets():
+    """Geometry over the real profile, not a probability.
+
+    The same two points, the same seed, so the draw is identical and
+    only its width can differ. Over a plain a 25 m mast has a direct ray
+    to a receiver 900 m away; put 40 m of hill in between and it does
+    not, and the shadow the budget is handed is exactly 7,82/4 times as
+    large.
+    """
+    import math
+    from dataclasses import replace
+
+    from yerkon.rf import earth_bulge_m
+    from yerkon.world import Shadowing, flat_terrain, rolling_terrain
+
+    split = Shadowing(sigma_db=4.0, sigma_obstructed_db=7.82,
+                      correlation_m=50.0, seed=1)
+    here, there = (0.0, 0.0, 25.0), (900.0, 0.0, 2.0)
+
+    plain = replace(flat_terrain(), shadowing=split)
+    hilly = replace(rolling_terrain(40.0, 900.0, seed=3), shadowing=split)
+
+    def blocks(ground) -> bool:
+        return any(
+            ground_m + earth_bulge_m(math.dist(here, there), fraction)
+            > here[2] + (there[2] - here[2]) * fraction
+            for fraction, ground_m in
+            ground.obstruction_between(here, there).profile
+            if 0.0 < fraction < 1.0
+        )
+
+    assert not blocks(plain), "a plain does not block this"
+    assert blocks(hilly), "the hill has to be in the way"
+
+    over_plain = plain.obstruction_between(here, there).shadow_db
+    over_hills = hilly.obstruction_between(here, there).shadow_db
+    assert over_plain != 0.0
+    assert over_hills == pytest.approx(over_plain * 7.82 / 4.0)
+
+
 def test_the_ground_hands_the_shadow_to_the_link_budget():
     """Through the obstruction, beside the clutter it sits next to: the
     terrain knows both ends of the path and the budget assembles the

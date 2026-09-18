@@ -242,7 +242,7 @@ def test_the_rural_round_polls_more_anchors_than_a_fix_needs():
 
 
 @pytest.mark.slow
-def test_how_long_a_rural_round_runs_cannot_be_settled_on_one_seed():
+def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
     """The check the neighbour list failed, applied to what replaced it.
 
     A change measured on one seed is a change measured on nothing: the
@@ -250,19 +250,23 @@ def test_how_long_a_rural_round_runs_cannot_be_settled_on_one_seed():
     was tried on and −1,24 on the third. Polling twelve anchors instead
     of eight replaced it and was recorded as worth 5,5 points free.
 
-    On fetched ground only (ADR-0037) that claim is gone, and since
-    shadowing arrived (ADR-0055) it is gone in a way that no longer
-    needs a lucky pair of seeds to show. Over eight seeds, polling ten
-    anchors beats polling eight on five of them and loses on three; it
-    is ahead by 0,008 of availability on average, and the spread from
-    seed to seed is 0,020. **The effect is a quarter of the noise it is
-    measured in.**
+    What that claim is worth has moved twice. On fetched ground only
+    (ADR-0037) it was gone. Under one shadow spread (ADR-0055) it stayed
+    gone: over eight seeds ten anchors beat eight on five of them and
+    lost on three, ahead by 0,008 against a seed-to-seed spread of
+    0,020, which is a quarter of the noise it is measured in.
 
-    So the test is that, rather than a reversal: a reversal is one
-    sample of the same fact and it stops appearing every time the model
-    moves, which is how this test came to be rewritten twice. What does
-    not move is that a difference smaller than the scatter cannot be
-    read off one run of either.
+    Splitting the shadow spread by whether the path is clear (ADR-0061)
+    brought it back, and the reason is the mechanism. Four fifths of
+    this row's links are blocked and their spread went from 6 dB to
+    7,82, so more of them sit near the bar, so having more candidates in
+    a round buys more. Over eight seeds ten now wins on **all eight**,
+    ahead by 0,0227 against a spread of 0,0069: three and a third times
+    the noise.
+
+    So the assertion is the direction and the size against the scatter,
+    measured over seeds either way. That method is what this test is
+    for, and it is what caught the claim being wrong and then right.
     """
     import statistics
     from dataclasses import replace
@@ -291,12 +295,14 @@ def test_how_long_a_rural_round_runs_cannot_be_settled_on_one_seed():
         statistics.pstdev([got[(seed, anchors)] for seed in seeds])
         for anchors in (8, 10)
     )
-    assert abs(statistics.mean(gaps)) < scatter, (
-        "the round length may be measurable after all: ten is ahead by "
+    assert all(gap > 0 for gap in gaps), (
+        "ten anchors no longer wins on every seed: {} — {}".format(gaps, got))
+    assert statistics.mean(gaps) > 2.0 * scatter, (
+        "the round length has gone back under the noise: ten is ahead by "
         "{:+.4f} against a seed-to-seed spread of {:.4f} — {}".format(
             statistics.mean(gaps), scatter, got)
     )
-    assert scatter > 0.005, "a scatter this small would make the bar meaningless"
+    assert scatter > 0.002, "a scatter this small would make the bar meaningless"
 
 
 # --- The figures reaching both ends of a link -----------------------------

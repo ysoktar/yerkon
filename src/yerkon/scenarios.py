@@ -393,6 +393,8 @@ def varying(terrain: Terrain, settings: Settings, row: str) -> Terrain:
         sigma_db=settings.number("site.shadow_sigma_db"),
         correlation_m=settings.number("site.shadow_correlation_m"),
         seed=int(settings.number("site.shadow_seed")),
+        sigma_obstructed_db=settings.number(
+            "site.shadow_sigma_obstructed_db"),
     ))
     spread = settings.number("{}.ground_roughness_spread".format(row))
     if spread <= 0.0:

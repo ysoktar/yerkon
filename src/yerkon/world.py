@@ -23,7 +23,7 @@ from yerkon.hardware import Radio, SX1280
 from yerkon.language import say
 from yerkon.numbers import decimal_comma
 from yerkon.settings import DEFAULTS, Settings
-from yerkon.rf import Obstruction, first_fresnel_radius_m
+from yerkon.rf import Obstruction, earth_bulge_m, first_fresnel_radius_m
 
 if TYPE_CHECKING:  # pragma: no cover
     from yerkon.site.model import Site
@@ -147,6 +147,27 @@ class Terrain:
             self._reflection_surface(a, b, profile, distance_m)
         )
 
+        # Whether there is a direct ray at all, which is what decides
+        # which of the two shadow spreads this link is drawn against
+        # (ADR-0061). Geometry rather than a probability, because this
+        # model has the real ground: the straight line between the ends
+        # against the terrain plus the earth's own curve, with no
+        # Fresnel margin, since the question is whether the ray exists
+        # and not whether it is comfortable.
+        #
+        # Worked out here rather than folded into `worst_ratio` above,
+        # which picks the point the budget reports and has no bulge in
+        # it. Changing that would move the published table for a reason
+        # that has nothing to do with this.
+        blocked = False
+        for fraction, ground_m in profile:
+            if fraction <= 0.0 or fraction >= 1.0:
+                continue
+            sight_m = a[2] + (b[2] - a[2]) * fraction
+            if ground_m + earth_bulge_m(distance_m, fraction) > sight_m:
+                blocked = True
+                break
+
         return Obstruction(
             # The whole ground, not just its worst point: the link
             # budget works diffraction out over all of it (ADR-0053).
@@ -155,7 +176,7 @@ class Terrain:
             # around what it does: the first end is the one the field is
             # indexed by, and every caller passes the anchor first
             # (ADR-0055).
-            shadow_db=(self.shadowing.between(a, b)
+            shadow_db=(self.shadowing.between(a, b, obstructed=blocked)
                        if self.shadowing is not None else 0.0),
             peak_terrain_m=worst_ground,
             peak_at_fraction=worst_fraction,
@@ -455,16 +476,47 @@ class Shadowing:
     #: Kept apart from the measurement seed so a run can hold the
     #: shadows and vary the noise, or the reverse.
     seed: int = 0
+    #: The spread on a path with something in the way, where that
+    #: differs from the spread on a clear one.
+    #:
+    #: Every published model splits these and this one did not. 3GPP
+    #: TR 38.901 gives 4 dB with line of sight and 7,82 without it in a
+    #: street canyon, 4 and 6 in an urban macrocell, 4 and 8 in a rural
+    #: one: roughly twice the variance once the direct ray is gone,
+    #: because what arrives is then a sum over edges and each of those
+    #: is its own piece of luck.
+    #:
+    #: ``None`` means one figure for both, which is what this carried
+    #: before the split and what an arrangement saved then loads as
+    #: (ADR-0035, ADR-0061).
+    sigma_obstructed_db: Optional[float] = None
 
     def __post_init__(self) -> None:
         if self.sigma_db < 0.0:
             raise ValueError("a spread is a magnitude")
         if self.correlation_m <= 0.0:
             raise ValueError("a shadow has a size")
+        if self.sigma_obstructed_db is not None \
+                and self.sigma_obstructed_db < 0.0:
+            raise ValueError("a spread is a magnitude")
 
-    def between(self, anchor: tuple, receiver: tuple) -> float:
-        """Extra loss on this link, in dB. Positive is worse."""
-        if self.sigma_db <= 0.0:
+    def spread_db(self, obstructed: bool) -> float:
+        """Which of the two figures this link is drawn against."""
+        if obstructed and self.sigma_obstructed_db is not None:
+            return self.sigma_obstructed_db
+        return self.sigma_db
+
+    def between(self, anchor: tuple, receiver: tuple,
+                obstructed: bool = False) -> float:
+        """Extra loss on this link, in dB. Positive is worse.
+
+        ``obstructed`` picks which of the two spreads this link is drawn
+        against. The draw itself does not change with it: the same place
+        keeps the same shadow and only its width moves, so a link that
+        goes behind a hill does not also get a different piece of luck.
+        """
+        sigma_db = self.spread_db(obstructed)
+        if sigma_db <= 0.0:
             return 0.0
         # Which anchor, to the nearest correlation distance: two anchors
         # in the same doorway are shadowed by the same doorway.
@@ -491,13 +543,17 @@ class Shadowing:
         # different amount in the middle of a cell than at its corner.
         if variance <= 0.0:
             return 0.0
-        return self.sigma_db * total / math.sqrt(variance)
+        return sigma_db * total / math.sqrt(variance)
 
     def describe(self) -> str:
-        if self.sigma_db <= 0.0:
+        if self.sigma_db <= 0.0 and not self.sigma_obstructed_db:
             return "no location variability"
-        return "±{:.1f} dB over {:.0f} m (seed {})".format(
-            self.sigma_db, self.correlation_m, self.seed)
+        if self.sigma_obstructed_db is None:
+            return "±{:.1f} dB over {:.0f} m (seed {})".format(
+                self.sigma_db, self.correlation_m, self.seed)
+        return "±{:.1f} dB clear, ±{:.1f} dB blocked, over {:.0f} m (seed {})".format(
+            self.sigma_db, self.sigma_obstructed_db, self.correlation_m,
+            self.seed)
 
 
 def patchwork(

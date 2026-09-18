@@ -479,11 +479,11 @@ affects = "hava süresini, dolayısıyla her birimin ne sıklıkta konumlandığ
 affects_en = "air time, and therefore how often each unit is fixed"
 
 [values."site.shadow_sigma_db"]
-value = 6.0
+value = 4.0
 unit = "dB"
-provenance = "ASSUMPTION"
-source = "bu proje, yayımlanan aralığın ortası"
-source_en = "this project, the middle of the published range"
+provenance = "STANDARD"
+source = "3GPP TR 38.901 Tablo 7.4.1-1, görüş hattı olan senaryolar"
+source_en = "3GPP TR 38.901 Table 7.4.1-1, the line-of-sight scenarios"
 note = """Aynı anten, aynı mesafe, aynı görünen zemin — ve ölçülen kayıp aynı \
 değil. Kaldırımdaki kamyonet, iki örnek arasına düşen bina köşesi, bir \
 sıra ağaç, modelin yuvarladığı o bir kat. Model ortancayı taşır, bu da \
@@ -491,9 +491,11 @@ etrafındaki yayılımı; desibel cinsinden normal olduğu için log-normal \
 sönümleme denir. Yayımlanan karasal modellerin hepsinde bir tane var ve \
 2 GHz civarında 4 ile 8 dB arasında veriliyor (3GPP TR 38.901'in senaryo \
 başına gölge sönümlemesi; ITU-R P.1546 ve P.1812'nin konum \
-değişkenliği). Altı, o aralığın ortası — bir ölçüm değil, adı konmuş bir \
-varsayım. Sıfır yazmak onu kapatır ve modeli her hücrenin ya geçtiği ya \
-kaldığı hâline döndürür."""
+değişkenliği). Bu, **yolda bir şey olmadığında** geçerli olanı: TR \
+38.901 üç senaryonun üçünde de görüş hattı için 4 dB veriyor. Yol \
+kapalıysa `site.shadow_sigma_obstructed_db` geçerli (ADR-0061). Sıfır \
+yazmak onu kapatır ve modeli her hücrenin ya geçtiği ya kaldığı hâline \
+döndürür."""
 note_en = """The same antenna, the same distance, ground that looks the same — and \
 the loss is not the same. A van at the kerb, a building corner that \
 falls between two profile samples, a row of trees, the one storey this \
@@ -501,9 +503,12 @@ rounded off. The model carries the median and this is the spread around \
 it; normal in decibels, which is why it is called log-normal fading. \
 Every published terrestrial model has one, and around 2 GHz they give 4 \
 to 8 dB (3GPP TR 38.901's per-scenario shadow fading; ITU-R P.1546 and \
-P.1812 as location variability). Six is the middle of that range — a \
-named assumption rather than a measurement. Zero switches it off and \
-returns the model to one where every cell either passes or does not."""
+P.1812 as location variability). This is the figure for a path with \
+**nothing in the way**: TR 38.901 gives 4 dB for line of sight in all \
+three of its scenarios. A blocked path uses \
+`site.shadow_sigma_obstructed_db` instead (ADR-0061). Zero switches it \
+off and returns the model to one where every cell either passes or does \
+not."""
 affects = """her bağlantının kapanıp kapanmadığını, dolayısıyla kullanılabilirlik ve \
 alan sütunlarını"""
 affects_en = """whether each link closes, and so the availability and area columns"""
@@ -513,6 +518,41 @@ yarısını kaybettiriyor"""
 sensitivity_en = """it turns the coverage edge from a line into a gradient: six decibels of \
 spread loses half the links anywhere the median loss sits exactly on the \
 bar"""
+
+[values."site.shadow_sigma_obstructed_db"]
+value = 7.82
+unit = "dB"
+provenance = "STANDARD"
+source = "3GPP TR 38.901 Tablo 7.4.1-1, UMi-Street Canyon NLOS"
+source_en = "3GPP TR 38.901 Table 7.4.1-1, UMi-Street Canyon NLOS"
+note = """Yolda bir şey olduğunda yayılım genişliyor. Yayımlanan modellerin \
+hepsi ikisini ayırıyor: TR 38.901 sokak kanyonunda görüş varken 4 dB, \
+yokken 7,82; şehir makro hücresinde 4 ve 6; kırsalda 4 ve 8. Sebep \
+fiziksel. Doğrudan ışın varken gelen alan tek bir yoldan geliyor ve \
+sapma o yolun etrafındaki tek tük engellerden ibaret; ışın kesildiğinde \
+gelen şey kenarların üzerinden dolaşan bir toplam ve her kenar kendi \
+şansı. Bu proje bu satıra kadar tek bir 6 dB taşıyordu, yani açık \
+yolları fazla, kapalı yolları eksik cezalandırıyordu. Hangisinin \
+kullanıldığına zemin karar veriyor: iki uç arasındaki düz çizgi araziyi \
+ve dünyanın kendi kavisini geçiyorsa açık (ADR-0061). Kızılay'da \
+bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri."""
+note_en = """The spread widens when something is in the way. Every published model \
+splits the two: TR 38.901 gives 4 dB with line of sight and 7,82 without \
+it in a street canyon, 4 and 6 in an urban macrocell, 4 and 8 in a rural \
+one. The reason is physical. With a direct ray the field arrives along \
+one path and the variation is whatever sits beside it; with the ray gone \
+what arrives is a sum over edges and each edge is its own piece of luck. \
+This project carried one 6 dB figure until this row, which overcharged \
+clear paths and undercharged blocked ones. The ground decides which \
+applies: a path is clear when the straight line between the ends passes \
+over the terrain and the earth's own curve (ADR-0061). Over Kızılay \
+98,1 % of links are blocked, over Polatlı 79,4 %, in the tunnel none."""
+affects = """kapalı yollarda her bağlantının kapanıp kapanmadığını, yani şehir ve \
+kırsal satırların neredeyse tamamını"""
+affects_en = """whether each link over a blocked path closes, which is almost all of the \
+urban and rural rows"""
+sensitivity = """şehirde bağlantıların %98'ini kapsıyor, tünelde hiçbirini"""
+sensitivity_en = """it covers 98 % of the urban row's links and none of the tunnel's"""
 
 [values."site.shadow_correlation_m"]
 value = 50.0
