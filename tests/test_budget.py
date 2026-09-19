@@ -4,7 +4,7 @@ import math
 
 import pytest
 
-from yerkon.budget import WEIGHTED, dissect, dissect_all
+from yerkon.budget import dissect, dissect_all
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario, run_scenario
 from yerkon.hardware import DWM3000, SX1280
 from yerkon.ranging import (
@@ -295,29 +295,24 @@ def test_only_leaves_one_source_live_and_without_leaves_the_rest():
 
 
 @pytest.mark.slow
-def test_several_scenarios_get_a_weighted_row_built_from_their_samples():
-    """ADR-0005 again: combined from raw samples, never from percentiles.
+def test_every_scenario_gets_its_own_dissection():
+    """ADR-0068. There is no weighted dissection any more."""
+    deployments = [
+        _deployed(a_scenario(seed=11, survey_sigma_m=0.0)),
+        _deployed(a_scenario(seed=12, survey_sigma_m=1.5)),
+    ]
+    dissections = dissect_all(deployments, sources=("survey",))
 
-    A weighted row whose fiftieth percentile fell outside the range of
-    the three it combines would be arithmetic on percentiles, which is
-    what ADR-0005 forbids.
-    """
-    deployments = (
-        _deployed(a_scenario(seed=11, survey_sigma_m=0.0), weight=0.7),
-        _deployed(a_scenario(seed=12, survey_sigma_m=1.5), weight=0.3),
-    )
-    dissections = dissect_all(deployments, sources=("survey", "floor"))
-
-    assert len(dissections) == 3
-    assert dissections[-1].name == WEIGHTED
-    each = [d.whole_p50_m for d in dissections[:-1]]
-    assert min(each) <= dissections[-1].whole_p50_m <= max(each)
+    assert len(dissections) == len(deployments)
+    assert [d.name for d in dissections] == [
+        d.scenario.name for d in deployments
+    ]
 
 
-def _deployed(scenario, weight=1.0):
+def _deployed(scenario):
     """The scenario wrapped in the bill of materials the report pairs it with.
 
-    The dissection only reads the scenario and the weight; the costing is
+    The dissection only reads the scenario; the costing is
     the table's business and not this module's.
     """
     from yerkon.cost import TUNNEL_ANCHOR
@@ -328,7 +323,6 @@ def _deployed(scenario, weight=1.0):
         product=TUNNEL_ANCHOR,
         mounting=TALL_MAST,
         route_km=1.2,
-        weight=weight,
         environment="Dış",
         technology="deneme",
     )

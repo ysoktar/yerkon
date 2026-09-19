@@ -1009,11 +1009,11 @@ RESULTS = Page(
     lead=_w(
         "Raporun karşılaştırma tablosu uydu sistemlerini, bölgesel "
         "sistemleri ve karasal alternatifleri aynı sütunlarla yan yana "
-        "koyuyor. Benzetimin doldurduğu dört satır aşağıda; geri kalanı "
+        "koyuyor. Benzetimin doldurduğu üç satır aşağıda; geri kalanı "
         "yayımlanmış kaynaklardan gelir ve raporun dipnotlarında durur.",
         "The report's comparison table puts satellite systems, regional "
         "systems and terrestrial alternatives side by side under the same "
-        "columns. The four rows the simulation filled are below. The rest "
+        "columns. The three rows the simulation filled are below. The rest "
         "come from published sources and are footnoted in the report.",
     ),
     parts=(
@@ -1156,11 +1156,11 @@ SIMULATION = Page(
     title=_w("Benzetim", "The simulation"),
     lead=_w(
         "Benzetim bu projenin bir parçası, tamamı değil. Tek bir işi "
-        "vardı: karşılaştırma tablosunun dört YERKON satırını tahminle "
+        "vardı: karşılaştırma tablosunun üç YERKON satırını tahminle "
         "değil, her sayısı izlenebilir bir modelle doldurmak. Sahada "
         "ölçüm değildir.",
         "The simulation is one part of this project rather than the whole "
-        "of it. It had one job: to fill the four YERKON rows of the "
+        "of it. It had one job: to fill the three YERKON rows of the "
         "comparison table with a model whose every number can be traced, "
         "instead of with an estimate. It is not a field measurement.",
     ),
@@ -1536,9 +1536,9 @@ SOURCES = Page(
                 ),
                 _w(
                     "Bu depo raporun kendisi değil, raporun karşılaştırma "
-                    "tablosundaki dört YERKON satırını üreten benzetimdir.",
+                    "tablosundaki üç YERKON satırını üreten benzetimdir.",
                     "This repository is not the report. It is the "
-                    "simulation that produces the four YERKON rows of its "
+                    "simulation that produces the three YERKON rows of its "
                     "comparison table.",
                 ),
             ),
@@ -1574,12 +1574,11 @@ BACK_TO_SITE = _w("Siteye dön", "Back to the site")
 
 LANGUAGES = (("tr", "TR"), ("en", "EN"))
 
-#: What the headline figures on the home page are called.
+#: The three rows on the home page, by key, with what each is called.
 HEADLINE = (
-    ("hpe_p50_m", _w("Yatay hata, P50", "Horizontal error, P50"), "m"),
-    ("hpe_p95_m", _w("Yatay hata, P95", "Horizontal error, P95"), "m"),
-    ("availability", _w("Kullanılabilirlik", "Availability"), "%"),
-    ("area_km2", _w("Hizmet alanı", "Service area"), "km²"),
+    ("urban", _w("Şehir içi", "Urban")),
+    ("rural", _w("Kırsal", "Rural")),
+    ("tunnel", _w("Tünel", "Tunnel")),
 )
 
 COLUMNS = (
@@ -1616,12 +1615,10 @@ FOOTER = _w(
 )
 
 WEIGHTING = _w(
-    "Benzetimin doldurduğu dört satırdan biri, ağırlıklı ortalama: %50 "
-    "şehir içi, %40 kırsal, %10 tünel. Üç senaryonun ham hata örneklerini "
-    "birleştirir, yüzdeliklerini değil.",
-    "One of the four rows the simulation filled, the weighted mean: 50% "
-    "urban, 40% rural, 10% tunnel. It combines the three scenarios' raw "
-    "per fix samples rather than their percentiles.",
+    "Benzetimin doldurduğu üç satır, yatay hatanın doksan beşinci "
+    "yüzdeliğinde. Her biri gerçek bir Ankara zemininin üzerinde koşuldu.",
+    "The three rows the simulation filled, at the ninety fifth percentile "
+    "of horizontal error. Each one was run over real ground near Ankara.",
 )
 
 NO_RUN = _w(
@@ -1792,17 +1789,16 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
 
 
 def _headline(published, language: str) -> str:
-    """The weighted row, four figures wide, on the home page."""
+    """One figure per row on the home page: the ninety fifth percentile.
+
+    The fiftieth is the flattering one and the ninety fifth is the one a
+    service level rests on, so this shows the ninety fifth.
+    """
     if published is None:
         return '<p class="warn">{}</p>'.format(_said(NO_RUN, language))
-    row = published.row("weighted")
     figures = []
-    for name, label, unit in HEADLINE:
-        value = getattr(row, name)
-        if name == "availability":
-            shown = "%" + decimal_comma(100.0 * value, 2)
-        else:
-            shown = decimal_comma(value, 2) + " " + unit
+    for key, label in HEADLINE:
+        shown = decimal_comma(published.row(key).hpe_p95_m, 2) + " m"
         figures.append(
             '<div class="figure"><b>{}</b><span>{}</span></div>'.format(
                 shown, _said(label, language)
@@ -1815,7 +1811,7 @@ def _headline(published, language: str) -> str:
 
 
 def _published(published, language: str) -> str:
-    """The four rows, exactly as the run printed them."""
+    """The rows, exactly as the run printed them."""
     if published is None:
         return '<p class="warn">{}</p>'.format(_said(NO_RUN, language))
     head = [_said(column, language) for column in COLUMNS]

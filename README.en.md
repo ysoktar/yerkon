@@ -46,7 +46,7 @@ Built and tested:
   of named recurring items, each carrying its own provenance.
 - `scenarios.py`, the three deployments the table describes, as
   configuration rather than as code.
-- `report.py`, the four rows and what they rest on.
+- `report.py`, the three rows and what they rest on.
 - `terms.py` and `budget.py`, the seven named error sources and the
   dissection that re-runs each scenario with one of them silenced, so the
   table's accuracy figures come with the reason they are what they are.
@@ -140,7 +140,7 @@ carrying its own state —
     3 YERLEŞİM  49 direk · 1 grup · 2 alıcı
     4 HEDEF     ±5,0 m · TR · tek yönlü
     5 DAYANAK   72 değerin 35 tanesi varsayım
-    6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
+    6 ÇALIŞTIR  üç satır
 
 — so the whole study reads without scrolling, and the result stays pinned
 to the bottom of the panel while you change the controls that move it.
@@ -348,7 +348,6 @@ yerkon table --fast   # for trying things, ~54 s, not publishable
 | YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
 | YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal konumlandırma | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone
@@ -402,7 +401,7 @@ cancel, which a blocked path does not have. Eight kilometres, a 20 m
 mast, a 25 m ridge at the midpoint: the reflection costs 15,7 dB, the
 diffraction 27,1, and the link pays 27,1 (ADR-0058).
 
-The OPEX column is the one the report leaves empty for all four rows. It
+The OPEX column is the one the report leaves empty for every row. It
 comes from an inventory of named recurring items rather than a percentage
 of capital (ADR-0006), and like every cost figure here it rests mostly on
 rates nobody supplied — the command prints that share alongside.
@@ -511,7 +510,7 @@ by different people:
 
 | file | what is in it |
 |---|---|
-| `tablo.md` | the four rows, the ground each stands on, and the notes |
+| `tablo.md` | the three rows, the ground each stands on, and the notes |
 | `hata-butcesi.md` | what each error source was worth, and what removing it takes |
 | `sayilar.md` | every figure, what it affects, and what it rests on — with design choices kept apart from placeholders |
 | `secenekler.md` | the deployments that could be built instead |

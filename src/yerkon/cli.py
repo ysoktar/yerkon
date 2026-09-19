@@ -554,15 +554,6 @@ def table(argv: list[str] | None = None) -> int:
         help="where saved arrangements are kept (default: %(default)s)",
     )
     parser.add_argument(
-        "--weight", action="append", metavar="NAME=SHARE",
-        help=(
-            "journey mix for the weighted row, for example --weight "
-            "urban=0.6 --weight rural=0.3 --weight tunnel=0.1. Nobody "
-            "supplied one, so the default is a starting point rather "
-            "than a finding."
-        ),
-    )
-    parser.add_argument(
         "--publish", nargs="?", const="", metavar="PATH",
         help=(
             "write what this run produced into the published record the "
@@ -605,8 +596,7 @@ def table(argv: list[str] | None = None) -> int:
     ), file=sys.stderr)
 
     try:
-        weights = _weights(args.weight)
-        results, rows = build(chosen, weights=weights, settings=settings)
+        results, rows = build(chosen, settings=settings)
     except ValueError as error:
         print(error, file=sys.stderr)
         return 2
@@ -647,14 +637,9 @@ def _publish(rows, keys, args, settings):
         source += " + {}".format(args.option)
     if getattr(args, "preset", None):
         source += " + {}".format(", ".join(args.preset))
-    # `build` appends the weighted row when it ran more than one
-    # scenario, and that row has no scenario key of its own.
-    named = tuple(keys)
-    if len(rows) > len(named):
-        named += ("weighted",)
     return write(
         rows=rows,
-        keys=named,
+        keys=tuple(keys),
         source=source,
         shadow_draws=settings.number("site.shadow_draws"),
         profile_spacing_m=settings.number("site.profile_spacing_m"),
@@ -699,26 +684,6 @@ def _with_presets(keys: list, chosen: tuple, args) -> tuple:
             )
         )
     return tuple(swapped), tuple(used)
-
-
-def _weights(pairs: list[str] | None) -> dict[str, float] | None:
-    """Parse --weight NAME=SHARE, saying what went wrong rather than raising."""
-    if not pairs:
-        return None
-    weights = {}
-    for pair in pairs:
-        name, _, share = pair.partition("=")
-        if not share:
-            raise ValueError(
-                "--weight wants NAME=SHARE, for example urban=0.5; got {!r}".format(
-                    pair
-                )
-            )
-        try:
-            weights[name.strip().lower()] = float(share)
-        except ValueError:
-            raise ValueError("{!r} is not a share".format(share)) from None
-    return weights
 
 
 def view(argv: list[str] | None = None) -> int:

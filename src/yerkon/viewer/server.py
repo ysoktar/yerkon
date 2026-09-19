@@ -99,7 +99,7 @@ class Session:
     arrangement on every switch meant an afternoon spent on the rural row
     was gone the moment somebody looked at the tunnel, so nothing could
     be prepared and compared. Tabs keep all three, and a run takes either
-    the one showing or all of them and the weighted row they make
+    the one showing or all of them
     (ADR-0028).
 
     A lock rather than a queue: the sweep takes seconds and a person can

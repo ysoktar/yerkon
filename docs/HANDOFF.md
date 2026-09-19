@@ -10,12 +10,12 @@ için yazıldı.
 
 ## Tek teslimat
 
-Raporun 15. sayfasındaki karşılaştırma tablosunun YERKON bloğu: dört satır
-(şehir içi, kırsal, tünel, ağırlıklı), on sütun. Her sayı bir veri
+Raporun karşılaştırma tablosunun YERKON bloğu: üç satır
+(şehir içi, kırsal, tünel), on sütun. Her sayı bir veri
 sayfasına, yayımlanmış bir ölçüme ya da açıkça söylenmiş bir varsayıma
 kadar izlenebilir.
 
-Rapor OPEX sütununu dört satır için de boş bırakıyor. Doldurmak kapsam
+Rapor OPEX sütununu her satır için boş bırakıyor. Doldurmak kapsam
 içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 (ADR-0006).
 
@@ -58,7 +58,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `evaluate.py` | yolculuklar, sabitleme başına hata örnekleri, kullanılabilirlik, hizmet alanı, ve taramanın dört okuması (sayım, marj, geometri, beklenen hata) |
 | `cost.py` | malzeme listesinden CAPEX, envanterden OPEX |
 | `scenarios.py` | tablonun anlattığı üç yerleşim, yapılandırma olarak |
-| `report.py` | dört satır, on sütun ve altlarındaki notlar |
+| `report.py` | üç satır, on sütun ve altlarındaki notlar |
 | `terms.py` | adlandırılmış yedi hata kaynağı; her biri kapatılabilsin diye |
 | `budget.py` | dağılım: her kaynağın neye değdiği, yeniden koşarak |
 | `layout.py` | direklerin nereye konulacağı: sekiz adlandırılmış yöntem, tek dikiş `place(plan, ground)` |
@@ -78,7 +78,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `presets.py` | adlandırılmış düzenlemeler: bir sekmenin tamamı, kaydedilip geri yüklenen |
 | `viewer/static/map.js` | yer seçici: kayan harita, serbest çizilen kutu, ad araması |
 | `viewer/pages.py` | projenin sitesi: sekiz sayfa, iki dilde, iki palette, sunucuda üretiliyor ve `yerkon pages` ile sabit dosya olarak da yazılıyor |
-| `published.py` | yayımlanan dört satır bir dosya olarak; sayfa ve README aynı koşuyu okusun diye |
+| `published.py` | yayımlanan üç satır bir dosya olarak; sayfa ve README aynı koşuyu okusun diye |
 | `.github/workflows/pages.yml` | `docs/` klasörünü GitHub Pages'e koyan iş akışı; gerekirse Pages'i kendisi açıyor |
 | `cli.py` | `fetch`, `design`, `table`, `view`, `pages`, `site`, `budget`, `deliver`, `options`, `solve`, `defaults` ve `calibrate` fiilleri |
 

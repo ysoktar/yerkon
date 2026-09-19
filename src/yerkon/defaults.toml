@@ -626,9 +626,8 @@ note = """Bir satırın kaç gölge dizilişi üzerinden koşturulacağı. Bir k
 veriyordu: sekiz çekiliş onun 95. yüzdeliğini 14,6 m ile 279,6 m \
 arasında herhangi bir yere koyuyor, çünkü o kullanılabilirlikte hayatta \
 kalan sabitleme sayısı az ve yüzdelik bir kuyruk. Yüzdelik onun yerine \
-çekilişlerin örnekleri birlikte alınarak hesaplanıyor — yüzdelik zaten \
-budur; bu proje aynı reddi ağırlıklı satır için bir kez veriyor \
-(ADR-0005). Bir yazmak havuzlamayı kapatır. Sekiz, kuyruğun oturduğu \
+çekilişlerin örnekleri birlikte alınarak hesaplanıyor, çünkü yüzdelik \
+zaten budur. Bir yazmak havuzlamayı kapatır. Sekiz, kuyruğun oturduğu \
 yer: bir çekilişte 279,6 m, üçte 32,0, sekizden yirmi dörde kadar 24 ile \
 26 m arası. Dört çekirdekte tabloyu yetmiş saniyeden 3 dk 50 sn'ye \
 çıkarıyor."""
@@ -637,8 +636,7 @@ and for the rural row one draw decided a published figure: eight of them \
 put its ninety-fifth percentile anywhere between 14,6 m and 279,6 m, \
 because at that availability the surviving fixes are few and the \
 percentile is a tail. The percentile is taken over the draws' samples \
-together instead, which is what a percentile is — this project already \
-refuses the other way once, for the weighted row (ADR-0005). One \
+together instead, which is what a percentile is. One \
 switches pooling off. Eight is where the tail settles: 279,6 m on one \
 draw, 32,0 over three, and 24 to 26 m from eight through twenty-four. On \
 four cores it takes the table from seventy seconds to 3 min 50 s."""

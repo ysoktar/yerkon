@@ -1,18 +1,15 @@
-"""The four YERKON rows of the comparison table on page 15 of the report.
+"""The YERKON rows of the comparison table in the report.
 
 Ten columns: system, technology, environment, HPE at the fiftieth and
 ninety-fifth percentiles, VPE at the ninety-fifth, availability, service
 area, capital cost per square kilometre and operating cost per square
 kilometre per year.
 
-The report leaves that last column empty for all four rows. This project
+The report leaves that last column empty for every row. This project
 fills it from an inventory of named recurring items (ADR-0006).
 
-The fourth row is a weighted average, and it is not a separate
-simulation. It combines the three scenarios' raw per-fix error samples
-under fixed weights and recomputes its percentiles from the combination,
-because averaging three ninety-fifth percentiles does not produce a
-ninety-fifth percentile of anything (ADR-0005).
+One row per deployment and nothing else. There was a fourth row once,
+a weighted average over the three; ADR-0068 says why it went.
 """
 
 from __future__ import annotations
@@ -30,10 +27,10 @@ from yerkon.cost import (
     price,
 )
 from yerkon.budget import Dissection
-from yerkon.evaluate import Samples, combine, coverage, pooled, run_scenario
+from yerkon.evaluate import Samples, coverage, pooled, run_scenario
 from yerkon.parallel import spread
 from yerkon.numbers import decimal_comma
-from yerkon.scenarios import ALL, Deployed, catalogue, reweighted
+from yerkon.scenarios import ALL, Deployed, catalogue
 from yerkon.settings import Settings
 
 COLUMNS = (
@@ -49,7 +46,6 @@ COLUMNS = (
     "OPEX [TL/km²/yıl]",
 )
 
-WEIGHTED_ROW = "YERKON Ağırlıklı Ortalama"
 
 
 @dataclass(frozen=True)
@@ -221,54 +217,13 @@ def folded(draws: Sequence[Result], rates: OperatingRates) -> Result:
     )
 
 
-def weighted(results: Sequence[Result]) -> Row:
-    """The fourth row. Samples combined, not percentiles. ADR-0005."""
-    if not results:
-        raise ValueError("a weighted row needs rows to weigh")
-
-    samples = combine(
-        [(r.samples, r.deployed.weight) for r in results], WEIGHTED_ROW
-    )
-    hpe_p50, _ = samples.percentile(50)
-    hpe_p95, vpe_p95 = samples.percentile(95)
-
-    total_weight = sum(r.deployed.weight for r in results)
-
-    def blended(value_of) -> float:
-        return sum(
-            r.deployed.weight * value_of(r) for r in results
-        ) / total_weight
-
-    return Row(
-        system=WEIGHTED_ROW,
-        technology="Karasal konumlandırma",
-        environment="İç + dış",
-        hpe_p50_m=hpe_p50,
-        hpe_p95_m=hpe_p95,
-        vpe_p95_m=vpe_p95,
-        availability=samples.availability,
-        # Cost per square kilometre is already a ratio, so the blend is of
-        # the ratios under the same weights the errors used. Adding the
-        # areas would describe a network nobody proposed.
-        area_km2=blended(lambda r: r.area_km2),
-        capex_tl_per_km2=blended(lambda r: r.costing.capex_tl_per_km2),
-        opex_tl_per_km2_year=blended(lambda r: r.costing.opex_tl_per_km2_year),
-        assumed_share=blended(lambda r: r.costing.assumed_share),
-    )
-
-
 def build(
     deployments: Optional[Sequence[Deployed]] = None,
     rates: Optional[OperatingRates] = None,
-    weights: Optional[dict] = None,
     settings: Optional[Settings] = None,
     only: Optional[Sequence[str]] = None,
 ) -> tuple[tuple[Result, ...], tuple[Row, ...]]:
     """Every row of the block, and the results behind them.
-
-    ``weights`` is the journey mix the last row is computed under, keyed
-    by scenario name. Nobody supplied one, so it is configuration and the
-    notes print whatever was used.
 
     ``settings`` is a file of the figures nobody supplied. Pass one and
     the scenarios, the mounting costs, the unpublished radio figures and
@@ -285,7 +240,7 @@ def build(
         deployments = deployments or ALL
         rates = rates or DEFAULT_RATES
 
-    deployments = reweighted(tuple(deployments), weights)
+    deployments = tuple(deployments)
     # Each row is a journey and a coverage sweep and depends on no other,
     # so the rows are run at the same time (ADR-0025).
     # Every row, every arrangement of shadows, all at once: the draws of
@@ -305,12 +260,6 @@ def build(
         at += how_many
     results = tuple(results)
     rows = tuple(r.row() for r in results)
-    if len(results) > 1:
-        # A weighted average of one scenario is that scenario, and
-        # printing it twice under a name that promises a combination is
-        # worse than not printing it. The block has four rows when it
-        # describes three deployments (ADR-0005).
-        rows += (weighted(results),)
     return results, rows
 
 
@@ -515,18 +464,6 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row],
                 "ones it shares a waveform with.".format(", ".join(modules))
             )
 
-    lines.append(
-        "  Weights for the last row: {}. It combines the three scenarios' "
-        "raw per-fix samples, not their percentiles (ADR-0005).".format(
-            ", ".join(
-                "{} {}".format(
-                    r.deployed.scenario.name,
-                    decimal_comma(r.deployed.weight, 2),
-                )
-                for r in results
-            )
-        )
-    )
     lines.append(
         "  Availability counts modelled failures only: a link that did not "
         "close, a round with too few ranges, a solve that did not settle. "

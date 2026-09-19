@@ -199,11 +199,13 @@ def test_the_results_page_draws_the_published_run():
     assert "2026-01-02" in drawn
 
 
-def test_the_home_page_leads_with_the_weighted_row():
+def test_the_home_page_leads_with_one_figure_per_row():
+    """ADR-0068. There is no weighted row to lead with any more."""
     record = a_record()
     drawn = render(page_at("/"), "tr", record)
-    weighted = record.row("weighted")
-    assert "{:.2f}".format(weighted.hpe_p50_m).replace(".", ",") in drawn
+    for key in EVERY_ROW:
+        shown = "{:.2f}".format(record.row(key).hpe_p95_m).replace(".", ",")
+        assert shown in drawn, key
 
 
 def test_no_page_carries_a_copy_of_the_published_table():
@@ -271,7 +273,7 @@ def test_a_coarse_run_is_not_published(tmp_path):
 
 def test_a_table_missing_a_row_is_not_published(tmp_path):
     record = a_record()
-    with pytest.raises(ValueError, match="four rows"):
+    with pytest.raises(ValueError, match="a row per deployment"):
         write(
             rows=record.rows[:2], keys=record.keys[:2], source="defaults.toml",
             shadow_draws=8, profile_spacing_m=10.0,
@@ -317,12 +319,11 @@ def test_the_shipped_record_is_a_whole_table_read_finely():
     assert record.run_on
 
 
-def test_the_command_line_names_the_weighted_row_the_record_wants(tmp_path):
-    """`build` appends a fourth row that has no scenario key of its own.
+def test_the_command_line_hands_the_record_the_keys_it_ran(tmp_path):
+    """Nothing else covers this wiring.
 
-    Nothing else covers this: publishing for real is a quarter of an
-    hour, so the wiring between the run and the record is tested here
-    rather than end to end.
+    Publishing for real is a quarter of an hour, so what runs between
+    the run and the record is tested here rather than end to end.
     """
     import argparse
 

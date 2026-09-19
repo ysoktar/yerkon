@@ -5,10 +5,9 @@ beside it, a ranging exchange over real ground, an estimator that sees
 only what the exchange produced, and truth that only this module and the
 world are allowed to read.
 
-What comes out is raw per-fix error samples, not summary statistics. The
-weighted row of the report combines the samples of three scenarios and
-recomputes its percentiles from the combination, which is impossible from
-percentiles alone. See ADR-0005.
+What comes out is raw per-fix error samples, not summary statistics. A
+row pools the samples of its shadow draws and computes its percentiles
+from the pool, which is impossible from percentiles alone. See ADR-0055.
 
 Every run reseeds. A previous version of this project held a generator
 across scenarios, so the second one in a process drew from wherever the
@@ -251,8 +250,9 @@ class Scenario:
 class Samples:
     """Raw per-fix errors, and how many fixes were not produced at all.
 
-    Percentiles are computed on demand rather than stored, because the
-    weighted row has to combine the samples themselves (ADR-0005).
+    Percentiles are computed on demand rather than stored, because a row
+    pools the samples of its draws and takes the percentile of the pool
+    (ADR-0055).
     """
 
     name: str
@@ -311,8 +311,8 @@ def pooled(draws: Sequence[Samples], name: str) -> Samples:
     A percentile is a statement about a population, so it is taken over
     the population: the draws' own samples together, rather than an
     average of eight percentiles, which is not a percentile of anything.
-    This project already refuses that averaging once, for the weighted
-    row (ADR-0005); the same refusal applies here.
+    Averaging percentiles is what this refuses, here and anywhere else
+    the question comes up.
     """
     if not draws:
         raise ValueError("nothing to pool")
@@ -331,56 +331,6 @@ def pooled(draws: Sequence[Samples], name: str) -> Samples:
         median_range_sigma_m=(
             float(np.median([d.median_range_sigma_m for d in draws]))
             if draws else 0.0
-        ),
-    )
-
-
-def combine(weighted: Sequence[tuple[Samples, float]], name: str) -> Samples:
-    """One set of samples from several, under fixed weights. ADR-0005.
-
-    Averaging three ninety-fifth percentiles does not give a ninety-fifth
-    percentile of anything, so this repeats each scenario's raw samples
-    in proportion to its weight and lets the percentile be computed from
-    the combination. Availability combines the same way.
-    """
-    if not weighted:
-        raise ValueError("nothing to combine")
-    total = sum(weight for _, weight in weighted)
-    if total <= 0.0:
-        raise ValueError("weights must add to something positive")
-
-    smallest = min(
-        (s.produced for s, _ in weighted if s.produced), default=0
-    )
-    if smallest == 0:
-        raise ValueError("a scenario with no fixes cannot be weighted in")
-
-    horizontal, vertical = [], []
-    attempted = produced_weight = 0.0
-    for samples, weight in weighted:
-        share = weight / total
-        # Draw the same proportion of each scenario's samples, so a
-        # scenario that happened to be run longer does not weigh more
-        # than the weights say.
-        take = max(int(round(share * smallest * len(weighted))), 1)
-        index = np.linspace(0, samples.produced - 1, take).astype(int)
-        horizontal.append(samples.horizontal_error_m[index])
-        vertical.append(samples.vertical_error_m[index])
-        attempted += share * samples.attempted
-        produced_weight += share * samples.produced
-
-    combined_h = np.concatenate(horizontal)
-    return Samples(
-        name=name,
-        horizontal_error_m=combined_h,
-        vertical_error_m=np.concatenate(vertical),
-        # Scale the attempt count so availability comes out as the
-        # weighted average of the scenarios' own.
-        attempted=int(round(combined_h.size * attempted / max(produced_weight, 1e-9))),
-        lost_links=sum(s.lost_links for s, _ in weighted),
-        attempted_links=sum(s.attempted_links for s, _ in weighted),
-        median_range_sigma_m=sum(
-            (weight / total) * s.median_range_sigma_m for s, weight in weighted
         ),
     )
 

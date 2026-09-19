@@ -28,7 +28,8 @@ from yerkon.report import Row
 PUBLISHED = pathlib.Path(__file__).parent / "published.toml"
 
 #: Keys of the rows a published table holds, in the order it holds them.
-EVERY_ROW = ("urban", "rural", "tunnel", "weighted")
+#: There was a fourth once, a weighted average over the three (ADR-0068).
+EVERY_ROW = ("urban", "rural", "tunnel")
 
 #: Columns of one row, in the order the report prints them. The three
 #: names are not translated: they are what goes into the Turkish report.
@@ -137,8 +138,8 @@ def write(
     missing = [key for key in EVERY_ROW if key not in keys]
     if missing:
         raise ValueError(
-            "the published table has four rows and this run has {}; "
-            "missing: {}".format(len(keys), ", ".join(missing))
+            "the published table has a row per deployment and this run "
+            "has {}; missing: {}".format(len(keys), ", ".join(missing))
         )
     if int(shadow_draws) < 2 or float(profile_spacing_m) <= 0.0:
         raise ValueError(

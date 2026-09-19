@@ -12,7 +12,6 @@ from yerkon.evaluate import (
     Receiver,
     Samples,
     Scenario,
-    combine,
     coverage,
     run_scenario,
 )
@@ -370,54 +369,6 @@ def made_up(name, horizontal, vertical=None, attempted=None):
         vertical_error_m=vertical,
         attempted=horizontal.size if attempted is None else attempted,
     )
-
-
-def test_the_weighted_row_combines_samples_and_not_percentiles():
-    """ADR-0005. Averaging three P95 values does not produce a P95.
-
-    One scenario at a steady one metre and another with a long tail: the
-    average of their ninety-fifth percentiles is not the ninety-fifth
-    percentile of the pair, and this is the arrangement that shows it.
-    """
-    steady = made_up("steady", np.ones(1000))
-    tailed = made_up("tailed", np.concatenate([np.ones(900), np.full(100, 50.0)]))
-
-    average_of_percentiles = 0.5 * (
-        steady.percentile(95)[0] + tailed.percentile(95)[0]
-    )
-    combined = combine([(steady, 0.5), (tailed, 0.5)], "weighted")
-
-    assert combined.percentile(95)[0] != pytest.approx(
-        average_of_percentiles, rel=0.05
-    )
-
-
-def test_a_heavier_weight_pulls_the_combination_toward_that_scenario():
-    good = made_up("good", np.ones(500))
-    bad = made_up("bad", np.full(500, 20.0))
-
-    mostly_good = combine([(good, 0.9), (bad, 0.1)], "mostly good")
-    mostly_bad = combine([(good, 0.1), (bad, 0.9)], "mostly bad")
-
-    assert mostly_good.percentile(50)[0] < mostly_bad.percentile(50)[0]
-
-
-def test_combining_carries_availability_across():
-    half = made_up("half", np.ones(100), attempted=200)
-    whole = made_up("whole", np.ones(100), attempted=100)
-    combined = combine([(half, 0.5), (whole, 0.5)], "both")
-    assert 0.6 < combined.availability < 0.8
-
-
-def test_a_scenario_with_no_fixes_cannot_be_weighted_in():
-    empty = made_up("empty", np.array([]))
-    with pytest.raises(ValueError, match="no fixes"):
-        combine([(empty, 1.0)], "impossible")
-
-
-def test_combining_nothing_is_refused():
-    with pytest.raises(ValueError, match="nothing to combine"):
-        combine([], "empty")
 
 
 def test_percentiles_of_an_empty_run_are_not_a_number():

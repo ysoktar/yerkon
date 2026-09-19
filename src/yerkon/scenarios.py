@@ -68,13 +68,6 @@ class Deployed:
     product: Product
     mounting: MountingOption
     route_km: float
-    #: Default share of a receiver's travel spent in this environment.
-    #:
-    #: Used only for the weighted row. Nobody supplied a journey mix, so
-    #: this is a starting point rather than a finding: it is overridden
-    #: per run from the command line or the viewer, and the row prints
-    #: the weights it used.
-    weight: float
     #: What the report calls the environment: inside, outside, or both.
     environment: str
     technology: str
@@ -569,7 +562,6 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         product=URBAN_ANCHOR,
         mounting=mounting["lighting_column"],
         route_km=URBAN_ROAD.length_m / 1000.0,
-        weight=0.5,
         environment="Dış",
         technology="Karasal konumlandırma (SX1280/LoRa TWR)",
         coverage_margin_m=1500.0,
@@ -632,7 +624,6 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         product=RURAL_ANCHOR,
         mounting=mounting["tall_mast"],
         route_km=RURAL_ROAD.length_m / 1000.0,
-        weight=0.4,
         environment="Dış",
         technology="Karasal konumlandırma (E28-SX1280 TWR)",
         coverage_margin_m=8000.0,
@@ -697,7 +688,6 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
         product=TUNNEL_ANCHOR,
         mounting=mounting["tunnel_bracket"],
         route_km=TUNNEL_M / 1000.0,
-        weight=0.1,
         environment="İç + dış",
         technology="Karasal konumlandırma (UWB/DWM3000 TWR)",
         confined_width_m=settings.number("tunnel.width_m"),
@@ -716,42 +706,3 @@ TUNNEL = CHOICES["tunnel"]
 ALL = (URBAN, RURAL, TUNNEL)
 
 
-#: The default journey mix for the weighted row, by scenario key.
-#:
-#: Half a receiver's travel in town, most of the rest between towns, a
-#: tenth in tunnels and other confined stretches. Nobody supplied these
-#: and no result should rest on them, so they are configuration: pass
-#: --weight to the command line or move the sliders in the viewer.
-DEFAULT_WEIGHTS = {name: deployed.weight for name, deployed in CHOICES.items()}
-
-
-def reweighted(
-    deployments: "tuple[Deployed, ...]", weights: "Optional[dict[str, float]]"
-) -> "tuple[Deployed, ...]":
-    """The same deployments under a different journey mix.
-
-    Keyed by the same short names the command line and the viewer use, so
-    a weight can travel from a slider to a table row without anything in
-    between having to know what a scenario is.
-    """
-    if not weights:
-        return deployments
-    unknown = set(weights) - set(CHOICES)
-    if unknown:
-        raise ValueError(
-            "no scenario called {}. Choose from: {}".format(
-                ", ".join(sorted(unknown)), ", ".join(sorted(CHOICES))
-            )
-        )
-    if any(value < 0.0 for value in weights.values()):
-        raise ValueError("a share of a journey is not negative")
-    if sum(weights.values()) <= 0.0:
-        raise ValueError("the weights must add to something positive")
-
-    by_name = {
-        deployed.scenario.name: name for name, deployed in CHOICES.items()
-    }
-    return tuple(
-        replace(d, weight=weights.get(by_name.get(d.scenario.name, ""), d.weight))
-        for d in deployments
-    )

@@ -1,16 +1,14 @@
-"""The four YERKON rows, and what they are allowed to claim."""
+"""The YERKON rows, and what they are allowed to claim."""
 
-import math
 
 import numpy as np
 import pytest
 
-from yerkon.cost import Costing, LineItem, price
+from yerkon.cost import Costing, LineItem
 from yerkon.evaluate import Samples
 from yerkon.evidence import Provenance
 from yerkon.report import (
     COLUMNS,
-    WEIGHTED_ROW,
     Result,
     Row,
     as_markdown,
@@ -18,7 +16,6 @@ from yerkon.report import (
     build,
     footnotes,
     run,
-    weighted,
 )
 from yerkon.scenarios import ALL, RURAL, TUNNEL, URBAN
 
@@ -82,7 +79,7 @@ def test_the_markdown_and_the_text_carry_the_same_numbers():
         assert cell in text
 
 
-# --- The weighted row ------------------------------------------------------
+# --- Rows made from samples -------------------------------------------------
 
 
 def made_up_result(deployed, horizontal, vertical, attempted=None, capex=1e5):
@@ -101,50 +98,6 @@ def made_up_result(deployed, horizontal, vertical, attempted=None, capex=1e5):
         route_km=10.0,
     )
     return Result(deployed, samples, costing, 10.0, 40.0)
-
-
-def test_the_weighted_row_is_not_an_average_of_the_percentiles():
-    """ADR-0005. Averaging three P95 values does not produce a P95."""
-    steady = made_up_result(URBAN, np.ones(1000), np.ones(1000))
-    tailed = made_up_result(
-        RURAL,
-        np.concatenate([np.ones(900), np.full(100, 60.0)]),
-        np.ones(1000),
-    )
-
-    average = 0.5 * (
-        steady.samples.percentile(95)[0] + tailed.samples.percentile(95)[0]
-    )
-    row = weighted([steady, tailed])
-
-    assert row.hpe_p95_m != pytest.approx(average, rel=0.05)
-
-
-def test_the_weighted_row_is_named_as_the_report_names_it():
-    assert weighted([made_up_result(URBAN, np.ones(50), np.ones(50))]).system == (
-        WEIGHTED_ROW
-    )
-
-
-def test_a_weighted_row_needs_something_to_weigh():
-    with pytest.raises(ValueError, match="needs rows to weigh"):
-        weighted([])
-
-
-def test_cost_per_square_kilometre_is_blended_and_not_summed():
-    """Adding the areas would describe a network nobody proposed."""
-    one = made_up_result(URBAN, np.ones(100), np.ones(100), capex=1e5)
-    two = made_up_result(RURAL, np.ones(100), np.ones(100), capex=3e5)
-    row = weighted([one, two])
-    assert row.capex_tl_per_km2 < max(
-        one.costing.capex_tl_per_km2, two.costing.capex_tl_per_km2
-    )
-    assert row.capex_tl_per_km2 > min(
-        one.costing.capex_tl_per_km2, two.costing.capex_tl_per_km2
-    )
-
-
-# --- Running the real scenarios -------------------------------------------
 
 
 def test_the_tunnel_serves_a_bore_and_not_a_plane():
@@ -190,10 +143,9 @@ def test_a_scenario_prices_the_units_it_actually_carries():
     assert names == {"Kara aracı alıcısı", "Yaya alıcısı"}
 
 
-def test_every_scenario_carries_a_weight_and_they_are_not_all_equal():
-    weights = [d.weight for d in ALL]
-    assert all(w > 0.0 for w in weights)
-    assert len(set(weights)) > 1
+def test_no_scenario_carries_a_journey_share_any_more():
+    """ADR-0068. It existed for the weighted row and went with it."""
+    assert not hasattr(ALL[0], "weight")
 
 
 @pytest.mark.slow
@@ -246,10 +198,13 @@ def test_the_tunnel_still_supports_the_height_the_open_road_cannot():
 
 
 @pytest.mark.slow
-def test_the_whole_block_is_four_rows():
+def test_the_whole_block_is_one_row_per_deployment():
+    """ADR-0068. There is no weighted row any more."""
     _, rows = build()
-    assert len(rows) == 4
-    assert rows[-1].system == WEIGHTED_ROW
+    assert len(rows) == 3
+    assert [row.system for row in rows] == [
+        "YERKON ({})".format(d.scenario.name) for d in ALL
+    ]
 
 
 @pytest.mark.slow

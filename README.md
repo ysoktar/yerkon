@@ -49,7 +49,7 @@ Kurulmuş ve test edilmiş:
   taşır.
 - `scenarios.py` — tablonun anlattığı üç yerleşim, kod olarak değil
   yapılandırma olarak.
-- `report.py` — dört satır ve neye dayandıkları.
+- `report.py` — üç satır ve neye dayandıkları.
 - `terms.py` ve `budget.py` — adlandırılmış yedi hata kaynağı ve her
   senaryoyu birini susturarak yeniden koşan dağılım; böylece tablonun
   hassasiyet değerleri neden öyle olduklarının gerekçesiyle gelir.
@@ -129,7 +129,7 @@ direğin erişimde olduğu zemin.
 
 Üç sekme, tablonun her satırı için biri, üçü birden tutulur: sekme
 değiştirmek hazırladığını silmez ve bir koşu ya üzerinde olduğun sekmeyi
-(bir satır) ya da üçünü birden ve oluşturdukları ağırlıklı satırı alır
+(bir satır) ya da üçünü birden alır
 (ADR-0028).
 
 **Panel altı adımdır, birinin çalıştığı sırayla** (ADR-0034): zemin
@@ -142,7 +142,7 @@ bir satıra kapanır —
     3 YERLEŞİM  49 direk · 1 grup · 2 alıcı
     4 HEDEF     ±5,0 m · TR · tek yönlü
     5 DAYANAK   72 değerin 35 tanesi varsayım
-    6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
+    6 ÇALIŞTIR  üç satır
 
 — böylece bütün çalışma kaydırmadan okunur ve sonuç, onu oynatan
 kontrolleri değiştirirken panelin altında sabit kalır. Aynı anda bir adım
@@ -347,7 +347,6 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 | YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
 | YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal konumlandırma | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir
@@ -399,7 +398,7 @@ doğrudan ışına ihtiyacı var, ki kesilmiş bir yolda o ışın yok. Sekiz
 kilometre, 20 m direk, ortada 25 m sırt: yansıma 15,7 dB, kırınım 27,1,
 ödenen 27,1 (ADR-0058).
 
-OPEX sütunu raporun dört satır için de boş bıraktığı sütundur. Sermayenin
+OPEX sütunu raporun her satır için boş bıraktığı sütundur. Sermayenin
 bir yüzdesi olarak değil, adlandırılmış yinelenen kalemlerden oluşan bir
 envanterden gelir (ADR-0006) ve buradaki her maliyet değeri gibi
 çoğunlukla kimsenin vermediği oranlara dayanır — komut bu payı yanında
@@ -511,7 +510,7 @@ kişiler tarafından okunurlar:
 
 | dosya | içinde ne var |
 |---|---|
-| `tablo.md` | dört satır, her birinin üzerinde durduğu zemin ve notlar |
+| `tablo.md` | üç satır, her birinin üzerinde durduğu zemin ve notlar |
 | `hata-butcesi.md` | her hata kaynağı neye değdi ve kaldırmak ne gerektiriyor |
 | `sayilar.md` | her değer, neyi etkilediği ve neye dayandığı — tasarım kararları vekillerden ayrı tutularak |
 | `secenekler.md` | bunun yerine kurulabilecek yerleşimler |

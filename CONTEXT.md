@@ -126,11 +126,15 @@ omurga bundan etkilenmez. ADR-0045'e bak.
 **Scenario** (senaryo): bir Deployment artı bir alıcı yolculukları kümesi
 artı değerlendirme ayarları. Bir senaryo bir tablo satırı üretir.
 
-**Weighted row** (ağırlıklı satır): tablonun dördüncü satırı. Ayrı bir
-benzetim değildir. Üç senaryonun sabitleme başına ham hata örneklerini sabit
-ağırlıklar altında birleştirir ve yüzdelikleri birleşik örnekten yeniden
-hesaplar. Üç P95 değerinin ortalaması bir P95 üretmez, dolayısıyla bu kod
-tabanı bunu yapmaz. ADR-0005'e bak.
+**Weighted row** (ağırlıklı satır): artık yok. Tablonun dördüncü satırı
+olarak üç senaryonun ham hata örneklerini sabit ağırlıklar altında
+birleştiriyordu. Rapordan çıkarıldığı için buradan da çıkarıldı;
+ADR-0068'e bak. Onunla birlikte senaryoların yolculuk payları, `--weight`
+ve `evaluate.combine` de gitti.
+
+Kalan kural aynı: üç P95 değerinin ortalaması bir P95 üretmez. Bu kod
+tabanı yüzdelik ortalamayı hiçbir yerde yapmaz; gölge çekilişleri de
+havuzlanır, ortalanmaz. ADR-0055'e bak.
 
 ## Ürünler
 

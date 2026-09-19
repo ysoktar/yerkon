@@ -71,7 +71,6 @@ CATALOGUE: dict[str, dict[str, str]] = {
     "row.urban": {"tr": "Şehir içi", "en": "Urban"},
     "row.rural": {"tr": "Kırsal", "en": "Rural"},
     "row.tunnel": {"tr": "Tünel", "en": "Tunnel"},
-    "row.weighted": {"tr": "Ağırlıklı Ortalama", "en": "Weighted mean"},
     # -- what the ground is -----------------------------------------------
     "terrain.flat": {
         "tr": "{elevation_m:.0f} m'de düz",

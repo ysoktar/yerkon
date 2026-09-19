@@ -1155,11 +1155,11 @@ def _template(name: str) -> ViewState:
 #: The three rows of the table, in the order the report prints them.
 #:
 #: Three, always. They are tabs rather than a menu: each holds a prepared
-#: deployment and a run takes either the one showing or all of them and
-#: the weighted row they make (ADR-0028). The mixed corridor that used to
-#: sit alongside them is gone as a preset — nothing is lost in kind,
-#: because any tab can still carry several anchor runs of different
-#: modules, which is what made it a mixed corridor.
+#: deployment and a run takes either the one showing or all of them
+#: (ADR-0028). The mixed corridor that used to sit alongside them is gone
+#: as a preset. Nothing is lost in kind, because any tab can still carry
+#: several anchor runs of different modules, which is what made it a
+#: mixed corridor.
 MODES = ("urban", "rural", "tunnel")
 
 def mode_labels(language: Optional[str] = None) -> dict:

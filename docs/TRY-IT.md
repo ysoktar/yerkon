@@ -88,7 +88,7 @@ biri o an ne tuttuğunu söyleyen tek bir satıra kapanıyor:
     3 YERLEŞİM  49 direk · 1 grup · 2 alıcı
     4 HEDEF     ±5,0 m · TR · tek yönlü
     5 DAYANAK   72 değerin 35 tanesi varsayım
-    6 ÇALIŞTIR  üç satır ve ağırlıklı ortalama
+    6 ÇALIŞTIR  üç satır
 
 Aynı anda biri açık. **Sonuç** alta sabitlenmiş ve hiç kaymıyor, yani bir
 kontrolü değiştirip ne yaptığını görmek iki hareket değil bir hareket.
@@ -555,8 +555,7 @@ karşılaştırılması ve o yapılmadı (ADR-0038).
 
 **Şehir içi · Kırsal · Tünel.** Her sekme hazır bir yerleşim tutar;
 aralarında geçmek kurduğunu atmaz. **Çalıştır → Hangi satırlar** altından
-ya üzerinde olduğun sekmeyi (bir satır) ya da üçünü birden koşarsın —
-üçü artı ağırlıklı satır çıkar.
+ya üzerinde olduğun sekmeyi (bir satır) ya da üçünü birden koşarsın.
 
 Bir koşu **sekmedeki düzeni** kullanır, gönderilen kataloğu değil — bir
 direği sürükle, koştuğun tablo bunu yansıtsın.
@@ -666,7 +665,7 @@ seçenek olarak kaydetsin.
 ## Terminalden
 
 ```bash
-yerkon table                  # dört satır             ~15 dk 33 sn
+yerkon table                  # üç satır              ~15 dk 33 sn
 yerkon table --fast           # denemek için, yayımlanmaz      ~54 sn
 yerkon budget                 # hata dağılımı           ~4 dk
 yerkon budget --only tunnel   #                         ~45 sn

@@ -75,7 +75,7 @@ def settings_of(rows) -> Settings:
 
 
 def table(rows) -> Callable:
-    """The rows as prepared, plus the weighted row when all three run."""
+    """The rows as prepared, run and returned as a table."""
 
     def work(tell: Tell) -> dict:
         language = language_of(rows)

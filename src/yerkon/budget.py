@@ -33,13 +33,10 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from yerkon.evaluate import Samples, combine, run_scenario
+from yerkon.evaluate import Samples, run_scenario
 from yerkon.parallel import spread
 from yerkon.scenarios import ALL, Deployed
 from yerkon.terms import ALL as EVERYTHING, LABELS, NAMES, REMEDIES, Terms
-
-#: What the combined row is called, in the language the table uses.
-WEIGHTED = "Ağırlıklı Ortalama"
 
 
 @dataclass(frozen=True)
@@ -172,33 +169,10 @@ def dissect_all(
     deployments: Sequence[Deployed] = ALL,
     sources: Sequence[str] = NAMES,
 ) -> tuple[Dissection, ...]:
-    """Every scenario taken apart, and the weighted row along with them.
-
-    The weighted row is dissected the same way the table's weighted row
-    is built: by combining the raw per-fix samples of each run under the
-    weights, never by averaging the three scenarios' percentiles, which
-    would not be a percentile of anything (ADR-0005).
-    """
-    per_scenario = [(d, _runs_of(d, sources)) for d in deployments]
-    each = tuple(
-        _from_runs(deployed.scenario.name, runs, sources)
-        for deployed, runs in per_scenario
-    )
-    if len(per_scenario) < 2:
-        return each
-
-    return each + (
-        _from_runs(
-            WEIGHTED,
-            {
-                name: combine(
-                    [(runs[name], deployed.weight) for deployed, runs in per_scenario],
-                    WEIGHTED,
-                )
-                for name, _ in _every_run(sources)
-            },
-            sources,
-        ),
+    """Every scenario taken apart, one dissection each."""
+    return tuple(
+        _from_runs(deployed.scenario.name, _runs_of(deployed, sources), sources)
+        for deployed in deployments
     )
 
 
