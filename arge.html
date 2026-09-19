@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Araştırma soruları · YERKON</title>
+<link rel="stylesheet" href="site.css">
+<script src="theme.js" defer></script>
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>Karasal konumlandırma yedek katmanı</span></a>
+<nav class="pages"><a href="index.html">Anasayfa</a><a href="sorun.html">Sorun</a><a href="sistem.html">Sistem</a><a href="arge.html" class="here">AR-GE</a><a href="fayda.html">Fayda</a><a href="sonuclar.html">Sonuçlar</a><a href="benzetim.html">Benzetim</a><a href="kaynaklar.html">Kaynaklar</a></nav>
+<nav class="tongues"><a href="arge.html" class="here">TR</a><a href="en/arge.html">EN</a><button class="theme" id="theme" type="button" hidden></button></nav>
+<a class="run" href="benzetim.html">Simülasyon →</a>
+</header>
+<main>
+<h1>Araştırma soruları</h1>
+<p class="lead">Proje dört soruya cevap arıyor. Hiçbiri kapanmış değil, ve her birinin altında ne yapılacağı yazılı.</p>
+<section><h2>Dört soru</h2><ul><li><strong>Karasal yayınlar, araç sensörleri ve harita kısıtları birleştirilerek uydu olmadan kabul edilebilir bir konum servisi üretilebilir mi?</strong> Şehir içinde uygulanabilirlik test edilecek. Çevredeki modemlerin MAC adreslerinden konum iyileştirme, baz istasyonlarıyla üçgenleme ve görüntü işleme de bu sürece katılacak.</li><li><strong>Mevcut altyapıya en az müdahaleyle ölçeklenebilir bir sistem kurulabilir mi?</strong> 12. Ulaştırma ve Haberleşme Şurası akıllı ulaşım sistemi altyapısının geliştirilmesini hedef koymuştu. Yol kenarı üniteleri ve trafik kontrol noktalarının enerji ve haberleşme kaynağını kullanmak, montajı en ucuz yapmanın yolu.</li><li><strong>Çift yönlü ölçümün ağ trafiği ve ölçeklenebilirlik dezavantajları azaltılabilir mi?</strong> Varış zamanı farkı sistemleri tek taraflı yayın yapar ve alıcıdan mesaj almaz, bu yüzden daha az trafik üretir. Çift yönlü ölçümde alıcı ile birim karşılıklı konuşur. TWR CDMA gibi yaklaşımlar ve yazılım tanımlı radyo bu farkı kapatmak için denenecek.</li><li><strong>Konumlandırma hizmeti sunan bir altyapının güvenlik gereksinimleri neler?</strong> Yayın birimlerinin taklit edilmesine ve izinsiz alıcıların sistemi meşgul etmesine karşı çözümler test edilecek. Modüllere donanımsal kriptografik hızlandırıcı (ATECC608B) girecek; kaynak ve bütünlük ECDSA imzasıyla doğrulanacak.</li></ul></section>
+<section><h2>Aldatmayı erken görmek</h2><p>Aldatma saldırısında alıcı teknik olarak tutarlı ve yüksek güvenli görünen, ama yanlış bir konum ve hız üretir. YERKON uydudan tamamen bağımsız çalıştığı için bir bütünlük referansı olabilir. İki çözüm sürekli karşılaştırılacak ve P50, P95, maksimum hata, konum sürekliliği, yeniden yakınsama süresi, yanlış alarm oranı, kaçırılmış tespit oranı ve zaman sapması üzerinden değerlendirilecek.</p><p>Kurulumun kendisi de araştırma konusu. Saha asistanı yazılımı, uzmanlık gerektirmeden yerleştirme yapılmasını hedefliyor: afet ya da askeri durumda geçici bir ağ kuracak personel, alıcı ekranındaki &quot;optimum sinyal için 120 derece yönünde 50 metre ilerleyin&quot; gibi yönlendirmeleri takip ederek birimleri yerleştirebilecek.</p></section>
+<section><h2>Pilot doğrulama</h2><ul><li>Seçilecek bir ulaşım koridoruna 10 ile 15 yayın birimi kurulacak. Araç, el tipi ve sabit alıcı prototipleri açık alan, tünel, kentsel kanyon ve kapsama sınırı koşullarında test edilecek.</li><li>Açık alanda yer gerçeği RTK-GNSS olacak. Uydunun ulaşmadığı tünel ve kapalı alanlarda ölçülmüş referans noktaları ve güzergâh kullanılacak.</li><li>Hedeflenen yatay konum hatası: P50 5 metrenin, P95 10 metrenin altında.</li><li>Yasal ve operasyonel güvenlik nedeniyle gerçek karıştırıcı kullanılmayacak. Onun yerine kontrollü uydu kesintileri, kayıtlı sinyaller ve laboratuvarda benzetilmiş aldatma senaryoları kullanılacak.</li></ul></section>
+</main>
+<footer><p>YERKON, Ulaştırma ve Altyapı Bakanlığı UDHAM fikir yarışmasına sunulan bir proje. Tablodaki sayılar benzetimin yayımlanan koşusundan gelir, ve neyi modellemediği Benzetim sayfasında yazıyor.</p></footer>
+</body>
+</html>
