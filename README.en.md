@@ -78,6 +78,10 @@ pytest
 
 ## The site
 
+**<https://ysoktar.github.io/yerkon/>**
+
+Or locally:
+
 ```bash
 yerkon view
 ```
@@ -97,6 +101,12 @@ a run wrote, rather than from a copy somebody typed. `yerkon table
 --publish` writes that file and refuses two things: a table missing rows
 and a coarse `--fast` reading. A test says no published cell was typed
 into the site.
+
+`yerkon pages` writes the published copy: the same pages, both
+languages, as static files under `docs/`. The simulator does not come
+with them, because it has a running engine behind it; what comes instead
+is a page saying where it is and how to start it (ADR-0065). A test says
+the folder matches what the pages draw.
 
 ## The simulator
 

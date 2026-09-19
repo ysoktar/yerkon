@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benzetim nasıl çalışıyor · YERKON</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>Karasal konumlandırma benzetimi</span></a>
+<nav class="pages"><a href="index.html">Anasayfa</a><a href="sorun.html">Sorun</a><a href="sistem.html">Sistem</a><a href="yontem.html" class="here">Yöntem</a><a href="sonuclar.html">Sonuçlar</a><a href="kaynaklar.html">Kaynaklar</a></nav>
+<nav class="tongues"><a href="yontem.html" class="here">TR</a><a href="en/yontem.html">EN</a></nav>
+<a class="run" href="simulasyon.html">Simülasyon →</a>
+</header>
+<main>
+<h1>Benzetim nasıl çalışıyor</h1>
+<p class="lead">Bu bir benzetimdir, saha ölçümü değil. Neyi modellediğini ve neyi modellemediğini olduğu gibi yazar: bir sayının nereden geldiği sorulduğunda cevabı olan bir tablo, olmayanından başka bir şeydir.</p>
+<section><h2>Zemin gerçek</h2><ul><li>Üç satır da gerçek Ankara zemininin üzerinde durur. Zemin Copernicus 30 m DEM&#x27;inden bir kez getirilip paketin içine işlenmiştir, yani bir klon tabloyu ağa hiç çıkmadan yeniden üretir (ADR-0008).</li><li>Kızılay&#x27;da 91 m iniş çıkış var, Polatlı&#x27;da 486 m rölyef, tünelde iki portal arasında %1,79 düşüş.</li><li>Hiçbir yerde düz zemin seçeneği yok. Düz bir düzlem bu modelin çizebileceği en tarafsız değil en elverişli yüzeydir (ADR-0021).</li></ul></section>
+<section><h2>Bir bağlantıya tek bir hesap karar verir</h2><ul><li>Azami menzil diye bir sabit yok. Menzil bir girdi değil, link bütçesinin sonucudur; aynı hesap bağlantının kapanıp kapanmadığına da, ne kadar hassas ölçtüğüne de karar verir (ADR-0002).</li><li>İki ışınlı zemin yansıması düz zeminde bile çalışır: kırılma mesafesinin ötesinde doğrudan ışınla zeminden yansıyan ışın ters fazda gelip birbirini götürür, ve o mesafe anten yüksekliğiyle doğrusal olduğu için alçak montaj pahalıdır (ADR-0007).</li><li>Kırınım en kötü tek nokta üzerinden değil, bütün profil üzerinden hesaplanır: ITU-R P.526-15 §4.5.2, delta-Bullington. Kızılay&#x27;da bir bağlantının ortanca üç engeli var, en kötüsünün on altı (ADR-0053).</li><li>Zemin profili on metrede bir okunur. Sabit 64 örnekte 6,9 km&#x27;lik bir kırsal bağlantı 108 m&#x27;de bir okunuyordu ve kırınımı 37,60 dB yerine 31,28 dB veriyordu (ADR-0062).</li><li>Bir bağlantı yansımayla kırınımın toplamını değil, büyüğünü öder. İkisi de aynı yer parçasının aynı bağlantıya yaptığını anlatır; toplamak o yer parçasını iki kez faturalandırmaktır (ADR-0058).</li><li>Gölgeleme ikisinin üstüne eklenir ve genişliği yolun açık olup olmamasına bağlıdır: görüş hattı varken 4 dB, yokken 7,82 (3GPP TR 38.901). Tablo sekiz çekilişin havuzudur, tek bir çekilişin değil (ADR-0055, ADR-0061).</li></ul></section>
+<section><h2>Alışveriş ve kestirici</h2><ul><li>Bir menzil link bütçesinden okunmaz. İki telsiz çerçeve alışverişi yapar; SX1280&#x27;de SF10&#x27;da bir çift yönlü alışveriş 47,86 ms sürer.</li><li>Altı direğe karşı bir tur 239 ms sürer. Bu sürede 100 km/sa giden bir araç 6,7 m yol alır, yani bir turun menzilleri eşzamanlı değildir ve öyleymiş gibi çözülmez.</li><li>Kestirici gerçeği hiç görmez. Yalnızca gözlemleri görür: ölçülmüş mesafe, direğin ölçülmüş konumu, bir zaman damgası ve bir varyans (ADR-0003).</li><li>Hiçbir yerde yükseklik kısıtı yok. Yol kenarına dizilmiş direkler düşeyi neredeyse gözlenemez bırakır, ve VPE sütunu bunu gizlemek yerine bildirir (ADR-0011).</li></ul></section>
+<section><h2>Gürültü olmayan üç hata</h2><ul><li><strong>Engellenmiş bir yol uzun ölçer.</strong> Sinyal engelin üzerinden gider ve menzil o sapmayı zamanlar. Sapma her zaman pozitiftir, yani ortalamayla asla kaybolmaz.</li><li><strong>Etüt hatası kurulumun özelliğidir</strong>, direk başına bir kez çekilir ve tutulur. Tünelin HPE P50 değeri kusursuz etütte 0,24 m, 15 cm&#x27;lik etüt hatasında 1,76 m: direkleri ölçtüğünden daha iyi konumlanamazsın.</li><li><strong>Kaybolan bir paket hiçbir şey üretmez.</strong> Bant 2,4 GHz kablosuz ağlarla aynıdır; şehirde kayıp %15, açık yolda %5, tünelde sıfır (ADR-0019).</li></ul></section>
+<section><h2>Modellenmeyenler</h2><ul><li>IMU, odometri, harita kısıtı ve Kalman füzyonu yok. Rapordaki mimari bunları öngörüyor; buradaki sayılar yalnızca radyo menzil ölçümünden çözülmüş serbest 3B konumlardır.</li><li>Faz gürültüsü, çok yolluluk ve alışveriş sırasında saat sürüklenmesi modellenmiyor.</li><li>Tünelde dalga kılavuzu etkisi yok, yani tünel satırı gerçek bir tünelin vereceğinden azını gösterir.</li><li>Kullanılabilirlik yalnızca modellenen başarısızlıkları sayar: kapanmayan bağlantı, yetersiz menzil, oturmayan çözüm. Bir hizmet kullanılabilirliği değeri değildir ve GNSS satırlarına karşı öyle okunmamalıdır.</li></ul></section>
+</main>
+<footer><p>YERKON benzetimi. Sayılar yayımlanan koşudan gelir; yöntemi ve sınırları Yöntem sayfasında.</p></footer>
+</body>
+</html>

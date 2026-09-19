@@ -82,6 +82,10 @@ pytest
 
 ## Site
 
+**<https://ysoktar.github.io/yerkon/>**
+
+Ya da yerelde:
+
 ```bash
 yerkon view
 ```
@@ -100,6 +104,12 @@ yazdığı `src/yerkon/published.toml` dosyasından okuyor. O dosyayı
 `yerkon table --publish` yazıyor ve iki şeyi reddediyor: eksik bir tablo
 ve `--fast` ile yapılmış kaba bir okuma. Bir sınama sitede yayımlanan
 hiçbir hücrenin elle yazılmadığını söylüyor.
+
+Yayımlanan hâli `yerkon pages` ile yazılıyor: aynı sayfalar, iki dilde,
+`docs/` klasöründe duran sabit dosyalar olarak. Simülatör oraya gelmiyor,
+çünkü arkasında çalışan bir motor var; yerine ne olduğunu ve nasıl
+çalıştırılacağını söyleyen bir sayfa geliyor (ADR-0065). Klasörün
+sayfalarla aynı olduğunu bir sınama söylüyor.
 
 ## Simülatör
 

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What it rests on · YERKON</title>
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>A terrestrial positioning simulation</span></a>
+<nav class="pages"><a href="index.html">Home</a><a href="sorun.html">The problem</a><a href="sistem.html">The system</a><a href="yontem.html">Method</a><a href="sonuclar.html">Results</a><a href="kaynaklar.html" class="here">Sources</a></nav>
+<nav class="tongues"><a href="../kaynaklar.html">TR</a><a href="kaynaklar.html" class="here">EN</a></nav>
+<a class="run" href="simulasyon.html">Simulator →</a>
+</header>
+<main>
+<h1>What it rests on</h1>
+<p class="lead">A number comes from a datasheet, from a published measurement, or from an assumption written down. The third kind carries its own type in this project, so the ones nobody supplied can be counted.</p>
+<section><h2>How to reproduce it</h2><pre><code>pip install -e &quot;.[dev]&quot;
+yerkon table          # the published numbers, about 15 min
+yerkon table --fast   # about 1 min, not publishable
+yerkon view           # this site and the simulator</code></pre></section>
+<section><ul><li>The ground is baked into the package, so the table above reproduces with no network at all. The seed is fixed.</li></ul></section>
+<section><h2>Standards and data</h2><ul><li>ITU-R P.526-15 §4.5.2, delta Bullington diffraction.</li><li>ITU-R P.452 and P.1812: how loss is built up.</li><li>3GPP TR 38.901 Table 7.4.1-1: shadowing widths.</li><li>Copernicus DEM 30 m: ground heights.</li><li>OpenStreetMap and Overture: buildings and roadside furniture.</li><li>Semtech SX1280, EBYTE E28-2G4M27S and Qorvo DWM3000 datasheets.</li><li>DigiKey, LCSC and Mouser list prices, 6 September 2026.</li></ul></section>
+<section><h2>What the repository holds</h2><ul><li><code>CONTEXT.md</code> is the glossary: the name the code uses for each term beside the one the report uses.</li><li><code>docs/adr/</code> holds every decision and what it replaced.</li><li><code>docs/HANDOFF.md</code> holds the open questions and the figures still standing in for real ones.</li><li>The documents are in Turkish and the code is in English.</li></ul></section>
+<section><h2>The project</h2><ul><li>YERKON is an idea submitted to UDHAM&#x27;s “Ulaşan ve Erişen Türkiye 2053” inter-university competition, run by the Ministry of Transport and Infrastructure, July 2026.</li><li>The team, at TOBB University of Economics and Technology: Mustafa Göktürk Binay, Mehmet Gönül, Yavuz Selim Oktar (group representative).</li><li>This repository is not the report. It is the simulation that produces the YERKON block on page 15 of it.</li></ul></section>
+<section><h2>Code</h2><ul><li><a href="https://github.com/ysoktar/yerkon">Repository: github.com/ysoktar/yerkon</a></li></ul></section>
+</main>
+<footer><p>The YERKON simulation. The numbers come from the published run; the method and its limits are on the Method page.</p></footer>
+</body>
+</html>

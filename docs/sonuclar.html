@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dört satır · YERKON</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>Karasal konumlandırma benzetimi</span></a>
+<nav class="pages"><a href="index.html">Anasayfa</a><a href="sorun.html">Sorun</a><a href="sistem.html">Sistem</a><a href="yontem.html">Yöntem</a><a href="sonuclar.html" class="here">Sonuçlar</a><a href="kaynaklar.html">Kaynaklar</a></nav>
+<nav class="tongues"><a href="sonuclar.html" class="here">TR</a><a href="en/sonuclar.html">EN</a></nav>
+<a class="run" href="simulasyon.html">Simülasyon →</a>
+</header>
+<main>
+<h1>Dört satır</h1>
+<p class="lead">Raporun 15. sayfasına giren blok. Aşağıdaki sayılar yayımlanan koşunun çıktısıdır ve bu sayfa onları koşunun yazdığı dosyadan okur; sitede elle yazılmış bir tablo yok.</p>
+<section><div class="wide"><div class="scroll"><table><thead><tr><th>Sistem</th><th>Teknoloji</th><th>Ortam</th><th class="num">HPE P50 [m]</th><th class="num">HPE P95 [m]</th><th class="num">VPE P95 [m]</th><th class="num">Kullanılabilirlik</th><th class="num">Alan [km²]</th><th class="num">CAPEX [TL/km²]</th><th class="num">OPEX [TL/km²/yıl]</th></tr></thead><tbody><tr><td>YERKON (Şehir içi)</td><td>Karasal PNT (SX1280/LoRa TWR)</td><td>Dış</td><td class="num">2,46</td><td class="num">8,19</td><td class="num">63,44</td><td class="num">%79,88</td><td class="num">6,68</td><td class="num">23518</td><td class="num">10896</td></tr><tr><td>YERKON (Kırsal)</td><td>Karasal PNT (E28-SX1280 TWR)</td><td>Dış</td><td class="num">3,70</td><td class="num">22,72</td><td class="num">232,33</td><td class="num">%41,83</td><td class="num">143,75</td><td class="num">18618</td><td class="num">772</td></tr><tr><td>YERKON (Tünel)</td><td>Karasal PNT (UWB/DWM3000 TWR)</td><td>İç + dış</td><td class="num">1,84</td><td class="num">2,93</td><td class="num">7,53</td><td class="num">%99,99</td><td class="num">0,02</td><td class="num">4453423</td><td class="num">849511</td></tr><tr><td>YERKON Ağırlıklı Ortalama</td><td>Karasal PNT</td><td>İç + dış</td><td class="num">2,64</td><td class="num">13,44</td><td class="num">150,24</td><td class="num">%58,87</td><td class="num">60,84</td><td class="num">464548</td><td class="num">90708</td></tr></tbody></table></div><p class="under">2026-09-19 tarihinde defaults.toml okunarak koşuldu. Gölgeler 8 kez çekildi, zemin profili 10 m&#x27;de bir okundu. İlk üç sütun rapora giren adlardır ve çevrilmez.</p></div></section>
+<section><h2>Sütunlar ne demek</h2><table><thead><tr><th>Sütun</th><th>Anlamı</th></tr></thead><tbody><tr><td>HPE, VPE</td><td>Yatay ve düşey konum hatası, metre, belirtilen yüzdelikte, değerlendirilen yolculuklar üzerinden.</td></tr><tr><td>Kullanılabilirlik</td><td>Denenen sabitlemelerin geçerli bir konum üretenleri. Yalnızca modellenen başarısızlıkları sayar.</td></tr><tr><td>Alan</td><td>Bir konum üretmeye yetecek kadar direğin erişilebilir olduğu zemin, gerçek arazi üzerinde taranarak. Bir paketin ulaştığı zemin değildir.</td></tr><tr><td>CAPEX</td><td>Direk donanım maliyetinin hizmet alanına bölümü. Yalnızca donanım.</td></tr><tr><td>OPEX</td><td>km² başına yıllık işletme maliyeti. Rapor bu sütunu boş bırakır; buradaki değer adlandırılmış yinelenen kalemlerden gelir (ADR-0006).</td></tr></tbody></table></section>
+<section><h2>Tablonun söylemeden yapmayacağı üç şey</h2><ul><li><strong>Tünelin km² başına maliyeti diğer satırlarla karşılaştırılamaz.</strong> 2 km boyunca 12 m genişliğinde bir tünel yaklaşık iki yüz dönümdür; buna bölmek büyük bir sayıyı yargıyla değil aritmetikle üretir. Tünel bir çizgiye hizmet eder, bu yüzden güzergâh kilometresi başına maliyetle karşılaştırılır ve <code>yerkon table</code> o değeri satırın yanında yazar.</li><li><strong>Hizmet alanı, bir konumun alınabildiği yerdir</strong>, bir paketin ulaştığı yer değil. Kırsalda bir paket, konum alınabilen zeminin 2,6 katına ulaşır, ve notlar her seferinde ikisini de yazar (ADR-0012).</li><li><strong>Kırsal kullanılabilirliğe arazi ve turun uzunluğu karar verir.</strong> Tek bir kırsal bağlantı bile mesafe yüzünden düşmez; her başarısızlık zemin kaldırılsa kapanırdı. Daha çok direk yanlış içgüdüdür (ADR-0022).</li></ul></section>
+<section><h2>Hızlı okuma</h2><p>Simülasyondaki <strong>Hızlı dene</strong> düğmesi ve komut satırındaki <code>--fast</code> aynı iki figürü kabalaştırır: gölgeler sekiz yerine bir kez çekilir, profil 10 m yerine sabit 64 örnekle okunur. Koşu on beş dakikadan bir dakikaya iner.</p><p>İki kabalık da kaybı eksik okur, yani hızlı bir cevap yerleşimi kayırır: kırsal satırın P95&#x27;i 4,13 m iyimser çıkıyor. Bu yüzden hızlı okumada kötü görünen bir satır gerçekten kötüdür, ve bu sayfa yalnızca yayımlanan koşuyu gösterir (ADR-0063).</p></section>
+</main>
+<footer><p>YERKON benzetimi. Sayılar yayımlanan koşudan gelir; yöntemi ve sınırları Yöntem sayfasında.</p></footer>
+</body>
+</html>

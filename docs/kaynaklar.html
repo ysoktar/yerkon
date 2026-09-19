@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neye dayanıyor · YERKON</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>Karasal konumlandırma benzetimi</span></a>
+<nav class="pages"><a href="index.html">Anasayfa</a><a href="sorun.html">Sorun</a><a href="sistem.html">Sistem</a><a href="yontem.html">Yöntem</a><a href="sonuclar.html">Sonuçlar</a><a href="kaynaklar.html" class="here">Kaynaklar</a></nav>
+<nav class="tongues"><a href="kaynaklar.html" class="here">TR</a><a href="en/kaynaklar.html">EN</a></nav>
+<a class="run" href="simulasyon.html">Simülasyon →</a>
+</header>
+<main>
+<h1>Neye dayanıyor</h1>
+<p class="lead">Bir sayı ya bir veri sayfasından, ya yayımlanmış bir ölçümden, ya da açıkça yazılmış bir varsayımdan gelir. Üçüncüsü bu projede ayrı bir tip taşır, böylece hangi sayının kaynağı olmadığı sayılabilir.</p>
+<section><h2>Nasıl yeniden üretilir</h2><pre><code>pip install -e &quot;.[dev]&quot;
+yerkon table          # yayımlanan sayılar, ~15 dk
+yerkon table --fast   # denemek için, ~1 dk, yayımlanmaz
+yerkon view           # bu site ve simülatör</code></pre></section>
+<section><ul><li>Zemin pakete işlenmiştir, yani yukarıdaki tablo ağa hiç çıkmadan yeniden üretilir. Tohum sabittir.</li></ul></section>
+<section><h2>Standartlar ve veri</h2><ul><li>ITU-R P.526-15 §4.5.2, delta-Bullington kırınımı.</li><li>ITU-R P.452 ve P.1812: kaybın nasıl kurulduğu.</li><li>3GPP TR 38.901 Tablo 7.4.1-1: gölgeleme genişlikleri.</li><li>Copernicus DEM 30 m: zemin yükseklikleri.</li><li>OpenStreetMap ve Overture: binalar ve yol kenarı donanımı.</li><li>Semtech SX1280, EBYTE E28-2G4M27S ve Qorvo DWM3000 veri sayfaları.</li><li>DigiKey, LCSC ve Mouser liste fiyatları, 6 Eylül 2026.</li></ul></section>
+<section><h2>Depodaki belgeler</h2><ul><li><code>CONTEXT.md</code> sözlüktür: her terimin kodda kullanılan adı ve raporda kullanılan karşılığı.</li><li><code>docs/adr/</code> her kararı ve neyin yerine geçtiğini tutar.</li><li><code>docs/HANDOFF.md</code> açık soruları ve hâlâ vekil olan değerleri tutar.</li><li>Belgeler Türkçe, kod İngilizce.</li></ul></section>
+<section><h2>Proje</h2><ul><li>YERKON, Ulaştırma ve Altyapı Bakanlığı UDHAM&#x27;ın “Ulaşan ve Erişen Türkiye 2053” üniversiteler arası fikir yarışmasına sunulan bir fikirdir, Temmuz 2026.</li><li>Proje ekibi, TOBB Ekonomi ve Teknoloji Üniversitesi: Mustafa Göktürk Binay, Mehmet Gönül, Yavuz Selim Oktar (grup temsilcisi).</li><li>Bu depo raporun kendisi değil, raporun 15. sayfasındaki YERKON bloğunu üreten benzetimdir.</li></ul></section>
+<section><h2>Kod</h2><ul><li><a href="https://github.com/ysoktar/yerkon">Depo: github.com/ysoktar/yerkon</a></li></ul></section>
+</main>
+<footer><p>YERKON benzetimi. Sayılar yayımlanan koşudan gelir; yöntemi ve sınırları Yöntem sayfasında.</p></footer>
+</body>
+</html>

@@ -11,6 +11,9 @@ report's comparison table.
 measured and what it left out, the published table, and behind them the
 same engine drawn in three dimensions with every setting live.
 
+``pages`` writes that site out as a folder of files, without the
+simulator, for anywhere that serves files and runs nothing.
+
 ``defaults`` lists every figure the model needs that nobody supplied,
 what it affects, and what replacing it would move.
 
@@ -777,6 +780,45 @@ def view(argv: list[str] | None = None) -> int:
     return 0
 
 
+def pages(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon pages",
+        description=(
+            "Write the site out as a folder of files, for somewhere that "
+            "serves files and runs nothing. The simulator stays behind "
+            "because it needs the engine, and a page in its place says "
+            "where it is and how to start it."
+        ),
+    )
+    parser.add_argument(
+        "--into", default="docs", metavar="DIR",
+        help=(
+            "where to write them (default: %(default)s, which is the "
+            "folder GitHub Pages can serve a branch from)"
+        ),
+    )
+    args = parser.parse_args(argv)
+
+    from yerkon.published import read
+    from yerkon.viewer.pages import write_pages
+
+    try:
+        record = read()
+    except (OSError, ValueError, KeyError) as error:
+        # A public site whose results page says "no published run" is
+        # worse than no site.
+        print(
+            "there is no published run to draw: {}. Run `yerkon table "
+            "--publish` first.".format(error),
+            file=sys.stderr,
+        )
+        return 2
+    written = write_pages(args.into, record)
+    print("Wrote {} files into {}/".format(len(written), args.into))
+    print("The table on them is the run of {}.".format(record.run_on))
+    return 0
+
+
 def site(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon site",
@@ -1361,6 +1403,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon design [--region TR] [--mounting mast] [--tolerance 5]")
         print("  yerkon table  [--markdown] [--only rural] [--publish]")
         print("  yerkon view   [--port 8765]        # the site and the simulator")
+        print("  yerkon pages  [--into docs]        # the site as files")
         print("  yerkon site   [--corridor 12000] [--tolerance 5] [--ground polatli]")
         print("  yerkon budget [--only tunnel] [--source survey]")
         print("  yerkon deliver [--into docs/teslim] [--no-budget]")
@@ -1380,6 +1423,8 @@ def main(argv: list[str] | None = None) -> int:
         return view(rest)
     if verb == "site":
         return site(rest)
+    if verb == "pages":
+        return pages(rest)
     if verb == "budget":
         return budget(rest)
     if verb == "deliver":

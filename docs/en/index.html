@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The YERKON simulation · YERKON</title>
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>A terrestrial positioning simulation</span></a>
+<nav class="pages"><a href="index.html" class="here">Home</a><a href="sorun.html">The problem</a><a href="sistem.html">The system</a><a href="yontem.html">Method</a><a href="sonuclar.html">Results</a><a href="kaynaklar.html">Sources</a></nav>
+<nav class="tongues"><a href="../index.html">TR</a><a href="index.html" class="here">EN</a></nav>
+<a class="run" href="simulasyon.html">Simulator →</a>
+</header>
+<main>
+<h1>The YERKON simulation</h1>
+<p class="lead">YERKON is a proposed terrestrial layer that keeps producing a position when foreign satellite systems are jammed or spoofed. This site describes the simulation that measures what such a network delivers and what it costs, and runs it in the browser.</p>
+<section><div class="figures"><div class="figure"><b>2,64 m</b><span>Horizontal error, P50</span></div><div class="figure"><b>13,44 m</b><span>Horizontal error, P95</span></div><div class="figure"><b>%58,87</b><span>Availability</span></div><div class="figure"><b>60,84 km²</b><span>Service area</span></div></div><p class="under">The weighted row: 50% urban, 40% rural, 10% tunnel. It combines the three scenarios&#x27; raw per fix samples rather than their percentiles (ADR-0005).</p></section>
+<section><h2>One output</h2><p>This project produces one thing: the YERKON block of the comparison table on page 15 of the report, four rows and ten columns. Every number traces back to a datasheet, a published measurement, or an assumption written down where it can be argued with.</p><p>The numbers are the output of a run rather than a claim. You can start the same run yourself from the simulator, move an anchor, and watch what the answer does.</p></section>
+<section><h2>Three scenarios</h2><ul><li><strong>Urban</strong>: Kızılay, three kilometres of real ground on a side, SX1280 anchors bolted to lighting columns.</li><li><strong>Rural</strong>: the Polatlı plain, twenty kilometres on a side, E28-SX1280 on tall masts.</li><li><strong>Tunnel</strong>: a real two kilometre bore through the mountains at Kızılcahamam, DWM3000 UWB on brackets.</li></ul></section>
+<section><h2>Pages</h2><div class="cards"><a class="card" href="sorun.html"><b>The problem</b><span>Most positioning, navigation and timing comes from GPS, Galileo, GLONASS and BeiDou. All four are controlled by foreign states, and all four share one weakness: the signal is very weak by the time it reaches the ground.</span></a><a class="card" href="sistem.html"><b>The system</b><span>YERKON has three parts: broadcast units standing at surveyed positions, receivers that work out their own position, and a management system that keeps the identities current.</span></a><a class="card" href="yontem.html"><b>Method</b><span>This is a simulation rather than a field measurement. It states what it models and what it does not, because a table that can answer where a number came from is a different object from one that cannot.</span></a><a class="card" href="sonuclar.html"><b>Results</b><span>The block that goes into page 15 of the report. These numbers are the output of the published run, read from the file that run wrote. No table on this site was typed by hand.</span></a><a class="card" href="kaynaklar.html"><b>Sources</b><span>A number comes from a datasheet, from a published measurement, or from an assumption written down. The third kind carries its own type in this project, so the ones nobody supplied can be counted.</span></a></div></section>
+<section><h2>What these numbers are</h2><p>The simulation solves radio ranging and nothing else. There is no inertial unit, no odometry, no map constraint and no sensor fusion, all of which the report&#x27;s architecture calls for. So read these numbers as a floor rather than as a ceiling.</p></section>
+</main>
+<footer><p>The YERKON simulation. The numbers come from the published run; the method and its limits are on the Method page.</p></footer>
+</body>
+</html>

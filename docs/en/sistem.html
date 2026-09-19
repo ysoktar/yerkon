@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How YERKON is built · YERKON</title>
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>A terrestrial positioning simulation</span></a>
+<nav class="pages"><a href="index.html">Home</a><a href="sorun.html">The problem</a><a href="sistem.html" class="here">The system</a><a href="yontem.html">Method</a><a href="sonuclar.html">Results</a><a href="kaynaklar.html">Sources</a></nav>
+<nav class="tongues"><a href="../sistem.html">TR</a><a href="sistem.html" class="here">EN</a></nav>
+<a class="run" href="simulasyon.html">Simulator →</a>
+</header>
+<main>
+<h1>How YERKON is built</h1>
+<p class="lead">YERKON has three parts: broadcast units standing at surveyed positions, receivers that work out their own position, and a management system that keeps the identities current.</p>
+<section><h2>Three parts</h2><ul><li><strong>The broadcast unit.</strong> A low cost transmitter bolted to something already standing: a mast, a roadside unit, a traffic light, a tunnel light. It broadcasts its identity and its surveyed position.</li><li><strong>The receiver.</strong> In a vehicle or in a hand. It measures range against the units around it and works out where it is.</li><li><strong>The management system.</strong> It holds the public keys and identities, so a receiver will not accept an impostor.</li></ul></section>
+<section><h2>Why two way ranging</h2><p>TDoA needs the broadcast units synchronised to the nanosecond, which means atomic clocks and an IEEE 1588 PTP backbone. Two way ranging does not, because the time of flight comes out of a short exchange between the two ends.</p><p>The simulation measures that difference. An uncorrected 10 ppm clock offset costs 24,1 m one way and 0,3 mm two ways. The offset itself was measured at 0,0793 ppm, and it is the one figure in this project that is no longer a guess (ADR-0018).</p></section>
+<section><h2>The hardware and its price</h2><table><thead><tr><th>Product</th><th>Radio</th><th>Unit price at 100</th></tr></thead><tbody><tr><td>Urban broadcast unit</td><td>SX1280 + 2,4 GHz antenna</td><td>1366,07 TL</td></tr><tr><td>Rural broadcast unit</td><td>E28-2G4M27S</td><td>1082,68 TL</td></tr><tr><td>Critical area unit</td><td>DWM3000 UWB</td><td>1634,44 TL</td></tr><tr><td>Pedestrian receiver</td><td>SX1280 + DWM3000 + ESP32-S3</td><td>3117,74 TL</td></tr><tr><td>Vehicle receiver</td><td>SX1280 + DWM3000 + STM32</td><td>4002,29 TL</td></tr></tbody></table></section>
+<section><ul><li>Prices come from distributor list prices dated 6 September 2026, at the hundred unit break. Board manufacture and assembly, cabling, machining, test, certification, tax, shipping and installation are all outside them.</li><li>Both receivers carry an SX1280 and a DWM3000. That is what lets one unit range against urban anchors on the road and against tunnel anchors inside the bore, with nothing switched over (ADR-0014).</li></ul></section>
+</main>
+<footer><p>The YERKON simulation. The numbers come from the published run; the method and its limits are on the Method page.</p></footer>
+</body>
+</html>

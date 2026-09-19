@@ -356,6 +356,82 @@ def test_publishing_says_which_figures_the_run_read(tmp_path):
     assert read(written).source == "my.toml + rural-dense"
 
 
+# --- the site as files ----------------------------------------------------
+
+
+def test_the_folder_carries_both_languages_and_the_simulator_page(tmp_path):
+    from yerkon.viewer.pages import LOOSE_PAGES, write_pages
+
+    written = write_pages(tmp_path, a_record())
+    names = {str(path.relative_to(tmp_path)) for path in written}
+    assert "index.html" in names and "en/index.html" in names
+    assert "simulasyon.html" in names and "en/simulasyon.html" in names
+    assert "site.css" in names and ".nojekyll" in names
+    assert len(written) == 2 * len(LOOSE_PAGES) + 3
+
+
+def test_a_page_in_the_folder_points_at_files_that_are_there(tmp_path):
+    """Served, the links are addresses. Loose, they are file names, and
+    a folder served under /yerkon/ has no root to point at."""
+    written = write_pages_of(tmp_path)
+    for path in written:
+        if path.suffix != ".html":
+            continue
+        drawn = path.read_text(encoding="utf-8")
+        for reference in re.findall(r'(?:href|src)="([^"]+)"', drawn):
+            if reference.startswith("http"):
+                continue
+            assert not reference.startswith("/"), "{}: {}".format(
+                path.name, reference
+            )
+            assert (path.parent / reference).resolve().exists(), "{}: {}".format(
+                path.name, reference
+            )
+
+
+def write_pages_of(into):
+    from yerkon.viewer.pages import write_pages
+
+    return write_pages(into, a_record())
+
+
+def test_the_folder_in_the_repository_is_what_the_pages_draw_now(tmp_path):
+    """`docs/` is generated and committed, so it can go stale in a way
+    `published.toml` cannot: nothing runs to rebuild it.
+
+    Redrawn here and compared. A page edited without `yerkon pages`
+    being run fails, and so does a published run nobody redrew the site
+    for.
+    """
+    from yerkon.viewer.pages import write_pages
+
+    docs = ROOT / "docs"
+    written = write_pages(tmp_path, read())
+    stale = []
+    for path in written:
+        beside = docs / path.relative_to(tmp_path)
+        if not beside.exists() or beside.read_bytes() != path.read_bytes():
+            stale.append(str(path.relative_to(tmp_path)))
+    assert not stale, (
+        "these differ from what the pages draw now; run `yerkon pages`: "
+        "{}".format(", ".join(stale))
+    )
+
+
+def test_the_site_as_files_refuses_to_draw_a_table_that_is_not_there(tmp_path):
+    from yerkon.cli import pages as write_them
+
+    holder = tmp_path / "nothing.toml"
+    import yerkon.published as published
+
+    was, published.PUBLISHED = published.PUBLISHED, holder
+    try:
+        assert write_them(["--into", str(tmp_path / "out")]) == 2
+    finally:
+        published.PUBLISHED = was
+    assert not (tmp_path / "out").exists()
+
+
 # --- drawing --------------------------------------------------------------
 
 

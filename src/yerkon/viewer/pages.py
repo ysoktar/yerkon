@@ -21,6 +21,7 @@ measurement this repository records, with the decision it came from.
 from __future__ import annotations
 
 import html
+import pathlib
 import re
 from dataclasses import dataclass
 from typing import Optional, Sequence
@@ -70,6 +71,8 @@ class Part:
     #: and the comments beside them are not, so it is a phrase like the
     #: rest of the page rather than one string.
     code: Optional[Words] = None
+    #: A file beside the page, with what it shows.
+    picture: str = ""
     shows: str = ""
 
 
@@ -88,6 +91,50 @@ class Page:
 
 def _w(tr: str, en: str) -> Words:
     return Words(tr=tr, en=en)
+
+
+@dataclass(frozen=True)
+class Where:
+    """How one page names another.
+
+    A server answers `/sorun` and a folder of files answers
+    `sorun.html`, and that is the only thing the two disagree about.
+    Keeping it in one object means the pages are written once and the
+    static export is not a second copy of them (ADR-0065).
+    """
+
+    #: The language of the page doing the naming. Only the static export
+    #: needs it, because there each language is its own folder.
+    language: str = "tr"
+    #: A folder of files rather than a running server.
+    loose: bool = False
+
+    def page(self, page: "Page") -> str:
+        if not self.loose:
+            return "/" + page.slug
+        return self.file(page)
+
+    def tongue(self, page: "Page", code: str) -> str:
+        if not self.loose:
+            return "/{}?dil={}".format(page.slug, code)
+        if code == self.language:
+            return self.file(page)
+        return ("en/" if code == "en" else "../") + self.file(page)
+
+    def asset(self, name: str) -> str:
+        if not self.loose:
+            return "/" + name
+        return ("../" if self.language == "en" else "") + name
+
+    def simulator(self) -> str:
+        # Served, this is the simulator itself. Loose, it is the page
+        # that says the simulator runs on your own machine, because a
+        # folder of files cannot run a link budget.
+        return SIMULATOR if not self.loose else self.file(RUN)
+
+    @staticmethod
+    def file(page: "Page") -> str:
+        return "index.html" if not page.slug else page.slug + ".html"
 
 
 # --- what the site says ---------------------------------------------------
@@ -953,8 +1000,118 @@ SOURCES = Page(
     ),
 )
 
+RUN = Page(
+    slug="simulasyon",
+    nav=_w("Simülasyon", "Simulator"),
+    title=_w("Simülatör", "The simulator"),
+    lead=_w(
+        "Simülatör kendi makinende çalışır. Bir koşu üç işlemciyi "
+        "dakikalarca meşgul eder ve gerçek zemin verisini okur, yani "
+        "bir web sayfasının içinde durmaz. Kurulumu iki komut.",
+        "The simulator runs on your own machine. A run keeps three "
+        "processors busy for minutes and reads real terrain data, so it "
+        "does not live inside a web page. Two commands install it.",
+    ),
+    parts=(
+        Part(
+            kind="code",
+            code=_w(
+                "git clone https://github.com/ysoktar/yerkon\n"
+                "cd yerkon\n"
+                "pip install -e \".[dev]\"\n"
+                "yerkon view",
+                "git clone https://github.com/ysoktar/yerkon\n"
+                "cd yerkon\n"
+                "pip install -e \".[dev]\"\n"
+                "yerkon view",
+            ),
+        ),
+        Part(
+            kind="picture",
+            picture="simulator.png",
+            lines=(_w(
+                "Şehir içi satırı: Kızılay'ın gerçek zemini, aydınlatma "
+                "direklerine monte 36 yayın birimi, ve zemine boyanmış "
+                "kapsama taraması. Renkler kaç direğin eriştiğini "
+                "gösteriyor, ve bir konum için dört gerekiyor.",
+                "The urban row: the real ground at Kızılay, 36 broadcast "
+                "units on lighting columns, and the swept coverage painted "
+                "on the ground. The colours count how many anchors reach, "
+                "and a position needs four.",
+            ),),
+        ),
+        Part(
+            kind="points",
+            heading=_w("İçinde ne yapılır", "What it does"),
+            lines=(
+                _w(
+                    "Üç sekme, tablonun her satırı için biri. Üçü birden "
+                    "tutulur ve bir koşu ya tek satırı ya üçünü birden alır.",
+                    "Three tabs, one per row of the table. All three are "
+                    "held at once, and a run takes either the row you are "
+                    "on or all three.",
+                ),
+                _w(
+                    "Yetmiş iki ayarın hepsi canlı: gürültü katsayısı, "
+                    "direk aralığı, montaj yüksekliği, menzil toleransı. "
+                    "Başka bir ayarı zorlayan her değişiklik önce onay "
+                    "paneline düşer.",
+                    "Seventy two settings are live: the noise figure, the "
+                    "anchor spacing, the mounting height, the ranging "
+                    "tolerance. Any change that forces another setting goes "
+                    "to a confirmation panel first.",
+                ),
+                _w(
+                    "Direkler elle taşınır ve silinir. Yeni bir yer "
+                    "getirilir: bir sınır kutusu çiz, zemin Copernicus'tan, "
+                    "binalar OpenStreetMap'ten gelsin.",
+                    "Anchors are dragged and deleted by hand. New ground is "
+                    "fetched: draw a box, take the terrain from Copernicus "
+                    "and the buildings from OpenStreetMap.",
+                ),
+                _w(
+                    "**Hızlı dene** düğmesi bir koşuyu on beş dakikadan bir "
+                    "dakikaya indiriyor. Cevap yayımlanabilir değil ve sayfa "
+                    "bunu yanında yazıyor (ADR-0063).",
+                    "A **fast** button takes a run from fifteen minutes to "
+                    "one. The answer is not publishable and the page says so "
+                    "beside it (ADR-0063).",
+                ),
+            ),
+        ),
+        Part(
+            kind="text",
+            heading=_w("Neden burada değil", "Why it is not here"),
+            lines=(
+                _w(
+                    "Bu site sabit dosyalardan oluşuyor. Simülatörün "
+                    "arkasında Python bir motor var: link bütçesi, arazi "
+                    "profili, çekilişler ve çözücü. Yarısı çalışan bir "
+                    "kopyasını koymak çalışmayan bir kopyadan kötü olurdu.",
+                    "This site is a folder of files. Behind the simulator "
+                    "there is a Python engine: the link budget, the terrain "
+                    "profile, the draws and the solver. A half working copy "
+                    "of it would be worse than none.",
+                ),
+                _w(
+                    "Yukarıdaki dört satır o motorun çıktısıdır ve sayıları "
+                    "koşunun yazdığı dosyadan gelir. Aynı koşuyu kendin "
+                    "başlatabilirsin.",
+                    "The four rows on this site are that engine's output, "
+                    "read from the file a run wrote. You can start the same "
+                    "run yourself.",
+                ),
+            ),
+        ),
+    ),
+)
+
 #: Every page, in the order the navigation shows them.
 PAGES = (HOME, WHY, SYSTEM, METHOD, RESULTS, SOURCES)
+
+#: The static export carries one more: the simulator cannot be served
+#: from a folder of files, so something has to say where it is.
+LOOSE_PAGES = PAGES + (RUN,)
 
 #: Where the simulator lives, and what the link to it is called.
 SIMULATOR = "/simulasyon"
@@ -1038,25 +1195,32 @@ def render(
     page: Page,
     language: str = "tr",
     published=None,
+    where: Optional[Where] = None,
 ) -> str:
-    """One page as a whole HTML document."""
+    """One page as a whole HTML document.
+
+    ``where`` decides how the links are spelled. Left out, they are the
+    addresses a running server answers.
+    """
+    where = where or Where(language=language)
     body = [
-        _header(page, language),
+        _header(page, language, where),
         '<main>',
         '<h1>{}</h1>'.format(_said(page.title, language)),
         '<p class="lead">{}</p>'.format(_said(page.lead, language)),
     ]
     for part in page.parts:
-        body.append(_part(part, language, published))
+        body.append(_part(part, language, published, where))
     body += ['</main>', _footer(language)]
     return _document(
         title="{} · YERKON".format(_said(page.title, language)),
         language=language,
+        stylesheet=where.asset("site.css"),
         body="\n".join(body),
     )
 
 
-def _document(title: str, language: str, body: str) -> str:
+def _document(title: str, language: str, stylesheet: str, body: str) -> str:
     return (
         "<!doctype html>\n"
         '<html lang="{language}">\n'
@@ -1064,39 +1228,41 @@ def _document(title: str, language: str, body: str) -> str:
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         "<title>{title}</title>\n"
-        '<link rel="stylesheet" href="/site.css">\n'
+        '<link rel="stylesheet" href="{stylesheet}">\n'
         "</head>\n"
         "<body>\n{body}\n</body>\n</html>\n"
-    ).format(language=language, title=html.escape(title), body=body)
+    ).format(language=language, title=html.escape(title),
+             stylesheet=html.escape(stylesheet, quote=True), body=body)
 
 
-def _header(page: Page, language: str) -> str:
+def _header(page: Page, language: str, where: Where) -> str:
     links = []
     for other in PAGES:
-        where = "/" + other.slug
         here = ' class="here"' if other.slug == page.slug else ""
         links.append('<a href="{}"{}>{}</a>'.format(
-            where, here, _said(other.nav, language)
+            where.page(other), here, _said(other.nav, language)
         ))
     tongues = "".join(
-        '<a href="{}?dil={}"{}>{}</a>'.format(
-            "/" + page.slug, code, ' class="here"' if code == language else "",
-            label,
+        '<a href="{}"{}>{}</a>'.format(
+            where.tongue(page, code),
+            ' class="here"' if code == language else "", label,
         )
         for code, label in LANGUAGES
     )
     return (
         "<header>\n"
-        '<a class="brand" href="/"><b>YERKON</b> <span>{standfirst}</span></a>\n'
+        '<a class="brand" href="{home}"><b>YERKON</b> '
+        "<span>{standfirst}</span></a>\n"
         '<nav class="pages">{links}</nav>\n'
         '<nav class="tongues">{tongues}</nav>\n'
         '<a class="run" href="{simulator}">{label} →</a>\n'
         "</header>"
     ).format(
+        home=where.page(HOME),
         standfirst=_said(STANDFIRST, language),
         links="".join(links),
         tongues=tongues,
-        simulator=SIMULATOR,
+        simulator=where.simulator(),
         label=_said(SIMULATOR_LABEL, language),
     )
 
@@ -1105,7 +1271,7 @@ def _footer(language: str) -> str:
     return "<footer><p>{}</p></footer>".format(_said(FOOTER, language))
 
 
-def _part(part: Part, language: str, published) -> str:
+def _part(part: Part, language: str, published, where: Optional[Where] = None) -> str:
     heading = (
         "<h2>{}</h2>".format(_said(part.heading, language))
         if part.heading else ""
@@ -1136,14 +1302,23 @@ def _part(part: Part, language: str, published) -> str:
             for one in part.links
         ))
     elif part.kind == "map":
+        where = where or Where(language=language)
         drawn = "".join(
-            '<a class="card" href="/{}"><b>{}</b><span>{}</span></a>'.format(
-                other.slug, _said(other.nav, language),
+            '<a class="card" href="{}"><b>{}</b><span>{}</span></a>'.format(
+                where.page(other), _said(other.nav, language),
                 _said(other.lead, language),
             )
             for other in PAGES if other.slug
         )
         drawn = '<div class="cards">{}</div>'.format(drawn)
+    elif part.kind == "picture":
+        where = where or Where(language=language)
+        drawn = '<figure><img src="{}" alt="{}"><figcaption>{}</figcaption>' \
+            "</figure>".format(
+                html.escape(where.asset(part.picture), quote=True),
+                html.escape(part.lines[0].said(language), quote=True),
+                _said(part.lines[0], language),
+            )
     elif part.kind == "shows" and part.shows == "headline":
         drawn = _headline(published, language)
     elif part.kind == "shows" and part.shows == "published":
@@ -1214,6 +1389,49 @@ def _table(rows: Sequence[Sequence[str]], numeric_from: int = 99) -> str:
         out.append("</tr>")
     out.append("</tbody></table>")
     return "".join(out)
+
+
+# --- writing it out -------------------------------------------------------
+
+#: Files copied beside the pages rather than rendered.
+CARRIED = ("site.css", "simulator.png")
+
+STATIC = pathlib.Path(__file__).parent / "static"
+
+
+def write_pages(into, published=None) -> tuple:
+    """Draw the whole site into a folder, both languages.
+
+    For somewhere that serves files and runs nothing, GitHub Pages being
+    the one this was written for. The simulator does not come: it needs
+    the engine, and what comes instead is a page saying so (ADR-0065).
+
+    Turkish at the root and English under `en/`, because the report is
+    Turkish and whoever opens the address without asking for a language
+    should get the one the project is written in.
+    """
+    into = pathlib.Path(into)
+    (into / "en").mkdir(parents=True, exist_ok=True)
+    written = []
+    for code, _ in LANGUAGES:
+        folder = into if code == "tr" else into / code
+        where = Where(language=code, loose=True)
+        for page in LOOSE_PAGES:
+            path = folder / Where.file(page)
+            path.write_text(
+                render(page, code, published, where), encoding="utf-8"
+            )
+            written.append(path)
+    for name in CARRIED:
+        path = into / name
+        path.write_bytes((STATIC / name).read_bytes())
+        written.append(path)
+    # Without this the pages are handed to Jekyll, which is a static site
+    # generator this site is not written for.
+    marker = into / ".nojekyll"
+    marker.write_text("", encoding="utf-8")
+    written.append(marker)
+    return tuple(written)
 
 
 def _said(words: Words, language: str) -> str:

@@ -29,6 +29,9 @@ ayrılıyor ve üçü de bu komutları kırıyor.
 
 ## Buradan başla: site ve uygulama
 
+Site yayımda: **<https://ysoktar.github.io/yerkon/>**. Orada simülatör
+yok, çünkü arkasında çalışan bir motor var. Hepsi için:
+
 ```bash
 yerkon view
 ```

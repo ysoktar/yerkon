@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the simulation works · YERKON</title>
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>A terrestrial positioning simulation</span></a>
+<nav class="pages"><a href="index.html">Home</a><a href="sorun.html">The problem</a><a href="sistem.html">The system</a><a href="yontem.html" class="here">Method</a><a href="sonuclar.html">Results</a><a href="kaynaklar.html">Sources</a></nav>
+<nav class="tongues"><a href="../yontem.html">TR</a><a href="yontem.html" class="here">EN</a></nav>
+<a class="run" href="simulasyon.html">Simulator →</a>
+</header>
+<main>
+<h1>How the simulation works</h1>
+<p class="lead">This is a simulation rather than a field measurement. It states what it models and what it does not, because a table that can answer where a number came from is a different object from one that cannot.</p>
+<section><h2>The ground is real</h2><ul><li>All three rows stand on real ground near Ankara, fetched once from the Copernicus 30 m DEM and baked into the package, so a clone reproduces the table without touching the network (ADR-0008).</li><li>Kızılay carries 91 m of rise and fall, Polatlı 486 m of relief, and the tunnel drops 1,79% between its two portals.</li><li>Nowhere is there a flat option. A flat plane is not the most neutral surface this model can draw, it is the most flattering one (ADR-0021).</li></ul></section>
+<section><h2>One calculation decides a link</h2><ul><li>There is no maximum range constant anywhere. Range is a result rather than an input, and the same calculation decides both whether a link closes and how precisely it measures (ADR-0002).</li><li>The two ray ground reflection works even over flat ground: past the break distance the direct ray and the reflected one arrive out of phase and cancel, and because that distance scales with antenna height, mounting low is expensive (ADR-0007).</li><li>Diffraction comes from the whole profile rather than from its worst single point: ITU-R P.526-15 §4.5.2, delta Bullington. A link across Kızılay has three obstacles at the median and sixteen at the worst (ADR-0053).</li><li>The ground profile is read every ten metres. At a fixed 64 samples a 6,9 km rural link was read every 108 m, and it put diffraction at 31,28 dB where the answer is 37,60 (ADR-0062).</li><li>A link pays the larger of reflection and diffraction rather than their sum. Both describe what the same piece of ground does to the same link, and adding them bills that ground twice (ADR-0058).</li><li>Shadowing sits on top of both, and its width depends on whether the path is clear: 4 dB with line of sight, 7,82 without (3GPP TR 38.901). The table pools eight draws rather than showing one (ADR-0055, ADR-0061).</li></ul></section>
+<section><h2>The exchange and the estimator</h2><ul><li>A range is not read off a link budget. Two radios exchange frames, and on the SX1280 at SF10 one two way exchange takes 47,86 ms.</li><li>A round against six anchors takes 239 ms. A car doing 100 km/h covers 6,7 m in that time, so the ranges in one round are not simultaneous and are not solved as though they were.</li><li>The estimator never sees the truth. It sees observations: a measured distance, an anchor&#x27;s surveyed position, a timestamp and a variance (ADR-0003).</li><li>There is no height constraint anywhere. Anchors strung along a roadside leave the vertical barely observable, and the VPE column reports that instead of hiding it (ADR-0011).</li></ul></section>
+<section><h2>Three errors that are not noise</h2><ul><li><strong>A blocked path measures long.</strong> The signal goes over the obstacle and the range times that detour. The error is always positive, so averaging never removes it.</li><li><strong>A survey error belongs to an installation</strong>, drawn once per anchor and kept. The tunnel&#x27;s HPE P50 is 0,24 m with perfect survey and 1,76 m with 15 cm of it: you cannot position better than you surveyed.</li><li><strong>A lost packet produces nothing.</strong> The band is shared with 2,4 GHz wireless networks: 15% loss in the city, 5% on the open road, none in the tunnel (ADR-0019).</li></ul></section>
+<section><h2>What is left out</h2><ul><li>No inertial unit, no odometry, no map constraint, no Kalman fusion. The report&#x27;s architecture calls for them; these numbers are free 3D fixes solved from radio ranging alone.</li><li>Phase noise, multipath and drift during an exchange are not modelled.</li><li>There is no waveguide term in the tunnel, so that row understates what a real bore delivers.</li><li>Availability counts modelled failures only: a link that did not close, a round with too few ranges, a solve that did not settle. It is not a service availability figure and should not be read against the GNSS rows as though it were.</li></ul></section>
+</main>
+<footer><p>The YERKON simulation. The numbers come from the published run; the method and its limits are on the Method page.</p></footer>
+</body>
+</html>
