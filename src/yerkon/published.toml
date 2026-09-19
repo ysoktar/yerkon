@@ -52,17 +52,3 @@ area_km2 = 0.024
 capex_tl_per_km2 = 4453423.3333
 opex_tl_per_km2_year = 849511.25
 assumed_share = 0.8202
-
-[[row]]
-key = "weighted"
-system = "YERKON Ağırlıklı Ortalama"
-technology = "Karasal konumlandırma"
-environment = "İç + dış"
-hpe_p50_m = 2.6385
-hpe_p95_m = 13.442
-vpe_p95_m = 150.2381
-availability = 0.5887
-area_km2 = 60.8441
-capex_tl_per_km2 = 464548.4624
-opex_tl_per_km2_year = 90707.7106
-assumed_share = 0.8708
