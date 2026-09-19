@@ -5,8 +5,15 @@
 # that folder is what the pages draw, which makes the bytes on the
 # address the same bytes somebody reviewed in the diff.
 #
-# `enablement: true` turns Pages on if it is off, so that switching the
-# site on is a push rather than somebody finding a setting.
+# One setting has to be made by hand, once: Settings > Pages > Source >
+# GitHub Actions. `enablement: true` is here to do it instead, and it
+# cannot: creating a Pages site needs admin on the repository and the
+# workflow's own token tops out at write. It stays because it costs
+# nothing and does work where the token has more, and because a run that
+# fails saying "Create Pages site failed" is a clearer signpost than a
+# run that says nothing.
+#
+# After that setting, every push that touches docs/ deploys.
 name: Pages
 
 on:

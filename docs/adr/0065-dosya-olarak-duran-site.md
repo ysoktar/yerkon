@@ -39,9 +39,16 @@ komut. Yarısı çalışan bir kopya hiç olmayandan kötü olurdu.
 duran baytlar, diff'te okunan baytlar oluyor.
 
 **Yayına bir iş akışı sokuyor**, `docs/` değiştiğinde çalışıp o klasörü
-olduğu gibi yükleyerek. Hiçbir şey kurmuyor ve hiçbir şey üretmiyor;
-`actions/configure-pages` gerekirse Pages'i kendisi açıyor, yani siteyi
-yayına almak bir ayar bulmak değil bir push.
+olduğu gibi yükleyerek. Hiçbir şey kurmuyor ve hiçbir şey üretmiyor.
+
+Bir ayar elle yapılıyor, bir kez: Settings, Pages, Source, GitHub
+Actions. `actions/configure-pages`'in `enablement: true` seçeneği bunu
+onun yerine yapmak için konuldu ve yapamadı: bir Pages sitesi kurmak
+depo üzerinde admin istiyor, iş akışının kendi jetonu ise write'ta
+bitiyor. Denendi, kayıt burada: "Create Pages site failed. Error:
+Resource not accessible by integration". Seçenek yerinde kalıyor, çünkü
+jetonun daha fazlasını taşıdığı yerde çalışıyor ve böyle söyleyerek
+düşen bir koşu hiçbir şey söylemeyenden iyi.
 
 **Ve eskiyebilir**, `published.toml`'un eskiyemeyeceği şekilde: onu bir
 koşu yazıyor, bunu hiçbir şey yeniden yazmıyor. O yüzden bir sınama
@@ -79,3 +86,5 @@ için yeni bir şey açılmıyor.
 şey bunu hatırlatmıyor.
 
 **Özel alan adı yok.** Site depo adını taşıyor.
+
+**İlk ayar elle.** Yukarıda. Ondan sonrası push.

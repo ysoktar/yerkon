@@ -103,7 +103,10 @@ and a coarse `--fast` reading. A test says no published cell was typed
 into the site.
 
 `yerkon pages` writes the published copy: the same pages, both
-languages, as static files under `docs/`. The simulator does not come
+languages, as static files under `docs/`. `.github/workflows/pages.yml`
+puts that folder on the address as it stands; the repository's Pages
+source has to have been set to **GitHub Actions** once, and after that
+it is a push. The simulator does not come
 with them, because it has a running engine behind it; what comes instead
 is a page saying where it is and how to start it (ADR-0065). A test says
 the folder matches what the pages draw.

@@ -106,7 +106,9 @@ ve `--fast` ile yapılmış kaba bir okuma. Bir sınama sitede yayımlanan
 hiçbir hücrenin elle yazılmadığını söylüyor.
 
 Yayımlanan hâli `yerkon pages` ile yazılıyor: aynı sayfalar, iki dilde,
-`docs/` klasöründe duran sabit dosyalar olarak. Simülatör oraya gelmiyor,
+`docs/` klasöründe duran sabit dosyalar olarak. `.github/workflows/pages.yml`
+o klasörü olduğu gibi yayına koyuyor; deponun Pages kaynağı bir kez
+**GitHub Actions** yapılmış olmalı, gerisi push. Simülatör oraya gelmiyor,
 çünkü arkasında çalışan bir motor var; yerine ne olduğunu ve nasıl
 çalıştırılacağını söyleyen bir sayfa geliyor (ADR-0065). Klasörün
 sayfalarla aynı olduğunu bir sınama söylüyor.
