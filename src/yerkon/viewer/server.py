@@ -361,7 +361,8 @@ class Handler(BaseHTTPRequestHandler):
         # for a slider on the noise figure (ADR-0064).
         if path in (SIMULATOR, SIMULATOR + "/"):
             return self._file("simulator.html", "text/html; charset=utf-8")
-        if path in ("/app.js", "/draw.js", "/words.js", "/map.js"):
+        if path in ("/app.js", "/draw.js", "/words.js", "/map.js",
+                    "/theme.js"):
             return self._file(path.lstrip("/"), "text/javascript; charset=utf-8")
         if path == "/favicon.ico":
             self.send_response(204)
@@ -369,6 +370,9 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path in ("/style.css", "/site.css"):
             return self._file(path.lstrip("/"), "text/css; charset=utf-8")
+        if path in ("/road.png", "/gnss.png", "/architecture.png",
+                    "/simulator.png"):
+            return self._file(path.lstrip("/"), "image/png")
         if path == "/api/figures":
             return self._json(lambda: figures(self.session.read()))
         if path == "/api/figures.toml":

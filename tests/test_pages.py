@@ -130,15 +130,19 @@ def test_the_site_links_to_nothing_the_server_does_not_serve():
     routing = (ROOT / "src/yerkon/viewer/server.py").read_text(encoding="utf-8")
     wanted = set()
     for page in PAGES:
-        wanted |= set(re.findall(r'href="([^"]+)"', render(page, "tr")))
+        drawn = render(page, "tr")
+        wanted |= set(re.findall(r'(?:href|src)="([^"]+)"', drawn))
     for reference in sorted(wanted):
         if reference.startswith("http"):
             continue
         address = reference.split("?")[0]
         if address == SIMULATOR:
             assert (STATIC / "simulator.html").exists()
-        elif address.endswith(".css") or address.endswith(".js"):
+        elif address.rsplit(".", 1)[-1] in ("css", "js", "png"):
+            # On disk, and routed: a picture the server does not serve is
+            # a broken image on a page that otherwise looks finished.
             assert (STATIC / address.lstrip("/")).exists(), reference
+            assert '"{}"'.format(address) in routing, reference
         else:
             assert page_at(address) is not None, reference
     assert '"/site.css"' in routing
@@ -168,7 +172,7 @@ def a_record(**changes) -> Published:
     for at, key in enumerate(EVERY_ROW):
         rows.append(Row(
             system="YERKON ({})".format(key),
-            technology="Karasal PNT",
+            technology="Karasal konumlandırma",
             environment="Dış",
             hpe_p50_m=90.0 + at,
             hpe_p95_m=91.0 + at,
@@ -359,15 +363,17 @@ def test_publishing_says_which_figures_the_run_read(tmp_path):
 # --- the site as files ----------------------------------------------------
 
 
-def test_the_folder_carries_both_languages_and_the_simulator_page(tmp_path):
-    from yerkon.viewer.pages import LOOSE_PAGES, write_pages
+def test_the_folder_carries_both_languages_and_every_page(tmp_path):
+    from yerkon.viewer.pages import CARRIED, write_pages
 
     written = write_pages(tmp_path, a_record())
     names = {str(path.relative_to(tmp_path)) for path in written}
     assert "index.html" in names and "en/index.html" in names
-    assert "simulasyon.html" in names and "en/simulasyon.html" in names
+    # The page that says where the simulation runs, since a folder of
+    # files cannot run it.
+    assert "benzetim.html" in names and "en/benzetim.html" in names
     assert "site.css" in names and ".nojekyll" in names
-    assert len(written) == 2 * len(LOOSE_PAGES) + 3
+    assert len(written) == 2 * len(PAGES) + len(CARRIED) + 1
 
 
 def test_a_page_in_the_folder_points_at_files_that_are_there(tmp_path):
@@ -416,6 +422,14 @@ def test_the_folder_in_the_repository_is_what_the_pages_draw_now(tmp_path):
         "these differ from what the pages draw now; run `yerkon pages`: "
         "{}".format(", ".join(stale))
     )
+    # And nothing the pages no longer draw. A page that was renamed
+    # leaves its file behind, and the address keeps serving it.
+    drawn = {path.relative_to(tmp_path) for path in written}
+    for folder in ("", "en"):
+        for found in (docs / folder).glob("*.html"):
+            assert found.relative_to(docs) in drawn, (
+                "{} is not a page any more; run `yerkon pages`".format(found)
+            )
 
 
 def test_the_site_as_files_refuses_to_draw_a_table_that_is_not_there(tmp_path):

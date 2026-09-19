@@ -86,15 +86,19 @@ Or locally:
 yerkon view
 ```
 
-Opens a local site: what YERKON is, where GNSS breaks, the hardware and
-its price, what the simulation models and what it leaves out, the four
-published rows, and what they rest on. Six pages, both languages, with a
-button into the simulator on every one and a link back on the
-simulator's own panel (ADR-0064).
+Opens a local site. Eight pages in the report's own order: what YERKON
+proposes, where GNSS breaks, the architecture and the hardware prices,
+the four research questions and the pilot, what it is for and how it
+could pay for itself, the published table, what the simulation models
+and leaves out, and the sources. A button into the simulator on every
+page, and a link back on the simulator's own panel (ADR-0064,
+ADR-0067).
 
-The language belongs to the person rather than to the page: switch to
-English on the site, walk into the simulator, and the panel is in
-English.
+Every page is in both languages, and the language belongs to the person
+rather than to the page: switch to English on the site, walk into the
+simulator, and the panel is in English. There are two palettes; the page
+follows the reader's system setting and the button in the header
+overrides it.
 
 The results page reads the table from `src/yerkon/published.toml`, which
 a run wrote, rather than from a copy somebody typed. `yerkon table
@@ -105,9 +109,10 @@ into the site.
 `yerkon pages` writes the published copy: the same pages, both
 languages, as static files under `docs/`. `.github/workflows/pages.yml`
 copies that folder onto the root of the `gh-pages` branch, which is
-what Pages serves, so publishing is a push. The simulator does not come
-with them, because it has a running engine behind it; what comes instead
-is a page saying where it is and how to start it (ADR-0065). A test says
+what Pages serves, so publishing is a push. The simulator itself does not come
+with them, because it has a running engine behind it. On the published
+site the button goes to the simulation page, which says how to start it
+(ADR-0065). A test says
 the folder matches what the pages draw.
 
 ## The simulator
@@ -340,10 +345,10 @@ yerkon table --fast   # for trying things, ~54 s, not publishable
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
+| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal konumlandırma | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone

@@ -5,21 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why GNSS is not enough · YERKON</title>
 <link rel="stylesheet" href="../site.css">
+<script src="../theme.js" defer></script>
 </head>
 <body>
 <header>
-<a class="brand" href="index.html"><b>YERKON</b> <span>A terrestrial positioning simulation</span></a>
-<nav class="pages"><a href="index.html">Home</a><a href="sorun.html" class="here">The problem</a><a href="sistem.html">The system</a><a href="yontem.html">Method</a><a href="sonuclar.html">Results</a><a href="kaynaklar.html">Sources</a></nav>
-<nav class="tongues"><a href="../sorun.html">TR</a><a href="sorun.html" class="here">EN</a></nav>
-<a class="run" href="simulasyon.html">Simulator →</a>
+<a class="brand" href="index.html"><b>YERKON</b> <span>A terrestrial positioning backup layer</span></a>
+<nav class="pages"><a href="index.html">Home</a><a href="sorun.html" class="here">The problem</a><a href="sistem.html">The system</a><a href="arge.html">Research</a><a href="fayda.html">What it is for</a><a href="sonuclar.html">Results</a><a href="benzetim.html">The simulation</a><a href="kaynaklar.html">Sources</a></nav>
+<nav class="tongues"><a href="../sorun.html">TR</a><a href="sorun.html" class="here">EN</a><button class="theme" id="theme" type="button" hidden></button></nav>
+<a class="run" href="benzetim.html">Simulator →</a>
 </header>
 <main>
 <h1>Why GNSS is not enough</h1>
-<p class="lead">Most positioning, navigation and timing comes from GPS, Galileo, GLONASS and BeiDou. All four are controlled by foreign states, and all four share one weakness: the signal is very weak by the time it reaches the ground.</p>
-<section><h2>Where it breaks</h2><ul><li>The signal is lost in tunnels, indoors and in urban canyons.</li><li>A weak signal is easy to jam, and jamming equipment keeps getting cheaper.</li><li>A spoofed signal produces a wrong position, and the receiver reports it as a consistent one with high confidence.</li><li>Critical services depend on a single family of technology.</li><li>In a crisis, nobody in Turkey decides what the system does.</li></ul></section>
-<section><h2>What has already happened</h2><ul><li><strong>United States, May 2026.</strong> An air ambulance out of Roswell flew into military GPS jamming and hit a mountain short of Ruidoso.</li><li><strong>The Baltic, April 2024.</strong> Finnair stopped flying to Tartu for a month. The airport had only a GPS based approach.</li><li><strong>Norway, 2019 onwards.</strong> Steady jamming over Finnmark has repeatedly blinded police, ambulance and rescue navigation.</li><li><strong>The Black Sea, 2017.</strong> Receivers on more than twenty ships put them at an airport 40 km inland while they were at sea.</li></ul></section>
-<section><h2>What YERKON answers</h2><p>YERKON does not try to replace GNSS. It produces an independent position from units bolted to transport infrastructure that is already standing. It is useful while GNSS works too: put the two answers side by side and spoofing becomes visible.</p><p>The four events above are sourced in the report&#x27;s bibliography. This page summarises what the report says; this repository measured none of them.</p></section>
+<p class="lead">Most positioning, navigation and timing comes from GPS, Galileo, GLONASS and BeiDou. The dependency goes past vehicle navigation: emergency response, public fleets, telecommunications networks, electrical systems and logistics all sit on it.</p>
+<section><figure><img src="../gnss.png" alt="All four are controlled by foreign states, and all four share one weakness. The signal is very weak by the time it reaches the ground."><figcaption>All four are controlled by foreign states, and all four share one weakness. The signal is very weak by the time it reaches the ground.</figcaption></figure></section>
+<section><h2>Where it breaks</h2><ul><li>The signal is lost in tunnels, indoors and in urban canyons.</li><li>A weak signal is open to jamming, and electronic warfare equipment keeps spreading.</li><li>A spoofed signal produces a wrong position, and the receiver reports it as a consistent one with high confidence. That is what makes it dangerous.</li><li>Critical services depend on a single family of technology.</li><li>In a crisis, the authority over the system is not in Turkey.</li></ul></section>
+<section><h2>What has already happened</h2><ul><li><strong>United States, May 2026.</strong> An air ambulance out of Roswell flew into military GPS jamming and hit a mountain short of Ruidoso.</li><li><strong>The Baltic, April 2024.</strong> Finnair stopped flying to Tartu for a month. Two airliners lost the signal on approach and turned back to Helsinki, and the airport closed for weeks because its only approach system was GPS based.</li><li><strong>Norway, 2019 onwards.</strong> Steady jamming from the Kola Peninsula has repeatedly blinded police, ambulance and rescue navigation in Finnmark. During one snowstorm a missing person&#x27;s emergency beacon failed and the rescue helicopters flew blind.</li><li><strong>The Black Sea, 2017.</strong> Receivers on more than twenty commercial ships put them at an airport 40 km inland while they were at sea.</li></ul></section>
+<section><h2>What YERKON answers</h2><p>The rural unit&#x27;s eight kilometre reach can be read at low altitude, and the critical area installation gives an airport an independent terrestrial network even with the satellites deafened. These are the report&#x27;s claims, and this repository measured none of them in the field.</p><p>Against spoofing YERKON is more than a backup. Vehicles and ships can compare the satellite solution with the terrestrial one and see that they are under attack. The four events above are sourced in the report&#x27;s bibliography.</p></section>
 </main>
-<footer><p>The YERKON simulation. The numbers come from the published run; the method and its limits are on the Method page.</p></footer>
+<footer><p>YERKON is a project submitted to the UDHAM idea competition of the Ministry of Transport and Infrastructure. The numbers in the table come from the simulation&#x27;s published run, and what it does not model is written on the simulation page.</p></footer>
 </body>
 </html>

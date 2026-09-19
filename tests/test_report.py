@@ -26,7 +26,7 @@ from yerkon.scenarios import ALL, RURAL, TUNNEL, URBAN
 def a_row(**overrides):
     fields = dict(
         system="YERKON (test)",
-        technology="Karasal PNT",
+        technology="Karasal konumlandırma",
         environment="Dış",
         hpe_p50_m=2.5,
         hpe_p95_m=8.0,

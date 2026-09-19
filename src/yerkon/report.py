@@ -241,7 +241,7 @@ def weighted(results: Sequence[Result]) -> Row:
 
     return Row(
         system=WEIGHTED_ROW,
-        technology="Karasal PNT",
+        technology="Karasal konumlandırma",
         environment="İç + dış",
         hpe_p50_m=hpe_p50,
         hpe_p95_m=hpe_p95,

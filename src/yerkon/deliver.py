@@ -74,7 +74,8 @@ def _header(title: str, settings: Settings) -> str:
     """
     return (
         "# {}\n\n"
-        "*YERKON — karasal PNT yedeği. {} tarihinde, {} sayıdan üretildi; "
+        "*YERKON, karasal konumlandırma yedeği. {} tarihinde, {} sayıdan "
+        "üretildi; "
         "bunların %{}'i hâlâ kimsenin sağlamadığı bir değere dayanıyor.*\n"
     ).format(
         title,

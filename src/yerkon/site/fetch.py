@@ -1328,7 +1328,7 @@ class TileImagery:
     cache_directory: str = "sites/_tiles"
     #: Sent on every request. Most tile servers refuse an unnamed client,
     #: and refusing back is the polite half of the arrangement.
-    user_agent: str = "yerkon/1.0 (terrestrial PNT study)"
+    user_agent: str = "yerkon/1.0 (terrestrial positioning study)"
 
     def image_for(self, bounds: BoundingBox) -> Aerial:
         try:

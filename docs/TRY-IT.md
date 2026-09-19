@@ -36,11 +36,16 @@ yok, çünkü arkasında çalışan bir motor var. Hepsi için:
 yerkon view
 ```
 
-**Artık bir anasayfa açıyor** (bu yeni). Altı sayfa: YERKON ne, GNSS
-nerede kırılıyor, donanım ve fiyatı, benzetim neyi modelleyip neyi
-modellemiyor, yayımlanan dört satır ve neye dayandıkları. Sağ üstteki
-**Simülasyon** düğmesi uygulamayı açıyor, panelin sol üstündeki bağlantı
-geri getiriyor (ADR-0064).
+**Artık bir anasayfa açıyor** (bu yeni). Sekiz sayfa, raporun
+bölümleriyle aynı sırada: YERKON ne öneriyor, GNSS nerede kırılıyor,
+mimari ve donanım fiyatları, dört araştırma sorusu ile pilot, sektör
+faydası ve ticarileşme, yayımlanan tablo, benzetimin neyi modelleyip
+neyi modellemediği, ve kaynaklar. Sağ üstteki **Simülasyon** düğmesi
+uygulamayı açıyor, panelin sol üstündeki bağlantı geri getiriyor
+(ADR-0064, ADR-0067).
+
+Başlıkta bir palet düğmesi var. Sayfa sistem ayarını izliyor, düğme onu
+eziyor, ve seçim tarayıcıda kalıyor.
 
 Sonuçlar sayfasındaki tablo elle yazılmadı: `yerkon table --publish`
 koştuğu şeyi `src/yerkon/published.toml` dosyasına yazıyor ve sayfa onu

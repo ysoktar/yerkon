@@ -90,14 +90,17 @@ Ya da yerelde:
 yerkon view
 ```
 
-Yerel bir site açar: YERKON'un ne olduğu, GNSS'in nerede kırıldığı,
-donanım ve fiyatı, benzetimin neyi modelleyip neyi modellemediği,
-yayımlanan dört satır, ve neye dayandıkları. Altı sayfa, ikisi de iki
-dilde, ve sayfanın sağ üstündeki düğme simülatöre giriyor; simülatörün
-panelindeki bağlantı geri getiriyor (ADR-0064).
+Yerel bir site açar. Sekiz sayfa, raporun bölümleriyle aynı sırada:
+YERKON ne öneriyor, GNSS nerede kırılıyor, mimari ve donanım fiyatları,
+dört araştırma sorusu ile pilot, sektör faydası ve ticarileşme,
+yayımlanan tablo, benzetimin neyi modelleyip neyi modellemediği, ve
+kaynaklar. Sağ üstteki düğme simülatöre giriyor, simülatörün panelindeki
+bağlantı geri getiriyor (ADR-0064, ADR-0067).
 
-Dil sayfanın değil okuyanın özelliği: sitede İngilizceye geçip
-simülatöre giren biri İngilizce bir panel buluyor.
+Her sayfa iki dilde, ve dil sayfanın değil okuyanın özelliği: sitede
+İngilizceye geçip simülatöre giren biri İngilizce bir panel buluyor.
+İki palet var; sayfa okuyanın sistem ayarını izliyor ve başlıktaki düğme
+onu eziyor.
 
 Sonuç sayfası tabloyu elle yazılmış bir kopyadan değil, koşunun kendi
 yazdığı `src/yerkon/published.toml` dosyasından okuyor. O dosyayı
@@ -108,9 +111,9 @@ hiçbir hücrenin elle yazılmadığını söylüyor.
 Yayımlanan hâli `yerkon pages` ile yazılıyor: aynı sayfalar, iki dilde,
 `docs/` klasöründe duran sabit dosyalar olarak. `.github/workflows/pages.yml`
 o klasörü `gh-pages` dalının köküne kopyalıyor ve Pages orayı sunuyor,
-yani yayımlamak bir push. Simülatör oraya gelmiyor,
-çünkü arkasında çalışan bir motor var; yerine ne olduğunu ve nasıl
-çalıştırılacağını söyleyen bir sayfa geliyor (ADR-0065). Klasörün
+yani yayımlamak bir push. Simülatörün kendisi oraya gelmiyor,
+çünkü arkasında çalışan bir motor var; yayımlanan sitede düğme benzetim
+sayfasına gidiyor ve o sayfa nasıl çalıştırılacağını söylüyor (ADR-0065). Klasörün
 sayfalarla aynı olduğunu bir sınama söylüyor.
 
 ## Simülatör
@@ -341,10 +344,10 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
+| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal konumlandırma | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir

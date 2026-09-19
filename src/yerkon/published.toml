@@ -12,7 +12,7 @@ profile_spacing_m = 10
 [[row]]
 key = "urban"
 system = "YERKON (Şehir içi)"
-technology = "Karasal PNT (SX1280/LoRa TWR)"
+technology = "Karasal konumlandırma (SX1280/LoRa TWR)"
 environment = "Dış"
 hpe_p50_m = 2.4637
 hpe_p95_m = 8.186
@@ -27,7 +27,7 @@ assumed_share = 0.7862
 [[row]]
 key = "rural"
 system = "YERKON (Kırsal)"
-technology = "Karasal PNT (E28-SX1280 TWR)"
+technology = "Karasal konumlandırma (E28-SX1280 TWR)"
 environment = "Dış"
 hpe_p50_m = 3.7024
 hpe_p95_m = 22.7159
@@ -42,7 +42,7 @@ assumed_share = 0.9891
 [[row]]
 key = "tunnel"
 system = "YERKON (Tünel)"
-technology = "Karasal PNT (UWB/DWM3000 TWR)"
+technology = "Karasal konumlandırma (UWB/DWM3000 TWR)"
 environment = "İç + dış"
 hpe_p50_m = 1.8426
 hpe_p95_m = 2.9271
@@ -56,7 +56,7 @@ assumed_share = 0.8202
 [[row]]
 key = "weighted"
 system = "YERKON Ağırlıklı Ortalama"
-technology = "Karasal PNT"
+technology = "Karasal konumlandırma"
 environment = "İç + dış"
 hpe_p50_m = 2.6385
 hpe_p95_m = 13.442

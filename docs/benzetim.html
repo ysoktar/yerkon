@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benzetim · YERKON</title>
+<link rel="stylesheet" href="site.css">
+<script src="theme.js" defer></script>
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>Karasal konumlandırma yedek katmanı</span></a>
+<nav class="pages"><a href="index.html">Anasayfa</a><a href="sorun.html">Sorun</a><a href="sistem.html">Sistem</a><a href="arge.html">AR-GE</a><a href="fayda.html">Fayda</a><a href="sonuclar.html">Sonuçlar</a><a href="benzetim.html" class="here">Benzetim</a><a href="kaynaklar.html">Kaynaklar</a></nav>
+<nav class="tongues"><a href="benzetim.html" class="here">TR</a><a href="en/benzetim.html">EN</a><button class="theme" id="theme" type="button" hidden></button></nav>
+<a class="run" href="benzetim.html">Simülasyon →</a>
+</header>
+<main>
+<h1>Benzetim</h1>
+<p class="lead">Benzetim bu projenin bir parçası, tamamı değil. Tek bir işi vardı: karşılaştırma tablosunun dört YERKON satırını tahminle değil, her sayısı izlenebilir bir modelle doldurmak. Sahada ölçüm değildir.</p>
+<section><figure><img src="simulator.png" alt="Şehir içi satırı: Kızılay&#x27;ın gerçek zemini, aydınlatma direklerine monte 36 yayın birimi, ve zemine boyanmış kapsama taraması. Renkler kaç birimin eriştiğini gösteriyor, ve bir konum için dört gerekiyor."><figcaption>Şehir içi satırı: Kızılay&#x27;ın gerçek zemini, aydınlatma direklerine monte 36 yayın birimi, ve zemine boyanmış kapsama taraması. Renkler kaç birimin eriştiğini gösteriyor, ve bir konum için dört gerekiyor.</figcaption></figure></section>
+<section><h2>Zemin gerçek</h2><ul><li>Üç satır da gerçek Ankara zemininin üzerinde durur. Zemin Copernicus 30 m DEM&#x27;inden bir kez getirilip paketin içine işlenmiştir, yani bir klon tabloyu ağa hiç çıkmadan yeniden üretir.</li><li>Şehir Kızılay&#x27;dır, bir kenarı üç kilometre ve 91 m iniş çıkışla. Açık arazi Polatlı ovasıdır, bir kenarı yirmi kilometre ve 486 m rölyefle. Tünel Kızılcahamam&#x27;daki dağların içinden geçen gerçek bir 2 km&#x27;lik güzergâhtır.</li><li>Hiçbir yerde düz zemin seçeneği yok. Düz bir düzlem bu modelin çizebileceği en tarafsız değil en elverişli yüzeydir.</li></ul></section>
+<section><h2>Bir bağlantıya tek bir hesap karar verir</h2><ul><li>Azami menzil diye bir sabit yok. Menzil bir girdi değil, link bütçesinin sonucudur, ve aynı hesap bağlantının kapanıp kapanmadığına da ne kadar hassas ölçtüğüne de karar verir.</li><li>İki ışınlı zemin yansıması düz zeminde bile çalışır: kırılma mesafesinin ötesinde doğrudan ışınla zeminden yansıyan ışın ters fazda gelip birbirini götürür, ve o mesafe anten yüksekliğiyle doğrusal olduğu için alçak montaj pahalıdır.</li><li>Kırınım en kötü tek nokta üzerinden değil, bütün profil üzerinden hesaplanır: ITU-R P.526-15 §4.5.2, delta-Bullington. Kızılay&#x27;da bir bağlantının ortanca üç engeli var, en kötüsünün on altı.</li><li>Zemin profili on metrede bir okunur. Sabit 64 örnekte 6,9 km&#x27;lik bir kırsal bağlantı 108 m&#x27;de bir okunuyordu ve kırınımı 37,60 dB yerine 31,28 dB veriyordu.</li><li>Bir bağlantı yansımayla kırınımın toplamını değil, büyüğünü öder. İkisi de aynı yer parçasının aynı bağlantıya yaptığını anlatır, ve toplamak o yer parçasını iki kez faturalandırmaktır.</li><li>Gölgeleme ikisinin üstüne eklenir ve genişliği yolun açık olup olmamasına bağlıdır: görüş hattı varken 4 dB, yokken 7,82 (3GPP TR 38.901). Tablo sekiz çekilişin havuzudur, tek bir çekilişin değil.</li></ul></section>
+<section><h2>Alışveriş ve kestirici</h2><ul><li>Bir menzil link bütçesinden okunmaz. İki telsiz çerçeve alışverişi yapar, ve SX1280&#x27;de SF10&#x27;da bir çift yönlü alışveriş 47,86 ms sürer.</li><li>Altı birime karşı bir tur 239 ms sürer. Bu sürede 100 km/sa giden bir araç 6,7 m yol alır, yani bir turun menzilleri eşzamanlı değildir ve öyleymiş gibi çözülmez.</li><li>Kestirici gerçeği hiç görmez. Yalnızca gözlemleri görür: ölçülmüş mesafe, birimin ölçülmüş konumu, bir zaman damgası ve bir varyans.</li><li>Hiçbir yerde yükseklik kısıtı yok. Yol kenarına dizilmiş birimler düşeyi neredeyse gözlenemez bırakır, ve VPE sütunu bunu gizlemek yerine bildirir.</li></ul></section>
+<section><h2>Gürültü olmayan üç hata</h2><ul><li><strong>Engellenmiş bir yol uzun ölçer.</strong> Sinyal engelin üzerinden gider ve menzil o sapmayı zamanlar. Sapma her zaman pozitiftir, yani ortalamayla asla kaybolmaz.</li><li><strong>Etüt hatası kurulumun özelliğidir</strong>, birim başına bir kez çekilir ve tutulur. Tünelin HPE P50 değeri kusursuz etütte 0,24 m, 15 cm&#x27;lik etüt hatasında 1,76 m: birimleri ölçtüğünden daha iyi konumlanamazsın.</li><li><strong>Kaybolan bir paket hiçbir şey üretmez.</strong> Bant 2,4 GHz kablosuz ağlarla aynıdır: şehirde kayıp %15, açık yolda %5, tünelde sıfır.</li></ul></section>
+<section><h2>Modellenmeyenler</h2><ul><li>IMU, odometri, harita kısıtı ve Kalman füzyonu yok. Rapordaki mimari bunları öngörüyor; buradaki sayılar yalnızca radyo menzil ölçümünden çözülmüş serbest 3B konumlardır.</li><li>Faz gürültüsü, çok yolluluk ve alışveriş sırasında saat sürüklenmesi modellenmiyor.</li><li>Tünelde dalga kılavuzu etkisi yok, yani tünel satırı gerçek bir tünelin vereceğinden azını gösterir.</li><li>Güvenlik katmanı da yok. İmza doğrulaması ve anahtar yönetimi mimarinin parçası, benzetimin değil.</li></ul></section>
+<section><h2>Kendi makinende</h2><p>Benzetim bir web sayfasının içinde durmaz. Bir koşu üç işlemciyi dakikalarca meşgul eder ve gerçek zemin verisini okur. Kurulumu dört komut, ve açılan sayfada her ayar canlıdır: birimler elle taşınır, yeni bir yer getirilir, ve üç satır da yeniden koşar.</p></section>
+<section><pre><code>git clone https://github.com/ysoktar/yerkon
+cd yerkon
+pip install -e &quot;.[dev]&quot;
+yerkon view</code></pre></section>
+</main>
+<footer><p>YERKON, Ulaştırma ve Altyapı Bakanlığı UDHAM fikir yarışmasına sunulan bir proje. Tablodaki sayılar benzetimin yayımlanan koşusundan gelir, ve neyi modellemediği Benzetim sayfasında yazıyor.</p></footer>
+</body>
+</html>
