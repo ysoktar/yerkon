@@ -34,10 +34,14 @@ arazi profili, çekilişler, çözücü. Yerine ne olduğunu söyleyen bir
 sayfa geliyor: bir ekran görüntüsü, içinde ne yapıldığı, ve dört
 komut. Yarısı çalışan bir kopya hiç olmayandan kötü olurdu.
 
-**Klasör depoda duruyor.** Pages bir dalın `/docs` klasörünü sunabiliyor
-ve bu depo için varsayılan dal zaten çalışılan dal, yani CI kurmadan
-yayımlanıyor. Üretilmiş bir dosyayı depoya koymak `published.toml` ile
-aynı karar.
+**Klasör depoda duruyor.** Üretilmiş bir dosyayı depoya koymak
+`published.toml` ile aynı karar, ve burada bir faydası daha var: adreste
+duran baytlar, diff'te okunan baytlar oluyor.
+
+**Yayına bir iş akışı sokuyor**, `docs/` değiştiğinde çalışıp o klasörü
+olduğu gibi yükleyerek. Hiçbir şey kurmuyor ve hiçbir şey üretmiyor;
+`actions/configure-pages` gerekirse Pages'i kendisi açıyor, yani siteyi
+yayına almak bir ayar bulmak değil bir push.
 
 **Ve eskiyebilir**, `published.toml`'un eskiyemeyeceği şekilde: onu bir
 koşu yazıyor, bunu hiçbir şey yeniden yazmıyor. O yüzden bir sınama
@@ -63,8 +67,13 @@ değişimi. 404 yok, sayfa hatası yok.
 
 ## Yapılmayanlar
 
-**CI yok.** `yerkon pages` elle çalıştırılıyor. Sınama unutulduğunu
-söylüyor ama kendisi yazmıyor.
+**`yerkon pages` elle çalıştırılıyor.** İş akışı klasörü yayına alıyor
+ama yeniden çizmiyor. Sınama unutulduğunu söylüyor, kendisi yazmıyor.
+
+**Yayımlanan kökte sitenin dosyaları dışında bir şeyler de var.**
+`docs/` zaten `HANDOFF.md`, `TRY-IT.md`, `WINDOWS.md` ve `adr/`
+taşıyordu, ve bunlar da adresten okunabiliyor. Depo herkese açık olduğu
+için yeni bir şey açılmıyor.
 
 **Ekran görüntüsü elle alındı.** Model değişse de aynı kalır, ve hiçbir
 şey bunu hatırlatmıyor.
