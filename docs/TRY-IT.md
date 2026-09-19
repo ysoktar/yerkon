@@ -644,6 +644,7 @@ seçenek olarak kaydetsin.
 
 ```bash
 yerkon table                  # dört satır             ~15 dk 33 sn
+yerkon table --fast           # denemek için, yayımlanmaz      ~54 sn
 yerkon budget                 # hata dağılımı           ~4 dk
 yerkon budget --only tunnel   #                         ~45 sn
 yerkon options                # adlandırılmış yerleşimler
@@ -667,10 +668,33 @@ bağlantının zemin profili **on metrede bir** okunuyor, çünkü 64 sabit
 örnek 6,9 km'lik bir kırsal bağlantıyı 108 m'de bir okuyordu ve
 kırınımı 6,32 dB eksik veriyordu (ADR-0062).
 
-İkisi de geri alınabilir. `site.shadow_draws` değerini 1 yapmak tek
-çekilişe indiriyor, `site.profile_spacing_m` değerini 0 yapmak sabit 64
-örneğe. İkisi birden yaklaşık yetmiş saniye, ve yayımlanamayacak bir
-yüzdelik.
+**İkisi birden `--fast` ile kalkıyor: 15 dk 33 sn yerine 54 saniye.**
+
+```bash
+yerkon table --fast
+```
+
+Sayfada da var: sonuç panelinin yanındaki **Hızlı dene** düğmesi. Basınca
+düğme yanıyor ve panele bir satır geliyor, hangi iki okumanın kabalaştığını
+yazan. Tekrar basınca geri dönüyor. Şehir satırında sayfadaki koşu 39,5
+sn'den 12,0 sn'ye iniyor.
+
+Bayrak da düğme de aynı iki figürü değiştiriyor, yani elle de
+yapılabilir: `site.shadow_draws` 1, `site.profile_spacing_m` 0. Uyarı
+figürlere bakıyor, düğmeye değil, yani elle yapan da aynı şeyi görüyor.
+
+**Hızlı okuma iyimser.** İki kabalık da kaybı eksik okuyor, yani hızlı bir
+cevap yerleşimi kayırıyor:
+
+| | yayımlanan (15 dk 33 sn) | hızlı (54 sn) |
+|---|---|---|
+| Şehir P95 | 8,19 m | 7,20 m |
+| Kırsal P95 | 22,72 m | 18,59 m |
+| Kırsal kullanılabilirlik | %41,83 | %52,00 |
+| Ağırlıklı P95 | 13,44 m | 11,89 m |
+
+Yani hızlı okumada kötü görünen bir satır gerçekten kötüdür; iyi görünen
+bir satır için yavaşını koşmak gerekir.
 
 **Sayfa da sekizini havuzluyor, ama önce birini gösteriyor.**
 "Simülasyonu çalıştır"a basınca ilk çekiliş hemen çıkar ve panelde

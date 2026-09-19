@@ -419,6 +419,22 @@ export const SAY = {
   "result.run": { tr: "Simülasyonu çalıştır", en: "Run the simulation" },
   "result.running": { tr: "Çalışıyor…", en: "Running…" },
   "result.reset": { tr: "Sıfırla", en: "Reset" },
+  // The fidelity toggle. Not a deployment choice, so it sits beside Run
+  // rather than among the ready-made options (ADR-0063).
+  "result.hurry": { tr: "Hızlı dene", en: "Try it fast" },
+  "result.hurry.on": { tr: "Hızlı: açık", en: "Fast: on" },
+  "result.hurried": {
+    tr: "Bu sayılar hızlı okundu, yayımlanacak olanlar değil",
+    en: "read fast, and not the published figures",
+  },
+  "result.hurried.draws": {
+    tr: "gölgeler sekiz yerine bir kez çekiliyor",
+    en: "the shadows are drawn once rather than eight times",
+  },
+  "result.hurried.profile": {
+    tr: "profil 10 m yerine sabit 64 örnekle okunuyor",
+    en: "the profile is read at a fixed 64 samples rather than every 10 m",
+  },
   "result.anchors": { tr: "Direk sayısı", en: "Anchors" },
   "result.units": { tr: "Alıcı sayısı", en: "Receivers" },
   "result.round": { tr: "Tur süresi", en: "Round" },

@@ -250,3 +250,54 @@ value = 20.0''',
     rebuilt = catalogue(load(write(tmp_path, text)))
     column = rebuilt["urban"].scenario.deployment.anchors[0].mounting
     assert float(column.height_m.value) == 20.0
+
+
+# --- Reading it coarsely, for trying things (ADR-0063) --------------------
+
+
+def test_the_fast_figures_are_the_two_that_decide_how_long_a_run_takes():
+    """And nothing about what the run is *about*.
+
+    A fast mode that changed the model would be a different study
+    wearing the same name. These two change how finely the same model is
+    read, and both are reversible.
+    """
+    from yerkon.settings import DEFAULTS, HURRIED, hurried
+
+    assert set(HURRIED) == {"site.shadow_draws", "site.profile_spacing_m"}
+
+    quick = hurried()
+    for key, value in HURRIED.items():
+        assert DEFAULTS.number(key) != value, "{} already there".format(key)
+        assert quick.number(key) == value
+
+    # Every other figure is untouched: a fast run prices the same
+    # deployment over the same ground. Compared through `sourced` rather
+    # than `number`, because some entries hold a name.
+    moved = [key for key in DEFAULTS.entries
+             if DEFAULTS.sourced(key).value != quick.sourced(key).value]
+    assert sorted(moved) == sorted(HURRIED)
+
+
+def test_fast_is_recognised_from_the_figures_not_from_who_set_them():
+    """Somebody who edits the draws to one by hand has a fast run and
+    has to be told so, exactly like somebody who pressed the button."""
+    from yerkon.settings import DEFAULTS, hurried, is_hurried
+
+    assert not is_hurried(DEFAULTS)
+    assert is_hurried(hurried())
+    by_hand = DEFAULTS.with_values({"site.shadow_draws": 1.0})
+    assert is_hurried(by_hand), "one of the two is enough to be coarse"
+
+
+def test_fast_applies_over_a_settings_file_rather_than_replacing_it():
+    """`--defaults` holding somebody's real quotations and `--fast`
+    holding a coarse reading compose. Replacing would throw the
+    quotations away and quietly price a different deployment."""
+    from yerkon.settings import DEFAULTS, hurried
+
+    theirs = DEFAULTS.with_values({"mounting.tall_mast.site_cost_tl": {
+        "value": 999.0, "source": "a real quotation"}})
+    quick = hurried(theirs)
+    assert quick.number("mounting.tall_mast.site_cost_tl") == 999.0
+    assert quick.number("site.shadow_draws") == 1.0

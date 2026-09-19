@@ -94,6 +94,81 @@ def test_the_table_verb_can_leave_the_notes_out(capsys):
     assert "Notes:" not in printed
 
 
+# --- Reading it coarsely, for trying things (ADR-0063) ------------------
+
+
+@pytest.mark.slow
+def test_fast_runs_the_same_study_read_coarsely_and_says_so(capsys):
+    """The whole point of the flag is that it is not publishable, so the
+    line saying that is checked rather than the speed, which a busy
+    machine would make flaky."""
+    from yerkon.cli import table
+
+    assert table(["--only", "tunnel", "--fast"]) == 0
+    printed = capsys.readouterr().out
+    assert "Sistem" in printed
+    assert "read coarsely for speed" in printed
+    assert "not the published ones" in printed
+    # Which way it is wrong, not only that it is.
+    assert "flatters the deployment" in printed
+
+
+@pytest.mark.slow
+def test_a_run_that_is_not_fast_says_nothing_about_being_coarse(capsys):
+    """Otherwise the warning is furniture and stops being read."""
+    from yerkon.cli import table
+
+    assert table(["--only", "tunnel"]) == 0
+    assert "read coarsely for speed" not in capsys.readouterr().out
+
+
+@pytest.mark.slow
+def test_turning_the_notes_off_does_not_turn_the_warning_off(capsys):
+    """It is about the table above rather than about what the table
+    rests on, so `--no-notes` does not take it with them."""
+    from yerkon.cli import table
+
+    assert table(["--only", "tunnel", "--fast", "--no-notes"]) == 0
+    said = capsys.readouterr()
+    assert "Notes:" not in said.out
+    assert "read coarsely for speed" in said.err
+
+
+def test_fast_reaches_the_figures_the_run_uses():
+    """Through the one funnel every verb takes its settings from, so a
+    verb added later gets the flag by taking that funnel."""
+    import argparse
+
+    from yerkon.cli import _settings_from
+    from yerkon.settings import is_hurried
+
+    plain = argparse.Namespace(defaults=None, option=None, fast=False)
+    assert _settings_from(plain) is None
+
+    quick = argparse.Namespace(defaults=None, option=None, fast=True)
+    assert is_hurried(_settings_from(quick))
+
+
+def test_fast_wins_over_a_file_that_set_the_same_figures(tmp_path):
+    """Asking for speed and being given a quarter of an hour anyway is
+    the one thing this flag must not do, so it is applied last."""
+    import argparse
+
+    from yerkon.cli import _settings_from
+    from yerkon.settings import DEFAULTS, is_hurried
+
+    slow = tmp_path / "slow.toml"
+    slow.write_text(DEFAULTS.with_values({
+        "site.shadow_draws": 8.0, "site.profile_spacing_m": 10.0,
+    }).to_toml(), encoding="utf-8")
+
+    asked = argparse.Namespace(defaults=str(slow), option=None, fast=False)
+    assert not is_hurried(_settings_from(asked))
+
+    asked.fast = True
+    assert is_hurried(_settings_from(asked))
+
+
 # --- The defaults verb --------------------------------------------------
 
 

@@ -300,7 +300,8 @@ of Turkish highway.
 ## The table
 
 ```bash
-yerkon table
+yerkon table          # the published figures, ~15 min 33 s
+yerkon table --fast   # for trying things, ~54 s, not publishable
 ```
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |

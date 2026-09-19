@@ -1147,6 +1147,9 @@ function fillControls() {
   drawRuns();
   drawUnits();
   drawSummary();
+  // However the figures got there: the button, a hand edit, a preset,
+  // or clearing the overrides.
+  drawHurry();
 }
 
 /* ---------- the six steps, each collapsed to its own state ----------
@@ -1429,6 +1432,21 @@ function wireControls() {
   };
 
   document.getElementById("run").onclick = runSimulation;
+  document.getElementById("hurry").onclick = async () => {
+    const overrides = Object.assign({}, state.overrides);
+    if (hurrying()) {
+      for (const key of Object.keys(HURRIED)) delete overrides[key];
+    } else {
+      Object.assign(overrides, HURRIED);
+    }
+    // The figures decide how long a run takes, so the answer on screen
+    // was worked out under the other setting and no longer describes
+    // what pressing Run would give.
+    simulated = null;
+    await edit({ overrides }, false).catch(e => flash(e.message, true));
+    drawHurry();
+    showNumbers(latest, simulated);
+  };
   document.getElementById("reset").onclick = async () => {
     const { state: fresh } = await ask("/api/reset", {});
     state = fresh;
@@ -2125,6 +2143,7 @@ function showNumbers(drawn, result, pending) {
   const rows = [];
 
   const warn = say("result.assumed_share");
+  const hurried = say("result.hurry");
 
   rows.push([say("result.anchors"), drawn.anchors.length]);
   // Per group, because a UWB bracket and a mast on one corridor do not
@@ -2165,6 +2184,19 @@ function showNumbers(drawn, result, pending) {
                  done < wanted ? say("result.draws.first", { done, wanted })
                                : say("result.draws.pooled", { wanted })]);
     }
+    // Above the figures it applies to, and named so the reader knows
+    // which of the two coarse readings is in force rather than only
+    // that something is (ADR-0063).
+    if (hurrying()) {
+      const given_up = [];
+      if (Number(state.overrides["site.shadow_draws"]) === 1) {
+        given_up.push(say("result.hurried.draws"));
+      }
+      if (Number(state.overrides["site.profile_spacing_m"]) === 0) {
+        given_up.push(say("result.hurried.profile"));
+      }
+      rows.push([hurried, `${say("result.hurried")}: ${given_up.join(", ")}`]);
+    }
     rows.push([say("result.hpe50"), `${tr(result.hpe_p50_m)} m`]);
     rows.push([say("result.hpe95"), `${tr(result.hpe_p95_m)} m`]);
     rows.push([say("result.vpe95"), `${tr(result.vpe_p95_m)} m`]);
@@ -2182,7 +2214,8 @@ function showNumbers(drawn, result, pending) {
   // one. The names stay, because a panel whose rows come and go moves
   // under the reader.
   list.innerHTML = rows.map(([name, value]) =>
-    `<dt>${name}</dt><dd${name === warn ? ' class="warn"' : ""}>`
+    `<dt>${name}</dt><dd${name === warn || name === hurried
+      ? ' class="warn"' : ""}>`
     + `${pending ? WORKING : value}</dd>`
   ).join("");
 }
@@ -3191,6 +3224,32 @@ function scheduleSweep() {
       if (mine === sweepWanted) flash(error.message, true);
     }
   }, 250);
+}
+
+/* ---------- reading it coarsely, for trying things ----------
+ *
+ * Two figures decide how long a run takes rather than what it is about,
+ * and both are reversible: the model does not change, it is read more
+ * coarsely. Kept here as the page's copy of `settings.HURRIED`, and a
+ * test pins the two against each other so they cannot drift (ADR-0063).
+ */
+const HURRIED = { "site.shadow_draws": 1, "site.profile_spacing_m": 0 };
+
+/* Whether the figures on screen are the coarse ones, however they got
+ * that way. Asked of the figures rather than of the button, so a person
+ * who edits the draws to one by hand is told the same thing. */
+function hurrying() {
+  const set = state && state.overrides ? state.overrides : {};
+  return Object.entries(HURRIED).some(([key, value]) =>
+    key in set && Number(set[key]) === value);
+}
+
+function drawHurry() {
+  const button = document.getElementById("hurry");
+  if (!button) return;
+  const on = hurrying();
+  button.textContent = say(on ? "result.hurry.on" : "result.hurry");
+  button.classList.toggle("on", on);
 }
 
 //: Which press of the button the answers on screen belong to.

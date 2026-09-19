@@ -67,7 +67,14 @@ from yerkon.design import (
 )
 from yerkon.numbers import decimal_comma, readable
 from yerkon.parallel import workers
-from yerkon.report import as_breakdown, as_markdown, as_text, build, footnotes
+from yerkon.report import (
+    as_breakdown,
+    as_markdown,
+    as_text,
+    build,
+    coarsely_read,
+    footnotes,
+)
 from yerkon.scenarios import (
     CHOICES as SCENARIO_CHOICES,
     SITES,
@@ -472,6 +479,15 @@ def _add_defaults_flag(parser: argparse.ArgumentParser) -> None:
             "rates. See `yerkon defaults`."
         ),
     )
+    parser.add_argument(
+        "--fast", action="store_true",
+        help=(
+            "read the ground coarsely and draw the shadows once, for "
+            "trying things: about a minute instead of about a quarter "
+            "of an hour. The answer is not publishable and every "
+            "command that takes this says so beside it."
+        ),
+    )
 
 
 def _settings_from(args):
@@ -483,13 +499,18 @@ def _settings_from(args):
     denser grid compose, instead of one silently discarding the other.
     """
     from yerkon.options import settings_for
-    from yerkon.settings import load
+    from yerkon.settings import hurried, load
 
     settings = load(args.defaults) if args.defaults else None
     name = getattr(args, "option", None)
-    if not name:
-        return settings
-    return settings_for(name, settings)
+    if name:
+        settings = settings_for(name, settings)
+    # Last, so it wins over a file or an option that set these: asking
+    # for speed and being given a quarter of an hour anyway is the one
+    # thing this flag must not do.
+    if getattr(args, "fast", False):
+        settings = hurried(settings)
+    return settings
 
 
 def table(argv: list[str] | None = None) -> int:
@@ -580,6 +601,13 @@ def table(argv: list[str] | None = None) -> int:
     if not args.no_notes:
         print()
         print(footnotes(results, rows, arrangements))
+    else:
+        # The notes carry this, and with them turned off it still has to
+        # be said: it is about the table above rather than about what
+        # the table rests on.
+        hurried = coarsely_read(results)
+        if hurried:
+            print("\n" + hurried, file=sys.stderr)
     return 0
 
 

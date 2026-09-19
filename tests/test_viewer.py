@@ -2549,3 +2549,52 @@ def test_the_card_says_which_disc_the_search_used():
         spot = words.index('"{}"'.format(key))
         assert "tr:" in words[spot:spot + 420], key
         assert "en:" in words[spot:spot + 420], key
+
+
+# --- Reading it coarsely, for trying things (ADR-0063) --------------------
+
+
+def test_the_page_and_the_engine_agree_on_what_fast_means():
+    """Two copies of the same pair, because the page holds no physics
+    and cannot import the engine's. If they drift, the button sets
+    figures the engine does not recognise as coarse and the warning row
+    stops appearing beside numbers that earned it."""
+    import re
+
+    from yerkon.settings import HURRIED
+
+    application = read_app_js()
+    written = re.search(r"const HURRIED = \{([^}]*)\}", application)
+    assert written, "the page lost its copy of the fast figures"
+    on_the_page = dict(re.findall(r'"([\w.]+)":\s*(-?[\d.]+)',
+                                  written.group(1)))
+    assert {k: float(v) for k, v in on_the_page.items()} == dict(HURRIED)
+
+
+def test_the_button_is_beside_run_rather_than_among_the_options():
+    """A ready-made option is a deployment choice. This is not one: it
+    changes how finely the same deployment is read, so putting it in
+    that list would file it as something it is not."""
+    markup = (STATIC / "index.html").read_text(encoding="utf-8")
+    readout = markup[markup.index('<section id="readout">'):]
+    readout = readout[:readout.index("</section>")]
+    assert 'id="hurry"' in readout
+    assert 'id="run"' in readout
+
+
+def test_the_panel_says_it_is_coarse_whoever_made_it_coarse():
+    """Keyed off the figures rather than off the button, so a hand edit
+    is told the same thing."""
+    application = read_app_js()
+    reader = application[application.index("function hurrying()"):]
+    reader = reader[:reader.index("\n}\n")]
+    assert "state.overrides" in reader
+    assert "HURRIED" in reader
+
+    panel = application[application.index("function showNumbers("):]
+    panel = panel[:panel.index("\n}\n")]
+    assert "hurrying()" in panel
+    assert 'say("result.hurried")' in panel
+    # And it names which of the two, not only that something is coarse.
+    assert 'say("result.hurried.draws")' in panel
+    assert 'say("result.hurried.profile")' in panel

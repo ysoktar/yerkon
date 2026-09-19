@@ -361,6 +361,45 @@ def _anchor_mix(deployment) -> str:
     )
 
 
+def coarsely_read(results: Sequence[Result]) -> str:
+    """What a run gave up for speed, or nothing where it gave up nothing.
+
+    Read off what actually ran rather than off what was asked for, so a
+    settings file that happens to carry these figures says the same
+    thing as `--fast` does.
+    """
+    if not results:
+        return ""
+    first = results[0]
+    given_up = []
+    if int(getattr(first.deployed, "shadow_draws", 1)) <= 1:
+        given_up.append(
+            "the shadows are drawn once rather than pooled over eight, and "
+            "one draw put the open-country row's ninety-fifth percentile "
+            "anywhere between 14,6 and 279,6 m (ADR-0055)"
+        )
+    spacing = getattr(first.deployed.scenario.terrain, "profile_spacing_m", 0.0)
+    if not spacing:
+        given_up.append(
+            "the ground profile is read at a fixed 64 samples rather than "
+            "every 10 m, which on a 6,9 km link is a reading every 108 m "
+            "and reads diffraction 6,32 dB low (ADR-0062)"
+        )
+    if not given_up:
+        return ""
+    # Which way it is wrong, not only that it is. Both coarse readings
+    # understate loss, so a fast run flatters the system: over the
+    # shipped rows it read the open-country percentile 18,59 m against
+    # the published 22,72 and its availability %52,00 against %41,83.
+    # A row that looks bad read fast really is bad (ADR-0063).
+    return (
+        "These numbers were read coarsely for speed and are not the "
+        "published ones: " + "; ".join(given_up) + ". Both read loss low, "
+        "so a fast answer flatters the deployment rather than erring the "
+        "safe way. Run it without --fast to publish anything."
+    )
+
+
 def footnotes(results: Sequence[Result], rows: Sequence[Row],
               arrangements: Sequence = ()) -> str:
     """What the table rests on, printed with it rather than beside it.
@@ -373,6 +412,9 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row],
     identical provenance (ADR-0001, ADR-0043).
     """
     lines = ["Notes:"]
+    hurried = coarsely_read(results)
+    if hurried:
+        lines.append("  {}".format(hurried))
     for arrangement in arrangements:
         lines.append("  {}".format(arrangement.describe()))
     if arrangements:

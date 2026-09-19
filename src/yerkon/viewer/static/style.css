@@ -34,6 +34,9 @@ button { flex: 1; padding: 7px 10px; border: 1px solid var(--accent);
   border-radius: 4px; background: var(--accent); color: #fff; font: inherit;
   cursor: pointer; }
 button.quiet { background: #fff; color: var(--ink); border-color: var(--line); }
+/* The fidelity toggle while it is on: the numbers beside it are coarse
+   and the button is the only thing on screen that undoes that. */
+button.quiet.on { background: var(--warn); color: #fff; border-color: var(--warn); }
 button:disabled { opacity: 0.5; cursor: progress; }
 dl { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; margin: 0; }
 dt { color: #61707e; font-size: 12px; }

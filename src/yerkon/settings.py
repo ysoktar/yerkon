@@ -382,3 +382,44 @@ DEFAULTS = IN_LANGUAGE[DEFAULT_LANGUAGE]
 def defaults_in(language: Optional[str] = None) -> Settings:
     """The shipped figures, in one language. The values do not differ."""
     return IN_LANGUAGE[language_chosen(language)]
+
+
+#: The two figures that decide how long a run takes rather than what it
+#: is about, and what to set them to when somebody is trying things.
+#:
+#: Both were measured into the published table and both are reversible,
+#: which is what makes a fast mode honest rather than a lie: the model
+#: does not change, it is read more coarsely.
+#:
+#: `site.shadow_draws` 8 -> 1 stops pooling eight arrangements of the
+#: shadows. One draw put the open-country row's ninety-fifth percentile
+#: anywhere between 14,6 and 279,6 m (ADR-0055).
+#:
+#: `site.profile_spacing_m` 10 -> 0 returns the ground profile to a
+#: fixed 64 samples, which on a 6,9 km link is a reading every 108 m and
+#: reads diffraction 6,32 dB low (ADR-0062).
+HURRIED = {
+    "site.shadow_draws": 1.0,
+    "site.profile_spacing_m": 0.0,
+}
+
+
+def hurried(settings: Optional[Settings] = None) -> Settings:
+    """The same figures, read coarsely enough to try things against.
+
+    Over the shipped defaults this takes `yerkon table` from about a
+    quarter of an hour to about a minute. What comes back is not
+    publishable and every caller says so.
+    """
+    return (settings or DEFAULTS).with_values(HURRIED)
+
+
+def is_hurried(settings: Optional[Settings] = None) -> bool:
+    """Whether these figures are the coarse ones, however they got that way.
+
+    Asked of the figures rather than of whoever set them, so a person
+    who edits `site.shadow_draws` to one by hand is told the same thing
+    as one who pressed the button.
+    """
+    settings = settings or DEFAULTS
+    return any(settings.number(key) == value for key, value in HURRIED.items())

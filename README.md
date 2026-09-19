@@ -301,7 +301,8 @@ bir varsayımdır.
 ## Tablo
 
 ```bash
-yerkon table
+yerkon table          # yayımlanan sayılar, ~15 dk 33 sn
+yerkon table --fast   # denemek için, ~54 sn, yayımlanmaz
 ```
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
