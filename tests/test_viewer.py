@@ -656,7 +656,7 @@ def test_the_page_asks_for_nothing_the_server_does_not_serve():
     static = viewer / "static"
     routing = (viewer / "server.py").read_text(encoding="utf-8")
 
-    page = (static / "index.html").read_text(encoding="utf-8")
+    page = (static / "simulator.html").read_text(encoding="utf-8")
     application = (static / "app.js").read_text(encoding="utf-8")
 
     wanted = set(re.findall(r'(?:src|href)="(/[^"]*)"', page))
@@ -934,7 +934,7 @@ def test_every_control_the_page_offers_is_wired_to_something():
         pathlib.Path(__file__).resolve().parent.parent
         / "src/yerkon/viewer/static"
     )
-    page = (static / "index.html").read_text(encoding="utf-8")
+    page = (static / "simulator.html").read_text(encoding="utf-8")
     application = (static / "app.js").read_text(encoding="utf-8")
 
     interactive = set(re.findall(
@@ -1327,7 +1327,7 @@ def test_the_markup_holds_no_words_of_its_own():
 
     page = (
         pathlib.Path(__file__).resolve().parent.parent
-        / "src/yerkon/viewer/static/index.html"
+        / "src/yerkon/viewer/static/simulator.html"
     ).read_text(encoding="utf-8")
     body = re.sub(r"<!--.*?-->", "", page, flags=re.S)
     body = body[body.index("<aside"):]
@@ -1581,7 +1581,7 @@ def test_every_step_of_the_panel_says_what_it_currently_holds():
         pathlib.Path(__file__).resolve().parent.parent
         / "src/yerkon/viewer/static"
     )
-    page = (static / "index.html").read_text(encoding="utf-8")
+    page = (static / "simulator.html").read_text(encoding="utf-8")
     application = read_app_js()
 
     steps = re.findall(r'<details class="step" id="(step-[a-z]+)"', page)
@@ -1628,7 +1628,7 @@ def read_markup():
 
     return (
         pathlib.Path(__file__).resolve().parent.parent
-        / "src/yerkon/viewer/static/index.html"
+        / "src/yerkon/viewer/static/simulator.html"
     ).read_text(encoding="utf-8")
 
 
@@ -1744,7 +1744,7 @@ def test_no_slider_stops_short_of_a_value_a_mode_actually_sets():
 
     page = (
         pathlib.Path(__file__).resolve().parent.parent
-        / "src/yerkon/viewer/static/index.html"
+        / "src/yerkon/viewer/static/simulator.html"
     ).read_text(encoding="utf-8")
     ranges = {
         found.group(1): (float(found.group(2)), float(found.group(3)))
@@ -1850,7 +1850,7 @@ def test_the_extent_knobs_can_reach_the_ground_that_was_actually_fetched():
     """
     import re
 
-    page = (STATIC / "index.html").read_text(encoding="utf-8")
+    page = (STATIC / "simulator.html").read_text(encoding="utf-8")
     from yerkon.viewer.state import fetched_sites
     from yerkon.scenarios import fetched
 
@@ -1904,7 +1904,7 @@ def test_the_page_says_why_a_number_came_back_smaller():
     page = (STATIC / "app.js").read_text(encoding="utf-8")
     assert "function sayIfClipped(" in page
     assert "site-clipped" in page
-    assert "site-clipped" in (STATIC / "index.html").read_text(encoding="utf-8")
+    assert "site-clipped" in (STATIC / "simulator.html").read_text(encoding="utf-8")
 
     words = (STATIC / "words.js").read_text(encoding="utf-8")
     assert '"site.clipped"' in words
@@ -2136,7 +2136,7 @@ def test_the_fetch_panel_is_greyed_rather_than_offered_and_then_refused():
     sites = page[page.index("function drawSites("):]
     assert "sayIfItCannotFetch();" in sites[:sites.index("\n}\n")]
 
-    assert "fetch-cannot" in (STATIC / "index.html").read_text(encoding="utf-8")
+    assert "fetch-cannot" in (STATIC / "simulator.html").read_text(encoding="utf-8")
     words = (STATIC / "words.js").read_text(encoding="utf-8")
     phrase = words[words.index('"fetch.cannot"'):][:700]
     # The sentence names a command somebody has to type, so each
@@ -2173,7 +2173,7 @@ def test_the_size_knob_stands_down_while_a_map_box_is_in_force():
     assert "redrawFetchBox = redraw;" in knob
     assert page.count("redrawFetchBox()") >= 2
 
-    html = (STATIC / "index.html").read_text(encoding="utf-8")
+    html = (STATIC / "simulator.html").read_text(encoding="utf-8")
     assert "fetch-picked-drop" in html
     words = (STATIC / "words.js").read_text(encoding="utf-8")
     for key in ('"fetch.box.map"', '"fetch.map.drop"'):
@@ -2575,7 +2575,7 @@ def test_the_button_is_beside_run_rather_than_among_the_options():
     """A ready-made option is a deployment choice. This is not one: it
     changes how finely the same deployment is read, so putting it in
     that list would file it as something it is not."""
-    markup = (STATIC / "index.html").read_text(encoding="utf-8")
+    markup = (STATIC / "simulator.html").read_text(encoding="utf-8")
     readout = markup[markup.index('<section id="readout">'):]
     readout = readout[:readout.index("</section>")]
     assert 'id="hurry"' in readout

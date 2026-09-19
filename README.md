@@ -80,13 +80,34 @@ pip install -e ".[dev]"
 pytest
 ```
 
-## Görüntüleyici
+## Site
 
 ```bash
 yerkon view
 ```
 
-Yerel bir web uygulaması açar. Sahanın üç boyutu: zemin, güzergâh, her
+Yerel bir site açar: YERKON'un ne olduğu, GNSS'in nerede kırıldığı,
+donanım ve fiyatı, benzetimin neyi modelleyip neyi modellemediği,
+yayımlanan dört satır, ve neye dayandıkları. Altı sayfa, ikisi de iki
+dilde, ve sayfanın sağ üstündeki düğme simülatöre giriyor; simülatörün
+panelindeki bağlantı geri getiriyor (ADR-0064).
+
+Dil sayfanın değil okuyanın özelliği: sitede İngilizceye geçip
+simülatöre giren biri İngilizce bir panel buluyor.
+
+Sonuç sayfası tabloyu elle yazılmış bir kopyadan değil, koşunun kendi
+yazdığı `src/yerkon/published.toml` dosyasından okuyor. O dosyayı
+`yerkon table --publish` yazıyor ve iki şeyi reddediyor: eksik bir tablo
+ve `--fast` ile yapılmış kaba bir okuma. Bir sınama sitede yayımlanan
+hiçbir hücrenin elle yazılmadığını söylüyor.
+
+## Simülatör
+
+```bash
+yerkon view          # site açılır, simülatör /simulasyon adresinde
+```
+
+Yerel bir web uygulaması. Sahanın üç boyutu: zemin, güzergâh, her
 direk ve toleransı içinde ölçebildiği halka; taranmış kapsama iki renkle
 zemine boyanmış — biri bir paketin ulaştığı zemin, diğeri aynı anda dört
 direğin erişimde olduğu zemin.
@@ -301,8 +322,9 @@ bir varsayımdır.
 ## Tablo
 
 ```bash
-yerkon table          # yayımlanan sayılar, ~15 dk 33 sn
-yerkon table --fast   # denemek için, ~54 sn, yayımlanmaz
+yerkon table            # yayımlanan sayılar, ~15 dk 33 sn
+yerkon table --fast     # denemek için, ~54 sn, yayımlanmaz
+yerkon table --publish  # koşulanı published.toml'a yaz
 ```
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |

@@ -1,0 +1,68 @@
+# The published YERKON block of the comparison table.
+#
+# Written by `yerkon table --publish`, read by the site and by
+# the tests that keep the README from drifting away from it.
+# Edit the model and run it again rather than editing this.
+
+run_on = "2026-09-19"
+source = "defaults.toml"
+shadow_draws = 8
+profile_spacing_m = 10
+
+[[row]]
+key = "urban"
+system = "YERKON (Şehir içi)"
+technology = "Karasal PNT (SX1280/LoRa TWR)"
+environment = "Dış"
+hpe_p50_m = 2.4637
+hpe_p95_m = 8.186
+vpe_p95_m = 63.4396
+availability = 0.7988
+area_km2 = 6.6833
+capex_tl_per_km2 = 23517.983
+opex_tl_per_km2_year = 10895.6581
+reached_km2 = 8.8567
+assumed_share = 0.7862
+
+[[row]]
+key = "rural"
+system = "YERKON (Kırsal)"
+technology = "Karasal PNT (E28-SX1280 TWR)"
+environment = "Dış"
+hpe_p50_m = 3.7024
+hpe_p95_m = 22.7159
+vpe_p95_m = 232.3251
+availability = 0.4183
+area_km2 = 143.75
+capex_tl_per_km2 = 18617.8438
+opex_tl_per_km2_year = 771.8913
+reached_km2 = 374
+assumed_share = 0.9891
+
+[[row]]
+key = "tunnel"
+system = "YERKON (Tünel)"
+technology = "Karasal PNT (UWB/DWM3000 TWR)"
+environment = "İç + dış"
+hpe_p50_m = 1.8426
+hpe_p95_m = 2.9271
+vpe_p95_m = 7.5252
+availability = 0.9999
+area_km2 = 0.024
+capex_tl_per_km2 = 4453423.3333
+opex_tl_per_km2_year = 849511.25
+assumed_share = 0.8202
+
+[[row]]
+key = "weighted"
+system = "YERKON Ağırlıklı Ortalama"
+technology = "Karasal PNT"
+environment = "İç + dış"
+hpe_p50_m = 2.6385
+hpe_p95_m = 13.442
+vpe_p95_m = 150.2381
+availability = 0.5887
+area_km2 = 60.8441
+capex_tl_per_km2 = 464548.4624
+opex_tl_per_km2_year = 90707.7106
+assumed_share = 0.8708

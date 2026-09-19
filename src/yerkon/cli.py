@@ -7,8 +7,9 @@ they are separate.
 ``table`` runs the three scenarios and prints the four rows of the
 report's comparison table.
 
-``view`` starts a local web app: the same engine, drawn in three
-dimensions, with every setting live.
+``view`` starts a local site: what YERKON is, what this project
+measured and what it left out, the published table, and behind them the
+same engine drawn in three dimensions with every setting live.
 
 ``defaults`` lists every figure the model needs that nobody supplied,
 what it affects, and what replacing it would move.
@@ -558,6 +559,15 @@ def table(argv: list[str] | None = None) -> int:
             "than a finding."
         ),
     )
+    parser.add_argument(
+        "--publish", nargs="?", const="", metavar="PATH",
+        help=(
+            "write what this run produced into the published record the "
+            "site and the README read, instead of leaving it in the "
+            "terminal for somebody to retype. Wants all four rows and "
+            "refuses a coarse read."
+        ),
+    )
     args = parser.parse_args(argv)
 
     try:
@@ -597,6 +607,13 @@ def table(argv: list[str] | None = None) -> int:
     except ValueError as error:
         print(error, file=sys.stderr)
         return 2
+    if args.publish is not None:
+        try:
+            written = _publish(rows, keys, args, settings)
+        except ValueError as error:
+            print(error, file=sys.stderr)
+            return 2
+        print("Published into {}".format(written), file=sys.stderr)
     print(as_markdown(rows) if args.markdown else as_text(rows))
     if not args.no_notes:
         print()
@@ -609,6 +626,37 @@ def table(argv: list[str] | None = None) -> int:
         if hurried:
             print("\n" + hurried, file=sys.stderr)
     return 0
+
+
+def _publish(rows, keys, args, settings):
+    """Write a finished run into the published record.
+
+    The record says which figures the run read and how finely it read
+    them, because on a web page a coarse table and a published one look
+    the same (ADR-0063, ADR-0064).
+    """
+    from yerkon.published import write
+    from yerkon.settings import DEFAULTS
+
+    settings = settings or DEFAULTS
+    source = str(args.defaults) if args.defaults else "defaults.toml"
+    if getattr(args, "option", None):
+        source += " + {}".format(args.option)
+    if getattr(args, "preset", None):
+        source += " + {}".format(", ".join(args.preset))
+    # `build` appends the weighted row when it ran more than one
+    # scenario, and that row has no scenario key of its own.
+    named = tuple(keys)
+    if len(rows) > len(named):
+        named += ("weighted",)
+    return write(
+        rows=rows,
+        keys=named,
+        source=source,
+        shadow_draws=settings.number("site.shadow_draws"),
+        profile_spacing_m=settings.number("site.profile_spacing_m"),
+        path=args.publish or None,
+    )
 
 
 def _with_presets(keys: list, chosen: tuple, args) -> tuple:
@@ -674,7 +722,9 @@ def view(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon view",
         description=(
-            "Open the live 3D viewer in a browser. Everything is "
+            "Open the site in a browser: what YERKON is, what this "
+            "project measured, the published table, and the live 3D "
+            "simulator behind it. Everything in the simulator is "
             "configurable and every number comes from the same engine "
             "that builds the table."
         ),
@@ -1309,8 +1359,8 @@ def main(argv: list[str] | None = None) -> int:
         print("\nUsage:")
         print("  yerkon fetch  --south .. --west .. --north .. --east .. --into DIR")
         print("  yerkon design [--region TR] [--mounting mast] [--tolerance 5]")
-        print("  yerkon table  [--markdown] [--only rural]")
-        print("  yerkon view   [--port 8765]")
+        print("  yerkon table  [--markdown] [--only rural] [--publish]")
+        print("  yerkon view   [--port 8765]        # the site and the simulator")
         print("  yerkon site   [--corridor 12000] [--tolerance 5] [--ground polatli]")
         print("  yerkon budget [--only tunnel] [--source survey]")
         print("  yerkon deliver [--into docs/teslim] [--no-budget]")

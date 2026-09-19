@@ -52,6 +52,8 @@ from yerkon.language import chosen as language_chosen, say
 from yerkon.presets import Preset, PresetStore, UnknownPreset, offered
 from yerkon.scenarios import SITES
 from yerkon.site.cache import AERIAL_NAME
+from yerkon.published import read as published_read
+from yerkon.viewer.pages import SIMULATOR, page_at, render
 from yerkon.viewer.state import (
     CASCADING,
     MODES,
@@ -354,16 +356,19 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         path = self.path.split("?")[0]
-        if path in ("/", "/index.html"):
-            return self._file("index.html", "text/html; charset=utf-8")
+        # The simulator is one page of a site rather than the whole of
+        # it: somebody who has not been told what YERKON is has no use
+        # for a slider on the noise figure (ADR-0064).
+        if path in (SIMULATOR, SIMULATOR + "/"):
+            return self._file("simulator.html", "text/html; charset=utf-8")
         if path in ("/app.js", "/draw.js", "/words.js", "/map.js"):
             return self._file(path.lstrip("/"), "text/javascript; charset=utf-8")
         if path == "/favicon.ico":
             self.send_response(204)
             self.end_headers()
             return
-        if path == "/style.css":
-            return self._file("style.css", "text/css; charset=utf-8")
+        if path in ("/style.css", "/site.css"):
+            return self._file(path.lstrip("/"), "text/css; charset=utf-8")
         if path == "/api/figures":
             return self._json(lambda: figures(self.session.read()))
         if path == "/api/figures.toml":
@@ -391,6 +396,9 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(self._presets)
         if path == "/api/job":
             return self._json(self._job)
+        page = page_at(path) if not path.startswith("/api/") else None
+        if page is not None:
+            return self._page(page)
         self.send_error(404)
 
     def do_POST(self) -> None:
@@ -663,6 +671,35 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(payload)
 
+    def _page(self, page) -> None:
+        """One page of the site, in the language the session is set to.
+
+        A language is switched with a link rather than with a script,
+        because these pages carry no script: ``?dil=en`` says it, and it
+        moves the simulator with it, the same way the simulator's own
+        TR/EN moves these (ADR-0035).
+        """
+        asked = parse_qs(urlparse(self.path).query).get("dil", [None])[0]
+        if asked in ("tr", "en"):
+            self.session.speak(asked)
+        language = self.session.read().language
+        try:
+            record = published_read()
+        except (OSError, ValueError, KeyError):
+            # A site that will not open because nobody has published a
+            # run yet is worse than a site that says so on one page.
+            record = None
+        payload = render(page, language, record).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(payload)))
+        # The published table changes under a running server when
+        # somebody publishes a run, and the address does not change with
+        # it.
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        self.wfile.write(payload)
+
     def _file(self, name: str, content_type: str) -> None:
         path = STATIC / name
         if not path.exists():
@@ -721,7 +758,8 @@ def serve(
         PRESETS[0] = PresetStore(presets)
     server = ThreadingHTTPServer((host, port), Handler)
     address = "http://{}:{}/".format(host, port)
-    print("YERKON viewer on {}".format(address))
+    print("YERKON on {}".format(address))
+    print("The simulator is at {}{}".format(address.rstrip("/"), SIMULATOR))
     print("Ctrl-C to stop.")
     if open_browser:
         threading.Timer(0.5, webbrowser.open, args=(address,)).start()

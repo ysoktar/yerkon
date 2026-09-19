@@ -76,13 +76,35 @@ pip install -e ".[dev]"
 pytest
 ```
 
-## The viewer
+## The site
 
 ```bash
 yerkon view
 ```
 
-Opens a local web app. The site in three dimensions, with the ground, the
+Opens a local site: what YERKON is, where GNSS breaks, the hardware and
+its price, what the simulation models and what it leaves out, the four
+published rows, and what they rest on. Six pages, both languages, with a
+button into the simulator on every one and a link back on the
+simulator's own panel (ADR-0064).
+
+The language belongs to the person rather than to the page: switch to
+English on the site, walk into the simulator, and the panel is in
+English.
+
+The results page reads the table from `src/yerkon/published.toml`, which
+a run wrote, rather than from a copy somebody typed. `yerkon table
+--publish` writes that file and refuses two things: a table missing rows
+and a coarse `--fast` reading. A test says no published cell was typed
+into the site.
+
+## The simulator
+
+```bash
+yerkon view          # opens the site; the simulator is at /simulasyon
+```
+
+A local web app. The site in three dimensions, with the ground, the
 route, each anchor and the ring it ranges within tolerance; the swept
 coverage painted on the ground in two colours, one for ground a packet
 reaches and one for ground where four anchors are in reach at once.

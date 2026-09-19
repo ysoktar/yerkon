@@ -1,0 +1,126 @@
+/* The site in front of the simulator.
+ *
+ * Separate from style.css rather than added to it: that one pins the
+ * page to the window and hides the overflow, because a 3D scene fills
+ * the screen and must not scroll. These are documents and have to.
+ *
+ * The palette is the same one, so moving between a page and the
+ * simulator does not look like moving between two projects.
+ */
+:root {
+  --ink: #12181f;
+  --paper: #ffffff;
+  --shade: #f4f6f8;
+  --line: #ccd4dc;
+  --quiet: #61707e;
+  --accent: #1f6feb;
+  --warn: #b4551d;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* --- the chrome --------------------------------------------------------- */
+
+header {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+  padding: 10px 24px; background: rgba(255,255,255,0.94);
+  border-bottom: 1px solid var(--line); backdrop-filter: blur(6px);
+}
+.brand { display: flex; align-items: baseline; gap: 10px;
+  text-decoration: none; color: inherit; }
+.brand b { font-size: 17px; letter-spacing: 0.16em; }
+.brand span { font-size: 11px; color: var(--quiet); }
+nav.pages { display: flex; flex-wrap: wrap; gap: 14px; margin-left: auto; }
+nav.pages a { font-size: 13px; color: var(--quiet); text-decoration: none; }
+nav.pages a:hover { color: var(--ink); }
+nav.pages a.here { color: var(--ink); font-weight: 600; }
+nav.tongues { display: flex; gap: 6px; }
+nav.tongues a {
+  padding: 2px 7px; border: 1px solid var(--line); border-radius: 4px;
+  font-size: 11px; color: var(--quiet); text-decoration: none;
+}
+nav.tongues a.here { background: var(--ink); border-color: var(--ink); color: #fff; }
+a.run {
+  padding: 7px 14px; border-radius: 4px; background: var(--accent);
+  color: #fff; font-size: 13px; font-weight: 600; text-decoration: none;
+}
+a.run:hover { background: #1a5fcc; }
+
+footer {
+  margin-top: 56px; padding: 22px 24px 40px;
+  border-top: 1px solid var(--line); background: var(--shade);
+}
+footer p { max-width: 720px; margin: 0 auto; color: var(--quiet);
+  font-size: 12px; }
+
+/* --- the page ----------------------------------------------------------- */
+
+main { max-width: 720px; margin: 0 auto; padding: 40px 24px 0; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 14px; letter-spacing: -0.01em; }
+.lead { margin: 0 0 8px; font-size: 17px; color: #2d3a46; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--quiet); margin: 0 0 10px; }
+section { margin-top: 34px; }
+p { margin: 0 0 12px; }
+ul { margin: 0; padding-left: 20px; }
+li { margin-bottom: 9px; }
+strong { font-weight: 650; }
+code { padding: 1px 4px; background: var(--shade); border-radius: 3px;
+  font-size: 0.9em; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto;
+  background: var(--shade); border: 1px solid var(--line); border-radius: 6px; }
+pre code { padding: 0; background: none; }
+.under { margin-top: 10px; color: var(--quiet); font-size: 12px; }
+.warn { color: var(--warn); }
+a { color: var(--accent); }
+
+/* --- figures and tables ------------------------------------------------- */
+
+.figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: var(--line); border: 1px solid var(--line); border-radius: 6px;
+  overflow: hidden; }
+.figure { padding: 14px 16px; background: var(--paper); }
+.figure b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+.figure span { font-size: 11px; color: var(--quiet); }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { display: block; padding: 14px 16px; border: 1px solid var(--line);
+  border-radius: 6px; color: inherit; text-decoration: none; }
+.card:hover { border-color: var(--accent); }
+.card b { display: block; margin-bottom: 4px; }
+.card span { font-size: 12px; color: var(--quiet); }
+
+/* The four rows are ten columns wide and the reading column is 720px,
+   so this one block breaks out of it: the table is the thing the whole
+   project exists to produce and it should not arrive pre-scrolled. On a
+   narrow window it scrolls sideways inside itself rather than pushing
+   the page wider. */
+.wide { width: min(100vw - 32px, 1120px); margin-left: 50%;
+  transform: translateX(-50%); }
+/* The table scrolls, the line under it does not: a note that slides out
+   of view with the columns it explains is a note nobody reads. */
+.wide .scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line);
+  text-align: left; vertical-align: top; }
+thead th { color: var(--quiet); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.num { text-align: right; font-variant-numeric: tabular-nums;
+  white-space: nowrap; }
+/* Only the four rows have a weighted last row worth thickening. */
+.wide tbody tr:last-child { font-weight: 600; }
+.wide table { min-width: 860px; }
+
+@media (max-width: 760px) {
+  header { padding: 10px 16px; }
+  nav.pages { margin-left: 0; order: 3; width: 100%; }
+  main { padding: 28px 16px 0; }
+  h1 { font-size: 24px; }
+  .figures, .cards { grid-template-columns: 1fr 1fr; }
+  .wide { width: calc(100vw - 32px); }
+}

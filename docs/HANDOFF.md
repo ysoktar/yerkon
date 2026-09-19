@@ -77,7 +77,9 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `routes.py` | alıcının sürdüğü şekil: yedi güzergâh, tek dikiş `trace(trip, course)` |
 | `presets.py` | adlandırılmış düzenlemeler: bir sekmenin tamamı, kaydedilip geri yüklenen |
 | `viewer/static/map.js` | yer seçici: kayan harita, serbest çizilen kutu, ad araması |
-| `cli.py` | `fetch`, `design`, `table`, `view`, `site`, `budget`, `defaults` ve `calibrate` fiilleri |
+| `viewer/pages.py` | simülatörün önündeki site: altı sayfa, iki dilde, sunucuda üretiliyor |
+| `published.py` | yayımlanan dört satır bir dosya olarak; sayfa ve README aynı koşuyu okusun diye |
+| `cli.py` | `fetch`, `design`, `table`, `view`, `site`, `budget`, `deliver`, `options`, `solve`, `defaults` ve `calibrate` fiilleri |
 
 `tests/test_architecture.py` import'ları denetler, böylece kestirici gerçeğe
 erişemez. Bilerek bir kural değil, bir testtir.

@@ -49,6 +49,10 @@ eğimi vardır, dolayısıyla bir alıcının yüksekliği yol boyunca değişir
 kod tabanında hiçbir şey bir yolu sabit bir yüksekliğe sabitlemez.
 ADR-0004'e bak.
 
+Kodda `Site` her zaman budur. Tarayıcıda açılan **web sitesi** başka bir
+şeydir ve kodda o adı taşımaz: sayfaları `viewer/pages.py` içinde durur
+(ADR-0064).
+
 **Service area** (hizmet alanı): bir yerleşimin çalıştığı iddia edilen
 zemin alanı, km² cinsinden. *Bir konum üretmeye yetecek kadar direğin
 erişilebilir olduğu* zemindir; bir koridor şeridi olarak çizilmez, gerçek

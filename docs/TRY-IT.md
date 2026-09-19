@@ -21,19 +21,34 @@ ayrılıyor ve üçü de bu komutları kırıyor.
 | ne istiyorsun | nereye git |
 |---|---|
 | gönderilen sayıları görmek | [Tablo](#tablo) |
-| resmi görmek, sayıları oynatmak | [Buradan başla: uygulama](#buradan-başla-uygulama) |
+| resmi görmek, sayıları oynatmak | [Buradan başla](#buradan-başla-site-ve-uygulama) |
 | **kendi bölgende sayı üretmek** | [Kendi bölgeni ekle](#kendi-bölgeni-ekle) |
 | neyin yanlış olduğunu bulmak | [Nereden itiraz etmeli](#nereden-itiraz-etmeli) |
 
 ---
 
-## Buradan başla: uygulama
+## Buradan başla: site ve uygulama
 
 ```bash
 yerkon view
 ```
 
-**Ana giriş arayüz** — komut satırının yaptığı her şeyi sayfa da yapar ve
+**Artık bir anasayfa açıyor** (bu yeni). Altı sayfa: YERKON ne, GNSS
+nerede kırılıyor, donanım ve fiyatı, benzetim neyi modelleyip neyi
+modellemiyor, yayımlanan dört satır ve neye dayandıkları. Sağ üstteki
+**Simülasyon** düğmesi uygulamayı açıyor, panelin sol üstündeki bağlantı
+geri getiriyor (ADR-0064).
+
+Sonuçlar sayfasındaki tablo elle yazılmadı: `yerkon table --publish`
+koştuğu şeyi `src/yerkon/published.toml` dosyasına yazıyor ve sayfa onu
+okuyor. Kaba bir okumayı (`--fast`) ve eksik bir tabloyu reddediyor.
+Bir sınama, sitede yayımlanan hiçbir hücrenin elle yazılmadığını
+söylüyor.
+
+Denemeye değer: sitede EN'e geç, sonra Simülasyon'a gir. Panel de
+İngilizce açılıyor; dil sayfanın değil okuyanın özelliği.
+
+**Uygulama.** Komut satırının yaptığı her şeyi sayfa da yapar ve
 gönderilen varsayılanlara değil sayfanın gösterdiği ayarlara karşı koşar.
 
 ### İki dil (bu yeni)

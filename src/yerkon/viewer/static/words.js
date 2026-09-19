@@ -21,6 +21,7 @@ export const SAY = {
   "find.empty": { tr: "Bu arama hiçbir ayara uymuyor.",
                   en: "Nothing here matches that." },
   "language.pick": { tr: "Dil", en: "Language" },
+  "back.site": { tr: "← Siteye dön", en: "← Back to the site" },
   "terrain.note": { tr: "{ground} · {anchors} direk",
                     en: "{ground} · {anchors|anchor|anchors}" },
 
