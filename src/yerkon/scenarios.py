@@ -389,7 +389,8 @@ def varying(terrain: Terrain, settings: Settings, row: str) -> Terrain:
     # because it is a fact about the place rather than about how the
     # elevation was arrived at, so a fetched grid and a modelled hill
     # want the same one.
-    terrain = replace(terrain, shadowing=Shadowing(
+    terrain = replace(terrain, profile_spacing_m=settings.number(
+        "site.profile_spacing_m"), shadowing=Shadowing(
         sigma_db=settings.number("site.shadow_sigma_db"),
         correlation_m=settings.number("site.shadow_correlation_m"),
         seed=int(settings.number("site.shadow_seed")),

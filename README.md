@@ -306,10 +306,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 8,78 | 67,50 | %80,08 | 6,84 | 22968 | 10641 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,47 | 31,77 | 311,08 | %51,80 | 175,67 | 15235 | 632 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,40 | %100,00 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,66 | 14,28 | 166,00 | %64,99 | 73,69 | 462920 | 90524 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir
@@ -341,6 +341,14 @@ kötüsünün on altı; tek bir bıçak sırtı bunların yalnızca birini sayı
 Zeminin yüzeyi çatıları da içerir, yani binalar ayrıca bir katsayı olarak
 değil, engel olarak sayılır (ADR-0046).
 
+Zemin profili **on metrede bir** okunuyor. Sabit bir örnek sayısı
+aralığı bağlantının boyuna bağlar ve bir örnek sayısı bir zemin
+modelinin özelliği değil: 64 örnekte 6,9 km'lik bir kırsal bağlantı
+zeminini 108 m'de bir okuyordu, hücreleri 30 m olan bir ızgaranın
+üzerinde. Bullington'ın kurgusu örnekler üzerinden bir maksimum aldığı
+için eksik örnekleme yalnızca eksik okur, ve okuyordu: 31,28 dB yerine
+37,60 (ADR-0062).
+
 Gölgeleme ikisinin de üstüne ekleniyor ve genişliği yolun açık olup
 olmamasına bağlı: görüş hattı varken 4 dB, yokken 7,82 (3GPP TR 38.901,
 ADR-0061). Kızılay'da bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü,
@@ -370,7 +378,7 @@ yolculuğunun uzunluğudur ve onlar için kilometre başına maliyet hiç
 verilmez.
 
 **Hizmet alanı, bir konumun alınabildiği yerdir**, bir paketin ulaştığı
-yer değil. Kırsal bölge için bunlar 175,67 ve 388,17 km²'dir, 2,2 kat, ve
+yer değil. Kırsal bölge için bunlar 143,75 ve 374,00 km²'dir, 2,6 kat, ve
 notlar her seferinde ikisini de yazdırır (ADR-0012).
 
 **Kırsal kullanılabilirliğe arazi ve bir turun uzunluğu karar verir.**
@@ -378,15 +386,18 @@ Tek bir kırsal bağlantı bile mesafe yüzünden düşmez — her bir başarıs
 zemin kaldırılsa kapanırdı — yani daha çok direk yanlış içgüdüdür. Yanlış
 olan turdu: yarısını engelleyen bir zemin üzerinde yoklanan sekiz direk
 yaklaşık dört yanıt verir, ki bu da soğuk bir sabitlemenin gerektirdiğinin
-tam kendisidir, yedeksiz. Tur uzunluğunun ne kadar değdiği model
-oynadıkça oynadı ve her seferinde tohumlar üzerinden ölçüldü: gölgeleme
-tek genişlikteyken sekiz tohumda on direk sekizi beşinde yeniyordu,
-+0,008 ile, tohumdan tohuma 0,020'lik bir yayılımın içinde, yani
-gürültünün dörtte biri. Gölge genişliği yola göre ayrılınca (ADR-0061)
-geri geldi: bu satırın bağlantılarının beşte dördü kapalı ve onların
-yayılımı 6 dB'den 7,82'ye çıktı, yani daha çoğu çıtanın yakınında
-duruyor. On direk artık sekiz tohumun **sekizinde de** kazanıyor, +0,0227
-ile, 0,0069'luk bir yayılıma karşı. %90'ı geçmek para tutuyor: kabaca direk
+tam kendisidir, yedeksiz. Tur uzunluğunun ne kadar değdiği yayılım
+modeli oynadıkça oynadı ve her seferinde sekiz tohum üzerinden ölçüldü:
+
+| model | on direk kaç tohumda kazanıyor | ortalama | yayılım | oran |
+|---|---|---|---|---|
+| tek gölge genişliği | 5/8 | +0,0080 | 0,0200 | 0,4 |
+| yola göre ayrılmış (ADR-0061) | 8/8 | +0,0227 | 0,0069 | 3,3 |
+| ve profil on metrede bir (ADR-0062) | 7/8 | +0,0088 | 0,0055 | 1,6 |
+
+Üç ölçümde de değişmeyen şey şekli: etki artı yönde ve tohumdan tohuma
+saçılımla aynı mertebede, yani tek bir koşu ikisinden hiçbirine karar
+veremiyor. %90'ı geçmek para tutuyor: kabaca direk
 sermayesinin iki katı, ya daha çok direk ya daha uzun direk olarak.
 ADR-0022 fiyatlandırılmış eğriyi ve denenip işe yaramayan iki şeyi tutar.
 

@@ -305,10 +305,10 @@ yerkon table
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,54 | 8,78 | 67,50 | %80,08 | 6,84 | 22968 | 10641 |
-| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,47 | 31,77 | 311,08 | %51,80 | 175,67 | 15235 | 632 |
-| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,40 | %100,00 | 0,02 | 4453423 | 849511 |
-| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,66 | 14,28 | 166,00 | %64,99 | 73,69 | 462920 | 90524 |
+| YERKON (Şehir içi) | Karasal PNT (SX1280/LoRa TWR) | Dış | 2,46 | 8,19 | 63,44 | %79,88 | 6,68 | 23518 | 10896 |
+| YERKON (Kırsal) | Karasal PNT (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
+| YERKON (Tünel) | Karasal PNT (UWB/DWM3000 TWR) | İç + dış | 1,84 | 2,93 | 7,53 | %99,99 | 0,02 | 4453423 | 849511 |
+| YERKON Ağırlıklı Ortalama | Karasal PNT | İç + dış | 2,64 | 13,44 | 150,24 | %58,87 | 60,84 | 464548 | 90708 |
 
 Every row stands on **real Ankara ground**, fetched once from the
 Copernicus 30 m DEM and committed inside the package, so a clone
@@ -342,6 +342,14 @@ sixteen; one knife edge counted one of them. The surface a profile
 reports includes roofs, so buildings are counted as obstacles rather
 than as a coefficient (ADR-0046).
 
+The ground profile is read **every ten metres**. A fixed sample count
+ties the spacing to the link's length, and a sample count is not a
+property of a ground model: at 64 samples a 6,9 km rural link read its
+ground every 108 m, over a grid whose own cells are 30 m across.
+Bullington's construction takes a maximum over the samples, so
+undersampling can only read low, and it did: 31,28 dB where the same
+link at 6,7 m spacing reads 37,60 (ADR-0062).
+
 Shadowing is added on top of both, and its width depends on whether the
 path is clear: 4 dB with line of sight and 7,82 without it (3GPP
 TR 38.901, ADR-0061). Over Kızılay 98,1 % of links are blocked, over
@@ -369,22 +377,26 @@ than lines, so their route kilometres are the length of a test journey
 and no cost per kilometre is quoted for them at all.
 
 **The service area is where a position is available**, not where a packet
-arrives. For the rural region those are 175,67 and 388,17 km², a factor
-of 2,2, and the notes print both every time (ADR-0012).
+arrives. For the rural region those are 143,75 and 374,00 km², a factor
+of 2,6, and the notes print both every time (ADR-0012).
 
 **Rural availability is decided by terrain, and by the length of a
 round.** Not one rural link fails for distance — every single failure
 would close if the ground were taken away — so more masts are the wrong
 instinct. What was wrong was the round: eight anchors polled over ground
 that blocks half of them yields about four replies, exactly what a cold
-fix needs and nothing spare. What the round length is worth has moved as the model
-has, and it is measured over seeds every time: under one shadow spread,
-ten anchors beat eight on five seeds of eight, ahead by 0,008 inside a
-seed-to-seed spread of 0,020, a quarter of the noise. Splitting the
-spread by whether the path is clear (ADR-0061) brought it back, because
-four fifths of this row's links are blocked and their spread went from 6
-to 7,82 dB, so more of them sit near the bar. Ten now wins on **all
-eight** seeds, ahead by 0,0227 against a spread of 0,0069. Getting past 90 % does cost money: about twice
+fix needs and nothing spare. What the round length is worth has moved every time
+the propagation has, and it is measured over eight seeds each time:
+
+| model | ten wins on | mean | scatter | ratio |
+|---|---|---|---|---|
+| one shadow spread | 5/8 | +0,0080 | 0,0200 | 0,4 |
+| split by line of sight (ADR-0061) | 8/8 | +0,0227 | 0,0069 | 3,3 |
+| and the profile every 10 m (ADR-0062) | 7/8 | +0,0088 | 0,0055 | 1,6 |
+
+What holds through all three is the shape: the effect is positive on
+balance and the same order as the seed-to-seed scatter, so one run of
+either cannot settle it. Getting past 90 % does cost money: about twice
 the mast capital, either as more masts or taller ones. ADR-0022 has the
 priced curve, and the two things that were tried and did not work.
 

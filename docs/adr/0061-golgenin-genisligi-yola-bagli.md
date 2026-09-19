@@ -114,7 +114,8 @@ kazandırıyor.
 Sınama `test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one`
 oldu. Ölçme yöntemi aynı kaldı, çünkü asıl iddiası o: bir tohumda
 ölçülen değişim hiçbir şeyde ölçülmüş değildir. İddianın yönü iki kez
-oynadı ve yöntem ikisini de yakaladı.
+oynadı ve yöntem ikisini de yakaladı. (ADR-0062 üçüncü kez oynattı:
+7/8, +0,0088, oran 1,6. Sınama artık boyu değil şekli çiviliyor.)
 
 ## Yapılmayanlar
 

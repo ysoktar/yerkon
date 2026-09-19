@@ -321,6 +321,121 @@ def test_gentle_relief_helps_by_aiming_the_cancelling_ray_away():
 # --- What the ground model does not carry (ADR-0055) ----------------------
 
 
+def test_how_finely_a_path_is_read_is_a_property_of_the_ground():
+    """ADR-0062. A fixed sample count makes the spacing depend on the
+    link's length, and a sample count is not a property of a ground
+    model. Given a spacing, the ground decides.
+    """
+    from dataclasses import replace
+
+    from yerkon.world import flat_terrain
+
+    plain = flat_terrain()
+    here, there = (0.0, 0.0, 25.0), (6884.0, 0.0, 2.0)
+
+    # Unset, a caller's count is what it gets: what this did before.
+    assert plain.profile_spacing_m == 0.0
+    assert plain.samples_between(here, there) == 64
+    assert plain.samples_between(here, there, 200) == 200
+
+    every_ten = replace(plain, profile_spacing_m=10.0)
+    assert every_ten.samples_between(here, there) == 688
+    assert every_ten.samples_between(here, there, 200) == 688, (
+        "the ground overrides what the caller asked for")
+    assert len(every_ten.profile_between(here, there)) == 689
+
+
+def test_the_spacing_has_a_floor_and_a_ceiling():
+    """A short link is not read off three points and a twenty kilometre
+    one does not cost two thousand."""
+    from dataclasses import replace
+
+    from yerkon.world import Terrain, flat_terrain
+
+    every_ten = replace(flat_terrain(), profile_spacing_m=10.0)
+    close = every_ten.samples_between((0.0, 0.0, 25.0), (90.0, 0.0, 2.0))
+    far = every_ten.samples_between((0.0, 0.0, 25.0), (90_000.0, 0.0, 2.0))
+    assert close == Terrain.FEWEST_SAMPLES
+    assert far == Terrain.MOST_SAMPLES
+
+
+def test_reading_a_path_too_coarsely_can_only_read_it_low():
+    """Bullington's construction takes a maximum over the samples, so a
+    sample it never took cannot lower the answer and can raise it.
+
+    Which is why the open-country row was the one that moved: at 64
+    samples a 6,9 km link reads its ground every 108 m, over a grid
+    whose own cells are 30 m across, and reads 31,28 dB where the same
+    link at 6,7 m spacing reads 37,60.
+    """
+    from dataclasses import replace
+
+    from yerkon.hardware import E28_2G4M27S, W24P_U
+    from yerkon.rf import Terminal, evaluate_link
+    from yerkon.world import rolling_terrain
+
+    hills = rolling_terrain(80.0, 700.0, seed=11)
+    here, there = (0.0, 0.0, 25.0), (6884.0, 0.0, 2.0)
+
+    def diffraction_at(spacing_m):
+        ground = replace(hills, profile_spacing_m=spacing_m)
+        return evaluate_link(
+            Terminal(E28_2G4M27S, W24P_U, here),
+            Terminal(E28_2G4M27S, W24P_U, there),
+            obstruction=ground.obstruction_between(here, there),
+        ).diffraction_loss_db
+
+    coarse = diffraction_at(108.0)
+    fine = diffraction_at(7.0)
+    assert fine > coarse, (coarse, fine)
+    # And it settles rather than climbing without end.
+    assert diffraction_at(3.0) == pytest.approx(fine, abs=1.0)
+
+
+def test_reading_a_profile_in_one_pass_reads_the_same_profile():
+    """The batch path is an optimisation and nothing else.
+
+    Reading a profile is 84 % of what asking about an obstruction costs
+    and nearly all of that was per-point call overhead, so every kind of
+    ground this project ships answers a whole line at once. If the two
+    paths ever disagree, the faster one is silently a different model
+    (ADR-0062).
+    """
+    from yerkon.viewer.state import from_scenario
+    from yerkon.world import bore_terrain, flat_terrain, rolling_terrain
+
+    here, there = (120.0, 80.0, 25.0), (1500.0, 900.0, 2.0)
+    grounds = [
+        flat_terrain(elevation_m=900.0),
+        rolling_terrain(40.0, 3000.0, seed=3),
+        bore_terrain(1168.5, 1132.7, 2000.0),
+        from_scenario("urban").terrain(),
+        from_scenario("rural").terrain(),
+    ]
+    for ground in grounds:
+        assert hasattr(ground.elevation_m, "along"), ground.description
+        in_one_pass = ground.profile_between(here, there, 128)
+        one_at_a_time = [
+            (f, ground.height_at(here[0] + (there[0] - here[0]) * f,
+                                 here[1] + (there[1] - here[1]) * f))
+            for f, _ in in_one_pass
+        ]
+        assert in_one_pass == one_at_a_time, ground.description
+
+
+def test_ground_that_cannot_answer_a_whole_line_is_still_read():
+    """`elevation_m` is a plain callable and a caller may pass one that
+    knows nothing about batches. It reads point by point and gets the
+    same profile."""
+    from yerkon.world import Terrain
+
+    ground = Terrain(elevation_m=lambda x, y: x / 100.0 + y / 200.0)
+    assert not hasattr(ground.elevation_m, "along")
+    profile = ground.profile_between((0.0, 0.0, 10.0), (400.0, 200.0, 2.0), 8)
+    assert len(profile) == 9
+    assert profile[-1][1] == pytest.approx(400.0 / 100.0 + 200.0 / 200.0)
+
+
 def test_a_shadow_is_a_fact_about_a_place_rather_than_a_draw():
     """The same rule as the ground's own roughness and the survey error
     before it (ADR-0019): a receiver ranging to the same anchor from the

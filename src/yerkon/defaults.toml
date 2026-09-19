@@ -554,6 +554,44 @@ urban and rural rows"""
 sensitivity = """şehirde bağlantıların %98'ini kapsıyor, tünelde hiçbirini"""
 sensitivity_en = """it covers 98 % of the urban row's links and none of the tunnel's"""
 
+[values."site.profile_spacing_m"]
+value = 10.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Bir bağlantının zemin profilinin kaç metrede bir okunduğu. Sıfır, \
+sabit 64 örnek demek, yani aralık bağlantının boyuna göre değişiyor: \
+1 km'lik bir şehir bağlantısında 15 m, 6,9 km'lik bir kırsal bağlantıda \
+108 m, hücreleri 30 m olan bir ızgaranın üzerinde. Bullington'ın kurgusu \
+örnekler üzerinden bir maksimum aldığı için eksik örnekleme yalnızca \
+eksik okur: Polatlı'da 108 m'de 31,28 dB, 6,7 m'de 37,60. Bir değer \
+verildiğinde profil o aralıkta okunuyor, 32 örnek tabanı ve 2048 \
+tavanıyla. On metre, 30 m'lik hücrenin içine üç örnek düşürüyor ve \
+yakınsamanın 0,3 dB altında kalıyor; yirmi yedi metre 6,32 dB'lik \
+farkın yalnızca üçte ikisini kapatıyor. Bedeli tablonun kendisinde \
+ölçüldü: 4 dk 46 sn yerine 15 dk 33 sn (ADR-0062). Sıfır yazmak sabit \
+64 örneğe döner."""
+note_en = """How many metres apart a link's ground profile is read. Zero means a \
+fixed 64 samples, so the spacing depends on the link's length rather \
+than on the ground: 15 m on a 1 km urban link, 108 m on a 6,9 km rural \
+one, over a grid whose own cells are 30 m across. Bullington's \
+construction takes a maximum over the samples, so undersampling can only \
+read low: over Polatlı 31,28 dB at 108 m against 37,60 at 6,7 m. Given a \
+value, the profile is read at that spacing, with a floor of 32 samples \
+and a ceiling of 2048. Ten metres puts three samples inside a 30 m cell \
+and lands within 0,3 dB of convergence, where 27 m closes only two \
+thirds of the 6,32 dB gap. The cost was measured on the table itself: \
+15 min 33 s against 4 min 46 s (ADR-0062). Zero returns it to a fixed \
+64 samples."""
+affects = """kırınımın ne kadar okunduğunu, dolayısıyla uzun bağlantıların kapanıp \
+kapanmadığını"""
+affects_en = """how much diffraction is read, and so whether long links close"""
+sensitivity = """kırsal satırda belirleyici: 64 sabit örnekte P95 15,75 m, 10 m aralıkta \
+30,03 m; şehir satırında 6,20'den 5,83'e"""
+sensitivity_en = """decisive in the rural row: P95 15,75 m at a fixed 64 samples against \
+30,03 m at 10 m spacing; in the urban row 6,20 to 5,83"""
+
 [values."site.shadow_correlation_m"]
 value = 50.0
 unit = "m"

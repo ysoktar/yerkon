@@ -109,4 +109,6 @@ modelde değil, yani her hücre ya geçiyor ya kalıyor. Gerçek kapsama
 
 **Profil 64–200 örnekle okunuyor.** 1,2 km'de örnek aralığı ~19 m, bir
 bina genişliği kadar. Daha sık örneklemek cevabı değiştirir ve ne yönde
-değiştirdiği ölçülmedi.
+değiştirdiği ölçülmedi. **ADR-0062 ölçtü:** yön tek, çünkü Bullington
+örnekler üzerinden maksimum alıyor, ve kırsalda 6,32 dB eksik
+okunuyormuş. Profil artık on metrede bir okunuyor.

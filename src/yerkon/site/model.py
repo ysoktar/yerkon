@@ -208,6 +208,32 @@ class Buildings:
             return 0.0
         return float(self.height_m[near][inside].max())
 
+    def tallest_at_many(self, xs, ys):
+        """`tallest_at` for a whole line of points at once.
+
+        Same answer, one pass. A profile read every ten metres over an
+        open-country link is seven hundred points, and asking them one
+        at a time spends most of its time in call overhead rather than
+        in arithmetic (ADR-0062).
+        """
+        out = np.zeros(len(xs), dtype=float)
+        if self.is_empty:
+            return out
+        cells, cell_m = self._index()
+        columns = (xs // cell_m).astype(int)
+        rows = (ys // cell_m).astype(int)
+        for index in range(len(xs)):
+            near = cells.get((int(columns[index]), int(rows[index])))
+            if near is None:
+                continue
+            inside = (
+                (xs[index] - self.centre_x_m[near]) ** 2
+                + (ys[index] - self.centre_y_m[near]) ** 2
+            ) <= self.radius_m[near] ** 2
+            if inside.any():
+                out[index] = float(self.height_m[near][inside].max())
+        return out
+
     def tallest_along(
         self,
         a: tuple[float, float, float],
@@ -460,6 +486,30 @@ class Site:
         top = grid[y0, x0] * (1 - fx) + grid[y0, x1] * fx
         bottom = grid[y1, x0] * (1 - fx) + grid[y1, x1] * fx
         return float(top * (1 - fy) + bottom * fy)
+
+    def heights_at(self, xs, ys):
+        """`height_at` for a whole line of points at once, same answer.
+
+        The bilinear arithmetic is identical; what goes is the per-point
+        call overhead, which is most of what reading a profile costs
+        (ADR-0062).
+        """
+        rows, columns = self.elevation_grid_m.shape
+        cx = np.clip(np.asarray(xs, dtype=float) / self.grid_spacing_m,
+                     0.0, columns - 1.0)
+        cy = np.clip(np.asarray(ys, dtype=float) / self.grid_spacing_m,
+                     0.0, rows - 1.0)
+
+        x0 = cx.astype(int)
+        y0 = cy.astype(int)
+        x1 = np.minimum(x0 + 1, columns - 1)
+        y1 = np.minimum(y0 + 1, rows - 1)
+        fx, fy = cx - x0, cy - y0
+
+        grid = self.elevation_grid_m
+        top = grid[y0, x0] * (1 - fx) + grid[y0, x1] * fx
+        bottom = grid[y1, x0] * (1 - fx) + grid[y1, x1] * fx
+        return top * (1 - fy) + bottom * fy
 
     @property
     def relief_m(self) -> float:

@@ -18,6 +18,8 @@ import math
 from dataclasses import dataclass, field
 from typing import Callable, Optional, Sequence, TYPE_CHECKING
 
+import numpy as np
+
 from yerkon.evidence import Sourced
 from yerkon.hardware import Radio, SX1280
 from yerkon.language import say
@@ -75,6 +77,20 @@ class Terrain:
     #: rest of this carries (ADR-0055). Nothing where it is not modelled,
     #: and last for the same reason `extent_m` is (ADR-0035).
     shadowing: Optional["Shadowing"] = None
+    #: How far apart the profile's samples are, in metres along the path.
+    #:
+    #: Zero keeps the fixed count a caller asks for, which is what this
+    #: did before the spacing existed and what an arrangement saved then
+    #: loads as (ADR-0035, ADR-0062).
+    #:
+    #: A fixed count makes the spacing depend on the link's length rather
+    #: than on the ground, and a sample count is not a property of a
+    #: ground model. At 64 samples a 6,9 km open-country link reads its
+    #: profile every 108 m, over a grid whose own cells are 30 m across,
+    #: and Bullington's construction takes a maximum over those samples,
+    #: so it can only be biased low. Measured over Polatlı it reads 31,28
+    #: dB where the same link at 6,7 m spacing reads 37,60.
+    profile_spacing_m: float = 0.0
 
     def __post_init__(self) -> None:
         if self.clutter_loss_db_per_km < 0.0:
@@ -84,6 +100,20 @@ class Terrain:
 
     def height_at(self, x: float, y: float) -> float:
         return float(self.elevation_m(x, y))
+
+    #: Fewest and most samples a spacing may ask for.
+    #:
+    #: The floor keeps a short link from being read off three points; the
+    #: ceiling keeps a 20 km one from costing two thousand.
+    FEWEST_SAMPLES = 32
+    MOST_SAMPLES = 2048
+
+    def samples_between(self, a, b, asked: int = 64) -> int:
+        """How many samples this ground wants along this path."""
+        if self.profile_spacing_m <= 0.0:
+            return asked
+        wanted = int(math.dist(a, b) / self.profile_spacing_m)
+        return max(min(wanted, self.MOST_SAMPLES), self.FEWEST_SAMPLES)
 
     def profile_between(
         self,
@@ -95,12 +125,31 @@ class Terrain:
 
         Sampled rather than analytic because a real site arrives as a
         raster and this keeps the interface the same either way.
+
+        ``samples`` is what the caller asks for and ``profile_spacing_m``
+        overrides it where it is set, because how finely a path is read
+        is a property of the ground rather than of whoever is asking.
         """
+        samples = self.samples_between(a, b, samples)
         if samples < 2:
             raise ValueError("a profile needs at least two samples")
+
+        # In one pass where the ground can answer that way, which is
+        # every kind of ground this project ships. Reading a profile is
+        # 84 % of what asking about an obstruction costs, and nearly all
+        # of that was per-point call overhead rather than arithmetic
+        # (ADR-0062). The fallback is here because `elevation_m` is a
+        # plain callable and a caller is free to pass one.
+        along = getattr(self.elevation_m, "along", None)
+        fractions = [i / samples for i in range(samples + 1)]
+        if along is not None:
+            steps = np.arange(samples + 1, dtype=float) / samples
+            heights = along(a[0] + (b[0] - a[0]) * steps,
+                            a[1] + (b[1] - a[1]) * steps)
+            return list(zip(fractions, (float(h) for h in heights)))
+
         out = []
-        for i in range(samples + 1):
-            f = i / samples
+        for f in fractions:
             x = a[0] + (b[0] - a[0]) * f
             y = a[1] + (b[1] - a[1]) * f
             out.append((f, self.height_at(x, y)))
@@ -600,6 +649,9 @@ class Level:
     def __call__(self, x: float, y: float) -> float:
         return self.elevation_m
 
+    def along(self, xs, ys):
+        return np.full(len(xs), self.elevation_m, dtype=float)
+
 
 @dataclass(frozen=True)
 class Rolling:
@@ -626,6 +678,17 @@ class Rolling:
         across = 0.2 * math.sin(2.0 * math.pi * y / (self.wavelength_m * 0.6))
         return self.amplitude_m * (long_wave + short_wave + across) / 1.55
 
+    def along(self, xs, ys):
+        phase = self.phase
+        xs = np.asarray(xs, dtype=float)
+        ys = np.asarray(ys, dtype=float)
+        long_wave = np.sin(2.0 * np.pi * xs / self.wavelength_m + phase)
+        short_wave = 0.35 * np.sin(
+            2.0 * np.pi * xs / (self.wavelength_m * 0.37) + 2.0 * phase
+        )
+        across = 0.2 * np.sin(2.0 * np.pi * ys / (self.wavelength_m * 0.6))
+        return self.amplitude_m * (long_wave + short_wave + across) / 1.55
+
 
 @dataclass(frozen=True)
 class Sloping:
@@ -640,6 +703,12 @@ class Sloping:
         return self.entry_elevation_m + (
             self.exit_elevation_m - self.entry_elevation_m
         ) * along
+
+    def along(self, xs, ys):
+        fraction = np.clip(np.asarray(xs, dtype=float) / self.length_m, 0.0, 1.0)
+        return self.entry_elevation_m + (
+            self.exit_elevation_m - self.entry_elevation_m
+        ) * fraction
 
 
 @dataclass(frozen=True)
@@ -660,6 +729,13 @@ class Fetched:
         if buildings is None or buildings.is_empty:
             return ground
         return ground + buildings.tallest_at(x, y)
+
+    def along(self, xs, ys):
+        ground = self.site.heights_at(xs, ys)
+        buildings = self.site.buildings
+        if buildings is None or buildings.is_empty:
+            return ground
+        return ground + buildings.tallest_at_many(xs, ys)
 
 
 def flat_terrain(

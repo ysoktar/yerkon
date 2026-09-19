@@ -643,7 +643,7 @@ seçenek olarak kaydetsin.
 ## Terminalden
 
 ```bash
-yerkon table                  # dört satır              ~3 dk 50 sn
+yerkon table                  # dört satır             ~15 dk 33 sn
 yerkon budget                 # hata dağılımı           ~4 dk
 yerkon budget --only tunnel   #                         ~45 sn
 yerkon options                # adlandırılmış yerleşimler
@@ -654,15 +654,23 @@ yerkon deliver --into docs/teslim --no-budget   # çalışma, Markdown olarak
 yerkon defaults --full        # her değer ve neye dayandığı
 ```
 
-Her şey makinenin ayırabildiği kadar çekirdekte koşar — sahip olduğundan
+Her şey makinenin ayırabildiği kadar çekirdekte koşar, sahip olduğundan
 bir eksik, böylece görüntüleyici kullanılabilir kalır. `yerkon table` bir
-ara dört dakikaydı, paralelleştirilince yetmiş saniyeye indi, ve
-gölgeleme geldiğinde tekrar çıktı — dört çekirdekte **3 dk 50 sn**:
-her satır **sekiz gölge dizilişi** üzerinden koşuyor, çünkü tek bir
-çekiliş kırsal satırın 95. yüzdeliğini 14,6 ile 279,6 m arasında
-herhangi bir yere koyuyor (ADR-0055). Hızlı olsun istersen
-`site.shadow_draws` değerini 1 yap: tek çekiliş, yetmiş saniye, ve
-yayımlanamayacak bir yüzdelik.
+ara dört dakikaydı, paralelleştirilince yetmiş saniyeye indi, gölgeleme
+geldiğinde 4 dk 46 sn'ye çıktı, ve profil on metrede bir okunmaya
+başlayınca dört çekirdekte **15 dk 33 sn** oldu.
+
+İki sebep, ikisi de ölçülmüş. Her satır **sekiz gölge dizilişi**
+üzerinden koşuyor, çünkü tek bir çekiliş kırsal satırın 95. yüzdeliğini
+14,6 ile 279,6 m arasında herhangi bir yere koyuyor (ADR-0055). Ve her
+bağlantının zemin profili **on metrede bir** okunuyor, çünkü 64 sabit
+örnek 6,9 km'lik bir kırsal bağlantıyı 108 m'de bir okuyordu ve
+kırınımı 6,32 dB eksik veriyordu (ADR-0062).
+
+İkisi de geri alınabilir. `site.shadow_draws` değerini 1 yapmak tek
+çekilişe indiriyor, `site.profile_spacing_m` değerini 0 yapmak sabit 64
+örneğe. İkisi birden yaklaşık yetmiş saniye, ve yayımlanamayacak bir
+yüzdelik.
 
 **Sayfa da sekizini havuzluyor, ama önce birini gösteriyor.**
 "Simülasyonu çalıştır"a basınca ilk çekiliş hemen çıkar ve panelde
@@ -688,10 +696,10 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,54 m | 8,78 m | %80,08 |
-| Kırsal | 3,47 m | 31,77 m | %51,80 |
-| Tünel | 1,84 m | 2,93 m | %100,00 |
-| Ağırlıklı | 2,66 m | 14,28 m | %64,99 |
+| Şehir içi | 2,46 m | 8,19 m | %79,88 |
+| Kırsal | 3,70 m | 22,72 m | %41,83 |
+| Tünel | 1,84 m | 2,93 m | %99,99 |
+| Ağırlıklı | 2,64 m | 13,44 m | %58,87 |
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
 zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79

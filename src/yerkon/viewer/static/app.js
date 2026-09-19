@@ -959,6 +959,7 @@ const TERMS = {
   demodulation_threshold_db: "çözme eşiği",
   electricity_tl_per_kwh: "elektrik birim fiyatı",
   estimator: "kestirici",
+  profile_spacing_m: "profil örnek aralığı",
   shadow_correlation_m: "gölge boyu",
   shadow_draws: "gölge çekilişi",
   shadow_seed: "gölge tohumu",
