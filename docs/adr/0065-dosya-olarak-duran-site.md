@@ -38,17 +38,26 @@ komut. Yarısı çalışan bir kopya hiç olmayandan kötü olurdu.
 `published.toml` ile aynı karar, ve burada bir faydası daha var: adreste
 duran baytlar, diff'te okunan baytlar oluyor.
 
-**Yayına bir iş akışı sokuyor**, `docs/` değiştiğinde çalışıp o klasörü
-olduğu gibi yükleyerek. Hiçbir şey kurmuyor ve hiçbir şey üretmiyor.
+**Yayın `gh-pages` dalından.** Sitenin dosyaları o dalın kökünde
+duruyor, ve dal ilk kez göründüğünde **GitHub Pages kendiliğinden
+açıldı**: `has_pages` false iken true oldu, ve ilk yayımlama
+`https://ysoktar.github.io/yerkon/` adresine `success` döndü. Hiçbir
+ayara dokunulmadı.
 
-Bir ayar elle yapılıyor, bir kez: Settings, Pages, Source, GitHub
-Actions. `actions/configure-pages`'in `enablement: true` seçeneği bunu
-onun yerine yapmak için konuldu ve yapamadı: bir Pages sitesi kurmak
-depo üzerinde admin istiyor, iş akışının kendi jetonu ise write'ta
-bitiyor. Denendi, kayıt burada: "Create Pages site failed. Error:
-Resource not accessible by integration". Seçenek yerinde kalıyor, çünkü
-jetonun daha fazlasını taşıdığı yerde çalışıyor ve böyle söyleyerek
-düşen bir koşu hiçbir şey söylemeyenden iyi.
+Bu, denenen üçüncü yoldu. İlk ikisi kapalı çıktı ve kaydı burada
+duruyor, çünkü bir sonraki sefer aynı duvara çarpmamak için:
+
+| yol | ne oldu |
+|---|---|
+| API'den `POST /repos/.../pages` | proxy bu yolu kapatıyor, 403 |
+| `actions/configure-pages` + `enablement: true` | "Create Pages site failed. Error: Resource not accessible by integration". Bir Pages sitesi kurmak depo üzerinde admin istiyor, iş akışının jetonu write'ta bitiyor |
+| `gh-pages` dalını push etmek | açıldı |
+
+**İş akışı da o dalı itiyor**, Pages'in yayımlama eylemlerini değil.
+Aynı sebep: o eylemler Pages API'sine gidiyor ve jeton oraya
+erişemiyor. Bir dal push etmek `contents: write` istiyor, o da var.
+`docs/` her değiştiğinde klasör olduğu gibi `gh-pages`'in köküne
+kopyalanıyor, tek bir commit olarak.
 
 **Ve eskiyebilir**, `published.toml`'un eskiyemeyeceği şekilde: onu bir
 koşu yazıyor, bunu hiçbir şey yeniden yazmıyor. O yüzden bir sınama
@@ -87,4 +96,6 @@ için yeni bir şey açılmıyor.
 
 **Özel alan adı yok.** Site depo adını taşıyor.
 
-**İlk ayar elle.** Yukarıda. Ondan sonrası push.
+**`gh-pages` tarihçe tutmuyor.** Her yayımlama tek bir commit olarak
+zorla itiliyor. Sitenin nereden geldiği ana dalın tarihçesinde duruyor,
+yayımlandığı dalda değil.

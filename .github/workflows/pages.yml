@@ -1,19 +1,16 @@
-# Puts the site on GitHub Pages.
+# Keeps the published site level with docs/.
 #
 # The site is a folder of files in the repository rather than something
-# built here (ADR-0065), so this uploads what is committed. A test says
-# that folder is what the pages draw, which makes the bytes on the
-# address the same bytes somebody reviewed in the diff.
+# built here (ADR-0065), so this copies what is committed onto the
+# branch GitHub Pages serves. A test says that folder is what the pages
+# draw, which makes the bytes on the address the bytes somebody read in
+# the diff.
 #
-# One setting has to be made by hand, once: Settings > Pages > Source >
-# GitHub Actions. `enablement: true` is here to do it instead, and it
-# cannot: creating a Pages site needs admin on the repository and the
-# workflow's own token tops out at write. It stays because it costs
-# nothing and does work where the token has more, and because a run that
-# fails saying "Create Pages site failed" is a clearer signpost than a
-# run that says nothing.
-#
-# After that setting, every push that touches docs/ deploys.
+# It pushes a branch rather than using the Pages deployment actions,
+# because those need the Pages API and the workflow's own token cannot
+# reach it: `actions/configure-pages` answered "Resource not accessible
+# by integration". Pushing a branch needs `contents: write`, which it
+# has. Pages itself turned on by itself when gh-pages first appeared.
 name: Pages
 
 on:
@@ -25,29 +22,36 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# One deployment at a time. A newer push wins rather than waiting behind
-# an older one, because what is wanted is the current site.
+# One at a time, and a newer push wins rather than waiting behind an
+# older one, because what is wanted is the current site.
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Put docs/ on gh-pages
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          # A fresh single commit each time. The branch is where the
+          # site is served from rather than where it is kept, so its
+          # history is nobody's record of anything.
+          out="$(mktemp -d)"
+          cp -a docs/. "$out/"
+          cd "$out"
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "The site, as GitHub Pages serves it"
+          git push -qf \
+            "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}" \
+            gh-pages
