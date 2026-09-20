@@ -1,0 +1,372 @@
+# Where every figure that is not ours came from.
+#
+# The bibliography of the report, as the report itself carries it: these
+# are the addresses its own hyperlinks point at, not addresses found
+# later. `comparison.toml` points at these keys, so a note in the table
+# and the list on the sources page name the same thing (ADR-0070).
+
+[[group]]
+key = "gnss"
+name.tr = "Uydu ve bölgesel uydu sistemleri"
+name.en = "Satellite and regional satellite systems"
+
+[[group]]
+key = "navic"
+name.tr = "NavIC"
+name.en = "NavIC"
+
+[[group]]
+key = "terrestrial"
+name.tr = "Karasal sistemler"
+name.en = "Terrestrial systems"
+
+[[group]]
+key = "radio"
+name.tr = "Telsiz modülleri ve makaleler"
+name.en = "Radio modules and papers"
+
+[[group]]
+key = "project"
+name.tr = "YERKON, fiyatlar ve kur"
+name.en = "YERKON, prices and exchange rates"
+
+[[group]]
+key = "news"
+name.tr = "Haberler"
+name.en = "News"
+
+[[source]]
+key = "nasa-area"
+group = "gnss"
+label.tr = "NASA/JPL, dünya yüzey alanı"
+label.en = "NASA, the earth's surface area"
+url = "https://science.nasa.gov/moon/by-the-numbers/"
+
+[[source]]
+key = "gps-gov"
+group = "gnss"
+label.tr = "GPS.gov, GPS performansı"
+label.en = "GPS.gov, GPS performance"
+url = "https://www.gps.gov/gps-performance"
+
+[[source]]
+key = "gps-investment"
+group = "gnss"
+label.tr = "National Academies, GPS tarihsel yatırım"
+label.en = "National Academies, historical GPS investment"
+url = "https://nap.nationalacademies.org/read/4920/chapter/86"
+
+[[source]]
+key = "gps-sustain"
+group = "gnss"
+label.tr = "U.S. Government GPS Archive, yıllık sürdürme maliyeti"
+label.en = "U.S. Government GPS Archive, yearly sustainment cost"
+url = "https://archive.gps.gov/policy/docs/1993-joint-task-force.pdf"
+
+[[source]]
+key = "eca-galileo"
+group = "gnss"
+label.tr = "European Court of Auditors, Galileo kurulum maliyeti"
+label.en = "European Court of Auditors, Galileo deployment cost"
+url = "https://www.eca.europa.eu/lists/ecadocuments/sr09_07/sr09_07_en.pdf"
+
+[[source]]
+key = "ec-galileo"
+group = "gnss"
+label.tr = "European Commission, Galileo işletme maliyeti"
+label.en = "European Commission, Galileo operating cost"
+url = "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=celex%3A52011DC0005"
+
+[[source]]
+key = "gsc-galileo"
+group = "gnss"
+label.tr = "European GNSS Service Centre, Galileo OS performansı"
+label.en = "European GNSS Service Centre, Galileo OS performance"
+url = "https://www.gsc-europa.eu/news/galileo-performance-reports-of-q1-2022-available-for-download"
+
+[[source]]
+key = "kommersant-build"
+group = "gnss"
+label.tr = "Kommersant, GLONASS kurulum dönemi maliyeti"
+label.en = "Kommersant, GLONASS deployment period cost"
+url = "https://www.kommersant.ru/doc/1868126"
+
+[[source]]
+key = "kommersant-run"
+group = "gnss"
+label.tr = "Kommersant, GLONASS işletme programı maliyetleri"
+label.en = "Kommersant, GLONASS operating programme costs"
+url = "https://www.kommersant.ru/doc/1868432"
+
+[[source]]
+key = "kommersant-items"
+group = "gnss"
+label.tr = "Kommersant, GLONASS program maliyet kalemleri"
+label.en = "Kommersant, GLONASS programme cost items"
+url = "https://www.kommersant.ru/doc/1868426"
+
+[[source]]
+key = "gost-glonass"
+group = "gnss"
+label.tr = "GOST 32454-2013, GLONASS performans eşikleri"
+label.en = "GOST 32454-2013, GLONASS performance thresholds"
+url = "https://base.garant.ru/71319252/"
+
+[[source]]
+key = "icao-annex"
+group = "gnss"
+label.tr = "ICAO Annex 10, GLONASS/BDS kullanılabilirliği"
+label.en = "ICAO Annex 10, GLONASS and BeiDou availability"
+url = "https://www.icao.int/sites/default/files/APAC/GBAS-SBAS/041e_Amendment-to-Annex-10-Vol-I-DFMC_GLONASS_BDS.pdf"
+
+[[source]]
+key = "casi-beidou"
+group = "gnss"
+label.tr = "CASI, BeiDou program maliyet tahmini"
+label.en = "CASI, BeiDou programme cost estimate"
+url = "https://www.airuniversity.af.edu/Portals/10/CASI/documents/Research/Space/2024-05-20%20To%20Be%20More%20Precise%20-%20Beidou.pdf"
+
+[[source]]
+key = "beidou-office"
+group = "gnss"
+label.tr = "China Satellite Navigation Office, BeiDou performansı"
+label.en = "China Satellite Navigation Office, BeiDou performance"
+url = "https://en.beidou.gov.cn/SYSTEMS/System/201806/t20180614_15002.html"
+
+[[source]]
+key = "qzss-spec"
+group = "gnss"
+label.tr = "QZSS, SLAS teknik şartnamesi"
+label.en = "QZSS, SLAS technical specification"
+url = "https://qzss.go.jp/technical/system/l1s.html"
+
+[[source]]
+key = "qzss-report"
+group = "gnss"
+label.tr = "QZSS, SLAS performans raporu"
+label.en = "QZSS, SLAS performance report"
+url = "https://sys.qzss.go.jp/serv_report/SLA/Service%20performance%20report_for_1stH_FY2025_SLAS.pdf"
+
+[[source]]
+key = "cao-cost"
+group = "gnss"
+label.tr = "Cabinet Office Japan, QZSS program maliyet bilgisi"
+label.en = "Cabinet Office Japan, QZSS programme cost"
+url = "https://www8.cao.go.jp/space/seminar/fy25-dai9/cao.pdf"
+
+[[source]]
+key = "cao-archive"
+group = "gnss"
+label.tr = "Cabinet Office Japan, QZSS bütçe arşivi"
+label.en = "Cabinet Office Japan, QZSS budget archive"
+url = "https://www8.cao.go.jp/space/qzs/qzs.html"
+
+[[source]]
+key = "cao-budget"
+group = "gnss"
+label.tr = "Cabinet Office Japan, QZSS FY2026 bütçesi"
+label.en = "Cabinet Office Japan, QZSS FY2026 budget"
+url = "https://www.cao.go.jp/yosan/soshiki/r08/yosan_gai_r08.pdf"
+
+[[source]]
+key = "navic-cost"
+group = "navic"
+label.tr = "Government of India, NavIC kurulum maliyeti"
+label.en = "Government of India, NavIC deployment cost"
+url = "https://www.pib.gov.in/newsite/erelcontent.aspx?lang=2&reg=48&relid=17521"
+
+[[source]]
+key = "navic-scope"
+group = "navic"
+label.tr = "Government of India, NavIC maliyet kapsamı"
+label.en = "Government of India, what the NavIC cost covers"
+url = "https://www.pib.gov.in/newsite/PrintRelease.aspx?lang=2&reg=3&relid=98888"
+
+[[source]]
+key = "isro-accuracy"
+group = "navic"
+label.tr = "ISRO, NavIC doğruluk ve yaklaşık servis alanı"
+label.en = "ISRO, NavIC accuracy and approximate service area"
+url = "https://www.isro.gov.in/NVS-02_Advancing_Navigation_Capabilities.html"
+
+[[source]]
+key = "isro-limits"
+group = "navic"
+label.tr = "ISRO, NavIC servis alanı sınırları"
+label.en = "ISRO, NavIC service area limits"
+url = "https://www.isro.gov.in/ISRO_EN/FAQ_Applications.html"
+
+[[source]]
+key = "pib-navic"
+group = "navic"
+label.tr = "Government of India / PIB, güncel NavIC durumu"
+label.en = "Government of India, current NavIC status"
+url = "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2291079&lang=1&reg=1"
+
+[[source]]
+key = "ion-terrapoint"
+group = "terrestrial"
+label.tr = "ION, NextNav TerraPoiNT P50/P95 2B performansı"
+label.en = "ION, NextNav TerraPoiNT P50/P95 2D performance"
+url = "https://www.ion.org/publications/abstract.cfm?articleID=18074"
+
+[[source]]
+key = "jrc-nextnav"
+group = "terrestrial"
+label.tr = "European Commission JRC, NextNav dikey doğruluk"
+label.en = "European Commission JRC, NextNav vertical accuracy"
+url = "https://joint-research-centre.ec.europa.eu/system/files/2023-03/AD_7_NextNav.pdf"
+
+[[source]]
+key = "sec-nextnav"
+group = "terrestrial"
+label.tr = "SEC / NextNav Investor Day, Bay Area ağ ölçeği"
+label.en = "SEC, NextNav investor day, Bay Area network scale"
+url = "https://www.sec.gov/Archives/edgar/data/1822553/000121390021048303/ea147497-425_spartacus.htm"
+
+[[source]]
+key = "jrc-locata"
+group = "terrestrial"
+label.tr = "European Commission JRC, Locata performansı"
+label.en = "European Commission JRC, Locata performance"
+url = "https://www.locata.com/s/1-JRC-DEFIS-Summary-Report-Main-JRC132737_01.pdf"
+
+[[source]]
+key = "airforce-locata"
+group = "terrestrial"
+label.tr = "Airforce Technology, Locata White Sands kapsaması"
+label.en = "Airforce Technology, Locata White Sands coverage"
+url = "https://www.airforce-technology.com/news/newsusaf-orders-locatanet-positioning-system/"
+
+[[source]]
+key = "sensors-pozyx"
+group = "terrestrial"
+label.tr = "Sensors, Pozyx P50/P95 konum hatası"
+label.en = "Sensors, Pozyx P50/P95 position error"
+url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC7582353/"
+
+[[source]]
+key = "pozyx-install"
+group = "terrestrial"
+label.tr = "Pozyx, 35.000 m² endüstriyel kurulum"
+label.en = "Pozyx, a 35000 m² industrial installation"
+url = "https://www.pozyx.io/newsroom/going-beyond-standard-forklift-telematics-with-location-data"
+
+[[source]]
+key = "mof-eloran"
+group = "terrestrial"
+label.tr = "Republic of Korea MOF, eLoran proje bütçesi"
+label.en = "Republic of Korea MOF, eLoran project budget"
+url = "https://www.mof.go.kr/doc/ko/selectDoc.do?bbsSeq=11&docSeq=2729&menuSeq=972"
+
+[[source]]
+key = "jpnt-requirements"
+group = "terrestrial"
+label.tr = "JPNT, eLoran testbed performans gereksinimleri"
+label.en = "JPNT, eLoran testbed performance requirements"
+url = "https://www.jpnt.org/wp-content/uploads/2024/03/JPNT-0602-02.pdf"
+
+[[source]]
+key = "kriso-eloran"
+group = "terrestrial"
+label.tr = "KRISO, eLoran ölçülmüş P95 yatay doğruluk"
+label.en = "KRISO, measured eLoran P95 horizontal accuracy"
+url = "https://www.kriso.re.kr/sciwatch/handle/2021.sw.kriso/7554?mode=full"
+
+[[source]]
+key = "jpnt-korea"
+group = "terrestrial"
+label.tr = "JPNT, güncel Kore eLoran kurulumu"
+label.en = "JPNT, the current Korean eLoran installation"
+url = "https://www.jpnt.org/1402-10/"
+
+[[source]]
+key = "sx1280-datasheet"
+group = "radio"
+label.tr = "SX1280 Datasheet"
+label.en = "SX1280 datasheet"
+url = "https://manuals.plus/m/b6f3f947301a57194a3450fa72bd48fb71ea75cff2e0fdefa29c6dd8230d9e38.pdf"
+
+[[source]]
+key = "sx1280-range"
+group = "radio"
+label.tr = "SX1280 Uzun Menzil Testi"
+label.en = "SX1280 long range test"
+url = "https://stuartsprojects.github.io/2019/04/26/Semtech-SX1280-2-4Ghz-LoRa-ranging-tranceivers.html"
+
+[[source]]
+key = "dwm3000-datasheet"
+group = "radio"
+label.tr = "Qorvo DWM3000 Datasheet"
+label.en = "Qorvo DWM3000 datasheet"
+url = "https://download.mikroe.com/documents/datasheets/DWM3000_datasheet.pdf"
+
+[[source]]
+key = "twr-cdma"
+group = "radio"
+label.tr = "TWR CDMA"
+label.en = "TWR CDMA"
+url = "https://ieeexplore.ieee.org/abstract/document/11435291"
+
+[[source]]
+key = "yerkon-github"
+group = "project"
+label.tr = "YERKON GitHub, simülasyon kodu ve yöntem"
+label.en = "YERKON on GitHub, the simulation code and its method"
+url = "https://github.com/ysoktar/yerkon"
+
+[[source]]
+key = "digikey"
+group = "project"
+label.tr = "DigiKey, elektronik bileşen fiyatları"
+label.en = "DigiKey, electronic component prices"
+url = "https://www.digikey.com/"
+
+[[source]]
+key = "lcsc"
+group = "project"
+label.tr = "LCSC, elektronik bileşen fiyatları"
+label.en = "LCSC, electronic component prices"
+url = "https://www.lcsc.com/"
+
+[[source]]
+key = "mouser"
+group = "project"
+label.tr = "Mouser, elektronik bileşen fiyatları"
+label.en = "Mouser, electronic component prices"
+url = "https://www.mouser.com/"
+
+[[source]]
+key = "banque-de-france"
+group = "project"
+label.tr = "Banque de France, 4 Eylül 2026 referans kurları"
+label.en = "Banque de France, reference rates of 4 September 2026"
+url = "https://www.banque-france.fr/en/statistics/rates-and-prices/exchange-rates-daily-parities-2026-09-04"
+
+[[source]]
+key = "news-ambulance"
+group = "news"
+label.tr = "Ambulans Uçağı Kazası (Mayıs 2026)"
+label.en = "The air ambulance crash (May 2026)"
+url = "https://www.military.com/air-medevac-crew-lost-gps-during-military-jamming-before-fatal-crash-ntsb-says?utm_source=gemini"
+
+[[source]]
+key = "news-baltic"
+group = "news"
+label.tr = "Baltık'ta Durdurulan Uçuşlar (Nisan 2024)"
+label.en = "Flights stopped over the Baltic (April 2024)"
+url = "https://www.aa.com.tr/en/europe/suspected-russian-gps-jamming-too-dangerous-to-ignore-baltic-officials/3205763"
+
+[[source]]
+key = "news-norway"
+group = "news"
+label.tr = "Norveç Arama-Kurtarma Zafiyeti (2019-Günümüz)"
+label.en = "Search and rescue blinded in Norway (2019 onwards)"
+url = "https://www.thebarentsobserver.com/security/gps-jamming-jeopardizes-public-safety-in-norways-northernmost-region/157622"
+
+[[source]]
+key = "news-black-sea"
+group = "news"
+label.tr = "Karadeniz'de Toplu Gemi Yanıltması / Spoofing (2017)"
+label.en = "Mass ship spoofing in the Black Sea (2017)"
+url = "https://galileognss.eu/mass-gps-spoofing-attack-in-black-sea/"

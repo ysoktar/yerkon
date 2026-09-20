@@ -105,8 +105,13 @@ onu eziyor.
 Sonuç sayfası karşılaştırma tablosunun tamamını gösteriyor: on üç
 sistem, aynı sütunlarla. Üç YERKON satırı koşunun kendi yazdığı
 `src/yerkon/published.toml` dosyasından geliyor; diğer on satır ve
-otuz iki not `src/yerkon/comparison.toml` içinde duruyor, ve oradaki
+otuz sekiz not `src/yerkon/comparison.toml` içinde duruyor, ve oradaki
 hiçbir sayı hesaplanmıyor (ADR-0069).
+
+Her not, dayandığı kaynağa bağlanıyor. Raporun kaynakçasındaki 48
+bağlantı `src/yerkon/sources.toml` içinde, altı grup altında; notlar
+onları anahtarla anıyor ve Kaynaklar sayfası hepsini listeliyor
+(ADR-0070).
 
 O dosyayı `yerkon table --publish` yazıyor ve iki şeyi reddediyor: eksik bir tablo
 ve `--fast` ile yapılmış kaba bir okuma. Bir sınama sitede yayımlanan

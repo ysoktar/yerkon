@@ -103,8 +103,13 @@ overrides it.
 The results page shows the whole comparison table: thirteen systems
 under the same columns. The three YERKON rows come from
 `src/yerkon/published.toml`, which a run wrote; the other ten rows and
-thirty two notes live in `src/yerkon/comparison.toml`, where nothing is
-computed (ADR-0069).
+thirty eight notes live in `src/yerkon/comparison.toml`, where nothing
+is computed (ADR-0069).
+
+Every note links to the source it rests on. The 48 hyperlinks of the
+report's bibliography live in `src/yerkon/sources.toml` under six
+groups; the notes cite them by key and the sources page lists all of
+them (ADR-0070).
 
 `yerkon table --publish` writes that file and refuses two things: a table missing rows
 and a coarse `--fast` reading. A test says no published cell was typed

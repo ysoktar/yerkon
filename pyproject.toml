@@ -27,6 +27,7 @@ where = ["src"]
                  "places/*/*.png"]
 # Named deployment options, shipped and saved. See `yerkon options`.
 "yerkon" = ["defaults.toml", "published.toml", "comparison.toml",
+            "sources.toml",
             "options/*.toml"]
 
 [tool.pytest.ini_options]

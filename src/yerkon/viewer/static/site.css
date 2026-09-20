@@ -180,6 +180,16 @@ ol.notes { margin: 18px 0 0; padding-left: 26px; color: var(--quiet);
 ol.notes li { margin-bottom: 7px; }
 ol.notes li:target { color: var(--ink); }
 a.back { text-decoration: none; }
+/* The bibliography entries a note rests on, beside the note itself. */
+.cited a { color: var(--quiet); }
+.cited a:hover { color: var(--ink); }
+
+/* The bibliography, grouped the way the report groups it. */
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--quiet); margin: 22px 0 9px; font-weight: 600; }
+section h3:first-child { margin-top: 0; }
+h3 + ul { font-size: 13px; }
+h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
 
 @media (max-width: 760px) {
   header { padding: 10px 16px; }

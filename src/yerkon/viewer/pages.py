@@ -26,6 +26,7 @@ import re
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
+from yerkon import sources
 from yerkon.numbers import decimal_comma
 
 
@@ -293,22 +294,34 @@ WHY = Page(
                 _w(
                     "**ABD, Mayıs 2026.** Roswell'den kalkan bir ambulans "
                     "uçağı askeri GPS karıştırmasına maruz kaldı ve "
-                    "Ruidoso'ya varamadan bir dağa çarptı.",
+                    "Ruidoso'ya varamadan bir dağa çarptı. "
+                    "[NTSB üzerine haber](https://www.military.com/"
+                    "air-medevac-crew-lost-gps-during-military-jamming-"
+                    "before-fatal-crash-ntsb-says?utm_source=gemini)",
                     "**United States, May 2026.** An air ambulance out of "
                     "Roswell flew into military GPS jamming and hit a "
-                    "mountain short of Ruidoso.",
+                    "mountain short of Ruidoso. "
+                    "[Report on the NTSB finding](https://www.military.com/"
+                    "air-medevac-crew-lost-gps-during-military-jamming-"
+                    "before-fatal-crash-ntsb-says?utm_source=gemini)",
                 ),
                 _w(
                     "**Baltık, Nisan 2024.** Finnair, Tartu uçuşlarını bir "
                     "ay boyunca durdurdu. İki yolcu uçağı yaklaşma "
                     "sırasında sinyali kaybedip Helsinki'ye döndü, ve "
                     "havalimanının yalnızca GPS tabanlı yaklaşma sistemi "
-                    "olduğu için haftalarca kapandı.",
+                    "olduğu için haftalarca kapandı. "
+                    "[Anadolu Ajansı](https://www.aa.com.tr/en/europe/"
+                    "suspected-russian-gps-jamming-too-dangerous-to-ignore-"
+                    "baltic-officials/3205763)",
                     "**The Baltic, April 2024.** Finnair stopped flying to "
                     "Tartu for a month. Two airliners lost the signal on "
                     "approach and turned back to Helsinki, and the airport "
                     "closed for weeks because its only approach system was "
-                    "GPS based.",
+                    "GPS based. "
+                    "[Anadolu Agency](https://www.aa.com.tr/en/europe/"
+                    "suspected-russian-gps-jamming-too-dangerous-to-ignore-"
+                    "baltic-officials/3205763)",
                 ),
                 _w(
                     "**Norveç, 2019'dan bu yana.** Kola Yarımadası'ndan "
@@ -316,20 +329,30 @@ WHY = Page(
                     "ambulans ve kurtarma ekiplerinin navigasyonunu "
                     "defalarca kör etti. Bir kar fırtınasında kaybolan "
                     "kişinin acil durum vericisi çalışmadı ve kurtarma "
-                    "helikopterleri kör uçtu.",
+                    "helikopterleri kör uçtu. "
+                    "[The Barents Observer](https://www.thebarentsobserver"
+                    ".com/security/gps-jamming-jeopardizes-public-safety-in-"
+                    "norways-northernmost-region/157622)",
                     "**Norway, 2019 onwards.** Steady jamming from the "
                     "Kola Peninsula has repeatedly blinded police, "
                     "ambulance and rescue navigation in Finnmark. During "
                     "one snowstorm a missing person's emergency beacon "
-                    "failed and the rescue helicopters flew blind.",
+                    "failed and the rescue helicopters flew blind. "
+                    "[The Barents Observer](https://www.thebarentsobserver"
+                    ".com/security/gps-jamming-jeopardizes-public-safety-in-"
+                    "norways-northernmost-region/157622)",
                 ),
                 _w(
                     "**Karadeniz, 2017.** Yirmiden fazla ticari geminin "
                     "alıcısı, gemiler denizin ortasındayken konumu 40 km "
-                    "içerideki bir havalimanında gösterdi.",
+                    "içerideki bir havalimanında gösterdi. "
+                    "[GalileoGNSS](https://galileognss.eu/"
+                    "mass-gps-spoofing-attack-in-black-sea/)",
                     "**The Black Sea, 2017.** Receivers on more than twenty "
                     "commercial ships put them at an airport 40 km inland "
-                    "while they were at sea.",
+                    "while they were at sea. "
+                    "[GalileoGNSS](https://galileognss.eu/"
+                    "mass-gps-spoofing-attack-in-black-sea/)",
                 ),
             ),
         ),
@@ -355,13 +378,11 @@ WHY = Page(
                     "Aldatmaya karşı YERKON bir yedekten fazlasıdır. "
                     "Araçlar ve gemiler uydu çözümüyle karasal çözümü "
                     "karşılaştırarak saldırı altında olduklarını "
-                    "görebilir. Yukarıdaki dört olayın kaynakları raporun "
-                    "kaynakçasındadır.",
+                    "görebilir.",
                     "Against spoofing YERKON is more than a backup. "
                     "Vehicles and ships can compare the satellite solution "
                     "with the terrestrial one and see that they are under "
-                    "attack. The four events above are sourced in the "
-                    "report's bibliography.",
+                    "attack.",
                 ),
             ),
         ),
@@ -704,14 +725,18 @@ RESEARCH = Page(
                     "almaz, bu yüzden daha az trafik üretir. Çift yönlü "
                     "ölçümde alıcı ile birim karşılıklı konuşur. TWR CDMA "
                     "gibi yaklaşımlar ve yazılım tanımlı radyo bu farkı "
-                    "kapatmak için denenecek.",
+                    "kapatmak için denenecek. "
+                    "[TWR CDMA makalesi](https://ieeexplore.ieee.org/"
+                    "abstract/document/11435291)",
                     "**Can two way ranging's traffic and scaling costs be "
                     "brought down?** Time difference systems broadcast one "
                     "way and take no message from the receiver, so they "
                     "produce less traffic. In two way ranging the receiver "
                     "and the unit talk to each other. Approaches such as "
                     "TWR CDMA and software defined radio will be tried to "
-                    "close that gap.",
+                    "close that gap. "
+                    "[The TWR CDMA paper](https://ieeexplore.ieee.org/"
+                    "abstract/document/11435291)",
                 ),
                 _w(
                     "**Konumlandırma hizmeti sunan bir altyapının güvenlik "
@@ -1470,17 +1495,31 @@ SOURCES = Page(
                    "Kur 4 Eylül 2026.",
                    "DigiKey, LCSC and Mouser list prices, 6 September 2026. "
                    "Exchange rate 4 September 2026."),
-                _w("Karşılaştırma tablosunun uydu ve karasal satırları: "
-                   "GPS.gov, European GNSS Service Centre, GOST 32454-2013, "
-                   "ICAO Annex 10, QZSS, ISRO, ION, JRC ve KRISO. Hepsi "
-                   "raporun kaynakçasında dipnotlarıyla.",
-                   "The satellite and terrestrial rows of the comparison "
-                   "table: GPS.gov, the European GNSS Service Centre, GOST "
-                   "32454-2013, ICAO Annex 10, QZSS, ISRO, ION, the JRC and "
-                   "KRISO. All of them are footnoted in the report's "
-                   "bibliography."),
+                _w("Karşılaştırma tablosunun bizim olmayan satırları "
+                   "aşağıdaki kaynakçadan gelir. Tablonun altındaki her "
+                   "dipnot, dayandığı girdiye bağlıdır.",
+                   "The rows of the comparison table that are not ours "
+                   "come from the bibliography below. Every note under the "
+                   "table links to the entry it rests on."),
             ),
         ),
+        Part(
+            kind="text",
+            heading=_w("Raporun kaynakçası", "The report's bibliography"),
+            lines=(
+                _w(
+                    "Raporun kaynakça bağlantılarının tamamı, raporda "
+                    "yazıldığı hâliyle. Bir girdiyi burada hiçbir dipnot "
+                    "anmıyorsa da listede kalır: bu liste raporun "
+                    "kaynakçası, sitenin kullandıklarının listesi değil.",
+                    "Every hyperlink in the report's bibliography, as the "
+                    "report wrote it. An entry no note cites is still "
+                    "listed: this is the report's bibliography, not a list "
+                    "of what the site happened to use.",
+                ),
+            ),
+        ),
+        Part(kind="shows", shows="bibliography"),
         Part(
             kind="code",
             heading=_w("Tabloyu yeniden üretmek", "Reproducing the table"),
@@ -1781,6 +1820,20 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
                 html.escape(part.lines[0].said(language), quote=True),
                 _said(part.lines[0], language),
             )
+    elif part.kind == "shows" and part.shows == "bibliography":
+        drawn = "".join(
+            "<h3>{}</h3><ul>{}</ul>".format(
+                html.escape(group.said(language)),
+                "".join(
+                    '<li><a href="{}">{}</a></li>'.format(
+                        html.escape(entry.url, quote=True),
+                        html.escape(entry.said(language)),
+                    )
+                    for entry in group.entries
+                ),
+            )
+            for group in sources.read().groups
+        )
     elif part.kind == "shows" and part.shows == "headline":
         drawn = _headline(published, language)
     elif part.kind == "shows" and part.shows == "published":
@@ -1873,9 +1926,12 @@ def _published(published, language: str, table=None) -> str:
         draws=published.shadow_draws,
         spacing=decimal_comma(published.profile_spacing_m, 0),
     )
+    bibliography = sources.read()
     listed = "".join(
-        '<li id="note{0}">{1} <a class="back" href="#back{0}">↑</a></li>'
-        .format(at, _marked(table.said(key, language)))
+        '<li id="note{0}">{1}{2} <a class="back" href="#back{0}">↑</a></li>'
+        .format(at, _marked(table.said(key, language)),
+                _cited(table.notes[key].get("sources", ()), bibliography,
+                       language))
         for key, at in sorted(numbered.items(), key=lambda pair: pair[1])
     )
     return (
@@ -1886,6 +1942,19 @@ def _published(published, language: str, table=None) -> str:
         table=_table([head] + body, numeric_from=3, ours_from=ours),
         note=note, notes=listed,
     )
+
+
+def _cited(keys, bibliography, language: str) -> str:
+    """The bibliography entries a note rests on, as links."""
+    if not keys:
+        return ""
+    return ' <span class="cited">{}</span>'.format(" · ".join(
+        '<a href="{}">{}</a>'.format(
+            html.escape(bibliography.entry(key).url, quote=True),
+            html.escape(bibliography.entry(key).said(language)),
+        )
+        for key in keys
+    ))
 
 
 def _table(
@@ -1974,4 +2043,15 @@ def _marked(text: str) -> str:
     out = html.escape(text)
     out = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", out)
     out = re.sub(r"`(.+?)`", r"<code>\1</code>", out)
+    # [what it is](where it is). Only http and https: a phrase is data
+    # as far as this function is concerned, and javascript: in a link is
+    # the one thing that turns data into behaviour.
+    # The whole text went through html.escape above, so the address the
+    # regex hands back is already safe to sit in an attribute. Escaping
+    # it again would turn & into &amp;amp; and break the address.
+    out = re.sub(
+        r"\[([^\]]+)\]\((https?://[^)\s]+)\)",
+        r'<a href="\2">\1</a>',
+        out,
+    )
     return out

@@ -78,9 +78,10 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `presets.py` | adlandırılmış düzenlemeler: bir sekmenin tamamı, kaydedilip geri yüklenen |
 | `viewer/static/map.js` | yer seçici: kayan harita, serbest çizilen kutu, ad araması |
 | `viewer/pages.py` | projenin sitesi: sekiz sayfa, iki dilde, iki palette, sunucuda üretiliyor ve `yerkon pages` ile sabit dosya olarak da yazılıyor |
-| `comparison.py` | tablonun diğer on sistemi, kendi kaynaklarının yayımladığı değerlerle ve otuz iki notla |
+| `comparison.py` | tablonun diğer on sistemi, kendi kaynaklarının yayımladığı değerlerle ve otuz sekiz notla |
+| `sources.py` | raporun kaynakçası: 48 bağlantı, altı grup; notlar bunları anahtarla anıyor |
 | `published.py` | yayımlanan üç satır bir dosya olarak; sayfa ve README aynı koşuyu okusun diye |
-| `.github/workflows/pages.yml` | `docs/` klasörünü GitHub Pages'e koyan iş akışı; gerekirse Pages'i kendisi açıyor |
+| `.github/workflows/pages.yml` | `docs/` klasörünü `gh-pages` dalının köküne kopyalayan iş akışı; yalnızca `contents: write` istiyor |
 | `cli.py` | `fetch`, `design`, `table`, `view`, `pages`, `site`, `budget`, `deliver`, `options`, `solve`, `defaults` ve `calibrate` fiilleri |
 
 `tests/test_architecture.py` import'ları denetler, böylece kestirici gerçeğe
@@ -176,6 +177,11 @@ yanlıştır.
   ediyorlar. 85000 TL'lik direk değeri en sonuçlusu: amaca özel direklerin
   mi mevcut yol donanımının mı kazanacağına o karar veriyor ve bu karar,
   telsiz seçiminin etkilediği her şeyden daha değerli.
+- **Raporun kaynakça adreslerinden biri yanlış görünüyor.** "dünya
+  yüzey alanı" için verilen NASA bağlantısı Ay'ın sayılarını gösteren
+  bir sayfaya gidiyor. Rapor ne yazdıysa o taşındı (ADR-0070); düzeltmek
+  rapor sahibinin işi. Hiçbir sınama adreslerin açılıp açılmadığına
+  bakmıyor, çünkü ağa çıkan sınama yok (ADR-0008).
 - **Frekans düzeltmesinden sonra kalan saat kayması**, milyonda yarım
   parça, ölçüm modelindeki en az desteklenen sayıydı. Yavaş telsizde tek
   yönlü ölçümün kullanılabilir olup olmadığına o karar veriyor ve ölçülmeye
@@ -184,10 +190,10 @@ yanlıştır.
   istiyor. Taban şu anda telsiz başına yayımlanmış tek bir ölçüm ve model
   artık bunun çoğunun zamanlama çözünürlüğü değil saat olduğunu söylüyor;
   aynı ölçüm bunu doğrulayabilir ya da çürütebilir. Dağılım bahsi
-  yükseltiyor: SX1280'in 2,94 m'lik tabanı hem şehir içi satırın (1,79
-  m'nin 1,22 m'si) hem ağırlıklı satırın en büyük tek katkısı, dolayısıyla
-  o sayının gerçekte ne olduğu bütün tablonun açık yol hakkında ne
-  söylediğine karar veriyor.
+  yükseltiyor: SX1280'in 2,94 m'lik tabanı şehir içi satırın en büyük
+  tek katkısı (1,79 m'nin 1,22 m'si), dolayısıyla o sayının gerçekte
+  ne olduğu bütün tablonun açık yol hakkında ne söylediğine karar
+  veriyor.
 
 ## Sayfanın gerçekten yürünmesinden çıkanlar
 

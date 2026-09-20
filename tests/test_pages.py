@@ -15,7 +15,7 @@ import re
 
 import pytest
 
-from yerkon.published import EVERY_ROW, Published, as_toml, read, write
+from yerkon.published import EVERY_ROW, Published, read, write
 from yerkon.report import Row
 from yerkon.viewer.pages import (
     COLUMNS,
@@ -420,6 +420,135 @@ def test_the_other_systems_are_not_drawn_without_a_run_of_our_own():
     drawn = render(page_at("/sonuclar"), "tr", None)
     assert "GPS" not in drawn
     assert "yerkon table --publish" in drawn
+
+
+# --- the bibliography -----------------------------------------------------
+
+
+def test_every_source_a_note_cites_is_in_the_bibliography():
+    from yerkon.comparison import read as read_comparison
+    from yerkon.sources import read as read_sources
+
+    known = read_sources().by_key
+    missing = sorted(
+        "{} -> {}".format(key, cited)
+        for key, note in read_comparison().notes.items()
+        for cited in note.get("sources", ())
+        if cited not in known
+    )
+    assert not missing, "notes cite entries that are not there: {}".format(
+        ", ".join(missing)
+    )
+
+
+def test_every_note_under_the_table_rests_on_a_source():
+    """A claim about somebody else's system has to say where it came from.
+
+    The one exception is the availability warning, which defines the
+    column rather than quoting a figure from anybody.
+    """
+    from yerkon.comparison import read as read_comparison
+
+    table = read_comparison()
+    bare = sorted(
+        key for key, note in table.notes.items()
+        if not note.get("sources") and key != table.availability_note
+    )
+    assert not bare, "notes with nothing behind them: {}".format(
+        ", ".join(bare)
+    )
+
+
+def test_every_entry_of_the_bibliography_is_whole_and_in_both_languages():
+    """The labels themselves, not what `said` hands back.
+
+    `said` falls back to Turkish when the English is missing, so asking
+    it would call a half written entry whole.
+    """
+    from yerkon.sources import read as read_sources
+
+    bibliography = read_sources()
+    seen = set()
+    for group in bibliography.groups:
+        assert group.entries, group.key
+        assert group.name.get("tr", "").strip(), group.key
+        assert group.name.get("en", "").strip(), group.key
+        for entry in group.entries:
+            assert entry.key not in seen, entry.key
+            seen.add(entry.key)
+            assert entry.url.startswith("https://"), entry.key
+            assert entry.label.get("tr", "").strip(), entry.key
+            assert entry.label.get("en", "").strip(), entry.key
+    assert seen == set(bibliography.by_key), "an entry is in no group"
+
+
+def test_an_entry_under_no_heading_is_an_error_rather_than_a_silent_drop(
+    tmp_path,
+):
+    """A misspelled group would otherwise take the entry off the page."""
+    from yerkon.sources import SOURCES, read as read_sources
+
+    beside = tmp_path / "sources.toml"
+    beside.write_text(
+        SOURCES.read_text(encoding="utf-8").replace(
+            'group = "news"', 'group = "nowhere"', 1
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="no declared group"):
+        read_sources(beside)
+
+
+def test_the_sources_page_draws_every_entry():
+    """Including the ones no note cites: the list is the report's."""
+    from yerkon.sources import read as read_sources
+
+    drawn = render(page_at("/kaynaklar"), "tr", a_record())
+    bibliography = read_sources()
+    for group in bibliography.groups:
+        assert ">{}<".format(group.said("tr")) in drawn, group.key
+        for entry in group.entries:
+            assert 'href="{}"'.format(entry.url.replace("&", "&amp;")) \
+                in drawn, entry.key
+
+
+def test_a_note_under_the_table_links_to_what_it_rests_on():
+    from yerkon.comparison import read as read_comparison
+    from yerkon.sources import read as read_sources
+
+    drawn = render(page_at("/sonuclar"), "tr", a_record())
+    cited = read_comparison().notes["gps-capex"]["sources"]
+    assert cited
+    for key in cited:
+        entry = read_sources().entry(key)
+        assert entry.said("tr") in drawn, key
+
+
+def test_a_link_in_a_phrase_is_drawn_once_escaped():
+    """html.escape runs over the whole phrase before the link is made.
+
+    Escaping the address a second time would turn & into &amp;amp; and
+    send the reader to an address that is not the one written down.
+    """
+    from yerkon.viewer.pages import _marked
+
+    drawn = _marked("bak [buraya](https://example.com/a?b=1&c=2)")
+    assert '<a href="https://example.com/a?b=1&amp;c=2">buraya</a>' in drawn
+    assert "&amp;amp;" not in drawn
+
+
+def test_a_link_to_anything_but_http_stays_text():
+    from yerkon.viewer.pages import _marked
+
+    for address in ("javascript:alert(1)", "data:text/html,<b>x</b>",
+                    "file:///etc/passwd"):
+        drawn = _marked("[kötü]({})".format(address))
+        assert "<a " not in drawn, address
+
+
+def test_the_sources_are_shipped_with_the_package():
+    named = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    assert '"sources.toml"' in named
 
 
 # --- the site as files ----------------------------------------------------

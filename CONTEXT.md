@@ -144,6 +144,12 @@ kaynaklarının yayımladığı değerlerdir ve `comparison.toml`'da durur.
 Oradaki hiçbir sayı hesaplanmaz; her birinin yanında ona ne yapıldığını
 söyleyen bir not vardır. ADR-0069'a bak.
 
+**Bibliography** (kaynakça): raporun kaynakça slaytındaki 48 bağlantı,
+`sources.toml`'da altı grup altında. Notlar bunları anahtarla anar
+(`sources = ["gps-gov"]`), yani bir adres tek yerde değişir. Hiçbir
+notun anmadığı girdi de listede kalır: liste raporun kaynakçasıdır,
+sitenin kullandıklarının listesi değil. ADR-0070'e bak.
+
 ## Ürünler
 
 Raporun 14. sayfasındaki malzeme listesinden. Fiyatlar 100 birimlik

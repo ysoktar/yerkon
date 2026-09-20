@@ -57,9 +57,9 @@ kendi içinde kayıyor ve sayfayı yana itmiyor.
 
 ## Yapılmayanlar
 
-**Kaynak bağlantıları yok.** Notlar kaynağın adını söylüyor, adresini
-değil. Raporun kaynakçası adresleri taşıyor, ve onları buraya
-kopyalamak üçüncü bir kopya olurdu.
+~~**Kaynak bağlantıları yok.** Notlar kaynağın adını söylüyor, adresini
+değil.~~ ADR-0070 bunun yerine geçti: adresler raporun kaynakça
+slaytından çıkarıldı, ve her not dayandığı girdiye bağlanıyor.
 
 **Diğer on satır elle yazıldı.** YERKON satırlarının aksine onları
 üreten bir koşu yok, çünkü onlar başkalarının ölçümleri. Kaynak bir
