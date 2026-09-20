@@ -78,6 +78,7 @@ içinde; oranlar modüler yapılandırmadır ve sonradan araştırılacaktır
 | `presets.py` | adlandırılmış düzenlemeler: bir sekmenin tamamı, kaydedilip geri yüklenen |
 | `viewer/static/map.js` | yer seçici: kayan harita, serbest çizilen kutu, ad araması |
 | `viewer/pages.py` | projenin sitesi: sekiz sayfa, iki dilde, iki palette, sunucuda üretiliyor ve `yerkon pages` ile sabit dosya olarak da yazılıyor |
+| `comparison.py` | tablonun diğer on sistemi, kendi kaynaklarının yayımladığı değerlerle ve otuz iki notla |
 | `published.py` | yayımlanan üç satır bir dosya olarak; sayfa ve README aynı koşuyu okusun diye |
 | `.github/workflows/pages.yml` | `docs/` klasörünü GitHub Pages'e koyan iş akışı; gerekirse Pages'i kendisi açıyor |
 | `cli.py` | `fetch`, `design`, `table`, `view`, `pages`, `site`, `budget`, `deliver`, `options`, `solve`, `defaults` ve `calibrate` fiilleri |

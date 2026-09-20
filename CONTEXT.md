@@ -136,6 +136,14 @@ Kalan kural aynı: üç P95 değerinin ortalaması bir P95 üretmez. Bu kod
 tabanı yüzdelik ortalamayı hiçbir yerde yapmaz; gölge çekilişleri de
 havuzlanır, ortalanmaz. ADR-0055'e bak.
 
+**Comparison table** (karşılaştırma tablosu): raporun on üç sistemi aynı
+sütunlarla yan yana koyan tablosu. Üç satırı bu deponun çıktısı ve
+`published.toml`'dan gelir; kalan on satır GPS, Galileo, GLONASS,
+BeiDou, QZSS, NavIC, TerraPoiNT, Locata, Pozyx ve eLoran'ın kendi
+kaynaklarının yayımladığı değerlerdir ve `comparison.toml`'da durur.
+Oradaki hiçbir sayı hesaplanmaz; her birinin yanında ona ne yapıldığını
+söyleyen bir not vardır. ADR-0069'a bak.
+
 ## Ürünler
 
 Raporun 14. sayfasındaki malzeme listesinden. Fiyatlar 100 birimlik

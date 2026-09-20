@@ -102,9 +102,13 @@ Her sayfa iki dilde, ve dil sayfanın değil okuyanın özelliği: sitede
 İki palet var; sayfa okuyanın sistem ayarını izliyor ve başlıktaki düğme
 onu eziyor.
 
-Sonuç sayfası tabloyu elle yazılmış bir kopyadan değil, koşunun kendi
-yazdığı `src/yerkon/published.toml` dosyasından okuyor. O dosyayı
-`yerkon table --publish` yazıyor ve iki şeyi reddediyor: eksik bir tablo
+Sonuç sayfası karşılaştırma tablosunun tamamını gösteriyor: on üç
+sistem, aynı sütunlarla. Üç YERKON satırı koşunun kendi yazdığı
+`src/yerkon/published.toml` dosyasından geliyor; diğer on satır ve
+otuz iki not `src/yerkon/comparison.toml` içinde duruyor, ve oradaki
+hiçbir sayı hesaplanmıyor (ADR-0069).
+
+O dosyayı `yerkon table --publish` yazıyor ve iki şeyi reddediyor: eksik bir tablo
 ve `--fast` ile yapılmış kaba bir okuma. Bir sınama sitede yayımlanan
 hiçbir hücrenin elle yazılmadığını söylüyor.
 

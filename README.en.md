@@ -100,9 +100,13 @@ simulator, and the panel is in English. There are two palettes; the page
 follows the reader's system setting and the button in the header
 overrides it.
 
-The results page reads the table from `src/yerkon/published.toml`, which
-a run wrote, rather than from a copy somebody typed. `yerkon table
---publish` writes that file and refuses two things: a table missing rows
+The results page shows the whole comparison table: thirteen systems
+under the same columns. The three YERKON rows come from
+`src/yerkon/published.toml`, which a run wrote; the other ten rows and
+thirty two notes live in `src/yerkon/comparison.toml`, where nothing is
+computed (ADR-0069).
+
+`yerkon table --publish` writes that file and refuses two things: a table missing rows
 and a coarse `--fast` reading. A test says no published cell was typed
 into the site.
 

@@ -1007,14 +1007,16 @@ RESULTS = Page(
     nav=_w("Sonuçlar", "Results"),
     title=_w("Karşılaştırma tablosu", "The comparison table"),
     lead=_w(
-        "Raporun karşılaştırma tablosu uydu sistemlerini, bölgesel "
-        "sistemleri ve karasal alternatifleri aynı sütunlarla yan yana "
-        "koyuyor. Benzetimin doldurduğu üç satır aşağıda; geri kalanı "
-        "yayımlanmış kaynaklardan gelir ve raporun dipnotlarında durur.",
-        "The report's comparison table puts satellite systems, regional "
-        "systems and terrestrial alternatives side by side under the same "
-        "columns. The three rows the simulation filled are below. The rest "
-        "come from published sources and are footnoted in the report.",
+        "On üç sistem, aynı sütunlarla yan yana. Koyu zeminli üç satır "
+        "benzetimin doldurduğu YERKON satırları; geri kalanı kendi "
+        "kaynaklarının yayımladığı değerler. Bir hücreye ne yapıldığı "
+        "altındaki notta yazıyor, ve boş bir hücre kaynağın o sütuna "
+        "uyan bir şey yayımlamadığı anlamına geliyor.",
+        "Thirteen systems side by side under the same columns. The three "
+        "shaded rows are the YERKON rows the simulation filled; the rest "
+        "are what their own sources publish. What was done to a cell is "
+        "in the note under it, and an empty cell means the source "
+        "publishes nothing that fits that column.",
     ),
     parts=(
         Part(kind="shows", shows="published"),
@@ -1810,12 +1812,58 @@ def _headline(published, language: str) -> str:
     ).format("".join(figures), _said(WEIGHTING, language))
 
 
-def _published(published, language: str) -> str:
-    """The rows, exactly as the run printed them."""
+def _published(published, language: str, table=None) -> str:
+    """Every system in the table, ours read from the run.
+
+    The other systems' rows are published figures and come from
+    `comparison.toml`; ours come from `published.toml`, which a run
+    writes. A marker is numbered where it first appears rather than in
+    the file, so a note can be added without renumbering anything
+    (ADR-0069).
+    """
     if published is None:
         return '<p class="warn">{}</p>'.format(_said(NO_RUN, language))
+    if table is None:
+        from yerkon import comparison
+
+        table = comparison.read()
+
+    numbered: dict = {}
+
+    def mark(key: str) -> str:
+        if key not in numbered:
+            numbered[key] = len(numbered) + 1
+        at = numbered[key]
+        return (
+            '<sup class="note"><a id="back{0}" href="#note{0}">{0}</a>'
+            "</sup>".format(at)
+        )
+
+    def cell(text: str) -> str:
+        from yerkon.comparison import keys_of, without_markers
+
+        shown = html.escape(without_markers(text))
+        return shown + "".join(mark(key) for key in keys_of(text))
+
     head = [_said(column, language) for column in COLUMNS]
-    body = [list(row.cells()) for row in published.rows]
+    # The warning about the availability column belongs to the column.
+    head[6] += mark(table.availability_note)
+
+    body = []
+    for row in table.rows:
+        body.append(
+            [html.escape(row.system), html.escape(row.technology),
+             html.escape(row.environment)] + [cell(one) for one in row.cells]
+        )
+    ours = len(body)
+    for key, row in zip(published.keys, published.rows):
+        cells = list(row.cells())
+        marked = [html.escape(one) for one in cells[:3]]
+        marked[0] += mark(table.yerkon[key])
+        rest = [html.escape(one) for one in cells[3:]]
+        rest[3] += mark(table.yerkon["availability"])
+        rest[5] += mark(table.yerkon["capex"])
+        body.append(marked + rest)
     # The template is escaped once, by `_said`. What comes out of the
     # record is escaped here, and escaping the result again would put
     # `&amp;#x27;` on the page where an apostrophe belongs.
@@ -1825,13 +1873,27 @@ def _published(published, language: str) -> str:
         draws=published.shadow_draws,
         spacing=decimal_comma(published.profile_spacing_m, 0),
     )
+    listed = "".join(
+        '<li id="note{0}">{1} <a class="back" href="#back{0}">↑</a></li>'
+        .format(at, _marked(table.said(key, language)))
+        for key, at in sorted(numbered.items(), key=lambda pair: pair[1])
+    )
     return (
-        '<div class="wide"><div class="scroll">{}</div>'
-        '<p class="under">{}</p></div>'
-    ).format(_table([head] + body, numeric_from=3), note)
+        '<div class="wide"><div class="scroll">{table}</div>'
+        '<p class="under">{note}</p></div>'
+        '<ol class="notes">{notes}</ol>'
+    ).format(
+        table=_table([head] + body, numeric_from=3, ours_from=ours),
+        note=note, notes=listed,
+    )
 
 
-def _table(rows: Sequence[Sequence[str]], numeric_from: int = 99) -> str:
+def _table(
+    rows: Sequence[Sequence[str]],
+    numeric_from: int = 99,
+    ours_from: Optional[int] = None,
+) -> str:
+    """One table. ``ours_from`` marks where this project's rows start."""
     head, body = rows[0], rows[1:]
     out = ["<table><thead><tr>"]
     for at, cell in enumerate(head):
@@ -1839,8 +1901,9 @@ def _table(rows: Sequence[Sequence[str]], numeric_from: int = 99) -> str:
             ' class="num"' if at >= numeric_from else "", cell
         ))
     out.append("</tr></thead><tbody>")
-    for row in body:
-        out.append("<tr>")
+    for line, row in enumerate(body):
+        ours = ours_from is not None and line >= ours_from
+        out.append('<tr class="ours">' if ours else "<tr>")
         for at, cell in enumerate(row):
             out.append('<td{}>{}</td>'.format(
                 ' class="num"' if at >= numeric_from else "", cell

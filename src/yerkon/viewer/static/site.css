@@ -154,7 +154,7 @@ figcaption { max-width: 720px; margin: 10px auto 0; color: var(--quiet);
    project exists to produce and it should not arrive pre-scrolled. On a
    narrow window it scrolls sideways inside itself rather than pushing
    the page wider. */
-.wide { width: min(100vw - 32px, 1120px); margin-left: 50%;
+.wide { width: min(100vw - 32px, 1400px); margin-left: 50%;
   transform: translateX(-50%); }
 /* A table scrolls inside itself rather than pushing the page sideways.
    Under the published one the note stays put, because a note that slides
@@ -167,9 +167,19 @@ thead th { color: var(--quiet); font-size: 11px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
 .num { text-align: right; font-variant-numeric: tabular-nums;
   white-space: nowrap; }
-/* Only the four rows have a weighted last row worth thickening. */
-.wide tbody tr:last-child { font-weight: 600; }
-.wide table { min-width: 860px; }
+.wide table { min-width: 980px; }
+/* This project's own rows, among the systems they are compared with. */
+tr.ours td { background: var(--shade); }
+tr.ours td:first-child { font-weight: 600; }
+
+/* A note marker, and the list it points into. */
+sup.note { font-size: 10px; line-height: 0; }
+sup.note a { text-decoration: none; padding-left: 1px; }
+ol.notes { margin: 18px 0 0; padding-left: 26px; color: var(--quiet);
+  font-size: 12px; }
+ol.notes li { margin-bottom: 7px; }
+ol.notes li:target { color: var(--ink); }
+a.back { text-decoration: none; }
 
 @media (max-width: 760px) {
   header { padding: 10px 16px; }

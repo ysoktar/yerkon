@@ -18,6 +18,7 @@ import pytest
 from yerkon.published import EVERY_ROW, Published, as_toml, read, write
 from yerkon.report import Row
 from yerkon.viewer.pages import (
+    COLUMNS,
     PAGES,
     SIMULATOR,
     Words,
@@ -134,6 +135,8 @@ def test_the_site_links_to_nothing_the_server_does_not_serve():
         wanted |= set(re.findall(r'(?:href|src)="([^"]+)"', drawn))
     for reference in sorted(wanted):
         if reference.startswith("http"):
+            continue
+        if reference.startswith("#"):
             continue
         address = reference.split("?")[0]
         if address == SIMULATOR:
@@ -361,6 +364,64 @@ def test_publishing_says_which_figures_the_run_read(tmp_path):
     assert read(written).source == "my.toml + rural-dense"
 
 
+# --- the other systems in the table ---------------------------------------
+
+
+def test_every_note_the_table_points_at_exists_and_is_in_both_languages():
+    from yerkon.comparison import keys_of, read as read_comparison
+
+    table = read_comparison()
+    wanted = {table.availability_note}
+    wanted |= set(table.yerkon.values())
+    for row in table.rows:
+        for cell in row.cells:
+            wanted |= set(keys_of(cell))
+
+    missing = sorted(wanted - set(table.notes))
+    assert not missing, "cells point at notes that are not there: {}".format(
+        ", ".join(missing)
+    )
+    spare = sorted(set(table.notes) - wanted)
+    assert not spare, "notes nothing points at: {}".format(", ".join(spare))
+    for key, note in table.notes.items():
+        assert note.get("tr", "").strip(), key
+        assert note.get("en", "").strip(), key
+        assert note["tr"] != note["en"], key
+
+
+def test_every_row_has_a_figure_for_every_column():
+    from yerkon.comparison import read as read_comparison
+
+    for row in read_comparison().rows:
+        assert len(row.cells) == len(COLUMNS) - 3, row.system
+
+
+def test_the_results_page_draws_the_other_systems_and_numbers_the_notes():
+    from yerkon.comparison import read as read_comparison
+
+    table = read_comparison()
+    drawn = render(page_at("/sonuclar"), "tr", a_record())
+    for row in table.rows:
+        assert ">{}<".format(row.system) in drawn, row.system
+    # Numbered in the order they appear, starting at the column head.
+    assert 'id="note1"' in drawn and 'href="#note1"' in drawn
+    assert 'id="note{}"'.format(len(table.notes)) in drawn
+    assert table.said("gps-capex", "tr")[:40] in drawn
+
+
+def test_our_own_rows_are_marked_apart_from_the_published_ones():
+    """A reader has to see which three rows this project produced."""
+    drawn = render(page_at("/sonuclar"), "tr", a_record())
+    assert drawn.count('<tr class="ours">') == len(EVERY_ROW)
+
+
+def test_the_other_systems_are_not_drawn_without_a_run_of_our_own():
+    """The page compares; with nothing of ours to compare it says so."""
+    drawn = render(page_at("/sonuclar"), "tr", None)
+    assert "GPS" not in drawn
+    assert "yerkon table --publish" in drawn
+
+
 # --- the site as files ----------------------------------------------------
 
 
@@ -386,7 +447,7 @@ def test_a_page_in_the_folder_points_at_files_that_are_there(tmp_path):
             continue
         drawn = path.read_text(encoding="utf-8")
         for reference in re.findall(r'(?:href|src)="([^"]+)"', drawn):
-            if reference.startswith("http"):
+            if reference.startswith("http") or reference.startswith("#"):
                 continue
             assert not reference.startswith("/"), "{}: {}".format(
                 path.name, reference

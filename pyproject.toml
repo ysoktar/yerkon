@@ -26,7 +26,8 @@ where = ["src"]
 "yerkon.site" = ["places/*/*.npy", "places/*/*.npz", "places/*/*.json",
                  "places/*/*.png"]
 # Named deployment options, shipped and saved. See `yerkon options`.
-"yerkon" = ["defaults.toml", "published.toml", "options/*.toml"]
+"yerkon" = ["defaults.toml", "published.toml", "comparison.toml",
+            "options/*.toml"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

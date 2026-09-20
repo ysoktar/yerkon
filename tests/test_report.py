@@ -214,7 +214,10 @@ def test_the_notes_say_what_the_table_rests_on():
     assert "rests on rates nobody supplied" in notes
     assert "waveguide" in notes
     assert "not a service availability figure" in notes
-    assert "ADR-0005" in notes
+    # The weights line carried the ADR-0005 citation and went with the
+    # weighted row (ADR-0068). What the notes still have to say is where
+    # the height constraint went.
+    assert "ADR-0011" in notes
 
 
 @pytest.mark.slow
