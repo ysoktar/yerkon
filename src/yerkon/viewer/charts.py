@@ -300,7 +300,7 @@ def scatter(points: Sequence[tuple[Mark, Figure]], *, title: str,
     plot_w = width - left - right
     plot_h = height - top - bottom
     x_low, x_high = min(xs) / 6.0, max(xs) * 14.0
-    y_low, y_high = min(ys) / 3.0, max(ys) * 3.0
+    y_low, y_high = min(ys) / 2.4, max(ys) * 2.4
 
     def across(value: float) -> float:
         return left + plot_w * (
@@ -383,6 +383,22 @@ def scatter(points: Sequence[tuple[Mark, Figure]], *, title: str,
         mark, x, y = spot["mark"], spot["x"], spot["y"]
         label_y, flip = spot["label_y"], spot["flip"]
         colour = "var(--chart-mark)" if mark.ours else "var(--chart-context)"
+        # A ceiling is not a measurement: the true value is somewhere
+        # below the mark, so the mark trails off that way rather than
+        # sitting there as though it had been measured.
+        if mark.figure.bounded:
+            down = mark.figure.kind in ("at_most", "under")
+            tip = y + (16 if down else -16)
+            out.append(
+                '<line x1="{0:.1f}" y1="{1:.1f}" x2="{0:.1f}" y2="{2:.1f}" '
+                'stroke="{3}" stroke-width="2" stroke-linecap="round"/>'
+                '<path d="M{4:.1f} {5:.1f} l{6} {7} l{8} {9}" fill="none" '
+                'stroke="{3}" stroke-width="2" stroke-linecap="round" '
+                'stroke-linejoin="round"/>'.format(
+                    x, y, tip, colour,
+                    x - 5, tip + (-5 if down else 5),
+                    5, 5 if down else -5, 5, -5 if down else 5)
+            )
         out.append(
             '<circle cx="{:.1f}" cy="{:.1f}" r="{}" fill="{}" '
             'stroke="var(--paper)" stroke-width="2"/>'.format(
