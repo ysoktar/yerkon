@@ -708,12 +708,12 @@ figürlere bakıyor, düğmeye değil, yani elle yapan da aynı şeyi görüyor.
 **Hızlı okuma iyimser.** İki kabalık da kaybı eksik okuyor, yani hızlı bir
 cevap yerleşimi kayırıyor:
 
-| | yayımlanan (15 dk 33 sn) | hızlı (54 sn) |
+| | yayımlanan | hızlı |
 |---|---|---|
-| Şehir P95 | 8,19 m | 7,20 m |
+| Şehir P95 | 8,84 m | 8,39 m |
 | Kırsal P95 | 22,72 m | 18,59 m |
 | Kırsal kullanılabilirlik | %41,83 | %52,00 |
-| Ağırlıklı P95 | 13,44 m | 11,89 m |
+| Tünel P50 | 0,78 m | 0,80 m |
 
 Yani hızlı okumada kötü görünen bir satır gerçekten kötüdür; iyi görünen
 bir satır için yavaşını koşmak gerekir.
@@ -754,8 +754,8 @@ Bu satırlar **sekiz gölge dizilişinin havuzu** — tek bir koşu tek bir
 çekiliştir ve kırsal satırda tek çekiliş 95. yüzdeliği 14,6 m ile
 279,6 m arasında herhangi bir yere koyuyordu (ADR-0055).
 
-Ve üçü de **ADR-0053'ten önce daha iyi görünüyordu** — şehir içi %99,79,
-kırsal %72,75, ağırlıklı HPE P95 9,76 m. Aradaki fark kırınımın yoldaki
+Ve üçü de **ADR-0053'ten önce daha iyi görünüyordu** — şehir içi
+kullanılabilirlik %99,79, kırsal %72,75. Aradaki fark kırınımın yoldaki
 en kötü tek nokta üzerinden değil bütün profil üzerinden hesaplanması:
 Kızılay'da bir bağlantının ortanca üç engeli var ve tek kenar bunların
 yalnızca birini sayıyordu. Aynı donanım, aynı direkler, daha dürüst
