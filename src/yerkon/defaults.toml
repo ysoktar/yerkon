@@ -929,17 +929,29 @@ affects = "şehir içi satırın yatay geometrisini"
 affects_en = "the urban row's horizontal geometry"
 
 [values."urban.anchors_per_round"]
-value = 8.0
+value = 12.0
 unit = "anchors"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Yoklananın \
-neredeyse hepsinin cevap verdiği yerde sekiz doğrudur; bir şehirde 500 m \
-ızgarada da öyledir. Olmadığı yer için ADR-0022'ye bak."""
-note_en = """How many anchors a unit polls before it is fixed. Eight is right where \
-nearly everything polled answers, which at a 500 m grid in a town it \
-does. See ADR-0022 for where it is not."""
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Sekizdi. \
+ADR-0022 sekizi şehir içinde bırakırken \"bir şehirde 500 m ızgarada \
+yoklananın neredeyse hepsi cevap veriyor\" diyordu; bu ölçülmemişti ve \
+yanlış çıktı. Üç tohumda, tam çözünürlükte, aynı 36 direk ve aynı \
+157 179 TL ile: %78,86 → %83,38, %79,20 → %82,74, %82,26 → %85,61. Üçü \
+de pozitif, ortalama +3,80 puan. Bedeli ortanca hatada 0,10 m ve turun \
+uzaması. On altı bir puan daha getiriyor ama üç tohumun birinde \
+kaybediyor, yani ADR-0022'nin kırsalda gördüğü gürültünün aynısı \
+(ADR-0072)."""
+note_en = """How many anchors a unit polls before it is fixed. It was eight. \
+ADR-0022 left urban at eight saying \"nearly everything polled answers \
+at a 500 m grid in a town\"; that was never measured and it is wrong. \
+Over three seeds at full resolution, on the same 36 anchors and the same \
+157 179 TL: 78,86 % → 83,38 %, 79,20 % → 82,74 %, 82,26 % → 85,61 %. All \
+three positive, +3,80 points on average. It costs 0,10 m of median error \
+and a longer round. Sixteen adds another point but loses on one seed of \
+the three, which is the noise ADR-0022 found in the rural row \
+(ADR-0072)."""
 affects = "şehir içi satırın güncelleme hızını ve kullanılabilirliğini"
 affects_en = "the urban row's update rate and availability"
 
@@ -1065,17 +1077,29 @@ maliyetini"""
 affects_en = "the tunnel row's served area and cost per route kilometre"
 
 [values."tunnel.anchor_spacing_m"]
-value = 150.0
+value = 225.0
 unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. Darbeli bir \
-telsiz yayılı olandan çok daha kısa erişir ve tünel bir koridordur; \
-dolayısıyla aralığı maliyet değil geometri belirler."""
-note_en = """How far apart the brackets stand along the bore. An impulse radio \
-reaches far less than a spread one, and a bore is a corridor, so the \
-spacing is set by geometry rather than by cost."""
+note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. Aralığı \
+maliyet değil geometri belirler, ve 150 m'de geometri kötüydü: bir \
+koridorda direkleri sıkıştırmak hepsini neredeyse aynı noktaya toplar ve \
+tabanı kısaltır. Üç tohumda, tam çözünürlükte: 150 m'de 14 askı, \
+106 882 TL, ortanca hata 1,86 m; 225 m'de 9 askı, 68 710 TL, ortanca \
+hata 0,79 m. Hem üçte bir ucuz hem iki kat hassas. Bedeli \
+kullanılabilirlikte: %100'den yaklaşık %99,3'e, çünkü uçtaki birkaç \
+bağlantı artık kapanmıyor. 300 m'de bağlantılar toptan kopuyor (%82,7), \
+yani 225 m sınırın hemen berisi (ADR-0072)."""
+note_en = """How far apart the brackets stand along the bore. The spacing is set by \
+geometry rather than by cost, and at 150 m the geometry was bad: packing \
+anchors along a corridor gathers them at nearly one point and shortens \
+the baseline. Over three seeds at full resolution: at 150 m, 14 brackets, \
+106 882 TL, 1,86 m of median error; at 225 m, 9 brackets, 68 710 TL, \
+0,79 m. A third cheaper and twice as precise. It costs availability, \
+100 % down to about 99,3 %, because a few links at the ends no longer \
+close. At 300 m the links fail outright (82,7 %), so 225 m is just \
+inside the edge (ADR-0072)."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \
 başına en büyük sermaye"""
 affects_en = """the tunnel row's anchor count and its capital, which is the largest per \
