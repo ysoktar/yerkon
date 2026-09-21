@@ -50,8 +50,11 @@ Sınama önce yazıldı ve iki kaymayı da yakaladı.
 
 ## Sonuçlar
 
-Simülatörü açıp çalıştırmak yayımlanan satırı üretiyor. Panelin
-söylediğiyle tablonun söylediği aynı şey.
+Şehir içi sekmesinde panel **HPE P95 8,86 m** diyor, tablo 8,84.
+Düzeltmeden önce 5,86 diyordu.
+
+Kullanılabilirlik hâlâ ayrışıyor: panel %90,64, tablo %83,98. Sebebi
+aşağıda; kapatılmadı.
 
 Şehir içi sekmesi artık 600 saniye sürüyor, yani bir koşu 240
 saniyelikten uzun. Bedeli bu; karşılığı panelin doğru sayıyı
@@ -73,3 +76,20 @@ daha doğru olurdu; bu ADR yalnızca iki kopyayı bire indiriyor.
 tolerans hâlâ şablonda yazılı. Bunların hiçbiri şu an kaymış değil, ve
 sınama direk sayısı ile yolculuk süresini tuttuğu için bir kayma
 sessiz kalmaz; ama aynı kopya sorunu orada da duruyor.
+
+**Yol üçüncü bir kopya ve öyle kaldı.** Kalan kullanılabilirlik farkı
+buradan geliyor. Tablo güzergâhı `scenarios._circuit` ile kuruyor: 300
+metre içeriden, 150 metre adımla bir tur. Simülatör ise ADR-0045 ile
+gelen yedi adlı güzergâh sisteminden geçiriyor, farklı bir iç boşluk ve
+farklı bir adımla. İki yol aynı sahanın farklı yerlerinden geçiyor,
+dolayısıyla farklı miktarda engelle karşılaşıyor.
+
+Bu, yatay hatada görünmüyor — başarılı sabitlemelerin hatası iki yolda
+da aynı — ama kullanılabilirlikte görünüyor, çünkü o, sabitlemenin hiç
+üretilememesini sayıyor.
+
+Kapatmak ikisinden birini seçmek demek: ya tablo yedi güzergâh
+sistemine geçecek, ya simülatör `_circuit`'e dönecek. İlki doğru yön
+gibi duruyor ama ADR-0045 o sistemi bir sebeple kurmuş ve tablonun
+yayımlanmış satırlarını yeniden koşmayı gerektirir. Burada kayıt
+altına alınıyor, yapılmıyor.

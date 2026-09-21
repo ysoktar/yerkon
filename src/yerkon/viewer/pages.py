@@ -1322,16 +1322,19 @@ SIMULATION = Page(
             kind="picture",
             picture="simulator.png",
             lines=(_w(
-                "Şehir içi satırı: Kızılay'ın gerçek arazisi, "
-                "aydınlatma direklerine takılmış 36 yayın birimi, ve "
-                "zemine boyanmış kapsama haritası. Renkler o noktada kaç "
-                "birimin duyulduğunu gösteriyor; konum hesabı için en az "
-                "dört gerekiyor.",
-                "The urban row: the real terrain at Kızılay, 36 broadcast "
-                "units on lighting columns, and the coverage painted onto "
-                "the ground. The colours show how many units can be heard "
-                "at that point; working out a position needs at least "
-                "four.",
+                "Şehir içi satırı, koşusu bitmiş hâlde: Kızılay'ın "
+                "gerçek arazisi, aydınlatma direklerine takılmış 36 yayın "
+                "birimi, ve zemine boyanmış kapsama haritası. Renkler o "
+                "noktada kaç birimin duyulduğunu gösteriyor; konum hesabı "
+                "için en az dört gerekiyor. Sağdaki panel o sekmenin "
+                "kendi koşusu, sekiz gölge çekilişi havuzlanmış.",
+                "The urban row with its run finished: the real terrain "
+                "at Kızılay, 36 broadcast units on lighting columns, and "
+                "the coverage painted onto the ground. The colours show "
+                "how many units can be heard at that point; working out a "
+                "position needs at least four. The panel on the right is "
+                "that tab's own run, pooled over eight draws of the "
+                "shadows.",
             ),),
         ),
         Part(
