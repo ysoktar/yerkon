@@ -356,6 +356,7 @@ WHY = Page(
                 ),
             ),
         ),
+        Part(kind="shows", shows="when"),
         Part(
             kind="text",
             heading=_w("YERKON'un cevabı", "What YERKON answers"),
@@ -507,6 +508,7 @@ SYSTEM = Page(
                 ),
             ),
         ),
+        Part(kind="shows", shows="clocks"),
         Part(
             kind="points",
             heading=_w("Üç kurulum grubu", "Three kinds of installation"),
@@ -1067,7 +1069,13 @@ RESULTS = Page(
         "publishes nothing that fits that column.",
     ),
     parts=(
+        Part(kind="shows", shows="landscape"),
         Part(kind="shows", shows="published"),
+        Part(
+            kind="shows", shows="accuracy",
+            heading=_w("Doğruluk yan yana", "Accuracy side by side"),
+        ),
+        Part(kind="shows", shows="cost"),
         Part(
             kind="table",
             heading=_w("Sütunlar ne demek", "What the columns mean"),
@@ -1411,6 +1419,7 @@ SIMULATION = Page(
                 ),
             ),
         ),
+        Part(kind="shows", shows="spread"),
         Part(
             kind="points",
             heading=_w("Ortalamayla geçmeyen üç hata",
@@ -1927,6 +1936,18 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         drawn = _headline(published, language)
     elif part.kind == "shows" and part.shows == "published":
         drawn = _published(published, language)
+    elif part.kind == "shows" and part.shows == "landscape":
+        drawn = _landscape(published, language)
+    elif part.kind == "shows" and part.shows == "accuracy":
+        drawn = _accuracy(published, language)
+    elif part.kind == "shows" and part.shows == "cost":
+        drawn = _cost(published, language)
+    elif part.kind == "shows" and part.shows == "spread":
+        drawn = _spread(published, language)
+    elif part.kind == "shows" and part.shows == "clocks":
+        drawn = _clocks(language)
+    elif part.kind == "shows" and part.shows == "when":
+        drawn = _when(language)
     else:
         raise ValueError("no way to draw a {} part".format(part.kind))
     return "<section>{}{}</section>".format(heading, drawn)
@@ -1952,6 +1973,264 @@ def _headline(published, language: str) -> str:
         '<div class="figures">{}</div>'
         '<p class="under">{}</p>'
     ).format("".join(figures), _said(WEIGHTING, language))
+
+
+#: What each drawing is about, and the caveat under it.
+LANDSCAPE = _w(
+    "Ne kadar yer, ne kadar hassas",
+    "How much ground, how precise",
+)
+LANDSCAPE_UNDER = _w(
+    "Yatayda hizmet alanı, dikeyde yatay hata. İkisi de logaritmik, "
+    "çünkü tablo alanda on bir, hatada dört basamak geziniyor. Sağa ve "
+    "aşağıya doğru daha iyi. Şu takas bütün tablonun konusu: Pozyx "
+    "santimetre veriyor çünkü bir depoyu kapsıyor, GPS dünyayı kapsıyor "
+    "çünkü metreyle yetiniyor. YERKON'un üç satırı ikisinin arasında "
+    "duruyor. Hücresi boş olan sistem çizilmedi.",
+    "Service area across, horizontal error up. Both logarithmic, since "
+    "the table spans eleven decades of area and four of error. Right "
+    "and down is better. This trade is what the whole table is about: "
+    "Pozyx gives centimetres because it covers a warehouse, GPS covers "
+    "the world because it settles for metres. YERKON's three rows sit "
+    "between them. A system with an empty cell is not drawn.",
+)
+#: The four events the problem page describes, on a line. The year is
+#: the fractional one the event happened in, so April 2024 sits a third
+#: of the way through its year rather than on its first day.
+WHEN = (
+    (2017.9, _w("Karadeniz", "The Black Sea"),
+     _w("20+ gemi, 40 km sapma", "20+ ships, 40 km out")),
+    (2019.0, _w("Norveç", "Norway"),
+     _w("Finnmark, süregelen", "Finnmark, still going")),
+    (2024.3, _w("Baltık", "The Baltic"),
+     _w("Tartu bir ay kapalı", "Tartu shut for a month")),
+    (2026.4, _w("ABD", "United States"),
+     _w("ambulans uçağı düştü", "air ambulance down")),
+)
+WHEN_TITLE = _w("Dört olay, dokuz yıl", "Four events, nine years")
+WHEN_UNDER = _w(
+    "Yukarıdaki dört olay zaman içinde. Hiçbiri tarihi bir merak değil: "
+    "en eskisi 2017, en yenisi bu yıl, ve aradaki boşluklar kapanıyor.",
+    "The four events above, in time. None of them is a historical "
+    "curiosity: the oldest is 2017, the newest is this year, and the "
+    "gaps between them are closing.",
+)
+CLOCKS = (
+    ("24,1 m", _w("tek yönlü ölçüm, saat düzeltilmeden",
+                  "one way ranging, clock uncorrected")),
+    ("0,3 mm", _w("çift yönlü ölçüm, aynı saatle",
+                  "two way ranging, the same clock")),
+)
+CLOCKS_UNDER = _w(
+    "Aynı 10 ppm'lik saat kaymasının iki ölçüm yöntemine maliyeti. "
+    "Aradaki fark seksen bin kat, ve bu yüzden çift yönlü ölçüm her "
+    "direğe atomik saat koymadan çalışabiliyor. İkisi de simülasyonun "
+    "ölçtüğü değer.",
+    "What the same 10 ppm clock offset costs each way of measuring. The "
+    "gap is eighty thousand fold, and it is why two way ranging works "
+    "without an atomic clock on every mast. Both figures are the "
+    "simulation's own measurement.",
+)
+SPREAD = _w("Üç satırın hatası: ortancadan en kötü %5'e",
+            "Each row's error, median to ninety fifth")
+SPREAD_UNDER = _w(
+    "Dolu nokta hataların yüzde 95'inin altında kaldığı değer, boş nokta "
+    "ortancası; aradaki çizgi ne kadar dağıldıklarını gösteriyor. "
+    "Baklava, aynı sabitlemenin düşey hatası. Düşey her üç satırda da "
+    "yataydan çok daha kötü, ve sebebi modelde yazıyor: yol kenarına "
+    "dizilmiş birimlerin hepsi aşağı yukarı aynı yükseklikte, o yüzden "
+    "yüksekliği ölçecek geometri yok. Tabloda bunu gizlemek yerine VPE "
+    "sütunu olarak yazılı.",
+    "The filled dot is the value 95 % of the errors stay under, the "
+    "hollow one the median; the line between them is how far they "
+    "spread. The diamond is the same fix's vertical error. Vertical is "
+    "far worse than horizontal on all three rows, and the model says "
+    "why: units strung along a roadside are all at much the same "
+    "height, so there is no geometry to measure height with. The table "
+    "writes it down as the VPE column rather than hiding it.",
+)
+COST = _w("Kilometrekare başına kurulum maliyeti",
+          "Capital per square kilometre")
+COST_UNDER = _w(
+    "On üç sistemin yedisi bir kurulum maliyeti yayımlıyor: üçü bizim, "
+    "dördü ötekilerin. Geri kalanı çizilemedi. Uydu satırları "
+    "kilometrekare başına ucuz "
+    "çünkü paydaları dünyanın yüzeyi. Tünel satırı en pahalı görünüyor "
+    "çünkü paydası bir km²'nin ellide biri; tünel bir alana değil bir "
+    "hatta hizmet eder.",
+    "Seven of the thirteen publish a capital cost: three of ours and "
+    "four of the others. The rest cannot be drawn. The satellite rows "
+    "are cheap per square kilometre "
+    "because their denominator is the surface of the earth. The tunnel "
+    "row looks dearest because its denominator is a fiftieth of a square "
+    "kilometre, and a tunnel serves a line rather than an area.",
+)
+ACCURACY = _w("Yatay hata, en kötü %5 hariç (HPE P95)",
+              "Horizontal error, worst 5 % excluded (HPE P95)")
+ACCURACY_UNDER = _w(
+    "Sola doğru daha iyi. Açık uçlu işaret bir üst sınırdır: kaynak "
+    "\"şundan kötü değil\" demiş, \"şu kadar\" dememiş. Bir hücre iki "
+    "değer taşıyorsa (ortalama ve en kötü durum) nokta ilkinde durur ve "
+    "yazan da odur; ikincisi tablonun dipnotunda. Hücresi boş olan "
+    "sistem çizilmedi.",
+    "Further left is better. An open end is a ceiling: the source said "
+    "\"no worse than\" rather than \"this much\". Where a cell holds two "
+    "figures, an average and a worst case, the mark sits on the first "
+    "and prints it; the second is in the table's note. A system with an "
+    "empty cell is not drawn.",
+)
+
+
+def _marks(published, language: str, at: int):
+    """Every system's figure for one column, ours among the others."""
+    from yerkon import comparison
+    from yerkon.viewer.charts import Mark, figure_in
+
+    table = comparison.read()
+    out = []
+    for row in table.rows:
+        cell = comparison.without_markers(row.cells[at])
+        figure = figure_in(cell)
+        if figure is not None:
+            out.append(Mark(label=row.system, figure=figure,
+                            shown=figure.text,
+                            short=row.system.split()[0]))
+    for row in published.rows:
+        cells = list(row.cells())
+        figure = figure_in(cells[at + 3])
+        if figure is not None:
+            out.append(Mark(
+                label=cells[0], figure=figure, ours=True,
+                shown=cells[at + 3].strip(),
+                short=cells[0].replace("YERKON ", "").strip("()"),
+            ))
+    return out
+
+
+def _figure(drawn: str, under, language: str, narrow: str = "") -> str:
+    """One drawing and what it says, with a phone sized twin.
+
+    A chart drawn for a laptop and then scrolled on a phone opens on
+    its label column with no data in view, which is worse than a table
+    doing the same: a table's first columns still say something. So the
+    narrow one is drawn again at a phone's width, with shorter names,
+    and the stylesheet shows whichever fits.
+    """
+    if not drawn:
+        return ""
+    body = drawn if not narrow else (
+        '<div class="only-wide">{}</div><div class="only-narrow">{}</div>'
+        .format(drawn, narrow)
+    )
+    return '<figure class="chart">{}<figcaption>{}</figcaption></figure>' \
+        .format(body, _said(under, language))
+
+
+def _accuracy(published, language: str) -> str:
+    """HPE P95 across the table, ours lit."""
+    if published is None:
+        return ""
+    from yerkon.viewer import charts
+
+    marks = _marks(published, language, 1)
+    return _figure(
+        charts.bars(marks, title=ACCURACY.said(language), unit="m"),
+        ACCURACY_UNDER, language,
+        narrow=charts.bars(marks, title=ACCURACY.said(language), unit="m",
+                           width=344.0, label_width=96.0, narrow=True),
+    )
+
+
+def _landscape(published, language: str) -> str:
+    """Coverage against error: the trade the whole table is about."""
+    if published is None:
+        return ""
+    from yerkon.viewer import charts
+
+    errors = {mark.label: mark for mark in _marks(published, language, 1)}
+    areas = {mark.label: mark.figure
+             for mark in _marks(published, language, 4)}
+    points = [(errors[name], areas[name]) for name in errors
+              if name in areas]
+    return _figure(
+        charts.scatter(
+            points, title=LANDSCAPE.said(language),
+            across_title="km²", up_title="HPE P95 [m]",
+        ),
+        LANDSCAPE_UNDER, language,
+        narrow=charts.scatter(
+            points, title=LANDSCAPE.said(language),
+            across_title="km²", up_title="HPE P95 [m]",
+            width=344.0, height=430.0, narrow=True,
+        ),
+    )
+
+
+def _when(language: str) -> str:
+    """The four incidents on one line."""
+    from yerkon.viewer import charts
+
+    return _figure(
+        charts.timeline(
+            [(year, where.said(language), what.said(language))
+             for year, where, what in WHEN],
+            title=WHEN_TITLE.said(language),
+        ),
+        WHEN_UNDER, language,
+    )
+
+
+def _clocks(language: str) -> str:
+    """Two numbers, side by side. A chart of them would show nothing:
+    on a straight axis the smaller is invisible, and a logarithmic one
+    would turn eighty thousand into a short bar."""
+    figures = "".join(
+        '<div class="figure"><b>{}</b><span>{}</span></div>'.format(
+            html.escape(value), _said(label, language))
+        for value, label in CLOCKS
+    )
+    return ('<div class="figures">{}</div>'
+            '<p class="under">{}</p>').format(
+        figures, _said(CLOCKS_UNDER, language))
+
+
+def _spread(published, language: str) -> str:
+    """Our three rows, median to ninety fifth, with the vertical beside."""
+    if published is None:
+        return ""
+    from yerkon.viewer import charts
+
+    rows = []
+    for row in published.rows:
+        cells = list(row.cells())
+        rows.append((
+            cells[0].replace("YERKON ", "").strip("()"),
+            charts.figure_in(cells[3]),
+            charts.figure_in(cells[4]),
+            charts.figure_in(cells[5]),
+        ))
+    return _figure(
+        charts.spread(rows, title=SPREAD.said(language), unit="m"),
+        SPREAD_UNDER, language,
+        narrow=charts.spread(rows, title=SPREAD.said(language), unit="m",
+                             width=344.0, label_width=76.0, narrow=True),
+    )
+
+
+def _cost(published, language: str) -> str:
+    """The capital column, for the six systems that publish one."""
+    if published is None:
+        return ""
+    from yerkon.viewer import charts
+
+    marks = _marks(published, language, 5)
+    return _figure(
+        charts.bars(marks, title=COST.said(language), unit="TL/km²",
+                    label_width=160.0),
+        COST_UNDER, language,
+        narrow=charts.bars(marks, title=COST.said(language), unit="TL/km²",
+                           width=344.0, label_width=96.0, narrow=True),
+    )
 
 
 def _published(published, language: str, table=None) -> str:

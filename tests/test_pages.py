@@ -447,6 +447,138 @@ def test_the_other_systems_are_not_drawn_without_a_run_of_our_own():
     assert "yerkon table --publish" in drawn
 
 
+# --- the drawings --------------------------------------------------------
+
+
+def test_a_cell_is_read_as_the_bound_it_is():
+    """A ceiling plotted as a point is the one way these could lie."""
+    from yerkon.viewer.charts import figure_in
+
+    assert figure_in("-") is None
+    assert figure_in("") is None
+    exact = figure_in("15,72")
+    assert (exact.value, exact.kind, exact.bounded) == (15.72, "exact", False)
+    ceiling = figure_in("≤ 8")
+    assert (ceiling.value, ceiling.kind, ceiling.bounded) == (
+        8.0, "at_most", True)
+    assert ceiling.text == "≤ 8"
+    floor = figure_in("≥ 0,035")
+    assert (floor.value, floor.kind, floor.bounded) == (
+        0.035, "at_least", True)
+    about = figure_in("≈ 683,80")
+    assert (about.value, about.kind, about.bounded) == (
+        683.80, "about", False)
+
+
+def test_a_region_name_is_not_mistaken_for_the_figure():
+    """QZSS writes "R1 ≤ 1", and the 1 in R1 comes first in the text."""
+    from yerkon.viewer.charts import figure_in
+
+    found = figure_in("R1 ≤ 1 / R2 ≤ 2")
+    assert (found.value, found.kind) == (1.0, "at_most")
+    assert found.paired and found.text == "≤ 1"
+
+
+def test_only_the_first_of_a_pair_is_printed_beside_a_mark():
+    """The mark sits on one figure, so it may not be labelled with two."""
+    from yerkon.viewer.charts import figure_in
+
+    assert figure_in("≤ 10 / ≤ 5").text == "≤ 10"
+    assert figure_in("≥ %99 / ≥ %90").text == "≥ 99"
+
+
+def test_a_drawing_prints_the_table_s_own_numbers():
+    """A reader moving between picture and table finds one number.
+
+    Read off the record rather than typed here, so the day the table is
+    published again this still holds.
+    """
+    record = read()
+    drawn = render(page_at("/sonuclar"), "tr", record)
+    # Inside the drawings only: the table itself and the note markers
+    # around it are full of bare numbers.
+    pictures = "".join(re.findall(r"<svg class=\"chart\".*?</svg>", drawn,
+                                  re.S))
+    assert pictures
+    for row in record.rows:
+        shown = list(row.cells())[4]
+        assert ">{}<".format(shown) in pictures, shown
+        assert ">{}<".format(shown.split(",")[0]) not in pictures, (
+            "{} was rounded to its whole part".format(shown))
+    # And one of the other systems', which comes from comparison.toml.
+    assert ">15,72<" in pictures and ">0,017<" in pictures
+
+
+def test_a_bound_is_drawn_with_an_open_end():
+    from yerkon.viewer.charts import Mark, bars, figure_in
+
+    ceiling = bars([Mark(label="X", figure=figure_in("≤ 8"))],
+                   title="t", unit="m")
+    exact = bars([Mark(label="X", figure=figure_in("8"))],
+                 title="t", unit="m")
+    assert "<path" in ceiling, "a ceiling needs the open end"
+    assert "<path" not in exact, "a measurement must not get one"
+
+
+def test_a_system_with_an_empty_cell_is_left_out_rather_than_guessed():
+    from yerkon.viewer.charts import figure_in
+    from yerkon.viewer.pages import _marks
+
+    # NavIC publishes no HPE P95, and QZSS no area.
+    names = {mark.label for mark in _marks(a_record(), "tr", 1)}
+    assert "NavIC SPS" not in names
+    assert "GPS" in names
+    areas = {mark.label for mark in _marks(a_record(), "tr", 4)}
+    assert "QZSS SLAS" not in areas
+
+
+def test_every_drawing_takes_its_colours_from_the_palette_tokens():
+    """Hard coded hex would be one palette's colour on both.
+
+    The accent and the recessive grey the charts use are their own
+    tokens, not the text ones: on a dark surface those two sit closer
+    together than a reader with full colour vision can separate.
+    """
+    from yerkon.viewer import charts
+
+    source = pathlib.Path(charts.__file__).read_text(encoding="utf-8")
+    hex_colour = re.compile(r"#[0-9a-fA-F]{3,8}\b")
+    found = hex_colour.findall(source)
+    assert not found, "hard coded colours: {}".format(found)
+    # Each token is defined once per palette: light, the dark media
+    # query, and the dark override the button sets.
+    css = (STATIC / "site.css").read_text(encoding="utf-8")
+    for token in ("--chart-mark", "--chart-context"):
+        assert css.count(token) == 3, token
+
+
+def test_a_chart_is_drawn_again_at_a_phone_s_width():
+    """Scrolled, the wide one opens on its labels with no data in view."""
+    drawn = render(page_at("/sonuclar"), "tr", a_record())
+    wide = drawn.count('class="only-wide"')
+    assert wide == drawn.count('class="only-narrow"')
+    assert wide == drawn.count('<figure class="chart">')
+    assert wide >= 3
+
+
+def test_a_drawing_escapes_what_it_is_given():
+    from yerkon.viewer.charts import Mark, bars, figure_in
+
+    drawn = bars([Mark(label="<script>x</script>", figure=figure_in("8"))],
+                 title="<b>t</b>", unit="m")
+    assert "<script>" not in drawn
+    assert "&lt;script&gt;" in drawn
+
+
+def test_an_apostrophe_reaches_the_page_as_an_apostrophe():
+    """SVG text is content, not an attribute: &#x27; shows up as itself."""
+    from yerkon.viewer.charts import Mark, bars, figure_in
+
+    drawn = bars([Mark(label="%5'e", figure=figure_in("8"))],
+                 title="t", unit="m")
+    assert "%5'e" in drawn and "&#x27;" not in drawn
+
+
 # --- the bibliography -----------------------------------------------------
 
 
