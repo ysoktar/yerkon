@@ -742,10 +742,9 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,46 m | 8,19 m | %79,88 |
+| Şehir içi | 2,67 m | 8,84 m | %83,98 |
 | Kırsal | 3,70 m | 22,72 m | %41,83 |
-| Tünel | 1,84 m | 2,93 m | %99,99 |
-| Ağırlıklı | 2,64 m | 13,44 m | %58,87 |
+| Tünel | 0,78 m | 2,90 m | %98,29 |
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
 zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79

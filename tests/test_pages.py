@@ -209,6 +209,10 @@ def a_record(**changes) -> Published:
             area_km2=93.0 + at,
             capex_tl_per_unit=94000.0 + at,
             opex_tl_per_unit_year=95000.0 + at,
+            # The real record's tunnel row is priced by its length
+            # (ADR-0073). A synthetic one where every row is an area
+            # never walks the path the real one takes.
+            costed_by="route" if key == "tunnel" else "area",
             reached_km2=96.0 + at,
             assumed_share=0.5,
         ))
