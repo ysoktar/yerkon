@@ -224,21 +224,28 @@ def test_no_rural_link_fails_for_distance():
     )
 
 
-def test_the_rural_round_polls_more_anchors_than_a_fix_needs():
-    """ADR-0022. Eight attempts over blocked ground yield four replies.
+def test_a_round_is_sized_by_how_many_anchors_answer():
+    """ADR-0022, and ADR-0072 where it turned out to be half measured.
 
-    Which is exactly what a cold fix needs and nothing spare, and it is
-    why the rural row sat in the low eighties. A round is sized by how
-    many anchors answer, not by how many a position needs — and those are
-    the same number only over ground that hides nothing.
+    Eight attempts over blocked ground yield four replies, exactly what
+    a cold fix needs and nothing spare. A round is sized by how many
+    anchors answer, not by how many a position needs, and those are the
+    same number only over ground that hides nothing.
+
+    ADR-0022 applied that to the rural row and left the other two at
+    eight, reasoning that in a town almost everything polled answers.
+    That part was never measured and was wrong: over three seeds at
+    full resolution, twelve beat eight in the urban row every time, by
+    3,80 points of availability on average, on the same 36 anchors and
+    the same capital.
+
+    The tunnel stays at eight. There a round already runs in tens of
+    milliseconds and nearly every poll answers, so a longer one would
+    cost update rate to buy nothing.
     """
-    rural = CHOICES["rural"].scenario.deployment
-    assert rural.max_anchors_per_round >= 12
-
-    # The other two rows poll almost nothing that fails, so a longer
-    # round would buy them nothing and cost update rate.
-    for name in ("urban", "tunnel"):
-        assert CHOICES[name].scenario.deployment.max_anchors_per_round == 8
+    for name in ("rural", "urban"):
+        assert CHOICES[name].scenario.deployment.max_anchors_per_round >= 12
+    assert CHOICES["tunnel"].scenario.deployment.max_anchors_per_round == 8
 
 
 @pytest.mark.slow

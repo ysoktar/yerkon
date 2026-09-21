@@ -1105,16 +1105,45 @@ def from_scenario(name: str) -> ViewState:
     return _template(name).within_site()
 
 
+#: How long each row's journey runs, in seconds.
+#:
+#: Read off the deployment the table evaluates rather than written here
+#: again. The urban tab used to carry its own 240 against the table's
+#: 600, so pressing run gave a different answer to the published row
+#: and the panel looked like it disagreed with the table (ADR-0076).
+def _journey_s(name: str) -> float:
+    from yerkon.scenarios import CHOICES
+
+    return max(unit.journey.duration_s
+               for unit in CHOICES[name].scenario.deployment.receivers)
+
+
+#: The spacing and stagger each row lays its anchors out on.
+#:
+#: From the settings, for the same reason: these are the figures that
+#: decide the row, and a second copy of them in this file is a copy
+#: that drifts. The tunnel's spacing moved from 150 m to 225 m and this
+#: file did not hear about it (ADR-0023, ADR-0076).
+def _grid(prefix: str, stagger: bool = True) -> tuple:
+    from yerkon.settings import DEFAULTS
+
+    spacing = DEFAULTS.number("{}.anchor_spacing_m".format(prefix))
+    if not stagger:
+        return (spacing, 0.0)
+    return (spacing, DEFAULTS.number("{}.anchor_stagger_m".format(prefix)))
+
+
 def _template(name: str) -> ViewState:
     if name == "urban":
         return ViewState(
             scenario="urban", corridor_m=3000.0, width_m=3000.0,
             site="kizilay",
             clutter_db_per_km=30.0, roughness_m=0.5, tolerance_m=5.0,
-            sweep_m=200.0, journey_s=240.0,
+            sweep_m=200.0, journey_s=_journey_s("urban"),
             runs=(
-                AnchorRun("C", "sx1280", "column", 0.0, 3000.0, 500.0, 0.0,
-                          stagger_m=250.0),
+                AnchorRun("C", "sx1280", "column", 0.0, 3000.0,
+                          _grid("urban")[0], 0.0,
+                          stagger_m=_grid("urban")[1]),
             ),
             units=(
                 UnitPlan("araç", "vehicle", 50.0, 0.0, 1.5),
@@ -1126,8 +1155,9 @@ def _template(name: str) -> ViewState:
             scenario="tunnel", corridor_m=2000.0,
             site="kizilcahamam", bore=True,
             clutter_db_per_km=0.0, roughness_m=0.05, tolerance_m=1.0,
-            sweep_m=100.0, journey_s=85.0, scheme="double",
-            runs=(AnchorRun("T", "dwm3000", "tunnel", 0.0, 2000.0, 150.0, 4.0),),
+            sweep_m=100.0, journey_s=_journey_s("tunnel"), scheme="double",
+            runs=(AnchorRun("T", "dwm3000", "tunnel", 0.0, 2000.0,
+                            _grid("tunnel", stagger=False)[0], 4.0),),
             units=(
                 UnitPlan("araç", "vehicle", 80.0, 0.0, 1.5),
                 UnitPlan("yaya", "pedestrian", 5.0, 600.0, 1.6),
@@ -1137,10 +1167,11 @@ def _template(name: str) -> ViewState:
         return ViewState(
             scenario="rural", corridor_m=20_000.0, width_m=20_000.0,
             site="polatli", roughness_m=0.2,
-            tolerance_m=5.0, sweep_m=500.0, journey_s=2400.0,
+            tolerance_m=5.0, sweep_m=500.0, journey_s=_journey_s("rural"),
             runs=(
-                AnchorRun("M", "e28", "mast", 0.0, 20_000.0, 4000.0, 0.0,
-                          stagger_m=2000.0),
+                AnchorRun("M", "e28", "mast", 0.0, 20_000.0,
+                          _grid("rural")[0], 0.0,
+                          stagger_m=_grid("rural")[1]),
             ),
             units=(
                 UnitPlan("araç", "vehicle", 100.0, 0.0, 1.5),

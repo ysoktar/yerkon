@@ -2598,3 +2598,37 @@ def test_the_panel_says_it_is_coarse_whoever_made_it_coarse():
     # And it names which of the two, not only that something is coarse.
     assert 'say("result.hurried.draws")' in panel
     assert 'say("result.hurried.profile")' in panel
+
+
+def test_the_simulator_starts_from_the_arrangement_the_table_ran():
+    """Open the simulator and press run: you should get the table's row.
+
+    The panel says "8 çekiliş havuzlandı" and prints an HPE P95, and a
+    reader has every reason to take that for the published number. It
+    only is one if the arrangement underneath is the same arrangement,
+    and the viewer keeps its own copy of the geometry: a template with
+    the spacing, the stagger and the length of the journey written into
+    it. Two of those had drifted (ADR-0076) — the urban journey was 240
+    seconds against the table's 600, and the tunnel spacing was still
+    150 m after the default moved to 225 — so the simulator quietly
+    answered a different question and the numbers disagreed.
+    """
+    from yerkon.scenarios import CHOICES
+    from yerkon.viewer.state import _template
+
+    for name in ("urban", "rural", "tunnel"):
+        deployed = CHOICES[name]
+        template = _template(name)
+        anchors = deployed.scenario.deployment.anchors
+        assert len(template.runs) == 1, name
+        drawn = template.within_site().anchors(deployed.scenario.terrain)
+        assert len(drawn) == len(anchors), (
+            "{}: the simulator lays out {} anchors, the table {}".format(
+                name, len(drawn), len(anchors))
+        )
+        longest = max(unit.journey.duration_s
+                      for unit in deployed.scenario.deployment.receivers)
+        assert template.journey_s == longest, (
+            "{}: the simulator drives {} s, the table {}".format(
+                name, template.journey_s, longest)
+        )
