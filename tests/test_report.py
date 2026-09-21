@@ -30,8 +30,8 @@ def a_row(**overrides):
         vpe_p95_m=30.0,
         availability=0.9817,
         area_km2=57.2,
-        capex_tl_per_km2=21723.34,
-        opex_tl_per_km2_year=900.64,
+        capex_tl_per_unit=21723.34,
+        opex_tl_per_unit_year=900.64,
     )
     fields.update(overrides)
     return Row(**fields)
@@ -61,7 +61,7 @@ def test_the_opex_column_is_filled_rather_than_left_empty():
 
 
 def test_numbers_use_a_comma_and_no_thousands_separator():
-    cells = a_row(capex_tl_per_km2=1242574.84, hpe_p50_m=2.5).cells()
+    cells = a_row(capex_tl_per_unit=1242574.84, hpe_p50_m=2.5).cells()
     assert "2,50" in cells
     assert "1242575" in cells
     assert not any("." in cell for cell in cells[3:])

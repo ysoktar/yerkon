@@ -39,8 +39,8 @@ NUMBERS = (
     "vpe_p95_m",
     "availability",
     "area_km2",
-    "capex_tl_per_km2",
-    "opex_tl_per_km2_year",
+    "capex_tl_per_unit",
+    "opex_tl_per_unit_year",
 )
 
 
@@ -77,6 +77,10 @@ def read(path: Optional[pathlib.Path] = None) -> Published:
             environment=one["environment"],
             reached_km2=one.get("reached_km2"),
             assumed_share=float(one.get("assumed_share", 0.0)),
+            # A record written before the tunnel row was priced by its
+            # length holds no denominator, and every row in one was an
+            # area (ADR-0073).
+            costed_by=one.get("costed_by", "area"),
             **{name: float(one[name]) for name in NUMBERS},
         ))
     return Published(
@@ -114,6 +118,7 @@ def as_toml(published: Published) -> str:
         ]
         for name in NUMBERS:
             out.append("{} = {}".format(name, _number(getattr(row, name))))
+        out.append("costed_by = {}".format(_text(row.costed_by)))
         if row.reached_km2 is not None:
             out.append("reached_km2 = {}".format(_number(row.reached_km2)))
         out.append("assumed_share = {}".format(_number(row.assumed_share)))

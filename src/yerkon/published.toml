@@ -4,7 +4,7 @@
 # the tests that keep the README from drifting away from it.
 # Edit the model and run it again rather than editing this.
 
-run_on = "2026-09-19"
+run_on = "2026-09-21"
 source = "defaults.toml"
 shadow_draws = 8
 profile_spacing_m = 10
@@ -14,10 +14,10 @@ key = "urban"
 system = "YERKON (Şehir içi)"
 technology = "Karasal konumlandırma (SX1280/LoRa TWR)"
 environment = "Dış"
-hpe_p50_m = 2.4637
-hpe_p95_m = 8.186
-vpe_p95_m = 63.4396
-availability = 0.7988
+hpe_p50_m = 2.6728
+hpe_p95_m = 8.8419
+vpe_p95_m = 64.2128
+availability = 0.8398
 area_km2 = 6.6833
 capex_tl_per_km2 = 23517.983
 opex_tl_per_km2_year = 10895.6581
@@ -44,11 +44,11 @@ key = "tunnel"
 system = "YERKON (Tünel)"
 technology = "Karasal konumlandırma (UWB/DWM3000 TWR)"
 environment = "İç + dış"
-hpe_p50_m = 1.8426
-hpe_p95_m = 2.9271
-vpe_p95_m = 7.5252
-availability = 0.9999
+hpe_p50_m = 0.7805
+hpe_p95_m = 2.9049
+vpe_p95_m = 7.601
+availability = 0.9829
 area_km2 = 0.024
-capex_tl_per_km2 = 4453423.3333
-opex_tl_per_km2_year = 849511.25
+capex_tl_per_km2 = 2862915
+opex_tl_per_km2_year = 546114.375
 assumed_share = 0.8202

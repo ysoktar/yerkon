@@ -23,6 +23,9 @@ rural = "rural-run"
 tunnel = "tunnel-run"
 availability = "yerkon-availability"
 capex = "yerkon-capex"
+# The tunnel row is priced by its length, so its two cost cells carry a
+# note of their own saying so (ADR-0073).
+by_route = "tunnel-per-km"
 
 [[row]]
 system = "GPS"
@@ -108,6 +111,9 @@ cells = ["-", "15,72^eloran-accuracy", "-^eloran-vertical",
 # note says why, rather than a proxy standing in silently.
 
 [note.availability-warning]
+# A definition rather than a claim: it says what the column means, not
+# what anybody measured.
+defines = true
 sources = []
 tr = """Kullanılabilirlik, tanımlanan doğruluk ve hizmet koşullarını \
 karşılayan geçerli bir konum çözümünün sunulabildiği zaman veya \
@@ -367,6 +373,28 @@ position where there were enough range measurements and valid geometry. \
 The service availability the satellite providers publish rests on \
 different test definitions, and the percentages must not be read as the \
 same metric."""
+
+[note.tunnel-per-km]
+# A definition rather than a claim: it says what the cell is divided
+# by, and no source outside this project could supply that.
+defines = true
+sources = []
+tr = """Tünel satırının iki maliyet hücresi kilometrekareye değil \
+güzergâh kilometresine bölünmüştür, ve "/km" ile işaretlidir. 12 m \
+genişliğinde 2 km'lik bir tünel bir kilometrekarenin ellide biri kadar \
+yer kaplar; bu kadar küçük bir alana bölmek sayıyı tünel pahalı olduğu \
+için değil, payda küçük olduğu için büyütüyordu. Tünel bir alana değil \
+bir hatta hizmet eder, ve bir tünel işletmecisinin soracağı sayı da \
+kilometre başına olandır. Diğer iki satır alana bölünmeye devam ediyor \
+ve bu yüzden bu hücre onlarla aynı ölçü değildir."""
+en = """The tunnel row's two cost cells are divided by route kilometre \
+rather than by square kilometre, and are marked "/km". A 2 km tunnel \
+12 m wide covers a fiftieth of a square kilometre; dividing by \
+something that small made the number large because the denominator was \
+small, not because a tunnel is dear. A tunnel serves a line rather \
+than an area, and cost per kilometre is the figure a tunnel operator \
+would ask for. The other two rows are still divided by area, so this \
+cell is not the same measure as theirs."""
 
 [note.yerkon-capex]
 sources = ["digikey", "lcsc", "mouser", "banque-de-france"]

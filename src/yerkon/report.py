@@ -60,8 +60,18 @@ class Row:
     vpe_p95_m: float
     availability: float
     area_km2: float
-    capex_tl_per_km2: float
-    opex_tl_per_km2_year: float
+    #: The two cost figures, over whichever denominator `costed_by`
+    #: names. Not called per_km2: on the tunnel row they are not.
+    capex_tl_per_unit: float
+    opex_tl_per_unit_year: float
+    #: "area" for a deployment that serves ground, "route" for one that
+    #: serves a line. A tunnel is 12 m wide and 2 km long, so dividing
+    #: its capital by its area produces a number that is large because
+    #: the denominator is a fiftieth of a square kilometre and not
+    #: because a tunnel is dear. Per route kilometre is the figure a
+    #: reader can use, and it is the one a tunnel operator would ask
+    #: for (ADR-0073).
+    costed_by: str = "area"
     #: Ground a packet reaches, which is not the service area. Carried so
     #: the two are never printed apart (ADR-0012).
     reached_km2: Optional[float] = None
@@ -78,9 +88,19 @@ class Row:
             decimal_comma(self.vpe_p95_m, 2),
             "%{}".format(decimal_comma(100.0 * self.availability, 2)),
             decimal_comma(self.area_km2, 2),
-            decimal_comma(self.capex_tl_per_km2, 0),
-            decimal_comma(self.opex_tl_per_km2_year, 0),
+            self._cost(self.capex_tl_per_unit),
+            self._cost(self.opex_tl_per_unit_year),
         )
+
+    def _cost(self, value: float) -> str:
+        """A cost cell, carrying its unit where it is not the column's.
+
+        The column head says TL/km². One row is priced per route
+        kilometre instead, and a cell that did not say so would be read
+        against the others as though it were the same measure.
+        """
+        shown = decimal_comma(value, 0)
+        return shown if self.costed_by == "area" else shown + " /km"
 
 
 @dataclass(frozen=True)
@@ -94,6 +114,9 @@ class Result:
     reached_km2: Optional[float]
 
     def row(self) -> Row:
+        # A corridor is priced by its length. The deployment says it is
+        # one rather than this guessing from the shape of the numbers.
+        by_route = self.deployed.serves_a_corridor
         hpe_p50, _ = self.samples.percentile(50)
         hpe_p95, vpe_p95 = self.samples.percentile(95)
         return Row(
@@ -105,8 +128,13 @@ class Result:
             vpe_p95_m=vpe_p95,
             availability=self.samples.availability,
             area_km2=self.area_km2,
-            capex_tl_per_km2=self.costing.capex_tl_per_km2,
-            opex_tl_per_km2_year=self.costing.opex_tl_per_km2_year,
+            capex_tl_per_unit=(
+                self.costing.capex_tl_per_route_km if by_route
+                else self.costing.capex_tl_per_km2),
+            opex_tl_per_unit_year=(
+                self.costing.opex_tl_per_route_km_year if by_route
+                else self.costing.opex_tl_per_km2_year),
+            costed_by="route" if by_route else "area",
             reached_km2=self.reached_km2,
             assumed_share=self.costing.assumed_share,
         )

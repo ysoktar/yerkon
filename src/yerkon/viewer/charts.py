@@ -3,7 +3,7 @@
 A thirteen row table with seven measures is a reference, not a picture.
 A reader who wants to know where YERKON sits has to hold thirteen
 numbers in their head, and nobody does. These draw the same numbers so
-the shape of the answer arrives before the reading does (ADR-0072).
+the shape of the answer arrives before the reading does (ADR-0074).
 
 Nothing here computes a figure. Every mark is a cell of the published
 record or of `comparison.toml`, parsed and placed; if a cell is empty

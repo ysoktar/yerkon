@@ -234,6 +234,12 @@ class Costing:
             return float("nan")
         return self.capex_tl / self.route_km
 
+    @property
+    def opex_tl_per_route_km_year(self) -> float:
+        if self.route_km <= 0.0:
+            return float("nan")
+        return self.opex_tl_per_year / self.route_km
+
     def _per_km2(self, total: float) -> float:
         if self.service_area_km2 <= 0.0:
             # Dividing by a service area of zero would produce infinity,

@@ -1146,19 +1146,24 @@ RESULTS = Page(
                        "Three warnings for reading the table"),
             lines=(
                 _w(
-                    "**Tünel satırının km² maliyeti diğerleriyle "
-                    "karşılaştırılamaz.** 12 m genişliğinde 2 km'lik bir "
-                    "tünel, bir km²'nin ellide biri kadar yer kaplar. Bu "
-                    "kadar küçük bir alana bölünce sayı kendiliğinden "
-                    "büyüyor; tünel pahalı olduğu için değil. Tünel bir "
-                    "alana değil bir hatta hizmet eder, o yüzden kilometre "
-                    "başına maliyetle karşılaştırılmalı.",
-                    "**The tunnel's cost per km² does not compare to the "
-                    "other rows.** Twelve metres wide over two kilometres "
-                    "is a fiftieth of a square kilometre, so dividing by it "
-                    "produces a large number by arithmetic rather than by "
-                    "judgement. A tunnel serves a line, so compare it on "
-                    "cost per route kilometre.",
+                    "**Tünel satırının maliyeti kilometre başına, "
+                    "diğerleri kilometrekare başına.** 12 m genişliğinde "
+                    "2 km'lik bir tünel bir km²'nin ellide biri kadar yer "
+                    "kaplar; alana bölmek sayıyı tünel pahalı olduğu için "
+                    "değil payda küçük olduğu için büyütüyordu. Tünel bir "
+                    "alana değil bir hatta hizmet ediyor, o yüzden o iki "
+                    "hücre güzergâh kilometresine bölündü ve \"/km\" ile "
+                    "işaretli. Aynı ölçü olmadığı için diğer satırlarla "
+                    "yan yana okunmamalı.",
+                    "**The tunnel row is priced per kilometre, the other "
+                    "two per square kilometre.** Twelve metres wide over "
+                    "two kilometres is a fiftieth of a square kilometre, "
+                    "so dividing by area made the number large because "
+                    "the denominator was small rather than because a "
+                    "tunnel is dear. A tunnel serves a line, so those two "
+                    "cells are divided by route kilometre and marked "
+                    "\"/km\". They are not the same measure as the other "
+                    "rows and should not be read beside them.",
                 ),
                 _w(
                     "**Hizmet alanı, konum alınabilen yerdir**, sinyalin "
@@ -2052,18 +2057,16 @@ SPREAD_UNDER = _w(
 COST = _w("Kilometrekare başına kurulum maliyeti",
           "Capital per square kilometre")
 COST_UNDER = _w(
-    "On üç sistemin yedisi bir kurulum maliyeti yayımlıyor: üçü bizim, "
-    "dördü ötekilerin. Geri kalanı çizilemedi. Uydu satırları "
-    "kilometrekare başına ucuz "
-    "çünkü paydaları dünyanın yüzeyi. Tünel satırı en pahalı görünüyor "
-    "çünkü paydası bir km²'nin ellide biri; tünel bir alana değil bir "
-    "hatta hizmet eder.",
-    "Seven of the thirteen publish a capital cost: three of ours and "
-    "four of the others. The rest cannot be drawn. The satellite rows "
-    "are cheap per square kilometre "
-    "because their denominator is the surface of the earth. The tunnel "
-    "row looks dearest because its denominator is a fiftieth of a square "
-    "kilometre, and a tunnel serves a line rather than an area.",
+    "Kurulum maliyetini yayımlayan sistemler. Uydu satırları "
+    "kilometrekare başına ucuz, çünkü paydaları dünyanın yüzeyi. Tünel "
+    "satırı burada yok: o kilometrekareye değil güzergâh kilometresine "
+    "bölünüyor, yani aynı eksene konamaz. Tablodaki dipnotu bunu "
+    "anlatıyor.",
+    "The systems that publish a capital cost. The satellite rows are "
+    "cheap per square kilometre because their denominator is the "
+    "surface of the earth. The tunnel row is absent: it is divided by "
+    "route kilometre rather than by square kilometre, so it does not "
+    "belong on this axis. Its note in the table says so.",
 )
 ACCURACY = _w("Yatay hata, en kötü %5 hariç (HPE P95)",
               "Horizontal error, worst 5 % excluded (HPE P95)")
@@ -2097,6 +2100,12 @@ def _marks(published, language: str, at: int):
                             short=row.system.split()[0]))
     for row in published.rows:
         cells = list(row.cells())
+        # The two cost columns. A row priced by its length is not on
+        # the same axis as one priced by its area, so it is left out of
+        # a drawing of them rather than plotted as though it were
+        # (ADR-0073).
+        if at in (5, 6) and row.costed_by != "area":
+            continue
         figure = figure_in(cells[at + 3])
         if figure is not None:
             out.append(Mark(
@@ -2284,6 +2293,12 @@ def _published(published, language: str, table=None) -> str:
         rest = [html.escape(one) for one in cells[3:]]
         rest[3] += mark(table.yerkon["availability"])
         rest[5] += mark(table.yerkon["capex"])
+        # A row priced by its length says so on both cost cells: the
+        # column head says TL/km² and for this one row it is not.
+        if row.costed_by == "route":
+            note = mark(table.yerkon["by_route"])
+            rest[5] += note
+            rest[6] += note
         body.append(marked + rest)
     # The template is escaped once, by `_said`. What comes out of the
     # record is escaped here, and escaping the result again would put

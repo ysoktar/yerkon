@@ -98,8 +98,8 @@ def table(rows) -> Callable:
                         decimal_comma(row.vpe_p95_m, 2),
                         "%" + decimal_comma(100.0 * row.availability, 2),
                         decimal_comma(row.area_km2, 2),
-                        decimal_comma(row.capex_tl_per_km2, 0),
-                        decimal_comma(row.opex_tl_per_km2_year, 0),
+                        decimal_comma(row.capex_tl_per_unit, 0),
+                        decimal_comma(row.opex_tl_per_unit_year, 0),
                     ],
                 }
                 for row in table_rows

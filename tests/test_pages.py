@@ -207,8 +207,8 @@ def a_record(**changes) -> Published:
             vpe_p95_m=92.0 + at,
             availability=0.9375,
             area_km2=93.0 + at,
-            capex_tl_per_km2=94000.0 + at,
-            opex_tl_per_km2_year=95000.0 + at,
+            capex_tl_per_unit=94000.0 + at,
+            opex_tl_per_unit_year=95000.0 + at,
             reached_km2=96.0 + at,
             assumed_share=0.5,
         ))
@@ -447,6 +447,45 @@ def test_the_other_systems_are_not_drawn_without_a_run_of_our_own():
     assert "yerkon table --publish" in drawn
 
 
+# --- what a cost is divided by ------------------------------------------
+
+
+def test_a_corridor_is_priced_by_its_length():
+    """A tunnel's area is a fiftieth of a km², and dividing by it made
+    the cell large for arithmetic reasons (ADR-0073)."""
+    record = read()
+    tunnel = dict(zip(record.keys, record.rows))["tunnel"]
+    assert tunnel.costed_by == "route"
+    cells = list(tunnel.cells())
+    assert cells[8].endswith(" /km"), cells[8]
+    assert cells[9].endswith(" /km"), cells[9]
+    for key in ("urban", "rural"):
+        row = dict(zip(record.keys, record.rows))[key]
+        assert row.costed_by == "area"
+        assert "/km" not in list(row.cells())[8]
+
+
+def test_the_row_priced_by_length_says_so_in_the_table():
+    from yerkon.comparison import read as read_comparison
+
+    drawn = render(page_at("/sonuclar"), "tr", read())
+    note = read_comparison().notes[read_comparison().yerkon["by_route"]]
+    assert note["tr"][:40] in drawn
+    assert note["tr"] != note["en"]
+
+
+def test_a_cost_drawing_leaves_out_what_is_not_on_its_axis():
+    """Per kilometre and per square kilometre are not one scale."""
+    from yerkon.viewer.pages import _marks
+
+    record = read()
+    priced = {mark.label for mark in _marks(record, "tr", 5)}
+    assert not any("Tünel" in name for name in priced), priced
+    # It is still in the drawings that do share an axis.
+    errors = {mark.label for mark in _marks(record, "tr", 1)}
+    assert any("Tünel" in name for name in errors)
+
+
 # --- the drawings --------------------------------------------------------
 
 
@@ -601,15 +640,17 @@ def test_every_source_a_note_cites_is_in_the_bibliography():
 def test_every_note_under_the_table_rests_on_a_source():
     """A claim about somebody else's system has to say where it came from.
 
-    The one exception is the availability warning, which defines the
-    column rather than quoting a figure from anybody.
+    A note that says what a column or a denominator means is exempt,
+    and says so with `defines = true` rather than being named here: the
+    list of exceptions grew once already (ADR-0073) and a list of names
+    is the kind of thing that stops being read.
     """
     from yerkon.comparison import read as read_comparison
 
     table = read_comparison()
     bare = sorted(
         key for key, note in table.notes.items()
-        if not note.get("sources") and key != table.availability_note
+        if not note.get("sources") and not note.get("defines")
     )
     assert not bare, "notes with nothing behind them: {}".format(
         ", ".join(bare)
