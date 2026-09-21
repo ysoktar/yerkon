@@ -110,11 +110,11 @@ yanlıştır.
    yendiğini söylüyor ve başabaş noktası 6588 TL.
 2. ~~**Frekans düzeltmesinden sonra kalan saat kayması.**~~ Yapıldı:
    2026-09-10'da 0,0793 ppm ölçüldü (ADR-0018) ve dosyadaki tahmin olmayan
-   tek değer o. Ondan geriye kalan bir tezgâh: benzetim toplanır gürültüyü
+   tek değer o. Ondan geriye kalan bir tezgâh: simülasyon toplanır gürültüyü
    kapsıyor; faz gürültüsünü, çok yolluluğu ve alışveriş sırasında
    sürüklenmeyi kapsamıyor.
-3. **Uygulama tabanı**, 2,94 m, bir benzetim değil bir tezgâh istiyor. 1625
-   kHz'de tek bir çip 184 m uçuştur, yani bir dalga formu benzetimi 18 m der
+3. **Uygulama tabanı**, 2,94 m, bir simülasyon değil bir tezgâh istiyor. 1625
+   kHz'de tek bir çip 184 m uçuştur, yani bir dalga formu simülasyonu 18 m der
    ve bir ölçümle, sebebi zaten anlaşılmış biçimde çelişir. SX1280'in ölçüm
    zamanlaması sembol ilintisinden gelmiyor; parçanın içindeki belgesiz bir
    mekanizmadan geliyor.

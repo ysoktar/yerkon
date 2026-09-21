@@ -1,4 +1,4 @@
-# YERKON benzetiminin bağlamı
+# YERKON simülasyonunun bağlamı
 
 Bu depo, YERKON donanımından kurulan karasal bir konumlandırma ağının
 gerçekte ne vereceğini ve neye mal olacağını kestirir. Tek çıktısı, YERKON
@@ -15,6 +15,11 @@ Her terimin başlığında **kodun kullandığı İngilizce ad** durur; kod
 İngilizcedir ve bu dosyanın işi tam olarak Türkçe raporla o adlar arasında
 köprü olmaktır. Parantez içindeki Türkçe karşılık, raporun ve arayüzün
 kullandığıdır.
+
+**Simulation** (simülasyon): bu deponun yaptığı iş. Türkçesi her yerde
+*simülasyon*; *benzetim* de doğru bir karşılıktır ama site bir yerde
+"Benzetim", bir yerde "Simülasyon" yazıyordu ve aynı şeyin iki adı
+vardı. Tek ad seçildi (ADR-0071).
 
 **Anchor** (direk, raporda *yayın birimi*): ölçülmüş bir konumda duran
 sabit verici. Üç ürün çeşidi vardır ve birbirinin yerine geçmezler, çünkü

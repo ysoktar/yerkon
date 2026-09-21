@@ -156,9 +156,34 @@ def test_the_simulator_is_served_where_the_pages_point_at_it():
     assert "SIMULATOR" in routing
     assert '"simulator.html"' in routing
     assert not (STATIC / "index.html").exists(), (
-        "the simulator moved to /simulasyon; a leftover index.html would be "
-        "served at the site's own address"
+        "the simulator moved off /; a leftover index.html would be served "
+        "at the site's own address"
     )
+
+
+def test_the_running_simulator_does_not_sit_on_a_page_of_the_site():
+    """Both were called "simulation" once, and both wanted /simulasyon.
+
+    The server answers SIMULATOR before it looks a page up, so a page
+    whose slug matched it could never be reached (ADR-0071).
+    """
+    from yerkon.viewer.pages import SIMULATOR
+
+    taken = SIMULATOR.strip("/")
+    clash = [page.slug for page in PAGES if page.slug == taken]
+    assert not clash, (
+        "{} is both the running simulator and the {} page; the page would "
+        "never be served".format(SIMULATOR, clash[0])
+    )
+
+
+def test_the_link_into_the_simulator_and_the_page_about_it_read_apart():
+    """One explains the simulation, the other runs it."""
+    from yerkon.viewer.pages import SIMULATION, SIMULATOR_LABEL
+
+    for language in ("tr", "en"):
+        assert (SIMULATOR_LABEL.said(language)
+                != SIMULATION.nav.said(language)), language
 
 
 def test_asking_for_a_page_that_is_not_there_is_not_a_page():
@@ -562,7 +587,7 @@ def test_the_folder_carries_both_languages_and_every_page(tmp_path):
     assert "index.html" in names and "en/index.html" in names
     # The page that says where the simulation runs, since a folder of
     # files cannot run it.
-    assert "benzetim.html" in names and "en/benzetim.html" in names
+    assert "simulasyon.html" in names and "en/simulasyon.html" in names
     assert "site.css" in names and ".nojekyll" in names
     assert len(written) == 2 * len(PAGES) + len(CARRIED) + 1
 

@@ -127,7 +127,7 @@ the folder matches what the pages draw.
 ## The simulator
 
 ```bash
-yerkon view          # opens the site; the simulator is at /simulasyon
+yerkon view          # opens the site; the simulator is at /calistir
 ```
 
 A local web app. The site in three dimensions, with the ground, the

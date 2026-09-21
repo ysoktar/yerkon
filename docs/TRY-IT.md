@@ -39,7 +39,7 @@ yerkon view
 **Artık bir anasayfa açıyor** (bu yeni). Sekiz sayfa, raporun
 bölümleriyle aynı sırada: YERKON ne öneriyor, GNSS nerede kırılıyor,
 mimari ve donanım fiyatları, dört araştırma sorusu ile pilot, sektör
-faydası ve ticarileşme, yayımlanan tablo, benzetimin neyi modelleyip
+faydası ve ticarileşme, yayımlanan tablo, simülasyonun neyi modelleyip
 neyi modellemediği, ve kaynaklar. Sağ üstteki **Simülasyon** düğmesi
 uygulamayı açıyor, panelin sol üstündeki bağlantı geri getiriyor
 (ADR-0064, ADR-0067).
@@ -147,7 +147,7 @@ Burada üç şey daha değişti ve her biri doğrudan bakmaya değer:
   demek — yakından bu düz bir yeşil duvardı. Yaklaşınca motordan aynı
   bütçe ekrandaki pencere için isteniyor, altmış metreye kadar; ki bu da
   alttaki 30 m yükseklik modelinin sınırına yakın. Hiçbir şey
-  uydurulmuyor: benzetimin çağırdığı `height_at`'ın kendisi (ADR-0031).
+  uydurulmuyor: simülasyonun çağırdığı `height_at`'ın kendisi (ADR-0031).
 
 Onlarla birlikte iki çizim hatası da gitti, ikisi de aynı sebepten
 (ADR-0030). Yol, çiziciye tek bir mesafesi olan tek bir şekil olarak
@@ -326,7 +326,7 @@ motorun kendi eşikleri — sayfada ikinci bir kopya yok.
 **Boyanmayan yer, hiçbir direğin erişmediği yerdir.** Sıfır değil, yok:
 sıfır dB marj kılpayı kapanan bir bağlantıdır, hiç erişmemek başka şey.
 
-Son katman bir **kestirimdir, benzetim değildir**: içinde saat kayması,
+Son katman bir **kestirimdir, simülasyon değildir**: içinde saat kayması,
 paket kaybı, oturmayan bir çözücü ya da gerçekten oradan geçen bir alıcı
 yok. Yayımlanan sayı **Simülasyonu çalıştır**'dan gelir (ADR-0001). Yine
 de birbirlerini tutarlar — kırsal zeminde kestirimin ortancası 3,21 m,

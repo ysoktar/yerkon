@@ -1,4 +1,4 @@
-# YERKON benzetimi
+# YERKON simülasyonu
 
 *English: **[README.en.md](README.en.md)***
 
@@ -93,7 +93,7 @@ yerkon view
 Yerel bir site açar. Sekiz sayfa, raporun bölümleriyle aynı sırada:
 YERKON ne öneriyor, GNSS nerede kırılıyor, mimari ve donanım fiyatları,
 dört araştırma sorusu ile pilot, sektör faydası ve ticarileşme,
-yayımlanan tablo, benzetimin neyi modelleyip neyi modellemediği, ve
+yayımlanan tablo, simülasyonun neyi modelleyip neyi modellemediği, ve
 kaynaklar. Sağ üstteki düğme simülatöre giriyor, simülatörün panelindeki
 bağlantı geri getiriyor (ADR-0064, ADR-0067).
 
@@ -121,14 +121,14 @@ Yayımlanan hâli `yerkon pages` ile yazılıyor: aynı sayfalar, iki dilde,
 `docs/` klasöründe duran sabit dosyalar olarak. `.github/workflows/pages.yml`
 o klasörü `gh-pages` dalının köküne kopyalıyor ve Pages orayı sunuyor,
 yani yayımlamak bir push. Simülatörün kendisi oraya gelmiyor,
-çünkü arkasında çalışan bir motor var; yayımlanan sitede düğme benzetim
+çünkü arkasında çalışan bir motor var; yayımlanan sitede düğme simülasyon
 sayfasına gidiyor ve o sayfa nasıl çalıştırılacağını söylüyor (ADR-0065). Klasörün
 sayfalarla aynı olduğunu bir sınama söylüyor.
 
 ## Simülatör
 
 ```bash
-yerkon view          # site açılır, simülatör /simulasyon adresinde
+yerkon view          # site açılır, simülatör /calistir adresinde
 ```
 
 Yerel bir web uygulaması. Sahanın üç boyutu: zemin, güzergâh, her
@@ -241,7 +241,7 @@ maliyetlendirilebilir:
 - **Çözücü** yerleşimleri bir hedefe karşı arar ve kazananı yeni bir
   adlandırılmış seçenek olarak kaydeder; seçenek listesi de onu sunar.
 
-Son üçü dakikalar sürer, çünkü içlerindeki her değer gerçek benzetimin
+Son üçü dakikalar sürer, çünkü içlerindeki her değer gerçek simülasyonun
 koşulmasından gelir. Bir iş parçacığında koşar ve satır satır bildirir,
 böylece merak etmek yerine izleyebilirsin.
 
@@ -490,7 +490,7 @@ yerkon solve --scenario tunnel --availability 0.99 --hpe-p50 1.0 --save tunnel-p
 
 Düzenleri bir hedefe karşı arar ve onu karşılayanların en ucuzunu
 adlandırılmış bir seçenek olarak kaydeder. Her aday gerçek zemine karşı
-tam bir benzetimdir — yavaş, ve cevapları kuruluş gereği tabloyla uyuşur.
+tam bir simülasyondur — yavaş, ve cevapları kuruluş gereği tabloyla uyuşur.
 
 Kimsenin denemediği bir şey buldu, çünkü denemek eskiden bir sabiti
 düzenlemek demekti: **120 m askı aralığı tünel satırını ellinci
@@ -616,7 +616,7 @@ Which also changes:
 Apply all of that? [y/N]
 ```
 
-Sonuçlar, yanında tutulan bir kural listesiyle değil benzetimin üzerinde
+Sonuçlar, yanında tutulan bir kural listesiyle değil simülasyonun üzerinde
 koştuğu link bütçesinin kendisiyle hesaplanır ve bunu bir test zorlar.
 
 ## Bir yerleşim gerçekte ne veriyor
@@ -689,7 +689,7 @@ devam ederken çoktan sinyal-gürültü oranıyla birlikte düşmeye başlar.
 Fark iki kattır; bu projenin iki hafta boyunca iddia ettiği yedi kat
 değil. Link bütçesi 30,1 dB yayma kazancını ekliyor, sonra da onu zaten
 varsayan bir eşiğe karşı sınıyordu; yani bağlantılar parçanın kendi
-hassasiyetinin 24 dB altında "kapanıyordu". Alıcının bir benzetimini
+hassasiyetinin 24 dB altında "kapanıyordu". Alıcının bir simülasyonunu
 yazmak bunu yakaladı: ilinti sonrası −20 dB'de hiçbir şey çözülmez, çünkü
 bulunacak bir tepe yoktur. Düzeltildikten sonra SX1280 11,7 km'ye kadar
 kapanır ve 5,52 km'ye kadar işe yarar biçimde ölçer (ADR-0017).

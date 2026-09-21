@@ -57,8 +57,9 @@ export const SAY = {
         + "go unread on this row, measured ground or not.",
   },
   "ground.real.note": {
-    tr: "Ölçülmüş bir zemin kendi rölyefini, kendi pürüzünü ve kendi "
-        + "engellerini getirir, bu yüzden aşağıdaki üç değer uygulanmaz.",
+    tr: "Ölçülmüş bir zemin kendi yükseklik farkını, kendi pürüzünü ve "
+        + "kendi engellerini getirir, bu yüzden aşağıdaki üç değer "
+        + "uygulanmaz.",
     en: "Measured ground brings its own relief, its own roughness and its "
         + "own obstructions, so the three figures below stop applying.",
   },
@@ -265,7 +266,7 @@ export const SAY = {
     en: "the search placed against {metres} m, set by hand",
   },
   "run.bar.met": {
-    tr: "çıta tutturuldu", en: "cleared its bar",
+    tr: "hedef tutturuldu", en: "cleared its bar",
   },
   // What the arrangement serves, beside what its method asked for. A
   // bar being met says the method got what it asked for and not that
@@ -280,23 +281,23 @@ export const SAY = {
     en: "but nowhere has four: this arrangement gives no position",
   },
   "run.bar.dilution.short": {
-    tr: "çıta tutturulamadı: sahanın bir kısmında konum alınamıyor, "
-        + "{short} görüş eksik",
+    tr: "hedef tutturulamadı: sahanın bir kısmında hiç konum "
+        + "alınamıyor, {short} görüş eksik",
     en: "did not clear its bar: part of the site cannot be fixed at all, "
         + "{short} sightings short",
   },
   "run.bar.dilution": {
-    tr: "çıta tutturulamadı: HDOP {got}, istenen {wanted}",
+    tr: "hedef tutturulamadı: HDOP {got}, istenen {wanted}",
     en: "did not clear its bar: HDOP {got} against {wanted} asked for",
   },
   "run.bar.anchors_in_reach": {
-    tr: "çıta tutturulamadı: bir yerde erişimde {got} direk var, "
+    tr: "hedef tutturulamadı: bir yerde yalnız {got} direk duyuluyor, "
         + "istenen {wanted}",
     en: "did not clear its bar: somewhere has {got} anchors in reach "
         + "against {wanted} asked for",
   },
   "run.bar.covered_share": {
-    tr: "çıta tutturulamadı: {short} hücreye hiçbir direk erişmiyor",
+    tr: "hedef tutturulamadı: {short} hücreye hiçbir direk erişmiyor",
     en: "did not clear its bar: no anchor reaches {short} cells",
   },
   "run.bar.budget": {
@@ -441,7 +442,8 @@ export const SAY = {
   "result.rate": { tr: "Konum sıklığı", en: "Fix rate" },
   "result.reach": { tr: "{run}: menzil", en: "{run}: reach" },
   "result.closure": { tr: "{run}: kopma", en: "{run}: closure" },
-  "result.reached": { tr: "Paketin ulaştığı alan", en: "Area a packet reaches" },
+  "result.reached": { tr: "Sinyalin ulaştığı alan",
+                      en: "Area a packet reaches" },
   "result.served": { tr: "Konum alınabilen alan", en: "Area with a position" },
   "result.hpe50": { tr: "HPE P50", en: "HPE P50" },
   "result.hpe95": { tr: "HPE P95", en: "HPE P95" },
@@ -511,9 +513,9 @@ export const SAY = {
         + "(ADR-0011).",
   },
   "layer.error_m.note": {
-    tr: "Menzil sigması × geometri. Bu satırın kendi toleransının "
-        + "katlarıyla renklendiriliyor. Bir kestirim, bir benzetim "
-        + "değil: saat kayması, paket kaybı ve gerçekten oradan geçen "
+    tr: "Ölçüm hatası × geometri. Bu satırın kendi toleransının "
+        + "katlarıyla renklendiriliyor. Bu bir tahmin, simülasyon "
+        + "değil: saat kayması, kaybolan mesaj ve gerçekten oradan geçen "
         + "bir alıcı yok. Yayımlanan sayı 'Simülasyonu çalıştır'dan "
         + "gelir (ADR-0001).",
     en: "Ranging sigma times geometry, coloured in multiples of this "
@@ -525,7 +527,7 @@ export const SAY = {
                       en: "unpainted: no anchor reaches" },
   "legend.served": { tr: "Konum alınabilen alan (≥4 direk)",
                      en: "Ground with a position (≥4 anchors)" },
-  "legend.reached": { tr: "Paketin ulaştığı alan (≥1 direk)",
+  "legend.reached": { tr: "Sinyalin ulaştığı alan (≥1 direk)",
                       en: "Ground a packet reaches (≥1 anchor)" },
   "legend.reach": { tr: "Grubun kullanılabilir menzili",
                     en: "The group's usable range" },
@@ -560,7 +562,8 @@ export const SAY = {
   "budget.alone": { tr: "Tek başına", en: "Alone" },
   "budget.without": { tr: "Kalkarsa", en: "Removed" },
   "budget.gain": { tr: "Kazanç", en: "Gain" },
-  "budget.residue": { tr: "Model artığı", en: "Model residue" },
+  "budget.residue": { tr: "Modelin açıklayamadığı",
+                      en: "Model residue" },
   "budget.no_dominant": {
     tr: "Tek bir baskın kaynak yok: en büyük ikisi birbirine yakın.",
     en: "No single source dominates: the largest two are close.",

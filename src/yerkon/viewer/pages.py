@@ -131,7 +131,7 @@ class Where:
         return ("../" if self.language == "en" else "") + name
 
     def simulator(self) -> str:
-        # Served, this is the simulator itself. Loose, it is the page
+        # Served, this is the running simulator. Loose, it is the page
         # that says the simulator runs on your own machine, because a
         # folder of files cannot run a link budget.
         return SIMULATOR if not self.loose else self.file(SIMULATION)
@@ -148,30 +148,30 @@ HOME = Page(
     nav=_w("Anasayfa", "Home"),
     title=_w("YERKON", "YERKON"),
     lead=_w(
-        "YERKON, karayolu ulaşımında konumun yabancı uydu sistemlerine "
-        "bağımlılığını azaltmak için bir fikirdir. Yol kenarında zaten "
-        "duran noktalara düşük maliyetli yayın birimleri takılır, ve "
-        "bir alıcı çevresindeki birimlerle mesafe ölçerek konumunu kendi "
-        "hesaplar.",
+        "YERKON, karayolunda konumun yabancı uydulara bağımlılığını "
+        "azaltmak için bir öneri. Yol kenarında zaten duran direklere ve "
+        "kabinlere ucuz birer yayın kartı takılıyor; araçtaki alıcı da "
+        "çevresindeki birimlere olan mesafesini ölçerek nerede olduğunu "
+        "kendi buluyor.",
         "YERKON is a proposal for road transport to depend less on "
-        "foreign satellite systems for position. Low cost broadcast "
-        "units go onto roadside points that are already standing, and a "
-        "receiver works out where it is by measuring range against the "
-        "units around it.",
+        "foreign satellites for position. A cheap broadcast board goes "
+        "onto masts and cabinets already standing by the road, and the "
+        "receiver in a vehicle finds where it is by measuring its distance "
+        "to the units around it.",
     ),
     parts=(
         Part(
             kind="picture",
             picture="road.png",
             lines=(_w(
-                "Rapordan. Yayın birimleri yol kenarındaki mevcut "
-                "noktalara takılır; alıcı hem uyduyu hem karasal "
-                "birimleri görebilir, ve uydu kesildiğinde karasal "
-                "olanla devam eder.",
-                "From the report. The broadcast units go onto existing "
-                "roadside points. A receiver can see both the satellites "
-                "and the terrestrial units, and carries on with the "
-                "terrestrial ones when the satellites go.",
+                "Rapordan. Yayın birimleri yol kenarında zaten duran "
+                "noktalara takılıyor. Alıcı hem uyduyu hem yerdeki "
+                "birimleri görüyor, ve uydu kesilince yerdekilerle devam "
+                "ediyor.",
+                "From the report. The broadcast units go onto points "
+                "already standing by the road. A receiver sees both the "
+                "satellites and the units on the ground, and carries on "
+                "with the ground ones when the satellites go.",
             ),),
         ),
         Part(
@@ -196,23 +196,21 @@ HOME = Page(
                 ),
                 _w(
                     "Bir yayın birimi 1000 ile 1600 lira arasında. Yeni "
-                    "direk dikmek, yeni enerji hattı çekmek ya da ağ "
-                    "geneli atomik saat kurmak gerekmiyor; maliyeti bu "
+                    "direk dikmek, yeni elektrik hattı çekmek ya da her "
+                    "direğe atomik saat koymak gerekmiyor. Maliyeti bu "
                     "kadar aşağıda tutan da bu.",
                     "A broadcast unit costs between 1000 and 1600 lira. "
-                    "Nothing here needs a new mast, a new power feed or a "
-                    "network of atomic clocks, which is what keeps the "
+                    "Nothing here needs a new mast, a new power feed, or an "
+                    "atomic clock on every mast. That is what keeps the "
                     "cost this low.",
                 ),
                 _w(
-                    "YERKON uydu sistemlerinin yerine geçmeyi hedeflemez. "
-                    "Uydu çalışırken iki cevap yan yana konur, ve "
-                    "aralarındaki tutarsızlık bir aldatma saldırısını "
-                    "görünür kılar.",
-                    "YERKON does not try to replace the satellite "
-                    "systems. While they work, the two answers sit side "
-                    "by side, and a disagreement between them makes a "
-                    "spoofing attack visible.",
+                    "YERKON uydunun yerine geçmeyi hedeflemiyor. Uydu "
+                    "çalışırken iki konum yan yana duruyor; ikisi "
+                    "tutmuyorsa ortada bir sahte sinyal var demektir.",
+                    "YERKON does not aim to replace the satellites. While "
+                    "they work, the two positions sit side by side; if the "
+                    "two disagree, there is a fake signal about.",
                 ),
             ),
         ),
@@ -226,64 +224,66 @@ WHY = Page(
     nav=_w("Sorun", "The problem"),
     title=_w("GNSS neden yetmiyor", "Why GNSS is not enough"),
     lead=_w(
-        "Konum, seyrüsefer ve hassas zamanlama hizmetlerinin büyük bölümü "
-        "GPS, Galileo, GLONASS ve BeiDou'dan gelir. Bu bağımlılık araç "
-        "navigasyonuyla kalmaz; acil müdahale koordinasyonunu, kamu "
-        "filolarını, telekomünikasyon şebekelerini, elektrik sistemlerini "
-        "ve lojistik operasyonlarını da kapsar.",
-        "Most positioning, navigation and timing comes from GPS, Galileo, "
-        "GLONASS and BeiDou. The dependency goes past vehicle navigation: "
-        "emergency response, public fleets, telecommunications networks, "
-        "electrical systems and logistics all sit on it.",
+        "Bugün konum bulmanın, yol tarif etmenin ve saati hassas tutmanın "
+        "neredeyse tamamı GPS, Galileo, GLONASS ve BeiDou'dan geliyor. Bu "
+        "bağımlılık araç navigasyonuyla bitmiyor: acil çağrı ekipleri, "
+        "kamu araç filoları, telefon şebekeleri, elektrik şebekesi ve "
+        "kargo taşımacılığı da aynı dört sisteme bağlı.",
+        "Nearly everything that finds a position, gives directions or "
+        "keeps precise time today runs on GPS, Galileo, GLONASS and "
+        "BeiDou. The dependency does not stop at vehicle navigation: "
+        "emergency crews, public fleets, telephone networks, the "
+        "electrical grid and freight all hang on the same four systems.",
     ),
     parts=(
         Part(
             kind="picture",
             picture="gnss.png",
             lines=(_w(
-                "Dördü de yabancı devletlerin kontrolünde, ve dördü de "
-                "aynı zayıflığı paylaşır: uydudan gelen sinyal yere "
-                "vardığında çok zayıftır.",
-                "All four are controlled by foreign states, and all four "
-                "share one weakness. The signal is very weak by the time "
-                "it reaches the ground.",
+                "Dördü de yabancı devletlerin elinde, ve dördünün de "
+                "aynı zayıf noktası var: uydudan gelen sinyal yere "
+                "vardığında çok cılızdır.",
+                "All four are in the hands of foreign states, and all "
+                "four have the same weak spot: the signal from a satellite "
+                "is faint by the time it reaches the ground.",
             ),),
         ),
         Part(
             kind="points",
-            heading=_w("Kırılganlıklar", "Where it breaks"),
+            heading=_w("Nerede işe yaramıyor", "Where it breaks"),
             lines=(
                 _w(
-                    "Tünelde, kapalı alanda ve kentsel kanyonda sinyal "
-                    "kaybolur.",
-                    "The signal is lost in tunnels, indoors and in urban "
-                    "canyons.",
+                    "Tünelde, kapalı alanda ve yüksek binaların "
+                    "arasında sinyal kayboluyor.",
+                    "The signal is lost in tunnels, indoors and between "
+                    "tall buildings.",
                 ),
                 _w(
-                    "Düşük güçlü sinyal karıştırmaya açıktır, ve "
-                    "elektronik harp ürünleri yaygınlaşıyor.",
-                    "A weak signal is open to jamming, and electronic "
-                    "warfare equipment keeps spreading.",
+                    "Sinyal zayıf olduğu için bastırmak kolay, ve "
+                    "bastırma cihazları gitgide yaygınlaşıyor.",
+                    "The signal is weak, so it is easy to drown out, and "
+                    "the equipment for doing it keeps spreading.",
                 ),
                 _w(
-                    "Sahte sinyal yanlış bir konum üretir. Alıcı bunu "
-                    "tutarlı ve yüksek güvenli bir konum olarak gösterir, "
-                    "ki tehlikeli olan da budur.",
-                    "A spoofed signal produces a wrong position, and the "
-                    "receiver reports it as a consistent one with high "
-                    "confidence. That is what makes it dangerous.",
+                    "Sahte sinyal alıcıya yanlış bir konum hesaplatır. "
+                    "Alıcı bu konumu doğruymuş gibi, üstelik yüksek "
+                    "güvenle gösterir. Tehlikeli olan da bu.",
+                    "A fake signal makes the receiver work out a wrong "
+                    "position. The receiver then shows that position as "
+                    "though it were right, and with high confidence. That "
+                    "is what makes it dangerous.",
                 ),
                 _w(
-                    "Kritik hizmetler tek bir teknoloji ailesine "
-                    "bağlıdır.",
-                    "Critical services depend on a single family of "
+                    "Hayati hizmetlerin hepsi tek bir teknolojiye "
+                    "bağlı.",
+                    "Every service people's lives depend on runs on one "
                     "technology.",
                 ),
                 _w(
-                    "Kriz anında sistem üzerindeki karar yetkisi "
-                    "Türkiye'de değildir.",
-                    "In a crisis, the authority over the system is not in "
-                    "Turkey.",
+                    "Bir kriz çıktığında bu sistemleri kapatma kararı "
+                    "Türkiye'de verilmiyor.",
+                    "If a crisis comes, the decision to switch these "
+                    "systems off is not taken in Turkey.",
                 ),
             ),
         ),
@@ -361,28 +361,28 @@ WHY = Page(
             heading=_w("YERKON'un cevabı", "What YERKON answers"),
             lines=(
                 _w(
-                    "Kırsal yayın biriminin sekiz kilometreyi bulan "
-                    "menzili alçak irtifada da okunabilir, kritik bölge "
-                    "altyapısı ise havalimanı çevresinde uydular sağır "
-                    "edilse bile bağımsız bir karasal ağ sunar. Bunlar "
-                    "raporun iddiasıdır; bu depo hiçbirini sahada "
-                    "ölçmedi.",
-                    "The rural unit's eight kilometre reach can be read at "
-                    "low altitude, and the critical area installation "
-                    "gives an airport an independent terrestrial network "
-                    "even with the satellites deafened. These are the "
-                    "report's claims, and this repository measured none of "
-                    "them in the field.",
+                    "Kırsal yayın birimi sekiz kilometreye kadar "
+                    "ulaşıyor, yani alçaktan uçan bir uçak da onu "
+                    "duyabilir. Havalimanı çevresine kurulan birimler ise "
+                    "uydular susturulsa bile yerde çalışmaya devam eden "
+                    "ayrı bir ağ bırakır. Bunlar raporun iddiası; bu "
+                    "depo hiçbirini sahada ölçmedi.",
+                    "The rural unit reaches up to eight kilometres, so a "
+                    "low flying aircraft can hear it too. Units around an "
+                    "airport leave a separate network that keeps working "
+                    "on the ground even with the satellites silenced. "
+                    "These are the report's claims, and this repository "
+                    "measured none of them in the field.",
                 ),
                 _w(
-                    "Aldatmaya karşı YERKON bir yedekten fazlasıdır. "
-                    "Araçlar ve gemiler uydu çözümüyle karasal çözümü "
-                    "karşılaştırarak saldırı altında olduklarını "
-                    "görebilir.",
-                    "Against spoofing YERKON is more than a backup. "
-                    "Vehicles and ships can compare the satellite solution "
-                    "with the terrestrial one and see that they are under "
-                    "attack.",
+                    "Sahte sinyale karşı YERKON yedekten fazlasını "
+                    "yapar. Araç ya da gemi, uydunun verdiği konumla "
+                    "yerden gelen konumu yan yana koyar; ikisi tutmuyorsa "
+                    "saldırı altında olduğunu anlar.",
+                    "Against a fake signal YERKON does more than stand "
+                    "by. A vehicle or a ship puts the satellite's position "
+                    "beside the one from the ground; if the two disagree, "
+                    "it knows it is under attack.",
                 ),
             ),
         ),
@@ -406,13 +406,13 @@ SYSTEM = Page(
             kind="picture",
             picture="architecture.png",
             lines=(_w(
-                "Rapordan. Alıcı menzili çift yönlü ölçümle çıkarır; "
-                "merkezi yönetim sistemiyle yayın birimleri arasındaki "
-                "bağ kimlik ve anahtar taşır, menzil değil.",
-                "From the report, with Turkish labels. The receiver gets "
-                "range by two way measurement. What runs between the "
-                "management system and the units is identity and keys "
-                "rather than range.",
+                "Rapordan. Alıcı mesafeyi karşılıklı mesajlaşarak "
+                "ölçüyor. Merkezî yönetim sistemiyle birimler arasındaki "
+                "hat ise mesafe değil, kimlik ve anahtar taşıyor.",
+                "From the report, with Turkish labels. The receiver "
+                "measures distance by sending messages back and forth. "
+                "The line between the management system and the units "
+                "carries identity and keys rather than distance.",
             ),),
         ),
         Part(
@@ -420,41 +420,42 @@ SYSTEM = Page(
             heading=_w("Üç parça", "Three parts"),
             lines=(
                 _w(
-                    "**Yayın birimi.** Kule, yol kenarı ünitesi, "
-                    "haberleşme tesisi ya da tünel sistemi gibi sabit bir "
-                    "noktaya yerleştirilen verici. Alıcı konum verisi "
-                    "istediğinde kimliğini, kurulumda ölçülmüş sabit "
-                    "koordinatını ve doğrulama için gereken güvenlik "
-                    "bilgisini yayınlar.",
-                    "**The broadcast unit.** A transmitter placed on a "
-                    "fixed point: a mast, a roadside unit, a "
-                    "communications site, a tunnel system. When a receiver "
-                    "asks for position data it broadcasts its identity, "
-                    "the fixed coordinate surveyed at installation, and "
-                    "the security information needed to verify it.",
+                    "**Yayın birimi.** Sabit bir noktaya, direğe, yol "
+                    "kenarı ünitesine, haberleşme tesisine ya da tünelin "
+                    "içine takılan verici. Alıcı sorduğunda üç şey "
+                    "yayınlar: kim olduğunu, kurulumda ölçülen sabit "
+                    "konumunu, ve bunların sahte olmadığını gösteren "
+                    "imzayı.",
+                    "**The broadcast unit.** A transmitter fixed to one "
+                    "point: a mast, a roadside unit, a communications "
+                    "site, or inside a tunnel. When a receiver asks, it "
+                    "broadcasts three things: who it is, the fixed "
+                    "position surveyed at installation, and the signature "
+                    "that shows neither is forged.",
                 ),
                 _w(
-                    "**Alıcı.** Araçlara ya da taşınabilir cihazlara "
-                    "yerleştirilir. Ölçümleri atalet ölçüm birimi, "
-                    "tekerlek odometrisi, araç sensörleri ve dijital "
-                    "harita verisiyle birleştirerek uydu olmadan da "
-                    "kesintisiz bir konum kestirimi üretir.",
-                    "**The receiver.** It goes in a vehicle or a portable "
-                    "device. It combines its measurements with an inertial "
-                    "unit, wheel odometry, vehicle sensors and digital map "
-                    "data to keep producing a position without the "
-                    "satellites.",
+                    "**Alıcı.** Araca ya da cebe girer. Yayın "
+                    "birimlerinden ölçtüğü mesafeleri, aracın kendi "
+                    "sensörleriyle birleştirir: hareketi ölçen atalet "
+                    "birimi, tekerleğin kaç tur döndüğü ve harita. "
+                    "Böylece uydu hiç görünmese de konum vermeye devam "
+                    "eder.",
+                    "**The receiver.** It goes in a vehicle or in a "
+                    "pocket. It combines the distances it measures to the "
+                    "units with the vehicle's own sensors: an inertial "
+                    "unit that measures movement, how far the wheels have "
+                    "turned, and the map. So it keeps giving a position "
+                    "with no satellite in sight.",
                 ),
                 _w(
-                    "**Merkezi yönetim sistemi.** Yayın birimlerinin açık "
-                    "anahtarlarını ve kimliklerini güncel tutar. Alıcı bu "
-                    "listenin güncel hâlini indirir ve birimin ECDSA "
-                    "imzasını doğrular, böylece taklit bir birimle "
-                    "konuşmaz.",
-                    "**The management system.** It keeps the units' public "
-                    "keys and identities current. A receiver downloads the "
-                    "current list and checks the unit's ECDSA signature, "
-                    "so it will not talk to an impostor.",
+                    "**Merkezî yönetim sistemi.** Hangi birimin hangi "
+                    "anahtara sahip olduğunun listesini tutar. Alıcı bu "
+                    "listeyi indirip her birimin imzasını kontrol eder, "
+                    "böylece sahte bir birimle konuşmaz.",
+                    "**The management system.** It keeps the list of which "
+                    "unit holds which key. A receiver downloads that list "
+                    "and checks each unit's signature, so it never talks "
+                    "to a forged one.",
                 ),
             ),
         ),
@@ -463,23 +464,27 @@ SYSTEM = Page(
             heading=_w("Neden çift yönlü ölçüm", "Why two way ranging"),
             lines=(
                 _w(
-                    "Varış zamanı farkına dayanan sistemlerde aynı "
-                    "doğruluğa ulaşmak için yayın birimlerinin saatleri ağ "
-                    "genelinde senkron olmalıdır. Bir nanosaniyenin "
-                    "altında senkronizasyon atomik saat ve IEEE 1588 PTP "
-                    "altyapısı demektir. Çift yönlü ölçüm bunu "
-                    "gerektirmez, çünkü paketin havada geçen süresi kule "
-                    "ile alıcı arasındaki kısa bir diyalogdan çıkar.",
-                    "Systems built on time difference of arrival need the "
-                    "units' clocks synchronised across the network to "
-                    "reach the same accuracy. Synchronisation below a "
-                    "nanosecond means atomic clocks and an IEEE 1588 PTP "
-                    "backbone. Two way ranging does not need it, because "
-                    "the packet's time of flight comes out of a short "
-                    "dialogue between the unit and the receiver.",
+                    "Bir sinyalin iki birime kaç saniye arayla "
+                    "vardığına bakan sistemlerde, aynı doğruluğu tutturmak "
+                    "için bütün birimlerin saatleri milyarda bir saniyeden "
+                    "daha yakın olmalı. Bu da her direğe atomik saat ve "
+                    "onları birbirine bağlayan ayrı bir altyapı demek. "
+                    "Çift yönlü ölçümde buna gerek yok: sinyalin yolda "
+                    "geçirdiği süre, birimle alıcı arasındaki kısa bir "
+                    "gidiş gelişten çıkıyor, ikisinin saatlerinin aynı "
+                    "olmasına gerek kalmıyor.",
+                    "Systems that look at how much later a signal "
+                    "reaches one unit than another need every clock in the "
+                    "network held within a billionth of a second to reach "
+                    "the same accuracy. That means an atomic clock on every "
+                    "mast and a backbone to tie them together. Two way "
+                    "ranging needs none of it: the time the signal spends "
+                    "in the air comes out of one short there-and-back "
+                    "between the unit and the receiver, so the two clocks "
+                    "never have to agree.",
                 ),
                 _w(
-                    "Benzetim bu farkı ölçtü. Düzeltilmemiş 10 ppm'lik bir "
+                    "Simülasyon bu farkı ölçtü. Düzeltilmemiş 10 ppm'lik bir "
                     "saat kayması tek yönlü ölçümde 24,1 m hata bırakır, "
                     "çift yönlüde 0,3 mm. Kaymanın kendisi 0,0793 ppm "
                     "ölçüldü, ve bu projede artık tahmin olmayan tek "
@@ -521,11 +526,11 @@ SYSTEM = Page(
                 _w(
                     "**Kırsal.** Az sayıda yüksek kapsamalı nokta: akıllı "
                     "ulaşım sistemi ve yol kenarı üniteleri, baz istasyonu "
-                    "sahaları, demiryolu ve karayolu altyapısı. Entegre RF "
-                    "amplifikatörlü bir modülle (E28-2G4M27S, +27 dBm) "
-                    "menzil uygun koşullarda 8-10 km'ye çıkar. Orman, dağ "
-                    "ve bayır sinyali soğurduğu için saha doğruluğunun "
-                    "10-15 m bandına gerilemesi bekleniyor.",
+                    "sahaları, demiryolu ve karayolu altyapısı. İçinde "
+                    "yükselteç olan bir modülle (E28-2G4M27S, +27 dBm) "
+                    "menzil uygun havada 8-10 km'ye çıkar. Orman, dağ ve "
+                    "bayır sinyali yuttuğu için sahada doğruluğun 10-15 m "
+                    "aralığına düşmesi bekleniyor.",
                     "**Open country.** A few points with wide reach: "
                     "intelligent transport and roadside units, base "
                     "station sites, rail and road infrastructure. With an "
@@ -538,13 +543,14 @@ SYSTEM = Page(
                     "**Kritik bölge.** Tüneller, metro ve istasyon "
                     "alanları, liman ve havalimanları, sınır kapıları, "
                     "afet lojistik alanları. Qorvo DWM3000 gibi 6,5-8 GHz "
-                    "bir UWB modülü 50-100 m menzil verir ve görüş hattı "
-                    "üzerinde hatayı santimetre mertebesine indirir.",
+                    "bir UWB modülü 50-100 m menzil verir ve arada engel "
+                    "yoksa hatayı santimetreye indirir.",
                     "**Critical areas.** Tunnels, metro and station areas, "
                     "ports and airports, border crossings, disaster "
                     "logistics areas. A 6,5 to 8 GHz UWB module such as the "
                     "Qorvo DWM3000 reaches 50 to 100 m and brings the "
-                    "error down to centimetres with line of sight.",
+                    "error down to centimetres when nothing stands in the "
+                    "way.",
                 ),
             ),
         ),
@@ -553,18 +559,19 @@ SYSTEM = Page(
             heading=_w("Alıcı modülleri", "Receiver modules"),
             lines=(
                 _w(
-                    "**Yaya.** Güç tüketimi ve taşınabilirlik merkeze "
-                    "alınmış. Şehir ve kırsal koridorlar için SX1280, "
-                    "tünel ve kapalı alanlar için DWM3000 taşır. ESP32-S3 "
-                    "üzerinden telefona BLE ile bağlanır, BNO085 ile ölü "
-                    "hesaplama yapar. UWB için seramik anten, 2,4 GHz için "
-                    "PCB üzeri çip anten kullanır.",
-                    "**Pedestrian.** Built around power draw and "
-                    "portability. It carries an SX1280 for urban and rural "
-                    "corridors and a DWM3000 for tunnels and indoors. An "
-                    "ESP32-S3 connects to a phone over BLE, and a BNO085 "
-                    "does dead reckoning. A ceramic antenna for UWB, a "
-                    "chip antenna on the board for 2,4 GHz.",
+                    "**Yaya.** Az pil harcasın ve cepte taşınsın diye "
+                    "tasarlandı. Şehirde ve kırsalda SX1280, tünelde ve "
+                    "kapalı alanda DWM3000 kullanır. ESP32-S3 ile telefona "
+                    "bağlanır; sinyal kesilirse BNO085 hareket sensörüyle "
+                    "son konumdan devam eder. UWB için seramik anten, "
+                    "2,4 GHz için kart üzerinde çip anten.",
+                    "**Pedestrian.** Designed to draw little power and "
+                    "fit in a pocket. It uses an SX1280 in town and in "
+                    "open country and a DWM3000 in tunnels and indoors. An "
+                    "ESP32-S3 connects it to a phone; if the signal drops, "
+                    "a BNO085 motion sensor carries on from the last "
+                    "position. A ceramic antenna for UWB, a chip antenna "
+                    "on the board for 2,4 GHz.",
                 ),
                 _w(
                     "**Kara aracı.** STM32 tabanlı, LCD harita ekranlı. "
@@ -580,16 +587,16 @@ SYSTEM = Page(
                 _w(
                     "**Nesnelerin interneti.** Kapalı ve yarı açık alan "
                     "robot filoları için. Yaygın robot işletim "
-                    "sistemleriyle doğrudan konuşur, tekerlek enkoderleri "
-                    "ve kendi atalet birimiyle kestirimini sürekli "
-                    "iyileştirir. Çoğu depo ve fabrika senaryosunda "
-                    "DWM3000 yeter.",
+                    "sistemleriyle doğrudan konuşur; tekerleğin kaç tur "
+                    "döndüğüne ve kendi hareket sensörüne bakarak konumunu "
+                    "sürekli düzeltir. Çoğu depo ve fabrikada DWM3000 "
+                    "yeter.",
                     "**Internet of things.** For robot fleets indoors and "
                     "in half open areas. It talks directly to the common "
-                    "robot operating systems and keeps improving its "
-                    "estimate from the wheel encoders and its own inertial "
-                    "unit. A DWM3000 is enough for most warehouse and "
-                    "factory work.",
+                    "robot operating systems and keeps correcting its "
+                    "position from how far the wheels have turned and its "
+                    "own motion sensor. A DWM3000 is enough for most "
+                    "warehouse and factory work.",
                 ),
             ),
         ),
@@ -657,10 +664,10 @@ SYSTEM = Page(
                     "tax, shipping and installation are all outside them.",
                 ),
                 _w(
-                    "İki alıcı da hem SX1280 hem DWM3000 taşır. Bir "
-                    "birimin yolda şehir birimleriyle, tünelin içinde "
-                    "tünel birimleriyle hiçbir şey değiştirmeden ölçmesini "
-                    "sağlayan budur.",
+                    "İki alıcı da hem SX1280 hem DWM3000 taşıyor. Bu "
+                    "sayede aynı cihaz yolda şehir birimleriyle, tünele "
+                    "girince tünel birimleriyle ölçüyor; kullanıcı hiçbir "
+                    "şeyi değiştirmiyor.",
                     "Both receivers carry an SX1280 and a DWM3000. That is "
                     "what lets one unit range against urban units on the "
                     "road and against tunnel units inside the bore, with "
@@ -687,110 +694,113 @@ RESEARCH = Page(
             heading=_w("Dört soru", "Four questions"),
             lines=(
                 _w(
-                    "**Karasal yayınlar, araç sensörleri ve harita "
-                    "kısıtları birleştirilerek uydu olmadan kabul "
-                    "edilebilir bir konum servisi üretilebilir mi?** "
-                    "Şehir içinde uygulanabilirlik test edilecek. "
-                    "Çevredeki modemlerin MAC adreslerinden konum "
-                    "iyileştirme, baz istasyonlarıyla üçgenleme ve görüntü "
-                    "işleme de bu sürece katılacak.",
-                    "**Can terrestrial broadcasts, vehicle sensors and map "
-                    "constraints together produce an acceptable position "
-                    "service without the satellites?** The work starts "
-                    "with whether it holds up in a city. Improving "
-                    "position from nearby modems' MAC addresses, "
-                    "triangulating from base stations and image processing "
-                    "all go into the same process.",
+                    "**Yerden gelen yayınlar, araç sensörleri ve harita "
+                    "bir araya getirilirse, uydu olmadan yeterince iyi bir "
+                    "konum çıkar mı?** Önce şehirde denenecek. Çevredeki "
+                    "modemlerin kimliğinden, baz istasyonlarına olan "
+                    "uzaklıktan ve kameradan gelen görüntüden de "
+                    "yararlanılacak.",
+                    "**If broadcasts from the ground, vehicle sensors and "
+                    "the map are put together, does a good enough position "
+                    "come out without the satellites?** It gets tried in a "
+                    "city first. What nearby modems call themselves, the "
+                    "distance to base stations and the picture from a "
+                    "camera all get used as well.",
                 ),
                 _w(
-                    "**Mevcut altyapıya en az müdahaleyle ölçeklenebilir "
-                    "bir sistem kurulabilir mi?** 12. Ulaştırma ve "
-                    "Haberleşme Şurası akıllı ulaşım sistemi altyapısının "
-                    "geliştirilmesini hedef koymuştu. Yol kenarı "
-                    "üniteleri ve trafik kontrol noktalarının enerji ve "
-                    "haberleşme kaynağını kullanmak, montajı en ucuz "
-                    "yapmanın yolu.",
-                    "**Can a system be built on the existing "
-                    "infrastructure with the least possible intervention?** "
-                    "The 12th Transport and Communications Council set "
-                    "developing intelligent transport infrastructure as a "
-                    "goal. Using the power and communications already at "
-                    "roadside units and traffic control points is the way "
-                    "to make installation cheapest.",
+                    "**Mevcut altyapıya en az dokunarak, sonradan "
+                    "büyütülebilen bir sistem kurulabilir mi?** 12. "
+                    "Ulaştırma ve Haberleşme Şurası akıllı ulaşım "
+                    "altyapısının geliştirilmesini hedef koymuştu. Yol "
+                    "kenarındaki ünitelerin ve trafik kontrol noktalarının "
+                    "elektriğini ve hattını kullanmak, montajı ucuza "
+                    "getirmenin yolu.",
+                    "**Can a system be built by touching the existing "
+                    "infrastructure as little as possible, and grown "
+                    "later?** The 12th Transport and Communications "
+                    "Council set developing intelligent transport "
+                    "infrastructure as a goal. Using the power and the "
+                    "line already at roadside units and traffic control "
+                    "points is the way to make installation cheap.",
                 ),
                 _w(
-                    "**Çift yönlü ölçümün ağ trafiği ve ölçeklenebilirlik "
-                    "dezavantajları azaltılabilir mi?** Varış zamanı farkı "
-                    "sistemleri tek taraflı yayın yapar ve alıcıdan mesaj "
-                    "almaz, bu yüzden daha az trafik üretir. Çift yönlü "
-                    "ölçümde alıcı ile birim karşılıklı konuşur. TWR CDMA "
+                    "**Çift yönlü ölçümün iki eksisi giderilebilir mi?** "
+                    "Bu eksiler şunlar: havada daha çok mesaj dolaşıyor, "
+                    "ve alıcı sayısı arttıkça sıra beklemek gerekiyor. "
+                    "Tek yönlü yayın yapan sistemler alıcıdan cevap "
+                    "beklemediği için bu yükü taşımıyor. TWR CDMA "
                     "gibi yaklaşımlar ve yazılım tanımlı radyo bu farkı "
                     "kapatmak için denenecek. "
                     "[TWR CDMA makalesi](https://ieeexplore.ieee.org/"
                     "abstract/document/11435291)",
-                    "**Can two way ranging's traffic and scaling costs be "
-                    "brought down?** Time difference systems broadcast one "
-                    "way and take no message from the receiver, so they "
-                    "produce less traffic. In two way ranging the receiver "
-                    "and the unit talk to each other. Approaches such as "
+                    "**Can two way ranging's two drawbacks be brought "
+                    "down?** They are these: more messages travel through "
+                    "the air, and receivers have to wait their turn as "
+                    "their number grows. Systems that broadcast one way "
+                    "expect no answer from the receiver, so they carry "
+                    "neither cost. Approaches such as "
                     "TWR CDMA and software defined radio will be tried to "
                     "close that gap. "
                     "[The TWR CDMA paper](https://ieeexplore.ieee.org/"
                     "abstract/document/11435291)",
                 ),
                 _w(
-                    "**Konumlandırma hizmeti sunan bir altyapının güvenlik "
-                    "gereksinimleri neler?** Yayın birimlerinin taklit "
-                    "edilmesine ve izinsiz alıcıların sistemi meşgul "
-                    "etmesine karşı çözümler test edilecek. Modüllere "
-                    "donanımsal kriptografik hızlandırıcı (ATECC608B) "
-                    "girecek; kaynak ve bütünlük ECDSA imzasıyla "
-                    "doğrulanacak.",
-                    "**What does an infrastructure that provides "
-                    "positioning need for security?** The work will test "
-                    "answers to units being impersonated and to "
-                    "unauthorised receivers occupying the system. The "
-                    "modules get a hardware cryptographic accelerator "
-                    "(ATECC608B), and an ECDSA signature verifies origin "
-                    "and integrity.",
+                    "**Konum hizmeti veren bir altyapının güvenliği ne "
+                    "ister?** İki tehdide karşı çözüm denenecek: birinin "
+                    "sahte bir yayın birimi kurması, ve izinsiz alıcıların "
+                    "sistemi doldurması. Her modüle şifreleme işini "
+                    "üstlenen ayrı bir yonga (ATECC608B) konacak; her "
+                    "mesajın kimden geldiği ve yolda değiştirilmediği "
+                    "imzayla doğrulanacak.",
+                    "**What does security ask of an infrastructure that "
+                    "gives out position?** Answers get tried against two "
+                    "threats: somebody setting up a fake broadcast unit, "
+                    "and unauthorised receivers filling the system. Every "
+                    "module gets a separate chip that does the encryption "
+                    "(ATECC608B), and a signature verifies who each "
+                    "message came from and that it was not altered on the "
+                    "way.",
                 ),
             ),
         ),
         Part(
             kind="text",
-            heading=_w("Aldatmayı erken görmek", "Seeing spoofing early"),
+            heading=_w("Sahte sinyali erken görmek", "Seeing spoofing early"),
             lines=(
                 _w(
-                    "Aldatma saldırısında alıcı teknik olarak tutarlı ve "
-                    "yüksek güvenli görünen, ama yanlış bir konum ve hız "
-                    "üretir. YERKON uydudan tamamen bağımsız çalıştığı "
-                    "için bir bütünlük referansı olabilir. İki çözüm "
-                    "sürekli karşılaştırılacak ve P50, P95, maksimum hata, "
-                    "konum sürekliliği, yeniden yakınsama süresi, yanlış "
-                    "alarm oranı, kaçırılmış tespit oranı ve zaman sapması "
-                    "üzerinden değerlendirilecek.",
-                    "Under a spoofing attack the receiver produces a "
-                    "position and speed that look technically consistent "
-                    "and confident, and are wrong. YERKON runs completely "
-                    "independently of the satellites, so it can be a "
-                    "reference for integrity. The two solutions will be "
-                    "compared continuously and judged on P50, P95, maximum "
-                    "error, position continuity, reconvergence time, false "
-                    "alarm rate, missed detection rate and time offset.",
+                    "Sahte sinyal altında alıcı, dışarıdan bakınca "
+                    "kusursuz görünen ama yanlış bir konum ve hız verir. "
+                    "YERKON uydudan tamamen ayrı çalıştığı için ikinci bir "
+                    "görüş sunabilir. İki konum sürekli karşılaştırılacak "
+                    "ve şunlara bakılacak: hataların ortancası ve en "
+                    "kötüsü, konumun kesintisiz gelip gelmediği, sinyal "
+                    "koptuktan sonra toparlanma süresi, boşuna verilen "
+                    "alarm oranı, kaçırılan saldırı oranı ve saatin ne "
+                    "kadar saptığı.",
+                    "Under a spoofing attack the receiver gives a "
+                    "position and speed that look flawless from outside "
+                    "and are wrong. YERKON runs entirely apart from the "
+                    "satellites, so it can offer a second opinion. The two "
+                    "positions will be compared continuously and judged "
+                    "on the median and worst error, whether the position "
+                    "arrives without gaps, how long recovery takes after "
+                    "the signal drops, how often an alarm fires for "
+                    "nothing, how often an attack is missed, and how far "
+                    "the clock drifts.",
                 ),
                 _w(
-                    "Kurulumun kendisi de araştırma konusu. Saha asistanı "
-                    "yazılımı, uzmanlık gerektirmeden yerleştirme "
-                    "yapılmasını hedefliyor: afet ya da askeri durumda "
-                    "geçici bir ağ kuracak personel, alıcı ekranındaki "
+                    "Kurulumun kendisi de araştırma konusu. Amaç, "
+                    "birimleri uzman olmayan birinin de doğru yere "
+                    "koyabilmesi: afette ya da askeri bir durumda geçici "
+                    "ağ kuracak personel, ekrandaki "
                     "\"optimum sinyal için 120 derece yönünde 50 metre "
                     "ilerleyin\" gibi yönlendirmeleri takip ederek "
                     "birimleri yerleştirebilecek.",
-                    "Installation is itself part of the research. Field "
-                    "assistant software aims to let somebody place units "
-                    "without expertise. Personnel setting up a temporary "
-                    "network after a disaster or in a military situation "
-                    "would follow directions on the receiver's screen, "
+                    "Installation is itself part of the research. The aim "
+                    "is that somebody who is not an expert can put the "
+                    "units in the right place: personnel setting up a "
+                    "temporary network after a disaster or in a military "
+                    "situation would follow directions on the screen, "
                     "such as \"move 50 metres on a bearing of 120 degrees "
                     "for the best signal\".",
                 ),
@@ -803,38 +813,40 @@ RESEARCH = Page(
                 _w(
                     "Seçilecek bir ulaşım koridoruna 10 ile 15 yayın "
                     "birimi kurulacak. Araç, el tipi ve sabit alıcı "
-                    "prototipleri açık alan, tünel, kentsel kanyon ve "
-                    "kapsama sınırı koşullarında test edilecek.",
+                    "prototipleri açık alanda, tünelde, yüksek binaların "
+                    "arasında ve kapsamanın bittiği yerde denenecek.",
                     "Between 10 and 15 units will go up along one "
                     "transport corridor. Vehicle, handheld and fixed "
-                    "receiver prototypes will be tested in the open, in a "
-                    "tunnel, in an urban canyon and at the edge of "
-                    "coverage.",
+                    "receiver prototypes will be tried in the open, in a "
+                    "tunnel, between tall buildings and where coverage "
+                    "runs out.",
                 ),
                 _w(
-                    "Açık alanda yer gerçeği RTK-GNSS olacak. Uydunun "
-                    "ulaşmadığı tünel ve kapalı alanlarda ölçülmüş "
-                    "referans noktaları ve güzergâh kullanılacak.",
-                    "In the open the ground truth will be RTK-GNSS. In "
-                    "tunnels and indoors, where the satellites do not "
-                    "reach, it will be surveyed reference points and a "
-                    "surveyed route.",
+                    "Açık alanda, karşılaştırılacak gerçek konumu "
+                    "RTK-GNSS verecek. Uydunun girmediği tünelde ve kapalı "
+                    "alanda ise önceden ölçülmüş noktalar ve güzergâh "
+                    "kullanılacak.",
+                    "In the open, the true position to compare against "
+                    "comes from RTK-GNSS. In tunnels and indoors, where "
+                    "the satellites do not reach, it comes from points and "
+                    "a route surveyed beforehand.",
                 ),
                 _w(
-                    "Hedeflenen yatay konum hatası: P50 5 metrenin, P95 10 "
-                    "metrenin altında.",
-                    "The target for horizontal position error is P50 below "
-                    "5 metres and P95 below 10 metres.",
+                    "Hedef: hataların yarısı 5 metrenin, yüzde 95'i 10 "
+                    "metrenin altında kalsın.",
+                    "The target: half the errors under 5 metres, and 95 "
+                    "per cent of them under 10.",
                 ),
                 _w(
-                    "Yasal ve operasyonel güvenlik nedeniyle gerçek "
-                    "karıştırıcı kullanılmayacak. Onun yerine kontrollü "
-                    "uydu kesintileri, kayıtlı sinyaller ve laboratuvarda "
-                    "benzetilmiş aldatma senaryoları kullanılacak.",
-                    "No real jammer will be used, for legal and "
-                    "operational safety reasons. Controlled satellite "
-                    "outages, recorded signals and spoofing scenarios "
-                    "simulated in a laboratory take its place.",
+                    "Gerçek bir karıştırıcı kullanılmayacak; hem yasak "
+                    "hem tehlikeli. Onun yerine uydu sinyali kontrollü "
+                    "biçimde kesilecek, önceden kaydedilmiş sinyaller "
+                    "çalınacak ve saldırılar laboratuvarda taklit "
+                    "edilecek.",
+                    "No real jammer will be used: it is both illegal and "
+                    "dangerous. Instead the satellite signal will be cut "
+                    "under control, recorded signals will be played back, "
+                    "and attacks will be imitated in a laboratory.",
                 ),
             ),
         ),
@@ -846,13 +858,12 @@ VALUE = Page(
     nav=_w("Fayda", "What it is for"),
     title=_w("Kime ne sağlar", "Who it is for"),
     lead=_w(
-        "YERKON, konum bilgisinin kritik olduğu ama uydu sinyalinin "
-        "kesildiği, zayıfladığı ya da güvenilirliğini kaybettiği "
-        "durumlarda ulaşım ve haberleşme altyapılarının çalışmayı "
-        "sürdürmesini hedefler.",
-        "YERKON aims to keep transport and communications infrastructure "
-        "working where position matters and the satellite signal is cut, "
-        "weakened or no longer trustworthy.",
+        "Konumun hayati olduğu, ama uydu sinyalinin kesildiği, "
+        "zayıfladığı ya da artık güvenilmediği yerlerde ulaşımın ve "
+        "haberleşmenin durmaması için.",
+        "So that transport and communications do not stop where position "
+        "is vital and the satellite signal is cut, weakened or no longer "
+        "trusted.",
     ),
     parts=(
         Part(
@@ -860,39 +871,43 @@ VALUE = Page(
             heading=_w("Sahada", "In the field"),
             lines=(
                 _w(
-                    "**Acil müdahale ve afet yönetimi.** Tünelde, kapalı "
-                    "alanda, kentsel kanyonda ve afet bölgesinde 112, AFAD "
-                    "ve diğer ekiplerin konum takibini sürdürür. "
-                    "Haberleşme bağlantısı sınırlıyken cihaz üzerindeki "
-                    "harita ve sensörlerle çevrimdışı konum desteği verir.",
-                    "**Emergency response and disaster management.** It "
-                    "keeps position tracking going for ambulance, disaster "
-                    "response and other teams in tunnels, indoors, in "
-                    "urban canyons and in disaster areas. Where the "
-                    "communications link is limited, the map and sensors "
-                    "on the device give offline position support.",
+                    "**Acil yardım ve afet.** 112, AFAD ve diğer "
+                    "ekiplerin nerede olduğu tünelde, kapalı alanda, "
+                    "yüksek binaların arasında ve afet bölgesinde "
+                    "görünmeye devam eder. Telsiz ya da şebeke "
+                    "tutmadığında cihaz, üzerindeki harita ve sensörlerle "
+                    "konum vermeyi sürdürür.",
+                    "**Emergency services and disasters.** It "
+                    "keeps ambulance, disaster response and other teams "
+                    "visible in tunnels, indoors, between tall buildings "
+                    "and in disaster areas. Where the radio or the network "
+                    "will not hold, the map and sensors on the device keep "
+                    "giving a position.",
                 ),
                 _w(
-                    "**Karayolu, lojistik ve toplu taşıma.** Kamu araç "
-                    "filoları, toplu taşıma araçları, tehlikeli madde "
-                    "taşıyan araçlar ve değerli kargolar için uydudan "
-                    "bağımsız bir yedek takip sağlar. Tünel ve otoyol "
-                    "işletmelerinde konum sürekliliğini korur.",
-                    "**Road, logistics and public transport.** It gives "
-                    "public fleets, public transport, dangerous goods "
-                    "vehicles and valuable cargo a backup that does not "
-                    "depend on the satellites. In tunnel and motorway "
-                    "operations it keeps position continuous.",
+                    "**Karayolu, kargo ve toplu taşıma.** Kamu araçları, "
+                    "otobüsler, tehlikeli madde taşıyan tankerler ve "
+                    "değerli yükler uyduya bakmayan ikinci bir takip "
+                    "kazanır. Tünelde ve otoyolda araç ekrandan hiç "
+                    "kaybolmaz.",
+                    "**Road, freight and public transport.** Public "
+                    "vehicles, buses, tankers carrying dangerous goods and "
+                    "valuable loads gain a second way of being tracked "
+                    "that does not look at the satellites. In a tunnel or "
+                    "on a motorway the vehicle never drops off the "
+                    "screen.",
                 ),
                 _w(
-                    "**GNSS bütünlük haritası.** Uydu ile YERKON çıktıları "
-                    "arasındaki tutarsızlıklar merkezi olarak "
-                    "toplandığında, Bakanlığa karıştırma ve aldatma "
-                    "olaylarını haritalayan bir olay haritası çıkar.",
-                    "**A map of GNSS integrity.** Collecting the "
-                    "disagreements between the satellite and YERKON "
-                    "solutions centrally gives the Ministry a map of "
-                    "jamming and spoofing events.",
+                    "**Karıştırma haritası.** Uydunun verdiği konumla "
+                    "YERKON'unki tutmadığında bu bir olaydır. Olaylar "
+                    "merkezde toplanınca Bakanlık, ülke genelinde nerede "
+                    "ne zaman karıştırma ve sahte sinyal olduğunu gösteren "
+                    "bir harita elde eder.",
+                    "**A map of jamming.** Every time the satellite "
+                    "position and YERKON's disagree, that is an event. "
+                    "Collected centrally, the events give the Ministry a "
+                    "map of where and when jamming and spoofing happen "
+                    "across the country.",
                 ),
             ),
         ),
@@ -900,21 +915,24 @@ VALUE = Page(
             kind="points",
             heading=_w("Stratejik katkı", "Strategic"),
             lines=(
-                _w("Yabancı uydu sistemlerine karşı teknolojik çeşitlilik.",
-                   "Technological diversity against foreign satellite "
-                   "systems."),
-                _w("Kritik hizmetlerde tek hata noktasının azaltılması.",
-                   "Fewer single points of failure in critical services."),
-                _w("Kriz anında alternatif bir karasal konumlandırma "
-                   "katmanı.",
-                   "An alternative terrestrial positioning layer in a "
-                   "crisis."),
-                _w("Sınır bölgelerinde ve kritik koridorlarda dayanıklılık.",
-                   "Resilience in border regions and critical corridors."),
-                _w("Yerli sistem mimarisi, yazılım ve entegrasyon "
-                   "yetkinliğinin geliştirilmesi.",
-                   "Domestic system architecture, software and integration "
-                   "capability."),
+                _w("Konum tek bir yabancı teknolojiye bağlı kalmaz.",
+                   "Position stops depending on one foreign technology."),
+                _w("Hayati hizmetlerde tek bir şeyin bozulmasıyla her şeyin "
+                   "durması ihtimali azalır.",
+                   "It gets less likely that one thing breaking stops "
+                   "everything in a critical service."),
+                _w("Kriz çıktığında yerde çalışan ikinci bir konum "
+                   "katmanı hazır olur.",
+                   "In a crisis a second layer of position, working from "
+                   "the ground, is already there."),
+                _w("Sınır bölgeleri ve yoğun koridorlar kesintiye daha "
+                   "dayanıklı olur.",
+                   "Border regions and busy corridors hold up better "
+                   "against interruption."),
+                _w("Böyle bir sistemi kurma, yazma ve bir araya getirme "
+                   "bilgisi ülkede kalır.",
+                   "The knowledge of how to build, write and put together "
+                   "such a system stays in the country."),
             ),
         ),
         Part(
@@ -922,46 +940,48 @@ VALUE = Page(
             heading=_w("Kurumsal ve akademik katkı",
                        "Institutional and academic"),
             lines=(
-                _w("GNSS bağımlılığı envanterinin çıkarılması ve karıştırma "
-                   "ile aldatma olaylarının ulusal haritası.",
-                   "An inventory of GNSS dependency and a national map of "
-                   "jamming and spoofing events."),
-                _w("İlgili kurumlar arasında ortak olay verisi, ve hizmet "
-                   "düzeyi ile bütünlük kriterlerinin tanımlanmasına veri.",
-                   "Shared event data between the institutions involved, "
-                   "and data for defining service level and integrity "
-                   "criteria."),
-                _w("Çok sensörlü bir konumlandırma veri seti ile GNSS reddi "
-                   "ve aldatma senaryoları.",
-                   "A multi sensor positioning dataset with GNSS denial "
-                   "and spoofing scenarios."),
-                _w("Yerli konumlandırma algoritmaları, ve üniversite, kamu "
-                   "ve sanayi arasında ortak araştırma.",
-                   "Domestic positioning algorithms, and research shared "
-                   "between universities, the state and industry."),
+                _w("Hangi hizmetin uyduya ne kadar bağlı olduğu "
+                   "çıkarılır, ve olaylar ülke haritasına işlenir.",
+                   "It comes out which service depends on the satellites "
+                   "how much, and the events go onto a national map."),
+                _w("Kurumlar aynı olay verisine bakar; hizmetin ne kadar "
+                   "iyi olması gerektiği bu veriyle tanımlanabilir.",
+                   "Institutions look at the same event data, and how good "
+                   "the service has to be can be defined from it."),
+                _w("Uydunun kesildiği ve kandırıldığı durumları içeren, "
+                   "birden çok sensörden toplanmış bir veri kümesi kalır.",
+                   "What is left is a dataset gathered from several "
+                   "sensors, covering satellites cut off and satellites "
+                   "fooled."),
+                _w("Konum hesaplayan yöntemler burada yazılır, ve "
+                   "üniversite, kamu ve sanayi aynı işin üzerinde çalışır.",
+                   "The methods that work out position get written here, "
+                   "with universities, the state and industry on the same "
+                   "work."),
             ),
         ),
         Part(
             kind="text",
-            heading=_w("Ticarileşme", "Turning it into a business"),
+            heading=_w("Nasıl kendini döndürür",
+                       "How it pays for itself"),
             lines=(
                 _w(
-                    "Model kamu altyapısını özelleştirmek değil. Kamu "
-                    "çekirdeği üzerinde kontrollü ek hizmetlerle işletme "
-                    "maliyetini karşılayacak bir yapı hedefleniyor.",
+                    "Amaç kamu altyapısını özelleştirmek değil. Çekirdek "
+                    "kamuda kalır; üzerine eklenen denetimli hizmetler "
+                    "işletme masrafını karşılar.",
                     "The model is not privatising public infrastructure. "
                     "The aim is controlled extra services on top of a "
                     "public core, enough to cover what running it costs.",
                 ),
                 _w(
-                    "İlk alan, uydu erişiminin düzenli olarak kesildiği "
-                    "tüneller ve kritik ulaşım koridorları. Buralarda "
-                    "ihtiyaç açıkça tanımlanabildiği ve performans "
-                    "kontrollü olarak ölçülebildiği için ilk uygulamaların "
-                    "sınırları nettir. Pilot sonucunda konum doğruluğu, "
-                    "kapsama, hizmet sürekliliği, gerekli birim yoğunluğu "
-                    "ve mevcut altyapının ne kadar yeniden kullanılabildiği "
-                    "belirlenecek.",
+                    "İlk yer, uydunun düzenli olarak kesildiği tüneller "
+                    "ve yoğun ulaşım koridorları. Orada ihtiyaç açıkça "
+                    "söylenebiliyor ve sonuç denetimli biçimde "
+                    "ölçülebiliyor, yani ilk kurulumun sınırları belli. "
+                    "Doğruluğun ne çıktığı, ne kadar alanın kapsandığı, "
+                    "hizmetin kesilip kesilmediği, kaç birim gerektiği ve "
+                    "mevcut altyapının ne kadarının kullanılabildiği "
+                    "pilotta belli olacak.",
                     "The first area is tunnels and critical transport "
                     "corridors, where satellite access is cut regularly. "
                     "There the need can be stated plainly and performance "
@@ -972,21 +992,20 @@ VALUE = Page(
                     "infrastructure can be reused.",
                 ),
                 _w(
-                    "Kısa vadede ticari hazır donanımla pilot "
-                    "doğrulanacak, yerli yazılım ve protokol geliştirilecek. "
-                    "Orta vadede yerli gömülü sistem ve RF firmalarıyla "
-                    "ortaklık ve kritik bileşenlerde çift kaynaklı tedarik "
-                    "hedefleniyor. Uzun vadede komşu ve gelişmekte olan "
-                    "ülkelere kurulum ve entegrasyon hizmeti, ve protokol "
-                    "ile alıcı ailesinin lisanslanması.",
-                    "In the short term the pilot gets validated with "
-                    "commercial off the shelf hardware while the domestic "
-                    "software and protocol are written. In the medium term "
-                    "the aim is partnership with domestic embedded and RF "
-                    "firms and two sources for the critical components. In "
-                    "the long term, installation and integration for "
-                    "neighbouring and developing countries, and licensing "
-                    "the protocol and the receiver family.",
+                    "Kısa vadede pilot, hazır satılan donanımla "
+                    "kurulacak; yazılım ve haberleşme kuralları burada "
+                    "yazılacak. Orta vadede yerli elektronik ve telsiz "
+                    "firmalarıyla ortaklık, ve kritik parçaların iki ayrı "
+                    "yerden tedariki. Uzun vadede komşu ülkelere kurulum "
+                    "hizmeti, ve alıcı ailesinin lisansla satılması.",
+                    "In the short term the pilot goes up on hardware "
+                    "bought off the shelf, and the software and the rules "
+                    "the radios follow get written here. In the medium "
+                    "term, partnership with domestic electronics and radio "
+                    "firms, and two suppliers for every critical part. In "
+                    "the long term, installation for neighbouring "
+                    "countries and the receiver family sold under "
+                    "licence.",
                 ),
             ),
         ),
@@ -1000,7 +1019,8 @@ VALUE = Page(
                     "güvenli anahtar ile yayın birimi yönetim sistemi.",
                     "**Infrastructure.** The urban broadcast unit, the "
                     "rural broadcast board, the precise unit for critical "
-                    "areas, and the secure key and unit management system.",
+                    "areas, and the system that manages the units and "
+                    "their keys.",
                 ),
                 _w(
                     "**Kullanıcı.** Araç konumlandırma birimi, taşınabilir "
@@ -1013,14 +1033,14 @@ VALUE = Page(
                     "receiver for rail and maritime.",
                 ),
                 _w(
-                    "**Yazılım.** Merkezi yönetim paneli, GNSS bütünlük ve "
-                    "olay haritası, filo ile kritik altyapı arayüzleri, "
-                    "analiz ve raporlama, çevrimdışı yayın birimi konum "
-                    "haritası.",
-                    "**Software.** The management panel, the GNSS "
-                    "integrity and event map, interfaces for fleets and "
-                    "critical infrastructure, analysis and reporting, and "
-                    "an offline map of where the units are.",
+                    "**Yazılım.** Merkezi yönetim paneli, karıştırma "
+                    "olaylarının haritası, filolar ve kritik altyapı için "
+                    "bağlantı arayüzleri, analiz ve raporlama, ve "
+                    "internetsiz de açılan birim konum haritası.",
+                    "**Software.** The management panel, the map of "
+                    "jamming events, interfaces for fleets and critical "
+                    "infrastructure, analysis and reporting, and a map of "
+                    "where the units are that opens without a network.",
                 ),
             ),
         ),
@@ -1032,10 +1052,10 @@ RESULTS = Page(
     nav=_w("Sonuçlar", "Results"),
     title=_w("Karşılaştırma tablosu", "The comparison table"),
     lead=_w(
-        "On üç sistem, aynı sütunlarla yan yana. Koyu zeminli üç satır "
-        "benzetimin doldurduğu YERKON satırları; geri kalanı kendi "
-        "kaynaklarının yayımladığı değerler. Bir hücreye ne yapıldığı "
-        "altındaki notta yazıyor, ve boş bir hücre kaynağın o sütuna "
+        "On üç sistem, aynı sütunlarla yan yana. Koyu zeminli üç satırı "
+        "simülasyon doldurdu; geri kalan on satır, o sistemlerin kendi "
+        "kaynaklarının yayımladığı değerler. Bir sayıya ne yapıldığı "
+        "altındaki dipnotta yazıyor. Boş hücre, o kaynağın bu sütuna "
         "uyan bir şey yayımlamadığı anlamına geliyor.",
         "Thirteen systems side by side under the same columns. The three "
         "shaded rows are the YERKON rows the simulation filled; the rest "
@@ -1053,40 +1073,45 @@ RESULTS = Page(
                 (
                     _w("HPE, VPE", "HPE, VPE"),
                     _w(
-                        "Yatay ve düşey konum hatası, metre, belirtilen "
-                        "yüzdelikte, değerlendirilen yolculuklar üzerinden.",
-                        "Horizontal and vertical position error in metres, "
-                        "at the stated percentile, over the journeys "
-                        "evaluated.",
+                        "Konumun yatayda ve düşeyde kaç metre şaştığı. "
+                        "P50 hataların yarısının, P95 yüzde 95'inin altında "
+                        "kaldığı değer.",
+                        "How far the position is out, horizontally and "
+                        "vertically, in metres. P50 is the value half the "
+                        "errors stay under, P95 the one 95 per cent of "
+                        "them stay under.",
                     ),
                 ),
                 (
                     _w("Kullanılabilirlik", "Availability"),
                     _w(
-                        "Denenen sabitlemelerin geçerli bir konum "
-                        "üretenleri. Yalnızca modellenen başarısızlıkları "
-                        "sayar, bir hizmet kullanılabilirliği değildir.",
-                        "The share of attempted fixes that produced a valid "
-                        "position. It counts modelled failures only and is "
-                        "not a service availability figure.",
+                        "Konum hesaplama denemelerinin yüzde kaçının "
+                        "geçerli bir sonuç verdiği. Yalnızca modele giren "
+                        "aksaklıkları sayar; bir hizmet garantisi "
+                        "değildir.",
+                        "What share of the attempts to work out a "
+                        "position gave a valid one. It counts only the "
+                        "failures in the model, and is not a promise about "
+                        "a service.",
                     ),
                 ),
                 (
                     _w("Alan", "Area"),
                     _w(
-                        "Bir konum üretmeye yetecek kadar birimin "
-                        "erişilebilir olduğu zemin, gerçek arazi üzerinde "
-                        "taranarak. Bir paketin ulaştığı zemin değildir.",
-                        "The ground where enough units are reachable for a "
-                        "position, swept over the real terrain. It is not "
-                        "the ground a packet reaches.",
+                        "Konum hesaplamaya yetecek kadar birimin "
+                        "duyulduğu zemin, gerçek arazi taranarak bulundu. "
+                        "Sinyalin ulaştığı zeminle aynı şey değil.",
+                        "The ground where enough units can be heard to "
+                        "work out a position, found by sweeping the real "
+                        "terrain. Not the same as the ground the signal "
+                        "reaches.",
                     ),
                 ),
                 (
                     _w("CAPEX", "CAPEX"),
                     _w(
-                        "Yayın birimi donanım maliyetinin hizmet alanına "
-                        "bölümü. Yalnızca ana donanım.",
+                        "Yayın birimlerinin donanım maliyeti, hizmet "
+                        "verilen alana bölündü. Yalnızca ana parçalar.",
                         "Unit hardware cost divided by the service area. "
                         "Main hardware only.",
                     ),
@@ -1094,28 +1119,29 @@ RESULTS = Page(
                 (
                     _w("OPEX", "OPEX"),
                     _w(
-                        "km² başına yıllık işletme maliyeti. Rapor bu "
-                        "sütunu boş bırakır; buradaki değer adlandırılmış "
-                        "yinelenen kalemlerden gelir.",
-                        "Yearly operating cost per km². The report leaves "
-                        "this column empty; this one comes from an "
-                        "itemised inventory.",
+                        "Bir km²'yi bir yıl işletmenin masrafı. Rapor bu "
+                        "sütunu boş bırakmıştı; buradaki sayı tek tek "
+                        "yazılmış gider kalemlerinden çıkıyor.",
+                        "What a year of running one km² costs. The report "
+                        "left this column empty; this figure comes from an "
+                        "itemised list of what recurs.",
                     ),
                 ),
             ),
         ),
         Part(
             kind="points",
-            heading=_w("Tablonun söylemeden yapmayacağı üç şey",
-                       "Three things the table will not do quietly"),
+            heading=_w("Tabloyu okurken üç uyarı",
+                       "Three warnings for reading the table"),
             lines=(
                 _w(
-                    "**Tünelin km² başına maliyeti diğer satırlarla "
-                    "karşılaştırılamaz.** 2 km boyunca 12 m genişliğinde "
-                    "bir tünel yaklaşık iki yüz dönümdür; buna bölmek "
-                    "büyük bir sayıyı yargıyla değil aritmetikle üretir. "
-                    "Tünel bir çizgiye hizmet eder, bu yüzden güzergâh "
-                    "kilometresi başına maliyetle karşılaştırılır.",
+                    "**Tünel satırının km² maliyeti diğerleriyle "
+                    "karşılaştırılamaz.** 12 m genişliğinde 2 km'lik bir "
+                    "tünel, bir km²'nin ellide biri kadar yer kaplar. Bu "
+                    "kadar küçük bir alana bölünce sayı kendiliğinden "
+                    "büyüyor; tünel pahalı olduğu için değil. Tünel bir "
+                    "alana değil bir hatta hizmet eder, o yüzden kilometre "
+                    "başına maliyetle karşılaştırılmalı.",
                     "**The tunnel's cost per km² does not compare to the "
                     "other rows.** Twelve metres wide over two kilometres "
                     "is a fiftieth of a square kilometre, so dividing by it "
@@ -1124,22 +1150,25 @@ RESULTS = Page(
                     "cost per route kilometre.",
                 ),
                 _w(
-                    "**Hizmet alanı, bir konumun alınabildiği yerdir**, bir "
-                    "paketin ulaştığı yer değil. Kırsalda bir paket, konum "
-                    "alınabilen zeminin 2,6 katına ulaşır.",
+                    "**Hizmet alanı, konum alınabilen yerdir**, sinyalin "
+                    "ulaştığı yer değil. Kırsalda sinyal, konum alınabilen "
+                    "zeminin 2,6 katına ulaşıyor: duymak yetmiyor, konum "
+                    "için aynı anda dört birim gerekiyor.",
                     "**The service area is where a position can be had**, "
-                    "not where a packet arrives. In open country a packet "
-                    "reaches 2,6 times the ground a position can be had on.",
+                    "not where the signal arrives. In open country the "
+                    "signal reaches 2,6 times that ground: hearing one "
+                    "unit is not enough, a position needs four at once.",
                 ),
                 _w(
-                    "**Yüzdeler aynı metrik değil.** Uydu sağlayıcılarının "
-                    "yayımladığı kullanılabilirlik farklı test "
-                    "tanımlarına, farklı sürelere ve farklı eşiklere "
-                    "dayanır. Aynı protokolün sonucu gibi okunmamalıdır.",
-                    "**The percentages are not the same metric.** The "
-                    "availability the satellite providers publish rests on "
-                    "different test definitions, durations and thresholds. "
-                    "It should not be read as the result of one protocol.",
+                    "**Yüzdeler aynı şeyi ölçmüyor.** Uydu sistemlerinin "
+                    "yayımladığı kullanılabilirlik değerleri farklı "
+                    "testlerden, farklı sürelerden ve farklı eşiklerden "
+                    "geliyor. Aynı ölçüm gibi yan yana okunmamalı.",
+                    "**The percentages do not measure the same thing.** "
+                    "The availability figures the satellite systems "
+                    "publish come from different tests, over different "
+                    "durations, against different thresholds. They should "
+                    "not be read side by side as one measurement.",
                 ),
             ),
         ),
@@ -1148,11 +1177,11 @@ RESULTS = Page(
             heading=_w("Hızlı okuma", "The fast reading"),
             lines=(
                 _w(
-                    "Benzetimdeki **Hızlı dene** düğmesi ve komut "
-                    "satırındaki `--fast` aynı iki figürü kabalaştırır: "
-                    "gölgeler sekiz yerine bir kez çekilir, zemin profili "
-                    "10 m yerine sabit 64 örnekle okunur. Koşu on beş "
-                    "dakikadan bir dakikaya iner.",
+                    "Simülasyondaki **Hızlı dene** düğmesi ve komut "
+                    "satırındaki `--fast` aynı iki ayarı kabalaştırır: "
+                    "gölgeleme sekiz kez yerine bir kez çekilir, ve zemin "
+                    "10 m'de bir yerine sabit 64 noktada okunur. Koşu on "
+                    "beş dakikadan bir dakikaya iner.",
                     "The **fast** button in the simulation and `--fast` on "
                     "the command line coarsen the same two figures: the "
                     "shadows are drawn once instead of pooled over eight, "
@@ -1161,16 +1190,16 @@ RESULTS = Page(
                     "minutes to about one.",
                 ),
                 _w(
-                    "İki kabalık da kaybı eksik okur, yani hızlı bir cevap "
-                    "yerleşimi kayırır: kırsal satırın P95'i 4,13 m iyimser "
-                    "çıkıyor. Bu yüzden hızlı okumada kötü görünen bir "
-                    "satır gerçekten kötüdür, ve bu sayfa yalnızca "
-                    "yayımlanan koşuyu gösterir.",
-                    "Both coarsenings read the loss low, so a fast answer "
-                    "flatters the deployment: the rural row's P95 came out "
-                    "4,13 m optimistic. A row that looks bad under a fast "
-                    "reading is genuinely bad, and this page shows the "
-                    "published run only.",
+                    "İkisi de kaybı olduğundan az gösteriyor, yani hızlı "
+                    "cevap kurulumu olduğundan iyi gösteriyor: kırsal "
+                    "satırın P95'i 4,13 m iyimser çıkıyor. Bu yüzden hızlı "
+                    "koşuda bile kötü görünen bir satır gerçekten kötüdür. "
+                    "Bu sayfa yalnızca yavaş ve tam koşuyu gösterir.",
+                    "Both read the loss low, so a fast answer flatters "
+                    "the deployment: the rural row's P95 came out 4,13 m "
+                    "optimistic. So a row that looks bad even under a fast "
+                    "run really is bad. This page shows the slow, full run "
+                    "only.",
                 ),
             ),
         ),
@@ -1178,14 +1207,14 @@ RESULTS = Page(
 )
 
 SIMULATION = Page(
-    slug="benzetim",
-    nav=_w("Benzetim", "The simulation"),
-    title=_w("Benzetim", "The simulation"),
+    slug="simulasyon",
+    nav=_w("Simülasyon", "The simulation"),
+    title=_w("Simülasyon", "The simulation"),
     lead=_w(
-        "Benzetim bu projenin bir parçası, tamamı değil. Tek bir işi "
-        "vardı: karşılaştırma tablosunun üç YERKON satırını tahminle "
-        "değil, her sayısı izlenebilir bir modelle doldurmak. Sahada "
-        "ölçüm değildir.",
+        "Simülasyon bu projenin bir parçası, tamamı değil. Tek bir işi "
+        "vardı: karşılaştırma tablosundaki üç YERKON satırını tahminle "
+        "değil, her sayısı kaynağına kadar izlenebilen bir modelle "
+        "doldurmak. Sahada yapılmış bir ölçüm değildir.",
         "The simulation is one part of this project rather than the whole "
         "of it. It had one job: to fill the three YERKON rows of the "
         "comparison table with a model whose every number can be traced, "
@@ -1196,14 +1225,16 @@ SIMULATION = Page(
             kind="picture",
             picture="simulator.png",
             lines=(_w(
-                "Şehir içi satırı: Kızılay'ın gerçek zemini, aydınlatma "
-                "direklerine monte 36 yayın birimi, ve zemine boyanmış "
-                "kapsama taraması. Renkler kaç birimin eriştiğini "
-                "gösteriyor, ve bir konum için dört gerekiyor.",
-                "The urban row: the real ground at Kızılay, 36 broadcast "
-                "units on lighting columns, and the swept coverage painted "
-                "on the ground. The colours count how many units reach, "
-                "and a position needs four.",
+                "Şehir içi satırı: Kızılay'ın gerçek arazisi, "
+                "aydınlatma direklerine takılmış 36 yayın birimi, ve "
+                "zemine boyanmış kapsama haritası. Renkler o noktada kaç "
+                "birimin duyulduğunu gösteriyor; konum hesabı için en az "
+                "dört gerekiyor.",
+                "The urban row: the real terrain at Kızılay, 36 broadcast "
+                "units on lighting columns, and the coverage painted onto "
+                "the ground. The colours show how many units can be heard "
+                "at that point; working out a position needs at least "
+                "four.",
             ),),
         ),
         Part(
@@ -1211,34 +1242,39 @@ SIMULATION = Page(
             heading=_w("Zemin gerçek", "The ground is real"),
             lines=(
                 _w(
-                    "Üç satır da gerçek Ankara zemininin üzerinde durur. "
-                    "Zemin Copernicus 30 m DEM'inden bir kez getirilip "
-                    "paketin içine işlenmiştir, yani bir klon tabloyu ağa "
-                    "hiç çıkmadan yeniden üretir.",
+                    "Üç satır da Ankara'nın gerçek arazisi üzerinde "
+                    "koşuldu. Yükseklik verisi Copernicus'un 30 metrelik "
+                    "haritasından bir kez indirilip paketin içine kondu, "
+                    "yani depoyu indiren biri tabloyu internete hiç "
+                    "çıkmadan yeniden üretebiliyor.",
                     "All three rows stand on real ground near Ankara, "
                     "fetched once from the Copernicus 30 m DEM and baked "
                     "into the package, so a clone reproduces the table "
                     "without touching the network.",
                 ),
                 _w(
-                    "Şehir Kızılay'dır, bir kenarı üç kilometre ve 91 m "
-                    "iniş çıkışla. Açık arazi Polatlı ovasıdır, bir kenarı "
-                    "yirmi kilometre ve 486 m rölyefle. Tünel "
+                    "Şehir Kızılay: bir kenarı üç kilometre, en alçak ve "
+                    "en yüksek noktası arasında 91 metre fark var. Açık "
+                    "arazi Polatlı ovası: bir kenarı yirmi kilometre, 486 "
+                    "metre yükseklik farkıyla. Tünel ise "
                     "Kızılcahamam'daki dağların içinden geçen gerçek bir 2 "
-                    "km'lik güzergâhtır.",
-                    "The city is Kızılay, three kilometres on a side with "
-                    "91 m of rise and fall. The open country is the "
-                    "Polatlı plain, twenty kilometres on a side with 486 m "
-                    "of relief. The tunnel is a real two kilometre bore "
-                    "through the mountains at Kızılcahamam.",
+                    "kilometrelik güzergâh.",
+                    "The city is Kızılay: three kilometres on a side, "
+                    "with 91 metres between its lowest and highest point. "
+                    "The open country is the Polatlı plain, twenty "
+                    "kilometres on a side with 486 metres of it. The "
+                    "tunnel is a real two kilometre bore through the "
+                    "mountains at Kızılcahamam.",
                 ),
                 _w(
-                    "Hiçbir yerde düz zemin seçeneği yok. Düz bir düzlem "
-                    "bu modelin çizebileceği en tarafsız değil en elverişli "
-                    "yüzeydir.",
-                    "Nowhere is there a flat option. A flat plane is not "
-                    "the most neutral surface this model can draw, it is "
-                    "the most flattering one.",
+                    "Hiçbir yerde \"düz zemin\" seçeneği yok. Düz bir "
+                    "yüzey modelin çizebileceği en tarafsız arazi değil, "
+                    "en elverişli arazidir: sonucu olduğundan iyi "
+                    "gösterirdi.",
+                    "Nowhere is there a \"flat ground\" option. A flat "
+                    "surface is not the most neutral terrain the model can "
+                    "draw, it is the most favourable one: it would make "
+                    "the result look better than it is.",
                 ),
             ),
         ),
@@ -1248,177 +1284,213 @@ SIMULATION = Page(
                        "One calculation decides a link"),
             lines=(
                 _w(
-                    "Azami menzil diye bir sabit yok. Menzil bir girdi "
-                    "değil, link bütçesinin sonucudur, ve aynı hesap "
-                    "bağlantının kapanıp kapanmadığına da ne kadar hassas "
-                    "ölçtüğüne de karar verir.",
-                    "There is no maximum range constant anywhere. Range is "
-                    "a result rather than an input, and the same "
-                    "calculation decides both whether a link closes and "
-                    "how precisely it measures.",
+                    "Kodun hiçbir yerinde \"azami menzil şu kadardır\" "
+                    "diye bir sayı yok. Menzil, sinyalin yolda ne kadar "
+                    "zayıfladığı hesaplanarak çıkıyor. Aynı hesap iki "
+                    "şeye birden karar veriyor: bağlantı kuruluyor mu, ve "
+                    "kurulduysa ne kadar hassas ölçüyor.",
+                    "Nowhere in the code is there a number saying \"the "
+                    "maximum range is this\". Range comes out of working "
+                    "out how much the signal weakens on its way. The same "
+                    "calculation decides two things at once: whether the "
+                    "link holds, and how precisely it measures when it "
+                    "does.",
                 ),
                 _w(
-                    "İki ışınlı zemin yansıması düz zeminde bile çalışır: "
-                    "kırılma mesafesinin ötesinde doğrudan ışınla zeminden "
-                    "yansıyan ışın ters fazda gelip birbirini götürür, ve "
-                    "o mesafe anten yüksekliğiyle doğrusal olduğu için "
-                    "alçak montaj pahalıdır.",
-                    "The two ray ground reflection works even over flat "
-                    "ground: past the break distance the direct ray and "
-                    "the reflected one arrive out of phase and cancel, and "
-                    "because that distance scales with antenna height, "
-                    "mounting low is expensive.",
+                    "Sinyal alıcıya iki yoldan gelir: doğrudan, ve "
+                    "zeminden sekerek. Belli bir mesafeden sonra bu ikisi "
+                    "ters düşüp birbirini zayıflatır. O mesafe anten "
+                    "yüksekliğiyle birlikte arttığı için, birimi alçağa "
+                    "koymak menzilden götürür.",
+                    "The signal reaches the receiver two ways: directly, "
+                    "and bouncing off the ground. Past a certain distance "
+                    "those two fall out of step and weaken each other. "
+                    "That distance grows with antenna height, so mounting "
+                    "a unit low costs range.",
                 ),
                 _w(
-                    "Kırınım en kötü tek nokta üzerinden değil, bütün "
-                    "profil üzerinden hesaplanır: ITU-R P.526-15 §4.5.2, "
-                    "delta-Bullington. Kızılay'da bir bağlantının ortanca "
-                    "üç engeli var, en kötüsünün on altı.",
-                    "Diffraction comes from the whole profile rather than "
-                    "from its worst single point: ITU-R P.526-15 §4.5.2, "
-                    "delta Bullington. A link across Kızılay has three "
-                    "obstacles at the median and sixteen at the worst.",
+                    "Sinyal engellerin üzerinden bükülerek geçer ve bu "
+                    "sırada zayıflar. Hesap, yoldaki en kötü tek engele "
+                    "değil bütün araziye bakıyor (ITU-R P.526-15 §4.5.2, "
+                    "delta-Bullington). Kızılay'da bir bağlantının önünde "
+                    "ortalama üç engel var, en kötüsünde on altı.",
+                    "The signal bends over obstacles and weakens doing "
+                    "it. The calculation looks at the whole terrain rather "
+                    "than the worst single obstacle on the path (ITU-R "
+                    "P.526-15 §4.5.2, delta Bullington). A link across "
+                    "Kızılay has three obstacles in front of it at the "
+                    "median, sixteen at the worst.",
                 ),
                 _w(
-                    "Zemin profili on metrede bir okunur. Sabit 64 örnekte "
-                    "6,9 km'lik bir kırsal bağlantı 108 m'de bir okunuyordu "
-                    "ve kırınımı 37,60 dB yerine 31,28 dB veriyordu.",
-                    "The ground profile is read every ten metres. At a "
-                    "fixed 64 samples a 6,9 km rural link was read every "
-                    "108 m, and it put diffraction at 31,28 dB where the "
+                    "Arazi on metrede bir okunuyor. Daha önce her "
+                    "bağlantı sabit 64 noktada okunuyordu; 6,9 km'lik bir "
+                    "kırsal bağlantıda bu 108 metrede bir demekti, ve "
+                    "aradaki tümsekleri atladığı için kaybı 37,60 dB "
+                    "yerine 31,28 dB gösteriyordu.",
+                    "The terrain is read every ten metres. Before, every "
+                    "link was read at a fixed 64 points; on a 6,9 km rural "
+                    "link that meant every 108 metres, and skipping the "
+                    "rises in between put the loss at 31,28 dB where the "
                     "answer is 37,60.",
                 ),
                 _w(
-                    "Bir bağlantı yansımayla kırınımın toplamını değil, "
-                    "büyüğünü öder. İkisi de aynı yer parçasının aynı "
-                    "bağlantıya yaptığını anlatır, ve toplamak o yer "
-                    "parçasını iki kez faturalandırmaktır.",
-                    "A link pays the larger of reflection and diffraction "
-                    "rather than their sum. Both describe what the same "
-                    "piece of ground does to the same link, and adding "
-                    "them bills that ground twice.",
+                    "Bir bağlantı bu iki kaybın toplamını değil, "
+                    "büyüğünü öder. İkisi de aynı arazinin aynı bağlantıya "
+                    "yaptığını anlatıyor; toplamak aynı tepeyi iki kez "
+                    "saymak olurdu.",
+                    "A link pays the larger of those two losses, not "
+                    "their sum. Both describe what the same terrain does "
+                    "to the same link, and adding them would count the "
+                    "same hill twice.",
                 ),
                 _w(
-                    "Gölgeleme ikisinin üstüne eklenir ve genişliği yolun "
-                    "açık olup olmamasına bağlıdır: görüş hattı varken 4 "
-                    "dB, yokken 7,82 (3GPP TR 38.901). Tablo sekiz "
-                    "çekilişin havuzudur, tek bir çekilişin değil.",
-                    "Shadowing sits on top of both, and its width depends "
-                    "on whether the path is clear: 4 dB with line of "
-                    "sight, 7,82 without (3GPP TR 38.901). The table pools "
-                    "eight draws rather than showing one.",
-                ),
-            ),
-        ),
-        Part(
-            kind="points",
-            heading=_w("Alışveriş ve kestirici",
-                       "The exchange and the estimator"),
-            lines=(
-                _w(
-                    "Bir menzil link bütçesinden okunmaz. İki telsiz "
-                    "çerçeve alışverişi yapar, ve SX1280'de SF10'da bir "
-                    "çift yönlü alışveriş 47,86 ms sürer.",
-                    "A range is not read off a link budget. Two radios "
-                    "exchange frames, and on the SX1280 at SF10 one two way "
-                    "exchange takes 47,86 ms.",
-                ),
-                _w(
-                    "Altı birime karşı bir tur 239 ms sürer. Bu sürede 100 "
-                    "km/sa giden bir araç 6,7 m yol alır, yani bir turun "
-                    "menzilleri eşzamanlı değildir ve öyleymiş gibi "
-                    "çözülmez.",
-                    "A round against six units takes 239 ms. A car doing "
-                    "100 km/h covers 6,7 m in that time, so the ranges in "
-                    "one round are not simultaneous and are not solved as "
-                    "though they were.",
-                ),
-                _w(
-                    "Kestirici gerçeği hiç görmez. Yalnızca gözlemleri "
-                    "görür: ölçülmüş mesafe, birimin ölçülmüş konumu, bir "
-                    "zaman damgası ve bir varyans.",
-                    "The estimator never sees the truth. It sees "
-                    "observations: a measured distance, a unit's surveyed "
-                    "position, a timestamp and a variance.",
-                ),
-                _w(
-                    "Hiçbir yerde yükseklik kısıtı yok. Yol kenarına "
-                    "dizilmiş birimler düşeyi neredeyse gözlenemez bırakır, "
-                    "ve VPE sütunu bunu gizlemek yerine bildirir.",
-                    "There is no height constraint anywhere. Units strung "
-                    "along a roadside leave the vertical barely "
-                    "observable, and the VPE column reports that instead of "
-                    "hiding it.",
+                    "Bunların üstüne bir de gölgeleme biniyor: aynı "
+                    "mesafedeki iki bağlantının, arada ne olduğuna göre "
+                    "farklı çıkması. Yol açıkken 4 dB, kapalıyken 7,82 "
+                    "(3GPP TR 38.901). Rastgele olduğu için tablo tek bir "
+                    "çekilişi değil, sekiz çekilişin hepsini birden "
+                    "gösteriyor.",
+                    "Shadowing sits on top of those: two links the same "
+                    "distance apart come out different depending on what "
+                    "stands between. 4 dB with a clear path, 7,82 without "
+                    "(3GPP TR 38.901). It is random, so the table pools "
+                    "all eight draws rather than showing one.",
                 ),
             ),
         ),
         Part(
             kind="points",
-            heading=_w("Gürültü olmayan üç hata",
-                       "Three errors that are not noise"),
+            heading=_w("Mesajlaşma ve konum hesabı",
+                       "The messages and the position"),
             lines=(
                 _w(
-                    "**Engellenmiş bir yol uzun ölçer.** Sinyal engelin "
-                    "üzerinden gider ve menzil o sapmayı zamanlar. Sapma "
-                    "her zaman pozitiftir, yani ortalamayla asla "
-                    "kaybolmaz.",
-                    "**A blocked path measures long.** The signal goes over "
-                    "the obstacle and the range times that detour. The "
-                    "error is always positive, so averaging never removes "
-                    "it.",
+                    "Mesafe hesapla çıkarılmaz, ölçülür. İki telsiz "
+                    "karşılıklı mesaj gönderir; SX1280'de bir gidiş geliş "
+                    "47,86 milisaniye sürüyor.",
+                    "A distance is measured rather than calculated. Two "
+                    "radios send messages back and forth; on the SX1280 "
+                    "one there-and-back takes 47,86 milliseconds.",
                 ),
                 _w(
-                    "**Etüt hatası kurulumun özelliğidir**, birim başına "
-                    "bir kez çekilir ve tutulur. Tünelin HPE P50 değeri "
-                    "kusursuz etütte 0,24 m, 15 cm'lik etüt hatasında 1,76 "
-                    "m: birimleri ölçtüğünden daha iyi konumlanamazsın.",
-                    "**A survey error belongs to an installation**, drawn "
-                    "once per unit and kept. The tunnel's HPE P50 is 0,24 "
-                    "m with perfect survey and 1,76 m with 15 cm of it: you "
-                    "cannot position better than you surveyed.",
+                    "Altı birimle sırayla ölçüşmek 239 milisaniye "
+                    "sürüyor. Bu sürede 100 km/sa giden araç 6,7 metre yol "
+                    "alıyor, yani bir turdaki ölçümler aynı ana ait değil. "
+                    "Hesap da onları aynı anda alınmış gibi kabul "
+                    "etmiyor.",
+                    "Measuring against six units in turn takes 239 "
+                    "milliseconds. A car doing 100 km/h covers 6,7 metres "
+                    "in that time, so the measurements in one round do not "
+                    "belong to one instant. The calculation does not "
+                    "pretend they do.",
                 ),
                 _w(
-                    "**Kaybolan bir paket hiçbir şey üretmez.** Bant 2,4 "
-                    "GHz kablosuz ağlarla aynıdır: şehirde kayıp %15, açık "
-                    "yolda %5, tünelde sıfır.",
-                    "**A lost packet produces nothing.** The band is shared "
-                    "with 2,4 GHz wireless networks: 15% loss in the city, "
-                    "5% on the open road, none in the tunnel.",
+                    "Konumu hesaplayan kod, aracın gerçekte nerede "
+                    "olduğunu hiç görmez. Yalnızca şunları görür: ölçülen "
+                    "mesafe, birimin kurulumda ölçülmüş konumu, ölçümün "
+                    "saati, ve o ölçüme ne kadar güvenildiği.",
+                    "The code that works out the position never sees "
+                    "where the vehicle really is. It sees only these: the "
+                    "measured distance, the unit's position as surveyed at "
+                    "installation, the time of the measurement, and how "
+                    "much that measurement is trusted.",
+                ),
+                _w(
+                    "Hiçbir yerde \"araç yol seviyesindedir\" varsayımı "
+                    "yok. Yol kenarına dizilmiş birimler hep aynı "
+                    "yükseklikte olduğu için yüksekliği ölçmek zor "
+                    "kalıyor. Tablodaki VPE sütunu bunu saklamak yerine "
+                    "olduğu gibi yazıyor.",
+                    "Nowhere is there an assumption that the vehicle sits "
+                    "at road level. Units strung along a roadside are all "
+                    "at much the same height, which leaves the vertical "
+                    "hard to measure. The VPE column writes that down "
+                    "rather than hiding it.",
                 ),
             ),
         ),
         Part(
             kind="points",
-            heading=_w("Modellenmeyenler", "What is left out"),
+            heading=_w("Ortalamayla geçmeyen üç hata",
+                       "Three errors that averaging will not remove"),
             lines=(
                 _w(
-                    "IMU, odometri, harita kısıtı ve Kalman füzyonu yok. "
-                    "Rapordaki mimari bunları öngörüyor; buradaki sayılar "
-                    "yalnızca radyo menzil ölçümünden çözülmüş serbest 3B "
-                    "konumlardır.",
-                    "No inertial unit, no odometry, no map constraint, no "
-                    "Kalman fusion. The report's architecture calls for "
-                    "them; these numbers are free 3D fixes solved from "
-                    "radio ranging alone.",
+                    "**Önü kapalı bir bağlantı olduğundan uzun ölçer.** "
+                    "Sinyal engelin üzerinden dolaşıyor, ve ölçüm bu uzun "
+                    "yolu sayıyor. Hata hep aynı yöne, artı yöne gidiyor; "
+                    "bu yüzden çok ölçüp ortalamak onu götürmüyor.",
+                    "**A blocked link measures longer than it is.** The "
+                    "signal goes around the obstacle and the measurement "
+                    "counts that longer way. The error always goes the "
+                    "same way, so measuring more often and averaging does "
+                    "not remove it.",
                 ),
                 _w(
-                    "Faz gürültüsü, çok yolluluk ve alışveriş sırasında "
-                    "saat sürüklenmesi modellenmiyor.",
-                    "Phase noise, multipath and drift during an exchange "
-                    "are not modelled.",
+                    "**Birimin konumu kurulumda yanlış ölçüldüyse, o "
+                    "yanlış orada kalır.** Her birim için bir kez "
+                    "çekiliyor ve sonuna kadar taşınıyor. Tünelde "
+                    "hataların ortancası, birimler kusursuz ölçülmüş "
+                    "olsaydı 0,24 m çıkıyor; 15 cm'lik bir ölçüm hatasıyla "
+                    "1,76 m. Birimleri ölçtüğünüzden daha iyi konum "
+                    "veremiyorsunuz.",
+                    "**If a unit's position is surveyed wrong at "
+                    "installation, it stays wrong.** It is drawn once per "
+                    "unit and carried to the end. In the tunnel the median "
+                    "error is 0,24 m with a perfect survey and 1,76 m with "
+                    "15 cm of survey error: you cannot position better "
+                    "than you surveyed.",
                 ),
                 _w(
-                    "Tünelde dalga kılavuzu etkisi yok, yani tünel satırı "
-                    "gerçek bir tünelin vereceğinden azını gösterir.",
-                    "There is no waveguide term in the tunnel, so that row "
-                    "understates what a real bore delivers.",
+                    "**Kaybolan mesaj ölçüm vermez.** Kullanılan 2,4 GHz "
+                    "bandı kablosuz ağlarla ortak, yani kalabalık. Şehirde "
+                    "mesajların %15'i kayboluyor, açık yolda %5'i, tünelde "
+                    "hiçbiri.",
+                    "**A lost message gives no measurement.** The 2,4 GHz "
+                    "band is shared with wireless networks, so it is "
+                    "crowded. 15% of messages are lost in the city, 5% on "
+                    "the open road, none in the tunnel.",
+                ),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Modele girmeyenler", "What is left out"),
+            lines=(
+                _w(
+                    "Aracın kendi sensörleri hesaba katılmadı: hareket "
+                    "sensörü, tekerlek turu, harita ve bunları birleştiren "
+                    "filtre yok. Rapordaki tasarımda bunların hepsi var; "
+                    "buradaki sayılar yalnızca telsiz ölçümünden çıkan "
+                    "konumlar. Yani gerçek bir araçtan daha kötü, çünkü "
+                    "eldeki en zayıf bilgiyle hesaplandı.",
+                    "The vehicle's own sensors are left out: no motion "
+                    "sensor, no wheel turns, no map, no filter combining "
+                    "them. The report's design has all of these; these "
+                    "numbers come from radio measurement alone. So they "
+                    "are worse than a real vehicle's, because they were "
+                    "worked out from the weakest information available.",
                 ),
                 _w(
-                    "Güvenlik katmanı da yok. İmza doğrulaması ve anahtar "
-                    "yönetimi mimarinin parçası, benzetimin değil.",
+                    "Telsizin kendi gürültüsü, sinyalin duvarlardan "
+                    "sekerek birden çok yoldan gelmesi ve mesajlaşma "
+                    "sırasında saatin kayması modele girmedi.",
+                    "The radio's own noise, the signal arriving by "
+                    "several paths after bouncing off walls, and the clock "
+                    "drifting during the exchange are not modelled.",
+                ),
+                _w(
+                    "Tünelin duvarları sinyali bir boru gibi taşır ve "
+                    "menzili uzatır; bu hesaba katılmadı. Yani tünel "
+                    "satırı gerçek bir tünelin vereceğinden kötü.",
+                    "A tunnel's walls carry the signal along like a pipe "
+                    "and extend its reach; that is not counted here. So "
+                    "the tunnel row is worse than a real bore would give.",
+                ),
+                _w(
+                    "Güvenlik katmanı da yok. İmza doğrulama ve anahtar "
+                    "yönetimi tasarımın parçası, simülasyonun değil.",
                     "The security layer is absent too. Signature checking "
-                    "and key management belong to the architecture rather "
-                    "than to the simulation.",
+                    "and key management belong to the design rather than "
+                    "to the simulation.",
                 ),
             ),
         ),
@@ -1427,17 +1499,18 @@ SIMULATION = Page(
             heading=_w("Kendi makinende", "On your own machine"),
             lines=(
                 _w(
-                    "Benzetim bir web sayfasının içinde durmaz. Bir koşu "
-                    "üç işlemciyi dakikalarca meşgul eder ve gerçek zemin "
-                    "verisini okur. Kurulumu dört komut, ve açılan "
-                    "sayfada her ayar canlıdır: birimler elle taşınır, yeni "
-                    "bir yer getirilir, ve üç satır da yeniden koşar.",
-                    "The simulation does not live inside a web page. A run "
-                    "keeps three processors busy for minutes and reads real "
-                    "terrain data. Four commands install it, and on the "
-                    "page it opens every setting is live: units are dragged "
-                    "by hand, new ground is fetched, and all three rows run "
-                    "again.",
+                    "Simülasyon bu sayfanın içinde çalışmaz. Bir koşu üç "
+                    "işlemciyi dakikalarca meşgul eder ve gerçek arazi "
+                    "verisi okur. Kurulumu dört komut. Açılan sayfada her "
+                    "ayar canlıdır: birimleri fareyle taşıyabilir, başka "
+                    "bir şehir indirebilir, üç satırı da yeniden "
+                    "koşturabilirsiniz.",
+                    "The simulation does not run inside this page. A run "
+                    "keeps three processors busy for minutes and reads "
+                    "real terrain data. Four commands install it. On the "
+                    "page it opens every setting is live: you can drag the "
+                    "units with the mouse, fetch another city, and run all "
+                    "three rows again.",
                 ),
             ),
         ),
@@ -1462,13 +1535,14 @@ SOURCES = Page(
     nav=_w("Kaynaklar", "Sources"),
     title=_w("Neye dayanıyor", "What it rests on"),
     lead=_w(
-        "Bir sayı ya bir veri sayfasından, ya yayımlanmış bir ölçümden, ya "
-        "da açıkça yazılmış bir varsayımdan gelir. Üçüncüsü bu projede "
-        "ayrı bir tip taşır, böylece hangi sayının kaynağı olmadığı "
-        "sayılabilir.",
-        "A number comes from a datasheet, from a published measurement, or "
-        "from an assumption written down. The third kind carries its own "
-        "type in this project, so the ones nobody supplied can be counted.",
+        "Buradaki her sayı üç yerden birinden geliyor: bir ürünün veri "
+        "sayfasından, yayımlanmış bir ölçümden, ya da açıkça yazılmış bir "
+        "varsayımdan. Üçüncüsü kodda ayrı bir tip taşıyor, yani kaç "
+        "sayının arkasında gerçek bir kaynak olmadığı sayılabiliyor.",
+        "Every number here comes from one of three places: a product's "
+        "datasheet, a published measurement, or an assumption written "
+        "down. The third kind carries its own type in the code, so it can "
+        "be counted how many numbers have no real source behind them.",
     ),
     parts=(
         Part(
@@ -1477,16 +1551,16 @@ SOURCES = Page(
             lines=(
                 _w("ITU-R P.526-15 §4.5.2, delta-Bullington kırınımı.",
                    "ITU-R P.526-15 §4.5.2, delta Bullington diffraction."),
-                _w("ITU-R P.452 ve P.1812: kaybın nasıl kurulduğu.",
-                   "ITU-R P.452 and P.1812: how loss is built up."),
+                _w("ITU-R P.452 ve P.1812: sinyalin yolda nasıl zayıfladığı.",
+                   "ITU-R P.452 and P.1812: how the signal weakens on its way."),
                 _w("3GPP TR 38.901 Tablo 7.4.1-1: gölgeleme genişlikleri.",
                    "3GPP TR 38.901 Table 7.4.1-1: shadowing widths."),
-                _w("Copernicus DEM 30 m: zemin yükseklikleri.",
+                _w("Copernicus DEM 30 m: arazinin yükseklikleri.",
                    "Copernicus DEM 30 m: ground heights."),
-                _w("OpenStreetMap ve Overture: binalar ve yol kenarı "
-                   "donanımı.",
-                   "OpenStreetMap and Overture: buildings and roadside "
-                   "furniture."),
+                _w("OpenStreetMap ve Overture: binalar ve yol kenarındaki "
+                   "direkler, levhalar, panolar.",
+                   "OpenStreetMap and Overture: buildings, and the masts, "
+                   "signs and boards along the road."),
                 _w("Semtech SX1280, EBYTE E28-2G4M27S ve Qorvo DWM3000 veri "
                    "sayfaları, ve SX1280 uzun menzil testi.",
                    "Semtech SX1280, EBYTE E28-2G4M27S and Qorvo DWM3000 "
@@ -1527,7 +1601,7 @@ SOURCES = Page(
                 "pip install -e \".[dev]\"\n"
                 "yerkon table          # yayımlanan sayılar, ~15 dk\n"
                 "yerkon table --fast   # denemek için, ~1 dk, yayımlanmaz\n"
-                "yerkon view           # bu site ve benzetim",
+                "yerkon view           # bu site ve simülasyon",
                 "pip install -e \".[dev]\"\n"
                 "yerkon table          # the published numbers, ~15 min\n"
                 "yerkon table --fast   # for trying things, ~1 min\n"
@@ -1538,10 +1612,13 @@ SOURCES = Page(
             kind="points",
             lines=(
                 _w(
-                    "Zemin pakete işlenmiştir, yani tablo ağa hiç çıkmadan "
-                    "yeniden üretilir. Tohum sabittir.",
-                    "The ground is baked into the package, so the table "
-                    "reproduces with no network at all. The seed is fixed.",
+                    "Arazi verisi paketin içinde geliyor, yani tablo "
+                    "internete hiç çıkmadan yeniden üretiliyor. Rastgele "
+                    "sayıların başlangıcı sabit, o yüzden her koşu aynı "
+                    "sonucu veriyor.",
+                    "The terrain data ships inside the package, so the "
+                    "table reproduces with no network at all. The random "
+                    "seed is fixed, so every run gives the same answer.",
                 ),
                 _w("`CONTEXT.md` sözlüktür: her terimin kodda kullanılan "
                    "adı ve raporda kullanılan karşılığı.",
@@ -1577,7 +1654,7 @@ SOURCES = Page(
                 ),
                 _w(
                     "Bu depo raporun kendisi değil, raporun karşılaştırma "
-                    "tablosundaki üç YERKON satırını üreten benzetimdir.",
+                    "tablosundaki üç YERKON satırını üreten simülasyondur.",
                     "This repository is not the report. It is the "
                     "simulation that produces the three YERKON rows of its "
                     "comparison table.",
@@ -1601,9 +1678,15 @@ SOURCES = Page(
 #: Every page, in the order the navigation shows them.
 PAGES = (HOME, WHY, SYSTEM, RESEARCH, VALUE, RESULTS, SIMULATION, SOURCES)
 
-#: Where the simulator lives, and what the link to it is called.
-SIMULATOR = "/simulasyon"
-SIMULATOR_LABEL = _w("Simülasyon", "Simulator")
+#: Where the running simulator lives, and what the link to it is
+#: called. Not the same thing as the SIMULATION page: that page says
+#: what the simulation models and what it leaves out, and this address
+#: is the thing itself. They had the same name once, and a reader had
+#: no way to tell which one a link meant (ADR-0071). The address has to
+#: differ from every page's slug or the page becomes unreachable, and a
+#: test holds that.
+SIMULATOR = "/calistir"
+SIMULATOR_LABEL = _w("Simülasyonu çalıştır", "Run the simulation")
 
 #: The one line under the wordmark, on every page.
 STANDFIRST = _w(
@@ -1636,9 +1719,9 @@ COLUMNS = (
 )
 
 RUN_NOTE = _w(
-    "{run_on} tarihinde {source} okunarak koşuldu. Gölgeler {draws} kez "
-    "çekildi, zemin profili {spacing} m'de bir okundu. İlk üç sütun rapora "
-    "giren adlardır ve çevrilmez.",
+    "{run_on} tarihinde {source} okunarak koşuldu. Gölgeleme {draws} kez "
+    "çekildi, arazi {spacing} metrede bir okundu. İlk üç sütun rapora "
+    "giren adlardır, o yüzden çevrilmiyor.",
     "Run on {run_on} against {source}. The shadows were drawn {draws} "
     "times and the ground profile was read every {spacing} m. The first "
     "three columns are the names that go into the Turkish report, so they "
@@ -1647,8 +1730,9 @@ RUN_NOTE = _w(
 
 FOOTER = _w(
     "YERKON, Ulaştırma ve Altyapı Bakanlığı UDHAM fikir yarışmasına "
-    "sunulan bir proje. Tablodaki sayılar benzetimin yayımlanan "
-    "koşusundan gelir, ve neyi modellemediği Benzetim sayfasında yazıyor.",
+    "sunulan bir proje. Tablodaki sayılar simülasyonun yayımlanan "
+    "koşusundan gelir; nelerin modele girmediği Simülasyon sayfasında "
+    "yazıyor.",
     "YERKON is a project submitted to the UDHAM idea competition of the "
     "Ministry of Transport and Infrastructure. The numbers in the table "
     "come from the simulation's published run, and what it does not model "
@@ -1656,14 +1740,16 @@ FOOTER = _w(
 )
 
 WEIGHTING = _w(
-    "Benzetimin doldurduğu üç satır, yatay hatanın doksan beşinci "
-    "yüzdeliğinde. Her biri gerçek bir Ankara zemininin üzerinde koşuldu.",
-    "The three rows the simulation filled, at the ninety fifth percentile "
-    "of horizontal error. Each one was run over real ground near Ankara.",
+    "Simülasyonun doldurduğu üç satır. Her biri, hataların yüzde "
+    "95'inin altında kaldığı yatay sapmayı gösteriyor, ve her biri "
+    "Ankara'nın gerçek arazisi üzerinde koşuldu.",
+    "The three rows the simulation filled. Each shows the horizontal "
+    "error that 95 per cent of the measurements stayed under, and each was "
+    "run over real ground near Ankara.",
 )
 
 NO_RUN = _w(
-    "Yayımlanmış bir koşu yok. `yerkon table --publish` çalıştır.",
+    "Yayımlanmış bir koşu yok. Önce `yerkon table --publish` çalıştırın.",
     "There is no published run. Run `yerkon table --publish`.",
 )
 
