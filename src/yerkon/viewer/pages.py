@@ -407,7 +407,7 @@ SYSTEM = Page(
             picture="architecture.png",
             lines=(_w(
                 "Rapordan. Alıcı mesafeyi karşılıklı mesajlaşarak "
-                "ölçüyor. Merkezî yönetim sistemiyle birimler arasındaki "
+                "ölçüyor. Merkezi yönetim sistemiyle birimler arasındaki "
                 "hat ise mesafe değil, kimlik ve anahtar taşıyor.",
                 "From the report, with Turkish labels. The receiver "
                 "measures distance by sending messages back and forth. "
@@ -448,7 +448,7 @@ SYSTEM = Page(
                     "with no satellite in sight.",
                 ),
                 _w(
-                    "**Merkezî yönetim sistemi.** Hangi birimin hangi "
+                    "**Merkezi yönetim sistemi.** Hangi birimin hangi "
                     "anahtara sahip olduğunun listesini tutar. Alıcı bu "
                     "listeyi indirip her birimin imzasını kontrol eder, "
                     "böylece sahte bir birimle konuşmaz.",
@@ -512,9 +512,9 @@ SYSTEM = Page(
             heading=_w("Üç kurulum grubu", "Three kinds of installation"),
             lines=(
                 _w(
-                    "**Şehir içi.** Çok sayıda kısa menzilli istasyon: baz "
+                    "**Şehir içi.** Çok sayıda, kısa menzilli birim: baz "
                     "istasyonları, trafik levhaları ve lambaları, reklam "
-                    "panoları, yol kenarı ışıklandırmaları. Semtech SX1280 "
+                    "panoları, yol kenarı aydınlatmaları. Semtech SX1280 "
                     "gibi bir 2,4 GHz LoRa modülü açık alanda ve görüş "
                     "hattında yaklaşık 2-4 km menzil verir.",
                     "**Urban.** Many short range stations: base station "
@@ -524,8 +524,9 @@ SYSTEM = Page(
                     "with line of sight.",
                 ),
                 _w(
-                    "**Kırsal.** Az sayıda yüksek kapsamalı nokta: akıllı "
-                    "ulaşım sistemi ve yol kenarı üniteleri, baz istasyonu "
+                    "**Kırsal.** Az sayıda ama geniş alana ulaşan nokta: "
+                    "akıllı ulaşım sistemi ve yol kenarı üniteleri, baz "
+                    "istasyonu "
                     "sahaları, demiryolu ve karayolu altyapısı. İçinde "
                     "yükselteç olan bir modülle (E28-2G4M27S, +27 dBm) "
                     "menzil uygun havada 8-10 km'ye çıkar. Orman, dağ ve "
@@ -574,10 +575,10 @@ SYSTEM = Page(
                     "on the board for 2,4 GHz.",
                 ),
                 _w(
-                    "**Kara aracı.** STM32 tabanlı, LCD harita ekranlı. "
-                    "Aracın CAN-Bus hattına bağlanıp tekerlek hız "
+                    "**Kara aracı.** STM32 üzerine kurulu, LCD harita "
+                    "ekranı var. Aracın CAN hattına bağlanıp tekerlek hız "
                     "sensörlerinden ve direksiyon açısından anlık veri "
-                    "çeker. Tavana 3-5 dBi kazançlı çubuk anten konur.",
+                    "alır. Anteni tavana konan 3-5 dBi'lik bir çubuk.",
                     "**Road vehicle.** Built on an STM32 with an LCD map "
                     "screen. It connects to the vehicle's CAN bus and "
                     "takes live data from the wheel speed sensors and the "
@@ -585,8 +586,9 @@ SYSTEM = Page(
                     "roof.",
                 ),
                 _w(
-                    "**Nesnelerin interneti.** Kapalı ve yarı açık alan "
-                    "robot filoları için. Yaygın robot işletim "
+                    "**Nesnelerin interneti alıcısı.** Kapalı ve yarı açık "
+                    "alanda çalışan robot filoları için. Yaygın robot "
+                    "işletim "
                     "sistemleriyle doğrudan konuşur; tekerleğin kaç tur "
                     "döndüğüne ve kendi hareket sensörüne bakarak konumunu "
                     "sürekli düzeltir. Çoğu depo ve fabrikada DWM3000 "
@@ -652,11 +654,12 @@ SYSTEM = Page(
             kind="points",
             lines=(
                 _w(
-                    "Fiyatlar 6 Eylül 2026 tarihli distribütör liste "
-                    "fiyatlarından hesaplanmış ana bileşen maliyetleridir. "
-                    "PCB üretimi ve dizgisi, pasif bileşenler, kablolama, "
-                    "mekanik işleme, test, kalibrasyon, sertifikasyon, "
-                    "vergi, kargo ve saha kurulumu dahil değildir.",
+                    "Fiyatlar yalnızca ana parçaların maliyeti, 6 Eylül "
+                    "2026 tarihli satıcı liste fiyatlarından hesaplandı. "
+                    "Kartın basılması ve parçaların lehimlenmesi, direnç "
+                    "ve kondansatörler, kablolama, kutu işçiliği, test, "
+                    "ayar, belgelendirme, vergi, kargo ve sahadaki montaj "
+                    "bu rakamların dışında.",
                     "The prices are main component costs worked out from "
                     "distributor list prices dated 6 September 2026. Board "
                     "manufacture and assembly, the passive components, "
@@ -793,7 +796,7 @@ RESEARCH = Page(
                     "birimleri uzman olmayan birinin de doğru yere "
                     "koyabilmesi: afette ya da askeri bir durumda geçici "
                     "ağ kuracak personel, ekrandaki "
-                    "\"optimum sinyal için 120 derece yönünde 50 metre "
+                    "\"en iyi sinyal için 120 derece yönünde 50 metre "
                     "ilerleyin\" gibi yönlendirmeleri takip ederek "
                     "birimleri yerleştirebilecek.",
                     "Installation is itself part of the research. The aim "
@@ -948,8 +951,9 @@ VALUE = Page(
                    "iyi olması gerektiği bu veriyle tanımlanabilir.",
                    "Institutions look at the same event data, and how good "
                    "the service has to be can be defined from it."),
-                _w("Uydunun kesildiği ve kandırıldığı durumları içeren, "
-                   "birden çok sensörden toplanmış bir veri kümesi kalır.",
+                _w("Geriye bir veri kümesi kalır: birden çok sensörden "
+                   "toplanmış, uydunun kesildiği ve kandırıldığı durumları "
+                   "içeren.",
                    "What is left is a dataset gathered from several "
                    "sensors, covering satellites cut off and satellites "
                    "fooled."),
@@ -1023,14 +1027,13 @@ VALUE = Page(
                     "their keys.",
                 ),
                 _w(
-                    "**Kullanıcı.** Araç konumlandırma birimi, taşınabilir "
-                    "saha alıcısı, nesnelerin interneti alıcısı. "
-                    "Sonrasında insansız hava aracı entegrasyon modülü ile "
-                    "demiryolu ve denizcilik alıcısı.",
-                    "**User.** The vehicle unit, the portable field "
-                    "receiver and the internet of things receiver. Later, "
-                    "an integration module for unmanned aircraft and a "
-                    "receiver for rail and maritime.",
+                    "**Kullanıcı.** Araç alıcısı, sahada taşınan alıcı, ve "
+                    "robotlar için alıcı. Sonrasında insansız hava "
+                    "araçlarına takılan modül, ve tren ile gemi alıcısı.",
+                    "**User.** The vehicle receiver, the one carried in "
+                    "the field, and one for robots. Later, a module that "
+                    "fits unmanned aircraft, and a receiver for trains and "
+                    "ships.",
                 ),
                 _w(
                     "**Yazılım.** Merkezi yönetim paneli, karıştırma "
@@ -1239,7 +1242,7 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Zemin gerçek", "The ground is real"),
+            heading=_w("Arazi gerçek", "The ground is real"),
             lines=(
                 _w(
                     "Üç satır da Ankara'nın gerçek arazisi üzerinde "
@@ -1280,8 +1283,8 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Bir bağlantıya tek bir hesap karar verir",
-                       "One calculation decides a link"),
+            heading=_w("Menzili tek bir hesap belirler",
+                       "One calculation decides the range"),
             lines=(
                 _w(
                     "Kodun hiçbir yerinde \"azami menzil şu kadardır\" "
