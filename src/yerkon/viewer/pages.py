@@ -1158,6 +1158,134 @@ RESULTS = Page(
         ),
         Part(kind="shows", shows="cost"),
         Part(
+            kind="text",
+            heading=_w("Şehir içi neden bu kadar ucuz",
+                       "Why the town row costs so little"),
+            lines=(
+                _w(
+                    "Bir şehirde yayın birimini taşıyacak yapı zaten "
+                    "duruyor: aydınlatma direkleri, levhalar, portallar, "
+                    "ışıklı kavşakların direkleri. Hepsinin ortak yanı "
+                    "elektrik şebekesine bağlı olması. Bir birim takmak "
+                    "kelepçe, muhafaza, işçilik ve direğin beslemesinden "
+                    "bir hat demek. Direk dikmek, temel atmak, güneş "
+                    "paneli ve akü almak demek değil.",
+                    "In a town the structures that can carry a broadcast "
+                    "unit already stand: lighting columns, signs, "
+                    "gantries, the poles at signalised junctions. What "
+                    "they have in common is that they are already on the "
+                    "electricity network. Fitting a unit to one means a "
+                    "bracket, an enclosure, the labour and a tap into the "
+                    "column's supply. It does not mean raising a mast, "
+                    "pouring a foundation, or buying a solar panel and a "
+                    "battery.",
+                ),
+                _w(
+                    "Ne kadar ettiğini ölçtük. Aynı 36 birim, aynı zemin, "
+                    "tek farkla: şehrin yapılarını kullanmak yerine her "
+                    "birim için 25 m'lik bir direk dikip güneş paneli "
+                    "takmak.",
+                    "We priced the difference. The same 36 units on the "
+                    "same ground, with one thing changed: instead of "
+                    "using the town's structures, raise a 25 m mast for "
+                    "each one and fit a solar panel to it.",
+                ),
+            ),
+        ),
+        Part(
+            kind="table",
+            numbers_from=1,
+            rows=(
+                (
+                    _w("Bir birimin bedeli", "What one unit costs"),
+                    _w("Mevcut yapıya", "On a structure that stands"),
+                    _w("Dikilen direğe", "On a mast raised for it"),
+                ),
+                (
+                    _w("Yayın birimi", "The broadcast unit"),
+                    _w("1366 TL", "1366 TL"),
+                    _w("1366 TL", "1366 TL"),
+                ),
+                (
+                    _w("Yapı ve montaj", "Structure and installation"),
+                    _w("3000 TL", "3000 TL"),
+                    _w("85000 TL", "85000 TL"),
+                ),
+                (
+                    _w("Şebeke dışı besleme", "Standalone power supply"),
+                    _w("yok", "none"),
+                    _w("9500 TL", "9500 TL"),
+                ),
+                (
+                    _w("Toplam", "Total"),
+                    _w("4366 TL", "4366 TL"),
+                    _w("95866 TL", "95866 TL"),
+                ),
+            ),
+        ),
+        Part(
+            kind="text",
+            lines=(
+                _w(
+                    "**Sermayede 22 kat.** Yukarıdaki tablonun şehir içi "
+                    "CAPEX hücresi, aynı birimler dikilen direklere "
+                    "konsaydı yirmi iki katı olurdu. Oradaki sayıyı "
+                    "düşüren şey donanım değil, donanımın neye "
+                    "takıldığı. Kırsal satırda böyle bir yapı yok: orada "
+                    "direğin 85000 TL'si ve panelin 9500 TL'si gerçekten "
+                    "ödeniyor, ve o direkler kırsal sermayenin "
+                    "%88,9'unu tutuyor.",
+                    "**Twenty-two times, on capital.** The urban CAPEX "
+                    "cell in the table above would be twenty-two times "
+                    "larger if the same units went on masts raised for "
+                    "them. What brings that figure down is not the "
+                    "hardware but what the hardware is bolted to. The "
+                    "open-country row has no such structures: there the "
+                    "mast's 85000 TL and the panel's 9500 TL really are "
+                    "paid, and those masts hold 88,9 % of its capital.",
+                ),
+                _w(
+                    "Elektrik, yapının verdiği iki şeyden yalnızca biri. "
+                    "Işıklı bir kavşakta sinyal dolabı durur: hem besleme "
+                    "hem de trafik yönetim merkezine giden bir hat. "
+                    "Belediyenin kameraları ve dedektörleri o hattı zaten "
+                    "kullanıyor. Izgaranın dörtte biri böyle bir kavşakta "
+                    "duruyor, hattını yanındaki dolaptan alıyor ve kendine "
+                    "hücresel veri paketi almıyor: işletme maliyetinin "
+                    "%7,4'ü. Yapı, yükseklik ve montaj bedeli değişmiyor, "
+                    "dolayısıyla doğruluk ve kullanılabilirlik de "
+                    "değişmiyor.",
+                    "Power is only one of the two things a structure "
+                    "gives. A signalised junction carries a controller "
+                    "cabinet: mains for the heads and a line to the "
+                    "traffic management centre. The municipality's "
+                    "cameras and detectors already use that line. A "
+                    "quarter of the grid stands at such a junction, takes "
+                    "its link from the cabinet beside it, and buys no "
+                    "cellular plan of its own: 7,4 % of what running the "
+                    "row costs. The structure, the height and the fitting "
+                    "cost do not change, so neither accuracy nor "
+                    "availability moves.",
+                ),
+                _w(
+                    "Sıklaştırmak kullanılabilirliği yükseltiyor ama "
+                    "bedava değil: kaba bir tarama 500 m'den 350 m'ye "
+                    "inmenin kullanılabilirliği yaklaşık altı puan "
+                    "artırdığını, kilometrekare başına sermayeyi de "
+                    "%67 büyüttüğünü söylüyor. Mevcut yapıların yaptığı "
+                    "şey bu alışverişi karşılanabilir kılmak: her ek "
+                    "birim bir modül artı bir montaj, bir saha değil.",
+                    "Tightening the grid raises availability, but not for "
+                    "nothing: a coarse sweep says going from 500 m to "
+                    "350 m buys about six points of availability and "
+                    "costs 67 % more capital per square kilometre. What "
+                    "the existing structures do is make that trade "
+                    "affordable at all, because each extra unit is a "
+                    "module and a fitting rather than a site.",
+                ),
+            ),
+        ),
+        Part(
             kind="table",
             heading=_w("Sütunlar ne demek", "What the columns mean"),
             rows=(

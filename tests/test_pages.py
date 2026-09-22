@@ -867,3 +867,49 @@ def test_a_part_nobody_can_draw_is_an_error_rather_than_a_blank():
 
     with pytest.raises(ValueError, match="draw"):
         _part(Part(kind="nonsense"), "tr", None)
+
+
+def test_what_the_town_s_structures_save_is_what_the_model_prices():
+    """ADR-0077. The one counterfactual the results page quotes.
+
+    The page says a unit on a lighting column costs 4366 TL installed
+    against 95866 TL on a mast raised for it, and twenty-two times on
+    capital per square kilometre. Those three figures cannot come out
+    of the published record, because the record has no run of a town on
+    masts in it. So they are priced here instead, and the page is held
+    to what the model says rather than to what somebody typed.
+    """
+    from yerkon.cost import URBAN_ANCHOR, AnchorSite, Inventory, price
+    from yerkon.scenarios import CHOICES
+    from yerkon.world import LIGHTING_COLUMN, TALL_MAST
+
+    anchors = len(CHOICES["urban"].scenario.deployment.anchors)
+
+    def priced(mounting):
+        return price(Inventory(
+            anchors=tuple(
+                AnchorSite(
+                    product=URBAN_ANCHOR,
+                    structure=mounting.kind,
+                    site_cost_tl=mounting.site_cost_tl,
+                    has_power=mounting.has_power,
+                    has_backhaul=mounting.has_backhaul,
+                )
+                for _ in range(anchors)
+            ),
+            service_area_km2=6.6833,
+        ))
+
+    columns, masts = priced(LIGHTING_COLUMN), priced(TALL_MAST)
+
+    assert round(columns.capex_tl / anchors) == 4366
+    assert round(masts.capex_tl / anchors) == 95866
+    assert round(masts.capex_tl / columns.capex_tl) == 22
+
+    page = render(page_at("sonuclar"), "tr")
+    for figure in ("1366", "3000", "85000", "9500", "4366", "95866",
+                   "22 kat"):
+        assert figure in page, figure
+    assert "{} birim".format(anchors) in page, (
+        "the page names an anchor count the deployment no longer has"
+    )

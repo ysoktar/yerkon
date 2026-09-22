@@ -4,7 +4,7 @@
 # the tests that keep the README from drifting away from it.
 # Edit the model and run it again rather than editing this.
 
-run_on = "2026-09-21"
+run_on = "2026-09-22"
 source = "defaults.toml"
 shadow_draws = 8
 profile_spacing_m = 10
@@ -20,10 +20,10 @@ vpe_p95_m = 64.2128
 availability = 0.8398
 area_km2 = 6.6833
 capex_tl_per_unit = 23517.983
-opex_tl_per_unit_year = 10895.6581
+opex_tl_per_unit_year = 10087.6781
 costed_by = "area"
 reached_km2 = 8.8567
-assumed_share = 0.7862
+assumed_share = 0.781
 
 [[row]]
 key = "rural"

@@ -116,8 +116,12 @@ gerçekten oradan geçen bir alıcı yoktur — yayımlanan sayı koşudan gelir
 ADR-0044'e bak.
 
 **Furniture** (yol kenarı donanımı): direğin cıvatalanabileceği, zaten
-duran yapılar — trafik ışığı, otobüs durağı, aydınlatma direği. Overture'ın
-altyapı temasından geliyor; Kızılay 232 taşıyor (155 durak, 77 ışık).
+duran yapılar — trafik ışığı, otobüs durağı, aydınlatma direği, yol
+levhası. Overture'ın altyapı temasından geliyor ve iki türe indirgenerek
+saklanıyor: *column* (trafik ışığı ve aydınlatma direği) ile *sign*
+(durak ve yol levhası). Kızılay 232 taşıyor: 77 column, 155 sign. İkiye
+indirgendiği için kaçının ışıklı kavşak olduğu bu veriden sayılamıyor;
+ADR-0077'nin dörtte biri o yüzden bir sayım değil bir okuma.
 Duvar, bordür, çit ve kamusal sanat aynı temada ve montaj noktası değil,
 o yüzden listede yok. Arayan yerleştirmeler kafes yerine bunları puanlar
 (ADR-0015, ADR-0040). ADR-0046'ya bak.
