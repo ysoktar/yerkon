@@ -928,6 +928,19 @@ arrangement than anything anybody builds."""
 affects = "şehir içi satırın yatay geometrisini"
 affects_en = "the urban row's horizontal geometry"
 
+[values."urban.junction_every"]
+value = 2.0
+unit = "anchors"
+provenance = "DESIGN"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Izgaranın kaçta kaçı ışıklı bir kavşakta duruyor: her ikinci sıranın her ikinci noktası, yani dörtte biri. Bir şehrin ana caddeleri ışıklıdır ve ışıklı bir kavşakta sinyal dolabı zaten durur: hem şebeke beslemesi hem de trafik yönetim merkezine giden bir hat. Oradaki direk, belediyenin kameralarının ve dedektörlerinin yaptığının aynısını yapar, hattını o dolaptan alır ve kendine bir veri paketi satın almaz. Yapı, yükseklik ve montaj bedeli aynı aydınlatma direğidir; dolayısıyla geometride hiçbir şey kımıldamaz. Dörtte bir, ihtiyatlı okuma: Ankara merkezinde ana cadde kavşaklarının yarısı da savunulabilir ve iki katı tasarruf eder."""
+note_en = """How much of the grid stands at a signalised junction: every second spot of every second row, so a quarter. A town's main streets are signalised, and a signalised junction already carries a controller cabinet: mains for the heads and a line to the traffic management centre. An anchor there does what the municipality's cameras and detectors already do, takes its link from that cabinet, and buys no data plan of its own. The structure, the height and the fitting cost are the same lighting column, so nothing about the geometry moves. A quarter is the conservative reading: half of the main-street junctions in Ankara's centre is defensible too, and saves twice as much."""
+affects = "şehir içi satırın OPEX'ini: bağlantı kalemi"
+affects_en = "the urban row's OPEX: the connectivity line"
+sensitivity = """1 yapmak her direği bağlar ve bağlantı kalemini sıfırlar; 0 yapmak hiçbirini bağlamaz"""
+sensitivity_en = """setting it to 1 connects every anchor and zeroes the connectivity line; 0 connects none"""
+
 [values."urban.anchors_per_round"]
 value = 12.0
 unit = "anchors"

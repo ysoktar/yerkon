@@ -17,7 +17,7 @@ from yerkon.cost import (
     price,
 )
 from yerkon.evidence import Provenance
-from yerkon.world import LIGHTING_COLUMN, TALL_MAST
+from yerkon.world import LIGHTING_COLUMN, SIGNALLED_COLUMN, TALL_MAST
 
 
 def site(mounting=TALL_MAST, product=RURAL_ANCHOR):
@@ -81,6 +81,40 @@ def test_an_inventory_counts_what_the_structures_do_not_provide():
     )
     assert mixed.off_grid_anchors == 1, "only the mast has no mains"
     assert mixed.unconnected_anchors == 3, "none of them has backhaul"
+
+
+def test_a_junction_cabinet_saves_the_data_plan_and_nothing_else():
+    """What reusing the city's own network is worth, and what it is not.
+
+    A signalised junction already carries a line to the traffic
+    management centre, so an anchor beside one buys no plan of its own.
+    It is the same column at the same height for the same fitting cost,
+    so the capital does not move. Only the connectivity line does, and
+    only by the share of anchors that stand at a junction.
+    """
+    plain = price(an_inventory(count=4, mounting=LIGHTING_COLUMN))
+    mixed = Inventory(
+        anchors=(
+            site(SIGNALLED_COLUMN), site(LIGHTING_COLUMN),
+            site(LIGHTING_COLUMN), site(LIGHTING_COLUMN),
+        ),
+        service_area_km2=57.2, route_km=24.0,
+    )
+    connected = price(mixed)
+
+    assert connected.capex_tl == pytest.approx(plain.capex_tl)
+    assert mixed.off_grid_anchors == 0, "every column has mains"
+    assert mixed.unconnected_anchors == 3, "one of the four is at a junction"
+
+    def line(costing, label):
+        return next(i for i in costing.operating if i.label == label).tl
+
+    rate = float(DEFAULT_RATES.connectivity_tl_per_year.value)
+    assert line(plain, "connectivity") - line(connected, "connectivity") == (
+        pytest.approx(rate)
+    )
+    for label in ("energy", "replacement", "maintenance", "central operation"):
+        assert line(connected, label) == pytest.approx(line(plain, label))
 
 
 # --- Capital --------------------------------------------------------------

@@ -7,6 +7,8 @@ import pytest
 from yerkon.world import (
     BILLBOARD,
     EXISTING_STRUCTURES,
+    LIGHTING_COLUMN,
+    SIGNALLED_COLUMN,
     MAX_HIGHWAY_GRADE,
     ROADSIDE_SIGN,
     TALL_MAST,
@@ -40,6 +42,22 @@ def test_a_sign_has_no_power_and_a_gantry_does():
     """Drives the operating cost: a structure with mains is cheaper to run."""
     assert not ROADSIDE_SIGN.has_power
     assert BILLBOARD.has_power
+
+
+def test_a_column_at_a_signalised_junction_is_connected_and_nothing_else():
+    """The saving is the cabinet, not a different structure.
+
+    A junction column is the same column at the same height for the same
+    fitting cost. If either of those ever differs, the deployment is
+    quietly buying geometry under the name of a connection, and the
+    availability the urban row reports would stop being the thing the
+    grid spacing bought.
+    """
+    assert SIGNALLED_COLUMN.height_m == LIGHTING_COLUMN.height_m
+    assert SIGNALLED_COLUMN.site_cost_tl == LIGHTING_COLUMN.site_cost_tl
+    assert SIGNALLED_COLUMN.has_power and LIGHTING_COLUMN.has_power
+    assert SIGNALLED_COLUMN.has_backhaul
+    assert not LIGHTING_COLUMN.has_backhaul
 
 
 def test_a_road_follows_the_ground_when_no_alignment_is_given():

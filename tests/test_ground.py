@@ -248,6 +248,40 @@ def test_a_round_is_sized_by_how_many_anchors_answer():
     assert CHOICES["tunnel"].scenario.deployment.max_anchors_per_round == 8
 
 
+def test_the_town_takes_its_link_from_the_junctions_it_already_has():
+    """ADR-0077: the city's own network carries part of the bill.
+
+    Every second spot of every second row stands at a signalised
+    junction, where a controller cabinet already has mains and a line to
+    the traffic management centre. Those anchors take their link from it
+    and buy no plan of their own, the way a municipality's cameras
+    already do.
+
+    Held here rather than only in the cost tests because the saving is
+    worth nothing if the structure moved with it. The junction anchors
+    are the same lighting columns at the same height: the count of
+    anchors, the mix of heights and the capital are all what they were
+    before any of them was connected.
+    """
+    anchors = CHOICES["urban"].scenario.deployment.anchors
+    every = int(DEFAULTS.number("urban.junction_every"))
+    assert every >= 1
+
+    connected = [a for a in anchors if a.mounting.has_backhaul]
+    assert connected, "no urban anchor is at a junction"
+    assert len(connected) < len(anchors), "every urban anchor is at a junction"
+
+    column = next(a for a in anchors if not a.mounting.has_backhaul)
+    for anchor in connected:
+        assert anchor.mounting.height_m == column.mounting.height_m
+        assert anchor.mounting.site_cost_tl == column.mounting.site_cost_tl
+        assert anchor.mounting.has_power
+
+    # A quarter, to within the row that runs off the end of the grid.
+    share = len(connected) / len(anchors)
+    assert 1.0 / (every * every) - 0.1 < share < 1.0 / (every * every) + 0.1
+
+
 @pytest.mark.slow
 def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
     """The check the neighbour list failed, applied to what replaced it.

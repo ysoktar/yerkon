@@ -42,6 +42,7 @@ from yerkon.site.cache import SiteCache
 if TYPE_CHECKING:  # pragma: no cover
     from yerkon.site.model import Site
 from yerkon.world import (
+    at_a_signalised_junction,
     bore_terrain,
     mountings,
     patchwork,
@@ -174,6 +175,8 @@ def _anchors_over(
     radio: Radio = SX1280,
     prefix: str = "A",
     stagger_m: float = 0.0,
+    junction: Optional[MountingOption] = None,
+    junction_every: int = 0,
 ):
     """Anchors across an area rather than along a line.
 
@@ -186,19 +189,30 @@ def _anchors_over(
     ``stagger_m`` offsets alternate rows, because a perfect grid puts
     every anchor a receiver can see on one of two lines through it, which
     is a worse arrangement than anything real.
+
+    ``junction_every`` says which spots stand at a signalised junction:
+    every nth spot of every nth row, which is the main streets of a town
+    grid. Those anchors go on ``junction`` instead. It is the same
+    structure at the same height for the same fitting cost, so nothing
+    about the geometry moves; what moves is that the cabinet beside it is
+    already connected and the anchor buys no data plan of its own.
     """
     from yerkon.world import Anchor
 
     placed = []
     index = 0
+    signalled = junction is not None and junction_every > 0
     for row, y in enumerate(np.arange(0.0, height_m + 1.0, spacing_m)):
         offset = stagger_m if row % 2 else 0.0
-        for x in np.arange(offset, width_m + 1.0, spacing_m):
+        for column, x in enumerate(np.arange(offset, width_m + 1.0, spacing_m)):
+            here = mounting
+            if signalled and row % junction_every == 0 and column % junction_every == 0:
+                here = junction
             placed.append(
                 Anchor(
                     "{}{}".format(prefix, index),
                     (float(x), float(y)),
-                    mounting,
+                    here,
                     terrain,
                     radio=radio,
                 )
@@ -539,6 +553,13 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     mounting["lighting_column"], URBAN_TERRAIN,
                     radio=module["sx1280"], prefix="C",
                     stagger_m=settings.number("urban.anchor_stagger_m"),
+                    junction=at_a_signalised_junction(
+                        mounting["lighting_column"],
+                        "lighting column at a signalised junction",
+                    ),
+                    junction_every=int(
+                        settings.number("urban.junction_every")
+                    ),
                 ),
                 receivers=(
                     _unit("araç", URBAN_ROAD, 13.9, 600.0, radios=both),

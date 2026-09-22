@@ -15,7 +15,7 @@ not, and the ratio between them is the design question.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Callable, Optional, Sequence, TYPE_CHECKING
 
 import numpy as np
@@ -928,6 +928,22 @@ def mountings(settings: Settings = DEFAULTS) -> dict:
     }
 
 
+def at_a_signalised_junction(base: MountingOption, kind: str) -> MountingOption:
+    """The same structure, standing at a junction that is already connected.
+
+    A signalised junction carries a controller cabinet: mains for the
+    heads and a link back to the traffic management centre. A unit on the
+    lighting column a few metres away takes its data from that cabinet,
+    the way a municipality's cameras and detectors already do, so it buys
+    no cellular plan of its own.
+
+    Built from the structure rather than written out again, because the
+    height and the fitting cost are the same figures and a second copy of
+    them would drift away from the first.
+    """
+    return replace(base, kind=kind, has_backhaul=True)
+
+
 MOUNTINGS = mountings()
 
 ROADSIDE_SIGN = MOUNTINGS["roadside_sign"]
@@ -937,6 +953,11 @@ LIGHTING_COLUMN = MOUNTINGS["lighting_column"]
 TALL_MAST = MOUNTINGS["tall_mast"]
 TUNNEL_BRACKET = MOUNTINGS["tunnel_bracket"]
 """Inside a tunnel, where power and backhaul already run the length of it."""
+
+SIGNALLED_COLUMN = at_a_signalised_junction(
+    LIGHTING_COLUMN, "lighting column at a signalised junction"
+)
+"""A town column at a junction whose signal cabinet is already connected."""
 
 
 EXISTING_STRUCTURES = (ROADSIDE_SIGN, SIGN_GANTRY, BILLBOARD, LIGHTING_COLUMN)
