@@ -184,13 +184,13 @@ def test_the_winner_is_measured_on_the_real_swept_area():
 
 
 def test_every_anchor_is_priced_as_the_module_inside_it():
-    from yerkon.cost import RURAL_ANCHOR, anchor_product
+    from yerkon.cost import AMPLIFIED_ANCHOR, anchor_product
 
     winner, _ = search(radio=E28_2G4M27S)
     units = next(
         item for item in winner.costing.capital if item.label == "anchor units"
     )
     assert units.tl == pytest.approx(
-        len(winner.anchors) * float(RURAL_ANCHOR.unit_price_tl.value)
+        len(winner.anchors) * float(AMPLIFIED_ANCHOR.unit_price_tl.value)
     )
-    assert anchor_product(E28_2G4M27S.part) is RURAL_ANCHOR
+    assert anchor_product(E28_2G4M27S.part) is AMPLIFIED_ANCHOR

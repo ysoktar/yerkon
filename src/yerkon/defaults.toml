@@ -114,15 +114,33 @@ affects = """aydınlatma direğinden kullanılabilir menzili: 5 m toleransta 3,8
 affects_en = "usable range from a column: 3,83 km at a 5 m tolerance"
 
 [values."mounting.lighting_column.site_cost_tl"]
-value = 3000.0
+value = 2450.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = "Levha gibi, artı direğin beslemesinden bir hat."
-note_en = "As a sign, plus a tap into the column's supply."
-affects = "aydınlatma direğindeki her direğin CAPEX'ini"
-affects_en = "CAPEX of every anchor on a column"
+source = """20 m sepetli araç saati 2000 TL'den, günlükte %30 indirim; usta \
+yevmiyesi 3000-4000 TL (Ankara, 2026 arama sonuçları); günde sekiz \
+birim ve malzeme bu projenin varsayımı"""
+source_en = """20 m bucket truck from 2000 TL an hour, 30 % off by the day; \
+electrician's day 3000 to 4000 TL (Ankara, 2026 search results); eight \
+units a day and the materials are this project's assumption"""
+note = """Zaten duran bir aydınlatma direğine birim takmanın bedeli. 3000 \
+TL idi ve hiçbir şeye dayanmıyordu. Şimdi kalemlerden: sepetli araç günü \
+11200 TL, usta ve yardımcısı 6000 TL, bir ekip günde sekiz birim takar, \
+yani birim başına 2150 TL; paslanmaz kelepçe, kablo ve sigorta 300 TL. \
+Toplam 2450 TL. Kutu ve güç kaynağı zaten birimin içinde (bom.toml, \
+"diğer")."""
+note_en = """What fitting a unit to a lighting column that already stands \
+costs. It was 3000 TL and rested on nothing. Now from its items: a \
+bucket truck day is 11200 TL, an electrician and a helper 6000 TL, a \
+crew fits eight units a day, so 2150 TL a unit; stainless clamps, cable \
+and a fuse 300 TL. 2450 TL in all. The enclosure and the power supply \
+are already inside the unit (bom.toml, "other")."""
+affects = "aydınlatma direğindeki her direğin CAPEX'ini; şehir içi sermayenin çoğu"
+affects_en = "CAPEX of every anchor on a column; most of the urban capital"
+sensitivity = """günde sekiz yerine dört birim takılırsa 4600 TL olur ve şehir \
+içi CAPEX yarıdan fazla artar"""
+sensitivity_en = """four units a day instead of eight makes it 4600 TL and \
+raises urban CAPEX by more than half"""
 
 [values."mounting.tall_mast.height_m"]
 value = 25.0
@@ -198,46 +216,99 @@ sensitivity = "direk yerleşiminde etkisi yok: direklerde şebeke elektriği yok
 sensitivity_en = "no effect on a mast deployment: masts have no mains"
 
 [values."operating.anchor_kwh_per_year"]
-value = 35.0
+value = 3.0
 unit = "kWh/year"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = "Tek bir direğin yıllık tüketimi."
-note_en = "One anchor's annual consumption."
-affects = "şebeke elektriği taşıyan yapılardaki direklerin OPEX'ini"
-affects_en = "OPEX of anchors on structures that carry mains"
-sensitivity = "direk yerleşiminde etkisi yok: direklerde şebeke elektriği yok"
-sensitivity_en = "no effect on a mast deployment: masts have no mains"
+provenance = "DERIVED"
+source = "SX1280 ve STM32G0 veri sayfaları, bu projenin hesabı"
+source_en = "SX1280 and STM32G0 datasheets, this project's arithmetic"
+note = """Bir yayın biriminin yıllık tüketimi. 35 kWh idi, yani sürekli \
+4 W: bir SX1280 kartı için on kat fazla. Birim zamanının neredeyse \
+tamamında dinliyor; SX1280 dinlerken birkaç mA, mikrodenetleyici bir iki \
+mA çeker, 3,3 V'ta ikisi 30 mW'ı bulmaz. Şebeke dönüştürücüsünün boştaki \
+kaybı ve yanıt yayınları eklenince ortalama 0,34 W'ı geçmiyor: yılda \
+3 kWh. Bu cömert bir üst sınır."""
+note_en = """One broadcast unit's yearly consumption. It was 35 kWh, a \
+steady 4 W, ten times too much for an SX1280 board. The unit spends \
+nearly all its time listening: the SX1280 draws a few mA doing that and \
+the microcontroller one or two, under 30 mW together at 3,3 V. With the \
+mains converter's idle loss and the replies it sends, the average stays \
+under 0,34 W, which is 3 kWh a year. That is a generous upper bound."""
+affects = """şebekeli direklerin enerji kalemini ve şebeke dışı beslemenin \
+boyutunu"""
+affects_en = """the energy line of mains-fed anchors and the size of an \
+off-grid supply"""
+sensitivity = "enerji kalemi her satırda OPEX'in %1'inden az"
+sensitivity_en = "the energy line is under 1 % of OPEX in every row"
 
 [values."operating.connectivity_tl_per_year"]
-value = 600.0
+value = 1188.0
 unit = "TL/year"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = """Kendi taşıma hattı olmayan her direk için bir hücresel veri paketi."""
-note_en = "A cellular data plan per anchor that has no backhaul of its own."
-affects = "OPEX'i; kırsal satırın %15,1'i"
-affects_en = "OPEX; 15,1 % of the rural row"
-sensitivity = "iki katına çıkarmak kırsal OPEX'i %15,1 artırır"
-sensitivity_en = "doubling it raises rural OPEX by 15,1 %"
+provenance = "DATASHEET"
+source = "Turkcell M2M IOT 2 GB, 99 TL/ay, KDV ve ÖİV dahil (2026)"
+source_en = "Turkcell M2M IOT 2 GB, 99 TL a month including VAT and ÖİV (2026)"
+note = """Bir hücresel veri paketinin yıllık bedeli. 600 TL varsayılmıştı; \
+bulunan en ucuz kurumsal M2M paketi ayda 99 TL, yani yılda 1188 TL. \
+Varsayım gerçek fiyatın yarısıydı. Ucuzlatmanın yolu paketi ucuz \
+varsaymak değil, paylaşmak: bkz. operating.anchors_per_data_plan."""
+note_en = """What a cellular data plan costs a year. 600 TL had been \
+assumed; the cheapest corporate M2M plan found is 99 TL a month, 1188 TL \
+a year. The assumption was half the real price. The way to spend less \
+is to share the plan, not to assume it cheap: see \
+operating.anchors_per_data_plan."""
+affects = "kendi hattı olmayan direklerin OPEX'ini"
+affects_en = "OPEX of anchors with no line of their own"
+sensitivity = """paylaşım sayısına bölünür; on direğe bir paketle direk başına \
+yılda 119 TL"""
+sensitivity_en = """divided by how many share a plan; one plan for ten anchors \
+is 119 TL an anchor a year"""
+
+[values."operating.anchors_per_data_plan"]
+value = 10.0
+unit = "anchors"
+provenance = "DESIGN"
+source = "bu proje, bir tasarım kararı olarak"
+source_en = "this project, as a design choice"
+note = """Bir veri paketini kaç direğin paylaştığı. Direk merkeze yalnızca \
+durum ve anahtar güncellemesi gönderiyor, günde birkaç kilobayt. Kendi \
+hattı olmayan bir direk bunu zaten konuştuğu SX1280 bağlantısıyla bir \
+komşusuna aktarır; ölçüm bağlantısı kapanan her komşu bu iş için de \
+yeter. On direğe bir paket, 2 GB'lık paketin binde birini kullanır."""
+note_en = """How many anchors share one data plan. An anchor sends the \
+centre only its status and key updates, a few kilobytes a day. One with \
+no line of its own passes them over the SX1280 link it already uses to \
+a neighbour; any neighbour whose ranging link closes will do. One plan \
+for ten anchors uses a thousandth of a 2 GB plan."""
+affects = "bağlantı kalemini"
+affects_en = "the connectivity line"
+sensitivity = "1 yapmak her direğe ayrı paket demek, kalemi on katına çıkarır"
+sensitivity_en = "1 means a plan per anchor and multiplies the line by ten"
 
 [values."operating.off_grid_supply_tl"]
-value = 9500.0
+value = 2600.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = """Şebekesi olmayan bir yapıdaki direk için güneş paneli, akü ve regülatör. \
-Bir kez, sermayeye yazılır."""
-note_en = """A solar panel, battery and regulator, for an anchor on a structure with \
-no mains. Charged once, to capital."""
-affects = """CAPEX ve OPEX'i; yerleşim aramasının bulduğu en ucuz düzenin %72,6'sı"""
-affects_en = """CAPEX and OPEX; 72,6 % of the cheapest deployment the siting search \
-finds"""
-sensitivity = "iki katına çıkarmak kırsal OPEX'i %30,0, CAPEX'i %9,9 artırır"
-sensitivity_en = "doubling it raises rural OPEX by 30,0 % and CAPEX by 9,9 %"
+source = """10 W güneş paneli 518,72-700 TL, 12 V 7 Ah kuru akü 611,27 TL \
+(Akakçe, Power Enerji, Eylül 2026); denetleyici, tutucu ve kablo bu \
+projenin varsayımı"""
+source_en = """10 W solar panel 518,72 to 700 TL, 12 V 7 Ah sealed battery \
+611,27 TL (Akakçe, Power Enerji, September 2026); the controller, bracket \
+and cable are this project's assumption"""
+note = """Şebekesi olmayan bir yapıdaki direk için panel, akü, denetleyici, \
+tutucu ve kablo. 9500 TL idi; o, birimin 4 W çektiği varsayımına göre \
+boyutlanmıştı. 0,34 W'lık bir yük günde 8 Wh ister: Ankara'nın kışında \
+günde iki saatlik tam güneşle 10 W'lık panel bunu verir, 84 Wh'lik akü \
+beş günü taşır. Panel 700, akü 611,27, denetleyici, tutucu ve kablo \
+1289 TL: 2600 TL."""
+note_en = """Panel, battery, controller, bracket and cable for an anchor on \
+a structure with no mains. It was 9500 TL, sized for a unit that drew \
+4 W. A 0,34 W load needs 8 Wh a day: a 10 W panel gives that on two \
+hours of full sun in an Ankara winter, and an 84 Wh battery carries five \
+days. Panel 700, battery 611,27, controller, bracket and cable 1289 TL: \
+2600 TL."""
+affects = "şebeke dışı direklerin CAPEX ve OPEX'ini"
+affects_en = "CAPEX and OPEX of off-grid anchors"
+sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
+sensitivity_en = "no effect on an anchor on a structure with mains"
 
 [values."operating.service_life_years"]
 value = 8.0
@@ -253,31 +324,41 @@ sensitivity = "iki katına çıkarmak kırsal OPEX'i %16,7 düşürür"
 sensitivity_en = "doubling it lowers rural OPEX by 16,7 %"
 
 [values."operating.maintenance_visits_per_year"]
-value = 0.5
+value = 0.2
 unit = "visits/year"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = "Bir direğe planlı bakım: iki yılda bir ziyaret."
-note_en = "Scheduled attendance at an anchor: one visit every two years."
-affects = "OPEX'i; bakımın kırsal satırda tuttuğu %45,4'ün bir parçası"
-affects_en = "OPEX; part of the 45,4 % maintenance takes of the rural row"
-sensitivity = "iki katına çıkarmak kırsal OPEX'i %22,7 artırır"
-sensitivity_en = "doubling it raises rural OPEX by 22,7 %"
+provenance = "DESIGN"
+source = "bu proje, bir işletme kararı olarak"
+source_en = "this project, as an operating choice"
+note = """Bir direğe yılda kaç kez gidildiği. 0,5 idi: takvime bağlı, iki \
+yılda bir ziyaret. Oysa merkezî sistem her birimin durumunu zaten \
+görüyor (rapor: yayın birimlerinin kayıtları izlenir). Ekip takvimle \
+değil arıza olduğunda gider. Beş yılda bir arıza, kapalı bir kart için \
+kötümser bir sayı."""
+note_en = """How often an anchor is visited a year. It was 0,5, a \
+calendar visit every two years. But the central system already sees \
+every unit's status (the report: the units' records are monitored). A \
+crew goes when one fails rather than by the calendar. One failure in \
+five years is a pessimistic figure for a sealed board."""
+affects = "OPEX'i; bakım her senaryoda en büyük kalemdi"
+affects_en = "OPEX; maintenance was the largest line in every scenario"
+sensitivity = "0,5'e geri çekmek bakım kalemini 2,5 katına çıkarır"
+sensitivity_en = "putting it back to 0,5 multiplies the maintenance line by 2,5"
 
 [values."operating.extra_off_grid_visits_per_year"]
-value = 0.5
+value = 0.25
 unit = "visits/year"
 provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
-note = """Şebeke dışı bir sahanın gerektirdiği ek bakım: aküler yaşlanır, paneller \
-kirlenir."""
-note_en = """The extra attendance an off-grid site needs: batteries age, panels foul."""
-affects = "şebeke dışı yapılardaki direklerin OPEX'ini"
+note = """Şebeke dışı bir sahanın ek bakımı: kuru akü dört yılda bir \
+değişir, panel o ziyarette temizlenir."""
+note_en = """The extra attendance an off-grid site needs: the sealed \
+battery is replaced every four years and the panel cleaned on that \
+visit."""
+affects = "şebeke dışı direklerin OPEX'ini"
 affects_en = "OPEX of anchors on structures with no mains"
-sensitivity = "iki katına çıkarmak kırsal OPEX'i %22,7 artırır"
-sensitivity_en = "doubling it raises rural OPEX by 22,7 %"
+sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
+sensitivity_en = "no effect on an anchor on a structure with mains"
 
 [values."operating.maintenance_tl_per_visit"]
 value = 1800.0

@@ -1,0 +1,230 @@
+# Malzeme listesi, parça parça. / The bill of materials, part by part.
+#
+# Raporun 14. sayfası her ürün için iki toplam veriyor: 1 adet ve 100
+# adette birim fiyat. Parça fiyatlarını vermiyor. Burada her ana parça
+# kendi satıcı fiyatıyla yazılı; raporun toplamından bu parçalar
+# çıkarılınca kalan "diğer" kalemi (güç dönüşümü, koruma, bağlantı,
+# kutu) ayrıca yazılı. Üç yayın biriminde de bu kalan 1 adette 18 USD
+# civarında çıkıyor, yani döküm raporla tutarlı.
+#
+# The report gives two totals per product and no part prices. Here each
+# main part carries its own distributor price, and what is left of the
+# report's total once they are taken out is written down as "other".
+# It comes to about 18 USD at one unit for all three broadcast units,
+# which is what says the breakdown agrees with the report (ADR-0079).
+#
+# Fiyatlar 23 Eylül 2026'da web aramasının döndürdüğü satıcı
+# fiyatlarıdır. Bu oturumun ağ politikası satıcı sitelerini açmaya izin
+# vermediği için sayfalar tek tek açılıp kademe kademe doğrulanamadı.
+# The prices are the distributor prices a web search returned on 23
+# September 2026. The session's network policy did not allow opening
+# the distributor pages, so no price tier was read off a page directly.
+
+#: TL per USD. Early September 2026; the report used the 4 September
+#: rate and did not print it.
+usd_try = 48.4
+usd_try_source = "USD/TRY 4-7 Eylül 2026 aralığı, arama sonuçları (valutafx, exchangerates.org.uk)"
+
+#: The 1000 unit price over the 100 unit price. No distributor tier at
+#: 1000 was readable, so this is an assumption, and the only one in the
+#: bill. The report's own 100 over 1 is 0,69 to 0,80 per line.
+thousand_over_hundred = 0.90
+
+#: Which tier the table prices a deployment at. A thousand, because the
+#: operating model already shares the central system across a thousand
+#: anchors (`operating.anchors_sharing_central_operation`); pricing the
+#: hardware at a hundred while running it as one of a thousand was two
+#: network sizes in one row.
+used_tier = 1000
+
+# --- Parts ------------------------------------------------------------------
+
+[[part]]
+key = "lambda80-24s"
+name = "RF Solutions LAMBDA80-24S"
+role.tr = "SX1280 telsiz modülü, 12,5 dBm"
+role.en = "SX1280 radio module, 12,5 dBm"
+usd = 16.49
+seller = "DigiKey"
+url = "https://www.digikey.co.uk/en/products/detail/rf-solutions/LAMBDA80-24S/9749701"
+
+[[part]]
+key = "e28-2g4m12s"
+name = "EBYTE E28-2G4M12S"
+role.tr = "SX1280 telsiz modülü, 12,5 dBm"
+role.en = "SX1280 radio module, 12,5 dBm"
+usd = 4.3869
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C411310.html"
+
+[[part]]
+key = "e28-2g4m27s"
+name = "EBYTE E28-2G4M27S"
+role.tr = "SX1280 telsiz modülü, yükselteçli, 27 dBm"
+role.en = "SX1280 radio module with an amplifier, 27 dBm"
+usd = 8.7416
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C411312.html"
+
+[[part]]
+key = "w24p-u"
+name = "Inventek W24P-U"
+role.tr = "2,4 GHz anten"
+role.en = "2,4 GHz antenna"
+usd = 1.48
+seller = "DigiKey"
+url = "https://www.digikey.com/en/products/detail/inventek-systems/W24P-U/4488778"
+
+[[part]]
+key = "stm32g0b1met6"
+name = "STM32G0B1MET6"
+role.tr = "mikrodenetleyici, 512 KB"
+role.en = "microcontroller, 512 KB"
+usd = 3.613
+seller = "DigiKey"
+url = "https://octopart.com/search?q=STM32G0B1MET6"
+
+[[part]]
+key = "stm32g031k8t6"
+name = "STM32G031K8T6"
+role.tr = "mikrodenetleyici, 64 KB"
+role.en = "microcontroller, 64 KB"
+usd = 1.9287
+seller = "LCSC"
+url = "https://lcsc.com/product-detail/ST-Microelectronics_STMicroelectronics_C432203.html"
+
+[[part]]
+key = "atecc608b"
+name = "Microchip ATECC608B"
+role.tr = "kimlik ve anahtar yongası"
+role.en = "identity and key chip"
+usd = 1.0811
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C1518773.html"
+
+[[part]]
+key = "dwm3000-digikey"
+name = "Qorvo DWM3000TR13"
+role.tr = "UWB telsiz modülü"
+role.en = "UWB radio module"
+usd = 23.62
+seller = "DigiKey"
+url = "https://www.digikey.com/en/products/detail/qorvo/DWM3000TR13/24367320"
+
+[[part]]
+key = "dwm3000-lcsc"
+name = "Qorvo DWM3000TR13"
+role.tr = "UWB telsiz modülü"
+role.en = "UWB radio module"
+usd = 16.6039
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C5299931.html"
+
+[[part]]
+key = "esp32-s3"
+name = "Espressif ESP32-S3-WROOM-1-N8"
+role.tr = "telefon bağlantısı (BLE)"
+role.en = "phone link (BLE)"
+usd = 3.0323
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C2913198.html"
+
+[[part]]
+key = "bno085"
+name = "CEVA BNO085"
+role.tr = "hareket sensörü"
+role.en = "motion sensor"
+usd = 13.57
+seller = "DigiKey"
+url = "https://www.digikey.com/en/products/detail/ceva-technologies-inc/BNO085/9445940"
+
+[[part]]
+key = "tcan1051"
+name = "TI TCAN1051HGVDRQ1"
+role.tr = "CAN hattı sürücüsü"
+role.en = "CAN transceiver"
+usd = 1.8732
+seller = "LCSC"
+url = "https://lcsc.com/product-detail/Others_TI_TCAN1051HGVDRQ1_TCAN1051HGVDRQ1_C190987.html"
+
+[[part]]
+key = "nhd-2.8"
+name = "Newhaven NHD-2.8-240320DA-CTXN-T"
+role.tr = "2,8 inç ekran"
+role.en = "2,8 inch display"
+usd = 21.80
+seller = "Newhaven"
+url = "https://newhavendisplay.com/2-8-inch-standard-tn-lcd-tft/"
+
+[[part]]
+key = "ili9341-2.8"
+name = "2,8 inç ILI9341 SPI TFT modülü"
+role.tr = "2,8 inç ekran"
+role.en = "2,8 inch display"
+usd = 10.90
+seller = "Elecrow"
+url = "https://www.elecrow.com/2-8-inch-320x240-spi-serial-tft-lcd-module-display-with-driver-ic-ili9341.html"
+
+# --- Products ---------------------------------------------------------------
+#
+# `report` is the line of page 14 the product is priced from, with its
+# two totals. `was` is what that line contains; `parts` is what goes in
+# now. The difference is priced at one unit and carried to 100 and 1000
+# by the report's own ratio between its two columns.
+
+[[product]]
+key = "sx1280-anchor"
+name.tr = "Şehir içi ve kırsal yayın birimi"
+name.en = "Urban and rural broadcast unit"
+report.tr = "Şehir içi yayın birimi"
+report.en = "Urban broadcast unit"
+report_one_tl = 1983.71
+report_hundred_tl = 1366.07
+was = ["lambda80-24s", "w24p-u", "stm32g0b1met6", "atecc608b"]
+parts = ["e28-2g4m12s", "w24p-u", "stm32g031k8t6", "atecc608b"]
+
+[[product]]
+key = "amplified-anchor"
+name.tr = "Yükselteçli yayın birimi"
+name.en = "Amplified broadcast unit"
+report.tr = "Kırsal yayın birimi"
+report.en = "Rural broadcast unit"
+report_one_tl = 1549.67
+report_hundred_tl = 1082.68
+was = ["e28-2g4m27s", "stm32g0b1met6", "atecc608b"]
+parts = ["e28-2g4m27s", "stm32g031k8t6", "atecc608b"]
+
+[[product]]
+key = "tunnel-anchor"
+name.tr = "Kritik bölge yayın birimi"
+name.en = "Critical area broadcast unit"
+report.tr = "Kritik bölge yayın birimi"
+report.en = "Critical area broadcast unit"
+report_one_tl = 2241.42
+report_hundred_tl = 1634.44
+was = ["dwm3000-digikey", "stm32g0b1met6", "atecc608b"]
+parts = ["dwm3000-lcsc", "stm32g031k8t6", "atecc608b"]
+
+[[product]]
+key = "pedestrian"
+name.tr = "Yaya alıcısı"
+name.en = "Pedestrian receiver"
+report.tr = "Yaya alıcısı"
+report.en = "Pedestrian receiver"
+report_one_tl = 3913.16
+report_hundred_tl = 3117.74
+was = ["lambda80-24s", "dwm3000-digikey", "esp32-s3", "bno085", "atecc608b"]
+parts = ["e28-2g4m12s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b"]
+
+[[product]]
+key = "vehicle"
+name.tr = "Kara aracı alıcısı"
+name.en = "Vehicle receiver"
+report.tr = "Kara aracı alıcısı"
+report.en = "Vehicle receiver"
+report_one_tl = 5202.69
+report_hundred_tl = 4002.29
+was = ["lambda80-24s", "dwm3000-digikey", "stm32g0b1met6", "bno085",
+       "atecc608b", "tcan1051", "nhd-2.8"]
+parts = ["e28-2g4m12s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
+         "atecc608b", "tcan1051", "ili9341-2.8"]

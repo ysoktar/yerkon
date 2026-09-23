@@ -148,7 +148,8 @@ def _sx1280_family(
         ),
         sensitivity_dbm=Sourced(
             -132.0, "dBm", Provenance.DATASHEET,
-            "RF Solutions LAMBDA80 datasheet, best-case LoRa sensitivity",
+            "Semtech SX1280 datasheet, best-case LoRa sensitivity; the "
+            "module only carries the chip",
         ),
         noise_figure_db=settings.sourced("radio.sx1280.noise_figure_db"),
         ranging_bandwidth_hz=Sourced(
@@ -201,8 +202,8 @@ def radios(settings: Settings = DEFAULTS) -> dict:
     come from the settings file like every other figure nobody supplied.
     """
     urban = _sx1280_family(
-        "Semtech SX1280 (RF Solutions LAMBDA80-24S)", 12.5,
-        "RF Solutions LAMBDA80-24S datasheet, maximum output power",
+        "Semtech SX1280 (EBYTE E28-2G4M12S)", 12.5,
+        "EBYTE E28-2G4M12S user manual, maximum output power",
         settings,
     )
     rural = _sx1280_family(
@@ -223,18 +224,29 @@ def radios(settings: Settings = DEFAULTS) -> dict:
 
 
 SX1280 = _sx1280_family(
-    "Semtech SX1280 (RF Solutions LAMBDA80-24S)",
+    "Semtech SX1280 (EBYTE E28-2G4M12S)",
     12.5,
-    "RF Solutions LAMBDA80-24S datasheet, maximum output power",
+    "EBYTE E28-2G4M12S user manual, maximum output power",
 )
-"""The urban anchor's radio, and the one in both receivers."""
+"""The town's and the open country's anchor radio, and the one in both
+receivers.
+
+It was an RF Solutions LAMBDA80-24S at 16,49 USD. The EBYTE module
+carries the same Semtech chip at the same 12,5 dBm for 4,39 USD, so
+nothing a link budget reads changes (ADR-0079)."""
 
 E28_2G4M27S = _sx1280_family(
     "EBYTE E28-2G4M27S",
     27.0,
     "EBYTE E28-2G4M27S product page, rated output power",
 )
-"""The rural anchor's radio: the same silicon behind a power amplifier."""
+"""The same silicon behind a power amplifier.
+
+No row uses it any more. In Turkey the density limit caps radiated power
+at 12,1 dBm at the ranging bandwidth, which the plain module already
+reaches, so the amplifier's 27 dBm cannot be used there. Under rules
+that allow it, the United States', it still can, which is why the
+design tool keeps it (ADR-0079)."""
 
 DWM3000 = Radio(
     part="Qorvo DWM3000",

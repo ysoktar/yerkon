@@ -16,6 +16,7 @@ hides that is worse than no total.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 from yerkon.evidence import Provenance, Sourced
@@ -35,26 +36,47 @@ class Product:
             raise ValueError("a product does not pay you to buy it")
 
 
-def _bom(name: str, price_tl: float) -> Product:
+def _bom(key: str, name: str) -> Product:
+    """A product priced from the itemised bill (`bom.py`, ADR-0079).
+
+    Derived rather than read off a datasheet: every part carries its own
+    distributor price, but the tier the table uses is carried from the
+    report's two columns and, at a thousand, by one assumed ratio.
+    """
+    from yerkon.bom import read
+
+    bill = read()
+    board = bill.boards[key]
     return Product(
         name=name,
         unit_price_tl=Sourced(
-            price_tl, "TL", Provenance.DATASHEET,
-            "YERKON report, bill of materials, page 14",
-            note="Hundred-unit tier, priced 6 September 2026.",
+            round(bill.price(key), 2), "TL", Provenance.DERIVED,
+            "bom.toml, itemised from the YERKON report's page 14",
+            note=(
+                "{} units; cheaper parts where the same function was "
+                "found for less; see ADR-0079.".format(bill.used_tier)
+            ),
         ),
     )
 
 
-URBAN_ANCHOR = _bom("Şehir içi yayın birimi", 1366.07)
-RURAL_ANCHOR = _bom("Kırsal yayın birimi", 1082.68)
-TUNNEL_ANCHOR = _bom("Kritik bölge yayın birimi", 1634.44)
-PEDESTRIAN_RECEIVER = _bom("Yaya alıcısı", 3117.74)
-VEHICLE_RECEIVER = _bom("Kara aracı alıcısı", 4002.29)
+#: The broadcast unit the town and the open country both use.
+#:
+#: They were two lines of the report because they carried two radio
+#: modules. The amplifier in the rural one buys nothing in Turkey: the
+#: density limit caps radiated power at 12,1 dBm at the ranging
+#: bandwidth, which the plain module already reaches. With the same
+#: module they are the same board (ADR-0079).
+SX1280_ANCHOR = _bom("sx1280-anchor", "Şehir içi ve kırsal yayın birimi")
+#: The amplified unit, kept for rules that let the amplifier speak.
+AMPLIFIED_ANCHOR = _bom("amplified-anchor", "Yükselteçli yayın birimi")
+TUNNEL_ANCHOR = _bom("tunnel-anchor", "Kritik bölge yayın birimi")
+PEDESTRIAN_RECEIVER = _bom("pedestrian", "Yaya alıcısı")
+VEHICLE_RECEIVER = _bom("vehicle", "Kara aracı alıcısı")
 
 PRODUCTS = {
-    "urban": URBAN_ANCHOR,
-    "rural": RURAL_ANCHOR,
+    "anchor": SX1280_ANCHOR,
+    "amplified": AMPLIFIED_ANCHOR,
     "tunnel": TUNNEL_ANCHOR,
     "pedestrian": PEDESTRIAN_RECEIVER,
     "vehicle": VEHICLE_RECEIVER,
@@ -67,8 +89,8 @@ PRODUCTS = {
 #: is three different products, and pricing it as one would put a
 #: thousand lira of difference per anchor in the wrong place.
 ANCHOR_PRODUCT_BY_PART = {
-    "Semtech SX1280 (RF Solutions LAMBDA80-24S)": URBAN_ANCHOR,
-    "EBYTE E28-2G4M27S": RURAL_ANCHOR,
+    "Semtech SX1280 (EBYTE E28-2G4M12S)": SX1280_ANCHOR,
+    "EBYTE E28-2G4M27S": AMPLIFIED_ANCHOR,
     "Qorvo DWM3000": TUNNEL_ANCHOR,
 }
 
@@ -152,6 +174,9 @@ class OperatingRates:
     electricity_tl_per_kwh: Sourced
     anchor_kwh_per_year: Sourced
     connectivity_tl_per_year: Sourced
+    #: Anchors that share one plan, passing their few bytes to it over
+    #: the radio they already range with (ADR-0079).
+    anchors_per_data_plan: Sourced
     #: A standalone supply for an anchor on a structure with no mains.
     off_grid_supply_tl: Sourced
     #: How long a unit lasts before it is replaced.
@@ -336,7 +361,10 @@ def price(
         * float(rates.anchor_kwh_per_year.value)
         * float(rates.electricity_tl_per_kwh.value)
     )
-    connectivity_tl = unconnected * float(rates.connectivity_tl_per_year.value)
+    plans = math.ceil(
+        unconnected / max(float(rates.anchors_per_data_plan.value), 1.0)
+    )
+    connectivity_tl = plans * float(rates.connectivity_tl_per_year.value)
     replacement_tl = (units_tl + supplies_tl) / max(
         float(rates.service_life_years.value), 1e-9
     )
@@ -358,7 +386,8 @@ def price(
         ),
         LineItem(
             "connectivity", connectivity_tl,
-            "{} anchors without existing backhaul".format(unconnected),
+            "{} plans for {} anchors without existing backhaul".format(
+                plans, unconnected),
             rates.connectivity_tl_per_year.provenance,
         ),
         LineItem(

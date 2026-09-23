@@ -23,9 +23,8 @@ import numpy as np
 from yerkon.cost import (
     PEDESTRIAN_RECEIVER,
     anchor_product,
-    RURAL_ANCHOR,
     TUNNEL_ANCHOR,
-    URBAN_ANCHOR,
+    SX1280_ANCHOR,
     VEHICLE_RECEIVER,
     AnchorSite,
     Inventory,
@@ -580,7 +579,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             # are lost here than anywhere else in the study.
             packet_loss=settings.number("site.urban_packet_loss"),
         ),
-        product=URBAN_ANCHOR,
+        product=SX1280_ANCHOR,
         mounting=mounting["lighting_column"],
         route_km=URBAN_ROAD.length_m / 1000.0,
         environment="Dış",
@@ -609,7 +608,11 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     RURAL_X, RURAL_Y,
                     settings.number("rural.anchor_spacing_m"),
                     mounting["tall_mast"], RURAL_TERRAIN,
-                    radio=module["e28"], prefix="M",
+                    # The plain module: the amplified one's extra power
+                    # is not legal at this bandwidth in Turkey, and the
+                    # link budget caps it to the same 12,1 dBm either
+                    # way (ADR-0079).
+                    radio=module["sx1280"], prefix="M",
                     stagger_m=settings.number("rural.anchor_stagger_m"),
                 ),
                 receivers=(
@@ -642,7 +645,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
             packet_loss=settings.number("ranging.packet_loss"),
         ),
-        product=RURAL_ANCHOR,
+        product=SX1280_ANCHOR,
         mounting=mounting["tall_mast"],
         route_km=RURAL_ROAD.length_m / 1000.0,
         environment="Dış",

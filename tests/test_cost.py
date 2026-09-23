@@ -7,8 +7,8 @@ import pytest
 from yerkon.cost import (
     DEFAULT_RATES,
     PRODUCTS,
-    RURAL_ANCHOR,
-    URBAN_ANCHOR,
+    AMPLIFIED_ANCHOR,
+    SX1280_ANCHOR,
     VEHICLE_RECEIVER,
     AnchorSite,
     Inventory,
@@ -20,7 +20,7 @@ from yerkon.evidence import Provenance
 from yerkon.world import LIGHTING_COLUMN, SIGNALLED_COLUMN, TALL_MAST
 
 
-def site(mounting=TALL_MAST, product=RURAL_ANCHOR):
+def site(mounting=TALL_MAST, product=SX1280_ANCHOR):
     return AnchorSite(
         product=product,
         structure=mounting.kind,
@@ -39,21 +39,74 @@ def an_inventory(count=13, mounting=TALL_MAST, **kwargs):
 # --- The bill of materials ------------------------------------------------
 
 
-def test_the_prices_are_the_ones_the_report_published():
-    assert float(URBAN_ANCHOR.unit_price_tl.value) == 1366.07
-    assert float(RURAL_ANCHOR.unit_price_tl.value) == 1082.68
-    assert float(VEHICLE_RECEIVER.unit_price_tl.value) == 4002.29
+def test_the_bill_starts_from_the_report_s_own_totals():
+    """ADR-0079. With the report's parts in, the report's number comes out.
+
+    The report prints a total per product and no part prices. The bill
+    takes the named parts out at their distributor prices and calls what
+    is left "other"; put the same parts back and the total is the
+    report's to the lira, at one unit and at a hundred.
+    """
+    from yerkon.bom import read
+
+    for board in read().boards.values():
+        back = (board.other_usd + sum(p.usd for p in board.was)) * board.usd_try
+        assert back == pytest.approx(board.report_one_tl)
+        assert back * board.hundred_over_one == pytest.approx(
+            board.report_hundred_tl)
+
+
+def test_what_is_left_of_each_anchor_is_the_same_board():
+    """The check that says the breakdown agrees with the report.
+
+    Taking each anchor's named parts out of the report's total leaves
+    power conversion, protection, connectors and an enclosure, which are
+    the same whatever radio sits on the board. If the three remainders
+    disagreed by much, a part price here would be wrong. They agree to
+    within a dollar.
+    """
+    from yerkon.bom import read
+
+    left = [read().boards[k].other_usd
+            for k in ("sx1280-anchor", "amplified-anchor", "tunnel-anchor")]
+    assert max(left) - min(left) < 1.0
+    assert all(15.0 < usd < 22.0 for usd in left)
+
+
+def test_no_part_is_swapped_for_a_dearer_one():
+    from yerkon.bom import read
+
+    for board in read().boards.values():
+        for gone, came in board.swapped:
+            assert came.usd < gone.usd, (board.key, gone.name, came.name)
+        assert board.one_tl <= board.report_one_tl
+
+
+def test_the_table_prices_hardware_for_the_network_it_runs():
+    """A thousand units, because the operating model runs a thousand.
+
+    The central system is shared across a thousand anchors in the
+    operating rates. Pricing the hardware at a hundred while running it
+    as one of a thousand put two network sizes in one row.
+    """
+    from yerkon.bom import read
+
+    assert read().used_tier == int(
+        float(DEFAULT_RATES.anchors_sharing_central_operation.value))
+    board = read().boards["sx1280-anchor"]
+    assert float(SX1280_ANCHOR.unit_price_tl.value) == pytest.approx(
+        board.thousand_tl, abs=0.01)
 
 
 def test_every_product_the_report_names_is_reachable():
     assert set(PRODUCTS) == {
-        "urban", "rural", "tunnel", "pedestrian", "vehicle"
+        "anchor", "amplified", "tunnel", "pedestrian", "vehicle"
     }
 
 
-def test_a_price_comes_from_the_report_and_says_so():
-    assert URBAN_ANCHOR.unit_price_tl.provenance is Provenance.DATASHEET
-    assert "page 14" in URBAN_ANCHOR.unit_price_tl.source
+def test_a_price_comes_from_the_bill_and_says_so():
+    assert SX1280_ANCHOR.unit_price_tl.provenance is Provenance.DERIVED
+    assert "bom.toml" in SX1280_ANCHOR.unit_price_tl.source
 
 
 def test_a_product_cannot_cost_less_than_nothing():
@@ -92,7 +145,16 @@ def test_a_junction_cabinet_saves_the_data_plan_and_nothing_else():
     so the capital does not move. Only the connectivity line does, and
     only by the share of anchors that stand at a junction.
     """
-    plain = price(an_inventory(count=4, mounting=LIGHTING_COLUMN))
+    import dataclasses
+
+    # One plan per anchor, so the junction's saving is not hidden inside
+    # a plan that three anchors would have shared anyway.
+    rates = dataclasses.replace(
+        DEFAULT_RATES,
+        anchors_per_data_plan=dataclasses.replace(
+            DEFAULT_RATES.anchors_per_data_plan, value=1.0),
+    )
+    plain = price(an_inventory(count=4, mounting=LIGHTING_COLUMN), rates)
     mixed = Inventory(
         anchors=(
             site(SIGNALLED_COLUMN), site(LIGHTING_COLUMN),
@@ -100,7 +162,7 @@ def test_a_junction_cabinet_saves_the_data_plan_and_nothing_else():
         ),
         service_area_km2=57.2, route_km=24.0,
     )
-    connected = price(mixed)
+    connected = price(mixed, rates)
 
     assert connected.capex_tl == pytest.approx(plain.capex_tl)
     assert mixed.off_grid_anchors == 0, "every column has mains"
@@ -212,9 +274,20 @@ def test_an_off_grid_site_is_visited_more_often():
 
 
 def test_operating_cost_responds_to_node_count():
-    """ADR-0006: a design change that halves the anchors halves most of it."""
-    thirteen = price(an_inventory(count=13)).opex_tl_per_year
-    twenty_six = price(an_inventory(count=26)).opex_tl_per_year
+    """ADR-0006: a design change that halves the anchors halves most of it.
+
+    With a plan per anchor, so the plans that ten anchors share do not
+    round the answer (ADR-0079).
+    """
+    import dataclasses
+
+    rates = dataclasses.replace(
+        DEFAULT_RATES,
+        anchors_per_data_plan=dataclasses.replace(
+            DEFAULT_RATES.anchors_per_data_plan, value=1.0),
+    )
+    thirteen = price(an_inventory(count=13), rates).opex_tl_per_year
+    twenty_six = price(an_inventory(count=26), rates).opex_tl_per_year
     assert twenty_six == pytest.approx(2.0 * thirteen, rel=0.01)
 
 
@@ -243,7 +316,8 @@ def test_receivers_are_counted_apart_from_the_infrastructure():
             service_area_km2=10.0,
         )
     )
-    assert costing.receiver_tl == pytest.approx(100 * 4002.29)
+    assert costing.receiver_tl == pytest.approx(
+        100 * float(VEHICLE_RECEIVER.unit_price_tl.value))
     assert costing.receiver_tl not in [item.tl for item in costing.capital]
     assert costing.capex_tl < costing.receiver_tl
 
@@ -266,17 +340,32 @@ def test_the_structures_line_carries_the_weakest_provenance_under_it():
 
 
 def test_the_description_warns_before_it_is_quoted():
-    printed = price(an_inventory()).describe()
+    from yerkon.numbers import decimal_comma
+
+    costing = price(an_inventory())
+    printed = costing.describe()
     assert "rests on figures nobody supplied" in printed
     assert "(assumed)" in printed
-    assert "," in printed and "1242574,84" in printed.replace(" ", "")
+    total = decimal_comma(costing.capex_tl, 2)
+    assert "," in total and total in printed.replace(" ", "")
 
 
-def test_the_default_rates_are_all_marked_as_assumptions():
-    """None of them was supplied, and none of them should look sourced."""
+def test_a_rate_looks_sourced_only_when_it_names_its_source():
+    """Most of them were supplied by nobody, and those must say so.
+
+    ADR-0079 gave three of them something to rest on: a published tariff
+    for the data plan, a datasheet sum for the energy, and two operating
+    choices. Each of those names where it came from; everything else is
+    still an assumption.
+    """
     for name in OperatingRates.__dataclass_fields__:
         rate = getattr(DEFAULT_RATES, name)
-        assert rate.provenance is Provenance.ASSUMPTION, name
+        if rate.provenance is Provenance.ASSUMPTION:
+            continue
+        assert rate.provenance in (
+            Provenance.DATASHEET, Provenance.DERIVED, Provenance.DESIGN), name
+        if rate.provenance is not Provenance.DESIGN:
+            assert not rate.source.startswith("bu proje"), name
 
 
 # --- Pricing a mixed corridor ---------------------------------------------
@@ -286,8 +375,8 @@ def test_each_module_is_priced_as_its_own_line_of_the_bill():
     from yerkon.cost import TUNNEL_ANCHOR, anchor_product
     from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
 
-    assert anchor_product(SX1280.part) is URBAN_ANCHOR
-    assert anchor_product(E28_2G4M27S.part) is RURAL_ANCHOR
+    assert anchor_product(SX1280.part) is SX1280_ANCHOR
+    assert anchor_product(E28_2G4M27S.part) is AMPLIFIED_ANCHOR
     assert anchor_product(DWM3000.part) is TUNNEL_ANCHOR
 
 
@@ -319,9 +408,46 @@ def test_a_corridor_of_three_modules_is_priced_as_three_products():
     assert len(products) == 3
 
     one_product = sum(
-        float(URBAN_ANCHOR.unit_price_tl.value) for _ in inventory.anchors
+        float(SX1280_ANCHOR.unit_price_tl.value) for _ in inventory.anchors
     )
     truthful = sum(
         float(site.product.unit_price_tl.value) for site in inventory.anchors
     )
     assert truthful != pytest.approx(one_product)
+
+
+def test_anchors_with_no_line_share_a_plan():
+    """ADR-0079. A few kilobytes a day do not need a plan each.
+
+    An anchor with no line passes its status over the radio it already
+    ranges with to one that has a plan. Twenty seven of them at ten to a
+    plan need three.
+    """
+    inventory = an_inventory(count=27, mounting=LIGHTING_COLUMN)
+    line = next(i for i in price(inventory).operating
+                if i.label == "connectivity")
+    plan = float(DEFAULT_RATES.connectivity_tl_per_year.value)
+    assert line.tl == pytest.approx(3 * plan)
+    assert "3 plans" in line.basis
+
+
+def test_the_amplifier_buys_nothing_under_the_turkish_rule():
+    """Why the open country lost its amplifier (ADR-0079).
+
+    At the ranging bandwidth the density limit caps radiated power at
+    about 12 dBm, which the plain module already reaches. Under the
+    American rule the amplifier still speaks, which is why the part
+    stays in the catalogue.
+    """
+    from yerkon.hardware import E28_2G4M27S, SX1280, W24P_U
+    from yerkon.regulatory import TURKEY, UNITED_STATES
+
+    gain = W24P_U.gain_dbi(0.0)
+    bandwidth = float(SX1280.ranging_bandwidth_hz.value)
+
+    def legal(rule, radio):
+        return rule.permitted_eirp_dbm(
+            bandwidth, gain, float(radio.max_output_dbm.value))
+
+    assert legal(TURKEY, E28_2G4M27S) == pytest.approx(legal(TURKEY, SX1280))
+    assert legal(UNITED_STATES, E28_2G4M27S) > legal(UNITED_STATES, SX1280)
