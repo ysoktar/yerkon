@@ -130,7 +130,7 @@ def rows(published, language: str, table) -> str:
         head = [
             _say(("Kalem", "Line"), language),
             _say(("Toplam", "Total"), language),
-            _say(("Birim başına", "Per unit"), language) + " " + unit,
+            _say(("{} başına", "Per {}"), language).format(unit.strip("/")),
         ]
         body = []
         for items, total, title in (
@@ -199,8 +199,8 @@ def parts(language: str, table) -> str:
         replaced = {came.key: gone for gone, came in board.swapped}
         head = [_say(pair, language) for pair in (
             ("Parça", "Part"), ("Görevi", "What it does"),
-            ("Satıcı", "Seller"), ("1 adet", "One"),
-            ("Yerine geçtiği", "Replaces"),
+            ("Satıcı", "Seller"), ("Yerine geçtiği", "Replaces"),
+            ("1 adet", "One"),
         )]
         body = []
         for part in board.parts:
@@ -209,10 +209,10 @@ def parts(language: str, table) -> str:
                 html.escape(part.name), html.escape(part.role(language)),
                 '<a href="{}">{}</a>'.format(
                     html.escape(part.url, quote=True), html.escape(part.seller)),
-                "{} USD".format(decimal_comma(part.usd, 2)),
-                html.escape("{} ({}, {} USD)".format(
+                html.escape("{}, {}, {} USD".format(
                     gone.name, gone.seller, decimal_comma(gone.usd, 2)))
                 if gone else "",
+                "{} USD".format(decimal_comma(part.usd, 2)),
             ])
         body.append([
             html.escape(_say(("Diğer", "Other"), language)),
@@ -222,13 +222,13 @@ def parts(language: str, table) -> str:
             ), language)),
             html.escape(_say(("raporun toplamından", "from the report's total"),
                              language)),
-            "{} USD".format(decimal_comma(board.other_usd, 2)),
             "",
+            "{} USD".format(decimal_comma(board.other_usd, 2)),
         ])
         out.append("<h3>{}</h3>{}".format(
             html.escape(board.name(language)),
             '<div class="scroll">{}</div>'.format(
-                table([head] + body, numeric_from=3))))
+                table([head] + body, numeric_from=4))))
     return "".join(out)
 
 
