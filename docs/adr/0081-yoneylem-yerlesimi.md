@@ -74,8 +74,7 @@ taşımıyor. Yayımlanabilir değil, karşılaştırma için.
 | Arama, `better` | 36 | 2,75 | 9,02 | %84,95 | 7,27 | 15688 | 3463 |
 | Arama, `cheaper` | 29 | 3,18 | 11,37 | %85,35 | 6,90 | 13315 | 2939 |
 
-Kırsal, Polatlı (bina izi içindeki sokak adayları çıkarılmadan önceki
-koşu; yeniden koşuluyor):
+Kırsal, Polatlı:
 
 | | Direk | P50 | P95 | Kullanılabilirlik | Alan km² | CAPEX TL/km² | OPEX TL/km² |
 |---|---|---|---|---|---|---|---|
@@ -83,17 +82,19 @@ koşu; yeniden koşuluyor):
 | Arama, `better` | 47 | 2,75 | 11,88 | %76,44 | 316,00 | 1573 | 357 |
 | Arama, `cheaper` | 29 | 2,99 | 14,63 | %61,72 | 233,33 | 1235 | 302 |
 
-- `better` iki satırda da kullanılabilirliği ve alanı artırıyor, aynı
-  paraya. Şehirde km² başına iki maliyet de düşüyor. Kırsalda alan %27
-  büyüyor, km² başına işletme %31 düşüyor, yatırım %4 artıyor. P95 iki
-  satırda da biraz kötüleşiyor.
-- `cheaper` şehirde km² başına maliyeti beşte bir düşürüyor ve
-  kullanılabilirlikten 1,3 puan veriyor. Kırsalda aramanın kendi sayımı
-  ızgaranın hücre payını tutuyor, ama simülasyonun yolculuğunda
-  kullanılabilirlik %74'ten %62'ye düşüyor. Arama hizmet alanının her
-  hücresini eşit sayıyor; yolculuk bu alandan belirli bir çizgi. Hücre
-  payının %36 olduğu bir yerde ucuz cevap başka hücrelere hizmet
-  verebiliyor. Kırsalda `cheaper` önerilmiyor.
+- Şehirde `cheaper` ızgaranın kullanılabilirliğini (%85,35 ile %85,30)
+  km² başına beşte bir daha az yatırım ve işletmeyle tutuyor; P95 9,61
+  m'den 11,37 m'ye kötüleşiyor. `better` kullanılabilirliği neredeyse
+  aynı tutuyor (0,35 puan aşağıda), P95'i 9,02 m'ye iyileştiriyor, alanı
+  %6 büyütüyor ve km² başına %6 daha ucuz.
+- Kırsalda `better` aynı paraya alanı %27 büyütüyor ve kullanılabilirliği
+  2,4 puan artırıyor; km² başına işletme %31 düşüyor, yatırım %4 artıyor,
+  P95 10,80 m'den 11,88 m'ye kötüleşiyor.
+- Kırsalda `cheaper` önerilmiyor. Aramanın kendi sayımı ızgaranın hücre
+  payını tutuyor, ama simülasyonun yolculuğunda kullanılabilirlik
+  %74'ten %62'ye düşüyor. Arama hizmet alanının her hücresini eşit
+  sayıyor; yolculuk bu alandan belirli bir çizgi. Hücre payının %36
+  olduğu bir yerde ucuz cevap başka hücrelere hizmet verebiliyor.
 - Şehirde arama çoğunlukla yol kenarındaki aydınlatma direklerini
   seçiyor, çatıları seçmiyor: sekiz yıllık çatı kirası (yılda 1200 TL,
   varsayım; toplam 9600 TL), aydınlatma direğindeki bir birimin bütün
@@ -115,9 +116,15 @@ koşu; yeniden koşuluyor):
   ve bu yüzden 12 m'lik aydınlatma direği 9 m'lik çatının üstünde, 21 m'de
   duruyor. Arazi bir noktada bina varsa çatıyı döndürüyor (ADR-0038) ve
   ızgara o noktaların bina içinde olup olmadığına bakmıyor. Bu, ızgarayı
-  olduğundan iyi gösteriyor. Aramanın yol kenarı adayları caddenin
-  üstünde, bu avantajı almıyor. Yayımlanan satır değiştirilmedi; ayrı
-  bir karar.
+  olduğundan iyi gösteriyor. Yayımlanan satır değiştirilmedi; ayrı bir
+  karar.
+- **Aramanın kendi adaylarında da aynı sorun vardı.** Kızılay'da 304 yol
+  kenarı noktasından 21'i ve 120 sokak donanımından 7'si bir bina izinin
+  içine düşüyordu. Artık çatı dışındaki hiçbir aday bir iz içinde
+  durmuyor. Bu kural öncesindeki şehir koşusunda `better` %89,79
+  kullanılabilirlik gösteriyordu; o kazancın bir kısmı çatıya çıkmış
+  sokak direklerinden geliyordu. Yukarıdaki tablo kuraldan sonraki koşu.
+  Kırsal sonuç değişmedi: çıkarılan adayların hiçbiri seçilmemişti.
 
 ## Simülatörde
 
