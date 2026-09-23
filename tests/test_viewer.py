@@ -1146,14 +1146,14 @@ def test_a_blank_target_field_is_not_a_bar_of_zero():
 def test_applying_an_option_keeps_the_edits_already_made():
     """An option is a short list of edits, so it composes with the rest.
 
-    A person who has already corrected the mast cost and then picks a
+    A person who has already corrected the pole fitting cost and then picks a
     denser grid must not silently lose the correction.
     """
     from yerkon.options import read
 
     edited = a_state().merged({
-        "overrides": {"mounting.tall_mast.site_cost_tl":
-                      {"value": 61000.0, "source": "a quotation"}}
+        "overrides": {"mounting.distribution_pole.site_cost_tl":
+                      {"value": 3800.0, "source": "a quotation"}}
     })
     option = read("rural-dense")
     overrides = dict(edited.overrides)
@@ -1161,9 +1161,9 @@ def test_applying_an_option_keeps_the_edits_already_made():
         overrides[key] = {"value": value, "source": "option"}
     both = edited.merged({"overrides": overrides})
 
-    assert both.settings().number("rural.anchor_spacing_m") == 3000.0
+    assert both.settings().number("rural.anchor_spacing_m") == 2500.0
     assert not both.settings().entry(
-        "mounting.tall_mast.site_cost_tl").is_assumed
+        "mounting.distribution_pole.site_cost_tl").is_assumed
 
 
 # --- Long work, watched rather than waited on ----------------------------

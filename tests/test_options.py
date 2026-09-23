@@ -148,12 +148,12 @@ def test_an_option_composes_with_a_settings_file_rather_than_replacing_it():
     measured figure in it.
     """
     measured = DEFAULTS.with_values(
-        {"mounting.tall_mast.site_cost_tl": {"value": 61000.0,
+        {"mounting.distribution_pole.site_cost_tl": {"value": 3800.0,
                                              "source": "a quotation"}}
     )
     both = settings_for("rural-dense", measured)
-    assert both.number("rural.anchor_spacing_m") == 3000.0
-    assert not both.entry("mounting.tall_mast.site_cost_tl").is_assumed
+    assert both.number("rural.anchor_spacing_m") == 2500.0
+    assert not both.entry("mounting.distribution_pole.site_cost_tl").is_assumed
 
 
 # --- The search ------------------------------------------------------------
