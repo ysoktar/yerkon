@@ -8,7 +8,7 @@ computed and nothing here is a measurement of ours.
 
 What this module does is keep those rows out of the page that draws
 them, beside the notes that say what was done to each one. A cell like
-"≈ 683,80" is a historical investment divided by the earth's surface,
+"≈ 2341,76" is a historical investment divided by the earth's land,
 and the note beside it says so; a cell that is empty is empty because
 the source publishes nothing that fits the column, and the note says
 that too (ADR-0069).

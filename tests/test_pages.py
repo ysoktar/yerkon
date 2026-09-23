@@ -567,12 +567,13 @@ def test_a_system_with_an_empty_cell_is_left_out_rather_than_guessed():
     from yerkon.viewer.charts import figure_in
     from yerkon.viewer.pages import _marks
 
-    # NavIC publishes no HPE P95, and QZSS no area.
+    # NavIC publishes no HPE P95, and eLoran no area.
     names = {mark.label for mark in _marks(a_record(), "tr", 1)}
     assert "NavIC SPS" not in names
     assert "GPS" in names
     areas = {mark.label for mark in _marks(a_record(), "tr", 4)}
-    assert "QZSS SLAS" not in areas
+    assert "eLoran" not in areas
+    assert "QZSS SLAS" in areas
 
 
 def test_every_drawing_takes_its_colours_from_the_palette_tokens():
@@ -913,3 +914,24 @@ def test_what_the_town_s_structures_save_is_what_the_model_prices():
     assert "{} birim".format(anchors) in page, (
         "the page names an anchor count the deployment no longer has"
     )
+
+
+def test_the_table_never_calls_anything_pnt():
+    """ADR-0066, carried to the other systems' rows.
+
+    The YERKON rows stopped saying it in ADR-0066, but the technology
+    cells of TerraPoiNT, Locata and eLoran still did, and so did the
+    page. The word is not used on this site, for anybody.
+    """
+    import tomllib
+
+    table = tomllib.loads(
+        (ROOT / "src/yerkon/comparison.toml").read_text(encoding="utf-8"))
+    for row in table["row"]:
+        assert "PNT" not in row["technology"], row["system"]
+    for key, note in table["note"].items():
+        assert "PNT" not in note["tr"] and "PNT" not in note["en"], key
+    for page in PAGES:
+        for language in ("tr", "en"):
+            drawn = re.sub(r'href="[^"]*"', "", render(page, language))
+            assert "PNT" not in drawn, (page.slug, language)

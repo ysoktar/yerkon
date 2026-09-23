@@ -2201,16 +2201,16 @@ LANDSCAPE_UNDER = _w(
     "Yatayda kilometrekare başına kurulum maliyeti, dikeyde yatay hata. "
     "İkisi de logaritmik. Sola ve aşağıya doğru daha iyi: ucuz ve "
     "hassas. Uydu sistemleri kilometrekare başına ucuz çünkü paydaları "
-    "dünyanın yüzeyi; YERKON'un iki satırı otuz kat pahalı ama aynı "
-    "doğruluk kuşağında duruyor. Açık uçlu işaret, kaynağın bir üst "
+    "dünyanın bütün kara yüzeyi; YERKON'un iki satırı daha pahalı ama "
+    "aynı doğruluk kuşağında duruyor. Açık uçlu işaret, kaynağın bir üst "
     "sınır yayımladığı anlamına gelir. Tünel satırı burada yok: o "
     "kilometreye bölünüyor, yani aynı eksene konamaz. Hem maliyetini "
     "hem doğruluğunu yayımlamayan sistem de çizilemedi.",
     "Capital per square kilometre across, horizontal error up, both "
     "logarithmic. Left and down is better: cheap and precise. The "
     "satellite systems are cheap per square kilometre because their "
-    "denominator is the surface of the earth; two of YERKON's rows cost "
-    "thirty times as much and sit in the same band of accuracy. An open "
+    "denominator is all the land on earth; two of YERKON's rows cost "
+    "more and sit in the same band of accuracy. An open "
     "end means the source published a bound. The tunnel row is absent: "
     "it is divided by route kilometre and does not belong on this axis. "
     "A system that publishes only one of the two cannot be drawn "
@@ -2275,13 +2275,14 @@ COST = _w("Kilometrekare başına kurulum maliyeti",
           "Capital per square kilometre")
 COST_UNDER = _w(
     "Kurulum maliyetini yayımlayan sistemler. Uydu satırları "
-    "kilometrekare başına ucuz, çünkü paydaları dünyanın yüzeyi. Tünel "
+    "kilometrekare başına ucuz, çünkü paydaları dünyanın bütün kara "
+    "yüzeyi. Tünel "
     "satırı burada yok: o kilometrekareye değil güzergâh kilometresine "
     "bölünüyor, yani aynı eksene konamaz. Tablodaki dipnotu bunu "
     "anlatıyor.",
     "The systems that publish a capital cost. The satellite rows are "
-    "cheap per square kilometre because their denominator is the "
-    "surface of the earth. The tunnel row is absent: it is divided by "
+    "cheap per square kilometre because their denominator is all the "
+    "land on earth. The tunnel row is absent: it is divided by "
     "route kilometre rather than by square kilometre, so it does not "
     "belong on this axis. Its note in the table says so.",
 )

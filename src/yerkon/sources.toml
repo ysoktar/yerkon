@@ -36,13 +36,6 @@ name.tr = "Haberler"
 name.en = "News"
 
 [[source]]
-key = "nasa-area"
-group = "gnss"
-label.tr = "NASA/JPL, dünya yüzey alanı"
-label.en = "NASA, the earth's surface area"
-url = "https://science.nasa.gov/moon/by-the-numbers/"
-
-[[source]]
 key = "gps-gov"
 group = "gnss"
 label.tr = "GPS.gov, GPS performansı"
@@ -143,9 +136,9 @@ url = "https://qzss.go.jp/technical/system/l1s.html"
 [[source]]
 key = "qzss-report"
 group = "gnss"
-label.tr = "QZSS, SLAS performans raporu"
-label.en = "QZSS, SLAS performance report"
-url = "https://sys.qzss.go.jp/serv_report/SLA/Service%20performance%20report_for_1stH_FY2025_SLAS.pdf"
+label.tr = "QZSS, SLAS FY2025 ikinci yarı performans raporu"
+label.en = "QZSS, SLAS performance report for the second half of FY2025"
+url = "https://sys.qzss.go.jp/serv_report/SLA/Service%20performance%20report_for_2ndH_FY2025_SLAS.pdf"
 
 [[source]]
 key = "cao-cost"
@@ -246,13 +239,6 @@ label.en = "Sensors, Pozyx P50/P95 position error"
 url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC7582353/"
 
 [[source]]
-key = "pozyx-install"
-group = "terrestrial"
-label.tr = "Pozyx, 35.000 m² endüstriyel kurulum"
-label.en = "Pozyx, a 35000 m² industrial installation"
-url = "https://www.pozyx.io/newsroom/going-beyond-standard-forklift-telematics-with-location-data"
-
-[[source]]
 key = "mof-eloran"
 group = "terrestrial"
 label.tr = "Republic of Korea MOF, eLoran proje bütçesi"
@@ -262,22 +248,15 @@ url = "https://www.mof.go.kr/doc/ko/selectDoc.do?bbsSeq=11&docSeq=2729&menuSeq=9
 [[source]]
 key = "jpnt-requirements"
 group = "terrestrial"
-label.tr = "JPNT, eLoran testbed performans gereksinimleri"
-label.en = "JPNT, eLoran testbed performance requirements"
+label.tr = "Kore konum, seyrüsefer ve zamanlama dergisi, eLoran testbed performans gereksinimleri"
+label.en = "Korean journal of positioning, navigation and timing, eLoran testbed performance requirements"
 url = "https://www.jpnt.org/wp-content/uploads/2024/03/JPNT-0602-02.pdf"
-
-[[source]]
-key = "kriso-eloran"
-group = "terrestrial"
-label.tr = "KRISO, eLoran ölçülmüş P95 yatay doğruluk"
-label.en = "KRISO, measured eLoran P95 horizontal accuracy"
-url = "https://www.kriso.re.kr/sciwatch/handle/2021.sw.kriso/7554?mode=full"
 
 [[source]]
 key = "jpnt-korea"
 group = "terrestrial"
-label.tr = "JPNT, güncel Kore eLoran kurulumu"
-label.en = "JPNT, the current Korean eLoran installation"
+label.tr = "Kore konum, seyrüsefer ve zamanlama dergisi, güncel Kore eLoran kurulumu"
+label.en = "Korean journal of positioning, navigation and timing, the current Korean eLoran installation"
 url = "https://www.jpnt.org/1402-10/"
 
 [[source]]
@@ -307,6 +286,83 @@ group = "radio"
 label.tr = "TWR CDMA"
 label.en = "TWR CDMA"
 url = "https://ieeexplore.ieee.org/abstract/document/11435291"
+
+[[source]]
+key = "cia-land"
+group = "gnss"
+label.tr = "CIA World Factbook, Dünya kara ve su alanı"
+label.en = "CIA World Factbook, the world's land and water area"
+url = "https://www.cia.gov/the-world-factbook/static/6c4d9b9a41b27707b6720720df7161d6/Physical_World.pdf"
+
+[[source]]
+key = "gps-standards"
+group = "gnss"
+label.tr = "GPS.gov, performans standartları"
+label.en = "GPS.gov, performance standards"
+url = "https://www.gps.gov/performance-standards-specifications"
+
+[[source]]
+key = "gsc-galileo-q2"
+group = "gnss"
+label.tr = "Galileo Açık Servis Q2 2026 performans raporu"
+label.en = "Galileo Open Service performance report, Q2 2026"
+url = "https://www.gsc-europa.eu/sites/default/files/sites/all/files/Galileo-OS-Quarterly-Performance_Report-Q2-2026.pdf"
+
+[[source]]
+key = "beidou-standard"
+group = "gnss"
+label.tr = "BeiDou Açık Servis Performans Standardı 2.0"
+label.en = "BeiDou Open Service Performance Standard 2.0"
+url = "https://www.beidou.gov.cn/xt/gfxz/201812/P020181227529449178798.pdf"
+
+[[source]]
+key = "beidou-igmas"
+group = "gnss"
+label.tr = "BeiDou, B1C küresel %95 performansı (iGMAS)"
+label.en = "BeiDou, B1C global 95 % performance (iGMAS)"
+url = "https://m.beidou.gov.cn/yw/gjdt/202201/t20220122_23613.html"
+
+[[source]]
+key = "gsi-japan"
+group = "gnss"
+label.tr = "Japonya Coğrafi Bilgi Kurumu, 1 Nisan 2026 ulusal alan"
+label.en = "Geospatial Information Authority of Japan, national area on 1 April 2026"
+url = "https://web1.gsi.go.jp/KOKUJYOHO/MENCHO-title.htm"
+
+[[source]]
+key = "sec-nextnav-s1"
+group = "terrestrial"
+label.tr = "SEC, NextNav kurulumları"
+label.en = "SEC, NextNav deployments"
+url = "https://www.sec.gov/Archives/edgar/data/1865631/000121390021056147/fs12021_nextnav.htm"
+
+[[source]]
+key = "insidegnss-locata"
+group = "terrestrial"
+label.tr = "Inside GNSS, Locata White Sands sözleşmesi"
+label.en = "Inside GNSS, the Locata White Sands contract"
+url = "https://insidegnss.com/air-force-awards-white-sands-contract-to-locata/"
+
+[[source]]
+key = "pozyx-case"
+group = "terrestrial"
+label.tr = "Pozyx, 35000 m² ve 250 anchor'lı kurulum"
+label.en = "Pozyx, a 35000 m² installation with 250 anchors"
+url = "https://www.pozyx.io/case-studies/intralogistics-optimization-case-study"
+
+[[source]]
+key = "mdpi-eloran"
+group = "terrestrial"
+label.tr = "MDPI Remote Sensing, eLoran %95 yatay doğruluk ve ASF"
+label.en = "MDPI Remote Sensing, eLoran 95 % horizontal accuracy and ASF"
+url = "https://www.mdpi.com/2072-4292/15/14/3586"
+
+[[source]]
+key = "kr-eloran-office"
+group = "terrestrial"
+label.tr = "Güney Kore ulusal denizcilik ofisi, eLoran mimarisi"
+label.en = "South Korea's national maritime office, the eLoran architecture"
+url = "https://www.nmpnt.go.kr/en/sub.do?menukey=5206"
 
 [[source]]
 key = "yerkon-github"
