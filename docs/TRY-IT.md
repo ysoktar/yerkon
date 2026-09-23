@@ -706,17 +706,19 @@ yapılabilir: `site.shadow_draws` 1, `site.profile_spacing_m` 0. Uyarı
 figürlere bakıyor, düğmeye değil, yani elle yapan da aynı şeyi görüyor.
 
 **Hızlı okuma iyimser.** İki kabalık da kaybı eksik okuyor, yani hızlı bir
-cevap yerleşimi kayırıyor:
+cevap yerleşimi kayırıyor (ADR-0079 sonrası, kırsal dağıtım direklerinde):
 
 | | yayımlanan | hızlı |
 |---|---|---|
 | Şehir P95 | 8,84 m | 8,39 m |
-| Kırsal P95 | 22,72 m | 18,59 m |
-| Kırsal kullanılabilirlik | %41,83 | %52,00 |
+| Kırsal P95 | 11,83 m | 13,02 m |
+| Kırsal kullanılabilirlik | %65,85 | %74,48 |
 | Tünel P50 | 0,78 m | 0,80 m |
 
-Yani hızlı okumada kötü görünen bir satır gerçekten kötüdür; iyi görünen
-bir satır için yavaşını koşmak gerekir.
+Kullanılabilirliği her zaman iyi okuyor. P95 tek çekilişte iki yöne de
+sapabiliyor: kırsalda bu sefer hızlı okuma daha kötü çıktı. Yani hızlı
+okumada kötü görünen bir satırın kullanılabilirliği gerçekten kötüdür; iyi
+görünen bir satır için yavaşını koşmak gerekir.
 
 **Sayfa da sekizini havuzluyor, ama önce birini gösteriyor.**
 "Simülasyonu çalıştır"a basınca ilk çekiliş hemen çıkar ve panelde
@@ -743,8 +745,12 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
 | Şehir içi | 2,67 m | 8,84 m | %83,98 |
-| Kırsal | 3,70 m | 22,72 m | %41,83 |
+| Kırsal | 2,91 m | 11,83 m | %65,85 |
 | Tünel | 0,78 m | 2,90 m | %98,29 |
+
+Kırsal satır ADR-0079'dan önce 25 m'lik 28 dikilen direkte %41,83 ve
+22,72 m diyordu; elektrik dağıtım hattının 10 m'deki 49 direğine geçince
+yukarıdaki değerler çıktı, sermayenin onda birine.
 
 Kırsal satır ADR-0037'den önce %89,50 diyordu. Aradaki fark, ölçülmemiş
 zeminde duran bir mast sırasıydı. Şehir içi satır ADR-0038'den önce 1,79

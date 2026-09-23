@@ -48,6 +48,9 @@ usd = 16.49
 seller = "DigiKey"
 url = "https://www.digikey.co.uk/en/products/detail/rf-solutions/LAMBDA80-24S/9749701"
 
+# Not the E28-2G4M12SX: the X variants carry the SX1281, which has no
+# ranging engine. EBYTE's own listings mix the two names; the order has
+# to say SX1280.
 [[part]]
 key = "e28-2g4m12s"
 name = "EBYTE E28-2G4M12S"

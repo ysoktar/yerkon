@@ -34,6 +34,10 @@ kalanların birbirinden bir dolardan fazla ayrılmamasını istiyor.
 | STM32G0B1MET6 (512 KB) | STM32G031K8T6 (64 KB) | 3,61 → 1,93 USD |
 | Newhaven 2,8 inç ekran (araç alıcısı) | 2,8 inç ILI9341 modülü | 21,80 → 10,90 USD |
 
+Sipariş notu: doğru parça ek harfsiz **E28-2G4M12S**. EBYTE'ın "X" ekli
+modülleri (E28-2G4M12SX) SX1281 taşıyor ve SX1281'de ölçüm motoru yok;
+satıcı ilanları iki adı karıştırıyor.
+
 **Kırsal birimin yükselteci kalktı.** Türkiye'nin 2,4 GHz kuralı (TS EN
 300 328) 1,6 MHz'lik ölçüm bant genişliğinde yayın gücünü yaklaşık
 12,1 dBm ile sınırlıyor. Yükselteçsiz modül bu sınıra zaten ulaşıyor,
@@ -82,6 +86,28 @@ hiçbir sayı elle yazılmadı. Bir sınama sayfadaki dökümün son satırını
 yayımlanan hücreyle aynı olmasını istiyor; bir fiyat değişip tablo yeniden
 yayımlanmazsa bu sınama düşüyor.
 
+**Kırsal satır elektrik dağıtım hattının direklerine taşındı.** 25 m'lik
+dikilen direk 85000 TL ve kırsal sermayenin %96'sını tutuyordu. Köy
+yollarında dağıtım hattının beton direkleri zaten duruyor. Kaba okumada
+(tek çekiliş) birimi 10 m'de, 3000 m aralıkla bu direklere koymak:
+
+| düzen | birim | kullanılabilirlik | P95 | alan |
+|---|---|---|---|---|
+| 25 m dikilen direk, 4000 m | 28 | %52,0 | 18,6 m | 178 km² |
+| 12 m dağıtım direği, 3000 m | 49 | %75,5 | 10,4 m | 256 km² |
+| 10 m dağıtım direği, 3000 m | 49 | %74,5 | 13,0 m | 246 km² |
+| 10 m dağıtım direği, 3500 m | 36 | %56,7 | 15,6 m | 126 km² |
+| 12 m dağıtım direği, 2500 m | 68 | %75,7 | 10,7 m | 278 km² |
+
+10 m seçildi, çünkü orta gerilim direkleri 12-14 m ve birim iletkenlerin
+en az iki üç metre altında kalmalı. 3500 m'de alan, direk sayısından
+hızlı düşüyor ve kilometrekare başına maliyet artıyor; 2500 m bir şey
+kazandırmıyor. Köyler arasındaki hat yalnızca orta gerilim taşıdığı için
+her birim kendi güneş setini taşıyor. Direk dağıtım şirketinin olduğu için
+kiralanıyor; modele bunun için bir kira kalemi eklendi. Yayımlanmış bir
+ortak kullanım bedeli bulunamadı, ayda 100 TL varsayıldı ve öyle
+işaretlendi. Montaj, köyler arası yol yüzünden günde dört birimle 4600 TL.
+
 ## Denenip alınmayanlar
 
 **Şehir içinde daha seyrek ızgara.** 500 m'den 600 ve 700 m'ye çıkınca
@@ -98,17 +124,26 @@ iyileştirmiyor. Şehirdeki direklerin hepsi o boyda da değil.
 tuttuğu için seyreltmek ucuzlatıyor, ama satırın zaten zayıf olan
 sütununu daha da zayıflatıyor.
 
-**Kırsalda elektrik dağıtım direkleri.** Köy yollarındaki beton direkler
-zaten elektrikli ve 25 m'lik direğin bedelinin küçük bir kısmına birim
-taşıyabilir. Ne kadar sık dizilmeleri gerektiği ayrıca ölçülüyor; sonuç
-bu kararın altına eklenecek.
-
 ## Sonuçlar
 
-Yayımlanan tablonun maliyet hücreleri değişiyor; doğruluk ve
-kullanılabilirlik değişmiyor, çünkü hiçbir değişiklik bir bağlantının
-kapanıp kapanmadığını etkilemiyor. Kırsal satırın hane hane aynı çıkması
-bunun kanıtı.
+Tam çözünürlükte, sekiz çekilişle yeniden yayımlandı:
+
+| | HPE P95 | kullanılabilirlik | alan | CAPEX | OPEX |
+|---|---|---|---|---|---|
+| Şehir içi | 8,84 m (aynı) | %83,98 (aynı) | 6,68 km² | 23518 → 17592 TL/km² | 10088 → 4366 TL/km²/yıl |
+| Kırsal | 22,72 → 11,83 m | %41,83 → %65,85 | 143,75 → 209,00 km² | 18618 → 1879 TL/km² | 772 → 656 TL/km²/yıl |
+| Tünel | 2,90 m (aynı) | %98,29 (aynı) | 0,02 km² | 34355 → 32376 TL/km | 6553 → 3415 TL/km/yıl |
+
+Şehir içi ve tünelde doğruluk sütunları hane hane aynı, çünkü oralarda
+değişen hiçbir şey bir bağlantının kapanıp kapanmadığını etkilemiyor.
+Kırsal satır yeni bir düzen; orada P50 3,70'ten 2,91 m'ye, VPE P95
+232,33'ten 140,75 m'ye de indi. Kırsal OPEX'in en büyük kalemi artık
+varsayılan direk kirası.
+
+Hızlı okuma kırsal kullanılabilirliği 8,6 puan iyi okudu (%74,48'e
+karşı %65,85), P95'i ise bu kez kötü okudu (13,02'ye karşı 11,83 m).
+Sayfalardaki "hızlı okuma iyimser" cümlesi kullanılabilirlik üzerinden
+yeniden yazıldı.
 
 ## Yapılmayanlar
 

@@ -574,7 +574,8 @@ SYSTEM = Page(
                     "at this bandwidth, so a module with an amplifier "
                     "(E28-2G4M27S) buys no extra reach here; the rural unit "
                     "is the same board as the urban one, and its reach "
-                    "comes from the height of its mast and a clear line "
+                    "comes from the height of the pole it stands on and a "
+                    "clear line "
                     "of sight. YERKON takes 8 to 10 km as a communications and "
                     "coverage target, and how accurately it ranges at that "
                     "distance is to be confirmed by field trials. Forest, "
@@ -1291,11 +1292,11 @@ RESULTS = Page(
                 _w(
                     "**Hizmet alanı, konum alınabilen yerdir**, sinyalin "
                     "ulaştığı yer değil. Kırsalda sinyal, konum alınabilen "
-                    "zeminin 2,6 katına ulaşıyor: duymak yetmiyor, konum "
+                    "zeminin iki katına ulaşıyor: duymak yetmiyor, konum "
                     "için aynı anda dört birim gerekiyor.",
                     "**The service area is where a position can be had**, "
                     "not where the signal arrives. In open country the "
-                    "signal reaches 2,6 times that ground: hearing one "
+                    "signal reaches twice that ground: hearing one "
                     "unit is not enough, a position needs four at once.",
                 ),
                 _w(
@@ -1331,12 +1332,14 @@ RESULTS = Page(
                 _w(
                     "İkisi de kaybı olduğundan az gösteriyor, yani hızlı "
                     "cevap kurulumu olduğundan iyi gösteriyor: kırsal "
-                    "satırın P95'i 4,13 m iyimser çıkıyor. Bu yüzden hızlı "
+                    "satırın kullanılabilirliği hızlı okumada 8,6 puan iyi "
+                    "çıkıyor. Bu yüzden hızlı "
                     "koşuda bile kötü görünen bir satır gerçekten kötüdür. "
                     "Bu sayfa yalnızca yavaş ve tam koşuyu gösterir.",
                     "Both read the loss low, so a fast answer flatters "
-                    "the deployment: the rural row's P95 came out 4,13 m "
-                    "optimistic. So a row that looks bad even under a fast "
+                    "the deployment: the rural row's availability came "
+                    "out 8,6 points high. So a row that looks bad even "
+                    "under a fast "
                     "run really is bad. This page shows the slow, full run "
                     "only.",
                 ),

@@ -353,9 +353,9 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,67 | 8,84 | 64,21 | %83,98 | 6,68 | 23518 | 10088 |
-| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 3,70 | 22,72 | 232,33 | %41,83 | 143,75 | 18618 | 772 |
-| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,78 | 2,90 | 7,60 | %98,29 | 0,02 | 34355 /km | 6553 /km |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,67 | 8,84 | 64,21 | %83,98 | 6,68 | 17592 | 4366 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,91 | 11,83 | 140,75 | %65,85 | 209,00 | 1879 | 656 |
+| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,78 | 2,90 | 7,60 | %98,29 | 0,02 | 32376 /km | 3415 /km |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir
@@ -417,19 +417,25 @@ Tablonun söylemeden yapmayacağı üç şey:
 
 **Tünelin km² başına maliyeti diğer satırlarla karşılaştırılabilir
 değildir.** 2 km boyunca 12 m genişliğinde bir tünel 0,024 km²'dir, yani
-buna bölmek büyük bir sayıyı yargıyla değil aritmetikle üretir. Güzergâh
-kilometresi başına maliyette tünel 53441 TL'dir. Diğer iki satır çizgiye
+buna bölmek büyük bir sayıyı yargıyla değil aritmetikle üretir. Bu
+yüzden tablo tünelin iki maliyet hücresini güzergâh kilometresine böler
+ve "/km" ile işaretler (ADR-0073). Diğer iki satır çizgiye
 değil alana hizmet eder, dolayısıyla güzergâh kilometreleri bir test
 yolculuğunun uzunluğudur ve onlar için kilometre başına maliyet hiç
 verilmez.
 
 **Hizmet alanı, bir konumun alınabildiği yerdir**, bir paketin ulaştığı
-yer değil. Kırsal bölge için bunlar 143,75 ve 374,00 km²'dir, 2,6 kat, ve
+yer değil. Kırsal bölge için bunlar 209,00 ve 409,92 km²'dir, 2,0 kat, ve
 notlar her seferinde ikisini de yazdırır (ADR-0012).
 
 **Kırsal kullanılabilirliğe arazi ve bir turun uzunluğu karar verir.**
 Tek bir kırsal bağlantı bile mesafe yüzünden düşmez — her bir başarısızlık
-zemin kaldırılsa kapanırdı — yani daha çok direk yanlış içgüdüdür. Yanlış
+zemin kaldırılsa kapanırdı — yani uzağa ulaşmak için daha çok direk yanlış
+içgüdüdür. Daha çok ama daha kısa ve daha ucuz direk ise başka bir şey
+satın alıyor: engelsiz görüşe sahip birim sayısı. ADR-0079 kırsal satırı
+25 m'lik 28 dikilen direkten elektrik dağıtım hattının 10 m'deki 49
+direğine taşıdı; kullanılabilirlik %41,83'ten %65,85'e çıktı, sermaye
+onda birine indi. Yanlış
 olan turdu: yarısını engelleyen bir zemin üzerinde yoklanan sekiz direk
 yaklaşık dört yanıt verir, ki bu da soğuk bir sabitlemenin gerektirdiğinin
 tam kendisidir, yedeksiz. Tur uzunluğunun ne kadar değdiği yayılım
