@@ -7,20 +7,11 @@
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-tall'
-title = 'Kırsal: 35 m direk, aynı ızgara — yeni saha açmadan'
-title_en = 'Rural: 35 m masts, the same grid — without opening a new site'
+title = 'Kırsal: dağıtım direğinde 12 m — iletkenlere daha yakın'
+title_en = 'Rural: 12 m on the distribution pole — closer to the conductors'
 origin = 'shipped'
-note = """Aynı otuz üç direk, zaten durdukları yerde, on metre daha uzun: varsayılanın %89,50'sine karşı %90,12 kullanılabilirlik, 3 154 228 TL'ye karşı 5 847 028 TL.
-
-Bu, 2,7 milyon liraya 0,6 puan eder — bu seçeneğin var olma sebebi dışında her bakımdan rural-dense'ten kötü bir değer: yeni saha yok, yeni ulaşım yolu yok, yeni enerji bağlantısı yok. Bir sahaya ulaşmanın kendisi, parasını ödemekten daha zor olduğu yerde bu hâlâ doğru cevap olabilir; ve bu projede bunun ne kadar zor olduğuna dair bir sayı yok.
-
-İki seçenek de varsayılan %82,26'da dururken yazıldı ve şimdi verdiklerinden çok daha fazlasını vaat ediyorlardı. Tur boyutu düzeltmesi (ADR-0022) boşluğun çoğunu bedelsiz aldı."""
-note_en = """The same thirty-three masts where they already are, ten metres taller: 90,12 % availability against the default's 89,50 %, for 5 847 028 TL against 3 154 228 TL.
-
-That is 0,6 points for 2,7 million lira — worse value than rural-dense on every count except the one this option exists for: no new site, no new access road, no new power connection. Where getting to a site is the hard part rather than paying for it, that can still be the right answer, and this project has no figure for how hard it is.
-
-Both options were written when the default sat at 82,26 % and promised far more than they now deliver. The round-size fix (ADR-0022) took most of the headroom for nothing."""
+note = """Aynı kırk dokuz dağıtım direği, birim 10 yerine 12 metrede. Kaba okumada %74,5'e karşı %75,5 kullanılabilirlik, 13,0 m'ye karşı 10,4 m P95, aynı sermaye. Bedeli sahada: orta gerilim direkleri 12-14 m ve iki metre birimi iletkenlere yaklaştırıyor, bu da dağıtım şirketinin iznine ve daha dikkatli bir montaja bağlı. Varsayılan bu yüzden 10 m'de kalıyor (ADR-0079)."""
+note_en = """The same forty nine distribution poles with the unit at 12 metres instead of 10. On a coarse read: 75,5 % availability against 74,5 %, 10,4 m P95 against 13,0 m, for the same capital. The cost is in the field: medium voltage poles are 12 to 14 m, and two metres bring the unit closer to the conductors, which rests on the distribution company's consent and a more careful fitting. That is why the default stays at 10 m (ADR-0079)."""
 
 [values]
-'mounting.tall_mast.height_m' = 35.0
-'mounting.tall_mast.site_cost_tl' = 166600.0
+'mounting.distribution_pole.height_m' = 12.0

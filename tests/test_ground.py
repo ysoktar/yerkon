@@ -298,12 +298,16 @@ def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
         one shadow spread           5/8   +0,0080  0,0200    0,4
         split by line of sight      8/8   +0,0227  0,0069    3,3
         and the profile every 10 m  7/8   +0,0088  0,0055    1,6
+        on distribution poles       4/4   +0,0117  0,0015    7,9
 
-    Three rewrites of one assertion, because each time it pinned the
-    size. What has held through all three is the shape: the effect is
-    positive on balance and it is the same order as the seed-to-seed
-    scatter, so one run of either cannot settle it. That is what this
-    asserts, and it is the reason the test exists.
+    Through the first three the shape held: the effect was positive on
+    balance and the same order as the seed-to-seed scatter, so one run
+    could not settle it. The fourth changed the shape rather than the
+    size (ADR-0079). Forty nine poles 3 km apart instead of twenty
+    eight masts 4 km apart steady the row, the scatter falls by a
+    factor of four, and the effect can now be read off one run. That is
+    what this asserts now; if it slips back into the noise, that is a
+    finding too.
     """
     import statistics
     from dataclasses import replace
@@ -334,19 +338,18 @@ def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
     )
     effect = statistics.mean(gaps)
 
-    assert sum(gap > 0.0 for gap in gaps) >= len(seeds) - 1, (
-        "ten anchors stopped winning on balance: {} — {}".format(gaps, got))
+    assert all(gap > 0.0 for gap in gaps), (
+        "ten anchors stopped winning on every seed: {} — {}".format(gaps, got))
     assert effect > 0.0, (effect, got)
-    # The band the three measurements sit in. Outside it on either side
-    # is a finding rather than a broken test: below, the round length
-    # has stopped mattering; above, it has become large enough to read
-    # off one run, and neither should pass quietly.
-    assert 0.2 * scatter < effect < 5.0 * scatter, (
-        "the round length is no longer the same order as the noise it is "
-        "measured in: {:+.4f} against a seed-to-seed spread of {:.4f} — "
+    # On the poles the effect stands clear of the scatter. Back inside
+    # it would mean the arrangement stopped steadying the row, which is
+    # a finding rather than a broken test and should not pass quietly.
+    assert effect > 3.0 * scatter, (
+        "the round length has slipped back into the noise it is measured "
+        "in: {:+.4f} against a seed-to-seed spread of {:.4f} — "
         "{}".format(effect, scatter, got)
     )
-    assert scatter > 0.002, "a scatter this small would make the bar meaningless"
+    assert effect < 0.05, "a round length worth this much would be a new row"
 
 
 # --- The figures reaching both ends of a link -----------------------------

@@ -188,10 +188,13 @@ def test_anchors_in_a_line_colour_the_ground_beside_them_badly():
 
     state = from_scenario("rural")
     # One run, all anchors on one side, which is the arrangement ADR-0011
-    # is about.
+    # is about: masts raised along a corridor, 4 km apart. Written out
+    # rather than taken from the rural row, which stands on the
+    # distribution network's poles now (ADR-0079) and is not a corridor.
     in_a_line = replace(
         state, width_m=0.0,
-        runs=tuple(replace(run, offset_m=0.0, stagger_m=0.0)
+        runs=tuple(replace(run, mounting="mast", spacing_m=4000.0,
+                           offset_m=0.0, stagger_m=0.0)
                    for run in state.runs),
     )
     terrain = in_a_line.terrain()

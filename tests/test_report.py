@@ -108,14 +108,22 @@ def test_the_tunnel_serves_a_bore_and_not_a_plane():
     assert RURAL.served_km2() is None
 
 
-def test_the_three_scenarios_use_the_three_modules_the_report_assigns():
+def test_the_three_scenarios_use_the_modules_the_bill_assigns():
+    """The town and the open country share a board now (ADR-0079).
+
+    The report gave the open country the amplified E28-2G4M27S. Under
+    the Turkish density limit its amplifier cannot speak at the ranging
+    bandwidth, so the rural row carries the plain module and reads the
+    same to the digit.
+    """
     from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
 
     def radios(deployed):
         return {a.radio for a in deployed.scenario.deployment.anchors}
 
     assert radios(URBAN) == {SX1280}
-    assert radios(RURAL) == {E28_2G4M27S}
+    assert radios(RURAL) == {SX1280}
+    assert E28_2G4M27S not in radios(RURAL)
     assert radios(TUNNEL) == {DWM3000}
 
 

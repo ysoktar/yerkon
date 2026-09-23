@@ -140,6 +140,18 @@ Kırsal satır yeni bir düzen; orada P50 3,70'ten 2,91 m'ye, VPE P95
 232,33'ten 140,75 m'ye de indi. Kırsal OPEX'in en büyük kalemi artık
 varsayılan direk kirası.
 
+Yeni düzen kırsal satırı sakinleştirdi. Bir turda 8 yerine 10 direk
+yoklamanın değeri dört tohumda ölçüldü: dördünde de kazanıyor, ortalama
++0,0117, tohumdan tohuma saçılım 0,0015. Önceki üç ölçümde etki
+saçılımla aynı mertebedeydi ve tek koşu karar veremiyordu; 49 direkte
+saçılım dörtte birine indi ve etki tek koşudan okunabiliyor. Bunu tutan
+sınama (`test_ground`) yeni şekli söyleyecek biçimde yeniden yazıldı.
+
+Kırsal için gönderilen iki seçenek eski, 25 m'lik direğe göre yazılmıştı
+ve artık hiçbir satırın kullanmadığı bir yapıyı ayarlıyordu. `rural-dense`
+şimdi 2,5 km'lik dağıtım direği ızgarası (daha çok direk, aynı sonuç),
+`rural-tall` ise direkte 12 m (iletkenlere daha yakın).
+
 Hızlı okuma kırsal kullanılabilirliği 8,6 puan iyi okudu (%74,48'e
 karşı %65,85), P95'i ise bu kez kötü okudu (13,02'ye karşı 11,83 m).
 Sayfalardaki "hızlı okuma iyimser" cümlesi kullanılabilirlik üzerinden
