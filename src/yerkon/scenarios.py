@@ -131,6 +131,11 @@ class Deployed:
                     site_cost_tl=anchor.mounting.site_cost_tl,
                     has_power=anchor.mounting.has_power,
                     has_backhaul=anchor.mounting.has_backhaul,
+                    rent_tl_per_year=(
+                        float(anchor.mounting.rent_tl_per_year.value)
+                        if anchor.mounting.rent_tl_per_year is not None
+                        else 0.0
+                    ),
                 )
                 for anchor in self.scenario.deployment.anchors
             ),
@@ -607,7 +612,9 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                 anchors=_anchors_over(
                     RURAL_X, RURAL_Y,
                     settings.number("rural.anchor_spacing_m"),
-                    mounting["tall_mast"], RURAL_TERRAIN,
+                    # The distribution network's own poles rather than
+                    # masts raised for the purpose (ADR-0079).
+                    mounting["distribution_pole"], RURAL_TERRAIN,
                     # The plain module: the amplified one's extra power
                     # is not legal at this bandwidth in Turkey, and the
                     # link budget caps it to the same 12,1 dBm either
@@ -646,7 +653,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
             packet_loss=settings.number("ranging.packet_loss"),
         ),
         product=SX1280_ANCHOR,
-        mounting=mounting["tall_mast"],
+        mounting=mounting["distribution_pole"],
         route_km=RURAL_ROAD.length_m / 1000.0,
         environment="Dış",
         technology="Karasal konumlandırma (E28-SX1280 TWR)",

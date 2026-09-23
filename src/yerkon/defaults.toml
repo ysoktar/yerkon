@@ -173,6 +173,61 @@ sensitivity = """direkler levhaları ancak 6588 TL'nin altında geçer, yani bun
 ucuz"""
 sensitivity_en = "masts beat signs only below 6588 TL, so 13 times cheaper than this"
 
+[values."mounting.distribution_pole.height_m"]
+value = 10.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Kırsal elektrik dağıtım hattının beton direğinde birimin \
+durduğu yükseklik. Orta gerilim direkleri 12-14 m; birim iletkenlerin \
+en az iki üç metre altında kalmalı, o yüzden 10 m."""
+note_en = """How high the unit sits on a concrete pole of the rural \
+distribution line. Medium voltage poles are 12 to 14 m; the unit has to \
+stay at least two or three metres below the conductors, so 10 m."""
+affects = "kırsal satırın menzilini ve kapsamasını"
+affects_en = "the rural row's reach and coverage"
+
+[values."mounting.distribution_pole.site_cost_tl"]
+value = 4600.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = """aydınlatma direğiyle aynı sepetli araç ve ekip günü (Ankara, 2026 \
+arama sonuçları); köyler arası yol yüzünden günde dört birim, bu projenin \
+varsayımı"""
+source_en = """the same bucket truck and crew day as for a lighting column \
+(Ankara, 2026 search results); four units a day because of the distance \
+between villages, this project's assumption"""
+note = """Zaten duran bir dağıtım direğine birim ve güneş setini takmak. \
+Sepetli araç günü 11200 TL, usta ve yardımcısı 6000 TL; sahalar \
+kilometrelerce ayrı olduğu için bir ekip günde dört birim takar, yani \
+birim başına 4300 TL; kelepçe ve kablo 300 TL. Toplam 4600 TL. Panel ve \
+akünün bedeli ayrı: operating.off_grid_supply_tl."""
+note_en = """Fitting a unit and its solar kit to a distribution pole that \
+already stands. A bucket truck day is 11200 TL, an electrician and a \
+helper 6000 TL; the sites are kilometres apart, so a crew fits four a \
+day, 4300 TL a unit; clamps and cable 300 TL. 4600 TL in all. The panel \
+and battery are priced apart: operating.off_grid_supply_tl."""
+affects = "dağıtım direğindeki her direğin CAPEX'ini; kırsal sermayenin çoğu"
+affects_en = "CAPEX of every anchor on a distribution pole; most of the rural capital"
+
+[values."mounting.distribution_pole.rent_tl_per_year"]
+value = 1200.0
+unit = "TL/year"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Dağıtım şirketinin direğine birim taşıtmanın yıllık bedeli. \
+Yayımlanmış bir ortak kullanım bedeli bulunamadı; ayda 100 TL varsayıldı. \
+Sayılırsa bu tek satır değişir."""
+note_en = """What the distribution company charges a year to carry a unit \
+on its pole. No published sharing fee was found; 100 TL a month is \
+assumed. When it is known, this one line changes."""
+affects = "dağıtım direğindeki direklerin OPEX'ini"
+affects_en = "OPEX of anchors on distribution poles"
+sensitivity = "iki katına çıkarmak kırsal OPEX'i kabaca üçte bir artırır"
+sensitivity_en = "doubling it raises rural OPEX by roughly a third"
+
 [values."mounting.tunnel_bracket.height_m"]
 value = 4.5
 unit = "m"
@@ -1078,27 +1133,29 @@ affects = "kırsal satırın hizmet alanını ve kilometrekare başına maliyeti
 affects_en = "the rural row's service area and cost per square kilometre"
 
 [values."rural.anchor_spacing_m"]
-value = 4000.0
+value = 3000.0
 unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Direklerin birbirinden ne kadar uzakta durduğu. Telsizin eriştiğinin \
-epey içinde — buradaki aralık bir menzil sorusu değil, görüş hattı \
-sorusudur, çünkü tek bir kırsal bağlantı bile mesafe yüzünden düşmüyor \
-(ADR-0022)."""
-note_en = """How far apart the masts stand. Well inside what the radio reaches — \
-spacing here is a line-of-sight question, not a range one, because not \
-one rural link fails for distance (ADR-0022)."""
+note = """Direklerin birbirinden ne kadar uzakta durduğu. 25 m'lik dikilen \
+direklerle 4000 m idi. Elektrik dağıtım hattının 10 m'deki direklerine \
+geçince kaba okumada 3000 m kazanıyor: 49 direk, kullanılabilirlik \
+%52'den %74,5'e, P95 18,6 m'den 13,0 m'ye, alan 178'den 246 km²'ye. \
+3500 m'de alan 126 km²'ye düşüyor ve kilometrekare başına maliyet \
+artıyor; 2500 m bir şey kazandırmıyor (ADR-0079)."""
+note_en = """How far apart the poles stand. It was 4000 m with 25 m masts \
+raised for the purpose. On the distribution line's own poles at 10 m, \
+3000 m wins on a coarse read: 49 poles, availability from 52 % to \
+74,5 %, P95 from 18,6 m to 13,0 m, area from 178 to 246 km². At 3500 m \
+the area falls to 126 km² and the cost per square kilometre rises; \
+2500 m buys nothing (ADR-0079)."""
 affects = "kırsal satırın direk sayısını, kullanılabilirliğini ve sermayesini"
-affects_en = "the rural row's mast count, availability and capital"
-sensitivity = """30 m direklerle 3000 m, direk sermayesinin yaklaşık iki katına %90,5 \
-kullanılabilirliğe ulaşır"""
-sensitivity_en = """3000 m with 30 m masts reaches 90,5 % availability for about twice the \
-mast capital"""
+affects_en = "the rural row's pole count, availability and capital"
+
 
 [values."rural.anchor_stagger_m"]
-value = 2000.0
+value = 1500.0
 unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
@@ -1108,6 +1165,7 @@ durur."""
 note_en = """Half a spacing, so alternate rows interleave rather than lining up."""
 affects = "kırsal satırın yatay geometrisini"
 affects_en = "the rural row's horizontal geometry"
+
 
 [values."rural.anchors_per_round"]
 value = 12.0

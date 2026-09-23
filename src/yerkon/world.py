@@ -890,6 +890,10 @@ class MountingOption:
     has_power: bool
     #: True when the structure already carries a data connection.
     has_backhaul: bool
+    #: What the structure's owner charges a year to carry the unit, where
+    #: the structure is somebody else's to rent. None for the town's own
+    #: columns and for structures this project builds.
+    rent_tl_per_year: Optional[Sourced] = None
 
     def __post_init__(self) -> None:
         if float(self.height_m.value) <= 0.0:
@@ -905,13 +909,18 @@ def mountings(settings: Settings = DEFAULTS) -> dict:
     written here. A run that has real ones loads its own file and builds
     its own catalogue from it; see `yerkon.settings`.
     """
-    def option(key: str, kind: str, has_power: bool, has_backhaul: bool):
+    def option(key: str, kind: str, has_power: bool, has_backhaul: bool,
+               rented: bool = False):
         return MountingOption(
             kind=kind,
             height_m=settings.sourced("mounting.{}.height_m".format(key)),
             site_cost_tl=settings.sourced("mounting.{}.site_cost_tl".format(key)),
             has_power=has_power,
             has_backhaul=has_backhaul,
+            rent_tl_per_year=(
+                settings.sourced("mounting.{}.rent_tl_per_year".format(key))
+                if rented else None
+            ),
         )
 
     return {
@@ -920,6 +929,14 @@ def mountings(settings: Settings = DEFAULTS) -> dict:
         "billboard": option("billboard", "billboard", True, False),
         "lighting_column": option("lighting_column", "lighting column", True, False),
         "tall_mast": option("tall_mast", "tall mast", False, False),
+        # A concrete pole of the rural distribution network. It stands
+        # along the road already, but between villages it carries only
+        # medium voltage, with no low voltage tap for a small load, so
+        # the unit brings its own supply; and the pole is the
+        # distribution company's, so it is rented (ADR-0079).
+        "distribution_pole": option(
+            "distribution_pole", "distribution pole", False, False,
+            rented=True),
         # A tunnel already has power and a communications spine along its
         # length, for lighting, ventilation and its own systems. That is
         # most of why a tunnel deployment costs less per anchor to run
@@ -951,6 +968,7 @@ SIGN_GANTRY = MOUNTINGS["sign_gantry"]
 BILLBOARD = MOUNTINGS["billboard"]
 LIGHTING_COLUMN = MOUNTINGS["lighting_column"]
 TALL_MAST = MOUNTINGS["tall_mast"]
+DISTRIBUTION_POLE = MOUNTINGS["distribution_pole"]
 TUNNEL_BRACKET = MOUNTINGS["tunnel_bracket"]
 """Inside a tunnel, where power and backhaul already run the length of it."""
 

@@ -25,6 +25,7 @@ from yerkon.rf import (
     usable_range_m,
 )
 from yerkon.world import (
+    DISTRIBUTION_POLE,
     TUNNEL_BRACKET,
     BILLBOARD,
     LIGHTING_COLUMN,
@@ -171,6 +172,9 @@ MOUNTING_CHOICES = {
     "billboard": BILLBOARD,
     "column": LIGHTING_COLUMN,
     "mast": TALL_MAST,
+    # The rural distribution line's poles, which the open country row
+    # stands on (ADR-0079).
+    "pole": DISTRIBUTION_POLE,
     # The tunnel row's own bracket. Missing here for a long time, while
     # the viewer's catalogue had it, so the two disagreed: asking this
     # one for a tunnel bracket raised, and the page's hardcoded dropdown

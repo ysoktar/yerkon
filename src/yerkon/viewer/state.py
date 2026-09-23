@@ -644,6 +644,7 @@ class ViewState:
                 "billboard": by_key["billboard"],
                 "column": by_key["lighting_column"],
                 "mast": by_key["tall_mast"],
+                "pole": by_key["distribution_pole"],
                 "tunnel": by_key["tunnel_bracket"],
             },
             radios(settings),
@@ -1169,7 +1170,7 @@ def _template(name: str) -> ViewState:
             site="polatli", roughness_m=0.2,
             tolerance_m=5.0, sweep_m=500.0, journey_s=_journey_s("rural"),
             runs=(
-                AnchorRun("M", "e28", "mast", 0.0, 20_000.0,
+                AnchorRun("M", "sx1280", "pole", 0.0, 20_000.0,
                           _grid("rural")[0], 0.0,
                           stagger_m=_grid("rural")[1]),
             ),

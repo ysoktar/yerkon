@@ -148,7 +148,7 @@ def test_an_unknown_name_lists_the_ones_that_exist():
     """A bare KeyError tells a person nothing they can act on."""
     from yerkon.design import MOUNTING_CHOICES, chosen
 
-    with pytest.raises(ValueError, match="billboard, column, gantry, mast, sign"):
+    with pytest.raises(ValueError, match="billboard, column, gantry, mast, pole, sign"):
         chosen(MOUNTING_CHOICES, "lamppost", "mounting")
 
 

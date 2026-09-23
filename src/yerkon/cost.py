@@ -123,6 +123,8 @@ class AnchorSite:
     has_power: bool = False
     #: True when the structure already carries a data connection.
     has_backhaul: bool = False
+    #: What the structure's owner charges a year, where it is rented.
+    rent_tl_per_year: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -361,6 +363,8 @@ def price(
         * float(rates.anchor_kwh_per_year.value)
         * float(rates.electricity_tl_per_kwh.value)
     )
+    rent_tl = sum(a.rent_tl_per_year for a in inventory.anchors)
+    rented = sum(1 for a in inventory.anchors if a.rent_tl_per_year > 0.0)
     plans = math.ceil(
         unconnected / max(float(rates.anchors_per_data_plan.value), 1.0)
     )
@@ -389,6 +393,11 @@ def price(
             "{} plans for {} anchors without existing backhaul".format(
                 plans, unconnected),
             rates.connectivity_tl_per_year.provenance,
+        ),
+        LineItem(
+            "structure rent", rent_tl,
+            "{} rented structures".format(rented),
+            Provenance.ASSUMPTION if rented else Provenance.DATASHEET,
         ),
         LineItem(
             "replacement", replacement_tl,
