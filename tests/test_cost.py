@@ -70,7 +70,7 @@ def test_what_is_left_of_each_anchor_is_the_same_board():
     left = [read().boards[k].other_usd
             for k in ("sx1280-anchor", "amplified-anchor", "tunnel-anchor")]
     assert max(left) - min(left) < 1.0
-    assert all(15.0 < usd < 22.0 for usd in left)
+    assert all(13.0 < usd < 22.0 for usd in left)
 
 
 def test_no_part_is_swapped_for_a_dearer_one():
@@ -147,12 +147,12 @@ def test_a_junction_cabinet_saves_the_data_plan_and_nothing_else():
     """
     import dataclasses
 
-    # One plan per anchor, so the junction's saving is not hidden inside
-    # a plan that three anchors would have shared anyway.
+    # Priced as if a line cost something. No unit buys one now
+    # (ADR-0079), which would make this test pass on nothing.
     rates = dataclasses.replace(
         DEFAULT_RATES,
-        anchors_per_data_plan=dataclasses.replace(
-            DEFAULT_RATES.anchors_per_data_plan, value=1.0),
+        connectivity_tl_per_year=dataclasses.replace(
+            DEFAULT_RATES.connectivity_tl_per_year, value=1188.0),
     )
     plain = price(an_inventory(count=4, mounting=LIGHTING_COLUMN), rates)
     mixed = Inventory(
@@ -171,7 +171,7 @@ def test_a_junction_cabinet_saves_the_data_plan_and_nothing_else():
     def line(costing, label):
         return next(i for i in costing.operating if i.label == label).tl
 
-    rate = float(DEFAULT_RATES.connectivity_tl_per_year.value)
+    rate = float(rates.connectivity_tl_per_year.value)
     assert line(plain, "connectivity") - line(connected, "connectivity") == (
         pytest.approx(rate)
     )
@@ -274,20 +274,9 @@ def test_an_off_grid_site_is_visited_more_often():
 
 
 def test_operating_cost_responds_to_node_count():
-    """ADR-0006: a design change that halves the anchors halves most of it.
-
-    With a plan per anchor, so the plans that ten anchors share do not
-    round the answer (ADR-0079).
-    """
-    import dataclasses
-
-    rates = dataclasses.replace(
-        DEFAULT_RATES,
-        anchors_per_data_plan=dataclasses.replace(
-            DEFAULT_RATES.anchors_per_data_plan, value=1.0),
-    )
-    thirteen = price(an_inventory(count=13), rates).opex_tl_per_year
-    twenty_six = price(an_inventory(count=26), rates).opex_tl_per_year
+    """ADR-0006: a design change that halves the anchors halves most of it."""
+    thirteen = price(an_inventory(count=13)).opex_tl_per_year
+    twenty_six = price(an_inventory(count=26)).opex_tl_per_year
     assert twenty_six == pytest.approx(2.0 * thirteen, rel=0.01)
 
 
@@ -416,19 +405,22 @@ def test_a_corridor_of_three_modules_is_priced_as_three_products():
     assert truthful != pytest.approx(one_product)
 
 
-def test_anchors_with_no_line_share_a_plan():
-    """ADR-0079. A few kilobytes a day do not need a plan each.
+def test_no_unit_carries_a_sim_card():
+    """ADR-0079. Nothing in the report asks for one.
 
-    An anchor with no line passes its status over the radio it already
-    ranges with to one that has a plan. Twenty seven of them at ten to a
-    plan need three.
+    The first cost model gave every unit without a line a cellular plan
+    of its own. The report only says the centre keeps the units' keys
+    and records current; the tie runs through the tunnel's spine and
+    the junction cabinets, and the receivers that range against a unit
+    are what notice when it stops answering. No row pays for data.
     """
-    inventory = an_inventory(count=27, mounting=LIGHTING_COLUMN)
-    line = next(i for i in price(inventory).operating
-                if i.label == "connectivity")
-    plan = float(DEFAULT_RATES.connectivity_tl_per_year.value)
-    assert line.tl == pytest.approx(3 * plan)
-    assert "3 plans" in line.basis
+    from yerkon.scenarios import CHOICES
+
+    assert float(DEFAULT_RATES.connectivity_tl_per_year.value) == 0.0
+    for name, deployed in CHOICES.items():
+        line = next(i for i in price(deployed.inventory(10.0)).operating
+                    if i.label == "connectivity")
+        assert line.tl == 0.0, name
 
 
 def test_the_amplifier_buys_nothing_under_the_turkish_rule():

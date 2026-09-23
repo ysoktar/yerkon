@@ -17,6 +17,7 @@ and the scene recomputes.
 
 from __future__ import annotations
 
+import io
 import json
 import pathlib
 import threading
@@ -737,6 +738,70 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)
+
+
+# --- The same engine without a socket -------------------------------------
+#
+# The published site is a folder of files, and a folder cannot run a
+# link budget. So the visitor's browser runs this package itself, in
+# Python compiled to WebAssembly, and asks it questions through the
+# function below instead of over HTTP (ADR-0080). It is the handler
+# above, word for word: only where the bytes go is different, so the
+# simulator on the site and the one on a laptop cannot answer the same
+# question two ways.
+
+
+class _Captured(Handler):
+    """The request handler, writing its answer into memory."""
+
+    def __init__(self, path: str, body: bytes) -> None:  # noqa: D107
+        # No socket and no server, so none of the base class's setup.
+        self.path = path
+        self.headers = {"Content-Length": str(len(body))}
+        self.rfile = io.BytesIO(body)
+        self.wfile = io.BytesIO()
+        self.status = 200
+        self.sent: dict = {}
+
+    def send_response(self, code, message=None) -> None:
+        self.status = int(code)
+
+    def send_header(self, keyword, value) -> None:
+        self.sent[keyword] = value
+
+    def end_headers(self) -> None:
+        return
+
+    def send_error(self, code, message=None, explain=None) -> None:
+        self.status = int(code)
+        self.sent["Content-Type"] = "application/json; charset=utf-8"
+        self.wfile.write(json.dumps(
+            {"error": message or "nothing at {}".format(self.path)}
+        ).encode("utf-8"))
+
+
+def answer(method: str, path: str, body: str = "") -> str:
+    """One request, answered as the server would, as a JSON triple.
+
+    ``[status, content type, text]``. Text rather than bytes because
+    everything the simulator asks for is JSON or TOML, and a string
+    crosses from Python to JavaScript without a copy anybody has to
+    manage. The one binary answer, the aerial photograph, is not shipped
+    to the browser, and asking for it is an ordinary 404.
+    """
+    handler = _Captured(path, body.encode("utf-8"))
+    if method.upper() == "POST":
+        handler.do_POST()
+    else:
+        handler.do_GET()
+    payload = handler.wfile.getvalue()
+    kind = handler.sent.get("Content-Type", "application/octet-stream")
+    try:
+        text = payload.decode("utf-8")
+    except UnicodeDecodeError:
+        return json.dumps([404, "application/json; charset=utf-8",
+                           json.dumps({"error": "binary answer"})])
+    return json.dumps([handler.status, kind, text])
 
 
 def serve(

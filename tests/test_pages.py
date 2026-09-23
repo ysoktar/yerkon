@@ -759,16 +759,17 @@ def test_the_sources_are_shipped_with_the_package():
 
 
 def test_the_folder_carries_both_languages_and_every_page(tmp_path):
-    from yerkon.viewer.pages import CARRIED, write_pages
+    from yerkon.viewer.pages import CARRIED, browser_simulator, write_pages
 
     written = write_pages(tmp_path, a_record())
     names = {str(path.relative_to(tmp_path)) for path in written}
     assert "index.html" in names and "en/index.html" in names
-    # The page that says where the simulation runs, since a folder of
-    # files cannot run it.
     assert "simulasyon.html" in names and "en/simulasyon.html" in names
     assert "site.css" in names and ".nojekyll" in names
-    assert len(written) == 2 * len(PAGES) + len(CARRIED) + 1
+    # The simulator itself, run by the visitor's browser (ADR-0080).
+    assert {"calistir.html", "yerkon.zip", "sim-worker.js"} <= names
+    assert len(written) == (2 * len(PAGES) + len(CARRIED) + 1
+                            + len(browser_simulator()))
 
 
 def test_a_page_in_the_folder_points_at_files_that_are_there(tmp_path):
@@ -781,6 +782,11 @@ def test_a_page_in_the_folder_points_at_files_that_are_there(tmp_path):
         drawn = path.read_text(encoding="utf-8")
         for reference in re.findall(r'(?:href|src)="([^"]+)"', drawn):
             if reference.startswith("http") or reference.startswith("#"):
+                continue
+            # The simulator is asked for its language in the address.
+            reference = reference.split("?")[0]
+            # Answered by the engine in the browser rather than by a file.
+            if reference.startswith("api/"):
                 continue
             assert not reference.startswith("/"), "{}: {}".format(
                 path.name, reference
@@ -951,3 +957,87 @@ def test_the_table_never_calls_anything_pnt():
         for language in ("tr", "en"):
             drawn = re.sub(r'href="[^"]*"', "", render(page, language))
             assert "PNT" not in drawn, (page.slug, language)
+
+
+# --- The simulator in the visitor's browser (ADR-0080) --------------------
+
+
+def test_the_published_site_opens_the_simulator_rather_than_a_page_about_it():
+    """"Simülasyonu çalıştır" runs it; it no longer sends people elsewhere."""
+    from yerkon.viewer.pages import BROWSER_SIMULATOR, Where
+
+    assert Where(language="tr", loose=True).simulator() == BROWSER_SIMULATOR
+    assert Where(language="en", loose=True).simulator() == (
+        "../" + BROWSER_SIMULATOR + "?dil=en")
+    assert Where().simulator() == SIMULATOR
+
+
+def test_the_browser_simulator_asks_nothing_of_the_domain_root(tmp_path):
+    """The site lives under a path of its own on GitHub Pages.
+
+    An absolute "/app.js" or "/words.js" is looked for at the root of the
+    domain, where there is nothing, and the page would be blank.
+    """
+    from yerkon.viewer.pages import browser_simulator
+
+    files = browser_simulator()
+    page = files["calistir.html"].decode("utf-8")
+    assert '<script src="local.js"></script>' in page
+    assert page.index("local.js") < page.index('src="app.js"'), (
+        "the replacement fetch has to be in place before the page asks")
+    for absolute in ('src="/', 'href="/style', 'href="/app'):
+        assert absolute not in page, absolute
+    app = files["app.js"].decode("utf-8")
+    assert 'from "/' not in app
+
+
+def test_the_archive_the_browser_imports_answers_on_its_own(tmp_path):
+    """The package as the browser gets it, imported from nowhere else.
+
+    Unpacked into a folder and imported in a fresh interpreter with that
+    folder first on the path, which is what the worker does. If a file
+    the engine needs were left out of the archive, this is where it
+    would show, rather than as an error in somebody's browser.
+    """
+    import io
+    import json
+    import subprocess
+    import sys
+    import zipfile
+
+    from yerkon.viewer.pages import package_zip
+
+    archive = package_zip()
+    assert package_zip() == archive, "the archive changes between builds"
+    names = zipfile.ZipFile(io.BytesIO(archive)).namelist()
+    assert "yerkon/viewer/server.py" in names
+    assert "yerkon/site/places/kizilay/elevation.npy" in names
+    assert not any("_tiles" in n or "__pycache__" in n for n in names)
+
+    zipfile.ZipFile(io.BytesIO(archive)).extractall(tmp_path)
+    script = (
+        "import sys, json; sys.path.insert(0, {!r});"
+        "import yerkon; assert yerkon.__file__.startswith({!r}), yerkon.__file__;"
+        "from yerkon.viewer.server import answer;"
+        "print(answer('GET', '/api/scene'))"
+    ).format(str(tmp_path), str(tmp_path))
+    run = subprocess.run([sys.executable, "-c", script], capture_output=True,
+                         text=True, cwd=tmp_path, timeout=300)
+    assert run.returncode == 0, run.stderr[-2000:]
+    status, kind, text = json.loads(run.stdout)
+    assert status == 200 and "json" in kind
+    assert json.loads(text)["anchors"]
+
+
+def test_the_socketless_answer_is_the_server_s_answer():
+    """Same handler, same bytes; only where they go is different."""
+    import json
+
+    from yerkon.viewer.server import answer
+
+    status, kind, text = json.loads(answer("GET", "/api/nothing-here"))
+    assert status == 404 and json.loads(text)["error"]
+    status, kind, text = json.loads(
+        answer("POST", "/api/mode", json.dumps({"mode": "tunnel"})))
+    assert status == 200 and json.loads(text)["showing"] == "tunnel"
+    answer("POST", "/api/mode", json.dumps({"mode": "urban"}))

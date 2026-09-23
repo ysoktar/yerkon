@@ -132,10 +132,14 @@ class Where:
         return ("../" if self.language == "en" else "") + name
 
     def simulator(self) -> str:
-        # Served, this is the running simulator. Loose, it is the page
-        # that says the simulator runs on your own machine, because a
-        # folder of files cannot run a link budget.
-        return SIMULATOR if not self.loose else self.file(SIMULATION)
+        # Served, this is the running simulator. Loose, it is the same
+        # simulator running in the visitor's browser, one folder up from
+        # the English pages (ADR-0080).
+        if not self.loose:
+            return SIMULATOR
+        if self.language == "en":
+            return "../" + BROWSER_SIMULATOR + "?dil=en"
+        return BROWSER_SIMULATOR
 
     @staticmethod
     def file(page: "Page") -> str:
@@ -1168,19 +1172,22 @@ RESULTS = Page(
                     "hem de trafik yönetim merkezine giden bir hat. "
                     "Belediyenin kameraları o hattı zaten kullanıyor. "
                     "Izgaranın dörtte biri böyle bir kavşakta duruyor ve "
-                    "veri paketi almıyor; geri kalanı durum bilgisini "
-                    "zaten konuştuğu telsizle bir komşusuna aktarıyor ve "
-                    "on birim bir paketi paylaşıyor. Kalem kalem döküm "
-                    "Maliyet sayfasında.",
+                    "merkeze oradan bağlanıyor. Hiçbir birime SIM kartı "
+                    "konmuyor: geri kalanları, onlara karşı ölçüm yapan "
+                    "telefonlar ve araç alıcıları izliyor, cevap vermeyen "
+                    "birim böyle görünüyor. Kalem kalem döküm Maliyet "
+                    "sayfasında.",
                     "Power is only one of the two things a structure "
                     "gives. A signalised junction carries a controller "
                     "cabinet: mains for the heads and a line to the "
                     "traffic management centre. The municipality's cameras "
                     "already use that line. A quarter of the grid stands "
-                    "at such a junction and buys no data plan; the rest "
-                    "pass their status over the radio they already use to "
-                    "a neighbour, and ten units share a plan. The line by "
-                    "line breakdown is on the Cost page.",
+                    "at such a junction and reaches the centre through "
+                    "it. No unit carries a SIM card: the rest are watched "
+                    "by the phones and vehicle receivers that range "
+                    "against them, and a unit that stops answering shows "
+                    "up that way. The line by line breakdown is on the "
+                    "Cost page.",
                 ),
                 _w(
                     "Sıklaştırmak kullanılabilirliği yükseltiyor ama "
@@ -1642,21 +1649,34 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Kendi makinende", "On your own machine"),
+            heading=_w("Tarayıcıda ve kendi makinende",
+                       "In the browser, and on your own machine"),
             lines=(
                 _w(
-                    "Simülasyon bu sayfanın içinde çalışmaz. Bir koşu üç "
-                    "işlemciyi dakikalarca meşgul eder ve gerçek arazi "
-                    "verisi okur. Kurulumu dört komut. Açılan sayfada her "
-                    "ayar canlıdır: birimleri fareyle taşıyabilir, başka "
-                    "bir şehir indirebilir, üç satırı da yeniden "
-                    "koşturabilirsiniz.",
-                    "The simulation does not run inside this page. A run "
-                    "keeps three processors busy for minutes and reads "
-                    "real terrain data. Four commands install it. On the "
-                    "page it opens every setting is live: you can drag the "
-                    "units with the mouse, fetch another city, and run all "
-                    "three rows again.",
+                    "**Simülasyonu çalıştır** düğmesi simülatörü bu "
+                    "tarayıcıda açar. Hiçbir sunucu hesap yapmaz: Python, "
+                    "numpy ve bu projenin kendi paketi sayfaya iner ve her "
+                    "şey bu bilgisayarda koşar. İlk açılış yaklaşık 20 MB "
+                    "indirir ve bir dakika kadar sürebilir; sonra tarayıcı "
+                    "saklar. Tarayıcıda tek işlemci kullanıldığı için bir "
+                    "koşu yerel kurulumdakinden yavaştır; **Hızlı dene** "
+                    "bunu kısaltır.",
+                    "The **Run the simulation** button opens the simulator "
+                    "in this browser. No server computes anything: Python, "
+                    "numpy and this project's own package come down to "
+                    "the page and everything runs on this computer. The "
+                    "first load fetches about 20 MB and can take a minute; "
+                    "after that the browser keeps it. In a browser one "
+                    "processor does the work, so a run is slower than in "
+                    "a local install; **Try it fast** shortens it.",
+                ),
+                _w(
+                    "Tabloyu yeniden yayımlamak, başka bir şehrin zeminini "
+                    "indirmek ya da üç satırı birden tam çözünürlükte "
+                    "koşturmak için yerel kurulum gerekir. Dört komut:",
+                    "Republishing the table, fetching another city's "
+                    "ground, or running all three rows at full resolution "
+                    "needs a local install. Four commands:",
                 ),
             ),
         ),
@@ -2632,12 +2652,85 @@ CARRIED = ("site.css", "theme.js", "road.png", "gnss.png",
 STATIC = pathlib.Path(__file__).parent / "static"
 
 
+#: The simulator's page on the published site, and what it needs beside it.
+BROWSER_SIMULATOR = "calistir.html"
+BROWSER_SCRIPTS = ("app.js", "draw.js", "words.js", "map.js", "style.css",
+                   "local.js", "sim-worker.js")
+#: What of the package the browser does not need: caches, the fetch
+#: cache of raw elevation tiles, and the files the server sends.
+LEFT_OUT = ("__pycache__", "_tiles", "static")
+
+
+def _loose(text: str, swaps) -> str:
+    """Absolute addresses made relative, refusing any that has moved.
+
+    The published site sits under a path of its own, so "/app.js" would
+    be looked for at the root of somebody else's domain. A swap whose
+    source is not there any more fails here rather than as a blank page.
+    """
+    for before, after in swaps:
+        if before not in text:
+            raise ValueError("the simulator no longer says {!r}".format(before))
+        text = text.replace(before, after)
+    return text
+
+
+def browser_simulator() -> dict:
+    """The simulator's files for a folder served by nothing, by name."""
+    page = _loose((STATIC / "simulator.html").read_text(encoding="utf-8"), (
+        ('href="/style.css"', 'href="style.css"'),
+        ('<a id="back" href="/"', '<a id="back" href="index.html"'),
+        ('href="/api/figures.toml"', 'href="api/figures.toml"'),
+        ('<script type="module" src="/app.js"></script>',
+         '<script src="local.js"></script>\n'
+         '<script type="module" src="app.js"></script>'),
+    ))
+    files = {BROWSER_SIMULATOR: page.encode("utf-8")}
+    for name in BROWSER_SCRIPTS:
+        body = (STATIC / name).read_bytes()
+        if name == "app.js":
+            body = _loose(body.decode("utf-8"), (
+                ('from "/words.js"', 'from "./words.js"'),
+                ('from "/draw.js"', 'from "./draw.js"'),
+                ('from "/map.js"', 'from "./map.js"'),
+            )).encode("utf-8")
+        files[name] = body
+    files["yerkon.zip"] = package_zip()
+    return files
+
+
+def package_zip() -> bytes:
+    """This package as one archive the browser unpacks and imports.
+
+    Written the same way every time: sorted, with one fixed date, so the
+    folder in the repository only changes when the package does.
+    """
+    import io
+    import zipfile
+
+    root = pathlib.Path(__file__).resolve().parent.parent
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        for path in sorted(root.rglob("*")):
+            relative = path.relative_to(root)
+            if path.is_dir() or any(part in LEFT_OUT for part in relative.parts):
+                continue
+            if path.suffix == ".pyc":
+                continue
+            info = zipfile.ZipInfo(
+                "yerkon/" + relative.as_posix(), date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            archive.writestr(info, path.read_bytes())
+    return buffer.getvalue()
+
+
 def write_pages(into, published=None) -> tuple:
     """Draw the whole site into a folder, both languages.
 
     For somewhere that serves files and runs nothing, GitHub Pages being
-    the one this was written for. The simulator does not come: it needs
-    the engine, and what comes instead is a page saying so (ADR-0065).
+    the one this was written for. The simulator comes too, and runs in
+    the visitor's browser rather than on the server (ADR-0080).
 
     Turkish at the root and English under `en/`, because the report is
     Turkish and whoever opens the address without asking for a language
@@ -2658,6 +2751,11 @@ def write_pages(into, published=None) -> tuple:
     for name in CARRIED:
         path = into / name
         path.write_bytes((STATIC / name).read_bytes())
+        written.append(path)
+    # The simulator itself, running in the visitor's browser (ADR-0080).
+    for name, body in browser_simulator().items():
+        path = into / name
+        path.write_bytes(body)
         written.append(path)
     # Without this the pages are handed to Jekyll, which is a static site
     # generator this site is not written for.

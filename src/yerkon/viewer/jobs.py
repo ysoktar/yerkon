@@ -16,11 +16,16 @@ print, and hands back whatever they returned.
 
 from __future__ import annotations
 
+import sys
 import threading
 import traceback
 import uuid
 from dataclasses import dataclass, field
 from typing import Callable, Optional
+
+
+#: Running as Python compiled to WebAssembly, in a visitor's browser.
+IN_A_BROWSER = sys.platform == "emscripten"
 
 
 @dataclass
@@ -109,7 +114,13 @@ class Jobs:
                 job.result = outcome
                 job.done = True
 
-        threading.Thread(target=run, daemon=True, name=kind).start()
+        if IN_A_BROWSER:
+            # Python in WebAssembly has no threads to start. The browser
+            # runs it in a worker already, so the page stays alive while
+            # this finishes before the first poll arrives (ADR-0080).
+            run()
+        else:
+            threading.Thread(target=run, daemon=True, name=kind).start()
         return job
 
     def read(self, identifier: str) -> Optional[Job]:

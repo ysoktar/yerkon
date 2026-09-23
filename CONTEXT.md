@@ -169,10 +169,10 @@ kutu). Tablo 1000 adetlik fiyatı kullanıyor. ADR-0079'a bak.
 
 | Ürün | Ana parçalar | Raporda, 100 adet | Şimdi, 1000 adet |
 |---|---|---|---|
-| Şehir içi ve kırsal yayın birimi | E28-2G4M12S (SX1280), W24P-U, STM32G031, ATECC608B | 1366,07 / 1082,68 | 815,88 |
-| Kritik bölge yayın birimi | DWM3000, STM32G031, ATECC608B | 1634,44 | 1194,64 |
-| Yaya alıcısı | E28-2G4M12S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3117,74 | 2142,42 |
-| Kara aracı alıcısı | E28-2G4M12S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran | 4002,29 | 2596,13 |
+| Şehir içi ve kırsal yayın birimi | E28-2G4M12S (SX1280), W24P-U, STM32G031, ATECC608B | 1366,07 / 1082,68 | 718,05 |
+| Kritik bölge yayın birimi | DWM3000, STM32G031, ATECC608B | 1634,44 | 1091,19 |
+| Yaya alıcısı | E28-2G4M12S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3117,74 | 2141,87 |
+| Kara aracı alıcısı | E28-2G4M12S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran | 4002,29 | 2595,30 |
 
 Şehir içi ve kırsal yayın birimi artık aynı kart. Raporda iki satırdılar,
 çünkü kırsal olanında yükselteçli E28-2G4M27S vardı; Türkiye'nin 2,4 GHz

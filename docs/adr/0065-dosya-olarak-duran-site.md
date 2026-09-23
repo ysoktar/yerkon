@@ -29,7 +29,7 @@ adlandırdığını biliyor: sunucu `/sorun` diyor, klasör `sorun.html`.
 iki kez yazılmıyor. Hiçbir bağlantı `/` ile başlamıyor, çünkü site
 `ysoktar.github.io/yerkon/` altında duruyor ve orada kök başka bir yer.
 
-**Simülatör gelmiyor.** Arkasında Python bir motor var: link bütçesi,
+**Simülatör gelmiyor.** (ADR-0080 bunu değiştirdi: simülatör artık ziyaretçinin tarayıcısında çalışıyor.) Arkasında Python bir motor var: link bütçesi,
 arazi profili, çekilişler, çözücü. Yerine ne olduğunu söyleyen bir
 sayfa geliyor: bir ekran görüntüsü, içinde ne yapıldığı, ve dört
 komut. Yarısı çalışan bir kopya hiç olmayandan kötü olurdu.

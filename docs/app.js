@@ -10,7 +10,7 @@
  * else applies immediately.
  */
 
-import { decimal, say, speak, speaks } from "/words.js";
+import { decimal, say, speak, speaks } from "./words.js";
 
 /* The choices whose names are this page's to give.
  *
@@ -1462,8 +1462,8 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "/draw.js";
-import * as pick from "/map.js";
+import * as draw from "./draw.js";
+import * as pick from "./map.js";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");

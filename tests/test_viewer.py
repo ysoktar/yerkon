@@ -2632,3 +2632,22 @@ def test_the_simulator_starts_from_the_arrangement_the_table_ran():
             "{}: the simulator drives {} s, the table {}".format(
                 name, template.journey_s, longest)
         )
+
+
+def test_in_a_browser_a_task_finishes_before_the_first_poll(monkeypatch):
+    """ADR-0080. Python in WebAssembly cannot start a thread.
+
+    The worker it runs in is already off the page's thread, so the task
+    runs where it is asked for and the first poll finds it done.
+    """
+    from yerkon import parallel
+    from yerkon.viewer import jobs
+
+    monkeypatch.setattr(jobs, "IN_A_BROWSER", True)
+    started = jobs.Jobs().start("table", lambda say: (say("one"), {"ok": 1})[1])
+    assert started.done and started.result == {"ok": 1}
+    assert started.progress == ["one"]
+
+    monkeypatch.setattr(parallel.sys, "platform", "emscripten")
+    assert parallel.workers() == 1
+    assert parallel.spread(abs, [-1, -2, -3]) == (1, 2, 3)

@@ -16,7 +16,6 @@ hides that is worse than no total.
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 
 from yerkon.evidence import Provenance, Sourced
@@ -176,9 +175,6 @@ class OperatingRates:
     electricity_tl_per_kwh: Sourced
     anchor_kwh_per_year: Sourced
     connectivity_tl_per_year: Sourced
-    #: Anchors that share one plan, passing their few bytes to it over
-    #: the radio they already range with (ADR-0079).
-    anchors_per_data_plan: Sourced
     #: A standalone supply for an anchor on a structure with no mains.
     off_grid_supply_tl: Sourced
     #: How long a unit lasts before it is replaced.
@@ -365,10 +361,7 @@ def price(
     )
     rent_tl = sum(a.rent_tl_per_year for a in inventory.anchors)
     rented = sum(1 for a in inventory.anchors if a.rent_tl_per_year > 0.0)
-    plans = math.ceil(
-        unconnected / max(float(rates.anchors_per_data_plan.value), 1.0)
-    )
-    connectivity_tl = plans * float(rates.connectivity_tl_per_year.value)
+    connectivity_tl = unconnected * float(rates.connectivity_tl_per_year.value)
     replacement_tl = (units_tl + supplies_tl) / max(
         float(rates.service_life_years.value), 1e-9
     )
@@ -390,8 +383,7 @@ def price(
         ),
         LineItem(
             "connectivity", connectivity_tl,
-            "{} plans for {} anchors without existing backhaul".format(
-                plans, unconnected),
+            "{} anchors without existing backhaul".format(unconnected),
             rates.connectivity_tl_per_year.provenance,
         ),
         LineItem(

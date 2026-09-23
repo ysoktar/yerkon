@@ -25,6 +25,7 @@ attribute one source's runs to another.
 from __future__ import annotations
 
 import os
+import sys
 from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, Iterable, Optional, Sequence, TypeVar
 
@@ -45,6 +46,9 @@ def workers(asked: Optional[int] = None) -> int:
     One less than the machine has, so the terminal and the viewer stay
     responsive while a search runs. At least one.
     """
+    # Python in a browser has no processes to spread over (ADR-0080).
+    if sys.platform == "emscripten":
+        return 1
     if asked is not None:
         return max(int(asked), 1)
     return max((os.cpu_count() or 2) - 1, 1)

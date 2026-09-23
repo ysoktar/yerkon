@@ -296,70 +296,53 @@ sensitivity = "enerji kalemi her satırda OPEX'in %2'sinden az"
 sensitivity_en = "the energy line is under 2 % of OPEX in every row"
 
 [values."operating.connectivity_tl_per_year"]
-value = 1188.0
+value = 0.0
 unit = "TL/year"
-provenance = "DATASHEET"
-source = "Turkcell M2M IOT 2 GB, 99 TL/ay, KDV ve ÖİV dahil (2026)"
-source_en = "Turkcell M2M IOT 2 GB, 99 TL a month including VAT and ÖİV (2026)"
-note = """Bir hücresel veri paketinin yıllık bedeli. 600 TL varsayılmıştı; \
-bulunan en ucuz kurumsal M2M paketi ayda 99 TL, yani yılda 1188 TL. \
-Varsayım gerçek fiyatın yarısıydı. Ucuzlatmanın yolu paketi ucuz \
-varsaymak değil, paylaşmak: bkz. operating.anchors_per_data_plan."""
-note_en = """What a cellular data plan costs a year. 600 TL had been \
-assumed; the cheapest corporate M2M plan found is 99 TL a month, 1188 TL \
-a year. The assumption was half the real price. The way to spend less \
-is to share the plan, not to assume it cheap: see \
-operating.anchors_per_data_plan."""
-affects = "kendi hattı olmayan direklerin OPEX'ini"
-affects_en = "OPEX of anchors with no line of their own"
-sensitivity = """paylaşım sayısına bölünür; on direğe bir paketle direk başına \
-yılda 119 TL"""
-sensitivity_en = """divided by how many share a plan; one plan for ten anchors \
-is 119 TL an anchor a year"""
-
-[values."operating.anchors_per_data_plan"]
-value = 10.0
-unit = "anchors"
 provenance = "DESIGN"
 source = "bu proje, bir tasarım kararı olarak"
 source_en = "this project, as a design choice"
-note = """Bir veri paketini kaç direğin paylaştığı. Direk merkeze yalnızca \
-durum ve anahtar güncellemesi gönderiyor, günde birkaç kilobayt. Kendi \
-hattı olmayan bir direk bunu zaten konuştuğu SX1280 bağlantısıyla bir \
-komşusuna aktarır; ölçüm bağlantısı kapanan her komşu bu iş için de \
-yeter. On direğe bir paket, 2 GB'lık paketin binde birini kullanır."""
-note_en = """How many anchors share one data plan. An anchor sends the \
-centre only its status and key updates, a few kilobytes a day. One with \
-no line of its own passes them over the SX1280 link it already uses to \
-a neighbour; any neighbour whose ranging link closes will do. One plan \
-for ten anchors uses a thousandth of a 2 GB plan."""
-affects = "bağlantı kalemini"
-affects_en = "the connectivity line"
-sensitivity = "1 yapmak her direğe ayrı paket demek, kalemi on katına çıkarır"
-sensitivity_en = "1 means a plan per anchor and multiplies the line by ten"
+note = """Kendi hattı olmayan bir birimin yıllık veri bedeli: sıfır, çünkü \
+birimlere SIM kartı konmuyor. Raporda böyle bir şey yok; ilk maliyet \
+modeli (ADR-0006) her birime bir hücresel paket varsaymıştı ve kaldırıldı \
+(ADR-0079). Merkeze bağ, tünelde tünelin haberleşme omurgasından, şehirde \
+ışıklı kavşağın sinyal dolabından geçiyor. Geri kalan birimleri, onlara \
+karşı ölçüm yapan telefonlar ve araç alıcıları izliyor: hangi birimin \
+cevap verdiğini zaten biliyorlar, dolayısıyla cevap vermeyen birim hattı \
+olmadan da görünüyor."""
+note_en = """What a year of data costs an anchor with no line of its own: \
+nothing, because no unit carries a SIM card. The report says nothing of \
+the kind; the first cost model (ADR-0006) assumed a cellular plan per \
+anchor and it has been taken out (ADR-0079). The tie to the centre runs \
+through the tunnel's own communications spine in a tunnel and a \
+signalised junction's cabinet in town. The other units are watched by \
+the phones and vehicle receivers that range against them: those already \
+know which unit answered, so a unit that stops answering shows up \
+without a line of its own."""
+affects = "kendi hattı olmayan direklerin OPEX'ini"
+affects_en = "OPEX of anchors with no line of their own"
 
 [values."operating.off_grid_supply_tl"]
-value = 2600.0
+value = 2330.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = """10 W güneş paneli 518,72-700 TL, 12 V 7 Ah kuru akü 611,27 TL \
-(Akakçe, Power Enerji, Eylül 2026); denetleyici, tutucu ve kablo bu \
-projenin varsayımı"""
-source_en = """10 W solar panel 518,72 to 700 TL, 12 V 7 Ah sealed battery \
-611,27 TL (Akakçe, Power Enerji, September 2026); the controller, bracket \
-and cable are this project's assumption"""
+source = """10 W güneş paneli 518,72 TL, 12 V 7 Ah kuru akü 524,40 TL (Akakçe, \
+Eylül 2026, bulunan en ucuzlar); denetleyici, tutucu ve kablo bu projenin \
+varsayımı"""
+source_en = """10 W solar panel 518,72 TL, 12 V 7 Ah sealed battery 524,40 TL \
+(Akakçe, September 2026, the cheapest found); the controller, bracket and \
+cable are this project's assumption"""
 note = """Şebekesi olmayan bir yapıdaki direk için panel, akü, denetleyici, \
 tutucu ve kablo. 9500 TL idi; o, birimin 4 W çektiği varsayımına göre \
 boyutlanmıştı. 0,34 W'lık bir yük günde 8 Wh ister: Ankara'nın kışında \
 günde iki saatlik tam güneşle 10 W'lık panel bunu verir, 84 Wh'lik akü \
-beş günü taşır. Panel 700, akü 611,27, denetleyici, tutucu ve kablo \
-1289 TL: 2600 TL."""
+beş günü taşır. Panel 518,72, akü 524,40, denetleyici, tutucu ve kablo \
+1286,88 TL: 2330 TL."""
 note_en = """Panel, battery, controller, bracket and cable for an anchor on \
 a structure with no mains. It was 9500 TL, sized for a unit that drew \
 4 W. A 0,34 W load needs 8 Wh a day: a 10 W panel gives that on two \
 hours of full sun in an Ankara winter, and an 84 Wh battery carries five \
-days. Panel 700, battery 611,27, controller, bracket and cable 1289 TL: \
-2600 TL."""
+days. Panel 518,72, battery 524,40, controller, bracket and cable \
+1286,88 TL: 2330 TL."""
 affects = "şebeke dışı direklerin CAPEX ve OPEX'ini"
 affects_en = "CAPEX and OPEX of off-grid anchors"
 sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
