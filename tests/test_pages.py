@@ -10,6 +10,7 @@ exists (ADR-0064).
 from __future__ import annotations
 
 import dataclasses
+import html
 import pathlib
 import re
 
@@ -871,49 +872,64 @@ def test_a_part_nobody_can_draw_is_an_error_rather_than_a_blank():
 
 
 def test_what_the_town_s_structures_save_is_what_the_model_prices():
-    """ADR-0077. The one counterfactual the results page quotes.
+    """ADR-0077, ADR-0079. The one counterfactual the results page quotes.
 
-    The page says a unit on a lighting column costs 4366 TL installed
-    against 95866 TL on a mast raised for it, and twenty-two times on
-    capital per square kilometre. Those three figures cannot come out
-    of the published record, because the record has no run of a town on
-    masts in it. So they are priced here instead, and the page is held
-    to what the model says rather than to what somebody typed.
+    A unit on a lighting column against the same unit on a mast raised
+    for it. The record has no run of a town on masts, so the page cannot
+    read the comparison from it; it draws it from the prices the model
+    uses instead, and nothing in it is typed. Moving the mast's price
+    moves the page.
     """
-    from yerkon.cost import URBAN_ANCHOR, AnchorSite, Inventory, price
-    from yerkon.scenarios import CHOICES
+    from yerkon.cost import SX1280_ANCHOR, DEFAULT_RATES
+    from yerkon.numbers import decimal_comma
+    from yerkon.viewer.costing import ratio_on_masts
     from yerkon.world import LIGHTING_COLUMN, TALL_MAST
 
-    anchors = len(CHOICES["urban"].scenario.deployment.anchors)
-
-    def priced(mounting):
-        return price(Inventory(
-            anchors=tuple(
-                AnchorSite(
-                    product=URBAN_ANCHOR,
-                    structure=mounting.kind,
-                    site_cost_tl=mounting.site_cost_tl,
-                    has_power=mounting.has_power,
-                    has_backhaul=mounting.has_backhaul,
-                )
-                for _ in range(anchors)
-            ),
-            service_area_km2=6.6833,
-        ))
-
-    columns, masts = priced(LIGHTING_COLUMN), priced(TALL_MAST)
-
-    assert round(columns.capex_tl / anchors) == 4366
-    assert round(masts.capex_tl / anchors) == 95866
-    assert round(masts.capex_tl / columns.capex_tl) == 22
+    unit = float(SX1280_ANCHOR.unit_price_tl.value)
+    on_column = unit + float(LIGHTING_COLUMN.site_cost_tl.value)
+    on_mast = (unit + float(TALL_MAST.site_cost_tl.value)
+               + float(DEFAULT_RATES.off_grid_supply_tl.value))
+    assert ratio_on_masts() == round(on_mast / on_column)
 
     page = render(page_at("sonuclar"), "tr")
-    for figure in ("1366", "3000", "85000", "9500", "4366", "95866",
-                   "22 kat"):
-        assert figure in page, figure
-    assert "{} birim".format(anchors) in page, (
-        "the page names an anchor count the deployment no longer has"
-    )
+    for figure in (on_column, on_mast):
+        assert decimal_comma(figure, 2) in page
+    assert "{} kat".format(ratio_on_masts()) in page
+
+
+def test_every_cost_cell_is_the_last_line_of_its_breakdown():
+    """ADR-0079. The cost page and the table cannot disagree.
+
+    The page prices each row from the same inventory over the same area
+    the published run used. If a price moves and nobody republishes, the
+    page and the table would say two things; this is what notices.
+    """
+    from yerkon.viewer.costing import costed
+
+    record = read()
+    for key in record.keys:
+        row = record.row(key)
+        deployed, costing = costed(key, row.area_km2)
+        if deployed.serves_a_corridor:
+            capex, opex = (costing.capex_tl_per_route_km,
+                           costing.opex_tl_per_route_km_year)
+        else:
+            capex, opex = costing.capex_tl_per_km2, costing.opex_tl_per_km2_year
+        assert capex == pytest.approx(row.capex_tl_per_unit, rel=1e-4), key
+        assert opex == pytest.approx(row.opex_tl_per_unit_year, rel=1e-4), key
+
+
+def test_the_cost_page_shows_every_part_and_every_assumption():
+    from yerkon.bom import read as bill
+    from yerkon.viewer.costing import ASSUMED
+
+    page = render(page_at("maliyet"), "tr", read())
+    for part in bill().parts.values():
+        used = any(part in board.parts for board in bill().boards.values())
+        if used:
+            assert html.escape(part.name) in page, part.name
+    for key, name in ASSUMED:
+        assert name[0] in page, key
 
 
 def test_the_table_never_calls_anything_pnt():

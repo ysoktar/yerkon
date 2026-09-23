@@ -161,20 +161,27 @@ sitenin kullandıklarının listesi değil. ADR-0070'e bak.
 
 ## Ürünler
 
-Raporun 14. sayfasındaki malzeme listesinden. Fiyatlar 100 birimlik
-kademede, Türk lirası, 6 Eylül 2026 tarihli.
+**Bill** (malzeme listesi): `bom.toml` ve `bom.py`. Raporun 14. sayfası her
+ürün için yalnızca iki toplam veriyor (1 adet ve 100 adette). Malzeme
+listesi her ana parçayı satıcı fiyatıyla yazıyor; raporun toplamından
+bunlar çıkınca kalan "diğer" satırıdır (güç dönüşümü, koruma, bağlantı,
+kutu). Tablo 1000 adetlik fiyatı kullanıyor. ADR-0079'a bak.
 
-| Ürün | Telsiz | Birim fiyat |
-|---|---|---|
-| Şehir içi yayın birimi | SX1280 + 2,4 GHz anten | 1366,07 |
-| Kırsal yayın birimi | E28-2G4M27S | 1082,68 |
-| Kritik bölge yayın birimi | DWM3000 UWB | 1634,44 |
-| Yaya alıcısı | SX1280 + DWM3000 + ESP32-S3 + BNO085 | 3117,74 |
-| Kara aracı alıcısı | SX1280 + DWM3000 + STM32 + BNO085 | 4002,29 |
+| Ürün | Ana parçalar | Raporda, 100 adet | Şimdi, 1000 adet |
+|---|---|---|---|
+| Şehir içi ve kırsal yayın birimi | E28-2G4M12S (SX1280), W24P-U, STM32G031, ATECC608B | 1366,07 / 1082,68 | 815,88 |
+| Kritik bölge yayın birimi | DWM3000, STM32G031, ATECC608B | 1634,44 | 1194,64 |
+| Yaya alıcısı | E28-2G4M12S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3117,74 | 2142,42 |
+| Kara aracı alıcısı | E28-2G4M12S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran | 4002,29 | 2596,13 |
 
-Aynı malzeme listesinde adı geçen antenler: RF Solutions LAMBDA80-24S ve
-Inventek W24P-U. Bunlar stok antenlerdir ve link bütçesi onların yayımlanmış
-kazancını kullanır. Hiçbir antenin rapordakinden iyi olduğu varsayılmaz.
+Şehir içi ve kırsal yayın birimi artık aynı kart. Raporda iki satırdılar,
+çünkü kırsal olanında yükselteçli E28-2G4M27S vardı; Türkiye'nin 2,4 GHz
+kuralı ölçüm bant genişliğinde yayın gücünü yaklaşık 12 dBm ile sınırladığı
+için o yükseltecin gücü kullanılamıyor.
+
+LAMBDA80-24S ve E28-2G4M12S anten değil, SX1280 modülüdür. Anten Inventek
+W24P-U; link bütçesi onun yayımlanmış kazancını kullanır. Hiçbir antenin
+rapordakinden iyi olduğu varsayılmaz.
 
 ## Tablo sütunları ne demek
 

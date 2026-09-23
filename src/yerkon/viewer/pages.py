@@ -27,6 +27,7 @@ from dataclasses import dataclass
 from typing import Optional, Sequence
 
 from yerkon import sources
+from yerkon.viewer import costing
 from yerkon.numbers import decimal_comma
 
 
@@ -554,9 +555,12 @@ SYSTEM = Page(
                     "**Kırsal.** Az sayıda ama geniş alana ulaşan nokta: "
                     "akıllı ulaşım sistemi ve yol kenarı üniteleri, baz "
                     "istasyonu sahaları, demiryolu ve karayolu altyapısı. "
-                    "İçinde yükselteç olan bir modül (E28-2G4M27S) açık "
-                    "alanda ve görüş hattında kilometreler mertebesinde "
-                    "bağlantı kurabiliyor; YERKON'da 8-10 km bir "
+                    "Türkiye'de 2,4 GHz'de yayın gücü bu bant genişliğinde "
+                    "yaklaşık 12 dBm ile sınırlı, bu yüzden yükselteçli bir "
+                    "modül (E28-2G4M27S) burada ek menzil vermiyor; kırsal "
+                    "birim şehir içindekiyle aynı kartı kullanıyor ve "
+                    "menzili direğin yüksekliği ve açık görüş sağlıyor. "
+                    "YERKON'da 8-10 km bir "
                     "haberleşme ve kapsama hedefi olarak alınıyor ve o "
                     "mesafedeki ölçüm doğruluğu saha deneyleriyle "
                     "doğrulanacak. Orman, engebe ve kapalı görüş yüzünden "
@@ -565,10 +569,13 @@ SYSTEM = Page(
                     "raporlanacak.",
                     "**Open country.** A few points with wide reach: "
                     "intelligent transport and roadside units, base "
-                    "station sites, rail and road infrastructure. A module "
-                    "with an integrated amplifier (E28-2G4M27S) can hold a "
-                    "link over kilometres in the open with line of sight; "
-                    "YERKON takes 8 to 10 km as a communications and "
+                    "station sites, rail and road infrastructure. In Turkey "
+                    "the 2,4 GHz limit holds radiated power to about 12 dBm "
+                    "at this bandwidth, so a module with an amplifier "
+                    "(E28-2G4M27S) buys no extra reach here; the rural unit "
+                    "is the same board as the urban one, and its reach "
+                    "comes from the height of its mast and a clear line "
+                    "of sight. YERKON takes 8 to 10 km as a communications and "
                     "coverage target, and how accurately it ranges at that "
                     "distance is to be confirmed by field trials. Forest, "
                     "broken ground and blocked sight lines are expected to "
@@ -652,72 +659,40 @@ SYSTEM = Page(
             ),
         ),
         Part(
-            kind="table",
+            kind="shows", shows="bill",
             heading=_w("Donanım ve fiyatı", "The hardware and its price"),
-            numbers_from=2,
-            rows=(
-                (
-                    _w("Ürün", "Product"),
-                    _w("Ana bileşenler", "Main parts"),
-                    _w("1 adet", "One"),
-                    _w("100 adette", "At 100"),
-                ),
-                (
-                    _w("Şehir içi yayın birimi", "Urban broadcast unit"),
-                    _w("SX1280, 2,4 GHz anten, STM32, ATECC608B",
-                       "SX1280, 2,4 GHz antenna, STM32, ATECC608B"),
-                    _w("1983,71 TL", "1983,71 TL"),
-                    _w("1366,07 TL", "1366,07 TL"),
-                ),
-                (
-                    _w("Kırsal yayın birimi", "Rural broadcast unit"),
-                    _w("E28-2G4M27S, STM32, ATECC608B",
-                       "E28-2G4M27S, STM32, ATECC608B"),
-                    _w("1549,67 TL", "1549,67 TL"),
-                    _w("1082,68 TL", "1082,68 TL"),
-                ),
-                (
-                    _w("Kritik bölge yayın birimi", "Critical area unit"),
-                    _w("DWM3000 UWB, STM32, ATECC608B",
-                       "DWM3000 UWB, STM32, ATECC608B"),
-                    _w("2241,42 TL", "2241,42 TL"),
-                    _w("1634,44 TL", "1634,44 TL"),
-                ),
-                (
-                    _w("Yaya alıcısı", "Pedestrian receiver"),
-                    _w("SX1280, DWM3000, ESP32-S3, BNO085, ATECC608B, "
-                       "LiPo",
-                       "SX1280, DWM3000, ESP32-S3, BNO085, ATECC608B, "
-                       "LiPo"),
-                    _w("3913,16 TL", "3913,16 TL"),
-                    _w("3117,74 TL", "3117,74 TL"),
-                ),
-                (
-                    _w("Kara aracı alıcısı", "Vehicle receiver"),
-                    _w("SX1280, DWM3000, STM32, BNO085, ATECC608B, CAN, "
-                       "ekran",
-                       "SX1280, DWM3000, STM32, BNO085, ATECC608B, CAN, "
-                       "screen"),
-                    _w("5202,69 TL", "5202,69 TL"),
-                    _w("4002,29 TL", "4002,29 TL"),
-                ),
-            ),
         ),
         Part(
             kind="points",
             lines=(
                 _w(
-                    "Fiyatlar yalnızca ana parçaların maliyeti, 6 Eylül "
-                    "2026 tarihli satıcı liste fiyatlarından hesaplandı. "
-                    "Kartın basılması ve parçaların lehimlenmesi, direnç "
-                    "ve kondansatörler, kablolama, kutu işçiliği, test, "
-                    "ayar, belgelendirme, vergi, kargo ve sahadaki montaj "
-                    "bu rakamların dışında.",
-                    "The prices are main component costs worked out from "
-                    "distributor list prices dated 6 September 2026. Board "
+                    "Rapordaki iki sütun, 1 adet ve 100 adet, raporun kendi "
+                    "fiyatları. \"Şimdi\" sütunları aynı işi daha ucuza "
+                    "yapan parçalarla: SX1280 yongasını taşıyan EBYTE "
+                    "E28-2G4M12S, LCSC'den alınan DWM3000 ve daha küçük bir "
+                    "STM32. Tablo 1000 adetlik fiyatla hesaplanıyor, çünkü "
+                    "işletme modeli zaten bin birimlik bir ağ varsayıyor. "
+                    "Her parça, satıcısı ve fiyatı Maliyet sayfasında.",
+                    "The two report columns, one and a hundred, are the "
+                    "report's own prices. The \"now\" columns use parts "
+                    "that do the same job for less: the EBYTE E28-2G4M12S "
+                    "carrying the SX1280 chip, a DWM3000 bought from LCSC, "
+                    "and a smaller STM32. The table prices at a thousand, "
+                    "because the operating model already assumes a network "
+                    "of a thousand units. Every part, its seller and its "
+                    "price are on the Cost page.",
+                ),
+                _w(
+                    "Fiyatlar yalnızca ana parçaların maliyeti. Kartın "
+                    "basılması ve parçaların lehimlenmesi, direnç ve "
+                    "kondansatörler, kablolama, test, ayar, belgelendirme, "
+                    "vergi ve kargo bu rakamların dışında; sahadaki montaj "
+                    "ayrı bir kalem olarak tabloya giriyor.",
+                    "The prices are main component costs. Board "
                     "manufacture and assembly, the passive components, "
-                    "cabling, machining, test, calibration, certification, "
-                    "tax, shipping and installation are all outside them.",
+                    "cabling, test, calibration, certification, tax and "
+                    "shipping are outside them; installation goes into "
+                    "the table as a line of its own.",
                 ),
                 _w(
                     "İki alıcı da hem SX1280 hem DWM3000 taşıyor. Bu "
@@ -1167,121 +1142,60 @@ RESULTS = Page(
                     "duruyor: aydınlatma direkleri, levhalar, portallar, "
                     "ışıklı kavşakların direkleri. Hepsinin ortak yanı "
                     "elektrik şebekesine bağlı olması. Bir birim takmak "
-                    "kelepçe, muhafaza, işçilik ve direğin beslemesinden "
-                    "bir hat demek. Direk dikmek, temel atmak, güneş "
-                    "paneli ve akü almak demek değil.",
+                    "kelepçe, işçilik ve direğin beslemesinden bir hat "
+                    "demek. Direk dikmek, temel atmak, güneş paneli ve akü "
+                    "almak demek değil. Aynı birimin iki yerdeki bedeli:",
                     "In a town the structures that can carry a broadcast "
                     "unit already stand: lighting columns, signs, "
                     "gantries, the poles at signalised junctions. What "
                     "they have in common is that they are already on the "
                     "electricity network. Fitting a unit to one means a "
-                    "bracket, an enclosure, the labour and a tap into the "
-                    "column's supply. It does not mean raising a mast, "
-                    "pouring a foundation, or buying a solar panel and a "
-                    "battery.",
-                ),
-                _w(
-                    "Ne kadar ettiğini ölçtük. Aynı 36 birim, aynı zemin, "
-                    "tek farkla: şehrin yapılarını kullanmak yerine her "
-                    "birim için 25 m'lik bir direk dikip güneş paneli "
-                    "takmak.",
-                    "We priced the difference. The same 36 units on the "
-                    "same ground, with one thing changed: instead of "
-                    "using the town's structures, raise a 25 m mast for "
-                    "each one and fit a solar panel to it.",
+                    "bracket, the labour and a tap into the column's "
+                    "supply. It does not mean raising a mast, pouring a "
+                    "foundation, or buying a solar panel and a battery. "
+                    "The same unit in the two places:",
                 ),
             ),
         ),
-        Part(
-            kind="table",
-            numbers_from=1,
-            rows=(
-                (
-                    _w("Bir birimin bedeli", "What one unit costs"),
-                    _w("Mevcut yapıya", "On a structure that stands"),
-                    _w("Dikilen direğe", "On a mast raised for it"),
-                ),
-                (
-                    _w("Yayın birimi", "The broadcast unit"),
-                    _w("1366 TL", "1366 TL"),
-                    _w("1366 TL", "1366 TL"),
-                ),
-                (
-                    _w("Yapı ve montaj", "Structure and installation"),
-                    _w("3000 TL", "3000 TL"),
-                    _w("85000 TL", "85000 TL"),
-                ),
-                (
-                    _w("Şebeke dışı besleme", "Standalone power supply"),
-                    _w("yok", "none"),
-                    _w("9500 TL", "9500 TL"),
-                ),
-                (
-                    _w("Toplam", "Total"),
-                    _w("4366 TL", "4366 TL"),
-                    _w("95866 TL", "95866 TL"),
-                ),
-            ),
-        ),
+        Part(kind="shows", shows="structures"),
         Part(
             kind="text",
             lines=(
                 _w(
-                    "**Sermayede 22 kat.** Yukarıdaki tablonun şehir içi "
-                    "CAPEX hücresi, aynı birimler dikilen direklere "
-                    "konsaydı yirmi iki katı olurdu. Oradaki sayıyı "
-                    "düşüren şey donanım değil, donanımın neye "
-                    "takıldığı. Kırsal satırda böyle bir yapı yok: orada "
-                    "direğin 85000 TL'si ve panelin 9500 TL'si gerçekten "
-                    "ödeniyor, ve o direkler kırsal sermayenin "
-                    "%88,9'unu tutuyor.",
-                    "**Twenty-two times, on capital.** The urban CAPEX "
-                    "cell in the table above would be twenty-two times "
-                    "larger if the same units went on masts raised for "
-                    "them. What brings that figure down is not the "
-                    "hardware but what the hardware is bolted to. The "
-                    "open-country row has no such structures: there the "
-                    "mast's 85000 TL and the panel's 9500 TL really are "
-                    "paid, and those masts hold 88,9 % of its capital.",
-                ),
-                _w(
                     "Elektrik, yapının verdiği iki şeyden yalnızca biri. "
                     "Işıklı bir kavşakta sinyal dolabı durur: hem besleme "
                     "hem de trafik yönetim merkezine giden bir hat. "
-                    "Belediyenin kameraları ve dedektörleri o hattı zaten "
-                    "kullanıyor. Izgaranın dörtte biri böyle bir kavşakta "
-                    "duruyor, hattını yanındaki dolaptan alıyor ve kendine "
-                    "hücresel veri paketi almıyor: işletme maliyetinin "
-                    "%7,4'ü. Yapı, yükseklik ve montaj bedeli değişmiyor, "
-                    "dolayısıyla doğruluk ve kullanılabilirlik de "
-                    "değişmiyor.",
+                    "Belediyenin kameraları o hattı zaten kullanıyor. "
+                    "Izgaranın dörtte biri böyle bir kavşakta duruyor ve "
+                    "veri paketi almıyor; geri kalanı durum bilgisini "
+                    "zaten konuştuğu telsizle bir komşusuna aktarıyor ve "
+                    "on birim bir paketi paylaşıyor. Kalem kalem döküm "
+                    "Maliyet sayfasında.",
                     "Power is only one of the two things a structure "
                     "gives. A signalised junction carries a controller "
                     "cabinet: mains for the heads and a line to the "
-                    "traffic management centre. The municipality's "
-                    "cameras and detectors already use that line. A "
-                    "quarter of the grid stands at such a junction, takes "
-                    "its link from the cabinet beside it, and buys no "
-                    "cellular plan of its own: 7,4 % of what running the "
-                    "row costs. The structure, the height and the fitting "
-                    "cost do not change, so neither accuracy nor "
-                    "availability moves.",
+                    "traffic management centre. The municipality's cameras "
+                    "already use that line. A quarter of the grid stands "
+                    "at such a junction and buys no data plan; the rest "
+                    "pass their status over the radio they already use to "
+                    "a neighbour, and ten units share a plan. The line by "
+                    "line breakdown is on the Cost page.",
                 ),
                 _w(
                     "Sıklaştırmak kullanılabilirliği yükseltiyor ama "
                     "bedava değil: kaba bir tarama 500 m'den 350 m'ye "
                     "inmenin kullanılabilirliği yaklaşık altı puan "
-                    "artırdığını, kilometrekare başına sermayeyi de "
-                    "%67 büyüttüğünü söylüyor. Mevcut yapıların yaptığı "
-                    "şey bu alışverişi karşılanabilir kılmak: her ek "
-                    "birim bir modül artı bir montaj, bir saha değil.",
+                    "artırdığını, direk sayısını da iki katından fazlasına "
+                    "çıkardığını söylüyor. Mevcut yapıların yaptığı şey bu "
+                    "alışverişi karşılanabilir kılmak: her ek birim bir "
+                    "kart ve bir montaj, bir saha değil.",
                     "Tightening the grid raises availability, but not for "
                     "nothing: a coarse sweep says going from 500 m to "
-                    "350 m buys about six points of availability and "
-                    "costs 67 % more capital per square kilometre. What "
-                    "the existing structures do is make that trade "
-                    "affordable at all, because each extra unit is a "
-                    "module and a fitting rather than a site.",
+                    "350 m buys about six points of availability and more "
+                    "than doubles the number of units. What the existing "
+                    "structures do is make that trade affordable, because "
+                    "each extra unit is a board and a fitting rather than "
+                    "a site.",
                 ),
             ),
         ),
@@ -1790,14 +1704,17 @@ SOURCES = Page(
                    "direkler, levhalar, panolar.",
                    "OpenStreetMap and Overture: buildings, and the masts, "
                    "signs and boards along the road."),
-                _w("Semtech SX1280, EBYTE E28-2G4M27S ve Qorvo DWM3000 veri "
+                _w("Semtech SX1280, EBYTE E28-2G4M12S ve Qorvo DWM3000 veri "
                    "sayfaları, ve SX1280 uzun menzil testi.",
-                   "Semtech SX1280, EBYTE E28-2G4M27S and Qorvo DWM3000 "
+                   "Semtech SX1280, EBYTE E28-2G4M12S and Qorvo DWM3000 "
                    "datasheets, and the SX1280 long range test."),
-                _w("DigiKey, LCSC ve Mouser liste fiyatları, 6 Eylül 2026. "
-                   "Kur 4 Eylül 2026.",
-                   "DigiKey, LCSC and Mouser list prices, 6 September 2026. "
-                   "Exchange rate 4 September 2026."),
+                _w("DigiKey, LCSC, Mouser ve Newhaven liste fiyatları: "
+                   "raporunki 6 Eylül, daha ucuz parçalarınki 23 Eylül "
+                   "2026. Kur Eylül 2026 başı, 48,4 TL/USD.",
+                   "DigiKey, LCSC, Mouser and Newhaven list prices: the "
+                   "report's from 6 September, the cheaper parts' from 23 "
+                   "September 2026. Exchange rate early September 2026, "
+                   "48,4 TL a dollar."),
                 _w("Karşılaştırma tablosunun bizim olmayan satırları "
                    "aşağıdaki kaynakçadan gelir. Tablonun altındaki her "
                    "dipnot, dayandığı girdiye bağlıdır.",
@@ -1904,8 +1821,116 @@ SOURCES = Page(
     ),
 )
 
+COST = Page(
+    slug="maliyet",
+    nav=_w("Maliyet", "Cost"),
+    title=_w("Ne kadara mal oluyor", "What it costs"),
+    lead=_w(
+        "Tablodaki her maliyet hücresinin kalem kalem dökümü: hangi parça, "
+        "kaça, kimden; hangi varsayım, neye dayanarak. Buradaki hiçbir "
+        "sayı elle yazılmadı. Hepsi modelden, malzeme listesinden ve "
+        "ayarlar dosyasından çiziliyor; biri değişince sayfa da değişiyor.",
+        "Every cost cell in the table, line by line: which part, for how "
+        "much, from whom; which assumption, resting on what. No number "
+        "here was typed. They are all drawn from the model, the bill of "
+        "materials and the settings file, so when one changes the page "
+        "does too.",
+    ),
+    parts=(
+        Part(
+            kind="shows", shows="cost-rows",
+            heading=_w("Satır satır", "Row by row"),
+        ),
+        Part(
+            kind="points",
+            lines=(
+                _w(
+                    "Şehir içi ve kırsal satırlar hizmet verdikleri alana, "
+                    "tünel ise uzunluğuna bölünüyor; tablodaki hücreler bu "
+                    "dökümün son satırlarıdır.",
+                    "The urban and rural rows are divided by the ground "
+                    "they serve and the tunnel by its length; the cells in "
+                    "the table are the last lines of this breakdown.",
+                ),
+                _w(
+                    "Alıcılar bu dökümde yok. Kimin alacağı rapor "
+                    "tarafından karara bağlanmadı, o yüzden kilometrekare "
+                    "başına rakamlara hiç girmiyorlar.",
+                    "Receivers are not in this breakdown. The report does "
+                    "not settle who buys them, so they never enter the "
+                    "per square kilometre figures.",
+                ),
+            ),
+        ),
+        Part(
+            kind="shows", shows="bill",
+            heading=_w("Kartlar: raporda ve şimdi",
+                       "The boards: in the report and now"),
+        ),
+        Part(
+            kind="shows", shows="parts",
+            heading=_w("Her kartın parçaları", "Every board's parts"),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Fiyatlar nereden geldi", "Where the prices came from"),
+            lines=(
+                _w(
+                    "Rapor her ürün için yalnızca iki toplam veriyor, parça "
+                    "fiyatı vermiyor. Burada her ana parça kendi satıcı "
+                    "fiyatıyla yazılı. Raporun toplamından o parçalar "
+                    "çıkarılınca kalan, \"diğer\" satırıdır: güç "
+                    "dönüşümü, koruma, bağlantı ve kutu. Üç yayın biriminde "
+                    "de bu kalan aynı çıkıyor, ki kart aynı kart olduğuna "
+                    "göre öyle olmalı; dökümün raporla tutarlı olduğunu "
+                    "söyleyen de bu.",
+                    "The report gives only two totals per product and no "
+                    "part prices. Here each main part carries its own "
+                    "distributor price. What is left of the report's total "
+                    "once those are taken out is the \"other\" line: power "
+                    "conversion, protection, connectors and the enclosure. "
+                    "It comes out the same for all three broadcast units, "
+                    "as it should for the same board, and that is what "
+                    "says the breakdown agrees with the report.",
+                ),
+                _w(
+                    "100 adetlik fiyat, raporun kendi 1'den 100'e "
+                    "indirimiyle hesaplandı. 1000 adette hiçbir satıcı "
+                    "kademesi okunamadığı için 100 adetlik fiyatın %90'ı "
+                    "varsayıldı; listedeki tek varsayım bu.",
+                    "The price at a hundred uses the report's own discount "
+                    "from one to a hundred. No seller's tier at a thousand "
+                    "could be read, so a thousand is assumed to cost 90 % "
+                    "of a hundred; that is the one assumption in the bill.",
+                ),
+                _w(
+                    "Parça fiyatları 23 Eylül 2026'da web aramasının "
+                    "döndürdüğü satıcı fiyatlarıdır. Bu çalışmanın yapıldığı "
+                    "ortamın ağ kuralları satıcı sayfalarını açmaya izin "
+                    "vermedi, o yüzden fiyat kademeleri sayfalardan tek tek "
+                    "okunmadı. Bağlantılar yukarıda; bir fiyat tutmazsa "
+                    "bom.toml dosyasındaki tek satır düzeltilir ve bu sayfa "
+                    "da tablo da onu izler.",
+                    "The part prices are the distributor prices a web "
+                    "search returned on 23 September 2026. The network "
+                    "rules of the environment this was done in did not "
+                    "allow opening the seller pages, so no price tier was "
+                    "read off a page directly. The links are above; if a "
+                    "price is wrong, one line in bom.toml fixes it and this "
+                    "page and the table follow.",
+                ),
+            ),
+        ),
+        Part(
+            kind="shows", shows="assumptions",
+            heading=_w("Her varsayım", "Every assumption"),
+        ),
+    ),
+)
+
 #: Every page, in the order the navigation shows them.
-PAGES = (HOME, WHY, SYSTEM, RESEARCH, VALUE, RESULTS, SIMULATION, SOURCES)
+PAGES = (HOME, WHY, SYSTEM, RESEARCH, VALUE, RESULTS, COST, SIMULATION,
+         SOURCES)
 
 #: Where the running simulator lives, and what the link to it is
 #: called. Not the same thing as the SIMULATION page: that page says
@@ -2165,6 +2190,18 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         drawn = _clocks(language)
     elif part.kind == "shows" and part.shows == "when":
         drawn = _when(language)
+    elif part.kind == "shows" and part.shows == "structures":
+        drawn = costing.structures(language, _table)
+    elif part.kind == "shows" and part.shows == "cost-rows":
+        drawn = (costing.rows(published, language, _table)
+                 if published is not None
+                 else '<p class="warn">{}</p>'.format(_said(NO_RUN, language)))
+    elif part.kind == "shows" and part.shows == "bill":
+        drawn = costing.summary(language, _table)
+    elif part.kind == "shows" and part.shows == "parts":
+        drawn = costing.parts(language, _table)
+    elif part.kind == "shows" and part.shows == "assumptions":
+        drawn = costing.assumptions(language, _table)
     else:
         raise ValueError("no way to draw a {} part".format(part.kind))
     return "<section>{}{}</section>".format(heading, drawn)

@@ -237,8 +237,8 @@ affects = """şebekeli direklerin enerji kalemini ve şebeke dışı beslemenin 
 boyutunu"""
 affects_en = """the energy line of mains-fed anchors and the size of an \
 off-grid supply"""
-sensitivity = "enerji kalemi her satırda OPEX'in %1'inden az"
-sensitivity_en = "the energy line is under 1 % of OPEX in every row"
+sensitivity = "enerji kalemi her satırda OPEX'in %2'sinden az"
+sensitivity_en = "the energy line is under 2 % of OPEX in every row"
 
 [values."operating.connectivity_tl_per_year"]
 value = 1188.0
