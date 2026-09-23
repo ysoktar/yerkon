@@ -972,6 +972,7 @@ const TERMS = {
   ground_roughness_spread: "pürüz saçılımı",
   ground_seed: "zemin tohumu",
   height_m: "yükseklik",
+  junction_every: "ışıklı kavşak aralığı",
   length_m: "uzunluk",
   lighting_column: "aydınlatma direği",
   maintenance_tl_per_visit: "bakım, ziyaret başına",
