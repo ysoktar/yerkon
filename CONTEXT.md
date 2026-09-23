@@ -75,6 +75,15 @@ adlandırılmış yöntem. Kafesler (kare, altıgen, koridor, çevre),
 aramalar (kapsama, geometri, k-örtme) ve elle. Hepsi tek bir dikişten
 geçer: `place(plan, ground)`. ADR-0040'a bak.
 
+**Placement search** (yöneylem yerleşimi): `placement.py`. Direkleri
+ızgara yerine zaten duran ya da zaten yüksek yerlere koyan arama: sokak
+donanımı, yüksekliği ölçülmüş çatılar, tepeler, yol kenarı ve ızgaranın
+kendi noktaları. Kapsamayı bağlantı bütçesiyle deniyor; bir hücre dört
+direk ona ulaşıp çevresindeki dört çeyreğin en az üçünde durduğunda
+sayılıyor. Seçim lira başına açgözlü, sonra bırakma ve değiş tokuş.
+Simülatörde "Yerleştir", komut satırında `yerkon place`. Cevap `placed`
+yöntemli bir direk grubu olarak gelir. ADR-0081'e bak.
+
 **Measured reach** (zeminde ölçülen menzil): bir aramanın adaylarını
 puanladığı disk, üzerinde durduğu zeminde ölçülerek. `reach_of` düz arazi
 rakamıdır ve kendi belgesi "bir iddia değil" der — bir halka için doğru,

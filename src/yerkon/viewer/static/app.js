@@ -986,6 +986,7 @@ const TERMS = {
   packet_loss: "paket kaybı",
   payload_bytes: "paket yükü",
   rent_tl_per_year: "yıllık kira",
+  rooftop: "çatı",
   radio: "modül",
   ranging: "ölçüm",
   residual_ppm: "düzeltme sonrası kalan sapma",
@@ -2582,6 +2583,38 @@ function drawFetched(result, host) {
   refreshScene().catch(e => flash(e.message, true));
 }
 
+/* What the placement search chose, beside the layout it replaces. */
+function drawPlaced(result, host) {
+  const table = document.createElement("table");
+  table.className = "out";
+  table.innerHTML =
+    `<tr><th></th><th>${say("place.now")}</th><th>${say("place.found")}</th></tr>` +
+    `<tr><td>${say("place.anchors")}</td><td>${result.grid_anchors}</td>` +
+    `<td>${result.anchors}</td></tr>` +
+    `<tr><td>${say("place.served")}</td><td>%${result.grid_share}</td>` +
+    `<td>%${result.share}</td></tr>` +
+    `<tr><td>${say("place.cost")}</td><td>${result.grid_lifecycle_tl} TL</td>` +
+    `<td>${result.lifecycle_tl} TL</td></tr>` +
+    Object.entries(result.mix).map(([origin, n]) =>
+      `<tr><td>${origin}</td><td></td><td>${n}</td></tr>`).join("");
+  host.appendChild(table);
+
+  const note = document.createElement("p");
+  note.className = "hint";
+  note.textContent = say("place.judge");
+  host.appendChild(note);
+
+  const use = document.createElement("button");
+  use.className = "quiet";
+  use.textContent = say("place.use");
+  // Through the panel like every other edit: it replaces every anchor
+  // on the row, and that is a change somebody should see first.
+  use.onclick = () => edit(result.changes, true)
+    .then(() => fillControls())
+    .catch(e => flash(e.message, true));
+  host.appendChild(use);
+}
+
 function wireTasks() {
   const chosenRows = () => {
     const picked = document.getElementById("task-only").value;
@@ -2611,6 +2644,10 @@ function wireTasks() {
       save: document.getElementById("solve-save").value.trim(),
     }, "solve-out", drawSolved);
   };
+
+  document.getElementById("run-place").onclick = () =>
+    watch("place", { aim: document.getElementById("place-aim").value },
+          "place-out", drawPlaced);
 
   document.getElementById("run-deliver").onclick = () =>
     watch("deliver", {

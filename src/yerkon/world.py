@@ -937,6 +937,12 @@ def mountings(settings: Settings = DEFAULTS) -> dict:
         "distribution_pole": option(
             "distribution_pole", "distribution pole", False, False,
             rented=True),
+        # The roof of a building that already stands tall. The height in
+        # the settings is the bracket above the roof; the building's own
+        # height comes from the fetched footprints, one building at a
+        # time (ADR-0081). The building has mains; the roof is the
+        # owner's, so it is rented.
+        "rooftop": option("rooftop", "rooftop", True, False, rented=True),
         # A tunnel already has power and a communications spine along its
         # length, for lighting, ventilation and its own systems. That is
         # most of why a tunnel deployment costs less per anchor to run

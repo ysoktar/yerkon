@@ -1649,6 +1649,46 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
+            heading=_w("Izgara yerine zaten yüksek yerler",
+                       "Already high places instead of a grid"),
+            lines=(
+                _w(
+                    "Tablonun satırları direkleri bir ızgaraya koyar. "
+                    "Simülatördeki **Yöneylem yerleşimi** bölümü aynı "
+                    "satırı ızgarasız kurar: aday yerler var olan "
+                    "aydınlatma direkleri ve tabelalar, yüksekliği "
+                    "ölçülmüş binaların çatıları, tepeler ve yol kenarıdır. "
+                    "Her aday bağlantı bütçesiyle denenir; seçim, ömür "
+                    "boyu maliyete göre bir örtme aramasıdır. Bir nokta, "
+                    "dört direk ona ulaştığında ve bu direkler çevresinin "
+                    "en az üç çeyreğinde durduğunda sayılır, çünkü aynı "
+                    "caddeye dizilmiş dört direk cadde boyunca ölçmez.",
+                    "The table's rows put their anchors on a grid. The "
+                    "simulator's **Placement search** section builds the "
+                    "same row without one: the candidates are existing "
+                    "lighting columns and signs, the roofs of buildings "
+                    "with a measured height, hilltops and the road side. "
+                    "Every candidate is tried with the link budget, and "
+                    "the choice is a cover search by lifecycle cost. A "
+                    "point counts once four anchors reach it and they "
+                    "stand in at least three quarters around it, because "
+                    "four anchors along one street do not measure along "
+                    "it.",
+                ),
+                _w(
+                    "Arama kendi sayımını verir; karar simülasyonundur. "
+                    "Önerilen yerleşimi uygulayıp **Simülasyonu çalıştır** "
+                    "düğmesine basınca ızgarayla aynı yolculukta "
+                    "karşılaştırılır.",
+                    "The search gives its own count; the simulation "
+                    "decides. Apply the proposed layout and press **Run the "
+                    "simulation** to compare it with the grid on the same "
+                    "journey.",
+                ),
+            ),
+        ),
+        Part(
+            kind="text",
             heading=_w("Tarayıcıda ve kendi makinende",
                        "In the browser, and on your own machine"),
             lines=(

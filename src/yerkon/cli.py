@@ -1313,6 +1313,81 @@ def deliver(argv: list[str] | None = None) -> int:
     return 0
 
 
+def place(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="yerkon place",
+        description=(
+            "Put a row's anchors on places that are already high instead "
+            "of on its grid: existing columns and signs, roofs with a "
+            "measured height, hilltops and the road side. Chosen by a "
+            "cost-weighted cover search over the real link budget, then "
+            "simulated beside the grid (ADR-0081)."
+        ),
+    )
+    parser.add_argument("--scenario", default="urban",
+                        choices=("urban", "rural"), help="which row")
+    parser.add_argument("--aim", default="better",
+                        choices=("better", "cheaper"),
+                        help="better: most cover for the grid's cost; "
+                             "cheaper: the grid's cover for least cost")
+    parser.add_argument("--no-simulation", action="store_true",
+                        help="stop at the search's own count")
+    _add_defaults_flag(parser)
+    args = parser.parse_args(argv)
+
+    from yerkon.cost import operating_rates
+    from yerkon.placement import deployed_with, mix, search
+    from yerkon.scenarios import catalogue, fetched
+    from yerkon.settings import DEFAULTS, is_hurried
+
+    settings = _settings_from(args) or DEFAULTS
+    row = args.scenario
+    deployed = catalogue(settings)[row]
+    site = fetched(settings.text(row + ".site"))
+    if site is None:
+        print("The {} row stands on no fetched ground, and the search reads "
+              "its structures, buildings and roads from it.".format(row),
+              file=sys.stderr)
+        return 2
+
+    print("Trying every candidate with the link budget on {} "
+          "processes.".format(workers()), file=sys.stderr)
+    answer = search(deployed, site, row, args.aim, settings)
+    p = answer.problem
+    print("candidates: {}".format(", ".join(
+        "{} {}".format(n, origin)
+        for origin, n in mix(p, range(len(p.candidates))).items())))
+    print("{:<10}{:>8}{:>12}{:>18}".format("", "anchors", "served", "lifecycle TL"))
+    for name, share, cost, count in (
+        ("grid", answer.grid_share, answer.grid_lifecycle_tl, len(p.grid)),
+        ("search", answer.share, answer.lifecycle_tl, len(answer.chosen)),
+    ):
+        print("{:<10}{:>8}{:>12}{:>18}".format(
+            name, count, "%" + decimal_comma(100.0 * share, 1),
+            decimal_comma(cost, 0)))
+    print("chosen: {}".format(", ".join(
+        "{} {}".format(n, origin)
+        for origin, n in mix(p, answer.chosen).items())))
+    if args.no_simulation:
+        return 0
+
+    from yerkon.report import build
+
+    _, rows = build(
+        deployments=(deployed, deployed_with(deployed, p, answer.chosen)),
+        rates=operating_rates(settings))
+    print()
+    print("{:<10}{:>8}{:>8}{:>10}{:>10}{:>12}{:>10}".format(
+        "", "P50", "P95", "avail", "km²", "capex/km²", "opex/km²"))
+    for name, one in zip(("grid", "search"), rows):
+        cells = one.cells()
+        print("{:<10}{:>8}{:>8}{:>10}{:>10}{:>12}{:>10}".format(
+            name, cells[3], cells[4], cells[6], cells[7], cells[8], cells[9]))
+    if is_hurried(settings):
+        print("\nRead coarsely (--fast): for trying, not for publishing.")
+    return 0
+
+
 def calibrate(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon calibrate",
@@ -1374,6 +1449,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon deliver [--into docs/teslim] [--no-budget]")
         print("  yerkon options [NAME]")
         print("  yerkon solve  --scenario rural --availability 0.95 --save NAME")
+        print("  yerkon place  --scenario urban [--aim better|cheaper] [--fast]")
         print("  yerkon defaults [--full]")
         print("  yerkon calibrate out/clock_residual.csv")
         return 0
@@ -1398,6 +1474,8 @@ def main(argv: list[str] | None = None) -> int:
         return options(rest)
     if verb == "solve":
         return solve(rest)
+    if verb == "place":
+        return place(rest)
     if verb == "defaults":
         return defaults(rest)
     if verb == "calibrate":

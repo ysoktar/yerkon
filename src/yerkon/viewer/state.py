@@ -419,6 +419,10 @@ class AnchorRun:
     #: link budget (ADR-0009), and the searching methods need a number to
     #: score discs against. The viewer passes what the budget said.
     reach_m: float = 0.0
+    #: Where the `placed` method puts anchors: (x, y, mounting) triples
+    #: the placement search wrote (ADR-0081). Empty for every other
+    #: method.
+    spots: tuple = ()
 
     def anchors(self, terrain: Terrain, catalogues=None, width_m: float = 0.0,
                 route=(), furniture=()) -> list:
@@ -475,6 +479,9 @@ class AnchorRun:
                 cover_k=int(self.cover_k),
                 target_dop=self.target_dop,
                 mounting=self.mounting,
+                spots=tuple(
+                    (x - start, y, mounting) for x, y, mounting in self.spots
+                ),
             ),
             LayoutGround(
                 length_m=max(self.to_m, self.from_m) - start,
@@ -530,6 +537,13 @@ class UnitPlan:
             for name in UnitPlan.__dataclass_fields__
         }
 
+
+#: Mountings the placement search may use and a whole run may not.
+#:
+#: A roof is only where a building stands, and its height comes from the
+#: footprint under it; a lattice of "roof" anchors would put brackets on
+#: bare ground (ADR-0081).
+ONLY_WHERE_PLACED = ("roof",)
 
 DEFAULT_RUNS = (
     AnchorRun("M", "e28", "mast", 0.0, 24_000.0, 2000.0, 400.0),
@@ -645,6 +659,10 @@ class ViewState:
                 "column": by_key["lighting_column"],
                 "mast": by_key["tall_mast"],
                 "pole": by_key["distribution_pole"],
+                # Only where a building stands: the placement search puts
+                # it on a roof, and the roof's height comes from the
+                # footprint (ADR-0081). Not offered for a whole run.
+                "roof": by_key["rooftop"],
                 "tunnel": by_key["tunnel_bracket"],
             },
             radios(settings),
@@ -962,7 +980,14 @@ class ViewState:
             cleaned["removed"] = tuple(str(v) for v in cleaned["removed"])
         if "runs" in cleaned:
             cleaned["runs"] = tuple(
-                run if isinstance(run, AnchorRun) else AnchorRun(**run)
+                run if isinstance(run, AnchorRun) else AnchorRun(**{
+                    **run,
+                    # JSON has no tuples, and a run is hashed.
+                    "spots": tuple(
+                        (float(x), float(y), str(mounting))
+                        for x, y, mounting in run.get("spots", ())
+                    ),
+                })
                 for run in cleaned["runs"]
             )
         if "overrides" in cleaned:

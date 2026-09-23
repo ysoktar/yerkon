@@ -261,6 +261,120 @@ def solve(
     return work
 
 
+# --- Placing anchors where the ground is already high ---------------------
+
+
+def place(state: ViewState, aim: str = "better") -> Callable:
+    """Search existing high places for this row's anchors (ADR-0081).
+
+    Hands back the search's own count and the change that puts its
+    answer on screen. The change goes through the panel like any other
+    edit, and the simulation is what judges it.
+    """
+    from yerkon.placement import SIZING, mix, search as placed_by_search
+
+    def work(tell: Tell) -> dict:
+        language = state.language
+        site = state.measured()
+        if site is None:
+            raise ValueError(say("task.place.needs_ground", language))
+        settings = state.settings()
+        deployed = state.deployed()
+        row = state.scenario
+
+        def kinds(counted: dict) -> str:
+            return ", ".join(
+                "{} {}".format(n, say("place.origin." + origin, language))
+                for origin, n in counted.items())
+
+        last = [0]
+
+        def progress(share: float) -> None:
+            tenth = int(share * 10)
+            if tenth > last[0]:
+                last[0] = tenth
+                tell(say("task.place.progress", language,
+                         share=decimal_comma(100.0 * share, 0)))
+
+        from yerkon.placement import candidates, demand_cells
+
+        found, _ = candidates(deployed, site, row, settings)
+        counted: dict = {}
+        for one in found:
+            counted[one.origin] = counted.get(one.origin, 0) + 1
+        tell(say("task.place.searching", language, scenario=row,
+                 candidates=len(found), kinds=kinds(counted),
+                 cells=len(demand_cells(deployed, SIZING[row]["cell_m"])),
+                 workers=workers()))
+        answer = placed_by_search(deployed, site, row, aim, settings,
+                        watching=progress)
+        chose = mix(answer.problem, answer.chosen)
+        tell(say(
+            "task.place.chose", language, anchors=len(answer.chosen),
+            kinds=kinds(chose),
+            share=decimal_comma(100.0 * answer.share, 1),
+            grid_share=decimal_comma(100.0 * answer.grid_share, 1),
+            cost=decimal_comma(answer.lifecycle_tl, 0),
+            grid_cost=decimal_comma(answer.grid_lifecycle_tl, 0),
+        ))
+        return {
+            "aim": aim,
+            "anchors": len(answer.chosen),
+            "grid_anchors": len(answer.problem.grid),
+            "share": decimal_comma(100.0 * answer.share, 1),
+            "grid_share": decimal_comma(100.0 * answer.grid_share, 1),
+            "lifecycle_tl": decimal_comma(answer.lifecycle_tl, 0),
+            "grid_lifecycle_tl": decimal_comma(answer.grid_lifecycle_tl, 0),
+            "mix": {say("place.origin." + origin, language): n
+                    for origin, n in chose.items()},
+            "changes": placed_run(state, answer),
+        }
+
+    return work
+
+
+def placed_run(state: ViewState, answer) -> dict:
+    """The edit that replaces this row's anchors with the search's answer.
+
+    One run on the `placed` method, carrying each anchor with the
+    structure it stands on, named by this page's own mounting keys.
+    Anchors moved or removed by hand belonged to the old runs, so they
+    go with them.
+    """
+    mounting_of, radio_of = state.catalogues()
+
+    def key_of(mounting) -> str:
+        for key, option in mounting_of.items():
+            if option.kind == mounting.kind:
+                return key
+        # A column at a signalised junction is a column (ADR-0077).
+        for key, option in mounting_of.items():
+            if mounting.kind.startswith(option.kind):
+                return key
+        raise ValueError("no mounting on this page is a {!r}".format(
+            mounting.kind))
+
+    first = state.runs[0] if state.runs else None
+    spots = [
+        (round(anchor.ground_position_m[0], 1),
+         round(anchor.ground_position_m[1], 1), key_of(anchor.mounting))
+        for anchor in (answer.problem.candidates[i].anchor
+                       for i in answer.chosen)
+    ]
+    run = {
+        "identifier": "P",
+        "radio": first.radio if first else "sx1280",
+        "mounting": first.mounting if first else "column",
+        "from_m": 0.0,
+        "to_m": state.corridor_m,
+        "spacing_m": first.spacing_m if first else 500.0,
+        "offset_m": 0.0,
+        "method": "placed",
+        "spots": spots,
+    }
+    return {"runs": [run], "moved": {}, "removed": []}
+
+
 def target_from(payload: dict) -> Target:
     """A target from what the page sent, treating a blank field as no bar."""
 

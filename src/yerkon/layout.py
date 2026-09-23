@@ -66,6 +66,7 @@ METHODS = (
     "greedy-coverage",
     "greedy-dop",
     "k-cover",
+    "placed",
     "manual",
 )
 
@@ -193,6 +194,9 @@ class Plan:
     #: position.
     target_dop: float = 2.0
     mounting: str = "mast"
+    #: Where `placed` puts anchors: (x, y, mounting) triples, in the
+    #: run's own metres. Written by the placement search (ADR-0081).
+    spots: tuple = ()
 
     def with_method(self, method: str) -> "Plan":
         from dataclasses import replace
@@ -309,6 +313,20 @@ def _perimeter(plan: Plan, ground: Ground) -> tuple[Spot, ...]:
 def _manual(plan: Plan, ground: Ground) -> tuple[Spot, ...]:
     """None. The empty arrangement somebody builds by hand."""
     return ()
+
+
+def _placed(plan: Plan, ground: Ground) -> tuple[Spot, ...]:
+    """Exactly the spots the plan carries, on what each names.
+
+    The placement search (ADR-0081) chooses with the link budget and the
+    cost model, which a layout is not allowed to read. So it runs apart
+    and hands its answer over as a list, and this method only puts it
+    down.
+    """
+    return tuple(
+        Spot(float(x), float(y), str(mounting))
+        for x, y, mounting in plan.spots
+    )
 
 
 # --- Greedy searches ------------------------------------------------------
@@ -728,5 +746,6 @@ _METHODS: dict = {
     "greedy-coverage": _greedy_coverage,
     "greedy-dop": _greedy_dop,
     "k-cover": _k_cover,
+    "placed": _placed,
     "manual": _manual,
 }

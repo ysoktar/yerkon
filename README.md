@@ -515,6 +515,21 @@ kaydetmek yerine bunu söyler.
 `--vary KEY=A,B,C` ayar dosyasındaki her değeri arar, senaryo başına
 kısa varsayılan listeyi değil.
 
+### Direkleri zaten yüksek olan yerlere koymak
+
+```bash
+yerkon place --scenario urban --aim better --fast
+```
+
+Izgara yerine zaten duran ya da zaten yüksek yerlerden seçer: sokak
+donanımı, yüksekliği ölçülmüş binaların çatıları, tepeler, yol kenarı.
+Her aday bağlantı bütçesiyle denenir, seçim ömür boyu maliyete göre bir
+örtme aramasıdır (açgözlü, sonra bırakma ve değiş tokuş), ve cevap
+ızgaranın yanında simüle edilir. `better` ızgaranın parasıyla en çok
+örtmeyi, `cheaper` ızgaranın örtmesini en az parayla arar. Simülatörde
+"Yöneylem yerleşimi" bölümündeki "Yerleştir" düğmesi aynı işi gösterilen
+sekme için yapar. Sonuçlar ve sınırları ADR-0081'de.
+
 ## Teslim
 
 ```bash

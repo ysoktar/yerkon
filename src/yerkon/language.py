@@ -372,6 +372,10 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "tr": "Arama: her noktaya yeter sayıda direk",
         "en": "Search: enough anchors over every point",
     },
+    "layout.placed": {
+        "tr": "Yöneylem — var olan yüksek yerler (Yerleştir düğmesi)",
+        "en": "Operations research — existing high places (Place button)",
+    },
     "layout.manual": {
         "tr": "Elle — hiçbiri; boştan başla",
         "en": "By hand — none; start from empty",
@@ -446,6 +450,39 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "tr": "{name} olarak kaydedildi.",
         "en": "Saved as {name}.",
     },
+    "task.place.searching": {
+        "tr": "{scenario}: {candidates} aday yer ({kinds}), {cells} hücre, "
+              "{workers} süreçte bağlantı bütçesiyle deneniyor.",
+        "en": "{scenario}: trying {candidates} candidate places ({kinds}) "
+              "against {cells} cells with the link budget, on {workers} "
+              "processes.",
+    },
+    "task.place.progress": {
+        "tr": "Denenen aday: %{share}",
+        "en": "Candidates tried: {share} %",
+    },
+    "task.place.chose": {
+        "tr": "{anchors} direk seçildi ({kinds}). Hizmet verilen hücre "
+              "%{share} (şimdiki düzen %{grid_share}); ömür boyu maliyet {cost} "
+              "TL (şimdiki düzen {grid_cost} TL).",
+        "en": "Chose {anchors} anchors ({kinds}). Cells served {share} % "
+              "(current layout {grid_share} %); lifecycle cost {cost} TL "
+              "(current layout {grid_cost} TL).",
+    },
+    "task.place.needs_ground": {
+        "tr": "Yöneylem araması ölçülmüş bir zemin ister: yapıları, "
+              "binaları ve yolları oradan okur.",
+        "en": "The placement search needs measured ground: it reads the "
+              "structures, buildings and roads from it.",
+    },
+    # The anchors the row already had, whatever laid them out: the
+    # search keeps them as candidates so it can never do worse.
+    "place.origin.grid": {"tr": "şimdiki düzenden", "en": "from the current layout"},
+    "place.origin.furniture": {"tr": "var olan direk ve tabela",
+                               "en": "existing columns and signs"},
+    "place.origin.rooftop": {"tr": "çatı", "en": "rooftop"},
+    "place.origin.hilltop": {"tr": "tepe", "en": "hilltop"},
+    "place.origin.road": {"tr": "yol kenarı", "en": "road side"},
     # A middle dot rather than a comma between the two halves of a
     # coordinate: the decimal mark here is a comma too (ADR-0035), and
     # "39,9208,32,8541" is four numbers to anybody reading it.

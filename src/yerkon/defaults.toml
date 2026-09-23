@@ -228,6 +228,59 @@ affects_en = "OPEX of anchors on distribution poles"
 sensitivity = "iki katına çıkarmak kırsal OPEX'i kabaca üçte bir artırır"
 sensitivity_en = "doubling it raises rural OPEX by roughly a third"
 
+[values."mounting.rooftop.height_m"]
+value = 2.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Çatıdaki tutucunun çatının üstüne çıkardığı yükseklik. Birimin \
+yerden yüksekliği binanın kendi yüksekliği artı bu; bina yüksekliği \
+getirilen bina izlerinden, bina bina okunuyor (ADR-0081)."""
+note_en = """How far the roof bracket lifts the unit above the roof. The \
+unit's height above the ground is the building's own height plus this; \
+the building's height is read from the fetched footprints, one building \
+at a time (ADR-0081)."""
+affects = "çatıdaki birimlerin menzilini"
+affects_en = "the reach of units on roofs"
+
+[values."mounting.rooftop.site_cost_tl"]
+value = 1800.0
+unit = "TL"
+provenance = "ASSUMPTION"
+source = """usta yevmiyesi 3000-4000 TL (2026 arama sonuçları); günde dört \
+çatı ve malzeme bu projenin varsayımı"""
+source_en = """electrician's day 3000 to 4000 TL (2026 search results); four \
+roofs a day and the materials are this project's assumption"""
+note = """Zaten duran bir binanın çatısına birim takmak. Sepetli araç \
+gerekmiyor, çatıya merdivenle çıkılıyor; ama izin ve erişim yüzünden bir \
+ekip günde dört çatı yapar. Usta ve yardımcısı 6000 TL / 4 = 1500 TL, \
+tutucu, kablo ve binanın beslemesinden bir hat 300 TL: 1800 TL."""
+note_en = """Fitting a unit to the roof of a building that already stands. \
+No bucket truck: the roof is reached by the stairs; but permission and \
+access mean a crew does four roofs a day. An electrician and a helper \
+6000 TL / 4 = 1500 TL, a bracket, cable and a tap into the building's \
+supply 300 TL: 1800 TL."""
+affects = "çatıdaki her birimin CAPEX'ini"
+affects_en = "CAPEX of every unit on a roof"
+
+[values."mounting.rooftop.rent_tl_per_year"]
+value = 1200.0
+unit = "TL/year"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Bina sahibine çatı için ödenen yıllık bedel. Yayımlanmış bir \
+sayı bulunamadı; dağıtım direği kirasıyla aynı, ayda 100 TL varsayıldı. \
+Baz istasyonu çatı kiraları bunun çok üstünde, ama onlar kilovatlar \
+çeken dolaplar için; bu birim avuç içi kadar."""
+note_en = """What the building's owner is paid a year for the roof. No \
+published figure was found; the same 100 TL a month as a distribution \
+pole is assumed. Base station roof rents are far above this, but those \
+are for cabinets drawing kilowatts; this unit fits in a palm."""
+affects = "çatıdaki birimlerin OPEX'ini"
+affects_en = "OPEX of units on roofs"
+
 [values."mounting.tunnel_bracket.height_m"]
 value = 4.5
 unit = "m"

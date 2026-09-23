@@ -46,6 +46,7 @@ from yerkon.viewer.tasks import (
     fetch as fetch_task,
     listed,
     solve as solve_task,
+    place as place_task,
     table as table_task,
     target_from,
 )
@@ -537,10 +538,12 @@ class Handler(BaseHTTPRequestHandler):
                 body.get("vary") or None,
                 (body.get("save") or "").strip() or None,
             )
+        elif kind == "place":
+            work = place_task(state, body.get("aim", "better"))
         else:
             raise ValueError(
                 "no such task: {!r}. There is: table, budget, solve, "
-                "deliver, fetch".format(kind)
+                "place, deliver, fetch".format(kind)
             )
         return {"job": self.jobs.start(kind, work).as_json()}
 

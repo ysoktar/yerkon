@@ -291,6 +291,16 @@
       <input type="text" id="solve-save" placeholder="ör. kirsal-hedef"></label>
     <div class="row"><button id="run-solve" data-say="solve.go"></button></div>
     <div id="solve-out"></div>
+
+    <h2 data-say="place.head"></h2>
+    <p class="hint" data-say="place.note"></p>
+    <label data-find="yöneylem yerleştir çatı tepe direk place rooftop hilltop"><span data-say="place.aim"></span>
+      <select id="place-aim">
+        <option value="better" data-say="place.better"></option>
+        <option value="cheaper" data-say="place.cheaper"></option>
+      </select></label>
+    <div class="row"><button id="run-place" data-say="place.go"></button></div>
+    <div id="place-out"></div>
   </details>
 
   <section id="readout">

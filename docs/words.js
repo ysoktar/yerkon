@@ -415,6 +415,42 @@ export const SAY = {
   "solve.save_as": { tr: "Kaydedilecek ad", en: "Save it as" },
   "solve.go": { tr: "Ara", en: "Search" },
 
+  // -- the placement search (ADR-0081) -------------------------------------
+  "place.head": { tr: "Yöneylem yerleşimi", en: "Placement search" },
+  "place.note": {
+    tr: "Direkleri ızgaraya değil zaten yüksek olan yerlere koyar: var olan "
+        + "aydınlatma direkleri ve tabelalar, yüksekliği ölçülmüş binaların "
+        + "çatıları, tepeler ve yol kenarı. Her aday bağlantı bütçesiyle "
+        + "denenir; bir hücre, dört direk ona ulaştığında ve bu direkler "
+        + "çevresindeki dört çeyreğin en az üçünde durduğunda sayılır. "
+        + "Ölçülmüş zemin ister ve birkaç dakika sürer.",
+    en: "Puts the anchors on places that are already high rather than on "
+        + "a grid: existing lighting columns and signs, the roofs of "
+        + "buildings with a measured height, hilltops and the road side. "
+        + "Every candidate is tried with the link budget; a cell counts "
+        + "once four anchors reach it and they stand in at least three of "
+        + "the four quarters around it. Needs measured ground and takes a "
+        + "few minutes.",
+  },
+  "place.aim": { tr: "Amaç", en: "Aim" },
+  "place.better": { tr: "Aynı maliyetle daha çok kapsama",
+                    en: "More cover for the same cost" },
+  "place.cheaper": { tr: "Aynı kapsama daha ucuza",
+                     en: "The same cover for less" },
+  "place.go": { tr: "Yerleştir", en: "Place" },
+  "place.served": { tr: "Hizmet verilen hücre", en: "Cells served" },
+  "place.cost": { tr: "Ömür boyu maliyet", en: "Lifecycle cost" },
+  "place.anchors": { tr: "Direk", en: "Anchors" },
+  "place.now": { tr: "Şimdiki düzen", en: "Current layout" },
+  "place.found": { tr: "Arama", en: "Search" },
+  "place.use": { tr: "Bu yerleşimi uygula", en: "Use this layout" },
+  "place.judge": {
+    tr: "Bu sayılar aramanın kendi sayımı. Asıl karar simülasyonun: "
+        + "uyguladıktan sonra \"Simülasyonu çalıştır\" düğmesine bas.",
+    en: "These are the search's own count. The simulation decides: "
+        + "after applying it, press \"Run the simulation\".",
+  },
+
   // -- the answer ---------------------------------------------------------
   "result.head": { tr: "Sonuç", en: "Result" },
   "result.run": { tr: "Simülasyonu çalıştır", en: "Run the simulation" },

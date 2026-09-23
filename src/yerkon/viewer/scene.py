@@ -40,6 +40,7 @@ from yerkon.viewer.state import (
     reach_on,
     mode_labels,
     ViewState,
+    ONLY_WHERE_PLACED,
     fetched_sites,
 )
 
@@ -368,6 +369,9 @@ def scene(state: ViewState) -> dict:
                 for key, option in sorted(
                     mounting_of.items(),
                     key=lambda pair: float(pair[1].height_m.value))
+                # A roof is only where a building stands, so a whole run
+                # on "roof" would put brackets on bare ground (ADR-0081).
+                if key not in ONLY_WHERE_PLACED
             ],
             "radios": [
                 [key, radio.part] for key, radio in sorted(radio_of.items())
