@@ -1392,13 +1392,24 @@ def calibrate(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon calibrate",
         description=(
-            "Read a measurement from the MATLAB scripts and print the "
+            "Read a measurement from the MATLAB scripts, or a recording of "
+            "the 2,4 GHz band from SDR++ or SDRangel, and print the "
             "defaults.toml entry that replaces the figure it stands in "
             "for. Nothing is written; the entry is printed to be pasted."
         ),
     )
-    parser.add_argument("files", nargs="+", metavar="CSV",
-                        help="what a MATLAB script wrote")
+    parser.add_argument("files", nargs="+", metavar="FILE",
+                        help="what a MATLAB script wrote, or a band recording "
+                             "from SDR++ (.wav) or SDRangel (.sdriq)")
+    parser.add_argument("--key", default="site.urban_packet_loss",
+                        help="which packet loss a band recording measures: "
+                             "site.urban_packet_loss or ranging.packet_loss")
+    parser.add_argument("--threshold-db", type=float, default=3.0,
+                        help="how far above the channel's quiet level counts "
+                             "as busy, in dB")
+    parser.add_argument("--offset-hz", type=float, default=0.0,
+                        help="where the anchor's channel sits relative to the "
+                             "recorder's centre, in Hz")
     args = parser.parse_args(argv)
 
     from yerkon.calibrate import read
@@ -1406,8 +1417,11 @@ def calibrate(argv: list[str] | None = None) -> int:
 
     measured = []
     for path in args.files:
+        options = ({"key": args.key, "threshold_db": args.threshold_db,
+                    "offset_hz": args.offset_hz}
+                   if path.lower().endswith((".wav", ".sdriq")) else {})
         try:
-            measured.append(read(path))
+            measured.append(read(path, **options))
         except (FileNotFoundError, ValueError) as error:
             print(error, file=sys.stderr)
             return 2
@@ -1452,6 +1466,7 @@ def main(argv: list[str] | None = None) -> int:
         print("  yerkon place  --scenario urban [--aim better|cheaper] [--fast]")
         print("  yerkon defaults [--full]")
         print("  yerkon calibrate out/clock_residual.csv")
+        print("  yerkon calibrate kayit.sdriq   # SDR++ .wav ya da SDRangel .sdriq")
         return 0
     verb, rest = argv[0], argv[1:]
     if verb == "fetch":

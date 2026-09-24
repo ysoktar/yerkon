@@ -530,6 +530,22 @@ Her aday bağlantı bütçesiyle denenir, seçim ömür boyu maliyete göre bir
 "Yöneylem yerleşimi" bölümündeki "Yerleştir" düğmesi aynı işi gösterilen
 sekme için yapar. Sonuçlar ve sınırları ADR-0081'de.
 
+### Bandın doluluğunu ölçmek (SDR++ ve SDRangel)
+
+```bash
+yerkon calibrate saha_2440000000Hz.wav     # SDR++ temel bant kaydı
+yerkon calibrate saha.sdriq                # SDRangel dosya çıkışı
+```
+
+Şehir içi satır, 2,4 GHz bandındaki başka trafik yüzünden alışverişlerin
+%15'inin kaybolduğunu varsayıyor. Pilot sahada, yayın biriminin
+kanalına ayarlı bir SDR ile birkaç dakikalık bir kayıt bu varsayımın
+yerine ölçülmüş bir değer koyar: kayıt 0,5 ms'lik bloklara bölünür,
+kanal içindeki güç kanalın sessiz seviyesiyle karşılaştırılır ve 31,8
+ms'lik bir alışverişin dolu bir bloğa denk gelme olasılığı yazdırılır.
+Kırsal için `--key ranging.packet_loss`. RTL-SDR bu bandı göremez;
+HackRF, PlutoSDR ya da LimeSDR gerekir. ADR-0083.
+
 ## Teslim
 
 ```bash

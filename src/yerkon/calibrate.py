@@ -182,13 +182,28 @@ READERS = {
 }
 
 
-def read(path: str) -> Measured:
-    """Whichever measurement this file holds, by its name."""
+#: Recordings of the band from a software defined radio, read by what
+#: kind of file they are rather than by name (ADR-0083).
+RECORDINGS = (".wav", ".sdriq")
+
+
+def read(path: str, **options) -> Measured:
+    """Whichever measurement this file holds, by its name or its kind.
+
+    ``options`` reach the band recording reader (the default's key, the
+    busy threshold, the channel's offset from the recorder's centre) and
+    nothing else.
+    """
+    if pathlib.Path(path).suffix.lower() in RECORDINGS:
+        from yerkon.spectrum import packet_loss
+
+        return packet_loss(path, **options)
     stem = pathlib.Path(path).stem
     for name, reader in READERS.items():
         if stem.startswith(name):
             return reader(path)
     raise ValueError(
         "{} is not a measurement this knows how to read. Expected one of: "
-        "{}.".format(path, ", ".join(sorted(READERS)))
+        "{}, or a band recording ({}).".format(
+            path, ", ".join(sorted(READERS)), ", ".join(RECORDINGS))
     )

@@ -20,13 +20,21 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
    6,68 km² yayımlıyor. Kırsalda fark daha büyük: sunum yaklaşık %98,9,
    site %65,85. Sunum, form ve site aynı sayıyı söylemeli; şartnamenin
    "sonuçların tutarlılığı" ölçütü tam olarak buna bakıyor.
-2. **Kırsal birim için "8-10 km" ve amplifikatörlü modül iddiası Türkiye
-   kuralıyla tutmuyor.** TS EN 300 328'in güç yoğunluğu sınırı 1625 kHz
-   bantta izin verilen EIRP'yi 12,11 dBm'de kesiyor. E28-2G4M27S'nin
-   27 dBm'lik çıkışı havaya ulaşamıyor; model E28-2G4M12S ile aynı
-   sonucu veriyor (ADR-0079). 10 m'lik bir dağıtım direğinde bağlantı
-   düz zeminde 7,4 km'ye kadar kuruluyor, ama 5 m'lik menzil
-   hassasiyeti 3,5 km'de bitiyor.
+2. **Kırsal birim için "8-10 km" ve 27 dBm'lik modül iddiası Türkiye
+   kuralıyla tutmuyor.** Türkiye'de 2400-2483,5 MHz için genel sınır
+   20 dBm e.i.r.p.; frekans atlamasız geniş bant iletimde ayrıca
+   10 dBm/MHz güç yoğunluğu sınırı var (TS EN 300 328). SX1280'in en
+   doğru mesafe ölçümü ayarı olan 1625 kHz'de ikincisi bağlayıcı:
+   10 mW/MHz × 1,625 MHz yaklaşık 12,11 dBm e.i.r.p. Model iki sınırı da
+   uyguluyor ve düşük olanı alıyor (`regulatory.py`). E28-2G4M27S'nin
+   üreticinin 8 km'yi ölçtüğü 27 dBm'i bu ayarda havaya çıkamıyor; model
+   E28-2G4M12S ile aynı sonucu veriyor (ADR-0079). Mesafe ölçümü EN 300
+   328 anlamında frekans atlamalı yapılırsa yoğunluk sınırı düşer ve
+   20 dBm geçerli olur; o zaman amplifikatör yeniden anlam kazanır (bkz.
+   "Model doğruluğu"). Menzil sayıları (bağlantı 7,4 km, 5 m hassasiyet
+   3,5 km) yasal ya da fiziksel sınır değil, modelin belirli
+   varsayımlarla ürettiği sonuç; en çok da doğrulanmamış bir alıcı
+   duyarlılığına bağlı.
 3. **SX1280 için "±1 m" tek bir ölçümün değeri değil.** Semtech'in
    AN1200.29 notundaki yaklaşık 1 m, 40 frekansa atlanarak yapılan
    yaklaşık 80 ölçüm alışverişinin ortalaması. Modeldeki tek alışveriş
@@ -187,6 +195,98 @@ Formdaki tutarsızlıklar:
 | Slayt 18 | "IMU, odometri, harita kısıtı ve Kalman filtresi kullanılmamıştır" | Model artık mesafeleri tek tek işleyen sabit hızlı bir Kalman filtresi kullanıyor. IMU, odometri ve harita kısıtı hâlâ yok. Cümle buna göre düzeltilmeli |
 | Form, "Yöntem" | "TWR-CDMA ve SDR tabanlı yöntemler araştırılacaktır" | Aşağıdaki SDR bölümüne bakın: SDR++ yalnız alıcı; bu araştırma zaman damgalı bir SDR ister |
 
+## Model doğruluğu
+
+Simülasyonun mantığı kod üzerinden okundu. Bulgular, önem sırasıyla.
+
+### 1. Alıcı duyarlılığı doğrulanmamış ve her şeyi belirliyor
+
+Model bağlantıyı alınan güç −125,9 dBm olana kadar kurulmuş sayıyor:
+6 dB gürültü faktörü (varsayım) ve −20 dB demodülasyon eşiği.
+`hardware.py` eşiği "SX1280 veri sayfası, SF10" diye veriyor; ama LoRa'da
+−20 dB genellikle SF12'nin, SF10'un değeri yaklaşık −15 dB. Başka bir
+değerlendirme veri sayfasında SF10 ve 1600 kHz için yaklaşık −114 dBm
+olduğunu söylüyor. Veri sayfasına bu ortamdan erişilemedi (DigiKey,
+Mouser, TME, HY-LINE, Semtech engelli), bu yüzden doğrulanamadı.
+
+Ne kadar önemli olduğu (10 m dağıtım direği, düz zemin; satırlar kaba
+okuma, tek çekiliş):
+
+| Bağlantı eşiği | 5 m hassasiyet | Bağlantı | Şehir içi kullanılabilirlik | Şehir içi P95 | Kırsal kullanılabilirlik | Kırsal alan |
+|---|---|---|---|---|---|---|
+| −125,9 dBm (model) | 3,5 km | 7,4 km | %86,24 | 8,39 m | %74,48 | 246,25 km² |
+| −120,9 dBm | 2,6 km | 5,6 km | %77,26 | 9,87 m | %67,88 | 197,25 km² |
+| −114,0 dBm | 1,8 km | 3,7 km | %52,17 | 20,30 m | %58,03 | 70,75 km² |
+
+Veri sayfasının duyarlılık tablosu modele girmeden yayımlanan sayılar
+güvenilir değil. Bu, sunuma geçmeden önce çözülmesi gereken tek bulgu.
+
+### 2. Menzil sayıları neyin sonucu
+
+7,4 km radyo ufku değil: 10 m ve 1,5 m yükseklikte 4/3 dünya ile ufuk
+yaklaşık 18 km. Modeldeki sınır yer yansıması: düzgün zeminde doğrudan
+ve yansıyan ışın yaklaşık 0,5 km'den sonra birbirini söndürüyor ve kayıp
+mesafenin dördüncü kuvvetiyle artıyor (ADR-0007). 3,5 km ise bu kaybın
+üstüne mesafe hatasının Cramér-Rao sınırının (işlem kazancıyla) 5 m'yi
+geçtiği yer; tabanı ölçülmüş 2,94 m. İkisi de model çıktısı.
+
+### 3. Çok yollu yayılım ve görüş dışı hata modelde yok
+
+Mesafe ölçümüne eklenen hatalar: gürültü (Cramér-Rao sınırı, saat, 2,94 m
+taban), bir engel doğrudan ışını kestiğinde engelin üstünden dolaşmanın
+getirdiği pozitif fazla yol, yayın biriminin sabit ölçüm hatası ve
+paket kaybı. `rf.py` "çok yollu yayılım kanal modelinde eklenir" diyor
+ama hiçbir yerde eklenmiyor. Sokak kanyonunda yansıyan yollardan ölçülen
+mesafeler metrelerce uzun okunur. Şehir içi doğruluk büyük olasılıkla
+iyimser. SX1280'in alınan güce bağlı yanlılığı (Semtech kalibrasyon
+öneriyor) da modelde yok.
+
+### 4. Kullanılabilirliğin tanımı gevşek
+
+Filtre bir kez başladıktan sonra, içinde tek bir mesafe olan bir tur bile
+"konum var" sayılıyor ve belirsizlik sınırı (500 m) hiç devreye girmiyor.
+Kaba bir koşuda şehir içi konumların %19,9'u, kırsaldakilerin %30,1'i
+dörtten az mesafeli turlardan geliyor. Dört mesafe şartıyla
+kullanılabilirlik şehir içinde %86,24'ten %69,04'e, kırsalda %74,48'den
+%52,10'a iniyor. İkisi de savunulabilir, ama sunumun dipnot 1'i
+"tanımlanan doğruluğu karşılayan" diyor. Tanım seçilmeli ve sunumla aynı
+olmalı. Ayrıca alan (dört birim, 5 m hassasiyet) ve kullanılabilirlik
+(15 m ya da 30 m kabul, filtre) farklı çıtalarla ölçülüyor.
+
+### 5. Filtre aykırı ölçümleri elemiyor
+
+Kalman filtresi gelen her mesafeyi alıyor; yenilik testi (innovation
+gating) yok. Bugün görüş dışı yanlılık modelde olmadığı için sonucu
+değiştirmiyor, ama 3. madde eklendiğinde gerekli.
+
+### 6. Doğru olanlar
+
+- Türkiye güç sınırı: iki tavan, düşük olan (20 dBm ve 10 dBm/MHz).
+- Mesafeler gerçek 3B uzaklıktan, yayın biriminin ölçüm hatası hattın
+  yönündeki bileşeniyle, her alışveriş kendi anında ölçülüyor.
+- Kırınım ITU-R P.526 (Bullington ve smooth earth), yansıma ile kırınım
+  toplanmıyor, büyüğü alınıyor (ADR-0058).
+- Kanal bütün saha için tek sayılıyor; bu, uzak alıcıların aynı anda
+  konuşabildiği büyük bir ağ için kötümser, iki alıcılı satırlar için
+  doğru.
+
+### Frekans atlama seçeneği
+
+Mesafe ölçüm alışverişleri EN 300 328'in frekans atlamalı tanımına
+uyarsa güç yoğunluğu sınırı yerine 20 dBm'lik toplam sınır geçerli olur.
+Modelde (10 m direk):
+
+| Kural | Modül | e.i.r.p. | 5 m hassasiyet | Bağlantı |
+|---|---|---|---|---|
+| Bugünkü (yoğunluk sınırı) | E28-2G4M12S ya da 27S | 12,11 dBm | 3,5 km | 7,4 km |
+| Frekans atlamalı | E28-2G4M12S | 15,70 dBm | 4,3 km | 9,1 km |
+| Frekans atlamalı | E28-2G4M27S | 20,00 dBm | 5,5 km | 11,7 km |
+
+Semtech'in yaklaşık 1 m'si zaten 40 kanalda atlayarak elde ediliyor; yani
+atlama doğruluğu da artırıyor. Atlama düzeninin standarttaki tanıma uyup
+uymadığı bir test laboratuvarına ya da BTK'ya sorulmalı.
+
+
 ## Mevzuat için doğrulanması gerekenler
 
 - **UWB sabit dış mekân kurulumu.** Avrupa'daki genel UWB kuralları (ECC
@@ -344,10 +444,13 @@ pahalılaştırır. İkisi de laboratuvar ve saha aracı. GPL lisansları araç
 olarak kullanmaya engel değil; YERKON'un kendi yazılımına gömülürse
 lisans yükümlülükleri doğar.
 
-Depoya eklenebilecek tek şey: bir spektrum doluluk kaydını (CSV) okuyup
-`site.urban_packet_loss` değerinin yerine ölçülmüş bir değer öneren bir
-`yerkon calibrate` okuyucusu. Bugün MATLAB çıktıları için yapılanın
-aynısı.
+Depoya eklenen: `yerkon calibrate` artık SDR++'ın temel bant WAV'ını ve
+SDRangel'in `.sdriq` dosyasını okuyor ve `site.urban_packet_loss` (ya da
+`ranging.packet_loss`) için ölçülmüş bir değer yazıyor: 31,8 ms'lik bir
+alışverişin kanalda başka bir yayına denk gelme olasılığı. İki biçim de
+programların kaynak kodundan okundu (ADR-0083). Programların kendisi
+simülasyonun içinde çalışmıyor ve çalışması bir şey kazandırmıyor;
+kayıtları kazandırıyor.
 
 ## Öncelikli düzeltme listesi
 

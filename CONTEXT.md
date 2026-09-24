@@ -84,6 +84,12 @@ sayılıyor. Seçim lira başına açgözlü, sonra bırakma ve değiş tokuş.
 Simülatörde "Yerleştir", komut satırında `yerkon place`. Cevap `placed`
 yöntemli bir direk grubu olarak gelir. ADR-0081'e bak.
 
+**Band recording** (bant kaydı): SDR++'ın temel bant WAV'ı ya da
+SDRangel'in `.sdriq` dosyası. `yerkon calibrate` bunu okuyup paket kaybı
+varsayımının yerine ölçülmüş bir değer yazar: 31,8 ms'lik bir
+alışverişin kanalda başka bir yayına denk gelme olasılığı. Programların
+kendisi simülasyonun içinde çalışmaz; kayıtları çalışır. ADR-0083.
+
 **Measured reach** (zeminde ölçülen menzil): bir aramanın adaylarını
 puanladığı disk, üzerinde durduğu zeminde ölçülerek. `reach_of` düz arazi
 rakamıdır ve kendi belgesi "bir iddia değil" der — bir halka için doğru,
