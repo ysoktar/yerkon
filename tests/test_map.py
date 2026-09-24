@@ -168,19 +168,18 @@ def test_no_tile_address_is_a_choice_the_payload_can_carry():
         scene_module.MAP_TILES[0] = was
 
 
-def test_the_map_ships_with_openstreetmap_and_the_drape_ships_with_nothing():
-    """Not two minds about one question (ADR-0042).
-
-    Picking a place is the few dozen tiles OSM's policy calls ordinary
-    use. Draping a city is thousands at once, which it calls bulk — so
-    that one has no default and the person choosing a provider is the
-    person accepting its terms.
+def test_the_map_ships_with_openstreetmap_and_the_page_drapes_the_owner_s_choice():
+    """Picking a place is the few dozen tiles OSM's policy calls ordinary
+    use (ADR-0042). The photograph is a provider the project owner chose,
+    behind a tick, so nobody pastes an address (ADR-0086). The library
+    itself still names none: a script that wants a photograph says whose.
     """
-    from yerkon.site.fetch import TileImagery
+    from yerkon.site.fetch import AERIAL_TILES, TileImagery
     from yerkon.viewer.scene import MAP_TILES
 
     assert "openstreetmap.org" in MAP_TILES[0]
     assert TileImagery().url_template == ""
+    assert AERIAL_TILES.startswith("https://")
 
 
 def test_the_gesture_hint_and_the_credit_are_in_both_languages():

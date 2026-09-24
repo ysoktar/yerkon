@@ -323,6 +323,19 @@ class RecordedOverpass:
     def json(self):
         return self.payload
 
+    # The parts of a response the fetch reads through `yerkon.site.http`.
+    @property
+    def status_code(self):
+        return self.status
+
+    @property
+    def content(self):
+        import json
+
+        return json.dumps(self.payload).encode("utf-8")
+
+    headers = {}
+
 
 def overpass_answering(monkeypatch, recorded):
     """Put a recorded Overpass in the place the real one is imported from."""

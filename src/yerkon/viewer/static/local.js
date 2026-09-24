@@ -88,7 +88,12 @@
     const options = init || {};
     const reply = await ask((options.method || "GET").toUpperCase(),
                             url.slice(at), options.body);
-    return new Response(reply.text, {
+    // The photograph of a fetched site is the one answer that is not
+    // text; it crosses from the worker as base64 (ADR-0086).
+    const body = reply.encoding === "base64"
+      ? Uint8Array.from(atob(reply.text), c => c.charCodeAt(0))
+      : reply.text;
+    return new Response(body, {
       status: reply.status,
       headers: { "Content-Type": reply.type },
     });

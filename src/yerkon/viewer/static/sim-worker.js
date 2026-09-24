@@ -36,8 +36,25 @@ const ready = (async () => {
   const answer = pyodide.runPython(
     "from yerkon.viewer.server import answer; answer");
   stage("ready");
-  return answer;
+  return { answer, pyodide };
 })();
+
+/* Pillow, loaded the first time somebody fetches ground (ADR-0086).
+ *
+ * A fetch decodes terrain tiles and photographs, and nothing else here
+ * needs an image library, so a visitor who never fetches never waits
+ * for it.
+ */
+let pillow = null;
+function withPillow() {
+  if (!pillow) pillow = ready.then(({ pyodide }) => pyodide.loadPackage("pillow"));
+  return pillow;
+}
+
+function isAFetch(path, body) {
+  if (!path.startsWith("/api/run")) return false;
+  try { return JSON.parse(body || "{}").kind === "fetch"; } catch { return false; }
+}
 
 ready.catch(error => stage("failed", String(error && error.message || error)));
 
@@ -48,11 +65,13 @@ onmessage = async event => {
   let status = 500;
   let type = "application/json; charset=utf-8";
   let text;
+  let encoding = "";
   try {
-    const answer = await ready;
-    [status, type, text] = JSON.parse(answer(method, path, body || ""));
+    const { answer } = await ready;
+    if (isAFetch(path, body)) await withPillow();
+    [status, type, text, encoding = ""] = JSON.parse(answer(method, path, body || ""));
   } catch (error) {
     text = JSON.stringify({ error: String(error && error.message || error) });
   }
-  postMessage({ id, status, type, text });
+  postMessage({ id, status, type, text, encoding });
 };

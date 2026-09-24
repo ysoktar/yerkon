@@ -433,16 +433,24 @@ def fetch(state: ViewState, payload: dict) -> Callable:
     def work(tell: Tell) -> dict:
         from yerkon.site.cache import SiteCache
         from yerkon.site.fetch import (
+            AERIAL_CREDIT,
+            AERIAL_NAME_SHOWN,
+            AERIAL_TILES,
             DEFAULT_ZOOM,
+            PAGE_MOST_TILES,
             CopernicusElevation,
             OpenStreetMapBuildings,
+            OpenStreetMapRoads,
             OvertureBuildings,
             OvertureFurniture,
             OvertureRoads,
             ServiceElevation,
+            TerrainTileElevation,
             TileImagery,
             build_site,
+            fitted_zoom,
         )
+        from yerkon.site.http import IN_A_BROWSER
         from yerkon.site.model import BoundingBox, box_around, read_point
 
         name = str(payload.get("name", "")).strip()
@@ -476,17 +484,43 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         spacing = float(payload.get("spacing_m") or 30.0)
         want_buildings = bool(payload.get("buildings", True))
 
-        # The photograph, only where somebody named a tile server.
-        #
-        # No default address, on purpose. Every provider has terms and
-        # most want a key, so shipping one would be accepting somebody
-        # else's terms on behalf of whoever runs this (ADR-0041).
+        # The photograph, where the box is ticked. The page names no tile
+        # server any more: the project owner chose one, so nobody has to
+        # find and paste an address (ADR-0086). An address sent by hand
+        # still wins, for whoever drives the page from a script.
         tiles = str(payload.get("imagery_url", "")).strip()
+        if not tiles and payload.get("imagery"):
+            tiles = AERIAL_TILES
+        named = (AERIAL_NAME_SHOWN + " (" + AERIAL_CREDIT + ")"
+                 if tiles == AERIAL_TILES else "aerial imagery")
         imagery = TileImagery(
             url_template=tiles,
-            zoom=int(payload.get("imagery_zoom") or DEFAULT_ZOOM),
+            name=named,
+            zoom=fitted_zoom(bounds, int(payload.get("imagery_zoom")
+                                         or DEFAULT_ZOOM), PAGE_MOST_TILES),
             cache_directory=str(SITES / "_tiles"),
         ) if tiles else None
+
+        # What each place can reach. The published site's worker reads
+        # no GeoTIFF and no GeoParquet and cannot ask the Copernicus
+        # bucket, which does not answer other pages; terrain tiles and
+        # Overpass both do (ADR-0086). A desktop tries the better
+        # source first and falls back to the same two.
+        cache = str(SITES / "_tiles")
+        if IN_A_BROWSER:
+            ground = (TerrainTileElevation(cache_directory=cache),)
+            built = (OpenStreetMapBuildings(),)
+            driven = (OpenStreetMapRoads(),)
+            standing = ()
+        else:
+            ground = (CopernicusElevation(cache_directory=cache),
+                      TerrainTileElevation(cache_directory=cache),
+                      ServiceElevation())
+            built = (OvertureBuildings(cache_directory=cache),
+                     OpenStreetMapBuildings())
+            driven = (OvertureRoads(cache_directory=cache),
+                      OpenStreetMapRoads())
+            standing = (OvertureFurniture(cache_directory=cache),)
 
         tell(say("task.fetch.fetching", state.language,
                  south=decimal_comma(bounds.south, 4),
@@ -499,24 +533,14 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         site = build_site(
             bounds,
             spacing_m=spacing,
-            elevation_sources=(
-                CopernicusElevation(cache_directory=str(SITES / "_tiles")),
-                ServiceElevation(),
-            ),
-            buildings_sources=(
-                OvertureBuildings(cache_directory=str(SITES / "_tiles")),
-                OpenStreetMapBuildings(),
-            ) if want_buildings else (),
+            elevation_sources=ground,
+            buildings_sources=built if want_buildings else (),
             # Roads come with the buildings: they are the same fetch by
             # the same road, and without them a receiver cannot drive the
             # real road and a search has no structure to bolt on to
             # (ADR-0045, ADR-0046).
-            roads_sources=(
-                OvertureRoads(cache_directory=str(SITES / "_tiles")),
-            ) if want_buildings else (),
-            furniture_sources=(
-                OvertureFurniture(cache_directory=str(SITES / "_tiles")),
-            ) if want_buildings else (),
+            roads_sources=driven if want_buildings else (),
+            furniture_sources=standing if want_buildings else (),
             imagery_source=imagery,
         )
         SiteCache(SITES / name).save(site)

@@ -784,13 +784,14 @@ class _Captured(Handler):
 
 
 def answer(method: str, path: str, body: str = "") -> str:
-    """One request, answered as the server would, as a JSON triple.
+    """One request, answered as the server would, as a JSON list.
 
     ``[status, content type, text]``. Text rather than bytes because
     everything the simulator asks for is JSON or TOML, and a string
     crosses from Python to JavaScript without a copy anybody has to
-    manage. The one binary answer, the aerial photograph, is not shipped
-    to the browser, and asking for it is an ordinary 404.
+    manage. The one binary answer, the photograph of a site fetched in
+    the browser, goes as base64 with a fourth entry saying so; it used
+    to be refused, which left a fetched site with no picture (ADR-0086).
     """
     handler = _Captured(path, body.encode("utf-8"))
     if method.upper() == "POST":
@@ -799,11 +800,18 @@ def answer(method: str, path: str, body: str = "") -> str:
         handler.do_GET()
     payload = handler.wfile.getvalue()
     kind = handler.sent.get("Content-Type", "application/octet-stream")
+    if not kind.startswith(("application/json", "text/", "application/toml")):
+        import base64
+
+        return json.dumps([handler.status, kind,
+                           base64.b64encode(payload).decode("ascii"), "base64"])
     try:
         text = payload.decode("utf-8")
     except UnicodeDecodeError:
-        return json.dumps([404, "application/json; charset=utf-8",
-                           json.dumps({"error": "binary answer"})])
+        import base64
+
+        return json.dumps([handler.status, kind,
+                           base64.b64encode(payload).decode("ascii"), "base64"])
     return json.dumps([handler.status, kind, text])
 
 

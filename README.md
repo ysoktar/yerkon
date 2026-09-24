@@ -180,9 +180,12 @@ tabloyu iki kez kurarak söyler (ADR-0035).
 **Zemin** neyin üzerinde durulduğunu seçer: getirilmiş Ankara — Kızılay,
 Polatlı, Kızılcahamam, Gölbaşı — ya da modellenmiş tepeler. **Yeni bir
 yer getir** başka her yeri getirir: bir sınır kutusu, bir ızgara aralığı
-ve OpenStreetMap'e bina sorulup sorulmayacağı. Paketin kendi saha
+ve OpenStreetMap'e bina sorulup sorulmayacağı. İsteğe bağlı bir onay
+kutusu uydu görüntüsünü de getirir; adres sorulmaz. Paketin kendi saha
 klasörüne yazar, böylece seçicide hemen belirir ve her şeyle birlikte
-işlenir. Ne seçicide ne de rölyef sürgüsünde düz bir seçenek vardır:
+işlenir. Yayımlanmış sitede de çalışır: orada zemin açık arazi
+karolarından, binalar ve yollar OpenStreetMap'ten gelir ve saha sayfa
+yenilenene kadar durur (ADR-0086). Ne seçicide ne de rölyef sürgüsünde düz bir seçenek vardır:
 hiçbir yer düz değildir ve düz bir düzlem bu modelin çizebileceği en
 tarafsız değil en elverişli yüzeydir (ADR-0021). Getirilmiş bir saha
 seçmek modellenmiş arazinin üç sürgüsünü soldurur, çünkü gerçek bir

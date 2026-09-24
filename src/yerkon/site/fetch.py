@@ -29,6 +29,7 @@ from typing import Optional, Protocol
 import numpy as np
 
 from yerkon.language import say
+from yerkon.site import http
 from yerkon.numbers import decimal_comma
 from yerkon.site.model import (
     Aerial,
@@ -86,7 +87,14 @@ def missing_for_a_fetch() -> tuple[str, ...]:
     second and loads GDAL, and the question here is only whether it is
     there. A package that is installed but broken answers "there", and
     then says so itself when it is actually used.
+
+    In the published site's worker none of the three is needed: the
+    browser does the asking, the ground comes as terrain tiles and the
+    buildings and roads from Overpass. Pillow, which decodes the tiles,
+    is loaded by the worker when a fetch starts (ADR-0086).
     """
+    if http.IN_A_BROWSER:
+        return ()
     missing = []
     for name in FETCH_NEEDS:
         try:
@@ -377,6 +385,153 @@ def _mosaic_grid(
     )
 
 
+# --- Terrain tiles --------------------------------------------------------
+
+
+#: The open terrain tiles on AWS, Terrarium encoding: a height in each
+#: pixel's red, green and blue. Public, keyless, and served to any page,
+#: which the Copernicus bucket is not (ADR-0086).
+TERRAIN_TILES = (
+    "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png")
+
+#: A Web Mercator pixel's width on the equator at zoom 0, in metres.
+EQUATOR_METRES_PER_PIXEL = 156543.03392
+
+
+@dataclass
+class TerrainTileElevation:
+    """Ground from the open terrain tiles, the one source a browser reaches.
+
+    The tiles mosaic the best public model for each place: in Turkey the
+    EU-DEM at 25 m, elsewhere SRTM at 30 m, so the ground is the same
+    class of data Copernicus serves. Copernicus stays first on a desktop,
+    because it is one survey everywhere; the published site, whose
+    worker cannot read from a bucket that does not answer other pages,
+    uses these (ADR-0086).
+    """
+
+    url_template: str = TERRAIN_TILES
+    name: str = "AWS Terrain Tiles"
+    #: Past zoom 13 a tile is finer than the model behind it: 15 m a
+    #: pixel at Ankara's latitude against 25 m of survey.
+    most_zoom: int = 13
+    most_tiles: int = 64
+    cache_directory: Optional[str] = None
+
+    def zoom_for(self, bounds: BoundingBox, spacing_m: float) -> int:
+        """The coarsest zoom whose pixel is no wider than the grid step,
+        coarser still if the box would take too many tiles."""
+        latitude = math.radians((bounds.south + bounds.north) / 2.0)
+        at_zero = EQUATOR_METRES_PER_PIXEL * math.cos(latitude)
+        zoom = math.ceil(math.log2(at_zero / max(spacing_m, 1.0)))
+        zoom = min(max(zoom, 1), self.most_zoom)
+        while zoom > 1 and _tile_count(bounds, zoom) > self.most_tiles:
+            zoom -= 1
+        return zoom
+
+    def grid_for(self, bounds: BoundingBox, spacing_m: float) -> ElevationGrid:
+        if not http.can_ask():
+            raise Unreachable(say("site.needs_requests"))
+        try:
+            from PIL import Image
+        except ImportError as error:
+            raise Unreachable(say("site.needs_pillow")) from error
+
+        zoom = self.zoom_for(bounds, spacing_m)
+        west, north = tile_of(bounds.north, bounds.west, zoom)
+        east, south = tile_of(bounds.south, bounds.east, zoom)
+        side = 256
+        sheet = np.full(((south - north + 1) * side, (east - west + 1) * side),
+                        np.nan)
+        arrived = 0
+        for y in range(north, south + 1):
+            for x in range(west, east + 1):
+                body = self._tile(zoom, x, y)
+                if body is None:
+                    continue
+                try:
+                    pixels = np.asarray(
+                        Image.open(io.BytesIO(body)).convert("RGB"), dtype=float)
+                except Exception:          # noqa: BLE001 — a broken tile is a hole
+                    continue
+                heights = (pixels[..., 0] * 256.0 + pixels[..., 1]
+                           + pixels[..., 2] / 256.0 - 32768.0)
+                row, column = (y - north) * side, (x - west) * side
+                sheet[row:row + side, column:column + side] = heights
+                arrived += 1
+        if arrived == 0:
+            raise Unreachable(say("site.no_tiles"))
+
+        per_lat, per_lon = bounds.metres_per_degree()
+        columns = max(int((bounds.east - bounds.west) * per_lon / spacing_m), 2)
+        rows = max(int((bounds.north - bounds.south) * per_lat / spacing_m), 2)
+        longitudes = bounds.west + np.arange(columns) * spacing_m / per_lon
+        latitudes = bounds.south + np.arange(rows) * spacing_m / per_lat
+        mesh_lon, mesh_lat = np.meshgrid(longitudes, latitudes)
+
+        world = (2 ** zoom) * side
+        # Pixel centres sit half a pixel in from the tile's corner.
+        px = (mesh_lon + 180.0) / 360.0 * world - west * side - 0.5
+        py = ((1.0 - np.arcsinh(np.tan(np.radians(mesh_lat))) / math.pi)
+              / 2.0 * world - north * side - 0.5)
+        grid = _bilinear(sheet, px, py)
+        if np.isnan(grid).any():
+            filled = float(np.nanmedian(grid)) if not np.isnan(grid).all() else 0.0
+            grid = np.where(np.isnan(grid), filled, grid)
+
+        return ElevationGrid(
+            values_m=grid, spacing_m=spacing_m,
+            source="{} z{}".format(self.name, zoom),
+            resolution_m=EQUATOR_METRES_PER_PIXEL
+            * math.cos(math.radians((bounds.south + bounds.north) / 2.0))
+            / 2 ** zoom,
+        )
+
+    def _tile(self, zoom: int, x: int, y: int) -> Optional[bytes]:
+        """One tile's bytes, from the cache if it is there."""
+        cached = None
+        if self.cache_directory:
+            cached = (pathlib.Path(self.cache_directory) / "terrarium"
+                      / str(zoom) / str(x) / "{}.png".format(y))
+            if cached.exists() and cached.stat().st_size > 0:
+                return cached.read_bytes()
+        url = (self.url_template.replace("{z}", str(zoom))
+               .replace("{x}", str(x)).replace("{y}", str(y)))
+        try:
+            reply = http.get(url, timeout=DEFAULT_TIMEOUT_S)
+        except http.Failed:
+            return None
+        if not reply.ok or not reply.content:
+            return None
+        if cached is not None:
+            cached.parent.mkdir(parents=True, exist_ok=True)
+            part = cached.with_suffix(".part")
+            part.write_bytes(reply.content)
+            part.replace(cached)
+        return reply.content
+
+
+def _tile_count(bounds: BoundingBox, zoom: int) -> int:
+    west, north = tile_of(bounds.north, bounds.west, zoom)
+    east, south = tile_of(bounds.south, bounds.east, zoom)
+    return (east - west + 1) * (south - north + 1)
+
+
+def _bilinear(sheet: np.ndarray, px: np.ndarray, py: np.ndarray) -> np.ndarray:
+    """Heights between pixel centres, NaN where any corner is missing."""
+    rows, columns = sheet.shape
+    px = np.clip(px, 0.0, columns - 1.0)
+    py = np.clip(py, 0.0, rows - 1.0)
+    left = np.minimum(np.floor(px).astype(int), columns - 2)
+    top = np.minimum(np.floor(py).astype(int), rows - 2)
+    across = px - left
+    down = py - top
+    upper = sheet[top, left] * (1.0 - across) + sheet[top, left + 1] * across
+    lower = (sheet[top + 1, left] * (1.0 - across)
+             + sheet[top + 1, left + 1] * across)
+    return upper * (1.0 - down) + lower * down
+
+
 # --- Elevation service ----------------------------------------------------
 
 
@@ -595,27 +750,12 @@ class OpenStreetMapBuildings:
     default_height_m: float = DEFAULT_BUILDING_HEIGHT_M
 
     def buildings_for(self, bounds: BoundingBox) -> tuple[Buildings, tuple[str, ...]]:
-        try:
-            import requests
-        except ImportError as error:
-            raise Unreachable(say("site.needs_requests")) from error
-
         query = (
             "[out:json][timeout:60];"
             "way[building]({s},{w},{n},{e});"
             "out center tags;"
         ).format(s=bounds.south, w=bounds.west, n=bounds.north, e=bounds.east)
-
-        try:
-            response = requests.post(
-                self.endpoint, data={"data": query}, timeout=DEFAULT_TIMEOUT_S * 3
-            )
-            response.raise_for_status()
-            payload = response.json()
-        except Exception as error:
-            raise Unreachable(
-                say("site.no_answer", None, name=self.name, error=error)
-            ) from error
+        payload = _overpass(self.endpoint, self.name, query)
 
         per_lat, per_lon = bounds.metres_per_degree()
         xs, ys, radii, heights = [], [], [], []
@@ -664,6 +804,82 @@ class OpenStreetMapBuildings:
             ),
             notes,
         )
+
+
+def _overpass(endpoint: str, name: str, query: str) -> dict:
+    """One Overpass query, answered or refused with a sentence.
+
+    Through `yerkon.site.http`, so the same query runs from a terminal
+    and from the published site's worker; Overpass answers a browser
+    from any page (ADR-0086).
+    """
+    if not http.can_ask():
+        raise Unreachable(say("site.needs_requests"))
+    try:
+        response = http.post_form(
+            endpoint, {"data": query}, timeout=DEFAULT_TIMEOUT_S * 3)
+        response.raise_for_status()
+        return response.json()
+    except Exception as error:
+        raise Unreachable(
+            say("site.no_answer", None, name=name, error=error)
+        ) from error
+
+
+#: Which OpenStreetMap roads a vehicle drives on: the same classes
+#: `OvertureRoads.keep` takes, by OpenStreetMap's names for them.
+DRIVEN = ("motorway", "trunk", "primary", "secondary", "tertiary",
+          "residential", "living_street", "unclassified", "service")
+
+
+@dataclass
+class OpenStreetMapRoads:
+    """Road centrelines from OpenStreetMap, through Overpass.
+
+    What the published site uses, where Overture's GeoParquet cannot be
+    read (no pyarrow in a browser). On a desktop it stands behind
+    Overture: the same roads, since Overture's transportation theme is
+    built from OpenStreetMap (ADR-0086).
+    """
+
+    endpoint: str = "https://overpass-api.de/api/interpreter"
+    name: str = "OpenStreetMap"
+    keep: tuple = DRIVEN
+
+    def roads_for(self, bounds: BoundingBox) -> tuple[tuple, tuple[str, ...]]:
+        query = (
+            "[out:json][timeout:60];"
+            'way[highway~"^({kinds})$"]({s},{w},{n},{e});'
+            "out geom tags;"
+        ).format(kinds="|".join(self.keep), s=bounds.south, w=bounds.west,
+                 n=bounds.north, e=bounds.east)
+        payload = _overpass(self.endpoint, self.name, query)
+
+        per_lat, per_lon = bounds.metres_per_degree()
+        kept = []
+        classes: dict = {}
+        for element in payload.get("elements", []):
+            points = element.get("geometry") or []
+            here = [
+                ((point["lon"] - bounds.west) * per_lon,
+                 (point["lat"] - bounds.south) * per_lat)
+                for point in points
+                if point and "lat" in point and "lon" in point
+            ]
+            if len(here) < 2:
+                continue
+            kind = element.get("tags", {}).get("highway", "")
+            classes[kind] = classes.get(kind, 0) + 1
+            kept.append(tuple(here))
+
+        if not kept:
+            return (), (say("site.no_roads", None, name=self.name),)
+        counted = ", ".join(
+            "{} {}".format(count, kind)
+            for kind, count in sorted(classes.items(), key=lambda p: -p[1])[:4]
+        )
+        return tuple(kept), (say("site.roads", None, name=self.name,
+                                 count=len(kept), classes=counted),)
 
 
 #: Where Overture publishes, and what to read out of it.
@@ -1305,6 +1521,34 @@ def tile_bounds(x: int, y: int, zoom: int) -> BoundingBox:
     )
 
 
+def fitted_zoom(bounds: BoundingBox, zoom: int, most: int) -> int:
+    """The given zoom, or the finest coarser one whose tiles fit ``most``.
+
+    A photograph a zoom coarser is still a photograph; a refusal is
+    nothing. The page does not ask for a zoom (ADR-0086), so it is this
+    that keeps a large box to a sensible number of tiles.
+    """
+    while zoom > 1 and _tile_count(bounds, zoom) > most:
+        zoom -= 1
+    return zoom
+
+
+#: The photograph the page drapes when its box is ticked.
+#:
+#: Chosen by the project owner, so that nobody fetching ground has to
+#: find and paste a tile address (ADR-0086, replacing ADR-0041's empty
+#: default for the page). Esri asks for its credit wherever the tiles
+#: are shown; the manifest and the page carry it.
+AERIAL_TILES = ("https://server.arcgisonline.com/ArcGIS/rest/services/"
+                "World_Imagery/MapServer/tile/{z}/{y}/{x}")
+AERIAL_NAME_SHOWN = "Esri World Imagery"
+AERIAL_CREDIT = "Esri, Maxar, Earthstar Geographics, GIS User Community"
+#: A page fetch stops at this many photograph tiles and takes a coarser
+#: zoom past it. At zoom 17 a 3 km box is 196 tiles, so it is drawn at
+#: 16 from 56; the browser asks for them one by one.
+PAGE_MOST_TILES = 120
+
+
 @dataclass
 class TileImagery:
     """A photograph of the site, stitched from a web map's tiles.
@@ -1348,8 +1592,13 @@ class TileImagery:
 
         wanted = [(x, y) for y in range(north, south + 1)
                   for x in range(west, east + 1)]
-        with ThreadPoolExecutor(self.at_once) as pool:
-            fetched = dict(pool.map(self._one_tile, wanted))
+        if http.IN_A_BROWSER or self.at_once <= 1:
+            # Python in a browser worker has no threads to start
+            # (ADR-0080); the tiles come one after another.
+            fetched = dict(map(self._one_tile, wanted))
+        else:
+            with ThreadPoolExecutor(self.at_once) as pool:
+                fetched = dict(pool.map(self._one_tile, wanted))
 
         first = next((image for image in fetched.values() if image is not None),
                      None)
@@ -1376,6 +1625,28 @@ class TileImagery:
             zoom=self.zoom,
         )
 
+    def _download(self, url: str) -> Optional[bytes]:
+        """A tile's bytes, or None. The browser names itself and refuses
+        to let a script do it, so the User-Agent goes only from here."""
+        if http.IN_A_BROWSER:
+            try:
+                reply = http.get(url, timeout=DEFAULT_TIMEOUT_S)
+            except http.Failed:
+                return None
+            return reply.content if reply.ok and reply.content else None
+        try:
+            import requests
+        except ImportError as error:
+            raise Unreachable(say("site.needs_requests")) from error
+        try:
+            response = requests.get(
+                url, headers={"User-Agent": self.user_agent},
+                timeout=DEFAULT_TIMEOUT_S)
+            response.raise_for_status()
+            return response.content
+        except Exception:                  # noqa: BLE001
+            return None
+
     def _one_tile(self, at: tuple[int, int]):
         """One tile, from disk if it is there and from the server if not.
 
@@ -1399,17 +1670,8 @@ class TileImagery:
                .replace("{z}", str(self.zoom))
                .replace("{x}", str(x))
                .replace("{y}", str(y)))
-        try:
-            import requests
-        except ImportError as error:
-            raise Unreachable(say("site.needs_requests")) from error
-        try:
-            response = requests.get(
-                url, headers={"User-Agent": self.user_agent},
-                timeout=DEFAULT_TIMEOUT_S)
-            response.raise_for_status()
-            body = response.content
-        except Exception:                  # noqa: BLE001
+        body = self._download(url)
+        if body is None:
             return at, None
 
         cached.parent.mkdir(parents=True, exist_ok=True)

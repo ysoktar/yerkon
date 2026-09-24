@@ -221,6 +221,10 @@ Bu tanımla turun uzunluğu, turdaki mesafe sayısından çok önemli: filtrenin
 belirsizliği turlar arasında büyür. Bu yüzden üç satır da turda sekiz
 direk yoklar, on iki değil (ADR-0085).
 
+**Arazi karosu**: AWS'deki açık Terrarium karoları; her pikselin rengi
+bir yükseklik (Türkiye'de EU-DEM 25 m). Yayımlanmış sitenin zemin
+kaynağı, masaüstünde Copernicus'un yedeği (ADR-0086).
+
 **Alan**: yukarıda tanımlandığı gibi hizmet alanı.
 
 **CAPEX**: direk donanım maliyetinin hizmet alanına bölümü. Yalnızca

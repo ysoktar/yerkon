@@ -1556,7 +1556,21 @@ function loadPhotograph() {
     render();
   };
   picture.onerror = () => { if (photographUrl === aerial.url) photograph = null; };
-  picture.src = aerial.url;
+  // Asked for with fetch rather than handed to the image as its address.
+  // On the published site there is no server behind /api/: the page's
+  // fetch is answered by the worker that fetched the ground, and an
+  // image's own request would go to the network and find nothing
+  // (ADR-0086). Same bytes from the local server.
+  fetch(aerial.url)
+    .then(reply => (reply.ok ? reply.blob() : Promise.reject(reply.status)))
+    .then(blob => {
+      if (photographUrl !== aerial.url) return;
+      const address = URL.createObjectURL(blob);
+      picture.addEventListener("load", () => URL.revokeObjectURL(address),
+                               { once: true });
+      picture.src = address;
+    })
+    .catch(() => { if (photographUrl === aerial.url) photograph = null; });
 }
 
 /* The photograph the painter should use this frame, if any. */
@@ -2669,8 +2683,7 @@ function wireTasks() {
         size_km: Number(document.getElementById("fetch-size").value),
         spacing_m: spacing === "" ? null : Number(spacing),
         buildings: document.getElementById("fetch-buildings").checked,
-        imagery_url: document.getElementById("fetch-imagery").value.trim(),
-        imagery_zoom: Number(document.getElementById("fetch-imagery-zoom").value),
+        imagery: document.getElementById("fetch-imagery").checked,
         // A box drawn on the map goes as its four corners, because it is
         // whatever shape somebody dragged and a centre with one size can
         // only say "square". Absent, the centre and the size decide, the
