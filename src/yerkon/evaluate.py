@@ -240,6 +240,17 @@ class Scenario:
     #: rather than improving it. Real receivers gate on signal quality
     #: for the same reason.
     accept_sigma_m: float = 30.0
+    #: The largest horizontal uncertainty the filter may report for a
+    #: position to count as available, in metres (square root of the
+    #: horizontal covariance's trace). Above it the receiver keeps
+    #: tracking but has no position to offer, so the round counts as an
+    #: outage and its error is not sampled (ADR-0084). Infinite means any
+    #: position the filter holds counts, which is what the table did
+    #: before.
+    fix_sigma_m: float = math.inf
+    #: How many sigmas from what the filter expects a range may land and
+    #: still be used. Zero takes every range (ADR-0084).
+    gate_sigmas: float = 0.0
 
     def __post_init__(self) -> None:
         if not self.deployment.receivers:
@@ -437,7 +448,8 @@ def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
                     sigmas.append(observation.sigma_m)
 
             fix = _fix_from(
-                observations, trackers[unit.identifier], scenario.manoeuvre_m_s2
+                observations, trackers[unit.identifier], scenario.manoeuvre_m_s2,
+                scenario.gate_sigmas,
             )
             if fix is None:
                 # A round that produced no position is an outage, and the
@@ -448,6 +460,11 @@ def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
 
             tracker, position = fix
             trackers[unit.identifier] = tracker
+            # A position the receiver itself would not stand behind is not
+            # offered. It keeps tracking, so the next good round starts
+            # from here, but this round is an outage (ADR-0084).
+            if tracker.horizontal_sigma_m > scenario.fix_sigma_m:
+                continue
             truth = unit.journey.position_at(tracker.at_s)
             horizontal.append(math.dist(position[:2], truth[:2]))
             vertical.append(abs(position[2] - truth[2]))
@@ -469,13 +486,16 @@ def _fix_from(
     observations: Sequence[RangeObservation],
     tracker: Optional[TrackingFilter],
     manoeuvre_m_s2: float,
+    gate_sigmas: float = 0.0,
 ):
     """Fold one round into a unit's filter, starting it if it is not running."""
     if tracker is None:
         start = trilaterate(observations)
         if start is None:
             return None
-        return TrackingFilter(start, manoeuvre_m_s2=manoeuvre_m_s2), start.position_m
+        return (TrackingFilter(start, manoeuvre_m_s2=manoeuvre_m_s2,
+                               gate_sigmas=gate_sigmas),
+                start.position_m)
 
     if not observations:
         return None

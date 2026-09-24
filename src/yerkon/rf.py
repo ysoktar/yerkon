@@ -123,6 +123,10 @@ class Obstruction:
     #: about this link rather than a draw, so the same receiver at the
     #: same spot meets the same shadow every round (ADR-0055).
     shadow_db: float = 0.0
+    #: Whether the ground or a building cuts the straight line between
+    #: the ends, so there is no direct ray and the first thing to arrive
+    #: took a longer way round (ADR-0061, ADR-0084).
+    blocked: bool = False
     #: The same profile as an (n, 2) array, where whoever built this had
     #: one to hand. A copy for speed rather than a second fact: it is left
     #: out of equality and of the printed form, and the budget falls back

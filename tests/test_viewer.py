@@ -2654,6 +2654,47 @@ def test_the_simulator_starts_from_the_arrangement_the_table_ran():
         )
 
 
+@pytest.mark.parametrize("name", ["urban", "rural", "tunnel"])
+def test_pressing_run_on_a_tab_runs_the_row_the_table_published(name):
+    """Sample for sample, not only anchor for anchor (ADR-0084).
+
+    The check above compares the layout and the journey length, and the
+    tabs still ran every row with no survey error, no packet loss, eight
+    anchors a round instead of twelve, their own seed, their own circuit,
+    a truck antenna the table did not have and, in the tunnel, the
+    double-sided scheme the table had left. Nothing about the geometry
+    was different, so nothing caught it. Running both and comparing the
+    errors catches all of it at once.
+    """
+    from dataclasses import fields, replace
+
+    import numpy as np
+
+    from yerkon.evaluate import run_scenario
+    from yerkon.scenarios import CHOICES
+    from yerkon.viewer.state import from_scenario
+
+    tab = from_scenario(name).deployed().scenario
+    row = CHOICES[name].scenario
+    for field in fields(row):
+        if field.name not in ("name", "terrain", "deployment"):
+            assert getattr(tab, field.name) == getattr(row, field.name), field.name
+
+    def briefly(scenario):
+        units = tuple(
+            replace(unit, journey=replace(unit.journey, duration_s=min(
+                unit.journey.duration_s, 40.0)))
+            for unit in scenario.deployment.receivers)
+        return replace(scenario, deployment=replace(
+            scenario.deployment, receivers=units))
+
+    ran, published = run_scenario(briefly(tab)), run_scenario(briefly(row))
+    assert ran.attempted == published.attempted
+    assert len(ran.horizontal_error_m) > 0
+    assert np.array_equal(ran.horizontal_error_m, published.horizontal_error_m)
+    assert np.array_equal(ran.vertical_error_m, published.vertical_error_m)
+
+
 def test_in_a_browser_a_task_finishes_before_the_first_poll(monkeypatch):
     """ADR-0080. Python in WebAssembly cannot start a thread.
 

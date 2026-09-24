@@ -228,35 +228,26 @@ def test_two_receivers_can_drive_two_different_routes():
 
 
 @pytest.mark.parametrize("mode", ["urban", "rural", "tunnel"])
-def test_a_unit_that_names_no_route_drives_what_it_always_drove(mode):
-    """Point for point, against the code this replaced.
+def test_a_unit_that_names_no_route_drives_the_road_its_row_publishes(mode):
+    """Point for point, against the table's own road.
 
-    Comparing the default against the new `circuit` would prove only that
-    the new code agrees with itself. The two shapes that were here before
-    are still in `scenarios`, so the comparison is against them — and it
-    has to be exact, because every published row is a journey along one
-    of these and a route that moved by a metre would move the table with
-    no visible reason.
+    The table's rows used to build their circuit with a helper of their
+    own, with its own inset and sampling, and the road the table
+    published and the road the tab drove drifted by half a percent. Both
+    now come from one place (ADR-0084), and this holds them to it.
     """
-    from yerkon.scenarios import _circuit, _straight_road
+    from yerkon.scenarios import CHOICES
     from yerkon.viewer.state import from_scenario
 
     state = from_scenario(mode)
     terrain = state.terrain()
     assert all(unit.route == "" for unit in state.units)
 
-    if state.width_m <= 0.0:
-        was = _straight_road(state.corridor_m, terrain)
-    else:
-        was = _circuit(
-            state.corridor_m, state.width_m, terrain,
-            inset_m=min(state.corridor_m, state.width_m) * 0.1,
-            step_m=max(min(state.corridor_m, state.width_m) / 20.0, 50.0),
-        )
+    published = CHOICES[mode].scenario.deployment.receivers[0].journey.road
     drove = state.receivers(terrain)[0].journey.road.centreline_m
-    assert len(drove) == len(was.centreline_m)
-    for mine, theirs in zip(drove, was.centreline_m):
-        assert mine == pytest.approx(theirs, abs=1e-9)
+    assert len(drove) == len(published.centreline_m)
+    for mine, theirs in zip(drove, published.centreline_m):
+        assert tuple(mine) == tuple(theirs)
 
 
 def test_where_the_anchors_go_does_not_move_with_one_units_route():

@@ -219,8 +219,22 @@ Son güncelleme: 24 Eylül 2026.
 
 ## Sorular (cevaplandıkça buraya)
 
-- Kullanılabilirlik hangi tanımla verilsin? Şimdi: filtre çalışırken tek
-  bir mesafe bile bir konum sayılıyor. Dört mesafe şartıyla şehir içi
-  yaklaşık %86'dan %69'a, kırsal %74'ten %52'ye iniyor (kaba okuma).
+- Kullanılabilirlik hangi tanımla verilsin? **Cevap: doğruluğa bağlı.**
+  Bir tur, filtrenin kendi yatay belirsizliği 5,78 m'yi (HPE P95 < 10 m
+  hedefinden) geçmiyorsa konum sayılıyor (ADR-0084). Dipnot 1 için metin:
+  "YERKON kullanılabilirliği, denenen konum turlarından, alıcının kendi
+  tahminine göre yatay hatası %95 olasılıkla 10 m'nin altında kalan bir
+  konum üretenlerin oranıdır."
+- Görüş dışı (çok yollu) yanlılık modele girsin mi? İki hâlin tam tablosu
+  hazırlandı; seçim bekleniyor.
 - SX1280'in SF10 ve 1625 kHz'deki duyarlılığı: model −125,9 dBm
-  varsayıyor; veri sayfasının tablosu gerekli.
+  varsayıyor; veri sayfasının tablosu gerekli. Yayımlanan sayılar buna çok
+  bağlı (bkz. `BASVURU-INCELEMESI.md`, "Model doğruluğu").
+
+## Slayt 16'yı etkileyen model değişiklikleri
+
+- Simülatörün sekmeleri tablonun satırlarından farklı değerlerle
+  koşuyordu (ölçüm hatası, paket kaybı, kabul eşiği, turdaki birim sayısı,
+  tünelde yöntem, tohum, tur, kamyon anteni). Düzeltildi (ADR-0084).
+- Kullanılabilirlik tanımı değişti. Tablo, görüş dışı seçimi yapıldıktan
+  sonra bir kez yeniden yayımlanacak; slayt 16 o sayılarla güncellenmeli.

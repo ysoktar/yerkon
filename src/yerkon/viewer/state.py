@@ -868,9 +868,9 @@ class ViewState:
         no route drives exactly the road it drove before there was a
         choice, point for point.
         """
-        if self.width_m <= 0.0:
-            return 500.0
-        return max(min(self.corridor_m, self.width_m) / 20.0, 50.0)
+        from yerkon.routes import area_step_m
+
+        return area_step_m(self.corridor_m, self.width_m)
 
     def receivers(self, terrain: Terrain) -> tuple[Receiver, ...]:
         """Each unit on its own route.
@@ -921,11 +921,18 @@ class ViewState:
         anchors = self.anchors(terrain)
         if not anchors:
             raise ValueError(say("deployment.no_anchors", self.language))
+        from yerkon.scenarios import row_deployment_figures
+
+        row = self.scenario if self.scenario in MODES else "rural"
         return Deployment(
             anchors=anchors,
             receivers=self.receivers(terrain),
+            # The scheme is the tab's own: the page offers it. How many
+            # anchors a round polls is the row's (ADR-0084).
             scheme=SCHEMES[self.scheme],
             region=chosen(REGION_CHOICES, self.region, "region"),
+            max_anchors_per_round=row_deployment_figures(
+                row, self.settings())["max_anchors_per_round"],
         )
 
     def scenario_object(self) -> Scenario:
@@ -938,9 +945,22 @@ class ViewState:
             ),
             terrain=terrain,
             deployment=self.deployment(terrain),
-            seed=self.seed,
-            accept_sigma_m=max(self.tolerance_m * 4.0, 5.0),
+            **self._row_figures(),
         )
+
+    def _row_figures(self) -> dict:
+        """What the scenario runs with beyond where things stand.
+
+        The row's own figures, read where the table reads them, so a tab
+        runs the row it shows. Only the seed stays the tab's, because the
+        page lets a person change it (ADR-0084).
+        """
+        from yerkon.scenarios import row_figures
+
+        row = self.scenario if self.scenario in MODES else "rural"
+        figures = row_figures(row, self.settings())
+        figures["seed"] = self.seed
+        return figures
 
     def deployed(self) -> Deployed:
         """The scenario dressed as a table row, for pricing and reporting."""
@@ -1159,50 +1179,70 @@ def _grid(prefix: str, stagger: bool = True) -> tuple:
     return (spacing, DEFAULTS.number("{}.anchor_stagger_m".format(prefix)))
 
 
+def _units(name: str) -> tuple:
+    """The row's own units, from the one list both sides read (ADR-0084)."""
+    from yerkon.scenarios import ROW_UNITS
+
+    return tuple(
+        UnitPlan(name_, kind, speed_km_h, start_m, height_m)
+        for name_, kind, speed_km_h, start_m, height_m in ROW_UNITS[name]
+    )
+
+
+def _seed(name: str) -> int:
+    from yerkon.scenarios import ROW_SEEDS
+
+    return ROW_SEEDS[name]
+
+
+def _sweep_m(name: str) -> float:
+    """The cell size the table sweeps the row's area at."""
+    from yerkon.scenarios import CHOICES
+
+    return CHOICES[name].coverage_resolution_m
+
+
 def _template(name: str) -> ViewState:
     if name == "urban":
         return ViewState(
             scenario="urban", corridor_m=3000.0, width_m=3000.0,
             site="kizilay",
             clutter_db_per_km=30.0, roughness_m=0.5, tolerance_m=5.0,
-            sweep_m=200.0, journey_s=_journey_s("urban"),
+            sweep_m=_sweep_m("urban"), journey_s=_journey_s("urban"),
             runs=(
                 AnchorRun("C", "sx1280", "column", 0.0, 3000.0,
                           _grid("urban")[0], 0.0,
                           stagger_m=_grid("urban")[1]),
             ),
-            units=(
-                UnitPlan("araç", "vehicle", 50.0, 0.0, 1.5),
-                UnitPlan("yaya", "pedestrian", 5.0, 2000.0, 1.6),
-            ),
+            units=_units("urban"),
+            seed=_seed("urban"),
         )
     if name == "tunnel":
         return ViewState(
             scenario="tunnel", corridor_m=2000.0,
             site="kizilcahamam", bore=True,
             clutter_db_per_km=0.0, roughness_m=0.05, tolerance_m=1.0,
-            sweep_m=100.0, journey_s=_journey_s("tunnel"), scheme="double",
+            # Single-sided, as the table runs it (ADR-0010). The tab
+            # carried double-sided after the table moved (ADR-0084).
+            sweep_m=100.0, journey_s=_journey_s("tunnel"), scheme="single",
             runs=(AnchorRun("T", "dwm3000", "tunnel", 0.0, 2000.0,
                             _grid("tunnel", stagger=False)[0], 4.0),),
-            units=(
-                UnitPlan("araç", "vehicle", 80.0, 0.0, 1.5),
-                UnitPlan("yaya", "pedestrian", 5.0, 600.0, 1.6),
-            ),
+            units=_units("tunnel"),
+            seed=_seed("tunnel"),
         )
     if name == "rural":
         return ViewState(
             scenario="rural", corridor_m=20_000.0, width_m=20_000.0,
             site="polatli", roughness_m=0.2,
-            tolerance_m=5.0, sweep_m=500.0, journey_s=_journey_s("rural"),
+            tolerance_m=5.0, sweep_m=_sweep_m("rural"),
+            journey_s=_journey_s("rural"),
             runs=(
                 AnchorRun("M", "sx1280", "pole", 0.0, 20_000.0,
                           _grid("rural")[0], 0.0,
                           stagger_m=_grid("rural")[1]),
             ),
-            units=(
-                UnitPlan("araç", "vehicle", 100.0, 0.0, 1.5),
-                UnitPlan("kamyon", "vehicle", 80.0, 20_000.0, 2.8),
-            ),
+            units=_units("rural"),
+            seed=_seed("rural"),
         )
     raise ValueError(
         "no row called {!r}. There are: {}".format(name, ", ".join(MODES))

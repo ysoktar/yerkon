@@ -9,6 +9,7 @@ than the one in the bill.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 from yerkon.evidence import Provenance, Sourced
 from yerkon.settings import DEFAULTS, Settings
@@ -102,6 +103,19 @@ class Radio:
     #: delay. Without this term the model would claim centimetre ranging
     #: from a narrowband radio.
     implementation_floor_m: Sourced
+    #: Mean of the positive bias a blocked path adds to a range, in
+    #: metres. With no direct ray, the first energy to arrive came the
+    #: long way round, and this part's timing locks onto it. Drawn from
+    #: an exponential distribution per exchange. None or zero is off
+    #: (ADR-0084).
+    nlos_bias_mean_m: Optional[Sourced] = None
+
+    @property
+    def nlos_bias_m(self) -> float:
+        """The mean as a number, zero where it is not set."""
+        if self.nlos_bias_mean_m is None:
+            return 0.0
+        return float(self.nlos_bias_mean_m.value)
 
     @property
     def rms_bandwidth_hz(self) -> float:
@@ -191,6 +205,7 @@ def _sx1280_family(
                 "figure in this project measured on the actual part."
             ),
         ),
+        nlos_bias_mean_m=settings.sourced("radio.sx1280.nlos_bias_mean_m"),
     )
 
 
@@ -219,6 +234,7 @@ def radios(settings: Settings = DEFAULTS) -> dict:
         demodulation_threshold_db=settings.sourced(
             "radio.dwm3000.demodulation_threshold_db"
         ),
+        nlos_bias_mean_m=settings.sourced("radio.dwm3000.nlos_bias_mean_m"),
     )
     return {"sx1280": urban, "e28": rural, "dwm3000": tunnel}
 

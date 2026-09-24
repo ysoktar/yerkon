@@ -383,9 +383,18 @@ def measure(
     # already drawn for that reason. Neither averages out over repeated
     # measurements, which is what makes them worse than their size
     # suggests (ADR-0019).
+    # A blocked path's first arrival came the long way round. Drawn only
+    # where the radio carries a bias and the path is blocked, so with the
+    # bias off nothing is drawn and a run is what it was (ADR-0084).
+    reflected_m = 0.0
+    if (terms.excess_path and obstruction is not None and obstruction.blocked
+            and anchor.radio.nlos_bias_m > 0.0):
+        reflected_m = float(rng.exponential(anchor.radio.nlos_bias_m))
+
     measured = (
         budget.distance_m
         + (budget.excess_path_m if terms.excess_path else 0.0)
+        + reflected_m
         + (survey_error_m if terms.survey else 0.0)
         + (float(rng.normal(0.0, noise_m)) if noise_m > 0.0 else 0.0)
     )

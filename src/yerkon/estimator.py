@@ -248,11 +248,19 @@ class TrackingFilter:
         start: Fix,
         manoeuvre_m_s2: float = DEFAULT_MANOEUVRE_M_S2,
         initial_speed_sigma_m_s: float = 30.0,
+        gate_sigmas: float = 0.0,
     ) -> None:
         if manoeuvre_m_s2 <= 0.0:
             raise ValueError("a filter that expects no surprises ignores its inputs")
+        if gate_sigmas < 0.0:
+            raise ValueError("a gate is a number of sigmas, not a negative one")
 
         self.manoeuvre_m_s2 = manoeuvre_m_s2
+        #: Ranges further than this many sigmas from the prediction are
+        #: dropped; zero takes them all (ADR-0084).
+        self.gate_sigmas = gate_sigmas
+        #: How many ranges the gate turned away.
+        self.gated = 0
         self.at_s = start.at_s
         self.state = np.zeros(6)
         self.state[:3] = start.position_m
@@ -269,6 +277,11 @@ class TrackingFilter:
     @property
     def position_m(self) -> tuple[float, float, float]:
         return tuple(float(value) for value in self.state[:3])
+
+    @property
+    def horizontal_sigma_m(self) -> float:
+        """One sigma over both horizontal axes: the root of their variances."""
+        return float(np.sqrt(self.covariance[0, 0] + self.covariance[1, 1]))
 
     @property
     def velocity_m_s(self) -> tuple[float, float, float]:
@@ -319,6 +332,15 @@ class TrackingFilter:
         innovation_variance = (
             float(jacobian @ self.covariance @ jacobian) + observation.variance_m2
         )
+        # A range the prediction cannot account for is more likely a
+        # reflection than a measurement. Turned away rather than blended
+        # in, because a blocked path's error is a bias, and a filter that
+        # averages biases in walks off with them (ADR-0084).
+        if (self.gate_sigmas > 0.0
+                and innovation * innovation
+                > self.gate_sigmas * self.gate_sigmas * innovation_variance):
+            self.gated += 1
+            return
         gain = (self.covariance @ jacobian) / innovation_variance
 
         self.state = self.state + gain * innovation

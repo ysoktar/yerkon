@@ -861,6 +861,71 @@ dört Ankara sahası bina taşıdığı için yayımlanan satırlarda okunmuyor"
 affects_en = """how far an urban anchor reaches over ground with no buildings; the four \
 Ankara sites carry them, so it goes unread in the published rows"""
 
+[values."site.fix_horizontal_sigma_m"]
+value = 5.78
+unit = "m"
+provenance = "DERIVED"
+source = "bu proje, HPE P95 < 10 m hedefinden"
+source_en = "this project, from the HPE P95 < 10 m target"
+note = """Bir konumun "var" sayılması için filtrenin kendi yatay belirsizliğinin \
+(kovaryansın izinin karekökü, bir sigma) en fazla bu olması gerekir. Sunumun \
+hedefi yatay hatada P95 < 10 m. İki boyutlu, eşit dağılımlı bir hata için \
+%95'lik yarıçap her eksende sigmanın 2,448 katıdır; 10 m / 2,448 = 4,08 m her \
+eksende, iki eksenin toplamı olarak 4,08 × √2 = 5,78 m (ADR-0084)."""
+note_en = """For a position to count as available, the filter's own horizontal \
+uncertainty (square root of the covariance trace, one sigma) must be at most \
+this. The deck's target is horizontal P95 < 10 m. For a two-dimensional error \
+equal in both axes the 95 % radius is 2,448 sigma per axis; 10 m / 2,448 = \
+4,08 m per axis, 4,08 × √2 = 5,78 m over both (ADR-0084)."""
+affects = "kullanılabilirliği ve hangi konumların hataya sayıldığını"
+affects_en = "availability, and which positions count towards the error"
+
+[values."estimator.gate_sigmas"]
+value = 0.0
+unit = "sigma"
+provenance = "DESIGN"
+source = "bu proje"
+source_en = "this project"
+note = """Filtrenin beklediğinden bu kadar sigmadan uzak düşen bir mesafe \
+ölçümü atılır (yenilik testi). 0 kapalı demek. Görüş dışı yanlılık açıldığında \
+3 ile birlikte açılır (ADR-0084)."""
+note_en = """A range further than this many sigmas from what the filter expects \
+is dropped (innovation gating). 0 means off. Switched on at 3 together with \
+the non-line-of-sight bias (ADR-0084)."""
+affects = "hangi mesafe ölçümlerinin filtreye girdiğini"
+affects_en = "which ranges the filter accepts"
+
+[values."radio.sx1280.nlos_bias_mean_m"]
+value = 0.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Doğrudan ışını bir engel kestiğinde SX1280'in ölçtüğü mesafeye eklenen \
+pozitif yanlılığın ortalaması; üstel dağılımla çekilir. 0 kapalı demek. \
+Yayımlanmış bir SX1280 görüş dışı ölçümü bulunamadı; pilotta ölçülecek. \
+Karşılaştırma 5 m ve 15 m ile koşuldu (ADR-0084)."""
+note_en = """Mean of the positive bias added to an SX1280 range when an obstacle \
+cuts the direct ray, drawn from an exponential distribution. 0 means off. \
+No published SX1280 non-line-of-sight measurement was found; the pilot will \
+measure it. The comparison was run at 5 m and 15 m (ADR-0084)."""
+affects = "şehir içi doğruluğu; engellenmiş her bağlantının mesafesini"
+affects_en = "urban accuracy; the range of every blocked link"
+
+[values."radio.dwm3000.nlos_bias_mean_m"]
+value = 0.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Aynısı, DWM3000 için. Geniş bantlı bir darbe radyosu yansımaları çok \
+daha ince ayırır; karşılaştırma 0,5 m ile koşuldu (ADR-0084)."""
+note_en = """The same, for the DWM3000. An impulse radio of this bandwidth \
+resolves reflections far more finely; the comparison was run at 0,5 m \
+(ADR-0084)."""
+affects = "tünel doğruluğunu"
+affects_en = "tunnel accuracy"
+
 [values."ranging.anchor_survey_sigma_m"]
 value = 0.15
 unit = "m"

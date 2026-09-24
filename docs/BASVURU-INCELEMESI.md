@@ -232,7 +232,11 @@ geçtiği yer; tabanı ölçülmüş 2,94 m. İkisi de model çıktısı.
 
 ### 3. Çok yollu yayılım ve görüş dışı hata modelde yok
 
-Mesafe ölçümüne eklenen hatalar: gürültü (Cramér-Rao sınırı, saat, 2,94 m
+Artık bir seçenek olarak var (ADR-0084): doğrudan ışın kesilince mesafeye
+üstel dağılımlı pozitif bir yanlılık ekleniyor. Kapalı geliyor; açık ve
+kapalı hâlin tam tablosu karşılaştırıldı.
+
+Önceki durum: mesafe ölçümüne eklenen hatalar: gürültü (Cramér-Rao sınırı, saat, 2,94 m
 taban), bir engel doğrudan ışını kestiğinde engelin üstünden dolaşmanın
 getirdiği pozitif fazla yol, yayın biriminin sabit ölçüm hatası ve
 paket kaybı. `rf.py` "çok yollu yayılım kanal modelinde eklenir" diyor
@@ -253,11 +257,24 @@ kullanılabilirlik şehir içinde %86,24'ten %69,04'e, kırsalda %74,48'den
 olmalı. Ayrıca alan (dört birim, 5 m hassasiyet) ve kullanılabilirlik
 (15 m ya da 30 m kabul, filtre) farklı çıtalarla ölçülüyor.
 
+Karar: doğruluğa bağlı tanım. Bir tur, filtrenin yatay belirsizliği
+5,78 m'yi (HPE P95 < 10 m hedefinden) geçmiyorsa konum sayılıyor
+(ADR-0084).
+
+### 4a. Simülatörün sekmeleri tablonun satırlarını koşturmuyordu
+
+Sekmeler her satırı ölçüm hatası ve paket kaybı olmadan, farklı kabul
+eşikleriyle, turda 12 yerine 8 birimle, kendi tohumlarıyla, farklı bir
+sürüş turuyla ve tünelde çift yönlü yöntemle koşturuyordu. Var olan
+sınama yalnız yerleşimi ve yolculuk süresini karşılaştırdığı için
+yakalamadı. Satırın değerleri artık tek yerde; yeni sınama her satırı iki
+yoldan koşturup hataları birebir karşılaştırıyor (ADR-0084).
+
 ### 5. Filtre aykırı ölçümleri elemiyor
 
-Kalman filtresi gelen her mesafeyi alıyor; yenilik testi (innovation
-gating) yok. Bugün görüş dışı yanlılık modelde olmadığı için sonucu
-değiştirmiyor, ama 3. madde eklendiğinde gerekli.
+Kalman filtresi gelen her mesafeyi alıyordu; yenilik testi (innovation
+gating) yoktu. Artık bir seçenek (`estimator.gate_sigmas`), görüş dışı
+yanlılıkla birlikte açılıyor (ADR-0084).
 
 ### 6. Doğru olanlar
 

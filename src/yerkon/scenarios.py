@@ -161,12 +161,85 @@ RECEIVER_PRODUCTS = {
 BOTH_MODULES = (SX1280, DWM3000)
 
 
-def _straight_road(length_m: float, terrain: Terrain, step_m: float = 500.0) -> Road:
-    centreline = [(float(x), 0.0) for x in np.arange(0.0, length_m + 1.0, step_m)]
-    return Road(
-        centreline_m=centreline,
-        terrain=terrain,
-        surface_m=graded_alignment(centreline, terrain),
+#: Which noise each row is run with. One place, because the simulator's
+#: tab for a row has to run the row's own noise or it is not the row
+#: (ADR-0084).
+ROW_SEEDS = {"urban": 101, "rural": 202, "tunnel": 303}
+
+#: How fast each unit on a row moves, in km/h, and how high its antenna
+#: sits. Kilometres per hour because that is what the simulator's panel
+#: edits, and one conversion done the same way on both sides gives the
+#: same number to the last bit.
+ROW_UNITS = {
+    "urban": (("araç", "vehicle", 50.0, 0.0, 1.5),
+              ("yaya", "pedestrian", 5.0, 2000.0, 1.6)),
+    # A truck's antenna sits on the cab, not at a car's roof height.
+    "rural": (("araç", "vehicle", 100.0, 0.0, 1.5),
+              ("kamyon", "vehicle", 80.0, 20_000.0, 2.8)),
+    "tunnel": (("araç", "vehicle", 80.0, 0.0, 1.5),
+               ("yaya", "pedestrian", 5.0, 600.0, 1.6)),
+}
+
+
+def row_figures(row: str, settings: Settings = DEFAULTS) -> dict:
+    """What a row's scenario is run with, beyond where things stand.
+
+    Read by the table's catalogue and by the simulator's tab alike, so
+    that pressing run on a tab runs the row the table published. The
+    simulator used to fill these in itself and ran every row with no
+    survey error, no packet loss, eight anchors a round instead of
+    twelve and its own seed (ADR-0084).
+    """
+    loss = {"urban": settings.number("site.urban_packet_loss"),
+            "rural": settings.number("ranging.packet_loss"),
+            # A bore is a shielded box: nothing outside it is competing
+            # for the band, and ultra-wideband does not share one anyway.
+            "tunnel": 0.0}[row]
+    return {
+        "seed": ROW_SEEDS[row],
+        "accept_sigma_m": settings.number("{}.accept_sigma_m".format(row)),
+        "anchor_survey_sigma_m": settings.number(
+            "ranging.anchor_survey_sigma_m"),
+        "packet_loss": loss,
+        "fix_sigma_m": settings.number("site.fix_horizontal_sigma_m"),
+        "gate_sigmas": settings.number("estimator.gate_sigmas"),
+    }
+
+
+def row_deployment_figures(row: str, settings: Settings = DEFAULTS) -> dict:
+    """The deployment-level half of the same: round size and scheme."""
+    return {
+        "max_anchors_per_round": int(
+            settings.number("{}.anchors_per_round".format(row))),
+        "scheme": SINGLE_SIDED,
+    }
+
+
+def site_road(length_m: float, width_m: float, terrain: Terrain) -> Road:
+    """The route a row's units drive: round an area and across it, or
+    down a corridor.
+
+    The same shape, the same inset and the same sampling the simulator's
+    tabs draw with (`yerkon.routes`), because a second circuit written
+    here had its own inset and step and the two roads drifted by half a
+    percent (ADR-0084).
+    """
+    from yerkon.routes import Course, Trip, area_step_m, trace
+
+    centreline = trace(
+        Trip(method="line" if width_m <= 0.0 else "circuit",
+             step_m=area_step_m(length_m, width_m)),
+        Course(length_m=length_m, width_m=width_m),
+    )
+    return Road(centreline_m=list(centreline), terrain=terrain,
+                surface_m=graded_alignment(list(centreline), terrain))
+
+
+def _units(row: str, road: Road, duration_s: float, radios) -> tuple:
+    return tuple(
+        _unit(name, road, speed_km_h / 3.6, duration_s, start_m=start_m,
+              antenna_height_m=height_m, product=product, radios=radios)
+        for name, product, speed_km_h, start_m, height_m in ROW_UNITS[row]
     )
 
 
@@ -223,40 +296,6 @@ def _anchors_over(
             )
             index += 1
     return tuple(placed)
-
-
-def _circuit(
-    width_m: float, height_m: float, terrain: Terrain, inset_m: float = 0.0,
-    step_m: float = 200.0,
-) -> Road:
-    """A route around and across an area, rather than a straight line.
-
-    A vehicle in a town turns. A journey that only ever runs east is a
-    journey whose cross-track geometry never changes, and it would make
-    an area deployment look like a corridor.
-    """
-    left, right = inset_m, width_m - inset_m
-    bottom, top = inset_m, height_m - inset_m
-    corners = [
-        (left, bottom), (right, bottom), (right, top), (left, top),
-        (left, bottom), (right, top),
-    ]
-
-    centreline = []
-    for start, finish in zip(corners, corners[1:]):
-        span = math.dist(start, finish)
-        steps = max(int(span / step_m), 1)
-        for step in range(steps):
-            fraction = step / steps
-            centreline.append((
-                start[0] + (finish[0] - start[0]) * fraction,
-                start[1] + (finish[1] - start[1]) * fraction,
-            ))
-    centreline.append(corners[-1])
-    return Road(
-        centreline_m=centreline, terrain=terrain,
-        surface_m=graded_alignment(centreline, terrain),
-    )
 
 
 def _anchors_along(
@@ -543,8 +582,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     URBAN_X, URBAN_Y = fits_on(
         fetched(settings.text("urban.site")),
         settings.number("urban.extent_m"), settings.number("urban.extent_m"))
-    URBAN_ROAD = _circuit(URBAN_X, URBAN_Y, URBAN_TERRAIN, inset_m=300.0,
-                          step_m=150.0)
+    URBAN_ROAD = site_road(URBAN_X, URBAN_Y, URBAN_TERRAIN)
 
     URBAN = Deployed(
         scenario=Scenario(
@@ -565,24 +603,13 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                         settings.number("urban.junction_every")
                     ),
                 ),
-                receivers=(
-                    _unit("araç", URBAN_ROAD, 13.9, 600.0, radios=both),
-                    _unit("yaya", URBAN_ROAD, 1.4, 600.0, start_m=2000.0,
-                          antenna_height_m=1.6, product="pedestrian",
-                          radios=both),
-                ),
-                max_anchors_per_round=int(
-                    settings.number("urban.anchors_per_round")
-                ),
-                scheme=SINGLE_SIDED,
+                receivers=_units("urban", URBAN_ROAD, 600.0, both),
                 region=TURKEY,
+                **row_deployment_figures("urban", settings),
             ),
-            seed=101,
-            accept_sigma_m=settings.number("urban.accept_sigma_m"),
-            anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
             # A town's share of the band is spoken for, so more exchanges
             # are lost here than anywhere else in the study.
-            packet_loss=settings.number("site.urban_packet_loss"),
+            **row_figures("urban", settings),
         ),
         product=SX1280_ANCHOR,
         mounting=mounting["lighting_column"],
@@ -602,7 +629,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     RURAL_X, RURAL_Y = fits_on(
         fetched(settings.text("rural.site")),
         settings.number("rural.extent_m"), settings.number("rural.extent_m"))
-    RURAL_ROAD = _circuit(RURAL_X, RURAL_Y, RURAL_TERRAIN, inset_m=2000.0)
+    RURAL_ROAD = site_road(RURAL_X, RURAL_Y, RURAL_TERRAIN)
 
     RURAL = Deployed(
         scenario=Scenario(
@@ -622,11 +649,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     radio=module["sx1280"], prefix="M",
                     stagger_m=settings.number("rural.anchor_stagger_m"),
                 ),
-                receivers=(
-                    _unit("araç", RURAL_ROAD, 27.8, 2400.0, radios=both),
-                    _unit("kamyon", RURAL_ROAD, 22.2, 2400.0,
-                          start_m=20_000.0, radios=both),
-                ),
+                receivers=_units("rural", RURAL_ROAD, 2400.0, both),
                 # Twelve, not the eight the other rows use, and the
                 # difference is worth 6,8 points of availability without
                 # a single extra mast (ADR-0022).
@@ -641,16 +664,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                 # how many anchors answer, not by how many a position
                 # needs. Sixteen buys only another 0,8 points and costs
                 # more than it returns.
-                max_anchors_per_round=int(
-                    settings.number("rural.anchors_per_round")
-                ),
-                scheme=SINGLE_SIDED,
                 region=TURKEY,
+                **row_deployment_figures("rural", settings),
             ),
-            seed=202,
-            accept_sigma_m=settings.number("rural.accept_sigma_m"),
-            anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
-            packet_loss=settings.number("ranging.packet_loss"),
+            **row_figures("rural", settings),
         ),
         product=SX1280_ANCHOR,
         mounting=mounting["distribution_pole"],
@@ -676,7 +693,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     TUNNEL_M = settings.number("tunnel.length_m")
     TUNNEL_TERRAIN = tunnel_ground(settings, TUNNEL_M)
 
-    TUNNEL_ROAD = _straight_road(TUNNEL_M, TUNNEL_TERRAIN, step_m=100.0)
+    TUNNEL_ROAD = site_road(TUNNEL_M, 0.0, TUNNEL_TERRAIN)
 
     TUNNEL = Deployed(
         scenario=Scenario(
@@ -690,12 +707,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     mounting["tunnel_bracket"], TUNNEL_TERRAIN,
                     radio=module["dwm3000"],
                 ),
-                receivers=(
-                    _unit("araç", TUNNEL_ROAD, 22.2, 85.0, radios=both),
-                    _unit("yaya", TUNNEL_ROAD, 1.4, 85.0, start_m=600.0,
-                          antenna_height_m=1.6, product="pedestrian",
-                          radios=both),
-                ),
+                receivers=_units("tunnel", TUNNEL_ROAD, 85.0, both),
                 # Single-sided, on the strength of a measurement rather
                 # than a preference. At the residual offset this project
                 # assumed, the third frame earned its place on this radio.
@@ -703,18 +715,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                 # floor, so the frame buys nothing and costs a third of
                 # the air: 0,72 m at the ninety-fifth percentile instead
                 # of 1,00, and half again as many fixes. See ADR-0010.
-                max_anchors_per_round=int(
-                    settings.number("tunnel.anchors_per_round")
-                ),
-                scheme=SINGLE_SIDED,
                 region=TURKEY,
+                **row_deployment_figures("tunnel", settings),
             ),
-            seed=303,
-            accept_sigma_m=settings.number("tunnel.accept_sigma_m"),
-            anchor_survey_sigma_m=settings.number("ranging.anchor_survey_sigma_m"),
-            # A bore is a shielded box: nothing outside it is competing
-            # for the band, and ultra-wideband does not share one anyway.
-            packet_loss=0.0,
+            **row_figures("tunnel", settings),
         ),
         product=TUNNEL_ANCHOR,
         mounting=mounting["tunnel_bracket"],

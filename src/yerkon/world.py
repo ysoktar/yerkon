@@ -238,6 +238,7 @@ class Terrain:
             # budget works diffraction out over all of it (ADR-0053).
             profile=tuple(profile),
             profile_array=np.column_stack((every_fraction, every_height)),
+            blocked=blocked,
             # Everything this ground model does not carry, as a spread
             # around what it does: the first end is the one the field is
             # indexed by, and every caller passes the anchor first

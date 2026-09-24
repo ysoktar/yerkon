@@ -84,6 +84,12 @@ sayılıyor. Seçim lira başına açgözlü, sonra bırakma ve değiş tokuş.
 Simülatörde "Yerleştir", komut satırında `yerkon place`. Cevap `placed`
 yöntemli bir direk grubu olarak gelir. ADR-0081'e bak.
 
+**Row figures** (satırın değerleri): `scenarios.row_figures`,
+`ROW_SEEDS`, `ROW_UNITS` ve `site_road`. Bir satırın konum dışında neyle
+koşturulduğu tek yerde duruyor; tablonun kataloğu da simülatörün sekmesi
+de oradan okuyor, bu yüzden bir sekmede "Çalıştır" satırın kendisini
+koşturur (ADR-0084).
+
 **Band recording** (bant kaydı): SDR++'ın temel bant WAV'ı ya da
 SDRangel'in `.sdriq` dosyası. `yerkon calibrate` bunu okuyup paket kaybı
 varsayımının yerine ölçülmüş bir değer yazar: 31,8 ms'lik bir
@@ -203,10 +209,13 @@ rapordakinden iyi olduğu varsayılmaz.
 **HPE, VPE**: yatay ve düşey konum hatası, metre cinsinden, belirtilen
 yüzdelikte, değerlendirilen yolculuklar üzerinden.
 
-**Kullanılabilirlik**: denenen sabitlemelerin geçerli bir konum üretenlerinin
-oranı. Yalnızca modellenen başarısızlık sebeplerini ölçer: bağlantı
-kapanması, paket kaybı ve çözücü başarısızlığı. Bir hizmet kullanılabilirliği
-değeri değildir ve GNSS satırlarına karşı öyleymiş gibi okunmamalıdır.
+**Kullanılabilirlik**: denenen turlardan, filtrenin kendi yatay
+belirsizliği 5,78 m'yi (HPE P95 < 10 m hedefinden türetilen çıta) geçmeyen
+bir konum üretenlerin oranı. Çıtayı geçmeyen turda alıcı izlemeyi sürdürür
+ama konum sunmaz ve hatası örneğe girmez (ADR-0084). Yalnızca modellenen
+başarısızlık sebeplerini ölçer: bağlantı kapanması, paket kaybı, çözücü
+başarısızlığı ve yetersiz doğruluk. Bir hizmet kullanılabilirliği değeri
+değildir ve GNSS satırlarına karşı öyleymiş gibi okunmamalıdır.
 
 **Alan**: yukarıda tanımlandığı gibi hizmet alanı.
 

@@ -83,6 +83,20 @@ class Course:
         return min(self.length_m, self.width_m) * INSET_SHARE
 
 
+def area_step_m(length_m: float, width_m: float) -> float:
+    """How finely a site's own route is sampled.
+
+    Fine enough to be a shape, coarse enough that a forty kilometre site
+    is not ten thousand points: 500 m down a corridor, a twentieth of the
+    shorter side over an area. The table's rows and the simulator's tabs
+    both ask this, so the road a row publishes and the road its tab
+    drives are the same road (ADR-0084).
+    """
+    if width_m <= 0.0:
+        return 500.0
+    return max(min(length_m, width_m) / 20.0, 50.0)
+
+
 @dataclass(frozen=True)
 class Trip:
     """What route to drive, and the handful of figures that shape it."""
