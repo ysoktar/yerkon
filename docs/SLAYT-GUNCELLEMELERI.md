@@ -145,15 +145,20 @@ Son güncelleme: 24 Eylül 2026.
   doğruluğu").
 
 - [ ] Prototip ve son ürün donanımı ayrı yazılmalı (proje sahibinin
-  kararı, 24 Eylül). Önerilen metin:
+  kararı, 24 Eylül). Aşağıdaki liste **yalnız prototip içindir**: ürüne,
+  fiyat tablosuna (slayt 15) ve maliyet sütunlarına (slayt 16) girmez.
+  Hazır cihazlarla yapılan bir ürün pahalı olur; son ürün sunumda verilen
+  bileşenlerle yapılır ve tablodaki maliyet o bileşenlerin maliyetidir.
+  Önerilen metin:
 
-  > "Prototipler ekibin elindeki cihazlarla gerçekleştirilecektir:
-  > RAKwireless R1 (harici antenli ve antensiz), Seeed Studio SenseCAP
+  > "Prototipler ekibin elindeki hazır cihazlarla gerçekleştirilecektir:
+  > Muzi Works R1 (harici antenli ve antensiz), Seeed Studio SenseCAP
   > Card Tracker T1000-E, ATGM336H GPS modülü, RAK WisBlock Meshtastic
   > Starter Kit, RAK WisBlock Starter Kit (pil, OLED ve IO modülüyle) ve
-  > 17 cm kırbaç anten. Son üründe sunumda verilen bileşenler (SX1280
+  > 17 cm kırbaç anten. Bu cihazlar yalnız prototip içindir. Son ürün,
+  > maliyeti düşük tutmak için sunumda verilen bileşenlerle (SX1280
   > tabanlı E28-2G4M12S, DWM3000, W24P-U anten ve diğerleri)
-  > kullanılacaktır."
+  > üretilecektir."
 
 - [ ] Adlar düzeltilmeli: "R1" RAKwireless'ın değil Muzi Works'ün
   cihazı; içinde RAKwireless'ın RAK4631 çekirdeği var. Önerilen:
@@ -179,12 +184,8 @@ Son güncelleme: 24 Eylül 2026.
   > (T1000-E'deki AG3335, ATGM336H) sahada karşılaştırma için referans
   > konum verecektir."
 
-  Bir öneri: E28-2G4M12S modülleri (bu projenin ürün listesinde, adedi
-  birkaç dolar) WisBlock'un IO yuvasına bağlanırsa mesafe ölçümü de
-  prototipte denenebilir.
-
-- [ ] Frekans: US915 kiti Türkiye'de US915 kanal planıyla
-  çalıştırılmamalı. 902-928 MHz bandı Türkiye'de tahsisten muaf değil;
+- [ ] Frekans (prototip denemeleri için): US915 kiti Türkiye'de US915
+  kanal planıyla çalıştırılmamalı. 902-928 MHz bandı Türkiye'de tahsisten muaf değil;
   yalnız 917,4-919,4 MHz gibi dar alt bantlar koşullu (25 mW e.r.p.,
   %1 görev döngüsü, yalnız veri şebekeleri). Donanım 868 MHz'i
   destekliyor (779-923 MHz); prototip BTK'nın 863-870 MHz alt bantlarına
@@ -296,6 +297,13 @@ Son güncelleme: 24 Eylül 2026.
   için veriyor. Bant genişliği 1625 kHz'e çıkınca +9,0 dB, SF12'den
   SF10'a +5 dB (LoRa'da her adım yaklaşık 2,5 dB) eklenirse yaklaşık
   −118 dBm çıkıyor: modelden yaklaşık 8 dB daha kötü. Karar bekliyor.
+
+- Prototipte mesafe ölçümü de denensin mi? Listedeki cihazların hiçbiri
+  mesafe ölçemiyor (SX1262, LR1110). İstenirse birkaç E28-2G4M12S modülü
+  (son ürünün parçası, adedi birkaç dolar) prototip kartlarına
+  bağlanabilir. Karar bekliyor; sunuma girmedi.
+- Bakım yerel ekiple mi yapılsın? Kırsal ve tünel için farkı
+  `MALIYET-KARSILASTIRMASI.md`'de; karar bekliyor, model değişmedi.
 
 ## Slayt 16'yı etkileyen model değişiklikleri
 

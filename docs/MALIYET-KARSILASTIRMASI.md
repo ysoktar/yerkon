@@ -35,6 +35,31 @@ maliyeti %30,6 düşürüyor (11 direk eksik). km² başına düşüş daha kü�
 %22,2, çünkü seyrek ızgaranın kapsadığı alan da 6,68'den 5,96 km²'ye
 iniyor.
 
+## Yerel bakım ekibi olsaydı (uygulanmadı, karar bekliyor)
+
+Bugünkü model: ekip Ankara merkezde, Polatlı ve Kızılcahamam'a her
+ziyarette iki kişi için kişi başı 850 TL harcırah (ADR-0089). Yerel ekip:
+aynı ziyaretler, harcırah yok.
+
+| Satır | Ekip | OPEX/yıl | OPEX | Harcırah | On yıl toplam |
+|---|---|---|---|---|---|
+| Kırsal | Ankara'dan | 156665 | 750 TL/km² | 33320 | 1941404 |
+| Kırsal | yerel | 123345 | 590 TL/km² | 0 | 1608204 |
+| Tünel | Ankara'dan | 9528 | 4764 TL/km | 3060 | 159105 |
+| Tünel | yerel | 6468 | 3234 TL/km | 0 | 128505 |
+
+Değişen yalnız harcırah kalemi: kırsalda OPEX %21,3, tünelde %32,1
+düşüyor. CAPEX, doğruluk ve kullanılabilirlik değişmiyor.
+
+Modelin göremediği: ziyaret bedeli (1800 TL, varsayım) mesafeye bağlı
+değil. Ankara'dan 70-80 km gidip gelmenin yakıtı ve yolda geçen iş
+saati bu bedelin içinde ayrı sayılmıyor, yani yerel ekibin gerçek
+kazancı tablodakinden biraz daha büyük olabilir. Karşılığında yerel ekip
+bir anlaşma demek: Polatlı'da elektrik dağıtım şirketinin ekipleri
+(direkler zaten onların), tünelde Karayolları'nın tünel bakım ekibi
+(tünele giriş ve şerit kapatma zaten onların işi). Arıza anında ne kadar
+sürede gidecekleri anlaşmaya bağlı.
+
 ## Şehir içi (Kızılay)
 
 | Aralık | Direk | CAPEX TL/km² | OPEX TL/km²/yıl | A: P95, kull. | B: P95, kull. | C: P95, kull. |
