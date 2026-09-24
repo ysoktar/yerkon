@@ -294,6 +294,48 @@ class Buildings:
 
 
 @dataclass(frozen=True)
+class Drape:
+    """A photograph the page puts together from map tiles itself.
+
+    Only which tiles cover the site: the provider's address, the zoom and
+    the range of tile numbers. The page asks for them and stitches them,
+    because a browser decodes the provider's JPEG natively and a plain
+    install has no image library to do it with (ADR-0087). Drawn, never
+    read, like `Aerial`.
+    """
+
+    template: str
+    zoom: int
+    west_x: int
+    north_y: int
+    east_x: int
+    south_y: int
+    source: str = ""
+
+    @property
+    def bounds(self) -> BoundingBox:
+        """The ground the whole block of tiles covers."""
+        count = 2 ** self.zoom
+
+        def latitude_at(row: int) -> float:
+            return math.degrees(math.atan(math.sinh(
+                math.pi * (1.0 - 2.0 * row / count))))
+
+        return BoundingBox(
+            west=self.west_x / count * 360.0 - 180.0,
+            east=(self.east_x + 1) / count * 360.0 - 180.0,
+            north=latitude_at(self.north_y),
+            south=latitude_at(self.south_y + 1),
+        )
+
+    def as_json(self) -> dict:
+        return {"template": self.template, "zoom": self.zoom,
+                "west_x": self.west_x, "north_y": self.north_y,
+                "east_x": self.east_x, "south_y": self.south_y,
+                "source": self.source}
+
+
+@dataclass(frozen=True)
 class Aerial:
     """A photograph of the site, north up, in whatever it was fetched at.
 
@@ -447,6 +489,9 @@ class Site:
     roads_m: tuple = ()
     #: Structures an anchor could be bolted to, where a fetch found any.
     furniture: Optional[Furniture] = None
+    #: A photograph for the page to stitch, where the fetch left that to
+    #: the browser instead of bringing pixels back (ADR-0087).
+    drape: Optional[Drape] = None
 
     def __post_init__(self) -> None:
         if self.elevation_grid_m.ndim != 2:
@@ -489,8 +534,17 @@ class Site:
         """
         if self.aerial is None:
             return None
+        return self._extent_of(self.aerial.bounds)
+
+    @property
+    def drape_extent_m(self):
+        """Where the page's stitched photograph sits, in the same way."""
+        if self.drape is None:
+            return None
+        return self._extent_of(self.drape.bounds)
+
+    def _extent_of(self, box: BoundingBox):
         per_lat, per_lon = self.bounds.metres_per_degree()
-        box = self.aerial.bounds
         return (
             (box.west - self.bounds.west) * per_lon,
             (box.south - self.bounds.south) * per_lat,

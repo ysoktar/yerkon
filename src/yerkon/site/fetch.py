@@ -68,35 +68,41 @@ class ElevationSource(Protocol):
 # --- GeoTIFF on disk ------------------------------------------------------
 
 
-#: What a fetch needs installed that a plain install does not bring.
+#: What makes a fetch better where it is installed, and none of which a
+#: fetch needs any more (ADR-0087).
 #:
-#: Ground arrives as a GeoTIFF and is read with rasterio, everything
-#: travels over HTTP with requests, and buildings, roads and structures
-#: are GeoParquet read with pyarrow. None of the three is a dependency
-#: of the package on purpose: every number in the table is reproducible
-#: from the ground shipped inside it, with no network and no GDAL
-#: (ADR-0008). That is worth keeping and it is not worth finding out
-#: about at the end of a fetch (ADR-0051).
-FETCH_NEEDS = ("rasterio", "requests", "pyarrow")
+#: rasterio reads the Copernicus GeoTIFF, requests carries HTTP, and
+#: pyarrow reads Overture's GeoParquet. Without them the ground comes as
+#: terrain tiles read with numpy, HTTP goes through the standard
+#: library, and buildings and roads come from Overpass. None of the
+#: three is a dependency on purpose: every number in the table is
+#: reproducible from the ground shipped inside the package, with no
+#: network and no GDAL (ADR-0008).
+FETCH_BETTER_WITH = ("rasterio", "requests", "pyarrow")
 
 
 def missing_for_a_fetch() -> tuple[str, ...]:
-    """Which of them this install has not got.
+    """What a fetch cannot do without on this install: nothing.
+
+    It used to be the three packages above, and the page greyed its
+    fetch button and told the person to run pip. A plain install now
+    fetches through the standard library and numpy, and so does the
+    published site's worker (ADR-0086, ADR-0087). Kept as a function
+    because the page still asks.
+    """
+    return ()
+
+
+def better_with() -> tuple[str, ...]:
+    """Which of the optional packages this install has not got.
 
     Asked rather than imported: importing rasterio costs most of a
-    second and loads GDAL, and the question here is only whether it is
-    there. A package that is installed but broken answers "there", and
-    then says so itself when it is actually used.
-
-    In the published site's worker none of the three is needed: the
-    browser does the asking, the ground comes as terrain tiles and the
-    buildings and roads from Overpass. Pillow, which decodes the tiles,
-    is loaded by the worker when a fetch starts (ADR-0086).
+    second and loads GDAL, and the question is only whether it is there.
     """
     if http.IN_A_BROWSER:
-        return ()
+        return FETCH_BETTER_WITH
     missing = []
-    for name in FETCH_NEEDS:
+    for name in FETCH_BETTER_WITH:
         try:
             found = importlib.util.find_spec(name) is not None
         except (ImportError, ValueError):
@@ -430,13 +436,6 @@ class TerrainTileElevation:
         return zoom
 
     def grid_for(self, bounds: BoundingBox, spacing_m: float) -> ElevationGrid:
-        if not http.can_ask():
-            raise Unreachable(say("site.needs_requests"))
-        try:
-            from PIL import Image
-        except ImportError as error:
-            raise Unreachable(say("site.needs_pillow")) from error
-
         zoom = self.zoom_for(bounds, spacing_m)
         west, north = tile_of(bounds.north, bounds.west, zoom)
         east, south = tile_of(bounds.south, bounds.east, zoom)
@@ -450,8 +449,7 @@ class TerrainTileElevation:
                 if body is None:
                     continue
                 try:
-                    pixels = np.asarray(
-                        Image.open(io.BytesIO(body)).convert("RGB"), dtype=float)
+                    pixels = _decoded(body).astype(float)
                 except Exception:          # noqa: BLE001 — a broken tile is a hole
                     continue
                 heights = (pixels[..., 0] * 256.0 + pixels[..., 1]
@@ -509,6 +507,19 @@ class TerrainTileElevation:
             part.write_bytes(reply.content)
             part.replace(cached)
         return reply.content
+
+
+def _decoded(body: bytes) -> np.ndarray:
+    """A PNG tile's pixels: Pillow where it is installed, because it is
+    quicker, and numpy where it is not (ADR-0087)."""
+    try:
+        from PIL import Image
+    except ImportError:
+        from yerkon.site import png
+
+        return png.read_rgb(body)
+    return np.asarray(Image.open(io.BytesIO(body)).convert("RGB"),
+                      dtype=np.uint8)
 
 
 def _tile_count(bounds: BoundingBox, zoom: int) -> int:
@@ -1544,9 +1555,10 @@ AERIAL_TILES = ("https://server.arcgisonline.com/ArcGIS/rest/services/"
 AERIAL_NAME_SHOWN = "Esri World Imagery"
 AERIAL_CREDIT = "Esri, Maxar, Earthstar Geographics, GIS User Community"
 #: A page fetch stops at this many photograph tiles and takes a coarser
-#: zoom past it. At zoom 17 a 3 km box is 196 tiles, so it is drawn at
-#: 16 from 56; the browser asks for them one by one.
-PAGE_MOST_TILES = 120
+#: zoom past it. The page asks for them itself, several at a time
+#: (ADR-0087): at zoom 17 a 3 km box is 196 tiles and stays at 17, about
+#: 0,9 m a pixel; a 10 km box drops to 15.
+PAGE_MOST_TILES = 200
 
 
 @dataclass

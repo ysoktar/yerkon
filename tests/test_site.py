@@ -1093,17 +1093,17 @@ def test_the_fetch_task_refuses_an_empty_centre_in_the_page_s_language():
 # --- What this install can fetch with (ADR-0051) --------------------------
 
 
-def test_an_install_knows_which_packages_it_is_short_of():
-    """None of the three is a dependency of this package, on purpose:
-    every number in the table is reproducible from the ground shipped
-    inside it, with no network and no GDAL (ADR-0008). So the question
-    is real on any machine, and it has to be answerable before a fetch
-    is started rather than at the end of one."""
+def test_a_plain_install_is_short_of_nothing_for_a_fetch():
+    """The page used to grey its fetch button and say "pip install" on
+    any install without rasterio, requests and pyarrow. None of the three
+    is needed now (ADR-0087); they only make a fetch better, and which of
+    them is missing is still answerable without importing them."""
     import importlib.util
 
     from yerkon.site import fetch as fetching
 
-    assert fetching.FETCH_NEEDS == ("rasterio", "requests", "pyarrow")
+    assert fetching.missing_for_a_fetch() == ()
+    assert fetching.FETCH_BETTER_WITH == ("rasterio", "requests", "pyarrow")
 
     real = importlib.util.find_spec
     try:
@@ -1111,7 +1111,8 @@ def test_an_install_knows_which_packages_it_is_short_of():
             lambda name, *rest, **kw: None
             if name.split(".")[0] in ("rasterio", "pyarrow") else real(name, *rest, **kw)
         )
-        assert fetching.missing_for_a_fetch() == ("rasterio", "pyarrow")
+        assert fetching.better_with() == ("rasterio", "pyarrow")
+        assert fetching.missing_for_a_fetch() == ()
 
         # A package that is installed but broken answers "there", and
         # says so itself when it is used.
@@ -1119,12 +1120,9 @@ def test_an_install_knows_which_packages_it_is_short_of():
             raise ValueError("__spec__ is not set")
 
         importlib.util.find_spec = angry
-        assert fetching.missing_for_a_fetch() == fetching.FETCH_NEEDS
+        assert fetching.better_with() == fetching.FETCH_BETTER_WITH
     finally:
         importlib.util.find_spec = real
-
-    # And on a machine that has them, nothing is reported short.
-    assert fetching.missing_for_a_fetch() == ()
 
 
 def test_a_missing_package_says_so_in_the_language_on_screen():

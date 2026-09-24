@@ -1,6 +1,8 @@
 """How a fetch asks a server for something, wherever it runs (ADR-0086).
 
-`requests` where it is installed. In the published site the simulator
+`requests` where it is installed, and the standard library's `urllib`
+where it is not, so a plain install fetches too (ADR-0087). In the
+published site the simulator
 runs as Python compiled to WebAssembly inside a browser worker
 (ADR-0080), which has no sockets and no `requests`; there the browser's
 own request does the asking. A worker may wait for an answer
@@ -50,14 +52,15 @@ class Reply:
             raise Failed("the server answered {}".format(self.status_code))
 
 
+#: Sent where the transport lets a script name itself. Overpass and most
+#: tile servers refuse an unnamed client.
+USER_AGENT = "yerkon/1.0 (terrestrial positioning study)"
+
+
 def can_ask() -> bool:
-    """Whether this install can reach a server at all."""
-    if IN_A_BROWSER:
-        return True
-    try:
-        import requests  # noqa: F401
-    except ImportError:
-        return False
+    """Whether this install can reach a server at all. Always, now that
+    the standard library is the fallback; kept so callers read as they
+    did."""
     return True
 
 
@@ -76,7 +79,10 @@ def _ask(method: str, url: str, form: Optional[dict], timeout: float) -> Reply:
     if IN_A_BROWSER:
         return _in_the_browser(
             method, url, None if form is None else urlencode(form), timeout)
-    import requests
+    try:
+        import requests
+    except ImportError:
+        return _with_urllib(method, url, form, timeout)
 
     try:
         if method == "POST":
@@ -86,6 +92,24 @@ def _ask(method: str, url: str, form: Optional[dict], timeout: float) -> Reply:
     except Exception as error:  # noqa: BLE001 — every transport failure is one
         raise Failed(_cause(error)) from error
     return Reply(answer.status_code, answer.content, dict(answer.headers))
+
+
+def _with_urllib(method: str, url: str, form: Optional[dict],
+                 timeout: float) -> Reply:
+    """The standard library's request, for an install without `requests`."""
+    import urllib.error
+    import urllib.request
+
+    body = None if form is None else urlencode(form).encode("utf-8")
+    request = urllib.request.Request(
+        url, data=body, method=method, headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as answer:
+            return Reply(answer.status, answer.read(), dict(answer.headers))
+    except urllib.error.HTTPError as refused:
+        return Reply(refused.code, refused.read() or b"", dict(refused.headers))
+    except Exception as error:  # noqa: BLE001 — every transport failure is one
+        raise Failed(_cause(error)) from error
 
 
 def _in_the_browser(method: str, url: str, form: Optional[str],

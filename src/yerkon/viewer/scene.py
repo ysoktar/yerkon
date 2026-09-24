@@ -159,7 +159,24 @@ def _aerial(state: ViewState, measured) -> Optional[dict]:
     picture per site and changing ground fetches the new one, rather than
     both sites sharing an address and whichever loaded first winning.
     """
-    if measured is None or measured.aerial is None:
+    if measured is None:
+        return None
+    drape = getattr(measured, "drape", None)
+    if measured.aerial is None and drape is not None:
+        # The page stitches this one from the provider's tiles; it gets
+        # which tiles and where they sit, and the key it caches under
+        # (ADR-0087).
+        west, south, east, north = measured.drape_extent_m
+        return {
+            "url": "drape:{}:{}".format(quote(state.site), drape.zoom),
+            "tiles": {"template": drape.template, "zoom": drape.zoom,
+                      "west_x": drape.west_x, "north_y": drape.north_y,
+                      "east_x": drape.east_x, "south_y": drape.south_y},
+            "extent_m": [west, south, east, north],
+            "source": drape.source,
+            "zoom": drape.zoom,
+        }
+    if measured.aerial is None:
         return None
     west, south, east, north = measured.aerial_extent_m
     return {

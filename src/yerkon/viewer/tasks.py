@@ -444,14 +444,16 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             OvertureBuildings,
             OvertureFurniture,
             OvertureRoads,
-            ServiceElevation,
             TerrainTileElevation,
             TileImagery,
+            better_with,
             build_site,
             fitted_zoom,
+            tile_of,
         )
         from yerkon.site.http import IN_A_BROWSER
-        from yerkon.site.model import BoundingBox, box_around, read_point
+        from yerkon.site.model import (
+            BoundingBox, Drape, box_around, read_point)
 
         name = str(payload.get("name", "")).strip()
         if not name or not name.replace("-", "").replace("_", "").isalnum():
@@ -488,16 +490,26 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         # server any more: the project owner chose one, so nobody has to
         # find and paste an address (ADR-0086). An address sent by hand
         # still wins, for whoever drives the page from a script.
+        #
+        # The owner's provider is not downloaded here at all: the site
+        # records which of its tiles cover the box and the page stitches
+        # them, since a browser decodes JPEG and a plain install has no
+        # image library (ADR-0087).
         tiles = str(payload.get("imagery_url", "")).strip()
+        zoom = fitted_zoom(bounds, int(payload.get("imagery_zoom")
+                                       or DEFAULT_ZOOM), PAGE_MOST_TILES)
+        drape = None
         if not tiles and payload.get("imagery"):
-            tiles = AERIAL_TILES
-        named = (AERIAL_NAME_SHOWN + " (" + AERIAL_CREDIT + ")"
-                 if tiles == AERIAL_TILES else "aerial imagery")
+            west_x, north_y = tile_of(bounds.north, bounds.west, zoom)
+            east_x, south_y = tile_of(bounds.south, bounds.east, zoom)
+            drape = Drape(
+                template=AERIAL_TILES, zoom=zoom,
+                west_x=west_x, north_y=north_y,
+                east_x=east_x, south_y=south_y,
+                source="{} z{} ({})".format(AERIAL_NAME_SHOWN, zoom,
+                                           AERIAL_CREDIT))
         imagery = TileImagery(
-            url_template=tiles,
-            name=named,
-            zoom=fitted_zoom(bounds, int(payload.get("imagery_zoom")
-                                         or DEFAULT_ZOOM), PAGE_MOST_TILES),
+            url_template=tiles, zoom=zoom,
             cache_directory=str(SITES / "_tiles"),
         ) if tiles else None
 
@@ -513,14 +525,21 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             driven = (OpenStreetMapRoads(),)
             standing = ()
         else:
-            ground = (CopernicusElevation(cache_directory=cache),
-                      TerrainTileElevation(cache_directory=cache),
-                      ServiceElevation())
-            built = (OvertureBuildings(cache_directory=cache),
-                     OpenStreetMapBuildings())
-            driven = (OvertureRoads(cache_directory=cache),
-                      OpenStreetMapRoads())
-            standing = (OvertureFurniture(cache_directory=cache),)
+            # The better sources only where this install can read them,
+            # so a plain install's record says what happened rather than
+            # what to install (ADR-0087).
+            short = set(better_with())
+            copernicus = "rasterio" not in short and "requests" not in short
+            overture = "pyarrow" not in short and "requests" not in short
+            ground = ((CopernicusElevation(cache_directory=cache),)
+                      if copernicus else ()) + (
+                TerrainTileElevation(cache_directory=cache),)
+            built = ((OvertureBuildings(cache_directory=cache),)
+                     if overture else ()) + (OpenStreetMapBuildings(),)
+            driven = ((OvertureRoads(cache_directory=cache),)
+                      if overture else ()) + (OpenStreetMapRoads(),)
+            standing = ((OvertureFurniture(cache_directory=cache),)
+                        if overture else ())
 
         tell(say("task.fetch.fetching", state.language,
                  south=decimal_comma(bounds.south, 4),
@@ -543,6 +562,12 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             furniture_sources=standing if want_buildings else (),
             imagery_source=imagery,
         )
+        if drape is not None:
+            from dataclasses import replace
+
+            site = replace(site, drape=drape, manifest=replace(
+                site.manifest,
+                notes=site.manifest.notes + (drape.source,)))
         SiteCache(SITES / name).save(site)
 
         tell(say("task.fetch.got", state.language,
@@ -561,7 +586,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             "relief_m": round(site.relief_m, 1),
             "roughness_m": round(site.roughness_m(), 2),
             "buildings": site.manifest.building_count,
-            "aerial": site.aerial is not None,
+            "aerial": site.aerial is not None or site.drape is not None,
             "roads": len(site.roads_m),
             "furniture": 0 if site.furniture is None else len(site.furniture),
             "notes": list(site.manifest.notes),

@@ -17,6 +17,7 @@ from yerkon.site.model import (
     Aerial,
     BoundingBox,
     Buildings,
+    Drape,
     Furniture,
     Site,
     SiteManifest,
@@ -59,10 +60,18 @@ class SiteCache:
             )
 
         if site.aerial is not None:
-            from PIL import Image
+            # Without Pillow the picture is written unfiltered, which is
+            # larger on disk and the same picture (ADR-0087).
+            try:
+                from PIL import Image
+            except ImportError:
+                from yerkon.site import png
 
-            Image.fromarray(site.aerial.pixels, "RGB").save(
-                self.directory / AERIAL_NAME, optimize=True)
+                (self.directory / AERIAL_NAME).write_bytes(
+                    png.write_rgb(site.aerial.pixels))
+            else:
+                Image.fromarray(site.aerial.pixels, "RGB").save(
+                    self.directory / AERIAL_NAME, optimize=True)
         else:
             # Fetched again without one, over a site that had one. The
             # manifest would already say there is no photograph, so
@@ -111,6 +120,8 @@ class SiteCache:
                 "source": site.aerial.source,
                 "zoom": site.aerial.zoom,
             },
+            # Which tiles the page stitches, where it does (ADR-0087).
+            "drape": None if site.drape is None else site.drape.as_json(),
             "manifest": {
                 "elevation_source": site.manifest.elevation_source,
                 "elevation_resolution_m": site.manifest.elevation_resolution_m,
@@ -145,12 +156,11 @@ class SiteCache:
         aerial: Optional[Aerial] = None
         aerial_path = self.directory / AERIAL_NAME
         if aerial_path.exists() and payload.get("aerial"):
-            from PIL import Image
+            from yerkon.site.fetch import _decoded
 
             stored = payload["aerial"]
             aerial = Aerial(
-                pixels=np.asarray(Image.open(aerial_path).convert("RGB"),
-                                  dtype=np.uint8),
+                pixels=_decoded(aerial_path.read_bytes()),
                 bounds=BoundingBox(**stored["bounds"]),
                 source=stored.get("source", ""),
                 zoom=int(stored.get("zoom", 0)),
@@ -178,8 +188,13 @@ class SiteCache:
                 kind=tuple(str(k) for k in stored["kind"]),
             )
 
+        drape = None
+        if payload.get("drape"):
+            drape = Drape(**payload["drape"])
+
         raw = payload["manifest"]
         return Site(
+            drape=drape,
             roads_m=roads,
             furniture=furniture,
             bounds=BoundingBox(**payload["bounds"]),

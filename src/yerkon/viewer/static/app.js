@@ -1533,29 +1533,28 @@ function loadPhotograph() {
   photographUrl = aerial.url;
   photograph = null;
 
+  // Another site's picture may have been asked for while this one was
+  // in flight; the last one asked for is the one that belongs.
+  const stillWanted = () => photographUrl === aerial.url;
+  const dropped = () => { if (stillWanted()) photograph = null; };
+
+  if (aerial.tiles) {
+    stitchTiles(aerial.tiles).then(sheet => {
+      if (stillWanted()) takePhotograph(sheet, aerial);
+    }, dropped);
+    return;
+  }
+
   const picture = new Image();
   picture.onload = () => {
-    // Another site's picture may have been asked for while this one was
-    // in flight; the last one asked for is the one that belongs.
-    if (photographUrl !== aerial.url) return;
+    if (!stillWanted()) return;
     const sheet = document.createElement("canvas");
     sheet.width = picture.naturalWidth;
     sheet.height = picture.naturalHeight;
-    const pen = sheet.getContext("2d", { willReadFrequently: true });
-    pen.drawImage(picture, 0, 0);
-    let pixels;
-    try {
-      pixels = pen.getImageData(0, 0, sheet.width, sheet.height).data;
-    } catch {
-      // A canvas the browser considers tainted. Same ground, no picture.
-      photograph = null;
-      return;
-    }
-    photograph = draw.photoSampler(
-      pixels, sheet.width, sheet.height, aerial.extent_m);
-    render();
+    sheet.getContext("2d", { willReadFrequently: true }).drawImage(picture, 0, 0);
+    takePhotograph(sheet, aerial);
   };
-  picture.onerror = () => { if (photographUrl === aerial.url) photograph = null; };
+  picture.onerror = dropped;
   // Asked for with fetch rather than handed to the image as its address.
   // On the published site there is no server behind /api/: the page's
   // fetch is answered by the worker that fetched the ground, and an
@@ -1564,13 +1563,67 @@ function loadPhotograph() {
   fetch(aerial.url)
     .then(reply => (reply.ok ? reply.blob() : Promise.reject(reply.status)))
     .then(blob => {
-      if (photographUrl !== aerial.url) return;
+      if (!stillWanted()) return;
       const address = URL.createObjectURL(blob);
       picture.addEventListener("load", () => URL.revokeObjectURL(address),
                                { once: true });
       picture.src = address;
     })
-    .catch(() => { if (photographUrl === aerial.url) photograph = null; });
+    .catch(dropped);
+}
+
+/* The pixels of a finished sheet, read out once for the painter. */
+function takePhotograph(sheet, aerial) {
+  const pen = sheet.getContext("2d", { willReadFrequently: true });
+  let pixels;
+  try {
+    pixels = pen.getImageData(0, 0, sheet.width, sheet.height).data;
+  } catch {
+    // A canvas the browser considers tainted. Same ground, no picture.
+    photograph = null;
+    return;
+  }
+  photograph = draw.photoSampler(
+    pixels, sheet.width, sheet.height, aerial.extent_m);
+  render();
+}
+
+/* A photograph put together here from the provider's tiles (ADR-0087).
+ *
+ * The site says which tiles cover it; the browser fetches and decodes
+ * them, which a plain install on the other end has no library to do.
+ * Asked for as anonymous requests so the sheet can be read back, and a
+ * tile that does not come is a grey square rather than no picture.
+ */
+function stitchTiles(tiles) {
+  const side = 256;
+  const columns = tiles.east_x - tiles.west_x + 1;
+  const rows = tiles.south_y - tiles.north_y + 1;
+  const sheet = document.createElement("canvas");
+  sheet.width = columns * side;
+  sheet.height = rows * side;
+  const pen = sheet.getContext("2d", { willReadFrequently: true });
+  pen.fillStyle = "rgb(128, 128, 128)";
+  pen.fillRect(0, 0, sheet.width, sheet.height);
+  const arrivals = [];
+  for (let y = tiles.north_y; y <= tiles.south_y; y++) {
+    for (let x = tiles.west_x; x <= tiles.east_x; x++) {
+      arrivals.push(new Promise(settle => {
+        const tile = new Image();
+        tile.crossOrigin = "anonymous";
+        tile.onload = () => {
+          pen.drawImage(tile, (x - tiles.west_x) * side,
+                        (y - tiles.north_y) * side, side, side);
+          settle(true);
+        };
+        tile.onerror = () => settle(false);
+        tile.src = tiles.template.replace("{z}", tiles.zoom)
+          .replace("{x}", x).replace("{y}", y);
+      }));
+    }
+  }
+  return Promise.all(arrivals).then(arrived =>
+    (arrived.some(Boolean) ? sheet : Promise.reject(new Error("no tiles"))));
 }
 
 /* The photograph the painter should use this frame, if any. */

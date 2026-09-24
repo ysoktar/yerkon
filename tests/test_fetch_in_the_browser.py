@@ -52,7 +52,7 @@ class Terrarium(http.server.BaseHTTPRequestHandler):
     asked = []
 
     def do_GET(self):                                    # noqa: N802
-        from PIL import Image
+        from yerkon.site import png
 
         _, zoom, x, y = self.path.rsplit("/", 3)
         zoom, x, y = int(zoom), int(x), int(y.split(".")[0])
@@ -67,9 +67,7 @@ class Terrarium(http.server.BaseHTTPRequestHandler):
         green = np.floor(value - red * 256.0)
         blue = np.floor((value - red * 256.0 - green) * 256.0)
         pixels = np.stack([red, green, blue], axis=-1).astype(np.uint8)
-        buffer = io.BytesIO()
-        Image.fromarray(pixels, "RGB").save(buffer, "PNG")
-        body = buffer.getvalue()
+        body = png.write_rgb(pixels)
         self.send_response(200)
         self.send_header("Content-Type", "image/png")
         self.send_header("Content-Length", str(len(body)))
@@ -208,30 +206,82 @@ def test_the_page_offers_a_tick_and_names_no_address():
     assert "{z}" in AERIAL_TILES and "{y}" in AERIAL_TILES
 
 
-def test_the_fetch_task_sends_the_built_in_provider_when_ticked(monkeypatch):
-    """What the tick turns into, without fetching anything."""
+def _tiny_site(bounds):
+    from yerkon.site.model import Site, SiteManifest
+
+    return Site(bounds=bounds, elevation_grid_m=np.full((4, 4), 900.0),
+                grid_spacing_m=30.0,
+                manifest=SiteManifest(elevation_source="test",
+                                      elevation_resolution_m=30.0,
+                                      fetched_at="now"))
+
+
+def test_the_tick_records_which_tiles_the_page_stitches(monkeypatch, tmp_path):
+    """The owner's provider is not downloaded by Python at all: the site
+    records the tiles that cover it and the page draws them (ADR-0087)."""
     from yerkon.site import fetch as source
-    from yerkon.viewer import tasks
+    from yerkon.site.cache import SiteCache
+    from yerkon.viewer import scene, tasks
     from yerkon.viewer.state import ViewState
 
     seen = {}
 
     def build_site(bounds, **kw):
         seen.update(kw)
-        raise Unreachable("stop here")
+        return _tiny_site(bounds)
 
     monkeypatch.setattr(source, "build_site", build_site)
-    work = tasks.fetch(ViewState(), {"name": "deneme", "centre": "39,92 32,85",
-                                     "size_km": 2, "imagery": True})
-    with pytest.raises(Unreachable):
-        work(lambda line: None)
-    imagery = seen["imagery_source"]
-    assert imagery.url_template == AERIAL_TILES
-    assert "Esri" in imagery.name
-    # And a desktop tries Copernicus first and terrain tiles after it.
+    monkeypatch.setattr(tasks, "SITES", tmp_path)
+    answer = tasks.fetch(ViewState(), {"name": "deneme", "centre": "39,92 32,85",
+                                       "size_km": 3, "imagery": True})(
+        lambda line: None)
+
+    assert seen["imagery_source"] is None
+    assert answer["aerial"] is True
+    site = SiteCache(tmp_path / "deneme").load()
+    drape = site.drape
+    assert drape.template == AERIAL_TILES
+    assert drape.zoom == 17          # a 3 km box fits in 200 tiles at 17
+    assert "Esri" in drape.source
+    # The tiles cover the box, whole tiles and so a little more.
+    assert drape.bounds.west <= site.bounds.west
+    assert drape.bounds.east >= site.bounds.east
+    assert drape.bounds.south <= site.bounds.south
+    assert drape.bounds.north >= site.bounds.north
+
+    # And the page is told which tiles and where they sit.
+    class Measured:
+        pass
+
+    told = scene._aerial(ViewState(site="deneme"), site)
+    assert told["tiles"]["zoom"] == 17
+    assert told["tiles"]["template"] == AERIAL_TILES
+    west, south, east, north = told["extent_m"]
+    assert west <= 0.0 and south <= 0.0
+    assert told["url"].startswith("drape:deneme")
+
+    # A desktop tries Copernicus first and terrain tiles after it.
     names = [type(s).__name__ for s in seen["elevation_sources"]]
     assert names[:2] == ["CopernicusElevation", "TerrainTileElevation"]
     assert "OpenStreetMapRoads" in [type(s).__name__ for s in seen["roads_sources"]]
+
+
+def test_a_plain_install_fetches_ground(terrarium, tmp_path, monkeypatch):
+    """No requests and no Pillow: the standard library asks and numpy
+    decodes (ADR-0087). The message that told people to run pip is gone
+    because nothing is missing."""
+    import sys
+
+    monkeypatch.setitem(sys.modules, "requests", None)
+    monkeypatch.setitem(sys.modules, "PIL", None)
+    grid = TerrainTileElevation(url_template=terrarium,
+                                cache_directory=str(tmp_path)).grid_for(KIZILAY, 30.0)
+    per_lat, per_lon = KIZILAY.metres_per_degree()
+    rows, columns = grid.values_m.shape
+    lat = KIZILAY.south + np.arange(rows)[:, None] * 30.0 / per_lat
+    lon = KIZILAY.west + np.arange(columns)[None, :] * 30.0 / per_lon
+    assert np.abs(grid.values_m - _height_at(lat, lon)).max() < 0.5
+    assert fetching.missing_for_a_fetch() == ()
 
 
 def test_in_a_browser_the_fetch_uses_only_what_a_browser_reaches(monkeypatch):
@@ -294,3 +344,40 @@ def test_the_page_asks_for_the_photograph_through_fetch():
     assert 'reply.encoding === "base64"' in local
     worker = (STATIC / "sim-worker.js").read_text(encoding="utf-8")
     assert 'loadPackage("pillow")' in worker
+
+
+def test_the_page_stitches_a_drape_itself():
+    """A browser decodes the provider's JPEG; a plain install cannot."""
+    app = (STATIC / "app.js").read_text(encoding="utf-8")
+    stitch = app[app.index("function stitchTiles"):]
+    stitch = stitch[:stitch.index("\n}\n")]
+    assert 'crossOrigin = "anonymous"' in stitch
+    assert '.replace("{z}"' in stitch
+    loader = app[app.index("function loadPhotograph"):]
+    loader = loader[:loader.index("\n}\n")]
+    assert "aerial.tiles" in loader and "stitchTiles(" in loader
+
+
+def test_a_plain_install_does_not_try_what_it_cannot_read(monkeypatch, tmp_path):
+    """So its record says what happened, not what to install."""
+    from yerkon.site import fetch as source
+    from yerkon.viewer import tasks
+    from yerkon.viewer.state import ViewState
+
+    monkeypatch.setattr(source, "better_with",
+                        lambda: ("rasterio", "requests", "pyarrow"))
+    seen = {}
+
+    def build_site(bounds, **kw):
+        seen.update(kw)
+        return _tiny_site(bounds)
+
+    monkeypatch.setattr(source, "build_site", build_site)
+    monkeypatch.setattr(tasks, "SITES", tmp_path)
+    tasks.fetch(ViewState(), {"name": "duz", "centre": "39,92 32,85",
+                              "size_km": 1})(lambda line: None)
+    kinds = lambda key: [type(s).__name__ for s in seen[key]]  # noqa: E731
+    assert kinds("elevation_sources") == ["TerrainTileElevation"]
+    assert kinds("buildings_sources") == ["OpenStreetMapBuildings"]
+    assert kinds("roads_sources") == ["OpenStreetMapRoads"]
+    assert kinds("furniture_sources") == []

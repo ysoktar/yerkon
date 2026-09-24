@@ -14,6 +14,10 @@ olduğunu `$PSVersionTable.PSVersion` söyler.
 
 ## Kurulum
 
+Bir yer getirmek dahil her şey `pip install -e ".[dev]"` ile çalışır
+(ADR-0087). Aşağıdaki `rasterio` yalnızca Copernicus zeminini ve
+Overture binalarını isteyen için; gerekmiyorsa atla.
+
 conda kuruluysa ayrı bir ortam en temizi. base'i kirletmez ve
 `rasterio` gibi paketleri conda-forge'dan alır, ki Windows'ta pip'ten
 kurmaktan daha güvenilir.

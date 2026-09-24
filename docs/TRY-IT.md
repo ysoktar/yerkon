@@ -11,7 +11,7 @@ pip install -e ".[dev]"
 
 Buradaki hiçbir şey ağ gerektirmiyor. Tablonun üzerinde durduğu zemin
 paketin içinde işlenmiş durumda. Tek istisnası **kendi bölgeni eklemek**;
-onun için `pip install -e ".[dev,sites]"` gerekiyor ve o bölüm aşağıda.
+o da ek paket istemiyor (ADR-0087) ve o bölüm aşağıda.
 
 Windows'taysan `docs/WINDOWS.md`'ye bak: PowerShell 5.1 üç yerde bash'ten
 ayrılıyor ve üçü de bu komutları kırıyor.
@@ -244,15 +244,12 @@ başkaysa onu getir; dört sahanın geldiği yolun aynısı ve ağa dokunan tek
 
 ### Sayfadan (önerilen)
 
-**Kurulumun indirebiliyor mu?** `pip install -e ".[dev]"` indirmeye
-yetmez: yükseklik bir GeoTIFF olarak geliyor (`rasterio`), her şey HTTP
-üzerinden (`requests`), binalar ve yollar GeoParquet (`pyarrow`). Üçü de
-bilerek bağımlılık değil — tablo, paketin içinde sevk edilen zeminden
-ağsız üretilebiliyor (ADR-0008). Eksikse panel **kutuyu çizdirmeden
-önce** söylüyor ve düğmeler kapalı duruyor (ADR-0051):
-
-> Bu kurulum saha indiremiyor: rasterio, pyarrow eksik. Kurmak için:
-> `pip install -e ".[dev,sites]"` — Windows'ta docs/WINDOWS.md.
+**Kurulumun indirebiliyor mu?** Evet, `pip install -e ".[dev]"` yeter
+(ADR-0087). Zemin açık arazi karolarından numpy ile okunuyor, istekler
+Python'un kendi kütüphanesiyle gidiyor, binalar ve yollar
+OpenStreetMap'ten geliyor. `pip install -e ".[dev,sites]"` yalnızca daha
+iyisini getirir: Copernicus zemini (`rasterio`) ve Overture binaları ve
+sokak donanımı (`pyarrow`). Uydu görüntüsünü sayfa kendisi çiziyor.
 
 **1 YER → Yeni bir yer getir**, sonra üç şey:
 
