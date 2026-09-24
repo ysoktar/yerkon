@@ -1136,22 +1136,30 @@ affects_en = """the urban row's service area, anchor count and therefore its cos
 square kilometre"""
 
 [values."urban.anchor_spacing_m"]
-value = 500.0
+value = 600.0
 unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
 note = """Direk taşıyan aydınlatma direklerinin birbirinden ne kadar uzakta \
-durduğu. Şehir ızgarasında kabaca iki kavşakta bir."""
-note_en = """How far apart the lighting columns carrying anchors stand. Roughly every \
-other junction on a town grid."""
+durduğu. 500 m idi. 250 ile 800 m arasındaki tarama (docs/MALIYET-\
+KARSILASTIRMASI.md) 600 m'de 36 yerine 25 direk verdi: km² başına \
+CAPEX ve OPEX yaklaşık %23 düştü, HPE P95 10 m hedefinin altında kaldı \
+ve kullanılabilirlik 6 puan kadar düştü. 700 m ve üstünde \
+kullanılabilirlik çöküyor. Proje sahibinin kararı."""
+note_en = """How far apart the lighting columns carrying anchors stand. It was \
+500 m. A sweep from 250 to 800 m (docs/MALIYET-KARSILASTIRMASI.md) gave \
+25 anchors instead of 36 at 600 m: CAPEX and OPEX per km² fell by about \
+23 %, HPE P95 stayed under the 10 m target and availability fell by \
+about 6 points. At 700 m and above availability collapses. The project \
+owner's choice."""
 affects = "şehir içi satırın direk sayısını, kapsamasını ve maliyetini"
 affects_en = "the urban row's anchor count, coverage and cost"
 sensitivity = "yarıya indirmek direk sayısını, dolayısıyla sermayeyi dörde katlar"
 sensitivity_en = "halving it quadruples the anchors and therefore the capital"
 
 [values."urban.anchor_stagger_m"]
-value = 250.0
+value = 300.0
 unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
@@ -1179,29 +1187,27 @@ sensitivity = """1 yapmak her direği bağlar ve bağlantı kalemini sıfırlar;
 sensitivity_en = """setting it to 1 connects every anchor and zeroes the connectivity line; 0 connects none"""
 
 [values."urban.anchors_per_round"]
-value = 12.0
+value = 8.0
 unit = "anchors"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Sekizdi. \
-ADR-0022 sekizi şehir içinde bırakırken \"bir şehirde 500 m ızgarada \
-yoklananın neredeyse hepsi cevap veriyor\" diyordu; bu ölçülmemişti ve \
-yanlış çıktı. Üç tohumda, tam çözünürlükte, aynı 36 direk ve aynı \
-157 179 TL ile: %78,86 → %83,38, %79,20 → %82,74, %82,26 → %85,61. Üçü \
-de pozitif, ortalama +3,80 puan. Bedeli ortanca hatada 0,10 m ve turun \
-uzaması. On altı bir puan daha getiriyor ama üç tohumun birinde \
-kaybediyor, yani ADR-0022'nin kırsalda gördüğü gürültünün aynısı \
-(ADR-0072)."""
-note_en = """How many anchors a unit polls before it is fixed. It was eight. \
-ADR-0022 left urban at eight saying \"nearly everything polled answers \
-at a 500 m grid in a town\"; that was never measured and it is wrong. \
-Over three seeds at full resolution, on the same 36 anchors and the same \
-157 179 TL: 78,86 % → 83,38 %, 79,20 % → 82,74 %, 82,26 % → 85,61 %. All \
-three positive, +3,80 points on average. It costs 0,10 m of median error \
-and a longer round. Sixteen adds another point but loses on one seed of \
-the three, which is the noise ADR-0022 found in the rural row \
-(ADR-0072)."""
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. 12 idi (ADR-0072); \
+kullanılabilirlik doğruluğa bağlanınca (ADR-0084) sıralama döndü. 600 m \
+ızgarada dört tohumda, tam çözünürlükte: 8 direkle %72,67, %71,99, \
+%73,68, %72,54; 12 direkle %68,66, %69,30, %69,81, %69,94. Dördünde de \
+sekiz önde, ortalama +3,3 puan; P95 tohum saçılımı içinde (6,76 ve 6,70 m). Kısa tur \
+saniyede daha çok tur demek; filtrenin belirsizliği turlar arasında \
+büyüdüğü için sık gelen tur çıtayı daha sık geçiyor. Maliyet değişmiyor \
+(ADR-0085)."""
+note_en = """How many anchors a unit polls before it is fixed. It was 12 \
+(ADR-0072); once availability was tied to accuracy (ADR-0084) the order \
+turned. On the 600 m grid over four seeds at full resolution: with 8, \
+72,67 %, 71,99 %, 73,68 %, 72,54 %; with 12, 68,66 %, 69,30 %, 69,81 %, \
+69,94 %. Eight leads on all four, +3,3 points on average; P95 is the \
+within the seed scatter (6,76 and 6,70 m). A shorter round is more rounds a second, and \
+the filter's uncertainty grows between rounds, so rounds that come \
+often clear the bar more often. The cost does not move (ADR-0085)."""
 affects = "şehir içi satırın güncelleme hızını ve kullanılabilirliğini"
 affects_en = "the urban row's update rate and availability"
 
@@ -1269,35 +1275,29 @@ affects_en = "the rural row's horizontal geometry"
 
 
 [values."rural.anchors_per_round"]
-value = 12.0
+value = 8.0
 unit = "anchors"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
 note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Altı çok az: \
-gerçek rölyefte yoklananın yarısı hiç cevap vermiyor, dolayısıyla altı \
-deneme yaklaşık üç yanıt verir ve bir konum dört istiyor — iki tohumda \
-da %65'te kalıyor. Sekizin üstünde tercih ölçülemiyor: yalnızca \
-indirilmiş zemin üzerinde koşulduğundan beri (ADR-0037) sıralama tohumla \
-birlikte dönüyor — sekiz bir tohumda onu geçiyor, ötekinde ona \
-kaybediyor — ve komşu değerler arasındaki fark tohumlar arasındaki kadar. \
-On iki, tek bir tohumla değiştirmemek için duruyor; bunu çözecek olan \
-daha çok tohumla `yerkon solve` (ADR-0022, ADR-0023)."""
+gerçek rölyefte yoklananın yarısı hiç cevap vermiyor. 12 idi; \
+kullanılabilirlik doğruluğa bağlanınca (ADR-0084) dört tohumda, tam \
+çözünürlükte: 8 direkle %58,15, %57,66, %58,62, %58,66; 12 direkle \
+%55,89, %56,55, %55,82, %55,82. Dördünde de sekiz önde, ortalama +2,3 \
+puan; P95 tohum saçılımı içinde (7,08 ve 6,92 m). On da sekize dört tohumun dördünde kaybediyor \
+(ADR-0085)."""
 note_en = """How many anchors a unit polls before it is fixed. Six is too few: \
-half of what is polled over real relief never answers, so six attempts \
-yield about three replies where a fix wants four, and both seeds sit at \
-65 %. Above eight the choice cannot be measured: since this has run on \
-fetched ground only (ADR-0037) the ordering turns with the seed — eight \
-beats ten on one and loses to it on the other — and neighbouring values \
-differ by as much as the seeds do. Twelve stands because changing it on \
-one seed is the mistake this project already made; more seeds through \
-`yerkon solve` is what settles it (ADR-0022, ADR-0023)."""
+half of what is polled over real relief never answers. It was 12; once \
+availability was tied to accuracy (ADR-0084), over four seeds at full \
+resolution: with 8, 58,15 %, 57,66 %, 58,62 %, 58,66 %; with 12, \
+55,89 %, 56,55 %, 55,82 %, 55,82 %. Eight leads on all four, +2,3 points \
+on average; P95 is within the seed scatter (7,08 and 6,92 m). Ten loses to eight on all four seeds too \
+(ADR-0085)."""
 affects = """kırsal satırın kullanılabilirliğini, güncelleme hızını ve yatay hatasını"""
 affects_en = "the rural row's availability, update rate and horizontal error"
-sensitivity = """altının altında çöküyor; sekiz ile on altı arasında iki tohumda \
-%69 ile %75 arasında geziniyor ve sıralama sabit değil"""
-sensitivity_en = """it collapses below six; between eight and sixteen it wanders \
-between 69 % and 75 % over two seeds and the ordering does not hold"""
+sensitivity = """altı ile sekiz arasında düz, sekizin üstünde her adımda düşüyor"""
+sensitivity_en = """flat between six and eight, falling with every step above eight"""
 
 [values."rural.accept_sigma_m"]
 value = 30.0

@@ -54,6 +54,18 @@ def a_state(**changes):
     return ViewState(**changes) if changes else ViewState()
 
 
+def a_fixing_state():
+    """The urban tab, briefly: an arrangement that meets the accuracy bar.
+
+    The default corridor is one line of masts, and a line fixes along
+    itself and not across it, so its horizontal uncertainty never gets
+    under 5,78 m and it has no position to offer (ADR-0084).
+    """
+    from dataclasses import replace
+
+    return replace(from_scenario("urban"), journey_s=60.0, sweep_m=1000.0)
+
+
 def runs_of(state, **patch):
     """The state's runs as plain dictionaries, with the first one edited."""
     runs = [run.as_json() for run in state.runs]
@@ -515,7 +527,7 @@ def test_the_scene_reports_how_long_a_round_takes():
 
 @pytest.mark.slow
 def test_simulating_from_the_viewer_gives_what_the_table_gives():
-    result = simulate(a_state(journey_s=60.0, sweep_m=1000.0))
+    result = simulate(a_fixing_state())
     assert result["units"] >= 1
     assert result["hpe_p50_m"] > 0.0
     assert 0.0 < result["availability"] <= 1.0
@@ -580,7 +592,7 @@ def test_the_pooled_answer_is_not_the_first_draw():
     """
     from yerkon.viewer.scene import pool
 
-    state = a_state(journey_s=60.0, sweep_m=1000.0)
+    state = a_fixing_state()
     first = simulate(state)
     every = pool(state)
     assert math.isfinite(first["hpe_p95_m"]), first["hpe_p95_m"]

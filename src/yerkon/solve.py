@@ -122,7 +122,7 @@ SEARCHABLE = {
         "rural.anchors_per_round": (8.0, 12.0, 16.0),
     },
     "urban": {
-        "urban.anchor_spacing_m": (500.0, 400.0, 300.0),
+        "urban.anchor_spacing_m": (600.0, 500.0, 400.0, 300.0),
         "urban.anchors_per_round": (8.0, 12.0),
     },
     "tunnel": {

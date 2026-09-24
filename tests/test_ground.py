@@ -239,13 +239,15 @@ def test_a_round_is_sized_by_how_many_anchors_answer():
     3,80 points of availability on average, on the same 36 anchors and
     the same capital.
 
-    The tunnel stays at eight. There a round already runs in tens of
-    milliseconds and nearly every poll answers, so a longer one would
-    cost update rate to buy nothing.
+    Then availability was tied to accuracy (ADR-0084) and the order
+    turned in both rows: a position now has to be accurate, the filter's
+    uncertainty grows between rounds, and a shorter round comes back
+    sooner. Eight beat twelve on four seeds out of four in each row, by
+    3,3 points in the town and 2,3 in open country (ADR-0085). Every row
+    polls eight now; the tunnel always did.
     """
-    for name in ("rural", "urban"):
-        assert CHOICES[name].scenario.deployment.max_anchors_per_round >= 12
-    assert CHOICES["tunnel"].scenario.deployment.max_anchors_per_round == 8
+    for name in ("rural", "urban", "tunnel"):
+        assert CHOICES[name].scenario.deployment.max_anchors_per_round == 8
 
 
 def test_the_town_takes_its_link_from_the_junctions_it_already_has():
@@ -277,9 +279,14 @@ def test_the_town_takes_its_link_from_the_junctions_it_already_has():
         assert anchor.mounting.site_cost_tl == column.mounting.site_cost_tl
         assert anchor.mounting.has_power
 
-    # A quarter, to within the row that runs off the end of the grid.
-    share = len(connected) / len(anchors)
-    assert 1.0 / (every * every) - 0.1 < share < 1.0 / (every * every) + 0.1
+    # Every nth spot of every nth row, counted row by row. A quarter on a
+    # large grid; on 25 anchors, five rows of five, the edges make it
+    # nine, so the share alone says little.
+    rows = sorted({a.ground_position_m[1] for a in anchors})
+    expected = sum(
+        -(-sum(1 for a in anchors if a.ground_position_m[1] == y) // every)
+        for index, y in enumerate(rows) if index % every == 0)
+    assert len(connected) == expected
 
 
 @pytest.mark.slow
@@ -288,26 +295,25 @@ def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
 
     A change measured on one seed is a change measured on nothing: the
     ordering trick this replaced gave +2,57 points on the first seed it
-    was tried on and −1,24 on the third. Polling twelve anchors instead
-    of eight replaced it and was recorded as worth 5,5 points free.
+    was tried on and −1,24 on the third.
 
-    What that is worth has been measured three times over eight seeds,
-    and it has moved every time the propagation did:
+    What a round's length is worth has been measured five times over
+    several seeds, and it has moved every time the model did:
 
-        model                      wins   mean     scatter   ratio
-        one shadow spread           5/8   +0,0080  0,0200    0,4
-        split by line of sight      8/8   +0,0227  0,0069    3,3
-        and the profile every 10 m  7/8   +0,0088  0,0055    1,6
-        on distribution poles       4/4   +0,0117  0,0015    7,9
+        model                      compared   wins   mean     scatter
+        one shadow spread          12 vs 8    5/8    +0,0080  0,0200
+        split by line of sight     12 vs 8    8/8    +0,0227  0,0069
+        and the profile every 10 m 12 vs 8    7/8    +0,0088  0,0055
+        on distribution poles      10 vs 8    4/4    +0,0117  0,0015
+        availability tied to       8 vs 12    4/4    +0,0225  0,0041
+        accuracy (ADR-0084)
 
-    Through the first three the shape held: the effect was positive on
-    balance and the same order as the seed-to-seed scatter, so one run
-    could not settle it. The fourth changed the shape rather than the
-    size (ADR-0079). Forty nine poles 3 km apart instead of twenty
-    eight masts 4 km apart steady the row, the scatter falls by a
-    factor of four, and the effect can now be read off one run. That is
-    what this asserts now; if it slips back into the noise, that is a
-    finding too.
+    The last one turned the sign. While any round with a range counted
+    as a position, polling more anchors bought more positions. Once a
+    position has to be accurate, the round's length is what matters: the
+    filter's uncertainty grows between rounds, and eight anchors come
+    round half again as often as twelve (ADR-0085). If it turns back,
+    that is a finding too.
     """
     import statistics
     from dataclasses import replace
@@ -316,6 +322,7 @@ def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
     from yerkon.parallel import spread
 
     base = CHOICES["rural"].scenario
+    assert base.deployment.max_anchors_per_round == 8
     seeds = (202, 404, 606, 808)
 
     runs = spread(run_scenario, [
@@ -323,27 +330,26 @@ def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
             replace(base, seed=seed),
             deployment=replace(base.deployment, max_anchors_per_round=anchors),
         )
-        for seed in seeds for anchors in (8, 10)
+        for seed in seeds for anchors in (8, 12)
     ])
     got = {
         (seed, anchors): run.availability
         for (seed, anchors), run in zip(
-            [(s, a) for s in seeds for a in (8, 10)], runs)
+            [(s, a) for s in seeds for a in (8, 12)], runs)
     }
 
-    gaps = [got[(seed, 10)] - got[(seed, 8)] for seed in seeds]
+    gaps = [got[(seed, 8)] - got[(seed, 12)] for seed in seeds]
     scatter = max(
         statistics.pstdev([got[(seed, anchors)] for seed in seeds])
-        for anchors in (8, 10)
+        for anchors in (8, 12)
     )
     effect = statistics.mean(gaps)
 
     assert all(gap > 0.0 for gap in gaps), (
-        "ten anchors stopped winning on every seed: {} — {}".format(gaps, got))
-    assert effect > 0.0, (effect, got)
-    # On the poles the effect stands clear of the scatter. Back inside
-    # it would mean the arrangement stopped steadying the row, which is
-    # a finding rather than a broken test and should not pass quietly.
+        "eight anchors stopped winning on every seed: {} — {}".format(gaps, got))
+    # The effect stands clear of the scatter. Back inside it would mean
+    # the choice can no longer be read off these seeds, which is a
+    # finding rather than a broken test and should not pass quietly.
     assert effect > 3.0 * scatter, (
         "the round length has slipped back into the noise it is measured "
         "in: {:+.4f} against a seed-to-seed spread of {:.4f} — "

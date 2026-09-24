@@ -14,6 +14,24 @@ yatay belirsizliği 5,78 m'yi geçmeyen turlar.
 Maliyet A, B ve C'de aynı: görüş dışı yanlılık doğruluğu değiştiriyor,
 kaç direk ve nerede olduğunu değil.
 
+## Toplam, km² ve km başına (tam alan taraması)
+
+Alan tam çözünürlükte, ilk üç gölge çekilişinin ortalaması; tablonun
+kendi yöntemi. Güzergâh km'si birimlerin sürdüğü yol. On yıl: CAPEX artı
+on yıllık OPEX, faizsiz. A, B ve C'de aynı.
+
+| Satır | Direk | Alan | Güzergâh | CAPEX | OPEX/yıl | On yıl | CAPEX/km² | OPEX/km²/yıl | CAPEX/km | OPEX/km/yıl |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
+| **Şehir içi, 600 m (yeni)** | 25 | 5,96 km² | 12,82 km | **79201** | **17484** | **254041** | **13281** | **2932** | **6180** | **1364** |
+| Kırsal, 3000 m | 49 | 209,00 km² | 86,40 km | 374754 | 128919 | 1663944 | 1793 | 617 | 4337 | 1492 |
+| Tünel, 225 m | 9 | yalnız tüp | 2,00 km | 63821 | 6714 | 130961 | yok | yok | 31910 | 3357 |
+
+Tutarlar TL. Şehir içinde 600 m, toplamı ve güzergâh km'si başına
+maliyeti %30,6 düşürüyor (11 direk eksik). km² başına düşüş daha küçük,
+%22,2, çünkü seyrek ızgaranın kapsadığı alan da 6,68'den 5,96 km²'ye
+iniyor.
+
 ## Şehir içi (Kızılay)
 
 | Aralık | Direk | CAPEX TL/km² | OPEX TL/km²/yıl | A: P95, kull. | B: P95, kull. | C: P95, kull. |
@@ -21,8 +39,8 @@ kaç direk ve nerede olduğunu değil.
 | 250 m | 144 | 51201 | 11303 | 5,94 m, %85,16 | 10,73 m, %81,82 | 42,10 m, %69,36 |
 | 300 m | 100 | 35899 | 7925 | 5,76 m, %81,72 | 11,86 m, %77,07 | 35,33 m, %63,28 |
 | 400 m | 60 | 22888 | 5053 | 5,80 m, %84,04 | 11,75 m, %79,43 | 36,67 m, %66,40 |
-| **500 m (bugün)** | 36 | 16589 | 3662 | 6,71 m, %78,82 | 11,55 m, %75,51 | 29,03 m, %57,45 |
-| 600 m | 25 | 12713 | 2806 | 6,74 m, %72,61 | 12,85 m, %68,85 | 31,68 m, %53,44 |
+| 500 m (eski) | 36 | 16589 | 3662 | 6,71 m, %78,82 | 11,55 m, %75,51 | 29,03 m, %57,45 |
+| **600 m (seçilen)** | 25 | 12713 | 2806 | 6,74 m, %72,61 | 12,85 m, %68,85 | 31,68 m, %53,44 |
 | 700 m | 23 | 12728 | 2810 | 7,33 m, %57,99 | 12,87 m, %54,17 | 41,77 m, %33,34 |
 | 800 m | 16 | 10762 | 2376 | 7,36 m, %61,88 | 13,80 m, %58,66 | 30,61 m, %34,84 |
 

@@ -217,6 +217,10 @@ başarısızlık sebeplerini ölçer: bağlantı kapanması, paket kaybı, çöz
 başarısızlığı ve yetersiz doğruluk. Bir hizmet kullanılabilirliği değeri
 değildir ve GNSS satırlarına karşı öyleymiş gibi okunmamalıdır.
 
+Bu tanımla turun uzunluğu, turdaki mesafe sayısından çok önemli: filtrenin
+belirsizliği turlar arasında büyür. Bu yüzden üç satır da turda sekiz
+direk yoklar, on iki değil (ADR-0085).
+
 **Alan**: yukarıda tanımlandığı gibi hizmet alanı.
 
 **CAPEX**: direk donanım maliyetinin hizmet alanına bölümü. Yalnızca

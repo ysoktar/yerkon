@@ -275,6 +275,7 @@ DWM3000 = Radio(
         "Qorvo DW3000 datasheet, channel 5 at 6.8 Mbps",
     ),
     noise_figure_db=DEFAULTS.sourced("radio.dwm3000.noise_figure_db"),
+    nlos_bias_mean_m=DEFAULTS.sourced("radio.dwm3000.nlos_bias_mean_m"),
     ranging_bandwidth_hz=Sourced(
         499.2e6, "Hz", Provenance.DATASHEET,
         "IEEE 802.15.4z HRP channel 5 bandwidth",
