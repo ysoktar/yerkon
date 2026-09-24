@@ -24,18 +24,18 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
 | **Şehir içi, 600 m (yeni)** | 25 | 5,96 km² | 12,82 km | **79201** | **17035** | **249551** | **13281** | **2857** | **6180** | **1329** |
-| Kırsal, 3000 m | 49 | 209,00 km² | 86,40 km | 374754 | 156665 | 1941404 | 1793 | 750 | 4337 | 1813 |
-| Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 63821 | 9528 | 159101 | yok | yok | 31910 | 4764 |
+| Kırsal, 3000 m | 49 | 209,00 km² | 86,40 km | 374754 | 123345 | 1608204 | 1793 | 590 | 4337 | 1428 |
+| Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 63821 | 6468 | 128501 | yok | yok | 31910 | 3234 |
 
 Tutarlar TL. OPEX 24 Eylül akşamından beri resmî harcırah ve amortisman
 değerleriyle (ADR-0089): kırsalda ve tünelde bakım ekibi şehir dışına
-gittiği için harcırah ekleniyor (kırsal +33320, tünel +3060 TL/yıl);
-yerel bir ekip bu kalemi sıfırlar. Şehir içinde 600 m, toplamı ve güzergâh km'si başına
+giderse harcırah eklenir; bakımı yerel bir teknik firma yaptığı için
+kırsalda ve tünelde sıfır (ADR-0090). Şehir içinde 600 m, toplamı ve güzergâh km'si başına
 maliyeti %30,6 düşürüyor (11 direk eksik). km² başına düşüş daha küçük,
 %22,2, çünkü seyrek ızgaranın kapsadığı alan da 6,68'den 5,96 km²'ye
 iniyor.
 
-## Yerel bakım ekibi olsaydı (uygulanmadı, karar bekliyor)
+## Yerel bakım ekibi (uygulandı, 24 Eylül, ADR-0090)
 
 Bugünkü model: ekip Ankara merkezde, Polatlı ve Kızılcahamam'a her
 ziyarette iki kişi için kişi başı 850 TL harcırah (ADR-0089). Yerel ekip:

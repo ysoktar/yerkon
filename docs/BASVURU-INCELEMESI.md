@@ -130,13 +130,13 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 | Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %61,03 |
 | Kırsal | Alan | 1,01 km² | 209,00 km² |
 | Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1793 TL/km² |
-| Kırsal | OPEX | boş | 750 TL/km²/yıl |
+| Kırsal | OPEX | boş | 590 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,80 m |
 | Tünel | HPE P95 | 1,88 m | 2,72 m |
 | Tünel | VPE P95 | 5,53 m | 2,04 m |
 | Tünel | Kullanılabilirlik | yaklaşık %97,0 | %98,61 |
 | Tünel | CAPEX | yaklaşık 545903 TL/km² | 31910 TL/km (güzergâh) |
-| Tünel | OPEX | boş | 4764 TL/km/yıl |
+| Tünel | OPEX | boş | 3234 TL/km/yıl |
 
 Farkın nedenleri modelde değişenler: gerçek Ankara zemini ve binaları,
 ITU-R P.526 kırınımı, gölgelenme, sekiz çekiliş, sahanın çevresinden ve

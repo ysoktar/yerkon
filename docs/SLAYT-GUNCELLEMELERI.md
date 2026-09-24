@@ -234,8 +234,8 @@ Son güncelleme: 24 Eylül 2026.
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
   | Şehir içi | 2,11 | 6,05 | 3,67 | %75,27 | 5,96 km² | 13281 TL/km² | 2857 TL/km²/yıl |
-  | Kırsal | 1,95 | 5,35 | 4,72 | %61,03 | 209,00 km² | 1793 TL/km² | 750 TL/km²/yıl |
-  | Tünel | 0,80 | 2,72 | 2,04 | %98,61 | güzergâh | 31910 TL/km | 4764 TL/km/yıl |
+  | Kırsal | 1,95 | 5,35 | 4,72 | %61,03 | 209,00 km² | 1793 TL/km² | 590 TL/km²/yıl |
+  | Tünel | 0,80 | 2,72 | 2,04 | %98,61 | güzergâh | 31910 TL/km | 3234 TL/km/yıl |
 
   (24 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
   içi 600 m, turda sekiz direk, tünel 250 m, yükseklik haritadan,
@@ -302,8 +302,10 @@ Son güncelleme: 24 Eylül 2026.
   mesafe ölçemiyor (SX1262, LR1110). İstenirse birkaç E28-2G4M12S modülü
   (son ürünün parçası, adedi birkaç dolar) prototip kartlarına
   bağlanabilir. Karar bekliyor; sunuma girmedi.
-- Bakım yerel ekiple mi yapılsın? Kırsal ve tünel için farkı
-  `MALIYET-KARSILASTIRMASI.md`'de; karar bekliyor, model değişmedi.
+- Bakım yerel ekiple mi yapılsın? **Cevap: evet**, yerel bir teknik
+  firma (elektrik dağıtım şirketi bu işi istemeyebilir). Harcırah yok;
+  kırsal OPEX 750'den 590 TL/km²'ye, tünel 4764'ten 3234 TL/km'ye
+  indi (ADR-0090).
 
 ## Slayt 16'yı etkileyen model değişiklikleri
 

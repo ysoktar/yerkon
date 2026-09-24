@@ -1412,16 +1412,23 @@ affects_en = "the rural row's horizontal geometry"
 
 
 [values."rural.crew_travels"]
-value = 1.0
+value = 0.0
 unit = "yes/no"
 provenance = "DESIGN"
-source = "bu proje, bakım ekibi Ankara merkezde"
-source_en = "this project, the maintenance crew is based in central Ankara"
-note = """Polatlı, Ankara merkezinden yaklaşık 80 km; şehir dışı görev sayıldı. Harcırah Kanunu'nda büyükşehir içindeki ilçelerin \
-görev yeri dışı sayılıp sayılmadığı doğrulanmadı (ADR-0089)."""
-note_en = """Polatlı is about 80 km from central Ankara; counted as travel out of the city. Whether districts inside a metropolitan municipality count \
-as outside the place of duty under the travel allowance law is not \
-verified (ADR-0089)."""
+source = "proje sahibinin kararı: yerel teknik firma"
+source_en = "the project owner's decision: a local technical firm"
+note = """Hayır: bakımı Polatlı'daki yerel bir teknik firma yapıyor, ekip \
+Ankara'dan gitmiyor ve harcırah yok (proje sahibinin kararı, 24 Eylül). \
+Elektrik dağıtım şirketinin ekiplerine dayanmıyor, çünkü şirket bu işi \
+istemeyebilir. Direkler yine şirketin: direğe çıkmak için onun izni ve \
+koşulları gerekebilir, bu direk kirası anlaşmasının içinde çözülmeli \
+(ADR-0090)."""
+note_en = """No: a local technical firm in Polatlı does the maintenance, no crew \
+travels from Ankara and there is no per diem (the project owner's \
+decision, 24 September). It does not rest on the distribution company's \
+crews, because the company may not want the work. The poles are still \
+the company's: climbing one may need its permission and conditions, to \
+be settled in the pole rental agreement (ADR-0090)."""
 affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 
@@ -1542,16 +1549,19 @@ affects_en = """the tunnel row's service area, and therefore every per-square-ki
 figure in that row"""
 
 [values."tunnel.crew_travels"]
-value = 1.0
+value = 0.0
 unit = "yes/no"
 provenance = "DESIGN"
-source = "bu proje, bakım ekibi Ankara merkezde"
-source_en = "this project, the maintenance crew is based in central Ankara"
-note = """Kızılcahamam, Ankara merkezinden yaklaşık 70 km; şehir dışı görev sayıldı. Harcırah Kanunu'nda büyükşehir içindeki ilçelerin \
-görev yeri dışı sayılıp sayılmadığı doğrulanmadı (ADR-0089)."""
-note_en = """Kızılcahamam is about 70 km from central Ankara; counted as travel out of the city. Whether districts inside a metropolitan municipality count \
-as outside the place of duty under the travel allowance law is not \
-verified (ADR-0089)."""
+source = "proje sahibinin kararı: yerel teknik firma"
+source_en = "the project owner's decision: a local technical firm"
+note = """Hayır: bakımı Kızılcahamam'daki yerel bir teknik firma yapıyor, \
+harcırah yok (proje sahibinin kararı, 24 Eylül). Tünele giriş ve şerit \
+kapatma yine Karayolları'nın izniyle; ziyaretler onların bakım \
+kapanışlarına denk getirilebilir (ADR-0090)."""
+note_en = """No: a local technical firm in Kızılcahamam does the maintenance, no \
+per diem (the project owner's decision, 24 September). Entering the bore \
+and closing a lane still need the highways authority's permission; \
+visits can be timed to its maintenance closures (ADR-0090)."""
 affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 
