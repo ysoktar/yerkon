@@ -23,11 +23,14 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 | Satır | Direk | Alan | Güzergâh | CAPEX | OPEX/yıl | On yıl | CAPEX/km² | OPEX/km²/yıl | CAPEX/km | OPEX/km/yıl |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
-| **Şehir içi, 600 m (yeni)** | 25 | 5,96 km² | 12,82 km | **79201** | **17484** | **254041** | **13281** | **2932** | **6180** | **1364** |
-| Kırsal, 3000 m | 49 | 209,00 km² | 86,40 km | 374754 | 128919 | 1663944 | 1793 | 617 | 4337 | 1492 |
-| Tünel, 225 m | 9 | yalnız tüp | 2,00 km | 63821 | 6714 | 130961 | yok | yok | 31910 | 3357 |
+| **Şehir içi, 600 m (yeni)** | 25 | 5,96 km² | 12,82 km | **79201** | **17035** | **249551** | **13281** | **2857** | **6180** | **1329** |
+| Kırsal, 3000 m | 49 | 209,00 km² | 86,40 km | 374754 | 156665 | 1941404 | 1793 | 750 | 4337 | 1813 |
+| Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 63821 | 9528 | 159101 | yok | yok | 31910 | 4764 |
 
-Tutarlar TL. Şehir içinde 600 m, toplamı ve güzergâh km'si başına
+Tutarlar TL. OPEX 24 Eylül akşamından beri resmî harcırah ve amortisman
+değerleriyle (ADR-0089): kırsalda ve tünelde bakım ekibi şehir dışına
+gittiği için harcırah ekleniyor (kırsal +33320, tünel +3060 TL/yıl);
+yerel bir ekip bu kalemi sıfırlar. Şehir içinde 600 m, toplamı ve güzergâh km'si başına
 maliyeti %30,6 düşürüyor (11 direk eksik). km² başına düşüş daha küçük,
 %22,2, çünkü seyrek ızgaranın kapsadığı alan da 6,68'den 5,96 km²'ye
 iniyor.

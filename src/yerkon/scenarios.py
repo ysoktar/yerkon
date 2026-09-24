@@ -94,6 +94,9 @@ class Deployed:
     #: percentile is. One means no pooling, which is what every caller
     #: that does not ask for it gets.
     shadow_draws: int = 1
+    #: Whether the maintenance crew travels out of its base city to reach
+    #: this row, which is what puts a per diem on each visit (ADR-0089).
+    crew_travels: bool = False
 
     @property
     def serves_a_corridor(self) -> bool:
@@ -142,6 +145,7 @@ class Deployed:
             receivers=tuple(units.items()),
             service_area_km2=service_area_km2,
             route_km=self.route_km,
+            crew_travels=self.crew_travels,
         )
 
 
@@ -203,6 +207,9 @@ def row_figures(row: str, settings: Settings = DEFAULTS) -> dict:
         "packet_loss": loss,
         "fix_sigma_m": settings.number("site.fix_horizontal_sigma_m"),
         "gate_sigmas": settings.number("estimator.gate_sigmas"),
+        "height_aid_sigma_m": settings.number("estimator.height_aid_sigma_m"),
+        "height_aid_correlation_m": settings.number(
+            "estimator.height_aid_correlation_m"),
     }
 
 
@@ -730,6 +737,13 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     )
 
 
+    # Whether a maintenance crew based in the city has to travel out of
+    # it to reach the row, and so draws a per diem (ADR-0089).
+    URBAN, RURAL, TUNNEL = (
+        replace(row, crew_travels=bool(settings.number(
+            "{}.crew_travels".format(name))))
+        for row, name in ((URBAN, "urban"), (RURAL, "rural"),
+                          (TUNNEL, "tunnel")))
     return {"urban": URBAN, "rural": RURAL, "tunnel": TUNNEL}
 
 

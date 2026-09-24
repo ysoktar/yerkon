@@ -402,18 +402,25 @@ sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
 sensitivity_en = "no effect on an anchor on a structure with mains"
 
 [values."operating.service_life_years"]
-value = 8.0
+value = 10.0
 unit = "years"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = "Dış ortamdaki bir birimin değiştirilene kadar dayandığı süre."
-note_en = "How long an outdoor unit lasts before it is replaced."
-affects = "OPEX'i; kırsal satırın %33,4'ü"
-affects_en = "OPEX; 33,4 % of the rural row"
-sensitivity = "iki katına çıkarmak kırsal OPEX'i %16,7 düşürür"
-sensitivity_en = "doubling it lowers rural OPEX by 16,7 %"
-
+provenance = "STANDARD"
+source = """GİB amortisman listesi, 3.49.4: telsiz telefon, telsiz telgraf veya \
+radyo yayını alıcı cihazlar ve sistemleri, 10 yıl, %10"""
+source_en = """Turkish Revenue Administration depreciation list, 3.49.4: radio \
+telephone, telegraph or broadcast receiving devices and systems, 10 years, 10 %"""
+note = """Bir yayın biriminin kaç yılda yenilendiği. 8 yıl idi, bir varsayım. \
+Yayın birimi bir telsiz sistemi; vergi mevzuatının ona verdiği faydalı \
+ömür 10 yıl. Konum belirleme satırı (3.49.8, 5 yıl) uydu ile konum \
+belirleyen cihazlar için; yayın birimi uyduya dayanmıyor (ADR-0089)."""
+note_en = """How many years a unit lasts before it is replaced. It was 8, an \
+assumption. An anchor is a radio system, and the tax rules give that \
+10 years. The positioning line (3.49.8, 5 years) is for devices that \
+locate by satellite, which an anchor does not (ADR-0089)."""
+affects = "OPEX'in yenileme kalemini"
+affects_en = "OPEX, the replacement line"
+sensitivity = "5 yıl (konum belirleme satırı) yenileme kalemini iki katına çıkarır"
+sensitivity_en = "5 years (the positioning line) doubles the replacement line"
 [values."operating.maintenance_visits_per_year"]
 value = 0.2
 unit = "visits/year"
@@ -436,16 +443,17 @@ sensitivity = "0,5'e geri çekmek bakım kalemini 2,5 katına çıkarır"
 sensitivity_en = "putting it back to 0,5 multiplies the maintenance line by 2,5"
 
 [values."operating.extra_off_grid_visits_per_year"]
-value = 0.25
+value = 0.2
 unit = "visits/year"
 provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
-note = """Şebeke dışı bir sahanın ek bakımı: kuru akü dört yılda bir \
-değişir, panel o ziyarette temizlenir."""
-note_en = """The extra attendance an off-grid site needs: the sealed \
-battery is replaced every four years and the panel cleaned on that \
-visit."""
+note = """Şebeke dışı bir sahanın ek bakımı: akü beş yılda bir değişir \
+(amortisman listesi 3.14.7), panel o ziyarette temizlenir. Dört yılda \
+bir idi (ADR-0089)."""
+note_en = """The extra attendance an off-grid site needs: the battery is \
+replaced every five years (depreciation list 3.14.7) and the panel \
+cleaned on that visit. It was every four years (ADR-0089)."""
 affects = "şebeke dışı direklerin OPEX'ini"
 affects_en = "OPEX of anchors on structures with no mains"
 sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
@@ -463,6 +471,83 @@ affects = "OPEX'i; her senaryodaki en büyük tek kalem"
 affects_en = "OPEX; the single largest line in every scenario"
 sensitivity = "iki katına çıkarmak kırsal OPEX'i %45,4 artırır"
 sensitivity_en = "doubling it raises rural OPEX by 45,4 %"
+
+[values."operating.battery_tl"]
+value = 524.40
+unit = "TL"
+provenance = "DATASHEET"
+source = "12 V 7 Ah kuru akü, Akakçe, Eylül 2026 (şebeke dışı beslemenin içindeki)"
+source_en = "12 V 7 Ah sealed battery, Akakçe, September 2026 (part of the standalone supply)"
+note = """Şebeke dışı beslemenin akü payı. Kendi ömrüyle ayrı yenileniyor, \
+çünkü panel ve denetleyiciden önce eskiyor (ADR-0089)."""
+note_en = """The battery's part of the standalone supply. Replaced on its own \
+life, because it wears out before the panel and the controller (ADR-0089)."""
+affects = "şebeke dışı direklerin yenileme kalemini"
+affects_en = "the replacement line of off-grid anchors"
+
+[values."operating.battery_life_years"]
+value = 5.0
+unit = "years"
+provenance = "STANDARD"
+source = "GİB amortisman listesi, 3.14.7: akümülatörler, 5 yıl, %20"
+source_en = "Turkish Revenue Administration depreciation list, 3.14.7: accumulators, 5 years, 20 %"
+note = "Akünün faydalı ömrü (ADR-0089)."
+note_en = "The battery's useful life (ADR-0089)."
+affects = "şebeke dışı direklerin yenileme kalemini"
+affects_en = "the replacement line of off-grid anchors"
+
+[values."operating.off_grid_life_years"]
+value = 10.0
+unit = "years"
+provenance = "STANDARD"
+source = "GİB amortisman listesi, 45.1.9: güneş enerjisi santrali, 10 yıl, %10"
+source_en = "Turkish Revenue Administration depreciation list, 45.1.9: solar power plant, 10 years, 10 %"
+note = """Akü dışındaki güneş beslemesi: panel, denetleyici, tutucu, kablo. \
+Listede tek başına güneş paneli satırı yok; santral satırı en yakını \
+(ADR-0089)."""
+note_en = """The solar supply apart from the battery: panel, controller, \
+bracket, cable. The list has no line for a panel on its own; the power \
+plant line is the nearest (ADR-0089)."""
+affects = "şebeke dışı direklerin yenileme kalemini"
+affects_en = "the replacement line of off-grid anchors"
+
+[values."operating.per_diem_tl"]
+value = 850.0
+unit = "TL/day"
+provenance = "STANDARD"
+source = """7567 sayılı 2026 Merkezi Yönetim Bütçe Kanunu, H Cetveli, B-e: \
+aylık/kadro derecesi 5-15, yurt içi gündelik 850 TL"""
+source_en = """Law 7567, 2026 Central Government Budget, Schedule H, B-e: grades \
+5-15, domestic daily allowance 850 TL"""
+note = """Bakım ekibinden bir kişinin şehir dışında geçirdiği bir günün \
+gündeliği. Özel sektörde vergiden istisna kısım GVK 24/2'ye göre aynı \
+aylık seviyesindeki devlet memurunun gündeliği; bir saha teknisyeni \
+için en yakın seviye 5-15. derece (850 TL) varsayıldı. Günübirlik \
+görevde tamamının mı bir kısmının mı ödendiği doğrulanmadı; tamamı \
+alındı, maliyet açısından ihtiyatlı taraf. Konaklama yok: iki saha da \
+aynı gün dönülecek uzaklıkta (ADR-0089)."""
+note_en = """The daily allowance of one crew member for a day out of the city. \
+In the private sector the tax-exempt part follows Income Tax Law 24/2: \
+the allowance of a civil servant on the same salary level; grades 5-15 \
+(850 TL) are taken as the nearest level for a field technician. Whether \
+a same-day trip earns all of it or part is not verified; all of it is \
+used, the cautious side for cost. No lodging: both sites are a day trip \
+(ADR-0089)."""
+affects = "kırsal ve tünel satırlarının OPEX'ini"
+affects_en = "OPEX of the rural and tunnel rows"
+
+[values."operating.crew_size"]
+value = 2.0
+unit = "people"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Bir bakım ziyaretindeki kişi sayısı: direğe çıkan ve trafiği \
+yöneten (ADR-0089)."""
+note_en = """People on a maintenance visit: one up the pole, one managing \
+traffic (ADR-0089)."""
+affects = "harcırah kalemini"
+affects_en = "the per diem line"
 
 [values."operating.central_operation_tl_per_year"]
 value = 240000.0
@@ -880,6 +965,44 @@ equal in both axes the 95 % radius is 2,448 sigma per axis; 10 m / 2,448 = \
 affects = "kullanılabilirliği ve hangi konumların hataya sayıldığını"
 affects_en = "availability, and which positions count towards the error"
 
+[values."estimator.height_aid_sigma_m"]
+value = 2.43
+unit = "m"
+provenance = "DERIVED"
+source = "Copernicus DEM ürün el kitabı: mutlak düşey doğruluk < 4 m (LE90)"
+source_en = "Copernicus DEM product handbook: absolute vertical accuracy < 4 m (LE90)"
+note = """Birimin haritasının yolun yüksekliğini ne kadar iyi bildiği, bir \
+sigma. Her turda filtre, kendini bulduğu yerdeki harita yüksekliğine \
+anten yüksekliğini ekleyip bir ölçüm olarak alıyor (harita kısıtı). \
+LE90 4 m, normal dağılımda 4 / 1,645 = 2,43 m. Hata yol boyunca \
+parça parça: her 500 m'de bir çekiliyor. 0 kısıtı kapatır ve \
+yüksekliği yalnız mesafelere bırakır (ADR-0088)."""
+note_en = """How well the unit's map knows the road's height, one sigma. Each \
+round the filter takes the map's height where it thinks it is, plus the \
+antenna height, as a measurement (a map constraint). LE90 4 m is \
+4 / 1,645 = 2,43 m for a normal error. The error comes in patches along \
+the road, drawn every 500 m. 0 switches the aid off and leaves the \
+height to the ranges (ADR-0088)."""
+affects = "düşey hatayı (VPE), dolaylı olarak yatay hatayı ve kullanılabilirliği"
+affects_en = "the vertical error (VPE), and through it the horizontal error and availability"
+
+[values."estimator.height_aid_correlation_m"]
+value = 500.0
+unit = "m"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Harita yükseklik hatasının yol boyunca ne kadar benzer kaldığı. \
+Yükseklik modelleri parça parça yanılır; bir araç 500 m'yi yarım \
+dakikada geçer, filtrenin düşey belleği bundan kısa, yani hata filtre \
+için bir sapma gibi davranır ve ortalamayla silinmez (ADR-0088)."""
+note_en = """How far along a road the map's height error stays alike. Height \
+models are wrong in patches; a vehicle covers 500 m in half a minute, \
+longer than the filter's vertical memory, so to the filter the error \
+behaves like a bias and does not average away (ADR-0088)."""
+affects = "düşey hatanın ne kadar ortalamayla silinebildiğini"
+affects_en = "how much of the vertical error averages away"
+
 [values."estimator.gate_sigmas"]
 value = 0.0
 unit = "sigma"
@@ -1186,6 +1309,20 @@ affects_en = "the urban row's OPEX: the connectivity line"
 sensitivity = """1 yapmak her direği bağlar ve bağlantı kalemini sıfırlar; 0 yapmak hiçbirini bağlamaz"""
 sensitivity_en = """setting it to 1 connects every anchor and zeroes the connectivity line; 0 connects none"""
 
+[values."urban.crew_travels"]
+value = 0.0
+unit = "yes/no"
+provenance = "DESIGN"
+source = "bu proje, bakım ekibi Ankara merkezde"
+source_en = "this project, the maintenance crew is based in central Ankara"
+note = """Kızılay ekibin kendi şehri; şehir dışı görev yok. Harcırah Kanunu'nda büyükşehir içindeki ilçelerin \
+görev yeri dışı sayılıp sayılmadığı doğrulanmadı (ADR-0089)."""
+note_en = """Kızılay is the crew's own city; no travel out of it. Whether districts inside a metropolitan municipality count \
+as outside the place of duty under the travel allowance law is not \
+verified (ADR-0089)."""
+affects = "bu satırın harcırah kalemini"
+affects_en = "this row's per diem line"
+
 [values."urban.anchors_per_round"]
 value = 8.0
 unit = "anchors"
@@ -1273,6 +1410,20 @@ note_en = """Half a spacing, so alternate rows interleave rather than lining up.
 affects = "kırsal satırın yatay geometrisini"
 affects_en = "the rural row's horizontal geometry"
 
+
+[values."rural.crew_travels"]
+value = 1.0
+unit = "yes/no"
+provenance = "DESIGN"
+source = "bu proje, bakım ekibi Ankara merkezde"
+source_en = "this project, the maintenance crew is based in central Ankara"
+note = """Polatlı, Ankara merkezinden yaklaşık 80 km; şehir dışı görev sayıldı. Harcırah Kanunu'nda büyükşehir içindeki ilçelerin \
+görev yeri dışı sayılıp sayılmadığı doğrulanmadı (ADR-0089)."""
+note_en = """Polatlı is about 80 km from central Ankara; counted as travel out of the city. Whether districts inside a metropolitan municipality count \
+as outside the place of duty under the travel allowance law is not \
+verified (ADR-0089)."""
+affects = "bu satırın harcırah kalemini"
+affects_en = "this row's per diem line"
 
 [values."rural.anchors_per_round"]
 value = 8.0
@@ -1389,6 +1540,20 @@ affects = """tünel satırının hizmet alanını, dolayısıyla o satırdaki ki
 başına her değeri"""
 affects_en = """the tunnel row's service area, and therefore every per-square-kilometre \
 figure in that row"""
+
+[values."tunnel.crew_travels"]
+value = 1.0
+unit = "yes/no"
+provenance = "DESIGN"
+source = "bu proje, bakım ekibi Ankara merkezde"
+source_en = "this project, the maintenance crew is based in central Ankara"
+note = """Kızılcahamam, Ankara merkezinden yaklaşık 70 km; şehir dışı görev sayıldı. Harcırah Kanunu'nda büyükşehir içindeki ilçelerin \
+görev yeri dışı sayılıp sayılmadığı doğrulanmadı (ADR-0089)."""
+note_en = """Kızılcahamam is about 70 km from central Ankara; counted as travel out of the city. Whether districts inside a metropolitan municipality count \
+as outside the place of duty under the travel allowance law is not \
+verified (ADR-0089)."""
+affects = "bu satırın harcırah kalemini"
+affects_en = "this row's per diem line"
 
 [values."tunnel.anchors_per_round"]
 value = 8.0

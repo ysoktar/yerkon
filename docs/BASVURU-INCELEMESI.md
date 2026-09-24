@@ -16,9 +16,9 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 1. **Sunumdaki YERKON sayıları eski.** Slayt 16'daki üç satır (ör. şehir
    içi HPE P50 1,28 m, kullanılabilirlik yaklaşık %98, alan 1,00 km²)
-   bugünkü modelin çıktısı değil. Site şehir içi için 2,39 m, %71,68 ve
+   bugünkü modelin çıktısı değil. Site şehir içi için 2,11 m, %75,27 ve
    5,96 km² yayımlıyor (24 Eylül). Kırsalda fark daha büyük: sunum
-   yaklaşık %98,9, site %57,43. Sitenin kullanılabilirliği artık
+   yaklaşık %98,9, site %61,03. Sitenin kullanılabilirliği artık
    doğruluğa bağlı (ADR-0084), sunumunki değil. Sunum, form ve site aynı sayıyı söylemeli; şartnamenin
    "sonuçların tutarlılığı" ölçütü tam olarak buna bakıyor.
 2. **Kırsal birim için "8-10 km" ve 27 dBm'lik modül iddiası Türkiye
@@ -97,7 +97,7 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
   senkronizasyonundan kurtulmak, GNSS bütünlük haritası. Sitedeki
   yöneylem yerleşimi (ADR-0081) bu fikrin sayısal karşılığı: direkleri
   zaten yüksek olan yerlere koyarak aynı parayla daha çok alan.
-- **İhtiyaca çözüm.** Tünel satırı en ikna edici: %98,57 kullanılabilirlik
+- **İhtiyaca çözüm.** Tünel satırı en ikna edici: %98,61 kullanılabilirlik
   ve metre altı P50. Sunumun ilk ticarileşme alanı olarak tünelleri
   seçmesi modelle uyumlu.
 - **Sürdürülebilirlik.** Çevresel boyut zayıf anlatılmış. Modelde bir birim
@@ -117,26 +117,26 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 | Satır | Sütun | Sunum | Site (24 Eylül koşusu) |
 |---|---|---|---|
-| Şehir içi | HPE P50 | 1,28 m | 2,39 m |
-| Şehir içi | HPE P95 | 2,99 m | 6,65 m |
-| Şehir içi | VPE P95 | 31,47 m | 72,81 m |
-| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %71,68 |
+| Şehir içi | HPE P50 | 1,28 m | 2,11 m |
+| Şehir içi | HPE P95 | 2,99 m | 6,05 m |
+| Şehir içi | VPE P95 | 31,47 m | 3,67 m |
+| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %75,27 |
 | Şehir içi | Alan | 1,00 km² | 5,96 km² |
 | Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 13281 TL/km² |
-| Şehir içi | OPEX | boş | 2932 TL/km²/yıl |
-| Kırsal | HPE P50 | 4,17 m | 2,27 m |
-| Kırsal | HPE P95 | 14,29 m | 6,80 m |
-| Kırsal | VPE P95 | 24,14 m | 115,90 m |
-| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %57,43 |
+| Şehir içi | OPEX | boş | 2857 TL/km²/yıl |
+| Kırsal | HPE P50 | 4,17 m | 1,95 m |
+| Kırsal | HPE P95 | 14,29 m | 5,35 m |
+| Kırsal | VPE P95 | 24,14 m | 4,72 m |
+| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %61,03 |
 | Kırsal | Alan | 1,01 km² | 209,00 km² |
 | Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1793 TL/km² |
-| Kırsal | OPEX | boş | 617 TL/km²/yıl |
-| Tünel | HPE P50 | 0,25 m | 0,85 m |
-| Tünel | HPE P95 | 1,88 m | 2,97 m |
-| Tünel | VPE P95 | 5,53 m | 6,81 m |
-| Tünel | Kullanılabilirlik | yaklaşık %97,0 | %98,57 |
+| Kırsal | OPEX | boş | 750 TL/km²/yıl |
+| Tünel | HPE P50 | 0,25 m | 0,80 m |
+| Tünel | HPE P95 | 1,88 m | 2,72 m |
+| Tünel | VPE P95 | 5,53 m | 2,04 m |
+| Tünel | Kullanılabilirlik | yaklaşık %97,0 | %98,61 |
 | Tünel | CAPEX | yaklaşık 545903 TL/km² | 31910 TL/km (güzergâh) |
-| Tünel | OPEX | boş | 3357 TL/km/yıl |
+| Tünel | OPEX | boş | 4764 TL/km/yıl |
 
 Farkın nedenleri modelde değişenler: gerçek Ankara zemini ve binaları,
 ITU-R P.526 kırınımı, gölgelenme, sekiz çekiliş, sahanın çevresinden ve
@@ -193,7 +193,7 @@ Formdaki tutarsızlıklar:
 | Slayt 5 | TDoA için birim başına yaklaşık 100000 TL | Kaynak yok. Ya kaynak eklenmeli ya da "hassas senkronizasyon altyapısı gerektirir" diye sayısız yazılmalı |
 | Slayt 6 | DWM3000 "yaklaşık 10 cm" | Modelde tünelde P50 0,78 m. 10 cm tek mesafe ölçümünün sınıfı, konum hatası değil; sunum bunu zaten söylüyor, tablo da aynı şeyi göstermeli |
 | Slayt 10 ve 16 | İngilizce kısaltmayla "karasal ..." | Site bu kısaltmayı kullanmıyor (ADR-0066); "karasal konumlandırma" yazılmalı |
-| Slayt 18 | "IMU, odometri, harita kısıtı ve Kalman filtresi kullanılmamıştır" | Model artık mesafeleri tek tek işleyen sabit hızlı bir Kalman filtresi kullanıyor. IMU, odometri ve harita kısıtı hâlâ yok. Cümle buna göre düzeltilmeli |
+| Slayt 18 | "IMU, odometri, harita kısıtı ve Kalman filtresi kullanılmamıştır" | Model mesafeleri tek tek işleyen sabit hızlı bir Kalman filtresi ve yükseklik için harita kısıtı kullanıyor (ADR-0088). IMU ve odometri hâlâ yok. Cümle buna göre düzeltilmeli |
 | Form, "Yöntem" | "TWR-CDMA ve SDR tabanlı yöntemler araştırılacaktır" | Aşağıdaki SDR bölümüne bakın: SDR++ yalnız alıcı; bu araştırma zaman damgalı bir SDR ister |
 
 ## Model doğruluğu
@@ -380,11 +380,9 @@ yatırımı yalnızca yaklaşık %11 düşürür; montajı yarıya indirmek %39.
    kullanılabilirliği %74,03'ten %76,44'e taşıyor (kaba okuma, dört
    çekiliş, ADR-0081).
 2. **Yükseklik bilgisi eklemek (harita kısıtı ya da barometre).**
-   Modelde VPE P95 şehirde 64 m, kırsalda 141 m, çünkü yol kenarındaki
-   direklerden düşey gözlenemiyor (ADR-0011). Alıcının yolun üstünde
-   olduğunu bilmek (yol yüzeyi modeli) ya da ucuz bir barometre düşeyi
-   metreler mertebesine indirir ve yatay çözümü de sağlamlaştırır. Bu,
-   sunumun kendi "harita kısıtı" planı; model henüz içermiyor.
+   Yapıldı (ADR-0088): yükseklik birimin haritasından, Copernicus'un
+   yayımlanmış doğruluğuyla (2,43 m) alınıyor. VPE P95 onlarca metreden
+   birkaç metreye indi; yatay hata ve kullanılabilirlik de iyileşti.
 3. **IMU ve odometri.** Model yalnız mesafe ölçümleriyle çalışıyor.
    Mesafe gelmeyen kısa aralıkları IMU ve tekerlek hızıyla köprülemek
    kullanılabilirliği doğrudan artırır; kırsaldaki %65,85'in bir kısmı

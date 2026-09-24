@@ -13,10 +13,11 @@ metres between the first range and the last. Every measurement is
 therefore applied at its own instant, against a state that has been
 carried forward to meet it.
 
-There is no height constraint. Anchors stand along a road at similar
-heights, which leaves the vertical almost unobservable, and the honest
-consequence is a large vertical error rather than a small one bought by
-telling the filter an answer it was meant to find.
+Anchors stand along a road at similar heights, which leaves the vertical
+almost unobservable from ranges. The filter takes the height from the
+unit's map instead, as a measurement carrying the map's own error: never
+the true height, which would be telling the filter the answer it was
+meant to find (ADR-0011, ADR-0088).
 """
 
 from __future__ import annotations
@@ -237,10 +238,12 @@ class TrackingFilter:
     separate events they are rather than as a simultaneous set. Between
     them the state coasts and its uncertainty grows.
 
-    The state is position and velocity in three dimensions. Nothing
-    constrains the height: the vertical is left to whatever the geometry
-    can support, which on a road is not much, and the filter reports a
-    large vertical uncertainty rather than a small false one.
+    The state is position and velocity in three dimensions. Ranges alone
+    leave the height to whatever the geometry can support, which on a
+    road is not much. `absorb_height` takes the map's answer to "how high
+    is the road here" as a measurement with the map's own error
+    (ADR-0088); without it the filter reports a large vertical
+    uncertainty rather than a small false one.
     """
 
     def __init__(
@@ -352,6 +355,29 @@ class TrackingFilter:
             + np.outer(gain, gain) * observation.variance_m2
         )
         self.used += 1
+
+    def absorb_height(self, at_s: float, height_m: float,
+                      variance_m2: float) -> None:
+        """Take a height in, as the map gives it, at an instant.
+
+        A scalar update on the third axis. The map is asked where the
+        filter thinks the unit is, not where it is, so a horizontal error
+        on a slope comes back as a height error: the same thing a real
+        receiver reading its own map would get (ADR-0088).
+        """
+        if variance_m2 <= 0.0:
+            raise ValueError("a map with no error is not a map")
+        self.state, self.covariance = self._coast(at_s - self.at_s)
+        self.at_s = max(self.at_s, at_s)
+        jacobian = np.zeros(6)
+        jacobian[2] = 1.0
+        innovation = height_m - self.state[2]
+        innovation_variance = self.covariance[2, 2] + variance_m2
+        gain = (self.covariance @ jacobian) / innovation_variance
+        self.state = self.state + gain * innovation
+        spread = np.eye(6) - np.outer(gain, jacobian)
+        self.covariance = (spread @ self.covariance @ spread.T
+                           + np.outer(gain, gain) * variance_m2)
 
     # -- the model between measurements ----------------------------------
 

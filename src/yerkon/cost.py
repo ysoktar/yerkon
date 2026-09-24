@@ -140,6 +140,8 @@ class Inventory:
     service_area_km2: float = 0.0
     #: Length of road served, in km, for corridor deployments.
     route_km: float = 0.0
+    #: Whether the maintenance crew leaves its base city to get here.
+    crew_travels: bool = False
 
     def __post_init__(self) -> None:
         if not self.anchors:
@@ -184,6 +186,15 @@ class OperatingRates:
     extra_off_grid_visits_per_year: Sourced
     maintenance_tl_per_visit: Sourced
     central_operation_tl_per_year: Sourced
+    #: What a crew member is paid a day away from the base city (H Cetveli).
+    per_diem_tl: Sourced
+    #: People in a maintenance crew.
+    crew_size: Sourced
+    #: The battery's part of the standalone supply, which wears out first.
+    battery_tl: Sourced
+    battery_life_years: Sourced
+    #: The rest of the standalone supply: panel, controller, bracket, cable.
+    off_grid_life_years: Sourced
     #: Anchors the central system is shared across. A national network
     #: amortises it far wider than one corridor does, which is why this
     #: is a rate rather than a constant added to every deployment.
@@ -362,13 +373,25 @@ def price(
     rent_tl = sum(a.rent_tl_per_year for a in inventory.anchors)
     rented = sum(1 for a in inventory.anchors if a.rent_tl_per_year > 0.0)
     connectivity_tl = unconnected * float(rates.connectivity_tl_per_year.value)
-    replacement_tl = (units_tl + supplies_tl) / max(
-        float(rates.service_life_years.value), 1e-9
+    # Each part over its own life in the tax depreciation list: the radio
+    # unit, the battery, and the rest of the solar supply (ADR-0089).
+    battery_tl = min(float(rates.battery_tl.value),
+                     float(rates.off_grid_supply_tl.value))
+    replacement_tl = (
+        units_tl / max(float(rates.service_life_years.value), 1e-9)
+        + off_grid * battery_tl
+        / max(float(rates.battery_life_years.value), 1e-9)
+        + off_grid * (float(rates.off_grid_supply_tl.value) - battery_tl)
+        / max(float(rates.off_grid_life_years.value), 1e-9)
     )
     visits = anchors * float(rates.maintenance_visits_per_year.value) + (
         off_grid * float(rates.extra_off_grid_visits_per_year.value)
     )
     maintenance_tl = visits * float(rates.maintenance_tl_per_visit.value)
+    per_diem_tl = (
+        visits * float(rates.crew_size.value) * float(rates.per_diem_tl.value)
+        if inventory.crew_travels else 0.0
+    )
     central_tl = (
         anchors
         * float(rates.central_operation_tl_per_year.value)
@@ -393,8 +416,9 @@ def price(
         ),
         LineItem(
             "replacement", replacement_tl,
-            "over {} years of service life".format(
-                decimal_comma(float(rates.service_life_years.value), 0)
+            "units over {} years, batteries over {} (depreciation list)".format(
+                decimal_comma(float(rates.service_life_years.value), 0),
+                decimal_comma(float(rates.battery_life_years.value), 0),
             ),
             rates.service_life_years.provenance,
         ),
@@ -402,6 +426,13 @@ def price(
             "maintenance", maintenance_tl,
             "{} visits a year".format(decimal_comma(visits, 1)),
             rates.maintenance_tl_per_visit.provenance,
+        ),
+        LineItem(
+            "per diem", per_diem_tl,
+            "{} crew-days away from the base city".format(
+                decimal_comma(visits * float(rates.crew_size.value), 1))
+            if inventory.crew_travels else "the crew stays in its city",
+            rates.per_diem_tl.provenance,
         ),
         LineItem(
             "central operation", central_tl,

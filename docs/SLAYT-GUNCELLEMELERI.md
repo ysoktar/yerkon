@@ -115,8 +115,10 @@ Son güncelleme: 24 Eylül 2026.
 
 - [ ] Araç alıcısı "3-5 dBi çubuk anten" diyor; model W24P-U anteniyle
   çalışıyor. Hangisi olacaksa ikisi aynı olmalı.
-- [ ] IMU, odometri ve harita kısıtı henüz modelde yok. "Kullanılacaktır"
-  yerine "pilotta eklenecek ve etkisi ölçülecek" denmeli.
+- [ ] Harita kısıtı artık modelde: yükseklik, birimin haritasından
+  2,43 m hatayla alınıyor (ADR-0088). IMU ve odometri hâlâ yok; onlar
+  için "kullanılacaktır" yerine "pilotta eklenecek ve etkisi ölçülecek"
+  denmeli.
 
 ## Slayt 8: Ar-Ge soruları
 
@@ -153,11 +155,42 @@ Son güncelleme: 24 Eylül 2026.
   > tabanlı E28-2G4M12S, DWM3000, W24P-U anten ve diğerleri)
   > kullanılacaktır."
 
-- [ ] Bu cihazların hangi radyo yongasını taşıdığı, hangi bantta çalıştığı
-  ve mesafe ölçümü yapıp yapamadığı doğrulanıyor (GPT'ye verilen
-  soru listesi). Cevap gelince buraya, prototipin neyi gösterip neyi
-  gösteremeyeceği yazılacak: tablodaki doğruluk SX1280 ve DWM3000'in
-  mesafe ölçümüne dayanıyor.
+- [ ] Adlar düzeltilmeli: "R1" RAKwireless'ın değil Muzi Works'ün
+  cihazı; içinde RAKwireless'ın RAK4631 çekirdeği var. Önerilen:
+  "Muzi Works R1 (RAK4631 çekirdekli)".
+
+- Cihazların içindekiler (üretici kaynaklarından):
+
+  | Cihaz | Radyo | Bant | GNSS | Mesafe ölçümü (ToF) |
+  |---|---|---|---|---|
+  | Muzi R1, R1 harici antenli | RAK4631: nRF52840 + SX1262 | 779-923 MHz | yok (telefonun konumunu kullanır) | yok |
+  | Seeed SenseCAP T1000-E | LR1110 + nRF52840 | 863-928 MHz | AG3335 | yok |
+  | RAK WisBlock Meshtastic Starter Kit US915 | RAK4631: nRF52840 + SX1262 | 779-923 MHz | yalnız Tracker seçeneğinde (RAK12501) | yok |
+  | RAK WisBlock Starter Kit (pil, OLED, IO) | RAK4631 | aynı | yok | yok |
+  | ATGM336H | GNSS alıcısı | - | var; doğruluk son eke bağlı (-5NR32: 2,5 m CEP50, -7N22: 1,5 m) | - |
+  | 17 cm kırbaç anten | - | 868 ya da 915 MHz sürümü var; boydan anlaşılmaz | - | - |
+
+- [ ] Sunuma prototipin neyi göstereceği açık yazılmalı. Önerilen metin:
+
+  > "Prototipler bu cihazlarla ağ, haberleşme, güç tüketimi, kutu ve
+  > yazılım tarafını gösterecektir. Bu cihazlarda SX1280 ya da DWM3000
+  > yoktur, dolayısıyla mesafe ölçümüne (uçuş süresi) dayanan konum
+  > doğruluğu prototipte değil, son üründe ölçülecektir. GNSS modülü
+  > (T1000-E'deki AG3335, ATGM336H) sahada karşılaştırma için referans
+  > konum verecektir."
+
+  Bir öneri: E28-2G4M12S modülleri (bu projenin ürün listesinde, adedi
+  birkaç dolar) WisBlock'un IO yuvasına bağlanırsa mesafe ölçümü de
+  prototipte denenebilir.
+
+- [ ] Frekans: US915 kiti Türkiye'de US915 kanal planıyla
+  çalıştırılmamalı. 902-928 MHz bandı Türkiye'de tahsisten muaf değil;
+  yalnız 917,4-919,4 MHz gibi dar alt bantlar koşullu (25 mW e.r.p.,
+  %1 görev döngüsü, yalnız veri şebekeleri). Donanım 868 MHz'i
+  destekliyor (779-923 MHz); prototip BTK'nın 863-870 MHz alt bantlarına
+  göre ayarlanmalı: çoğunda 25 mW e.r.p. ve %0,1 ile %1 görev döngüsü,
+  869,4-869,65 MHz'de 500 mW ve %10 (BTK, Frekans Tahsisinden Muaf
+  Telsiz Cihaz ve Sistemlerine İlişkin Teknik Ölçütler).
 
 ## Slayt 10: yenilikçi yön
 
@@ -199,12 +232,13 @@ Son güncelleme: 24 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,39 | 6,65 | 72,81 | %71,68 | 5,96 km² | 13281 TL/km² | 2932 TL/km²/yıl |
-  | Kırsal | 2,27 | 6,80 | 115,90 | %57,43 | 209,00 km² | 1793 TL/km² | 617 TL/km²/yıl |
-  | Tünel | 0,85 | 2,97 | 6,81 | %98,57 | güzergâh | 31910 TL/km | 3357 TL/km/yıl |
+  | Şehir içi | 2,11 | 6,05 | 3,67 | %75,27 | 5,96 km² | 13281 TL/km² | 2857 TL/km²/yıl |
+  | Kırsal | 1,95 | 5,35 | 4,72 | %61,03 | 209,00 km² | 1793 TL/km² | 750 TL/km²/yıl |
+  | Tünel | 0,80 | 2,72 | 2,04 | %98,61 | güzergâh | 31910 TL/km | 4764 TL/km/yıl |
 
   (24 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
-  içi 600 m, turda sekiz direk, tünel 250 m.)
+  içi 600 m, turda sekiz direk, tünel 250 m, yükseklik haritadan,
+  harcırah ve amortisman resmî kaynaklardan.)
 
 - [ ] TerraPoiNT ve eLoran satırlarının teknoloji sütunundaki İngilizce
   kısaltma → "Karasal konumlandırma".
@@ -221,7 +255,10 @@ Son güncelleme: 24 Eylül 2026.
   > binaları (OpenStreetMap), ITU-R P.526 kırınımı, gölgelenme, her satır
   > için sekiz gölge çekilişi, sahanın çevresinden ve köşegeninden geçen
   > araç ve yaya yolculukları. Mesafeler tek tek, sabit hızlı bir Kalman
-  > filtresine verilir; IMU, odometri ve harita kısıtı kullanılmamıştır.
+  > filtresine verilir; yükseklik, birimin haritasından (Copernicus'un
+  > yayımlanmış doğruluğuyla, 2,43 m) bir ölçüm olarak eklenir. IMU ve
+  > odometri kullanılmamıştır. Bakım maliyetinde harcırah 2026 H
+  > Cetveli'nden, yenileme GİB amortisman listesinden alınmıştır.
   > SX1280'in mesafe tabanı yayımlanmış bir ölçümden (2,94 m) alınmıştır.
   > Alan, dört yayın biriminin 5 m menzil hassasiyetiyle ulaştığı
   > hücrelerin taramasıdır. CAPEX ve OPEX; kart, montaj, enerji, kira,
@@ -254,8 +291,11 @@ Son güncelleme: 24 Eylül 2026.
 - Şehir içi direk aralığı? **Cevap: 600 m** (500 m idi). 25 direk,
   toplam maliyet %30,6 düşük (`MALIYET-KARSILASTIRMASI.md`).
 - SX1280'in SF10 ve 1625 kHz'deki duyarlılığı: model −125,9 dBm
-  varsayıyor; veri sayfasının tablosu gerekli. Yayımlanan sayılar buna çok
-  bağlı (bkz. `BASVURU-INCELEMESI.md`, "Model doğruluğu").
+  varsayıyor; veri sayfasının tablosu hâlâ resmî kaynaktan
+  doğrulanamadı. Semtech'in ürün sayfası −132 dBm'yi SF12 ve 203 kHz
+  için veriyor. Bant genişliği 1625 kHz'e çıkınca +9,0 dB, SF12'den
+  SF10'a +5 dB (LoRa'da her adım yaklaşık 2,5 dB) eklenirse yaklaşık
+  −118 dBm çıkıyor: modelden yaklaşık 8 dB daha kötü. Karar bekliyor.
 
 ## Slayt 16'yı etkileyen model değişiklikleri
 

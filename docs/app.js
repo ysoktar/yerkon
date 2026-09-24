@@ -944,6 +944,12 @@ let onlyAssumed = false;
  */
 const TERMS = {
   accept_sigma_m: "kabul eşiği",
+  battery_life_years: "akü ömrü (amortisman)",
+  battery_tl: "akü fiyatı",
+  crew_size: "bakım ekibi kişi sayısı",
+  crew_travels: "ekip şehir dışına gidiyor",
+  off_grid_life_years: "güneş beslemesi ömrü (amortisman)",
+  per_diem_tl: "harcırah, kişi başı gündelik",
   anchor_kwh_per_year: "yıllık elektrik",
   anchor_offset_m: "yoldan uzaklık",
   anchor_spacing_m: "direk aralığı",
@@ -969,6 +975,8 @@ const TERMS = {
   extent_m: "uzunluk",
   fix_horizontal_sigma_m: "konum çıtası, yatay belirsizlik",
   gate_sigmas: "filtre kapısı",
+  height_aid_sigma_m: "harita yükseklik hatası",
+  height_aid_correlation_m: "harita hatasının boyu",
   extra_off_grid_visits_per_year: "şebeke dışı ek ziyaret",
   ground_levels: "zemin pürüz katmanı",
   ground_patch_m: "zemin yaması",

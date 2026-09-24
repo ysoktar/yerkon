@@ -1120,6 +1120,33 @@ class Road:
             travelled += segment
         return tuple(segments), tuple(starts), tuple(ends)
 
+    @cached_property
+    def _segment_arrays(self) -> tuple:
+        """The segments as arrays, for asking which is nearest a point."""
+        segments, starts, _ = self._segments
+        a = np.array([s[0] for s in segments], dtype=float)
+        b = np.array([s[1] for s in segments], dtype=float)
+        lengths = np.array([s[2] for s in segments], dtype=float)
+        return a, b, lengths, np.array(starts, dtype=float)
+
+    def nearest_along(self, x_m: float, y_m: float) -> float:
+        """How far along the road its closest point to (x, y) lies.
+
+        What a receiver matching its position to a map does: the road
+        under it is the nearest one, and on a loop that can be a stretch
+        of the same road from another lap (ADR-0088).
+        """
+        a, b, lengths, starts = self._segment_arrays
+        span = b - a
+        squared = np.maximum(lengths ** 2, 1e-12)
+        share = np.clip(((x_m - a[:, 0]) * span[:, 0]
+                         + (y_m - a[:, 1]) * span[:, 1]) / squared, 0.0, 1.0)
+        near_x = a[:, 0] + span[:, 0] * share
+        near_y = a[:, 1] + span[:, 1] * share
+        index = int(np.argmin((near_x - x_m) ** 2 + (near_y - y_m) ** 2))
+        return float(min(starts[index] + share[index] * lengths[index],
+                         self.length_m))
+
     def _ground_point(self, distance_m: float, offset_m: float = 0.0) -> tuple[float, float]:
         if distance_m < 0.0:
             raise ValueError("distance along a road cannot be negative")

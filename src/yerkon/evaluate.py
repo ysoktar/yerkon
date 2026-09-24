@@ -251,6 +251,15 @@ class Scenario:
     #: How many sigmas from what the filter expects a range may land and
     #: still be used. Zero takes every range (ADR-0084).
     gate_sigmas: float = 0.0
+    #: How well the unit's map knows the road's height, one sigma in
+    #: metres. Each round the filter takes the map's height at the place
+    #: it thinks it is as a measurement. Zero leaves the height to the
+    #: ranges alone, which is what the table did before (ADR-0088).
+    height_aid_sigma_m: float = 0.0
+    #: How far along a road the map's error stays alike, in metres. A
+    #: height model is wrong in patches, not independently at every
+    #: metre, so the error is drawn every this many metres and joined.
+    height_aid_correlation_m: float = 500.0
 
     def __post_init__(self) -> None:
         if not self.deployment.receivers:
@@ -386,6 +395,15 @@ def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
     trackers: dict[str, Optional[TrackingFilter]] = {
         unit.identifier: None for unit in deployment.receivers
     }
+    # The map each unit carries: the road's height, wrong in patches.
+    # Drawn from its own stream so that switching the aid on or off
+    # leaves every ranging draw where it was (ADR-0088).
+    maps = {
+        unit.identifier: _MapError.drawn(
+            unit.journey.road.length_m, scenario.height_aid_sigma_m,
+            scenario.height_aid_correlation_m, scenario.seed, index)
+        for index, unit in enumerate(deployment.receivers)
+    } if scenario.height_aid_sigma_m > 0.0 else {}
     longest_s = max(
         unit.journey.duration_s for unit in deployment.receivers
     )
@@ -460,6 +478,17 @@ def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
 
             tracker, position = fix
             trackers[unit.identifier] = tracker
+            if maps:
+                # The map's height where the filter thinks the unit is.
+                road = unit.journey.road
+                along = road.nearest_along(*tracker.state[:2])
+                tracker.absorb_height(
+                    tracker.at_s,
+                    road.surface_height_at(along)
+                    + unit.journey.antenna_height_m
+                    + maps[unit.identifier].at(along),
+                    scenario.height_aid_sigma_m ** 2)
+                position = tracker.position_m
             # A position the receiver itself would not stand behind is not
             # offered. It keeps tracking, so the next good round starts
             # from here, but this round is an outage (ADR-0084).
@@ -480,6 +509,34 @@ def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
         attempted_links=attempted_links,
         median_range_sigma_m=float(np.median(sigmas)) if sigmas else 0.0,
     )
+
+
+@dataclass(frozen=True)
+class _MapError:
+    """A map's height error along one road: drawn every ``step_m`` and
+    joined smoothly, the same draw for the whole journey.
+
+    Joined with quarter-circle weights rather than a straight line,
+    because a straight blend of two independent draws is smaller than
+    either halfway between them, and the map would be better there than
+    its stated accuracy (ADR-0088)."""
+
+    knots_m: np.ndarray
+    step_m: float
+
+    @classmethod
+    def drawn(cls, length_m: float, sigma_m: float, step_m: float,
+              seed: int, index: int) -> "_MapError":
+        count = int(math.ceil(length_m / max(step_m, 1.0))) + 2
+        stream = np.random.default_rng([int(seed), 88, int(index)])
+        return cls(stream.normal(0.0, sigma_m, size=count), max(step_m, 1.0))
+
+    def at(self, along_m: float) -> float:
+        position = max(along_m, 0.0) / self.step_m
+        left = min(int(position), len(self.knots_m) - 2)
+        turn = (position - left) * math.pi / 2.0
+        return float(self.knots_m[left] * math.cos(turn)
+                     + self.knots_m[left + 1] * math.sin(turn))
 
 
 def _fix_from(

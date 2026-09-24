@@ -498,8 +498,9 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row],
         "It is not a service availability figure."
     )
     lines.append(
-        "  No height constraint anywhere. VPE is what roadside geometry "
-        "actually supports (ADR-0011)."
+        "  Height comes from the unit's map, one sigma of 2,43 m in patches "
+        "along the road, not from the truth; with ranges alone VPE is what "
+        "roadside geometry supports (ADR-0011, ADR-0088)."
     )
     return "\n".join(lines)
 

@@ -231,12 +231,41 @@ def test_a_longer_service_life_costs_less_a_year():
 
     def replacement(years):
         rates = replace(DEFAULT_RATES, service_life_years=_rate_of(years))
-        costing = price(an_inventory(), rates)
+        costing = price(an_inventory(mounting=LIGHTING_COLUMN), rates)
         return next(
             item.tl for item in costing.operating if item.label == "replacement"
         )
 
+    # Grid-fed, so the units are all there is to replace, and they go
+    # on the unit life alone (ADR-0089).
     assert replacement(16.0) == pytest.approx(replacement(8.0) / 2.0)
+
+
+def test_each_part_of_an_off_grid_site_is_replaced_on_its_own_life():
+    """The radio unit, the battery and the rest of the solar supply each
+    on their line of the depreciation list (ADR-0089)."""
+    inventory = an_inventory(count=4)
+    costing = price(inventory, DEFAULT_RATES)
+    replaced = next(i.tl for i in costing.operating if i.label == "replacement")
+    units = sum(float(a.product.unit_price_tl.value) for a in inventory.anchors)
+    off_grid = inventory.off_grid_anchors
+    battery = float(DEFAULT_RATES.battery_tl.value)
+    supply = float(DEFAULT_RATES.off_grid_supply_tl.value)
+    assert off_grid > 0
+    assert replaced == pytest.approx(
+        units / 10.0 + off_grid * (battery / 5.0 + (supply - battery) / 10.0))
+
+
+def test_a_crew_that_leaves_its_city_draws_a_per_diem():
+    """850 TL a person a day from the 2026 budget law's Schedule H."""
+    home = price(an_inventory(), DEFAULT_RATES)
+    away = price(an_inventory(crew_travels=True), DEFAULT_RATES)
+    per_diem = {i.label: i.tl for i in away.operating}["per diem"]
+    assert {i.label: i.tl for i in home.operating}["per diem"] == 0.0
+    visits = next(i for i in away.operating if i.label == "maintenance").tl / float(
+        DEFAULT_RATES.maintenance_tl_per_visit.value)
+    assert per_diem == pytest.approx(visits * 2 * 850.0)
+    assert away.opex_tl_per_year - home.opex_tl_per_year == pytest.approx(per_diem)
 
 
 def _rate_of(value, unit="years"):
@@ -351,8 +380,11 @@ def test_a_rate_looks_sourced_only_when_it_names_its_source():
         rate = getattr(DEFAULT_RATES, name)
         if rate.provenance is Provenance.ASSUMPTION:
             continue
+        # A regulation counts too: the depreciation list's lives and the
+        # budget law's per diem (ADR-0089).
         assert rate.provenance in (
-            Provenance.DATASHEET, Provenance.DERIVED, Provenance.DESIGN), name
+            Provenance.DATASHEET, Provenance.DERIVED, Provenance.DESIGN,
+            Provenance.STANDARD), name
         if rate.provenance is not Provenance.DESIGN:
             assert not rate.source.startswith("bu proje"), name
 
