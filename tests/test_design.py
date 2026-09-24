@@ -75,13 +75,15 @@ def test_the_amplifier_is_inert_in_turkey_and_worth_having_in_america():
 def test_a_link_reaches_beyond_where_it_still_measures():
     """ADR-0007. Quoting the closure distance as coverage is the error.
 
-    Twice, not the five times an earlier version of this model claimed by
-    counting the despreading gain into both the range and the threshold
-    (ADR-0017). The distinction is smaller than it was and it is still
-    the one siting turns on.
+    A third further, not the five times an earlier version of this model
+    claimed by counting the despreading gain into both the range and the
+    threshold (ADR-0017), nor the twice it was before the chip's official
+    sensitivity took 8 dB off the closure (ADR-0091). Smaller each time,
+    and still the distinction siting turns on: 7,4 km of closure against
+    5,5 km of usable range from a 25 m mast.
     """
     outcome = derive(Design())
-    assert outcome.closure_range_m > 2.0 * outcome.usable_range_m
+    assert outcome.closure_range_m > 1.3 * outcome.usable_range_m
 
 
 def test_a_tolerance_below_the_radios_own_floor_is_met_nowhere():

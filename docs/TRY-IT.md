@@ -741,13 +741,14 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,11 m | 6,05 m | %75,27 |
-| Kırsal | 1,95 m | 5,35 m | %61,03 |
-| Tünel | 0,80 m | 2,72 m | %98,61 |
+| Şehir içi | 2,06 m | 5,53 m | %69,00 |
+| Kırsal | 1,84 m | 5,01 m | %57,75 |
+| Tünel | 0,79 m | 2,73 m | %98,61 |
 
 24 Eylül koşusu: kullanılabilirlik doğruluğa bağlı (ADR-0084), şehir
 içi 600 m, turda sekiz direk (ADR-0085), tünel 250 m, yükseklik
-haritadan (ADR-0088), harcırah ve amortisman resmî (ADR-0089).
+haritadan (ADR-0088), harcırah ve amortisman resmî (ADR-0089), SX1280'in resmî duyarlılığı ve
+direk ile araç çatısı antenleri (ADR-0091).
 
 Kırsal satır ADR-0079'dan önce 25 m'lik 28 dikilen direkte %41,83 ve
 22,72 m diyordu; elektrik dağıtım hattının 10 m'deki 49 direğine geçince

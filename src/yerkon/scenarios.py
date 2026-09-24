@@ -31,7 +31,8 @@ from yerkon.cost import (
     Product,
 )
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
-from yerkon.hardware import DWM3000, SX1280, Radio, W24P_U, radios
+from yerkon.hardware import (
+    DWM3000, HGV_2409U, SX1280, TL_ANT2412D, Radio, W24P_U, radios)
 from yerkon.ranging import SINGLE_SIDED
 from yerkon.regulatory import TURKEY
 from yerkon.language import say
@@ -214,12 +215,33 @@ def row_figures(row: str, settings: Settings = DEFAULTS) -> dict:
 
 
 def row_deployment_figures(row: str, settings: Settings = DEFAULTS) -> dict:
-    """The deployment-level half of the same: round size and scheme."""
+    """The deployment-level half of the same: round size, scheme and the
+    anchors' antenna."""
     return {
         "max_anchors_per_round": int(
             settings.number("{}.anchors_per_round".format(row))),
         "scheme": SINGLE_SIDED,
+        "antenna": ROW_ANTENNAS[row][0],
     }
+
+
+#: Each row's antennas: the pole's, and a unit's by what it is.
+#:
+#: The town and the open country hear with mast antennas at both ends,
+#: which is how the range lost to the chip's official sensitivity comes
+#: back within the Turkish limit: transmit gain is paid back in power,
+#: receive gain is not. A pedestrian keeps the printed antenna. The
+#: tunnel ranges by ultra-wideband and keeps it everywhere (ADR-0091).
+ROW_ANTENNAS = {
+    "urban": (TL_ANT2412D, {"vehicle": HGV_2409U}),
+    "rural": (TL_ANT2412D, {"vehicle": HGV_2409U}),
+    "tunnel": (W24P_U, {}),
+}
+
+
+def unit_antenna(row: str, product: str):
+    """The antenna a unit of this kind carries on this row."""
+    return ROW_ANTENNAS.get(row, ROW_ANTENNAS["rural"])[1].get(product, W24P_U)
 
 
 def site_road(length_m: float, width_m: float, terrain: Terrain) -> Road:
@@ -245,7 +267,8 @@ def site_road(length_m: float, width_m: float, terrain: Terrain) -> Road:
 def _units(row: str, road: Road, duration_s: float, radios) -> tuple:
     return tuple(
         _unit(name, road, speed_km_h / 3.6, duration_s, start_m=start_m,
-              antenna_height_m=height_m, product=product, radios=radios)
+              antenna_height_m=height_m, product=product, radios=radios,
+              antenna=unit_antenna(row, product))
         for name, product, speed_km_h, start_m, height_m in ROW_UNITS[row]
     )
 
@@ -329,7 +352,8 @@ def _anchors_along(
 
 
 def _unit(identifier, road, speed_m_s, duration_s, start_m=0.0,
-          antenna_height_m=1.5, product="vehicle", radios=None):
+          antenna_height_m=1.5, product="vehicle", radios=None,
+          antenna=None):
     return Receiver(
         identifier=identifier,
         journey=Journey(
@@ -337,7 +361,7 @@ def _unit(identifier, road, speed_m_s, duration_s, start_m=0.0,
             start_m=start_m, antenna_height_m=antenna_height_m,
         ),
         radios=radios or BOTH_MODULES,
-        antenna=W24P_U,
+        antenna=antenna or W24P_U,
         product=product,
     )
 

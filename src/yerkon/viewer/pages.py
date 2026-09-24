@@ -1498,13 +1498,13 @@ SIMULATION = Page(
                 _w(
                     "Bunların üstüne bir de gölgeleme biniyor: aynı "
                     "mesafedeki iki bağlantının, arada ne olduğuna göre "
-                    "farklı çıkması. Yol açıkken 4 dB, kapalıyken 7,82 "
+                    "farklı çıkması. Yol açıkken 4 dB, kapalıyken 7,8 dB kadar "
                     "(3GPP TR 38.901). Rastgele olduğu için tablo tek bir "
                     "çekilişi değil, sekiz çekilişin hepsini birden "
                     "gösteriyor.",
                     "Shadowing sits on top of those: two links the same "
                     "distance apart come out different depending on what "
-                    "stands between. 4 dB with a clear path, 7,82 without "
+                    "stands between. 4 dB with a clear path, about 7,8 dB without "
                     "(3GPP TR 38.901). It is random, so the table pools "
                     "all eight draws rather than showing one.",
                 ),

@@ -690,19 +690,26 @@ def evaluate_link(
 
     eirp_dbm = output_dbm + tx_gain
     if respect_regulatory_limit:
-        eirp_dbm = min(
-            eirp_dbm,
+        # The limit holds in every direction, so it is met at the beam's
+        # peak and the power set there; toward this receiver the antenna
+        # then gives what it gives. Capping toward the receiver instead
+        # let a narrow beam exceed the limit at its own peak (ADR-0091).
+        peak = transmitter.antenna.peak_dbi
+        peak_eirp_dbm = min(
+            output_dbm + peak,
             regulatory_eirp_limit_dbm(
                 float(radio.ranging_bandwidth_hz.value),
-                antenna_gain_dbi=tx_gain,
+                antenna_gain_dbi=peak,
                 radio_max_dbm=output_dbm,
                 region=region,
             ),
             # An ultra-wideband rating is already an emission limit rather
             # than a conducted power, so antenna gain cannot be added on
             # top of it.
-            output_dbm if radio.max_output_dbm.unit.endswith("/MHz") else eirp_dbm,
+            output_dbm if radio.max_output_dbm.unit.endswith("/MHz")
+            else output_dbm + peak,
         )
+        eirp_dbm = peak_eirp_dbm - (peak - tx_gain)
 
     # Geometry of the obstruction: how far the path clears the highest
     # ground between the ends, once the earth's own curvature is added to

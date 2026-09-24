@@ -78,19 +78,50 @@ def test_blocking_the_path_costs_much_more_than_grazing():
 # --- The claims the study rests on ---------------------------------------
 
 
-def test_the_stock_hardware_reaches_ten_kilometres():
-    """The requirement: 5 to 10 km links on the parts the report names.
+def test_ten_kilometres_needs_the_mast_antennas():
+    """The requirement: 5 to 10 km links within the band's limit.
 
-    No better antenna, no more power than the band allows. If this fails,
-    the rural deployment needs different hardware and the cost model
-    changes with it.
+    With the chip's official sensitivity (-118 dBm at SF10 and 1625 kHz)
+    the printed antenna still closes 10 km from a 35 m mast, by a quarter
+    of a decibel: nothing to stand on. The mast antennas buy it back the
+    legal way, on receive only, since the Turkish limit takes transmit
+    gain back in power (ADR-0091).
     """
-    budget = evaluate_link(mast(35.0), vehicle(10_000.0))
-    assert budget.closes
-    # Eight decibels, not the thirty an earlier version of this model
-    # claimed by counting the despreading gain twice (ADR-0017). It still
-    # closes, and it is no longer comfortable.
-    assert budget.margin_db > 5.0
+    from yerkon.hardware import HGV_2409U, TL_ANT2412D
+
+    stock = evaluate_link(mast(35.0), vehicle(10_000.0))
+    assert stock.closes
+    assert stock.margin_db < 1.0
+
+    pole = Terminal(E28_2G4M27S, TL_ANT2412D, (0.0, 0.0, 35.0))
+    car = Terminal(SX1280, HGV_2409U, (10_000.0, 0.0, 2.0))
+    heard_by_car = evaluate_link(pole, car)
+    heard_by_pole = evaluate_link(car, pole)
+    # Each direction gains what the listening end adds over the printed
+    # antenna, and nothing on transmit.
+    assert heard_by_car.margin_db == pytest.approx(
+        stock.margin_db + HGV_2409U.peak_dbi - float(W24P_U.peak_gain_dbi.value),
+        abs=0.3)
+    assert heard_by_pole.margin_db > stock.margin_db + 8.0
+    assert heard_by_car.eirp_dbm == pytest.approx(stock.eirp_dbm, abs=0.05)
+
+
+def test_the_limit_is_met_at_the_beam_s_peak():
+    """A narrow beam may not radiate past the limit where it points.
+
+    The cap used to be applied toward the receiver, which let a mast
+    antenna exceed it at its own peak whenever the receiver sat off the
+    beam (ADR-0091).
+    """
+    from yerkon.hardware import TL_ANT2412D
+
+    pole = Terminal(SX1280, TL_ANT2412D, (0.0, 0.0, 35.0))
+    level = evaluate_link(pole, vehicle(10_000.0))
+    below = evaluate_link(pole, Terminal(SX1280, W24P_U, (60.0, 0.0, 2.0)))
+    assert level.eirp_dbm == pytest.approx(12.1, abs=0.1)
+    # Thirty degrees below the horizon the beam gives far less, and the
+    # power toward that point is the peak's allowance less the drop.
+    assert below.eirp_dbm < level.eirp_dbm - 10.0
 
 
 def test_height_buys_range_because_of_ground_reflection():
@@ -120,10 +151,11 @@ def test_a_link_that_closes_is_not_a_link_that_ranges():
     gone. Reporting the closure distance as the range would overstate what
     an anchor covers by a factor of several.
     """
-    far = evaluate_link(mast(25.0), vehicle(10_000.0))
+    far = evaluate_link(mast(25.0), vehicle(8_000.0))
     assert far.closes
     assert far.margin_db > 0.0
-    assert ranging_sigma_m(far, E28_2G4M27S) > 10.0
+    # Well past the 5 m the study asks of a range.
+    assert ranging_sigma_m(far, E28_2G4M27S) > 7.0
 
     useful = usable_range_m(mast(25.0), vehicle(1.0), E28_2G4M27S, target_sigma_m=5.0)
     assert 3_000.0 < useful < far.distance_m
@@ -226,7 +258,7 @@ def test_a_narrowband_radio_does_not_deliver_centimetres_up_close():
 
 
 def test_the_floor_stops_binding_once_the_signal_gets_weak():
-    far = evaluate_link(mast(45.0), vehicle(12_000.0))
+    far = evaluate_link(mast(45.0), vehicle(9_000.0))
     assert cramer_rao_sigma_m(far, E28_2G4M27S) > float(
         E28_2G4M27S.implementation_floor_m.value
     )

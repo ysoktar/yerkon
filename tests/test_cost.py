@@ -73,13 +73,26 @@ def test_what_is_left_of_each_anchor_is_the_same_board():
     assert all(13.0 < usd < 22.0 for usd in left)
 
 
+#: Parts bought for range rather than for price (ADR-0091). The chip's
+#: official sensitivity is 8 dB worse than the model had assumed, and
+#: receive gain is the legal way back: a mast antenna on a short cable on
+#: the pole, and a roof antenna on the vehicle.
+FOR_RANGE = {"tl-ant2412d", "hgv-2409u", "lmr200-pigtail"}
+
+
 def test_no_part_is_swapped_for_a_dearer_one():
+    """Except the parts bought for range, which are named above. Without
+    them every board still costs no more than the report said."""
     from yerkon.bom import read
 
     for board in read().boards.values():
         for gone, came in board.swapped:
+            if came.key in FOR_RANGE:
+                continue
             assert came.usd < gone.usd, (board.key, gone.name, came.name)
-        assert board.one_tl <= board.report_one_tl
+        for_range_tl = sum(
+            p.usd for p in board.parts if p.key in FOR_RANGE) * board.usd_try
+        assert board.one_tl - for_range_tl <= board.report_one_tl, board.key
 
 
 def test_the_table_prices_hardware_for_the_network_it_runs():

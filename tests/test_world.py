@@ -192,8 +192,22 @@ def test_relief_costs_more_than_the_reflection_it_weakens():
     """
     import statistics
 
+    from dataclasses import replace
+
+    from yerkon.evidence import Provenance, Sourced
     from yerkon.hardware import E28_2G4M27S, SX1280, W24P_U
     from yerkon.rf import Terminal, evaluate_link, ranging_sigma_m
+
+    # This is about the ground, not the chip. The figures above were read
+    # with the radio as sensitive as the model once assumed (-125,9 dBm),
+    # which closes the whole 3 to 10 km corridor over a plane; at the
+    # chip's official sensitivity it does not, and the comparison would
+    # be of which links survive rather than of what the ground does to
+    # them (ADR-0091).
+    keen = Sourced(-20.0, "dB", Provenance.ASSUMPTION, "test",
+                   note="the model's earlier threshold, to test the ground")
+    E28_2G4M27S = replace(E28_2G4M27S, demodulation_threshold_db=keen)
+    SX1280 = replace(SX1280, demodulation_threshold_db=keen)
 
     def sweep(terrain):
         alive = []

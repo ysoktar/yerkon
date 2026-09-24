@@ -880,7 +880,10 @@ class ViewState:
         different questions of the same anchors — and a single road for
         all of them was an arrangement rather than a choice (ADR-0045).
         """
+        from yerkon.scenarios import unit_antenna
+
         _, radio_of = self.catalogues()
+        row = self.scenario if self.scenario in MODES else "rural"
         roads = {}
         for unit in self.units:
             if unit.route not in roads:
@@ -898,6 +901,7 @@ class ViewState:
                 radios=tuple(
                     chosen(radio_of, name, "radio") for name in unit.radios
                 ),
+                antenna=unit_antenna(row, unit.kind),
                 product=unit.kind,
             )
             for unit in self.units
@@ -933,6 +937,8 @@ class ViewState:
             region=chosen(REGION_CHOICES, self.region, "region"),
             max_anchors_per_round=row_deployment_figures(
                 row, self.settings())["max_anchors_per_round"],
+            # The row's antennas, so a tab hears as its row does (ADR-0091).
+            antenna=row_deployment_figures(row, self.settings())["antenna"],
         )
 
     def scenario_object(self) -> Scenario:

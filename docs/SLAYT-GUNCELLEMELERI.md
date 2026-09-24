@@ -120,13 +120,19 @@ Son güncelleme: 24 Eylül 2026.
   için "kullanılacaktır" yerine "pilotta eklenecek ve etkisi ölçülecek"
   denmeli.
 
+- [ ] Anten: şehir içi ve kırsal yayın birimleri direkte 12 dBi dış ortam
+  anteniyle (TP-Link TL-ANT2412D), araç alıcısı çatıda 8 dBi antenle
+  (L-com HGV-2409U) çalışıyor; araçta telsiz çatıdaki kutuda, kabine CAN
+  ile bağlı. Yaya küçük anteninde kalıyor (ADR-0091).
+
 ## Slayt 8: Ar-Ge soruları
 
 - [ ] TWR ölçeklenebilirlik sorusuna sayı eklenmeli: "SX1280'de bir
   mesafe ölçümü 31,8 ms sürüyor; turda 8 yayın birimi sorulursa bir
   alıcı yaklaşık 0,25 s'de bir konum alıyor. Aynı kanalı paylaşan her
   yeni alıcı bu süreyi uzatır." Soru böylece ölçülebilir hâle gelir.
-  (Turda 12 değil 8: kısa tur kullanılabilirliği artırıyor, ADR-0085.)
+  (Turda 12 değil 8: antenlerle kırsalda ikisi berabere, 8 havayı üçte
+  bir daha az meşgul ediyor; ADR-0085, ADR-0091.)
 - [ ] "SDR vasıtasıyla" ifadesi netleşmeli: TWR-CDMA denemesi, örnek
   düzeyinde zaman damgası veren bir SDR (ör. USRP ve UHD) ister. SDR++
   yalnız alıcıdır; SDRangel verici olsa da USB üzerinden bu zamanlamayı
@@ -214,18 +220,17 @@ Son güncelleme: 24 Eylül 2026.
 
   | Ürün | 1 adet | 100 adet | 1000 adet |
   |---|---|---|---|
-  | Şehir içi ve kırsal yayın birimi | 1158,56 TL | 797,84 TL | 718,05 TL |
+  | Şehir içi ve kırsal yayın birimi (direk anteniyle) | 4001,02 TL | 2755,28 TL | 2479,75 TL |
   | Kritik bölge yayın birimi | 1662,69 TL | 1212,43 TL | 1091,19 TL |
   | Yaya alıcısı | 2987,03 TL | 2379,86 TL | 2141,87 TL |
-  | Kara aracı alıcısı | 3748,56 TL | 2883,67 TL | 2595,30 TL |
+  | Kara aracı alıcısı (çatı anteniyle) | 7064,28 TL | 5434,36 TL | 4890,92 TL |
 
 - [ ] Kırsal birim satırı E28-2G4M27S'den E28-2G4M12S'ye geçmeli (ya da
   frekans atlama doğrulanırsa 27S kalıp gerekçesi yazılmalı).
 - [ ] Kaynak satırı: LAMBDA80-24S yerine E28-2G4M12S (LCSC),
   STM32G0B1 yerine yayın birimlerinde STM32G031 (LCSC).
-- [ ] Bir cümle: "Yatırımın büyük kısmı kart değil montaj: şehir içinde
-  25 birim 17951 TL, montaj 61250 TL; tünelde 9 birim 9821 TL, askı
-  montajı 54000 TL."
+- [ ] Bir cümle: "Şehir içinde 25 birim (antenleriyle) 61994 TL, montaj
+  61250 TL; tünelde 9 birim 9821 TL, askı montajı 54000 TL."
 
 ## Slayt 16: karşılaştırma tablosu
 
@@ -233,13 +238,14 @@ Son güncelleme: 24 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,11 | 6,05 | 3,67 | %75,27 | 5,96 km² | 13281 TL/km² | 2857 TL/km²/yıl |
-  | Kırsal | 1,95 | 5,35 | 4,72 | %61,03 | 209,00 km² | 1793 TL/km² | 590 TL/km²/yıl |
-  | Tünel | 0,80 | 2,72 | 2,04 | %98,61 | güzergâh | 31910 TL/km | 3234 TL/km/yıl |
+  | Şehir içi | 2,06 | 5,53 | 3,71 | %69,00 | 7,82 km² | 15760 TL/km² | 2742 TL/km²/yıl |
+  | Kırsal | 1,84 | 5,01 | 4,73 | %57,75 | 285,83 km² | 1613 TL/km² | 462 TL/km²/yıl |
+  | Tünel | 0,79 | 2,73 | 2,06 | %98,61 | güzergâh | 31910 TL/km | 3234 TL/km/yıl |
 
   (24 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
   içi 600 m, turda sekiz direk, tünel 250 m, yükseklik haritadan,
-  harcırah ve amortisman resmî kaynaklardan.)
+  harcırah ve amortisman resmî kaynaklardan, SX1280'in resmî
+  duyarlılığı, direkte 12 dBi ve araç çatısında 8 dBi anten.)
 
 - [ ] TerraPoiNT ve eLoran satırlarının teknoloji sütunundaki İngilizce
   kısaltma → "Karasal konumlandırma".
@@ -292,11 +298,10 @@ Son güncelleme: 24 Eylül 2026.
 - Şehir içi direk aralığı? **Cevap: 600 m** (500 m idi). 25 direk,
   toplam maliyet %30,6 düşük (`MALIYET-KARSILASTIRMASI.md`).
 - SX1280'in SF10 ve 1625 kHz'deki duyarlılığı: model −125,9 dBm
-  varsayıyor; veri sayfasının tablosu hâlâ resmî kaynaktan
-  doğrulanamadı. Semtech'in ürün sayfası −132 dBm'yi SF12 ve 203 kHz
-  için veriyor. Bant genişliği 1625 kHz'e çıkınca +9,0 dB, SF12'den
-  SF10'a +5 dB (LoRa'da her adım yaklaşık 2,5 dB) eklenirse yaklaşık
-  −118 dBm çıkıyor: modelden yaklaşık 8 dB daha kötü. Karar bekliyor.
+  varsayıyordu. **Cevap: resmî değer**, Semtech'in −132 dBm'sinden
+  (SF12, 203 kHz) SF10 ve 1625 kHz'e taşınan −118 dBm; kaybolan menzil
+  direkte 12 dBi ve araç çatısında 8 dBi antenle geri kazanıldı
+  (ADR-0091).
 
 - Prototipte mesafe ölçümü de denensin mi? Listedeki cihazların hiçbiri
   mesafe ölçemiyor (SX1262, LR1110). İstenirse birkaç E28-2G4M12S modülü

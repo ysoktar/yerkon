@@ -100,12 +100,15 @@ def test_frequency_correction_is_what_makes_single_sided_ranging_usable():
 
 
 def test_a_better_clock_is_worth_nothing_on_the_long_links():
-    """At 10 km the waveform bound is metres and the clock is millimetres.
+    """At 7 km the waveform bound is metres and the clock is millimetres.
 
     Buying a temperature-compensated oscillator to fix a range error that
     is not the clock's fault is the mistake this test exists to prevent.
+    It was 10 km; at the chip's official sensitivity the printed antenna
+    no longer closes that far from a 25 m mast (ADR-0091).
     """
-    budget = budget_at(10_000.0)
+    budget = budget_at(7_000.0)
+    assert budget.closes
     crystal = measurement_sigma_m(budget, SX1280, clock=CRYSTAL)
     tcxo = measurement_sigma_m(budget, SX1280, clock=TCXO)
     assert tcxo == pytest.approx(crystal, rel=1e-6)
@@ -304,9 +307,13 @@ def test_a_vehicle_moves_further_between_ranges_than_the_ranging_error():
     rng = np.random.default_rng(2)
     speed_m_s = 27.8
 
+    # A kilometre apart, so all six are in reach of the printed antenna
+    # at the chip's official sensitivity (ADR-0091).
     observations = round_robin(
-        anchors_along(6), moving_receiver(speed_m_s), 0.0, rng, SX1280
+        anchors_along(6, spacing_m=1000.0), moving_receiver(speed_m_s),
+        0.0, rng, SX1280
     )
+    assert len(observations) == 6
 
     spread_s = observations[-1].at_s - observations[0].at_s
     travelled_m = speed_m_s * spread_s

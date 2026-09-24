@@ -599,6 +599,32 @@ affects = """her link bütçesini: menzil, kullanılabilirlik ve dolayısıyla d
 sayısı"""
 affects_en = "every link budget: range, availability, and therefore anchor count"
 
+[values."radio.sx1280.demodulation_threshold_db"]
+value = -12.08
+unit = "dB"
+provenance = "DERIVED"
+source = """Semtech SX1280 ürün sayfası: en iyi duyarlılık -132 dBm (SF12, \
+203 kHz); SF başına 2,5 dB (LoRa modem SNR tablosu)"""
+source_en = """Semtech SX1280 product page: best sensitivity -132 dBm (SF12, \
+203 kHz); 2,5 dB per spreading factor (LoRa modem SNR table)"""
+note = """Kanal gürültüsüne göre çözme eşiği, bant içinde. -20 dB idi ve \
+"veri sayfası, SF10" diye etiketliydi; o değer SF12'ninkine benziyor ve \
+resmî bir kaynaktan doğrulanamadı. Semtech'in kendi sayfasındaki tek \
+resmî nokta -132 dBm (SF12, 203 kHz). 1625 kHz'e +9,03 dB, SF12'den \
+SF10'a +5 dB: SF10 ve 1625 kHz'de -117,97 dBm. 6 dB'lik gürültü \
+sayısıyla bu, -174 + 62,11 + 6 + eşik = -117,97, yani eşik -12,08 dB \
+demek. Model bununla -125,9 yerine -118,0 dBm'de kapanıyor (ADR-0091)."""
+note_en = """Demodulation threshold relative to the channel noise, in band. It \
+was -20 dB, labelled "datasheet, SF10"; that looks like the SF12 figure \
+and could not be checked against an official source. The one official \
+point on Semtech's own page is -132 dBm (SF12, 203 kHz). +9,03 dB to \
+1625 kHz and +5 dB from SF12 to SF10 give -117,97 dBm at SF10 and \
+1625 kHz. With a 6 dB noise figure that is -174 + 62,11 + 6 + threshold \
+= -117,97, so the threshold is -12,08 dB. The model now closes at \
+-118,0 dBm instead of -125,9 (ADR-0091)."""
+affects = "SX1280 bağlantılarının menzilini; şehir içi ve kırsal satırların her şeyini"
+affects_en = "the reach of every SX1280 link; everything in the urban and rural rows"
+
 [values."radio.dwm3000.noise_figure_db"]
 value = 6.0
 unit = "dB"

@@ -65,3 +65,10 @@ vermiyor ve cevap vermeyen direğin payı da turun süresine ekleniyor.
   birim sığar.
 - `yerkon solve` şehir içinde hâlâ 8 ile 12 arasında arıyor; çıta
   değişirse sıralama yeniden dönebilir, sınama bunu yakalar.
+
+## Sonradan (ADR-0091)
+
+Direkte ve araçta anten ve SX1280'in resmî duyarlılığıyla kırsalda
+sekiz ile on iki berabere: dört tohumda fark -0,1 puan, tohum saçılımı
+0,35 puan. Sekiz kalıyor, çünkü aynı kullanılabilirliği havayı üçte bir
+daha az meşgul ederek veriyor.

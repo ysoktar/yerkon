@@ -71,11 +71,15 @@ def a_unit(identifier="araç", terrain=ROLLING, speed_m_s=27.8, duration_s=60.0,
            radios=None, **journey):
     from yerkon.hardware import DWM3000, SX1280
 
+    from yerkon.hardware import HGV_2409U
+
+    # The vehicle's roof antenna, as the open-country row fits (ADR-0091).
     return Receiver(
         identifier=identifier,
         journey=Journey(road=a_road(terrain), speed_m_s=speed_m_s,
                         duration_s=duration_s, **journey),
         radios=radios or (SX1280, DWM3000),
+        antenna=HGV_2409U,
     )
 
 
@@ -90,10 +94,14 @@ def a_deployment(spacing_m=2000.0, terrain=ROLLING, mounting=TALL_MAST,
 
 def a_scenario(spacing_m=2000.0, duration_s=60.0, seed=1, terrain=ROLLING,
                units=None, mounting=TALL_MAST, **kwargs):
+    from yerkon.hardware import TL_ANT2412D
+
     return Scenario(
         name="test",
         terrain=terrain,
         deployment=Deployment(
+            # The pole antenna the open-country row fits (ADR-0091).
+            antenna=TL_ANT2412D,
             anchors=anchors_every(spacing_m, terrain, mounting),
             receivers=units if units is not None
             else (a_unit(terrain=terrain, duration_s=duration_s),),

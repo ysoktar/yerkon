@@ -23,9 +23,16 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 | Satır | Direk | Alan | Güzergâh | CAPEX | OPEX/yıl | On yıl | CAPEX/km² | OPEX/km²/yıl | CAPEX/km | OPEX/km/yıl |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
-| **Şehir içi, 600 m (yeni)** | 25 | 5,96 km² | 12,82 km | **79201** | **17035** | **249551** | **13281** | **2857** | **6180** | **1329** |
-| Kırsal, 3000 m | 49 | 209,00 km² | 86,40 km | 374754 | 123345 | 1608204 | 1793 | 590 | 4337 | 1428 |
+| **Şehir içi, 600 m (yeni)** | 25 | 7,82 km² | 12,82 km | **123244** | **21439** | **337634** | **15760** | **2742** | **9613** | **1672** |
+| Kırsal, 3000 m | 49 | 285,83 km² | 86,40 km | 461078 | 131977 | 1780848 | 1613 | 462 | 5337 | 1527 |
 | Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 63821 | 6468 | 128501 | yok | yok | 31910 | 3234 |
+
+24 Eylül gecesinden beri şehir içi ve kırsal yayın birimleri direkte
+12 dBi antenle, araçlar çatıda 8 dBi antenle; SX1280 resmî duyarlılıkta
+(ADR-0091). Antenler birim fiyatını artırıyor, ama direğin 5 m
+hassasiyetle ulaştığı alan da büyüyor (şehir içi 5,96'dan 7,82 km²'ye,
+kırsal 209'dan 285,83 km²'ye); kırsalda km² başına maliyet bu yüzden
+düştü.
 
 Tutarlar TL. OPEX 24 Eylül akşamından beri resmî harcırah ve amortisman
 değerleriyle (ADR-0089): kırsalda ve tünelde bakım ekibi şehir dışına

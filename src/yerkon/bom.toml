@@ -74,6 +74,33 @@ seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C411312.html"
 
 [[part]]
+key = "tl-ant2412d"
+name = "TP-Link TL-ANT2412D"
+role.tr = "direk anteni, 2,4 GHz, 12 dBi, dış ortam, çok yönlü"
+role.en = "pole antenna, 2,4 GHz, 12 dBi, outdoor omni"
+usd = 50.66
+seller = "Amazon"
+url = "https://www.amazon.com/TP-Link-Outdoor-Omni-directional-Antenna-TL-ANT2412D/dp/B003CFATO2"
+
+[[part]]
+key = "hgv-2409u"
+name = "L-com HGV-2409U"
+role.tr = "araç çatı anteni, 2,4 GHz, 8 dBi, çok yönlü"
+role.en = "vehicle roof antenna, 2,4 GHz, 8 dBi, omni"
+usd = 58.95
+seller = "Microcom"
+url = "https://www.microcom.us/hgv2409u.html"
+
+[[part]]
+key = "lmr200-pigtail"
+name = "LMR-200 anten kablosu"
+role.tr = "karttan antene kısa kablo (LMR-200)"
+role.en = "short cable from board to antenna (LMR-200)"
+usd = 9.50
+seller = "Amazon"
+url = "https://www.amazon.com/LMR200-Double-Shielded-LMR-200-Pigtail/dp/B0DQ61NXP9"
+
+[[part]]
 key = "w24p-u"
 name = "Inventek W24P-U"
 role.tr = "2,4 GHz anten"
@@ -190,7 +217,11 @@ report.en = "Urban broadcast unit"
 report_one_tl = 1983.71
 report_hundred_tl = 1366.07
 was = ["lambda80-24s", "w24p-u", "stm32g0b1met6", "atecc608b"]
-parts = ["e28-2g4m12s", "w24p-u", "stm32g031k8t6", "atecc608b"]
+# The printed antenna gives way to a mast antenna on a short cable: the
+# chip's official sensitivity is 8 dB worse than the model had assumed,
+# and receive gain is the legal way back (ADR-0091).
+parts = ["e28-2g4m12s", "tl-ant2412d", "stm32g031k8t6", "atecc608b",
+         "lmr200-pigtail"]
 
 [[product]]
 key = "amplified-anchor"
@@ -236,4 +267,5 @@ report_hundred_tl = 4002.29
 was = ["lambda80-24s", "dwm3000-digikey", "stm32g0b1met6", "bno085",
        "atecc608b", "tcan1051", "nhd-2.8"]
 parts = ["e28-2g4m12s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
-         "atecc608b", "tcan1051", "ili9341-2.8"]
+         "atecc608b", "tcan1051", "ili9341-2.8", "hgv-2409u",
+         "lmr200-pigtail"]

@@ -26,6 +26,20 @@ class Antenna:
     efficiency: Sourced
     centre_frequency_hz: float
     bandwidth_hz: float
+    #: Half-power width of the beam in the vertical plane, in degrees.
+    #: None for a small printed antenna, whose broad torus the cosine
+    #: shape below describes; set for a collinear mast antenna, whose
+    #: gain comes from squeezing that torus flat (ADR-0091).
+    vertical_beamwidth_deg: Optional[float] = None
+    #: Cable and connectors between the radio and the antenna, in dB.
+    #: Lost on the way out and on the way in alike.
+    feed_loss_db: float = 0.0
+
+    @property
+    def peak_dbi(self) -> float:
+        """The most gain toward any direction, after the feed. What a
+        radiated power limit is measured against (ADR-0091)."""
+        return float(self.peak_gain_dbi.value) - self.feed_loss_db
 
     def gain_dbi(self, elevation_deg: float = 0.0) -> float:
         """Gain toward a direction, in dBi.
@@ -40,13 +54,17 @@ class Antenna:
 
         if not -90.0 <= elevation_deg <= 90.0:
             raise ValueError("elevation_deg must be within +/- 90")
+        if self.vertical_beamwidth_deg is not None:
+            # 3GPP TR 36.814's vertical pattern: 3 dB down at half the
+            # beamwidth off the horizon, levelling at 20 dB down.
+            drop = min(12.0 * (elevation_deg / self.vertical_beamwidth_deg) ** 2,
+                       20.0)
+            return self.peak_dbi - drop
         shape = math.cos(math.radians(elevation_deg)) ** 2
         floor_db = -20.0
         if shape <= 0.0:
-            return float(self.peak_gain_dbi.value) + floor_db
-        return float(self.peak_gain_dbi.value) + max(
-            floor_db, 10.0 * math.log10(shape)
-        )
+            return self.peak_dbi + floor_db
+        return self.peak_dbi + max(floor_db, 10.0 * math.log10(shape))
 
 
 @dataclass(frozen=True)
@@ -148,6 +166,76 @@ W24P_U = Antenna(
 """The printed antenna the report's bill of materials names."""
 
 
+def _omni_beamwidth_deg(gain_dbi: float) -> float:
+    """An omni antenna's vertical half-power beamwidth from its gain.
+
+    McDonald's approximation for omnidirectional antennas, D ~ 101 /
+    (HPBW - 0,0027 HPBW^2), solved for HPBW. Used where a datasheet
+    gives the gain and not the beam, and in place of a datasheet's
+    "at most" figure, because the narrower beam is the cautious reading
+    near the pole (ADR-0091).
+    """
+    import math
+
+    directivity = 10.0 ** (gain_dbi / 10.0)
+    target = 101.0 / directivity
+    # x - 0,0027 x^2 = target, the smaller root.
+    return (1.0 - math.sqrt(1.0 - 4.0 * 0.0027 * target)) / (2.0 * 0.0027)
+
+
+#: LMR-200 at 2,5 GHz, Times Microwave: 16,9 dB per 100 ft.
+LMR200_DB_PER_M = 16.9 / 30.48
+
+
+TL_ANT2412D = Antenna(
+    part="TP-Link TL-ANT2412D",
+    peak_gain_dbi=Sourced(
+        12.0, "dBi", Provenance.DATASHEET,
+        "TP-Link TL-ANT2412D datasheet: 2,4-2,5 GHz, 12 dBi, omni, "
+        "vertical HPBW at most 12 degrees",
+    ),
+    efficiency=Sourced(
+        1.0, "fraction", Provenance.DATASHEET,
+        "TP-Link TL-ANT2412D datasheet; the gain already includes it",
+    ),
+    centre_frequency_hz=2450e6,
+    bandwidth_hz=100e6,
+    vertical_beamwidth_deg=_omni_beamwidth_deg(12.0),
+    # 0,3 m of LMR-200 from the unit to the mast, and two connectors.
+    feed_loss_db=round(0.3 * LMR200_DB_PER_M + 2 * 0.15, 2),
+)
+"""The pole's antenna for the town and the open country (ADR-0091).
+
+An outdoor omni collinear on the pole beside the unit, fed through a
+short cable. It hears the vehicle 8,8 dB better than the printed
+antenna; on transmit the Turkish limit takes the gain back, so it buys
+reception and nothing else."""
+
+
+HGV_2409U = Antenna(
+    part="L-com HGV-2409U",
+    peak_gain_dbi=Sourced(
+        8.0, "dBi", Provenance.DATASHEET,
+        "L-com HGV-2409U: 2,4 GHz, 8 dBi, omni, N female",
+    ),
+    efficiency=Sourced(
+        1.0, "fraction", Provenance.DATASHEET,
+        "L-com HGV-2409U; the gain already includes it",
+    ),
+    centre_frequency_hz=2450e6,
+    bandwidth_hz=100e6,
+    vertical_beamwidth_deg=_omni_beamwidth_deg(8.0),
+    # The radio sits in a box on the roof beside the antenna and talks to
+    # the cab over the CAN bus the vehicle unit already has; 0,3 m of
+    # LMR-200 and two connectors. Three metres down into the cab would
+    # lose 1,96 dB and three points of availability (ADR-0091).
+    feed_loss_db=round(0.3 * LMR200_DB_PER_M + 2 * 0.15, 2),
+)
+"""The vehicle's roof antenna for the town and the open country
+(ADR-0091). A pedestrian keeps the printed antenna: a mast antenna is
+not something a person carries."""
+
+
 # --- Radios ---------------------------------------------------------------
 
 def _sx1280_family(
@@ -174,15 +262,8 @@ def _sx1280_family(
             30.1, "dB", Provenance.DERIVED,
             "10*log10(2^10) for the SF10 ranging mode",
         ),
-        demodulation_threshold_db=Sourced(
-            -20.0, "dB", Provenance.DATASHEET,
-            "SX1280 datasheet, SF10 demodulation floor relative to noise",
-            note=(
-                "Quoted in the occupied bandwidth. LoRa works below the "
-                "noise because despreading lifts it, and that is what "
-                "this figure already allows for."
-            ),
-        ),
+        demodulation_threshold_db=settings.sourced(
+            "radio.sx1280.demodulation_threshold_db"),
         threshold_is_in_band=True,
         symbol_duration_s=Sourced(
             2 ** 10 / 1625e3, "s", Provenance.DERIVED,
