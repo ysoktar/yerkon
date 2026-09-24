@@ -54,8 +54,13 @@ def test_the_table_file_carries_the_rows_and_the_ground_under_them():
     real mountain; a delivery that omitted that would be four numbers
     with no way back to what produced them.
     """
-    results, rows = build(tuple(CHOICES.values()))
-    body = table_md(results, rows, DEFAULTS)
+    # Read coarsely: what this checks is what the file says about the
+    # rows and the ground, not how finely the ground was read.
+    from yerkon.settings import hurried
+
+    settings = hurried()
+    results, rows = build(settings=settings)
+    body = table_md(results, rows, settings)
 
     for row in rows:
         assert row.system in body

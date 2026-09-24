@@ -205,9 +205,21 @@ def test_the_tunnel_still_supports_the_height_the_open_road_cannot():
     assert run(TUNNEL).row().vpe_p95_m < run(URBAN).row().vpe_p95_m
 
 
-@pytest.mark.slow
-def test_the_whole_block_is_one_row_per_deployment():
-    """ADR-0068. There is no weighted row any more."""
+def test_the_whole_block_is_one_row_per_deployment(monkeypatch):
+    """ADR-0068. There is no weighted row any more.
+
+    A claim about the table's shape, so the simulations are stood in
+    for: every draw of every row comes back as a made-up result, and
+    `build` still does the part this is about, which is folding the
+    draws back into one row per deployment. Run for real it was the
+    publishing run, eight draws of three rows at full resolution, and
+    the slowest test in the suite at nearly ten minutes.
+    """
+    import yerkon.report as report
+
+    monkeypatch.setattr(report, "spread", lambda work, jobs: tuple(
+        made_up_result(deployed, [1.0, 2.0], [3.0, 4.0])
+        for deployed, *_ in jobs))
     _, rows = build()
     assert len(rows) == 3
     assert [row.system for row in rows] == [
@@ -230,8 +242,15 @@ def test_the_notes_say_what_the_table_rests_on():
 
 @pytest.mark.slow
 def test_the_notes_never_print_a_service_area_without_the_reached_area():
-    """ADR-0012. The gap between them is the finding."""
-    results, rows = build((RURAL,))
+    """ADR-0012. The gap between them is the finding.
+
+    Read coarsely: the two areas and the gap between them come from a
+    sweep, and the sweep does not need eight draws or full-resolution
+    profiles to show that one is several times the other.
+    """
+    from yerkon.settings import hurried
+
+    results, rows = build(settings=hurried(), only=("rural",))
     notes = footnotes(results, rows)
     assert "is not coverage" in notes
     assert "times more ground" in notes
