@@ -87,3 +87,36 @@ değer bir varsayım, iki düzeyde (5 m ve 15 m) koşuldu ve pilotta
   proje sahibine sunuldu; seçilen hâl yayımlanacak.
 - Yayımlanmış tablo (23 Eylül) bu ADR'den önceki modelin çıktısı. Seçim
   yapıldıktan sonra bir kez yeniden koşturulup yayımlanacak.
+
+## Karşılaştırma
+
+Tam okuma (sekiz çekiliş, 10 m profil), yeni kullanılabilirlik tanımıyla.
+A: görüş dışı yanlılık yok. B: SX1280 için ortalama 5 m, DWM3000 için
+0,5 m, filtrede 3 sigma kapısı. C: B ile aynı, SX1280 için 15 m.
+Yayımlanan: 23 Eylül tablosu (eski tanım).
+
+| Satır | Hâl | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik |
+|---|---|---|---|---|---|
+| Şehir içi | Yayımlanan | 2,67 | 8,84 | 64,21 | %83,98 |
+| Şehir içi | A | 2,40 | 6,38 | 57,85 | %76,35 |
+| Şehir içi | B | 4,80 | 12,99 | 106,34 | %72,20 |
+| Şehir içi | C | 10,72 | 32,42 | 174,93 | %53,41 |
+| Kırsal | Yayımlanan | 2,91 | 11,83 | 140,75 | %65,85 |
+| Kırsal | A | 2,45 | 6,89 | 113,16 | %55,78 |
+| Kırsal | B | 3,72 | 11,61 | 192,26 | %52,33 |
+| Kırsal | C | 5,52 | 24,35 | 315,67 | %44,83 |
+| Tünel | Yayımlanan | 0,78 | 2,90 | 7,60 | %98,29 |
+| Tünel | A | 0,79 | 3,21 | 7,26 | %98,25 |
+| Tünel | B ve C | 0,80 | 3,53 | 7,41 | %97,54 |
+
+Alan ve maliyet sütunları üç hâlde de aynı (alan taraması mesafe
+hassasiyetine bakar, yanlılığa bakmaz): şehir içi 6,68 km², kırsal
+209,00 km².
+
+Kapının ilk hâli tüneli %62'ye düşürmüştü: filtre bir turun bütün
+mesafelerini atınca sürüklenmeye devam ediyor ve sonraki turu da
+atıyordu. Bütün mesafeleri atılan bir turda filtre artık o turdan yeniden
+başlatılıyor; sınaması var.
+
+Yeni tanımla P95 düşüyor, çünkü belirsizliği çıtayı geçen konumlar artık
+örneğe girmiyor; aynı konumlar kullanılabilirliği düşürüyor.
