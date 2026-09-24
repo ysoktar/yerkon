@@ -499,8 +499,21 @@ def _fix_from(
 
     if not observations:
         return None
+    before = tracker.used
     for observation in observations:
         tracker.absorb(observation)
+    if tracker.used == before:
+        # Every range was turned away. A filter that disagrees with all of
+        # them is more likely the one that is wrong, and one that keeps
+        # coasting only drifts further and turns away the next round too:
+        # the lockout every gated filter has to guard against. Start again
+        # from what this round measured (ADR-0084).
+        start = trilaterate(observations)
+        if start is None:
+            return None
+        return (TrackingFilter(start, manoeuvre_m_s2=manoeuvre_m_s2,
+                               gate_sigmas=gate_sigmas),
+                start.position_m)
     return tracker, tracker.position_m
 
 

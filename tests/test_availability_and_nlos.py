@@ -135,3 +135,27 @@ def test_the_option_ships_switched_off():
     assert DEFAULTS.number("radio.sx1280.nlos_bias_mean_m") == 0.0
     assert DEFAULTS.number("radio.dwm3000.nlos_bias_mean_m") == 0.0
     assert DEFAULTS.number("estimator.gate_sigmas") == 0.0
+
+
+def test_a_round_the_gate_turns_away_entirely_restarts_the_filter():
+    """The lockout every gated filter has to guard against (ADR-0084).
+
+    A filter that has wandered disagrees with every range and keeps
+    coasting, so it disagrees with the next round too. Ranges that agree
+    with each other and not with the filter start it again.
+    """
+    from yerkon.evaluate import _fix_from
+
+    lost = _filter(3.0)
+    lost.state[:3] = (500.0, 500.0, 0.0)
+    anchors = ((0.0, 0.0, 10.0), (100.0, 0.0, 10.0),
+               (0.0, 100.0, 10.0), (100.0, 100.0, 10.0))
+    truth = np.array((40.0, 60.0, 1.5))
+    round_ = [
+        RangeObservation(at_s=0.5, anchor_position_m=a,
+                         measured_range_m=float(np.linalg.norm(truth - a)),
+                         variance_m2=1.0)
+        for a in anchors]
+    tracker, position = _fix_from(round_, lost, 1.0, 3.0)
+    assert tracker is not lost
+    assert np.linalg.norm(np.array(position[:2]) - truth[:2]) < 1.0
