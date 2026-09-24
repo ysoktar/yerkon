@@ -1330,29 +1330,30 @@ maliyetini"""
 affects_en = "the tunnel row's served area and cost per route kilometre"
 
 [values."tunnel.anchor_spacing_m"]
-value = 225.0
+value = 250.0
 unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. Aralığı \
-maliyet değil geometri belirler, ve 150 m'de geometri kötüydü: bir \
-koridorda direkleri sıkıştırmak hepsini neredeyse aynı noktaya toplar ve \
-tabanı kısaltır. Üç tohumda, tam çözünürlükte: 150 m'de 14 askı, \
-106 882 TL, ortanca hata 1,86 m; 225 m'de 9 askı, 68 710 TL, ortanca \
-hata 0,79 m. Hem üçte bir ucuz hem iki kat hassas. Bedeli \
-kullanılabilirlikte: %100'den yaklaşık %99,3'e, çünkü uçtaki birkaç \
-bağlantı artık kapanmıyor. 300 m'de bağlantılar toptan kopuyor (%82,7), \
-yani 225 m sınırın hemen berisi (ADR-0072)."""
-note_en = """How far apart the brackets stand along the bore. The spacing is set by \
-geometry rather than by cost, and at 150 m the geometry was bad: packing \
-anchors along a corridor gathers them at nearly one point and shortens \
-the baseline. Over three seeds at full resolution: at 150 m, 14 brackets, \
-106 882 TL, 1,86 m of median error; at 225 m, 9 brackets, 68 710 TL, \
-0,79 m. A third cheaper and twice as precise. It costs availability, \
-100 % down to about 99,3 %, because a few links at the ends no longer \
-close. At 300 m the links fail outright (82,7 %), so 225 m is just \
-inside the edge (ADR-0072)."""
+note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. 225 m \
+idi (ADR-0072: 150 m'de geometri kötüydü, 300 m'de bağlantılar \
+kopuyordu). Tam çözünürlükte, sekiz gölge çekilişiyle, doğruluğa bağlı \
+kullanılabilirlikle: 225 m'de 9 askı, P95 3,21 m, %98,25; 250 m'de 9 \
+askı, P95 2,97 m, %98,57; 275 m'de 8 askı, P95 3,80 m, %91,21; 300 m'de \
+7 askı, P95 3,68 m, %88,29. 250 m her ölçüde en az 225 m kadar iyi ve \
+uzun bir tünelde kilometre başına %10 daha az askı istiyor (4,4 yerine \
+4,0). 275 ve 300 m daha ucuz, bedeli kullanılabilirlikte; seçim proje \
+sahibinin (docs/MALIYET-KARSILASTIRMASI.md)."""
+note_en = """How far apart the brackets stand along the bore. It was 225 m \
+(ADR-0072: at 150 m the geometry was bad, at 300 m links broke). At full \
+resolution, eight shadow draws, availability tied to accuracy: at \
+225 m, 9 brackets, P95 3,21 m, 98,25 %; at 250 m, 9 brackets, P95 \
+2,97 m, 98,57 %; at 275 m, 8 brackets, P95 3,80 m, 91,21 %; at 300 m, \
+7 brackets, P95 3,68 m, 88,29 %. 250 m is at least as good as 225 m on \
+every measure and needs 10 % fewer brackets a kilometre in a long bore \
+(4,0 instead of 4,4). 275 and 300 m are cheaper and pay in \
+availability; that choice is the project owner's \
+(docs/MALIYET-KARSILASTIRMASI.md)."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \
 başına en büyük sermaye"""
 affects_en = """the tunnel row's anchor count and its capital, which is the largest per \

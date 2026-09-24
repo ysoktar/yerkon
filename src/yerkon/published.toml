@@ -4,7 +4,7 @@
 # the tests that keep the README from drifting away from it.
 # Edit the model and run it again rather than editing this.
 
-run_on = "2026-09-23"
+run_on = "2026-09-24"
 source = "defaults.toml"
 shadow_draws = 8
 profile_spacing_m = 10
@@ -14,15 +14,15 @@ key = "urban"
 system = "YERKON (Şehir içi)"
 technology = "Karasal konumlandırma (SX1280/LoRa TWR)"
 environment = "Dış"
-hpe_p50_m = 2.6728
-hpe_p95_m = 8.8419
-vpe_p95_m = 64.2128
-availability = 0.8398
-area_km2 = 6.6833
-capex_tl_per_unit = 17064.808
-opex_tl_per_unit_year = 3767.106
+hpe_p50_m = 2.3947
+hpe_p95_m = 6.6518
+vpe_p95_m = 72.8103
+availability = 0.7168
+area_km2 = 5.9633
+capex_tl_per_unit = 13281.3723
+opex_tl_per_unit_year = 2931.9016
 costed_by = "area"
-reached_km2 = 8.8567
+reached_km2 = 8.75
 assumed_share = 0.8119
 
 [[row]]
@@ -30,10 +30,10 @@ key = "rural"
 system = "YERKON (Kırsal)"
 technology = "Karasal konumlandırma (E28-SX1280 TWR)"
 environment = "Dış"
-hpe_p50_m = 2.9126
-hpe_p95_m = 11.8342
-vpe_p95_m = 140.7539
-availability = 0.6585
+hpe_p50_m = 2.2727
+hpe_p95_m = 6.8048
+vpe_p95_m = 115.9008
+availability = 0.5743
 area_km2 = 209
 capex_tl_per_unit = 1793.0835
 opex_tl_per_unit_year = 616.8388
@@ -46,10 +46,10 @@ key = "tunnel"
 system = "YERKON (Tünel)"
 technology = "Karasal konumlandırma (UWB/DWM3000 TWR)"
 environment = "İç + dış"
-hpe_p50_m = 0.7805
-hpe_p95_m = 2.9049
-vpe_p95_m = 7.601
-availability = 0.9829
+hpe_p50_m = 0.8502
+hpe_p95_m = 2.9717
+vpe_p95_m = 6.8092
+availability = 0.9857
 area_km2 = 0.024
 capex_tl_per_unit = 31910.355
 opex_tl_per_unit_year = 3356.9944

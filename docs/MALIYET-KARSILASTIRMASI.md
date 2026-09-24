@@ -57,14 +57,19 @@ iniyor.
 
 ## Tünel (Kızılcahamam, güzergâh km başına)
 
-| Aralık | Direk | CAPEX TL/km | OPEX TL/km/yıl | A: P95, kull. | B ve C: P95, kull. |
-|---|---|---|---|---|---|
-| **225 m (bugün)** | 9 | 31910 | 3357 | 3,21 m, %98,25 | 3,53 m, %97,54 |
-| 300 m | 7 | 24819 | 2611 | 3,76 m, %75,63 | 3,68 m, %75,60 |
-| 375 m | 6 | 21274 | 2238 | 4,47 m, %45,02 | 4,47 m, %45,02 |
-| 450 m | 5 | 17728 | 1865 | 8,54 m, %36,65 | 8,40 m, %36,07 |
+Tam okuma, sekiz gölge çekilişi, turda sekiz direk, A seçeneği.
 
-(Tünelde bugünkü satır tam okumadan; diğerleri kaba okuma.)
+| Aralık | Askı | CAPEX TL/km | OPEX TL/km/yıl | HPE P50 | HPE P95 | Kullanılabilirlik |
+|---|---|---|---|---|---|---|
+| 225 m (eski) | 9 | 31910 | 3357 | 0,79 m | 3,21 m | %98,25 |
+| **250 m (yeni)** | 9 | 31910 | 3357 | 0,85 m | 2,97 m | %98,57 |
+| 275 m | 8 | 28365 | 2984 | 1,04 m | 3,80 m | %91,21 |
+| 300 m | 7 | 24819 | 2611 | 0,80 m | 3,68 m | %88,29 |
+
+2 km'lik tünelde 225 ve 250 m aynı sayıda askı veriyor. Uzun bir tünelde
+250 m kilometre başına 4,4 yerine 4,0 askı demek: aynı doğrulukla %10
+daha ucuz. Tünel CAPEX'inin %85'i askı montajı (askı başına 6000 TL,
+varsayım); birim yalnızca 1091 TL. En büyük kaldıraç aralık değil montaj.
 
 ## Ne gösteriyor
 

@@ -152,18 +152,14 @@ export const SAY = {
     en: "The search service did not answer. Find the place by hand and "
         + "draw the box.",
   },
-  "fetch.imagery": { tr: "Uydu karo adresi (isteğe bağlı)",
-                     en: "Tile address for the photograph (optional)" },
-  "fetch.imagery.zoom": { tr: "Karo yakınlığı", en: "Tile zoom" },
+  "fetch.imagery": { tr: "Uydu görüntüsünü de getir",
+                     en: "Fetch the satellite photograph too" },
   "fetch.imagery.note": {
-    tr: "Boş bırakılırsa fotoğraf indirilmez; zemin düz renk çizilir. "
-        + "Her sağlayıcının kendi koşulları var, bu yüzden buraya hazır "
-        + "bir adres konmuyor — kullanacağınız servisin koşullarını siz "
-        + "kabul edersiniz. 17 yakınlığı Ankara'da yaklaşık 0,92 m/piksel.",
-    en: "Left empty, no photograph is downloaded and the ground is drawn "
-        + "in flat colour. Every provider has its own terms, so no "
-        + "address ships here — the terms you accept are yours. Zoom 17 "
-        + "is about 0,92 m per pixel in Ankara.",
+    tr: "Zemin fotoğrafla boyanır; hesaba girmez. Görüntü: Esri, Maxar, "
+        + "Earthstar Geographics, GIS User Community.",
+    en: "The ground is painted with the photograph; nothing is computed "
+        + "from it. Imagery: Esri, Maxar, Earthstar Geographics, GIS User "
+        + "Community.",
   },
   "fetch.open": { tr: "Yeni bir yer getir", en: "Fetch somewhere new" },
   "fetch.note": {

@@ -121,9 +121,10 @@ Son güncelleme: 24 Eylül 2026.
 ## Slayt 8: Ar-Ge soruları
 
 - [ ] TWR ölçeklenebilirlik sorusuna sayı eklenmeli: "SX1280'de bir
-  mesafe ölçümü 31,8 ms sürüyor; turda 12 yayın birimi sorulursa bir
-  alıcı yaklaşık 0,4 s'de bir konum alıyor. Aynı kanalı paylaşan her
+  mesafe ölçümü 31,8 ms sürüyor; turda 8 yayın birimi sorulursa bir
+  alıcı yaklaşık 0,25 s'de bir konum alıyor. Aynı kanalı paylaşan her
   yeni alıcı bu süreyi uzatır." Soru böylece ölçülebilir hâle gelir.
+  (Turda 12 değil 8: kısa tur kullanılabilirliği artırıyor, ADR-0085.)
 - [ ] "SDR vasıtasıyla" ifadesi netleşmeli: TWR-CDMA denemesi, örnek
   düzeyinde zaman damgası veren bir SDR (ör. USRP ve UHD) ister. SDR++
   yalnız alıcıdır; SDRangel verici olsa da USB üzerinden bu zamanlamayı
@@ -140,6 +141,23 @@ Son güncelleme: 24 Eylül 2026.
 - [ ] Başarı ölçütlerinin yanına kullanılabilirliğin nasıl tanımlandığı
   yazılmalı (bkz. dipnot 1 ve `BASVURU-INCELEMESI.md`, "Model
   doğruluğu").
+
+- [ ] Prototip ve son ürün donanımı ayrı yazılmalı (proje sahibinin
+  kararı, 24 Eylül). Önerilen metin:
+
+  > "Prototipler ekibin elindeki cihazlarla gerçekleştirilecektir:
+  > RAKwireless R1 (harici antenli ve antensiz), Seeed Studio SenseCAP
+  > Card Tracker T1000-E, ATGM336H GPS modülü, RAK WisBlock Meshtastic
+  > Starter Kit, RAK WisBlock Starter Kit (pil, OLED ve IO modülüyle) ve
+  > 17 cm kırbaç anten. Son üründe sunumda verilen bileşenler (SX1280
+  > tabanlı E28-2G4M12S, DWM3000, W24P-U anten ve diğerleri)
+  > kullanılacaktır."
+
+- [ ] Bu cihazların hangi radyo yongasını taşıdığı, hangi bantta çalıştığı
+  ve mesafe ölçümü yapıp yapamadığı doğrulanıyor (GPT'ye verilen
+  soru listesi). Cevap gelince buraya, prototipin neyi gösterip neyi
+  gösteremeyeceği yazılacak: tablodaki doğruluk SX1280 ve DWM3000'in
+  mesafe ölçümüne dayanıyor.
 
 ## Slayt 10: yenilikçi yön
 
@@ -172,7 +190,8 @@ Son güncelleme: 24 Eylül 2026.
 - [ ] Kaynak satırı: LAMBDA80-24S yerine E28-2G4M12S (LCSC),
   STM32G0B1 yerine yayın birimlerinde STM32G031 (LCSC).
 - [ ] Bir cümle: "Yatırımın büyük kısmı kart değil montaj: şehir içinde
-  36 birim 25850 TL, montaj 88200 TL."
+  25 birim 17951 TL, montaj 61250 TL; tünelde 9 birim 9821 TL, askı
+  montajı 54000 TL."
 
 ## Slayt 16: karşılaştırma tablosu
 
@@ -180,20 +199,24 @@ Son güncelleme: 24 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,67 | 8,84 | 64,21 | %83,98 | 6,68 km² | 17065 TL/km² | 3767 TL/km²/yıl |
-  | Kırsal | 2,91 | 11,83 | 140,75 | %65,85 | 209,00 km² | 1793 TL/km² | 617 TL/km²/yıl |
-  | Tünel | 0,78 | 2,90 | 7,60 | %98,29 | güzergâh | 31910 TL/km | 3357 TL/km/yıl |
+  | Şehir içi | 2,39 | 6,65 | 72,81 | %71,68 | 5,96 km² | 13281 TL/km² | 2932 TL/km²/yıl |
+  | Kırsal | 2,27 | 6,80 | 115,90 | %57,43 | 209,00 km² | 1793 TL/km² | 617 TL/km²/yıl |
+  | Tünel | 0,85 | 2,97 | 6,81 | %98,57 | güzergâh | 31910 TL/km | 3357 TL/km/yıl |
+
+  (24 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
+  içi 600 m, turda sekiz direk, tünel 250 m.)
 
 - [ ] TerraPoiNT ve eLoran satırlarının teknoloji sütunundaki İngilizce
   kısaltma → "Karasal konumlandırma".
-- [ ] Kullanılabilirlik tanımı karara bağlandıktan sonra (bkz.
-  "Sorular") bu sütun yeniden koşturulacak.
+- [ ] Kullanılabilirlik düştü görünüyor ama tanım değişti: artık
+  yalnız 10 m hedefini karşılayan konumlar sayılıyor. Dipnot 1 bunu
+  söylemeli (bkz. "Sorular").
 
 ## Slayt 17 ve 18: dipnotlar
 
 - [ ] Dipnot 28-32 bugünkü yöntemle yeniden yazılmalı. Taslak:
 
-  > "YERKON satırları, projenin açık kaynak simülasyonunun 23 Eylül 2026
+  > "YERKON satırları, projenin açık kaynak simülasyonunun 24 Eylül 2026
   > koşusudur: gerçek Ankara zemini (Copernicus yükseklik modeli) ve
   > binaları (OpenStreetMap), ITU-R P.526 kırınımı, gölgelenme, her satır
   > için sekiz gölge çekilişi, sahanın çevresinden ve köşegeninden geçen
@@ -225,8 +248,11 @@ Son güncelleme: 24 Eylül 2026.
   "YERKON kullanılabilirliği, denenen konum turlarından, alıcının kendi
   tahminine göre yatay hatası %95 olasılıkla 10 m'nin altında kalan bir
   konum üretenlerin oranıdır."
-- Görüş dışı (çok yollu) yanlılık modele girsin mi? İki hâlin tam tablosu
-  hazırlandı; seçim bekleniyor.
+- Görüş dışı (çok yollu) yanlılık modele girsin mi? **Cevap: A, yanlılık
+  yok** (24 Eylül). Tablo bu hâlle yeniden yayımlandı. B ve C'nin
+  sayıları ADR-0084'te duruyor; pilot ölçümü gelince yeniden bakılacak.
+- Şehir içi direk aralığı? **Cevap: 600 m** (500 m idi). 25 direk,
+  toplam maliyet %30,6 düşük (`MALIYET-KARSILASTIRMASI.md`).
 - SX1280'in SF10 ve 1625 kHz'deki duyarlılığı: model −125,9 dBm
   varsayıyor; veri sayfasının tablosu gerekli. Yayımlanan sayılar buna çok
   bağlı (bkz. `BASVURU-INCELEMESI.md`, "Model doğruluğu").
@@ -236,5 +262,7 @@ Son güncelleme: 24 Eylül 2026.
 - Simülatörün sekmeleri tablonun satırlarından farklı değerlerle
   koşuyordu (ölçüm hatası, paket kaybı, kabul eşiği, turdaki birim sayısı,
   tünelde yöntem, tohum, tur, kamyon anteni). Düzeltildi (ADR-0084).
-- Kullanılabilirlik tanımı değişti. Tablo, görüş dışı seçimi yapıldıktan
-  sonra bir kez yeniden yayımlanacak; slayt 16 o sayılarla güncellenmeli.
+- Kullanılabilirlik tanımı değişti; tablo 24 Eylül'de A seçeneğiyle
+  yeniden yayımlandı. Slayt 16 yukarıdaki sayılarla güncellenmeli.
+- Şehir içi 600 m (500 idi), turda sekiz direk (12 idi, ADR-0085), tünel
+  250 m (225 idi).
