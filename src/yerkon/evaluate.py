@@ -568,20 +568,17 @@ class Coverage:
     anchors_required: int
 
 
-def coverage_grid(
+def sweep_axes(
     deployment: Deployment,
     terrain: Terrain,
-    receiver_height_m: float = 1.5,
-    target_sigma_m: float = 5.0,
     resolution_m: float = 250.0,
     margin_m: float = 12_000.0,
-    count_up_to: int = 8,
-) -> CoverageGrid:
-    """Sweep a grid and count reachable anchors at every cell.
+) -> tuple[np.ndarray, np.ndarray]:
+    """The cells a coverage sweep will visit, as its x and y axes.
 
-    ``count_up_to`` stops counting once a cell has that many anchors in
-    reach, because nothing downstream distinguishes eight from nine and
-    the sweep is the slowest thing in the project.
+    Apart from the sweep so that whoever needs to know where it will
+    paint — the ground mesh drawn under it — can ask without paying for
+    the link budget at every cell (ADR-0082).
     """
     positions = [anchor.position_m for anchor in deployment.anchors]
     west = min(p[0] for p in positions) - margin_m
@@ -597,8 +594,25 @@ def coverage_grid(
         left, bottom, right, top = terrain.extent_m
         west, east = max(west, left), min(east, right)
         south, north = max(south, bottom), min(north, top)
-    xs = np.arange(west, east, resolution_m)
-    ys = np.arange(south, north, resolution_m)
+    return np.arange(west, east, resolution_m), np.arange(south, north, resolution_m)
+
+
+def coverage_grid(
+    deployment: Deployment,
+    terrain: Terrain,
+    receiver_height_m: float = 1.5,
+    target_sigma_m: float = 5.0,
+    resolution_m: float = 250.0,
+    margin_m: float = 12_000.0,
+    count_up_to: int = 8,
+) -> CoverageGrid:
+    """Sweep a grid and count reachable anchors at every cell.
+
+    ``count_up_to`` stops counting once a cell has that many anchors in
+    reach, because nothing downstream distinguishes eight from nine and
+    the sweep is the slowest thing in the project.
+    """
+    xs, ys = sweep_axes(deployment, terrain, resolution_m, margin_m)
 
     anchors = deployment.terminals()
     # Ground is served for a unit carrying whatever the deployment's

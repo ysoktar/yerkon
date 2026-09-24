@@ -15,17 +15,19 @@ not, and the ratio between them is the design question.
 from __future__ import annotations
 
 import math
+from bisect import bisect_left
 from dataclasses import dataclass, field, replace
+from functools import cached_property
 from typing import Callable, Optional, Sequence, TYPE_CHECKING
 
 import numpy as np
 
 from yerkon.evidence import Sourced
-from yerkon.hardware import Radio, SX1280
+from yerkon.hardware import SPEED_OF_LIGHT_M_S, Radio, SX1280
 from yerkon.language import say
 from yerkon.numbers import decimal_comma
 from yerkon.settings import DEFAULTS, Settings
-from yerkon.rf import Obstruction, earth_bulge_m, first_fresnel_radius_m
+from yerkon.rf import EARTH_RADIUS_M, FOUR_THIRDS_EARTH, Obstruction
 
 if TYPE_CHECKING:  # pragma: no cover
     from yerkon.site.model import Site
@@ -130,6 +132,17 @@ class Terrain:
         overrides it where it is set, because how finely a path is read
         is a property of the ground rather than of whoever is asking.
         """
+        fractions, heights = self._profile_arrays(a, b, samples)
+        return list(zip(fractions.tolist(), heights.tolist()))
+
+    def _profile_arrays(self, a, b, samples: int = 64):
+        """The same profile as two arrays: fractions, and heights.
+
+        What `profile_between` hands out as pairs, before it is paired.
+        The obstruction and the link budget work on the arrays, so the
+        pairs are made once for whoever reads them rather than taken
+        apart again for every sum (ADR-0082).
+        """
         samples = self.samples_between(a, b, samples)
         if samples < 2:
             raise ValueError("a profile needs at least two samples")
@@ -141,19 +154,18 @@ class Terrain:
         # (ADR-0062). The fallback is here because `elevation_m` is a
         # plain callable and a caller is free to pass one.
         along = getattr(self.elevation_m, "along", None)
-        fractions = [i / samples for i in range(samples + 1)]
+        fractions = np.arange(samples + 1, dtype=float) / samples
         if along is not None:
-            steps = np.arange(samples + 1, dtype=float) / samples
-            heights = along(a[0] + (b[0] - a[0]) * steps,
-                            a[1] + (b[1] - a[1]) * steps)
-            return list(zip(fractions, (float(h) for h in heights)))
+            heights = along(a[0] + (b[0] - a[0]) * fractions,
+                            a[1] + (b[1] - a[1]) * fractions)
+            return fractions, np.asarray(heights, dtype=float)
 
-        out = []
-        for f in fractions:
+        heights = []
+        for f in fractions.tolist():
             x = a[0] + (b[0] - a[0]) * f
             y = a[1] + (b[1] - a[1]) * f
-            out.append((f, self.height_at(x, y)))
-        return out
+            heights.append(self.height_at(x, y))
+        return fractions, np.asarray(heights, dtype=float)
 
     def obstruction_between(
         self,
@@ -177,23 +189,31 @@ class Terrain:
         """
         distance_m = math.dist(a, b)
         frequency_hz = 2450e6
-        profile = self.profile_between(a, b, samples)
+        every_fraction, every_height = self._profile_arrays(a, b, samples)
+        profile = list(zip(every_fraction.tolist(), every_height.tolist()))
 
         worst_fraction = 0.5
-        worst_ratio = math.inf
         worst_ground = a[2]
 
-        for fraction, ground_m in profile:
-            if fraction <= 0.0 or fraction >= 1.0:
-                continue
-            sight_m = a[2] + (b[2] - a[2]) * fraction
-            zone_m = first_fresnel_radius_m(distance_m, frequency_hz, fraction)
-            ratio = (sight_m - ground_m) / zone_m
-            if ratio < worst_ratio:
-                worst_ratio, worst_fraction, worst_ground = ratio, fraction, ground_m
+        # Every sample at once, with the scalar helpers' own arithmetic
+        # in their own order, so the answer is the one the loop gave to
+        # the last bit (ADR-0082). The first minimum wins, as it did.
+        inside = (every_fraction > 0.0) & (every_fraction < 1.0)
+        fractions = every_fraction[inside]
+        grounds = every_height[inside]
+        sights = a[2] + (b[2] - a[2]) * fractions
+        if fractions.size:
+            wavelength_m = SPEED_OF_LIGHT_M_S / frequency_hz
+            near = distance_m * fractions
+            zones = np.sqrt(wavelength_m * near * (distance_m - near)
+                            / distance_m)
+            worst = int(np.argmin((sights - grounds) / zones))
+            worst_fraction = float(fractions[worst])
+            worst_ground = float(grounds[worst])
 
         surface_m, roughness_m, tilt_rad, at_fraction = (
-            self._reflection_surface(a, b, profile, distance_m)
+            self._reflection_surface(a, b, profile, distance_m,
+                                     arrays=(every_fraction, every_height))
         )
 
         # Whether there is a direct ray at all, which is what decides
@@ -208,19 +228,16 @@ class Terrain:
         # which picks the point the budget reports and has no bulge in
         # it. Changing that would move the published table for a reason
         # that has nothing to do with this.
-        blocked = False
-        for fraction, ground_m in profile:
-            if fraction <= 0.0 or fraction >= 1.0:
-                continue
-            sight_m = a[2] + (b[2] - a[2]) * fraction
-            if ground_m + earth_bulge_m(distance_m, fraction) > sight_m:
-                blocked = True
-                break
+        near = distance_m * fractions
+        bulges = (near * (distance_m - near)) / (
+            2.0 * FOUR_THIRDS_EARTH * EARTH_RADIUS_M)
+        blocked = bool(np.any(grounds + bulges > sights))
 
         return Obstruction(
             # The whole ground, not just its worst point: the link
             # budget works diffraction out over all of it (ADR-0053).
             profile=tuple(profile),
+            profile_array=np.column_stack((every_fraction, every_height)),
             # Everything this ground model does not carry, as a spread
             # around what it does: the first end is the one the field is
             # indexed by, and every caller passes the anchor first
@@ -242,6 +259,7 @@ class Terrain:
         b: tuple[float, float, float],
         profile: Sequence[tuple[float, float]],
         distance_m: float = 0.0,
+        arrays=None,
     ) -> tuple[float, float, float, float]:
         """Where the specular reflection lands, how rough it is, and its tilt.
 
@@ -262,7 +280,11 @@ class Terrain:
         very differently, and which one the reflection lands on is a fact
         about that place rather than about the measurement (ADR-0026).
         """
-        heights = [h for _, h in profile]
+        if arrays is None:
+            arrays = (np.array([f for f, _ in profile], dtype=float),
+                      np.array([h for _, h in profile], dtype=float))
+        every_fraction, every_height = arrays
+        heights = every_height.tolist()
         surface_m = sum(heights) / len(heights)
 
         for _ in range(4):
@@ -276,9 +298,9 @@ class Terrain:
         h1 = max(a[2] - surface_m, 0.1)
         h2 = max(b[2] - surface_m, 0.1)
         centre = min(max(h1 / (h1 + h2), 0.02), 0.98)
-        window = [
-            (f, h) for f, h in profile if abs(f - centre) <= 0.1
-        ] or [(centre, surface_m)]
+        near = np.abs(every_fraction - centre) <= 0.1
+        window = list(zip(every_fraction[near].tolist(),
+                          every_height[near].tolist())) or [(centre, surface_m)]
 
         here_x = a[0] + (b[0] - a[0]) * centre
         here_y = a[1] + (b[1] - a[1]) * centre
@@ -294,13 +316,21 @@ class Terrain:
 
     @staticmethod
     def _interpolate(profile: Sequence[tuple[float, float]], fraction: float) -> float:
-        for (f0, h0), (f1, h1) in zip(profile, profile[1:]):
-            if f0 <= fraction <= f1:
-                if f1 == f0:
-                    return h0
-                t = (fraction - f0) / (f1 - f0)
-                return h0 + (h1 - h0) * t
-        return profile[-1][1]
+        # The first segment whose ends straddle the fraction, found by
+        # bisection rather than by walking to it. Fractions only rise
+        # along a profile, so it is the segment the walk would find.
+        at = bisect_left(profile, fraction, key=lambda pair: pair[0])
+        if at >= len(profile):
+            return profile[-1][1]
+        if at == 0:
+            at = 1
+        (f0, h0), (f1, h1) = profile[at - 1], profile[at]
+        if not f0 <= fraction <= f1:
+            return profile[-1][1]
+        if f1 == f0:
+            return h0
+        t = (fraction - f0) / (f1 - f0)
+        return h0 + (h1 - h0) * t
 
 
 def _plane_through(window: Sequence[tuple[float, float]]) -> tuple[float, float]:
@@ -1058,35 +1088,56 @@ class Road:
         x, y = self._ground_point(distance_m)
         return self.terrain.height_at(x, y)
 
-    @property
+    # Worked out once per road rather than on every question. A journey
+    # asks where it is thousands of times and each answer used to walk
+    # and re-measure the whole centreline, which was a tenth of what a
+    # simulation cost (ADR-0082). Cached on the instance, which a frozen
+    # dataclass allows because the cache is not a field: equality, hash
+    # and repr never see it.
+
+    @cached_property
     def length_m(self) -> float:
         return sum(
             math.dist(a, b)
             for a, b in zip(self.centreline_m, self.centreline_m[1:])
         )
 
+    @cached_property
+    def _segments(self) -> tuple:
+        """Each segment's ends, its length, and how far along it starts.
+
+        The running total is added up exactly as the walk added it, so a
+        bisection over the ends lands on the segment the walk stopped at.
+        """
+        segments, starts, ends = [], [], []
+        travelled = 0.0
+        for a, b in zip(self.centreline_m, self.centreline_m[1:]):
+            segment = math.dist(a, b)
+            segments.append((a, b, segment))
+            starts.append(travelled)
+            ends.append(travelled + segment)
+            travelled += segment
+        return tuple(segments), tuple(starts), tuple(ends)
+
     def _ground_point(self, distance_m: float, offset_m: float = 0.0) -> tuple[float, float]:
         if distance_m < 0.0:
             raise ValueError("distance along a road cannot be negative")
         if distance_m > self.length_m + 1e-6:
             raise ValueError("distance beyond the end of the road")
-        travelled = 0.0
-        segments = list(zip(self.centreline_m, self.centreline_m[1:]))
-        for index, (a, b) in enumerate(segments):
-            segment = math.dist(a, b)
-            last = index == len(segments) - 1
-            if travelled + segment >= distance_m or last:
-                f = 0.0 if segment == 0.0 else (distance_m - travelled) / segment
-                f = min(max(f, 0.0), 1.0)
-                x = a[0] + (b[0] - a[0]) * f
-                y = a[1] + (b[1] - a[1]) * f
-                if offset_m and segment > 0.0:
-                    nx, ny = -(b[1] - a[1]) / segment, (b[0] - a[0]) / segment
-                    x += nx * offset_m
-                    y += ny * offset_m
-                return (x, y)
-            travelled += segment
-        raise ValueError("distance beyond the end of the road")
+        segments, starts, ends = self._segments
+        # The first segment that reaches this far, or the last one.
+        index = min(bisect_left(ends, distance_m), len(segments) - 1)
+        a, b, segment = segments[index]
+        travelled = starts[index]
+        f = 0.0 if segment == 0.0 else (distance_m - travelled) / segment
+        f = min(max(f, 0.0), 1.0)
+        x = a[0] + (b[0] - a[0]) * f
+        y = a[1] + (b[1] - a[1]) * f
+        if offset_m and segment > 0.0:
+            nx, ny = -(b[1] - a[1]) / segment, (b[0] - a[0]) / segment
+            x += nx * offset_m
+            y += ny * offset_m
+        return (x, y)
 
     def point_at(self, distance_m: float, offset_m: float = 0.0) -> tuple[float, float, float]:
         """A point on the carriageway, ``distance_m`` along and offset across."""

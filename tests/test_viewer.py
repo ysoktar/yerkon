@@ -391,14 +391,34 @@ def test_the_scene_is_json_and_nothing_but_json():
 
 
 def test_the_ground_mesh_covers_everything_the_sweep_will_cover():
-    """Or coverage cells are painted beside the terrain rather than on it."""
+    """Or coverage cells are painted beside the terrain rather than on it.
+
+    Asked of the sweep's own axes rather than of a finished sweep: the
+    edges are all this is about, and a sweep of this corridor ran a link
+    budget at every cell to hand them back — the slowest test in the
+    viewer at nearly two minutes (ADR-0082).
+    """
+    from yerkon.viewer.scene import swept_cells
+
     state = a_mixed_corridor()
     drawn = scene(state)
+    xs, ys = swept_cells(state)
+    assert xs and ys
+    assert min(drawn["terrain"]["xs"]) <= min(xs)
+    assert max(drawn["terrain"]["xs"]) >= max(xs)
+    assert min(drawn["terrain"]["ys"]) <= min(ys)
+    assert max(drawn["terrain"]["ys"]) >= max(ys)
+
+
+def test_the_sweep_paints_exactly_the_cells_it_says_it_will():
+    """The seam the test above leans on: a sweep and its axes agree."""
+    from yerkon.viewer.scene import swept_cells
+
+    state = a_state(corridor_m=3000.0, width_m=0.0, sweep_m=1500.0)
+    xs, ys = swept_cells(state)
     swept = sweep(state)
-    assert min(drawn["terrain"]["xs"]) <= min(swept["xs"])
-    assert max(drawn["terrain"]["xs"]) >= max(swept["xs"])
-    assert min(drawn["terrain"]["ys"]) <= min(swept["ys"])
-    assert max(drawn["terrain"]["ys"]) >= max(swept["ys"])
+    assert xs and ys, "an empty sweep would agree with anything"
+    assert (swept["xs"], swept["ys"]) == (xs, ys)
 
 
 def test_the_ground_mesh_holds_the_route_as_well_as_the_anchors():

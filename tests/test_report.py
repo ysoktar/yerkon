@@ -1,5 +1,6 @@
 """The YERKON rows, and what they are allowed to claim."""
 
+import functools
 
 import numpy as np
 import pytest
@@ -156,6 +157,18 @@ def test_no_scenario_carries_a_journey_share_any_more():
     assert not hasattr(ALL[0], "weight")
 
 
+@functools.cache
+def _ran(name):
+    """One run of a shipped row, shared by the tests that compare rows.
+
+    Three tests below compare the tunnel with the town, and each used to
+    run both from scratch: six full runs with their coverage sweeps for
+    two answers. A run is deterministic, so running it once is the same
+    run (ADR-0082).
+    """
+    return run({"tunnel": TUNNEL, "urban": URBAN}[name])
+
+
 @pytest.mark.slow
 def test_the_tunnel_measures_a_range_far_better_than_the_town_does():
     """An impulse radio against a spread one. If this inverts, something broke.
@@ -167,8 +180,8 @@ def test_the_tunnel_measures_a_range_far_better_than_the_town_does():
     all. That was not a regression, and a test that called it one would
     have argued for undoing the fix.
     """
-    tunnel = run(TUNNEL)
-    urban = run(URBAN)
+    tunnel = _ran("tunnel")
+    urban = _ran("urban")
     assert tunnel.samples.median_range_sigma_m < (
         urban.samples.median_range_sigma_m / 10.0
     )
@@ -185,7 +198,7 @@ def test_a_bore_turns_its_ranging_advantage_into_no_advantage_at_all():
     the number that says so is the ratio of position error to range
     error: far above one in the bore, below one in the town.
     """
-    tunnel, urban = run(TUNNEL), run(URBAN)
+    tunnel, urban = _ran("tunnel"), _ran("urban")
 
     def amplification(result):
         return result.row().hpe_p50_m / result.samples.median_range_sigma_m
@@ -202,7 +215,7 @@ def test_the_tunnel_still_supports_the_height_the_open_road_cannot():
     this is the one comparison between the rows that the area rewrite
     left standing.
     """
-    assert run(TUNNEL).row().vpe_p95_m < run(URBAN).row().vpe_p95_m
+    assert _ran("tunnel").row().vpe_p95_m < _ran("urban").row().vpe_p95_m
 
 
 def test_the_whole_block_is_one_row_per_deployment(monkeypatch):
@@ -258,8 +271,12 @@ def test_the_notes_never_print_a_service_area_without_the_reached_area():
 
 @pytest.mark.slow
 def test_running_the_block_twice_gives_the_same_table():
-    first = as_markdown(build((TUNNEL,))[1])
-    again = as_markdown(build((TUNNEL,))[1])
+    """Determinism does not depend on how finely the ground is read, so
+    this reads it coarsely and runs one draw rather than eight."""
+    from yerkon.settings import hurried
+
+    first = as_markdown(build(settings=hurried(), only=("tunnel",))[1])
+    again = as_markdown(build(settings=hurried(), only=("tunnel",))[1])
     assert first == again
 
 
@@ -294,9 +311,15 @@ def test_a_row_with_no_shadows_to_draw_is_still_a_row():
     from yerkon.scenarios import CHOICES
 
     urban = CHOICES["urban"]
+    # A minute of driving rather than ten: which arrangement a draw
+    # lands on does not depend on how long the journey through it is.
+    brief = tuple(
+        replace(unit, journey=replace(unit.journey, duration_s=60.0))
+        for unit in urban.scenario.deployment.receivers)
     bare = replace(urban, scenario=replace(
-        urban.scenario, terrain=replace(urban.scenario.terrain,
-                                        shadowing=None)))
+        urban.scenario,
+        terrain=replace(urban.scenario.terrain, shadowing=None),
+        deployment=replace(urban.scenario.deployment, receivers=brief)))
     assert bare.shadow_draws > 1 and len(draws_of(bare)) == 1
     first = run(bare, draw=0, with_area=False).samples.percentile(50)[0]
     for draw in (3, 7, 99):

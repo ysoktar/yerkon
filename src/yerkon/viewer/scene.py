@@ -486,6 +486,23 @@ def figures(state: ViewState) -> dict:
     }
 
 
+def swept_cells(state: ViewState) -> tuple:
+    """Where `sweep` will paint, without running it.
+
+    The same axes the sweep uses, from the same function, so a check that
+    the ground mesh covers them is a check on the sweep itself.
+    """
+    from yerkon.evaluate import sweep_axes
+
+    terrain = state.terrain()
+    if not state.anchors(terrain):
+        return [], []
+    xs, ys = sweep_axes(state.deployment(terrain), terrain,
+                        resolution_m=state.sweep_m,
+                        margin_m=sweep_margin_m(state))
+    return [float(x) for x in xs], [float(y) for y in ys]
+
+
 def sweep(state: ViewState) -> dict:
     """How many anchors reach each cell of the ground. Seconds, not milliseconds."""
     terrain = state.terrain()

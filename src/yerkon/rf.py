@@ -21,8 +21,10 @@ bandwidth appears in the accuracy answer at all.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, Sequence
+
+import numpy as np
 
 from yerkon.hardware import SPEED_OF_LIGHT_M_S, Antenna, Radio
 from yerkon.regulatory import TURKEY, SpectrumRule
@@ -121,6 +123,12 @@ class Obstruction:
     #: about this link rather than a draw, so the same receiver at the
     #: same spot meets the same shadow every round (ADR-0055).
     shadow_db: float = 0.0
+    #: The same profile as an (n, 2) array, where whoever built this had
+    #: one to hand. A copy for speed rather than a second fact: it is left
+    #: out of equality and of the printed form, and the budget falls back
+    #: on ``profile`` when it is absent (ADR-0082).
+    profile_array: Optional[np.ndarray] = field(
+        default=None, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         if not 0.0 < self.peak_at_fraction < 1.0:
@@ -464,28 +472,27 @@ def bullington_db(
         return 0.0
     wavelength_m = SPEED_OF_LIGHT_M_S / frequency_hz
     span_km = distance_m / 1000.0
+
+    # As arrays rather than a loop over pairs. Each line below is the
+    # same arithmetic, in the same order, as the scalar form it replaced,
+    # so the answer is identical to the last bit; only the per-point call
+    # overhead is gone, and that overhead was most of what a simulation
+    # spent its time on.
+    pairs = np.asarray(profile, dtype=float).reshape(-1, 2)
+    inside = (pairs[:, 0] > 0.0) & (pairs[:, 0] < 1.0)
+    if not inside.any():
+        return 0.0
+    km = pairs[inside, 0] * span_km
+    height = pairs[inside, 1]
     # Curvature enters as a correction to each profile height rather than
     # as a separate obstacle: over 20 km the earth itself rises 23 m into
     # the path, which is more than most of Ankara's buildings.
-    bulge = ((lambda km: 500.0 * km * (span_km - km) / EFFECTIVE_EARTH_KM)
-             if curved else (lambda km: 0.0))
-
-    inner = [(fraction * span_km, height) for fraction, height in profile
-             if 0.0 < fraction < 1.0]
-    if not inner:
-        return 0.0
+    bulge = (500.0 * km * (span_km - km) / EFFECTIVE_EARTH_KM if curved
+             else np.zeros_like(km))
 
     straight = (rx_height_m - tx_height_m) / span_km
-    from_tx = max(((height + bulge(km) - tx_height_m) / km)
-                  for km, height in inner)
-
-    def over(km: float, height: float) -> float:
-        sight = (tx_height_m * (span_km - km) + rx_height_m * km) / span_km
-        return (height + bulge(km) - sight) * math.sqrt(
-            0.002 * span_km / (wavelength_m * km * (span_km - km)))
-
-    from_rx = max(((height + bulge(km) - rx_height_m) / (span_km - km))
-                  for km, height in inner)
+    from_tx = float(np.max((height + bulge - tx_height_m) / km))
+    from_rx = float(np.max((height + bulge - rx_height_m) / (span_km - km)))
     # Exactly grazing: the two steepest lines are parallel and never
     # cross, so there is no equivalent edge to put anywhere and the
     # answer is the worst single intrusion — which is the same thing the
@@ -493,7 +500,9 @@ def bullington_db(
     if from_tx < straight or abs(from_tx + from_rx) < 1e-12:
         # Nothing rises above the line between the ends, so the worst
         # intrusion into the zone is the edge that stands for the path.
-        worst = max(over(km, height) for km, height in inner)
+        sight = (tx_height_m * (span_km - km) + rx_height_m * km) / span_km
+        worst = float(np.max((height + bulge - sight) * np.sqrt(
+            0.002 * span_km / (wavelength_m * km * (span_km - km)))))
     else:
         crossing_km = ((rx_height_m - tx_height_m + from_rx * span_km)
                        / (from_tx + from_rx))
@@ -568,20 +577,23 @@ def smooth_earth_heights_m(
     would lift an antenna off its own mounting.
     """
     span_km = distance_m / 1000.0
-    points = [(fraction * span_km, height) for fraction, height in profile]
-    if len(points) < 2 or span_km <= 0.0:
+    pairs = np.asarray(profile, dtype=float).reshape(-1, 2)
+    if len(pairs) < 2 or span_km <= 0.0:
         return (0.0, 0.0)
+    km = pairs[:, 0] * span_km
+    height = pairs[:, 1]
 
-    first = second = 0.0
-    for (km_a, height_a), (km_b, height_b) in zip(points, points[1:]):
-        step = km_b - km_a
-        first += step * (height_b + height_a)
-        second += step * (height_b * (2.0 * km_b + km_a)
-                          + height_a * (km_b + 2.0 * km_a))
+    # Segment by segment, as arrays; the running sums are accumulated in
+    # order, the way the loop added them, so the fit is the same number.
+    step = km[1:] - km[:-1]
+    first = float(np.cumsum(step * (height[1:] + height[:-1]))[-1])
+    second = float(np.cumsum(step * (
+        height[1:] * (2.0 * km[1:] + km[:-1])
+        + height[:-1] * (km[1:] + 2.0 * km[:-1])))[-1])
     at_tx = (2.0 * first * span_km - second) / span_km ** 2
     at_rx = (second - first * span_km) / span_km ** 2
-    return (min(at_tx, points[0][1], tx_height_m),
-            min(at_rx, points[-1][1], rx_height_m))
+    return (min(at_tx, float(height[0]), tx_height_m),
+            min(at_rx, float(height[-1]), rx_height_m))
 
 
 def delta_bullington_db(
@@ -603,14 +615,16 @@ def delta_bullington_db(
     Heights are metres in the profile's own datum, which for a fetched
     site is metres above sea level with roofs folded in (ADR-0046).
     """
-    on_the_ground = bullington_db(profile, tx_height_m, rx_height_m,
+    # Read into an array once, for the three things below that use it.
+    pairs = np.asarray(profile, dtype=float).reshape(-1, 2)
+    on_the_ground = bullington_db(pairs, tx_height_m, rx_height_m,
                                   distance_m, frequency_hz)
-    at_tx, at_rx = smooth_earth_heights_m(profile, distance_m,
+    at_tx, at_rx = smooth_earth_heights_m(pairs, distance_m,
                                           tx_height_m, rx_height_m)
     above_tx = max(tx_height_m - at_tx, 0.0)
     above_rx = max(rx_height_m - at_rx, 0.0)
 
-    flat = [(fraction, 0.0) for fraction, _ in profile]
+    flat = np.column_stack((pairs[:, 0], np.zeros(len(pairs))))
     on_a_smooth_earth = bullington_db(flat, above_tx, above_rx,
                                       distance_m, frequency_hz)
     curving = spherical_earth_db(distance_m, above_tx, above_rx,
@@ -703,7 +717,9 @@ def evaluate_link(
     # it says (ADR-0053).
     if obstruction.profile:
         diffraction_db = delta_bullington_db(
-            obstruction.profile, tx[2], rx[2], distance_m, frequency_hz)
+            obstruction.profile if obstruction.profile_array is None
+            else obstruction.profile_array,
+            tx[2], rx[2], distance_m, frequency_hz)
     else:
         diffraction_db = diffraction_loss_db(clearance_m, fresnel_m)
 

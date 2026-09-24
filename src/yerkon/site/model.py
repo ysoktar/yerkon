@@ -170,6 +170,7 @@ class Buildings:
         state = dict(self.__dict__)
         state.pop("_cells", None)
         state.pop("_cell_m", None)
+        state.pop("_occupied", None)
         return state
 
     def _index(self) -> tuple:
@@ -192,6 +193,26 @@ class Buildings:
         object.__setattr__(self, "_cells", packed)
         object.__setattr__(self, "_cell_m", cell_m)
         return packed, cell_m
+
+    def _occupancy(self) -> tuple:
+        """Which index cells hold any building, as a dense grid.
+
+        Built beside the index and dropped from the pickle with it.
+        """
+        found = self.__dict__.get("_occupied")
+        if found is not None:
+            return found
+        cells, _ = self._index()
+        keys = np.array(list(cells), dtype=int).reshape(-1, 2)
+        first_column, first_row = keys.min(axis=0) if len(keys) else (0, 0)
+        size = (keys.max(axis=0) - (first_column, first_row) + 1
+                if len(keys) else (1, 1))
+        occupied = np.zeros(tuple(int(n) for n in size), dtype=bool)
+        if len(keys):
+            occupied[keys[:, 0] - first_column, keys[:, 1] - first_row] = True
+        found = (occupied, int(first_column), int(first_row))
+        object.__setattr__(self, "_occupied", found)
+        return found
 
     def tallest_at(self, x: float, y: float) -> float:
         """The tallest roof over this point, or zero where there is none."""
@@ -222,7 +243,17 @@ class Buildings:
         cells, cell_m = self._index()
         columns = (xs // cell_m).astype(int)
         rows = (ys // cell_m).astype(int)
-        for index in range(len(xs)):
+        # Most of a path crosses cells with no building in them. Those are
+        # dropped in one step against an occupancy grid, and only the rest
+        # are asked one at a time, with the same arithmetic (ADR-0082).
+        occupied, first_column, first_row = self._occupancy()
+        across = columns - first_column
+        up = rows - first_row
+        on_grid = ((across >= 0) & (across < occupied.shape[0])
+                   & (up >= 0) & (up < occupied.shape[1]))
+        worth_asking = np.zeros(len(xs), dtype=bool)
+        worth_asking[on_grid] = occupied[across[on_grid], up[on_grid]]
+        for index in np.flatnonzero(worth_asking):
             near = cells.get((int(columns[index]), int(rows[index])))
             if near is None:
                 continue
