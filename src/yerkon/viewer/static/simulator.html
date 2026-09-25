@@ -24,7 +24,7 @@
   -->
   <a id="back" href="/" data-say="back.site"></a>
   <h1>YERKON</h1>
-  <p class="sub" id="terrain-note">—</p>
+  <p class="sub" id="terrain-note">-</p>
 
   <!--
     Which row, what to search for, and which language belong to the whole
@@ -64,11 +64,11 @@
 
   <details class="step" id="step-place" open>
     <summary><span class="n">1</span><span class="what" data-say="step.place"></span>
-      <span class="now" id="sum-place">—</span></summary>
+      <span class="now" id="sum-place">-</span></summary>
 
     <label data-find="zemin yer saha arazi site ground"><span data-say="ground.pick"></span>
       <select id="site"></select></label>
-    <p class="hint" id="ground-note">—</p>
+    <p class="hint" id="ground-note">-</p>
 
     <details id="fetch-panel" data-find="getir indir yeni yer openstreetmap
                                         copernicus enlem boylam kutu">
@@ -102,7 +102,7 @@
       <label class="knob"><span data-say="fetch.size"></span><output id="fetch-size-out"></output>
         <input type="range" id="fetch-size" min="1" max="40" step="1" value="3">
         <input type="number" id="fetch-size-num" class="num" step="1"></label>
-      <p class="hint" id="fetch-box">—</p>
+      <p class="hint" id="fetch-box">-</p>
       <label><span data-say="fetch.spacing"></span>
         <input type="number" id="fetch-spacing" value="30" step="10"></label>
       <label class="tick"><input type="checkbox" id="fetch-buildings" checked>
@@ -151,7 +151,7 @@
 
   <details class="step" id="step-site">
     <summary><span class="n">2</span><span class="what" data-say="step.site"></span>
-      <span class="now" id="sum-site">—</span></summary>
+      <span class="now" id="sum-site">-</span></summary>
 
     <p class="hint" data-say="site.rows"></p>
     <!--
@@ -183,7 +183,7 @@
 
   <details class="step" id="step-layout">
     <summary><span class="n">3</span><span class="what" data-say="step.layout"></span>
-      <span class="now" id="sum-layout">—</span></summary>
+      <span class="now" id="sum-layout">-</span></summary>
 
     <h2 data-say="runs.head"></h2>
     <div id="runs"></div>
@@ -198,7 +198,7 @@
 
   <details class="step" id="step-target">
     <summary><span class="n">4</span><span class="what" data-say="step.target"></span>
-      <span class="now" id="sum-target">—</span></summary>
+      <span class="now" id="sum-target">-</span></summary>
 
     <label data-find="bölge mevzuat eirp güç yasal region region"><span data-say="target.region"></span>
       <select id="region" data-cascades></select></label>
@@ -221,7 +221,7 @@
 
   <details class="step" id="step-basis">
     <summary><span class="n">5</span><span class="what" data-say="step.basis"></span>
-      <span class="now" id="sum-basis">—</span></summary>
+      <span class="now" id="sum-basis">-</span></summary>
 
     <h2 data-say="options.head"></h2>
     <p class="hint" data-say="options.note"></p>
@@ -249,7 +249,7 @@
 
   <details class="step" id="step-run">
     <summary><span class="n">6</span><span class="what" data-say="step.run"></span>
-      <span class="now" id="sum-run">—</span></summary>
+      <span class="now" id="sum-run">-</span></summary>
 
     <p class="hint" data-say="run.note"></p>
     <label data-find="hangi satır tablo rows"><span data-say="run.which"></span>
@@ -276,11 +276,11 @@
         <input type="number" id="solve-availability" step="0.01"
                min="0" max="1" placeholder="0,95"></label>
       <label><span data-say="solve.hpe50"></span>
-        <input type="number" id="solve-hpe50" step="0.1" placeholder="—"></label>
+        <input type="number" id="solve-hpe50" step="0.1" placeholder="-"></label>
       <label><span data-say="solve.hpe95"></span>
-        <input type="number" id="solve-hpe95" step="0.1" placeholder="—"></label>
+        <input type="number" id="solve-hpe95" step="0.1" placeholder="-"></label>
       <label><span data-say="solve.fixes"></span>
-        <input type="number" id="solve-fixes" step="0.1" placeholder="—"></label>
+        <input type="number" id="solve-fixes" step="0.1" placeholder="-"></label>
     </div>
     <div id="solve-vary"></div>
     <label data-find="çözücü kaydet ad seçenek save"><span data-say="solve.save_as"></span>
@@ -331,7 +331,7 @@
     <input type="search" id="map-search" data-say-placeholder="fetch.map.search">
     <button id="map-find" class="quiet" data-say="fetch.map.find"></button>
     <button id="map-draw" class="quiet" data-say="fetch.map.draw"></button>
-    <span class="map-span" id="map-span">—</span>
+    <span class="map-span" id="map-span">-</span>
     <button id="map-take" data-say="fetch.map.take"></button>
     <button id="map-close" class="quiet" data-say="fetch.map.close"></button>
   </div>

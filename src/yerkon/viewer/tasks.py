@@ -606,7 +606,7 @@ def _shown(value) -> str:
     — so the page showed no options at all rather than one bad row.
     """
     if isinstance(value, str):
-        return value or "—"
+        return value or "-"
     return decimal_comma(value, 2)
 
 

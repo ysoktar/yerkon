@@ -1184,7 +1184,7 @@ function drawSummary() {
   const assumed = figuresData
     ? say("figures.assumed",
       { assumed: figuresData.assumed, total: figuresData.total })
-    : "—";
+    : "-";
   const edits = Object.keys(state.overrides || {}).length;
   const scope = document.getElementById("task-only");
 
@@ -1653,7 +1653,7 @@ function lockPhotographTick() {
   box.disabled = !aerial;
   tick.classList.toggle("dead", !aerial);
   tick.title = aerial
-    ? say("ground.photo.from", { source: aerial.source || "—" })
+    ? say("ground.photo.from", { source: aerial.source || "-" })
     : say(state.site ? "ground.photo.none" : "ground.photo.modelled");
 }
 
@@ -2845,7 +2845,7 @@ function bandRange(band, edges, rising, unit) {
  * An em dash rather than a zero: zero is an answer, and "no anchors
  * reach anywhere because there are no anchors" is not one.
  */
-const NOTHING = "—";
+const NOTHING = "-";
 
 /* A number that is being worked out right now.
  *

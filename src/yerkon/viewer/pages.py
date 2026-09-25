@@ -2063,6 +2063,88 @@ LAW = Page(
             ),
         ),
         Part(
+            kind="table",
+            heading=_w("Tünelde UWB, 6-8,5 GHz",
+                       "UWB in the tunnel, 6-8,5 GHz"),
+            rows=(
+                (_w("Kullanım", "Use"),
+                 _w("Sınır (e.i.r.p.)", "Limit (e.i.r.p.)"),
+                 _w("YERKON için ne demek", "What it means for YERKON")),
+                (
+                    _w("Genel amaçlı UWB (Madde 18(1), Tablo 16)",
+                       "General purpose UWB (Article 18(1), Table 16)"),
+                    _w("Ortalama -41,3 dBm/MHz, tepe 0 dBm/50 MHz",
+                       "Mean -41,3 dBm/MHz, peak 0 dBm/50 MHz"),
+                    _w("Açık alanda sabit kullanılan ya da sabit bir dış "
+                       "antene bağlı cihazlar ve kara taşıtlarındakiler bu "
+                       "maddenin dışında. Yaya alıcısı bu satırda.",
+                       "Devices fixed outdoors or on a fixed outdoor "
+                       "antenna, and those in road vehicles, are outside "
+                       "this article. The pedestrian receiver is in this "
+                       "row."),
+                ),
+                (
+                    _w("Konum izleme tip 1, LT1 (Madde 18(4), Tablo 19)",
+                       "Location tracking type 1, LT1 (Article 18(4), "
+                       "Table 19)"),
+                    _w("Ortalama -41,3 dBm/MHz, tepe 0 dBm; TS EN 302 065-2",
+                       "Mean -41,3 dBm/MHz, peak 0 dBm; TS EN 302 065-2"),
+                    _w("İnsanların ve nesnelerin konumunu izleyen sistemler "
+                       "için. Tünel birimleri bu satırda: 499,2 MHz'lik "
+                       "kanalda -14,3 dBm e.i.r.p., model de bunu "
+                       "kullanıyor.",
+                       "For systems that track where people and objects "
+                       "are. The tunnel units are in this row: -14,3 dBm "
+                       "e.i.r.p. over a 499,2 MHz channel, which is what "
+                       "the model uses."),
+                ),
+                (
+                    _w("Karayolu ve demiryolu taşıtları (Madde 18(2), "
+                       "Tablo 17)",
+                       "Road and rail vehicles (Article 18(2), Table 17)"),
+                    _w("Ortalama -53,3 dBm/MHz, tepe -13,3 dBm/50 MHz. "
+                       "LDC ya da TPC ile ortalama -41,3 dBm/MHz, tepe "
+                       "0 dBm/50 MHz; 0°'den büyük yükselme açılarında "
+                       "-53,3 dBm/MHz harici sınırla. TS EN 302 065-3",
+                       "Mean -53,3 dBm/MHz, peak -13,3 dBm/50 MHz. With "
+                       "LDC or TPC, mean -41,3 dBm/MHz and peak 0 dBm/50 "
+                       "MHz, with an exterior limit of -53,3 dBm/MHz at "
+                       "elevation angles above 0°. TS EN 302 065-3"),
+                    _w("Araç alıcısı bu satırda ve gücünü denetleyebilmeli "
+                       "(TPC). DWM3000'in çıkış gücü yazılımla "
+                       "ayarlanabiliyor; uygunluğu TS EN 302 065-3 testinde "
+                       "gösterilir.",
+                       "The vehicle receiver is in this row and has to "
+                       "control its power (TPC). The DWM3000's output "
+                       "power is set in firmware; conformity is shown in "
+                       "the TS EN 302 065-3 test."),
+                ),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("UWB tanımları", "UWB definitions"),
+            lines=(
+                _w("Düşük görev çevrimi (LDC): gönderilen bütün sinyallerin "
+                   "toplamı her saniyenin %5'inden ve her saatin %0,5'inden "
+                   "az, tek bir sinyal en çok 5 ms.",
+                   "Low duty cycle (LDC): all transmissions together under "
+                   "5 % of every second and under 0,5 % of every hour, no "
+                   "single transmission over 5 ms."),
+                _w("Verici gücü kontrolü (TPC): cihazın, başka sistemlere "
+                   "girişimi azaltmak için çıkış gücünü denetleyebilmesi.",
+                   "Transmit power control (TPC): the device's ability to "
+                   "control its output power to reduce interference with "
+                   "other systems."),
+                _w("Kaynak: BTK, Frekans Tahsisinden Muaf Telsiz Cihaz ve "
+                   "Sistemlerine İlişkin Teknik Ölçütler, Madde 1 ve "
+                   "Madde 18.",
+                   "Source: BTK, Technical Criteria for Radio Equipment "
+                   "and Systems Exempt from Frequency Assignment, "
+                   "Articles 1 and 18."),
+            ),
+        ),
+        Part(
             kind="points",
             heading=_w("Anten kazancı", "Antenna gain"),
             lines=(

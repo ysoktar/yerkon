@@ -140,7 +140,7 @@ class PresetStore:
         if not path.exists():
             raise UnknownPreset(say(
                 "preset.unknown", None, name=name,
-                known=", ".join(self.names()) or "—",
+                known=", ".join(self.names()) or "-",
                 directory=str(self.directory)))
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
@@ -169,7 +169,7 @@ class PresetStore:
         if not path.exists():
             raise UnknownPreset(say(
                 "preset.unknown", None, name=name,
-                known=", ".join(self.names()) or "—",
+                known=", ".join(self.names()) or "-",
                 directory=str(self.directory)))
         path.unlink()
 
@@ -205,7 +205,7 @@ def shipped(mode: str, which: str, from_scenario) -> Preset:
     """
     if which not in SHIPPED:
         raise ValueError(say("preset.unknown", None, name=which,
-                             known=", ".join(SHIPPED), directory="—"))
+                             known=", ".join(SHIPPED), directory="-"))
     state = (empty_state(mode, from_scenario) if which == "empty"
              else from_scenario(mode).as_json())
     return Preset(name=which, mode=mode, state=state, source="shipped")
