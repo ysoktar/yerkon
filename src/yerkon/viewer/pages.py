@@ -1958,13 +1958,17 @@ COST = Page(
                 ),
                 _w(
                     "100 adetlik fiyat, raporun kendi 1'den 100'e "
-                    "indirimiyle hesaplandı. 1000 adette hiçbir satıcı "
-                    "kademesi okunamadığı için 100 adetlik fiyatın %90'ı "
-                    "varsayıldı; listedeki tek varsayım bu.",
+                    "indirimiyle hesaplandı. 1000 adette, dağıtıcının "
+                    "kademe fiyatı doğrulanan parça o fiyatla giriyor; "
+                    "doğrulanmayan parçalar ve \"diğer\" satırı 100 "
+                    "adetlik fiyatın %90'ı sayılıyor. Doğrulanan kademeler "
+                    "raporun indiriminden çoğu zaman pahalı çıktı.",
                     "The price at a hundred uses the report's own discount "
-                    "from one to a hundred. No seller's tier at a thousand "
-                    "could be read, so a thousand is assumed to cost 90 % "
-                    "of a hundred; that is the one assumption in the bill.",
+                    "from one to a hundred. At a thousand, a part whose "
+                    "distributor tier was verified enters at that price; "
+                    "the others and the \"other\" line are taken at 90 % "
+                    "of the hundred price. The verified tiers mostly came "
+                    "out dearer than the report's discount.",
                 ),
                 _w(
                     "Parça fiyatları 23 Eylül 2026'da web aramasının "
@@ -1991,9 +1995,207 @@ COST = Page(
     ),
 )
 
+LAW = Page(
+    slug="mevzuat",
+    nav=_w("Mevzuat", "Regulation"),
+    title=_w("Hangi kurallar, hangi sınırlar", "Which rules, which limits"),
+    lead=_w(
+        "YERKON'un gücünü, piyasaya çıkışını ve bakım maliyetini belirleyen "
+        "kurallar, resmî kaynaklarıyla. Burada yazan her sınır modelde de "
+        "aynen kullanılıyor.",
+        "The rules that set YERKON's power, its route to market and its "
+        "maintenance cost, with their official sources. Every limit written "
+        "here is the one the model uses.",
+    ),
+    parts=(
+        Part(
+            kind="table",
+            heading=_w("2,4 GHz'de ne kadar güç", "How much power at 2,4 GHz"),
+            rows=(
+                (_w("Kip", "Mode"), _w("Sınır", "Limit"),
+                 _w("YERKON için ne demek", "What it means for YERKON")),
+                (
+                    _w("Frekans atlamasız (bugünkü)", "Not hopping (today)"),
+                    _w("20 dBm e.i.r.p. ve 10 dBm/MHz",
+                       "20 dBm e.i.r.p. and 10 dBm/MHz"),
+                    _w("1625 kHz'lik dalgada yoğunluk sınırı bağlıyor: "
+                       "12,1 dBm e.i.r.p.",
+                       "On the 1625 kHz waveform the density limit binds: "
+                       "12,1 dBm e.i.r.p."),
+                ),
+                (
+                    _w("Uyarlamasız frekans atlama", "Non-adaptive hopping"),
+                    _w("20 dBm; yayın dizisi en çok 5 ms, ara en az 5 ms; "
+                       "bir frekansta 15 ms × N içinde en çok 15 ms; havayı "
+                       "meşgul etme payı en çok %10",
+                       "20 dBm; transmissions at most 5 ms with gaps of at "
+                       "least 5 ms; at most 15 ms on one frequency in "
+                       "15 ms × N; medium utilisation at most 10 %"),
+                    _w("Uymuyor: bir ölçüm paketi SF10'da yaklaşık 15 ms "
+                       "sürüyor ve araç sürekli soruyor.",
+                       "Does not fit: one ranging frame lasts about 15 ms "
+                       "at SF10 and a vehicle polls continuously."),
+                ),
+                (
+                    _w("Uyarlamalı frekans atlama (dinle, sonra konuş)",
+                       "Adaptive hopping (listen before talk)"),
+                    _w("20 dBm; her beklemeden önce kanal kontrolü, eşik "
+                       "-70 dBm/MHz; kanal kullanımı 60 ms'den kısa, "
+                       "ardından onun en az %5'i kadar sessizlik; bandın en "
+                       "az %70'inde çalışabilmeli",
+                       "20 dBm; a channel check before each dwell, threshold "
+                       "-70 dBm/MHz; channel occupancy under 60 ms, then "
+                       "silence of at least 5 % of it; able to use at least "
+                       "70 % of the band"),
+                    _w("Tek açık yol. Bir ölçüm alışverişi 31,8 ms, 60 ms'ye "
+                       "sığıyor. Laboratuvar testiyle belgelendirilmeli.",
+                       "The one open road. A ranging exchange is 31,8 ms "
+                       "and fits in 60 ms. It must be certified by a test "
+                       "laboratory."),
+                ),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Anten kazancı", "Antenna gain"),
+            lines=(
+                _w("Sınır yayılan güç için; anten kazancı da ona dahil. "
+                   "Daha güçlü bir antenle yayın yapan cihaz gücünü o kadar "
+                   "kısmak zorunda.",
+                   "The limit is on radiated power, antenna gain included. "
+                   "A device transmitting through a stronger antenna has "
+                   "to turn its power down by as much."),
+                _w("Alışta sınır yok: güçlü anten zayıf sinyali daha iyi "
+                   "duyar. Her ölçüm iki yönlü olduğu için kazanç iki uçta "
+                   "da gerekiyor.",
+                   "There is no limit on receiving: a stronger antenna "
+                   "hears a weak signal better. Every range goes both ways, "
+                   "so the gain is needed at both ends."),
+                _w("Model sınırı antenin en güçlü yönünde tutuyor; alıcıya "
+                   "doğru ne düşüyorsa o.",
+                   "The model meets the limit where the antenna is "
+                   "strongest; toward the receiver it gives what it gives."),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Piyasaya çıkış", "Going to market"),
+            lines=(
+                _w("BTK, 5 Şubat 2021'den beri piyasaya arz öncesi bildirim "
+                   "başvurusu almıyor. Telsiz Ekipmanları Yönetmeliği "
+                   "kapsamında ayrı bir BTK başvurusu ya da ücreti yok.",
+                   "Since 5 February 2021 the BTK takes no notification "
+                   "before a product is placed on the market. Under the "
+                   "Radio Equipment Regulation there is no separate BTK "
+                   "application or fee."),
+                _w("Üretici CE işaretinden, AB uygunluk beyanından ve temel "
+                   "gereklere uygunluktan sorumlu; kutuda kısa ya da uzun "
+                   "uygunluk beyanı bulunmalı.",
+                   "The manufacturer is responsible for the CE mark, the EU "
+                   "declaration of conformity and the essential "
+                   "requirements; the box carries the short or the full "
+                   "declaration."),
+                _w("Gereken testler: EN 300 328 (telsiz), EN 301 489-1 ve "
+                   "-17 (elektromanyetik uyumluluk), EN 62368-1 (güvenlik). "
+                   "Ücretleri yayımlanmış değil: TSE'nin sorgusu doğrulama "
+                   "istiyor, TÜBİTAK UME teklifle çalışıyor.",
+                   "Tests needed: EN 300 328 (radio), EN 301 489-1 and -17 "
+                   "(electromagnetic compatibility), EN 62368-1 (safety). "
+                   "Their fees are not published: TSE's query asks for a "
+                   "challenge, TÜBİTAK UME works by quotation."),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Prototip cihazları için frekans",
+                       "Frequency for the prototype devices"),
+            lines=(
+                _w("Prototipteki Meshtastic cihazları 868 MHz ya da 915 MHz "
+                   "bandında çalışıyor. 902-928 MHz bandı Türkiye'de "
+                   "tahsisten muaf değil; yalnız 917,4-919,4 MHz gibi dar "
+                   "alt bantlar koşullu.",
+                   "The prototype's Meshtastic devices work at 868 or "
+                   "915 MHz. The 902-928 MHz band is not licence-exempt in "
+                   "Turkey; only narrow sub-bands such as 917,4-919,4 MHz "
+                   "are, under conditions."),
+                _w("863-870 MHz alt bantlarının çoğunda 25 mW e.r.p. ve "
+                   "%0,1 ile %1 görev döngüsü; 869,4-869,65 MHz'de 500 mW ve "
+                   "%10. Prototipler bu koşullara göre ayarlanmalı.",
+                   "Most 863-870 MHz sub-bands allow 25 mW e.r.p. at a "
+                   "0,1 to 1 % duty cycle; 869,4-869,65 MHz allows 500 mW "
+                   "at 10 %. The prototypes should be set to these."),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Bakım maliyetinde mevzuat",
+                       "Regulation in the maintenance cost"),
+            lines=(
+                _w("Harcırah: 2026 Bütçe Kanunu H Cetveli, 5-15. derece "
+                   "için yurt içi gündelik 850 TL. Özel sektörde vergiden "
+                   "istisna kısım GVK 24/2'ye göre aynı aylık seviyesindeki "
+                   "memurun gündeliği. Bakımı yerel bir firma yaptığı için "
+                   "bugün harcırah ödenmiyor; kural modelde duruyor.",
+                   "Per diem: 2026 Budget Law Schedule H, domestic "
+                   "allowance for grades 5-15, 850 TL. In the private "
+                   "sector the tax-exempt part follows Income Tax Law "
+                   "24/2. A local firm does the maintenance, so no per "
+                   "diem is paid today; the rule stays in the model."),
+                _w("Amortisman (GİB listesi): telsiz cihaz ve sistemleri "
+                   "10 yıl (3.49.4), akümülatörler 5 yıl (3.14.7), güneş "
+                   "enerjisi santrali 10 yıl (45.1.9). Yenileme kalemi her "
+                   "parçayı kendi ömrüne bölüyor.",
+                   "Depreciation (Revenue Administration list): radio "
+                   "devices and systems 10 years (3.49.4), batteries 5 "
+                   "years (3.14.7), solar power plant 10 years (45.1.9). "
+                   "The replacement line divides each part by its own "
+                   "life."),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Harita ve uydu görüntüsü", "Maps and imagery"),
+            lines=(
+                _w("Yer seçme haritası OpenStreetMap'in karolarını kullanıyor "
+                   "ve onu anıyor. Uydu görüntüsü Esri World Imagery; atfı: "
+                   "Esri, Maxar, Earthstar Geographics, GIS User Community. "
+                   "Görüntü yalnız zemini boyuyor, hesaba girmiyor.",
+                   "The place picker uses OpenStreetMap's tiles and credits "
+                   "it. The imagery is Esri World Imagery, credited to "
+                   "Esri, Maxar, Earthstar Geographics and the GIS User "
+                   "Community. It paints the ground and enters no "
+                   "calculation."),
+            ),
+        ),
+        Part(
+            kind="links",
+            heading=_w("Resmî kaynaklar", "Official sources"),
+            links=(
+                Link(label=_w("ETSI EN 300 328 V2.2.2 (2019-07)",
+                              "ETSI EN 300 328 V2.2.2 (2019-07)"),
+                     url="https://www.etsi.org/deliver/etsi_en/300300_300399/300328/02.02.02_60/en_300328v020202p.pdf"),
+                Link(label=_w("BTK: Sınıf 2 bildirim uygulamasına son verildi",
+                              "BTK: the Class 2 notification has ended"),
+                     url="https://btk.gov.tr/sinif-2-bildirim-formu-ile-bilgi-teknolojileri-ve-iletisim-kurumuna-basvuruda-bulunulmasi-uygulamasina-son-verilmistir"),
+                Link(label=_w("BTK: piyasa gözetimi, sıkça sorulan sorular",
+                              "BTK: market surveillance, frequently asked questions"),
+                     url="https://www.btk.gov.tr/piyasa-gozetimi-ve-denetimi-sikca-sorulan-sorular"),
+                Link(label=_w("BTK: frekans tahsisinden muaf telsiz cihazların teknik ölçütleri",
+                              "BTK: technical criteria for licence-exempt radio devices"),
+                     url="https://www.btk.gov.tr/uploads/pages/frekans-tahsisinden-muaf-telsiz-cihaz-sistemleri-olcutler-633d4ca68c0b1.pdf"),
+                Link(label=_w("SBB: 2026 H Cetveli", "SBB: 2026 Schedule H"),
+                     url="https://www.sbb.gov.tr/wp-content/uploads/2025/12/8-H-Cetveli_2026Butcesi.pdf"),
+                Link(label=_w("GİB: amortisman oranları tablosu",
+                              "Revenue Administration: depreciation rates"),
+                     url="https://cdn.gib.gov.tr/api/gibportal-file/file/getFileResources?objectKey=arsiv/yardim-kaynaklar/yararli-bilgiler/AmortismanOranlariTablosu.pdf"),
+            ),
+        ),
+    ),
+)
+
 #: Every page, in the order the navigation shows them.
-PAGES = (HOME, WHY, SYSTEM, RESEARCH, VALUE, RESULTS, COST, SIMULATION,
-         SOURCES)
+PAGES = (HOME, WHY, SYSTEM, RESEARCH, VALUE, RESULTS, COST, LAW,
+         SIMULATION, SOURCES)
 
 #: Where the running simulator lives, and what the link to it is
 #: called. Not the same thing as the SIMULATION page: that page says

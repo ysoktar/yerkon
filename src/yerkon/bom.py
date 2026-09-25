@@ -31,6 +31,14 @@ class Part:
     usd: float
     seller: str
     url: str
+    #: A distributor's published price at volume, where one was read:
+    #: the tier it applies from, and where and when (ADR-0093).
+    volume_usd: Optional[float] = None
+    volume_tier: Optional[int] = None
+    volume_seller: str = ""
+    volume_url: str = ""
+    volume_date: str = ""
+    volume_note: str = ""
 
     def role(self, language: Optional[str] = None) -> str:
         return self.role_en if language == "en" else self.role_tr
@@ -76,7 +84,21 @@ class Board:
 
     @property
     def thousand_tl(self) -> float:
-        return self.hundred_tl * self.thousand_over_hundred
+        """A thousand units: each part at its published volume price
+        where one was read, and the rest, the "other" line included,
+        carried from one unit by the report's own discount (ADR-0093).
+
+        A published volume price is often dearer than that discount
+        would make it: the report's ratio was a guess about volume, and
+        where a distributor's tier says otherwise the tier wins.
+        """
+        carried = self.hundred_over_one * self.thousand_over_hundred
+        total = self.other_usd * carried + sum(
+            part.volume_usd if part.volume_usd is not None
+            else part.usd * carried
+            for part in self.parts
+        )
+        return total * self.usd_try
 
     def at(self, tier: int) -> float:
         return {1: self.one_tl, 100: self.hundred_tl,
@@ -105,6 +127,16 @@ class Bill:
         return self.boards[key].at(self.used_tier)
 
 
+def _volume(table: Optional[dict]) -> dict:
+    if not table:
+        return {}
+    return {
+        "volume_usd": float(table["usd"]), "volume_tier": int(table["tier"]),
+        "volume_seller": table.get("seller", ""), "volume_url": table.get("url", ""),
+        "volume_date": table.get("date", ""), "volume_note": table.get("note", ""),
+    }
+
+
 @lru_cache(maxsize=None)
 def read(path: pathlib.Path = FILE) -> Bill:
     raw = tomllib.loads(path.read_text(encoding="utf-8"))
@@ -113,6 +145,7 @@ def read(path: pathlib.Path = FILE) -> Bill:
             key=p["key"], name=p["name"], role_tr=p["role"]["tr"],
             role_en=p["role"]["en"], usd=float(p["usd"]),
             seller=p["seller"], url=p["url"],
+            **_volume(p.get("volume")),
         )
         for p in raw["part"]
     }

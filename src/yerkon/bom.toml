@@ -27,9 +27,11 @@
 usd_try = 48.44
 usd_try_source = "USD/TRY 4 Eylül 2026, serbest piyasa 09:30 satış 48,4445 (BloombergHT)"
 
-#: The 1000 unit price over the 100 unit price. No distributor tier at
-#: 1000 was readable, so this is an assumption, and the only one in the
-#: bill. The report's own 100 over 1 is 0,69 to 0,80 per line.
+#: The 1000 unit price over the 100 unit price, for whatever has no
+#: verified volume price: the "other" line and parts whose distributor
+#: tier could not be read. A part with a `volume` table is priced at the
+#: thousand from that table instead (ADR-0093). The report's own 100
+#: over 1 is 0,69 to 0,80 per line.
 thousand_over_hundred = 0.90
 
 #: Which tier the table prices a deployment at. A thousand, because the
@@ -108,7 +110,12 @@ role.en = "2,4 GHz antenna"
 usd = 1.48
 seller = "DigiKey"
 url = "https://www.digikey.com/en/products/detail/inventek-systems/W24P-U/4488778"
-
+volume.usd = 1.4375
+volume.tier = 500
+volume.seller = "DigiKey"
+volume.url = "https://www.digikey.com/en/products/detail/inventek-systems/W24P-U/4488778"
+volume.date = "25.09.2026"
+volume.note = "1000 kademesi yok; yayımlanmış en yakın kademe 500+"
 [[part]]
 key = "stm32g0b1met6"
 name = "STM32G0B1MET6"
@@ -119,7 +126,12 @@ role.en = "microcontroller, 512 KB"
 usd = 6.86
 seller = "DigiKey"
 url = "https://www.digikey.com/en/products/detail/stmicroelectronics/STM32G0B1MET6/13693657"
-
+volume.usd = 3.83132
+volume.tier = 500
+volume.seller = "DigiKey"
+volume.url = "https://www.digikey.com/en/products/detail/stmicroelectronics/STM32G0B1MET6/18085464"
+volume.date = "25.09.2026"
+volume.note = "1000 kademesi yok; yayımlanmış en yakın kademe 500+"
 [[part]]
 key = "stm32g031k8t6"
 name = "STM32G031K8T6"
@@ -137,7 +149,12 @@ role.en = "identity and key chip"
 usd = 0.90
 seller = "DigiKey"
 url = "https://www.digikey.com/en/products/detail/microchip-technology/ATECC608B-MAHDA-S/13415130"
-
+volume.usd = 0.819
+volume.tier = 1000
+volume.seller = "Mouser"
+volume.url = "https://www.mouser.com/en/ProductDetail/Microchip-Technology/ATECC608B-MAHDA-S?qs=sPbYRqrBIVnKfPKcuUlUgg%3D%3D"
+volume.date = "25.09.2026"
+volume.note = "tam 1000 kademesi"
 [[part]]
 key = "dwm3000-digikey"
 name = "Qorvo DWM3000TR13"
@@ -155,7 +172,12 @@ role.en = "UWB radio module"
 usd = 16.6039
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C5299931.html"
-
+volume.usd = 22.5844
+volume.tier = 10
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-image/C5299931.html?whichImg=0"
+volume.date = "25.09.2026"
+volume.note = "LCSC yalnız 1+ ve 10+ yayımlıyor; 1000'lik makara bir ambalaj miktarı, kademe değil"
 [[part]]
 key = "esp32-s3"
 name = "Espressif ESP32-S3-WROOM-1-N8"
@@ -164,7 +186,12 @@ role.en = "phone link (BLE)"
 usd = 3.0323
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C2913198.html"
-
+volume.usd = 3.1542
+volume.tier = 1300
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/wifi-modules_espressif-esp32-s3-wroom-1-n8_C2913198.html"
+volume.date = "25.09.2026"
+volume.note = "1000 yok; en yakın kademe 1300+ (650+ 3,2391)"
 [[part]]
 key = "bno085"
 name = "CEVA BNO085"
@@ -173,7 +200,12 @@ role.en = "motion sensor"
 usd = 13.57
 seller = "DigiKey"
 url = "https://www.digikey.com/en/products/detail/ceva-technologies-inc/BNO085/9445940"
-
+volume.usd = 8.81
+volume.tier = 1000
+volume.seller = "Mouser"
+volume.url = "https://www.mouser.com/en/ProductDetail/CEVA/BNO085?qs=ulEaXIWI0c9BFVeZDQCmmQ%3D%3D"
+volume.date = "25.09.2026"
+volume.note = "tam 1000 kademesi"
 [[part]]
 key = "tcan1051"
 name = "TI TCAN1051HGVDRQ1"
@@ -182,7 +214,12 @@ role.en = "CAN transceiver"
 usd = 1.8732
 seller = "LCSC"
 url = "https://lcsc.com/product-detail/Others_TI_TCAN1051HGVDRQ1_TCAN1051HGVDRQ1_C190987.html"
-
+volume.usd = 1.19
+volume.tier = 1000
+volume.seller = "Mouser"
+volume.url = "https://www.mouser.com/en/ProductDetail/Texas-Instruments/TCAN1051HGVDRQ1?qs=dSktwyqbRaUv%252Bzz8wwNi2g%3D%3D"
+volume.date = "25.09.2026"
+volume.note = "tam 1000 kademesi"
 [[part]]
 key = "nhd-2.8"
 name = "Newhaven NHD-2.8-240320DA-CTXN-T"

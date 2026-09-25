@@ -122,21 +122,21 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 | Şehir içi | VPE P95 | 31,47 m | 3,71 m |
 | Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %69,00 |
 | Şehir içi | Alan | 1,00 km² | 7,82 km² |
-| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 15760 TL/km² |
-| Şehir içi | OPEX | boş | 2742 TL/km²/yıl |
+| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 15801 TL/km² |
+| Şehir içi | OPEX | boş | 2746 TL/km²/yıl |
 | Kırsal | HPE P50 | 4,17 m | 1,84 m |
 | Kırsal | HPE P95 | 14,29 m | 5,01 m |
 | Kırsal | VPE P95 | 24,14 m | 4,73 m |
 | Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %57,75 |
 | Kırsal | Alan | 1,01 km² | 285,83 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1613 TL/km² |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1615 TL/km² |
 | Kırsal | OPEX | boş | 462 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,79 m |
 | Tünel | HPE P95 | 1,88 m | 2,73 m |
 | Tünel | VPE P95 | 5,53 m | 2,06 m |
 | Tünel | Kullanılabilirlik | yaklaşık %97,0 | %98,61 |
-| Tünel | CAPEX | yaklaşık 545903 TL/km² | 31910 TL/km (güzergâh) |
-| Tünel | OPEX | boş | 3234 TL/km/yıl |
+| Tünel | CAPEX | yaklaşık 545903 TL/km² | 34508 TL/km (güzergâh) |
+| Tünel | OPEX | boş | 3494 TL/km/yıl |
 
 Farkın nedenleri modelde değişenler: gerçek Ankara zemini ve binaları,
 ITU-R P.526 kırınımı, gölgelenme, sekiz çekiliş, sahanın çevresinden ve
