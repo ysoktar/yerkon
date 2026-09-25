@@ -104,21 +104,19 @@ seller = "Microcom"
 url = "https://www.microcom.us/hgv2409u.html"
 
 [[part]]
-key = "duck-5dbi"
-name = "RP-SMA 2,4 GHz dipol, 5 dBi"
-role.tr = "direk ve araç anteni, 2,4 GHz, 5 dBi, çok yönlü"
-role.en = "pole and vehicle antenna, 2,4 GHz, 5 dBi, omni"
-# Only the volume price was found; it stands for one unit too, which
-# overstates nothing at the tier the table uses (ADR-0094).
-usd = 1.18
-seller = "Alibaba"
-url = "https://www.alibaba.com/product-detail/RP-SMA-2-4GHz-Dipole-Antenna_62191332176.html"
-volume.usd = 1.18
-volume.tier = 500
-volume.seller = "Alibaba"
-volume.url = "https://www.alibaba.com/product-detail/RP-SMA-2-4GHz-Dipole-Antenna_62191332176.html"
+key = "gw-22-5151"
+name = "Taoglas GW.22.5151"
+role.tr = "direk ve araç anteni, 2,4 GHz, 5 dBi, IP67, dış ortam"
+role.en = "pole and vehicle antenna, 2,4 GHz, 5 dBi, IP67, outdoor"
+usd = 11.51
+seller = "Westward Sales"
+url = "https://westwardsales.com/taoglas-gw.22.5151-rp-sma-antenna"
+volume.usd = 10.07
+volume.tier = 1000
+volume.seller = "Mouser"
+volume.url = "https://www.mouser.com/en/ProductDetail/Taoglas/GW.22.5151?qs=vLWxofP3U2zcF%2FANv9lyVA%3D%3D"
 volume.date = "25.09.2026"
-volume.note = "500-49999 adet kademesi"
+volume.note = "tam 1000 kademesi"
 
 [[part]]
 key = "lmr200-pigtail"
@@ -295,7 +293,7 @@ was = ["lambda80-24s", "w24p-u", "stm32g0b1met6", "atecc608b"]
 # density limit holds it to 12,1 dBm, which the plain module reaches. No
 # row of the table uses it now (ADR-0094); it stays for the simulator,
 # where a module can be chosen per run.
-parts = ["e28-2g4m12s", "duck-5dbi", "stm32g031k8t6", "atecc608b"]
+parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
 
 [[product]]
 key = "amplified-anchor"
@@ -307,10 +305,10 @@ report_one_tl = 1549.67
 report_hundred_tl = 1082.68
 was = ["e28-2g4m27s", "stm32g0b1met6", "atecc608b"]
 # Certified as adaptive frequency hopping, the unit may radiate 20 dBm
-# at any bandwidth: the 27 dBm module reaches it through a 5 dBi rubber
-# duck on the box's own connector (ADR-0094). The town used the 12,5 dBm
+# at any bandwidth: the 27 dBm module reaches it through a sealed 5 dBi
+# rubber duck on the box's own connector (ADR-0094). The town used the 12,5 dBm
 # module with a 12 dBi mast antenna on a cable (ADR-0091).
-parts = ["e28-2g4m27s", "duck-5dbi", "stm32g031k8t6", "atecc608b"]
+parts = ["e28-2g4m27s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
 
 [[product]]
 key = "tunnel-anchor"
@@ -345,4 +343,4 @@ report_hundred_tl = 4002.29
 was = ["lambda80-24s", "dwm3000-digikey", "stm32g0b1met6", "bno085",
        "atecc608b", "tcan1051", "nhd-2.8"]
 parts = ["e28-2g4m27s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
-         "atecc608b", "tcan1051", "ili9341-2.8", "duck-5dbi"]
+         "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151"]

@@ -7,11 +7,11 @@
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-dense'
-title = 'Kırsal: 2,5 km ızgara, dağıtım direkleri — daha çok direk, aynı sonuç'
-title_en = 'Rural: a 2,5 km grid on distribution poles — more poles, the same result'
+title = 'Kırsal: 2,5 km ızgara, dağıtım direkleri'
+title_en = 'Rural: a 2,5 km grid on distribution poles'
 origin = 'shipped'
-note = """Üç kilometrede kırk dokuz dağıtım direği yerine iki buçuk kilometrede altmış sekiz. Kaba okumada, 12 m'de: %75,5'e karşı %75,7 kullanılabilirlik, 10,4 m'ye karşı 10,7 m P95. Direk sayısı %39 artıyor, sonuç yerinde sayıyor. Bu seçenek, kırsalda daha sık dizmenin artık bir şey satın almadığını gösterdiği için duruyor: kullanılabilirliği yükseltmek istenirse yükseklik ya da yoklama sayısı denenmeli (ADR-0079)."""
-note_en = """Sixty eight distribution poles at two and a half kilometres instead of forty nine at three. On a coarse read at 12 m: 75,7 % availability against 75,5 %, 10,7 m P95 against 10,4 m. The pole count rises by 39 % and the result stands still. The option stays because it shows that packing the open country tighter no longer buys anything: to raise availability, try height or how many anchors a round polls (ADR-0079)."""
+note = """Üç kilometrede kırk dokuz dağıtım direği yerine iki buçuk kilometrede altmış sekiz: direk sayısı %39 artıyor. Kaba okumada kullanılabilirlik birkaç puan artıyor, kilometrekare başına maliyet ondan fazla artıyor. Kullanılabilirliği yükseltmek için yükseklik ya da turda yoklanan direk sayısı da denenebilir."""
+note_en = """Sixty eight distribution poles at two and a half kilometres instead of forty nine at three: 39 % more poles. On a coarse read availability rises by a few points and the cost per square kilometre rises by more. Height or how many anchors a round polls are other ways to raise availability."""
 
 [values]
 'rural.anchor_spacing_m' = 2500.0

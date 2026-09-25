@@ -56,8 +56,10 @@ bunu kullanmak için direk ve araç 27 dBm'lik modüle (E28-2G4M27S) geçiyor.
 Tutarlar TL. Direk birimi ve araç alıcısı 1000 adetlik birim fiyat.
 Alanın birimi km².
 
-Yayımlanan tabloda O6'nın direk birimi 1062,80 TL, km² başına CAPEX
-şehir içinde 10220, kırsalda 1280 TL. Buradaki 1048 TL belgesiz kartın
+Yayımlanan tabloda O6 dış ortam anteniyle (Taoglas GW.22.5151, IP67,
+1000 adette 10,07 USD): direk birimi 1493,43 TL, km² başına CAPEX
+şehir içinde 11477, kırsalda 1350 TL; kullanılabilirlik %85,67 ve
+%66,47 (ADR-0094). Aşağıdaki satır iç ortam anteniyle hesaplandı. Buradaki 1048 TL belgesiz kartın
 "diğer" kalemiyle hesaplandı; yükselteçli kart raporun kırsal
 satırından ayrıştırıldığı için o kalem yaklaşık 0,3 USD farklı
 (ADR-0094).
@@ -109,5 +111,5 @@ eklenmedi.
 - **Test ücretleri** (EN 300 328, EN 301 489-1/-17, EN 62368-1).
 - **Şehir içinde kanalın dolu bulunma oranı** (-70 dBm/MHz eşiği):
   sahada SDR kaydıyla ölçülmeli (ADR-0083).
-- **5 dBi çubuk anten iç ortam tipi.** Direkte su geçirmez bir sürüm ya
-  da muhafaza gerekir; fiyatı biraz artar.
+- **Dış ortam anteninin hüzme genişliği.** Taoglas GW.22.5151 için
+  üretici değer vermiyor; model McDonald yaklaşımıyla 35,3° kullanıyor.

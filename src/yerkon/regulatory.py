@@ -125,7 +125,7 @@ TURKEY_FREQUENCY_HOPPING = SpectrumRule(
         "e.i.r.p. is the whole ceiling. SX1280 ranging already hops its "
         "channels; the equipment has to be tested as FHSS by an accredited "
         "laboratory, and EN 300 328 then sets its own dwell-time and "
-        "medium-utilisation conditions (ADR-0092)."
+        "medium-utilisation conditions."
     ),
 )
 

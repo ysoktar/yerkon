@@ -123,18 +123,17 @@ birim ve malzeme bu projenin varsayımı"""
 source_en = """20 m bucket truck from 2000 TL an hour, 30 % off by the day; \
 electrician's day 3000 to 4000 TL (Ankara, 2026 search results); eight \
 units a day and the materials are this project's assumption"""
-note = """Zaten duran bir aydınlatma direğine birim takmanın bedeli. 3000 \
-TL idi ve hiçbir şeye dayanmıyordu. Şimdi kalemlerden: sepetli araç günü \
-11200 TL, usta ve yardımcısı 6000 TL, bir ekip günde sekiz birim takar, \
-yani birim başına 2150 TL; paslanmaz kelepçe, kablo ve sigorta 300 TL. \
-Toplam 2450 TL. Kutu ve güç kaynağı zaten birimin içinde (bom.toml, \
-"diğer")."""
+note = """Zaten duran bir aydınlatma direğine birim takmanın bedeli, \
+kalemleriyle: sepetli araç günü 11200 TL, usta ve yardımcısı 6000 TL, bir \
+ekip günde sekiz birim takar, yani birim başına 2150 TL; paslanmaz \
+kelepçe, kablo ve sigorta 300 TL. Toplam 2450 TL. Kutu ve güç kaynağı \
+zaten birimin içinde (malzeme listesinde "diğer")."""
 note_en = """What fitting a unit to a lighting column that already stands \
-costs. It was 3000 TL and rested on nothing. Now from its items: a \
-bucket truck day is 11200 TL, an electrician and a helper 6000 TL, a \
-crew fits eight units a day, so 2150 TL a unit; stainless clamps, cable \
-and a fuse 300 TL. 2450 TL in all. The enclosure and the power supply \
-are already inside the unit (bom.toml, "other")."""
+costs, item by item: a bucket truck day is 11200 TL, an electrician and a \
+helper 6000 TL, a crew fits eight units a day, so 2150 TL a unit; \
+stainless clamps, cable and a fuse 300 TL. 2450 TL in all. The enclosure \
+and the power supply are already inside the unit (the "other" line of the \
+bill of materials)."""
 affects = "aydınlatma direğindeki her direğin CAPEX'ini; şehir içi sermayenin çoğu"
 affects_en = "CAPEX of every anchor on a column; most of the urban capital"
 sensitivity = """günde sekiz yerine dört birim takılırsa 4600 TL olur ve şehir \
@@ -236,11 +235,11 @@ source = "bu proje"
 source_en = "this project"
 note = """Çatıdaki tutucunun çatının üstüne çıkardığı yükseklik. Birimin \
 yerden yüksekliği binanın kendi yüksekliği artı bu; bina yüksekliği \
-getirilen bina izlerinden, bina bina okunuyor (ADR-0081)."""
+getirilen bina izlerinden, bina bina okunuyor."""
 note_en = """How far the roof bracket lifts the unit above the roof. The \
-unit's height above the ground is the building's own height plus this; \
-the building's height is read from the fetched footprints, one building \
-at a time (ADR-0081)."""
+unit's height above the ground is the building's own height plus this; the \
+building's height is read from the fetched footprints, one building at a \
+time."""
 affects = "çatıdaki birimlerin menzilini"
 affects_en = "the reach of units on roofs"
 
@@ -329,14 +328,12 @@ unit = "kWh/year"
 provenance = "DERIVED"
 source = "SX1280 ve STM32G0 veri sayfaları, bu projenin hesabı"
 source_en = "SX1280 and STM32G0 datasheets, this project's arithmetic"
-note = """Bir yayın biriminin yıllık tüketimi. 35 kWh idi, yani sürekli \
-4 W: bir SX1280 kartı için on kat fazla. Birim zamanının neredeyse \
-tamamında dinliyor; SX1280 dinlerken birkaç mA, mikrodenetleyici bir iki \
+note = """Bir yayın biriminin yıllık tüketimi. Birim zamanının neredeyse \
+tamamında dinliyor: SX1280 dinlerken birkaç mA, mikrodenetleyici bir iki \
 mA çeker, 3,3 V'ta ikisi 30 mW'ı bulmaz. Şebeke dönüştürücüsünün boştaki \
-kaybı ve yanıt yayınları eklenince ortalama 0,34 W'ı geçmiyor: yılda \
-3 kWh. Bu cömert bir üst sınır."""
-note_en = """One broadcast unit's yearly consumption. It was 35 kWh, a \
-steady 4 W, ten times too much for an SX1280 board. The unit spends \
+kaybı ve yanıt yayınları eklenince ortalama 0,34 W'ı geçmiyor: yılda 3 \
+kWh. Bu cömert bir üst sınır."""
+note_en = """One broadcast unit's yearly consumption. The unit spends \
 nearly all its time listening: the SX1280 draws a few mA doing that and \
 the microcontroller one or two, under 30 mW together at 3,3 V. With the \
 mains converter's idle loss and the replies it sends, the average stays \
@@ -355,22 +352,18 @@ provenance = "DESIGN"
 source = "bu proje, bir tasarım kararı olarak"
 source_en = "this project, as a design choice"
 note = """Kendi hattı olmayan bir birimin yıllık veri bedeli: sıfır, çünkü \
-birimlere SIM kartı konmuyor. Raporda böyle bir şey yok; ilk maliyet \
-modeli (ADR-0006) her birime bir hücresel paket varsaymıştı ve kaldırıldı \
-(ADR-0079). Merkeze bağ, tünelde tünelin haberleşme omurgasından, şehirde \
-ışıklı kavşağın sinyal dolabından geçiyor. Geri kalan birimleri, onlara \
-karşı ölçüm yapan telefonlar ve araç alıcıları izliyor: hangi birimin \
-cevap verdiğini zaten biliyorlar, dolayısıyla cevap vermeyen birim hattı \
-olmadan da görünüyor."""
+birimlere SIM kartı konmuyor. Merkeze bağ, tünelde tünelin haberleşme \
+omurgasından, şehirde ışıklı kavşağın sinyal dolabından geçiyor. Geri \
+kalan birimleri, onlara karşı ölçüm yapan telefonlar ve araç alıcıları \
+izliyor: hangi birimin cevap verdiğini zaten biliyorlar, dolayısıyla cevap \
+vermeyen birim hattı olmadan da görünüyor."""
 note_en = """What a year of data costs an anchor with no line of its own: \
-nothing, because no unit carries a SIM card. The report says nothing of \
-the kind; the first cost model (ADR-0006) assumed a cellular plan per \
-anchor and it has been taken out (ADR-0079). The tie to the centre runs \
-through the tunnel's own communications spine in a tunnel and a \
-signalised junction's cabinet in town. The other units are watched by \
-the phones and vehicle receivers that range against them: those already \
-know which unit answered, so a unit that stops answering shows up \
-without a line of its own."""
+nothing, because no unit carries a SIM card. The tie to the centre runs \
+through the tunnel's own communications spine in a tunnel and a signalised \
+junction's cabinet in town. The other units are watched by the phones and \
+vehicle receivers that range against them: those already know which unit \
+answered, so a unit that stops answering shows up without a line of its \
+own."""
 affects = "kendi hattı olmayan direklerin OPEX'ini"
 affects_en = "OPEX of anchors with no line of their own"
 
@@ -384,18 +377,16 @@ varsayımı"""
 source_en = """10 W solar panel 518,72 TL, 12 V 7 Ah sealed battery 524,40 TL \
 (Akakçe, September 2026, the cheapest found); the controller, bracket and \
 cable are this project's assumption"""
-note = """Şebekesi olmayan bir yapıdaki direk için panel, akü, denetleyici, \
-tutucu ve kablo. 9500 TL idi; o, birimin 4 W çektiği varsayımına göre \
-boyutlanmıştı. 0,34 W'lık bir yük günde 8 Wh ister: Ankara'nın kışında \
-günde iki saatlik tam güneşle 10 W'lık panel bunu verir, 84 Wh'lik akü \
-beş günü taşır. Panel 518,72, akü 524,40, denetleyici, tutucu ve kablo \
-1286,88 TL: 2330 TL."""
-note_en = """Panel, battery, controller, bracket and cable for an anchor on \
-a structure with no mains. It was 9500 TL, sized for a unit that drew \
-4 W. A 0,34 W load needs 8 Wh a day: a 10 W panel gives that on two \
-hours of full sun in an Ankara winter, and an 84 Wh battery carries five \
-days. Panel 518,72, battery 524,40, controller, bracket and cable \
-1286,88 TL: 2330 TL."""
+note = """Şebekesi olmayan bir yapıdaki direk için panel, akü, \
+denetleyici, tutucu ve kablo. 0,34 W'lık bir yük günde 8 Wh ister: \
+Ankara'nın kışında günde iki saatlik tam güneşle 10 W'lık panel bunu \
+verir, 84 Wh'lik akü beş günü taşır. Panel 518,72, akü 524,40, \
+denetleyici, tutucu ve kablo 1286,88 TL: 2330 TL."""
+note_en = """Panel, battery, controller, bracket and cable for an anchor \
+on a structure with no mains. A 0,34 W load needs 8 Wh a day: a 10 W panel \
+gives that on two hours of full sun in an Ankara winter, and an 84 Wh \
+battery carries five days. Panel 518,72, battery 524,40, controller, \
+bracket and cable 1286,88 TL: 2330 TL."""
 affects = "şebeke dışı direklerin CAPEX ve OPEX'ini"
 affects_en = "CAPEX and OPEX of off-grid anchors"
 sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
@@ -409,14 +400,14 @@ source = """GİB amortisman listesi, 3.49.4: telsiz telefon, telsiz telgraf veya
 radyo yayını alıcı cihazlar ve sistemleri, 10 yıl, %10"""
 source_en = """Turkish Revenue Administration depreciation list, 3.49.4: radio \
 telephone, telegraph or broadcast receiving devices and systems, 10 years, 10 %"""
-note = """Bir yayın biriminin kaç yılda yenilendiği. 8 yıl idi, bir varsayım. \
-Yayın birimi bir telsiz sistemi; vergi mevzuatının ona verdiği faydalı \
-ömür 10 yıl. Konum belirleme satırı (3.49.8, 5 yıl) uydu ile konum \
-belirleyen cihazlar için; yayın birimi uyduya dayanmıyor (ADR-0089)."""
-note_en = """How many years a unit lasts before it is replaced. It was 8, an \
-assumption. An anchor is a radio system, and the tax rules give that \
-10 years. The positioning line (3.49.8, 5 years) is for devices that \
-locate by satellite, which an anchor does not (ADR-0089)."""
+note = """Bir yayın biriminin kaç yılda yenilendiği. Yayın birimi bir \
+telsiz sistemi; vergi mevzuatının ona verdiği faydalı ömür 10 yıl. Konum \
+belirleme satırı (3.49.8, 5 yıl) uydu ile konum belirleyen cihazlar için; \
+yayın birimi uyduya dayanmıyor."""
+note_en = """How many years a unit lasts before it is replaced. An anchor \
+is a radio system, and the tax rules give that 10 years. The positioning \
+line (3.49.8, 5 years) is for devices that locate by satellite, which an \
+anchor does not."""
 affects = "OPEX'in yenileme kalemini"
 affects_en = "OPEX, the replacement line"
 sensitivity = "5 yıl (konum belirleme satırı) yenileme kalemini iki katına çıkarır"
@@ -427,18 +418,16 @@ unit = "visits/year"
 provenance = "DESIGN"
 source = "bu proje, bir işletme kararı olarak"
 source_en = "this project, as an operating choice"
-note = """Bir direğe yılda kaç kez gidildiği. 0,5 idi: takvime bağlı, iki \
-yılda bir ziyaret. Oysa merkezî sistem her birimin durumunu zaten \
-görüyor (rapor: yayın birimlerinin kayıtları izlenir). Ekip takvimle \
-değil arıza olduğunda gider. Beş yılda bir arıza, kapalı bir kart için \
-kötümser bir sayı."""
-note_en = """How often an anchor is visited a year. It was 0,5, a \
-calendar visit every two years. But the central system already sees \
-every unit's status (the report: the units' records are monitored). A \
-crew goes when one fails rather than by the calendar. One failure in \
+note = """Bir direğe yılda kaç kez gidildiği. Merkezî sistem her birimin \
+durumunu görüyor (rapor: yayın birimlerinin kayıtları izlenir), bu yüzden \
+ekip takvimle değil arıza olduğunda gider. Beş yılda bir arıza, kapalı bir \
+kart için kötümser bir sayı."""
+note_en = """How often an anchor is visited a year. The central system \
+sees every unit's status (the report: the units' records are monitored), \
+so a crew goes when one fails rather than by the calendar. One failure in \
 five years is a pessimistic figure for a sealed board."""
-affects = "OPEX'i; bakım her senaryoda en büyük kalemdi"
-affects_en = "OPEX; maintenance was the largest line in every scenario"
+affects = "her direğin OPEX'ini"
+affects_en = "OPEX of every anchor"
 sensitivity = "0,5'e geri çekmek bakım kalemini 2,5 katına çıkarır"
 sensitivity_en = "putting it back to 0,5 multiplies the maintenance line by 2,5"
 
@@ -449,11 +438,10 @@ provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
 note = """Şebeke dışı bir sahanın ek bakımı: akü beş yılda bir değişir \
-(amortisman listesi 3.14.7), panel o ziyarette temizlenir. Dört yılda \
-bir idi (ADR-0089)."""
+(amortisman listesi 3.14.7), panel o ziyarette temizlenir."""
 note_en = """The extra attendance an off-grid site needs: the battery is \
-replaced every five years (depreciation list 3.14.7) and the panel \
-cleaned on that visit. It was every four years (ADR-0089)."""
+replaced every five years (depreciation list 3.14.7) and the panel cleaned \
+on that visit."""
 affects = "şebeke dışı direklerin OPEX'ini"
 affects_en = "OPEX of anchors on structures with no mains"
 sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
@@ -479,9 +467,9 @@ provenance = "DATASHEET"
 source = "12 V 7 Ah kuru akü, Akakçe, Eylül 2026 (şebeke dışı beslemenin içindeki)"
 source_en = "12 V 7 Ah sealed battery, Akakçe, September 2026 (part of the standalone supply)"
 note = """Şebeke dışı beslemenin akü payı. Kendi ömrüyle ayrı yenileniyor, \
-çünkü panel ve denetleyiciden önce eskiyor (ADR-0089)."""
-note_en = """The battery's part of the standalone supply. Replaced on its own \
-life, because it wears out before the panel and the controller (ADR-0089)."""
+çünkü panel ve denetleyiciden önce eskiyor."""
+note_en = """The battery's part of the standalone supply. Replaced on its \
+own life, because it wears out before the panel and the controller."""
 affects = "şebeke dışı direklerin yenileme kalemini"
 affects_en = "the replacement line of off-grid anchors"
 
@@ -491,8 +479,8 @@ unit = "years"
 provenance = "STANDARD"
 source = "GİB amortisman listesi, 3.14.7: akümülatörler, 5 yıl, %20"
 source_en = "Turkish Revenue Administration depreciation list, 3.14.7: accumulators, 5 years, 20 %"
-note = "Akünün faydalı ömrü (ADR-0089)."
-note_en = "The battery's useful life (ADR-0089)."
+note = "Akünün faydalı ömrü."
+note_en = "The battery's useful life."
 affects = "şebeke dışı direklerin yenileme kalemini"
 affects_en = "the replacement line of off-grid anchors"
 
@@ -502,12 +490,12 @@ unit = "years"
 provenance = "STANDARD"
 source = "GİB amortisman listesi, 45.1.9: güneş enerjisi santrali, 10 yıl, %10"
 source_en = "Turkish Revenue Administration depreciation list, 45.1.9: solar power plant, 10 years, 10 %"
-note = """Akü dışındaki güneş beslemesi: panel, denetleyici, tutucu, kablo. \
-Listede tek başına güneş paneli satırı yok; santral satırı en yakını \
-(ADR-0089)."""
+note = """Akü dışındaki güneş beslemesi: panel, denetleyici, tutucu, \
+kablo. Listede tek başına güneş paneli satırı yok; santral satırı en \
+yakını."""
 note_en = """The solar supply apart from the battery: panel, controller, \
 bracket, cable. The list has no line for a panel on its own; the power \
-plant line is the nearest (ADR-0089)."""
+plant line is the nearest."""
 affects = "şebeke dışı direklerin yenileme kalemini"
 affects_en = "the replacement line of off-grid anchors"
 
@@ -521,18 +509,18 @@ source_en = """Law 7567, 2026 Central Government Budget, Schedule H, B-e: grades
 5-15, domestic daily allowance 850 TL"""
 note = """Bakım ekibinden bir kişinin şehir dışında geçirdiği bir günün \
 gündeliği. Özel sektörde vergiden istisna kısım GVK 24/2'ye göre aynı \
-aylık seviyesindeki devlet memurunun gündeliği; bir saha teknisyeni \
-için en yakın seviye 5-15. derece (850 TL) varsayıldı. Günübirlik \
-görevde tamamının mı bir kısmının mı ödendiği doğrulanmadı; tamamı \
-alındı, maliyet açısından ihtiyatlı taraf. Konaklama yok: iki saha da \
-aynı gün dönülecek uzaklıkta (ADR-0089)."""
-note_en = """The daily allowance of one crew member for a day out of the city. \
-In the private sector the tax-exempt part follows Income Tax Law 24/2: \
-the allowance of a civil servant on the same salary level; grades 5-15 \
-(850 TL) are taken as the nearest level for a field technician. Whether \
-a same-day trip earns all of it or part is not verified; all of it is \
-used, the cautious side for cost. No lodging: both sites are a day trip \
-(ADR-0089)."""
+aylık seviyesindeki devlet memurunun gündeliği; bir saha teknisyeni için \
+en yakın seviye 5-15. derece (850 TL) varsayıldı. Günübirlik görevde \
+tamamının mı bir kısmının mı ödendiği doğrulanmadı; tamamı alındı, maliyet \
+açısından ihtiyatlı taraf. Konaklama yok: iki saha da aynı gün dönülecek \
+uzaklıkta."""
+note_en = """The daily allowance of one crew member for a day out of the \
+city. In the private sector the tax-exempt part follows Income Tax Law \
+24/2: the allowance of a civil servant on the same salary level; grades \
+5-15 (850 TL) are taken as the nearest level for a field technician. \
+Whether a same-day trip earns all of it or part is not verified; all of it \
+is used, the cautious side for cost. No lodging: both sites are a day \
+trip."""
 affects = "kırsal ve tünel satırlarının OPEX'ini"
 affects_en = "OPEX of the rural and tunnel rows"
 
@@ -542,10 +530,9 @@ unit = "people"
 provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
-note = """Bir bakım ziyaretindeki kişi sayısı: direğe çıkan ve trafiği \
-yöneten (ADR-0089)."""
+note = "Bir bakım ziyaretindeki kişi sayısı: direğe çıkan ve trafiği yöneten."
 note_en = """People on a maintenance visit: one up the pole, one managing \
-traffic (ADR-0089)."""
+traffic."""
 affects = "harcırah kalemini"
 affects_en = "the per diem line"
 
@@ -607,21 +594,16 @@ source = """Semtech SX1280 ürün sayfası: en iyi duyarlılık -132 dBm (SF12, 
 203 kHz); SF başına 2,5 dB (LoRa modem SNR tablosu)"""
 source_en = """Semtech SX1280 product page: best sensitivity -132 dBm (SF12, \
 203 kHz); 2,5 dB per spreading factor (LoRa modem SNR table)"""
-note = """Kanal gürültüsüne göre çözme eşiği, bant içinde. -20 dB idi ve \
-"veri sayfası, SF10" diye etiketliydi; o değer SF12'ninkine benziyor ve \
-resmî bir kaynaktan doğrulanamadı. Semtech'in kendi sayfasındaki tek \
-resmî nokta -132 dBm (SF12, 203 kHz). 1625 kHz'e +9,03 dB, SF12'den \
-SF10'a +5 dB: SF10 ve 1625 kHz'de -117,97 dBm. 6 dB'lik gürültü \
-sayısıyla bu, -174 + 62,11 + 6 + eşik = -117,97, yani eşik -12,08 dB \
-demek. Model bununla -125,9 yerine -118,0 dBm'de kapanıyor (ADR-0091)."""
-note_en = """Demodulation threshold relative to the channel noise, in band. It \
-was -20 dB, labelled "datasheet, SF10"; that looks like the SF12 figure \
-and could not be checked against an official source. The one official \
-point on Semtech's own page is -132 dBm (SF12, 203 kHz). +9,03 dB to \
-1625 kHz and +5 dB from SF12 to SF10 give -117,97 dBm at SF10 and \
-1625 kHz. With a 6 dB noise figure that is -174 + 62,11 + 6 + threshold \
-= -117,97, so the threshold is -12,08 dB. The model now closes at \
--118,0 dBm instead of -125,9 (ADR-0091)."""
+note = """Kanal gürültüsüne göre çözme eşiği, bant içinde. Semtech'in \
+kendi sayfasındaki resmî nokta -132 dBm (SF12, 203 kHz). 1625 kHz'e +9,03 \
+dB, SF12'den SF10'a +5 dB: SF10 ve 1625 kHz'de -117,97 dBm. 6 dB'lik \
+gürültü sayısıyla bu, -174 + 62,11 + 6 + eşik = -117,97, yani eşik -12,08 \
+dB."""
+note_en = """Demodulation threshold relative to the channel noise, in \
+band. The official point on Semtech's own page is -132 dBm (SF12, 203 \
+kHz). +9,03 dB to 1625 kHz and +5 dB from SF12 to SF10 give -117,97 dBm at \
+SF10 and 1625 kHz. With a 6 dB noise figure that is -174 + 62,11 + 6 + \
+threshold = -117,97, so the threshold is -12,08 dB."""
 affects = "SX1280 bağlantılarının menzilini; şehir içi ve kırsal satırların her şeyini"
 affects_en = "the reach of every SX1280 link; everything in the urban and rural rows"
 
@@ -699,13 +681,12 @@ noise, no multipath and no drift during the exchange, so a real part \
 will be worse."""
 affects = "yavaş modülde tek yönlü ölçümün kullanılabilir olup olmadığını"
 affects_en = "whether single-sided ranging is usable at all on the slow radio"
-sensitivity = """Bu değerde tek yönlü saat terimi 0,19 m; ölçülen 2,94 m'lik tabanın \
-yanında hiçbir şey katmıyor. Anlam kazanması için on beş katına çıkması \
-gerekirdi. Yerine geçtiği 0,5 ppm altı kat ihtiyatlıymış."""
-sensitivity_en = """At this value the single-sided clock term is 0,19 m, against a 2,94 m \
-measured floor, so it contributes nothing. It would have to rise \
-fifteen-fold before it mattered. The 0,5 ppm this replaced was \
-conservative by six times."""
+sensitivity = """Bu değerde tek yönlü saat terimi 0,19 m; ölçülen 2,94 \
+m'lik tabanın yanında hiçbir şey katmıyor. Anlam kazanması için on beş \
+katına çıkması gerekir."""
+sensitivity_en = """At this value the single-sided clock term is 0,19 m, \
+against a 2,94 m measured floor, so it contributes nothing. It would have \
+to rise fifteen-fold before it mattered."""
 
 [values."clock.tcxo.tolerance_ppm"]
 value = 2.0
@@ -767,31 +748,29 @@ unit = "dB"
 provenance = "STANDARD"
 source = "3GPP TR 38.901 Tablo 7.4.1-1, görüş hattı olan senaryolar"
 source_en = "3GPP TR 38.901 Table 7.4.1-1, the line-of-sight scenarios"
-note = """Aynı anten, aynı mesafe, aynı görünen zemin — ve ölçülen kayıp aynı \
-değil. Kaldırımdaki kamyonet, iki örnek arasına düşen bina köşesi, bir \
-sıra ağaç, modelin yuvarladığı o bir kat. Model ortancayı taşır, bu da \
+note = """Aynı anten, aynı mesafe, aynı görünen zemin, ama ölçülen kayıp \
+aynı değil. Kaldırımdaki kamyonet, iki örnek arasına düşen bina köşesi, \
+bir sıra ağaç, modelin yuvarladığı o bir kat. Model ortancayı taşır, bu da \
 etrafındaki yayılımı; desibel cinsinden normal olduğu için log-normal \
-sönümleme denir. Yayımlanan karasal modellerin hepsinde bir tane var ve \
-2 GHz civarında 4 ile 8 dB arasında veriliyor (3GPP TR 38.901'in senaryo \
-başına gölge sönümlemesi; ITU-R P.1546 ve P.1812'nin konum \
-değişkenliği). Bu, **yolda bir şey olmadığında** geçerli olanı: TR \
-38.901 üç senaryonun üçünde de görüş hattı için 4 dB veriyor. Yol \
-kapalıysa `site.shadow_sigma_obstructed_db` geçerli (ADR-0061). Sıfır \
-yazmak onu kapatır ve modeli her hücrenin ya geçtiği ya kaldığı hâline \
-döndürür."""
-note_en = """The same antenna, the same distance, ground that looks the same — and \
-the loss is not the same. A van at the kerb, a building corner that \
-falls between two profile samples, a row of trees, the one storey this \
-rounded off. The model carries the median and this is the spread around \
-it; normal in decibels, which is why it is called log-normal fading. \
-Every published terrestrial model has one, and around 2 GHz they give 4 \
-to 8 dB (3GPP TR 38.901's per-scenario shadow fading; ITU-R P.1546 and \
-P.1812 as location variability). This is the figure for a path with \
+sönümleme denir. Yayımlanan karasal modellerin hepsinde bir tane var ve 2 \
+GHz civarında 4 ile 8 dB arasında veriliyor (3GPP TR 38.901'in senaryo \
+başına gölge sönümlemesi; ITU-R P.1546 ve P.1812'nin konum değişkenliği). \
+Bu, **yolda bir şey olmadığında** geçerli olanı: TR 38.901 üç senaryonun \
+üçünde de görüş hattı için 4 dB veriyor. Yol kapalıysa \
+`site.shadow_sigma_obstructed_db` geçerli. Sıfır yazmak onu kapatır ve \
+modeli her hücrenin ya geçtiği ya kaldığı hâline döndürür."""
+note_en = """The same antenna, the same distance, ground that looks the \
+same, and still the loss is not the same. A van at the kerb, a building \
+corner that falls between two profile samples, a row of trees, the one \
+storey this rounded off. The model carries the median and this is the \
+spread around it; normal in decibels, which is why it is called log-normal \
+fading. Every published terrestrial model has one, and around 2 GHz they \
+give 4 to 8 dB (3GPP TR 38.901's per-scenario shadow fading; ITU-R P.1546 \
+and P.1812 as location variability). This is the figure for a path with \
 **nothing in the way**: TR 38.901 gives 4 dB for line of sight in all \
 three of its scenarios. A blocked path uses \
-`site.shadow_sigma_obstructed_db` instead (ADR-0061). Zero switches it \
-off and returns the model to one where every cell either passes or does \
-not."""
+`site.shadow_sigma_obstructed_db` instead. Zero switches it off and \
+returns the model to one where every cell either passes or does not."""
 affects = """her bağlantının kapanıp kapanmadığını, dolayısıyla kullanılabilirlik ve \
 alan sütunlarını"""
 affects_en = """whether each link closes, and so the availability and area columns"""
@@ -808,28 +787,28 @@ unit = "dB"
 provenance = "STANDARD"
 source = "3GPP TR 38.901 Tablo 7.4.1-1, UMi-Street Canyon NLOS"
 source_en = "3GPP TR 38.901 Table 7.4.1-1, UMi-Street Canyon NLOS"
-note = """Yolda bir şey olduğunda yayılım genişliyor. Yayımlanan modellerin \
-hepsi ikisini ayırıyor: TR 38.901 sokak kanyonunda görüş varken 4 dB, \
-yokken 7,82; şehir makro hücresinde 4 ve 6; kırsalda 4 ve 8. Sebep \
-fiziksel. Doğrudan ışın varken gelen alan tek bir yoldan geliyor ve \
-sapma o yolun etrafındaki tek tük engellerden ibaret; ışın kesildiğinde \
-gelen şey kenarların üzerinden dolaşan bir toplam ve her kenar kendi \
-şansı. Bu proje bu satıra kadar tek bir 6 dB taşıyordu, yani açık \
-yolları fazla, kapalı yolları eksik cezalandırıyordu. Hangisinin \
-kullanıldığına zemin karar veriyor: iki uç arasındaki düz çizgi araziyi \
-ve dünyanın kendi kavisini geçiyorsa açık (ADR-0061). Kızılay'da \
-bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri."""
-note_en = """The spread widens when something is in the way. Every published model \
-splits the two: TR 38.901 gives 4 dB with line of sight and 7,82 without \
-it in a street canyon, 4 and 6 in an urban macrocell, 4 and 8 in a rural \
-one. The reason is physical. With a direct ray the field arrives along \
-one path and the variation is whatever sits beside it; with the ray gone \
-what arrives is a sum over edges and each edge is its own piece of luck. \
-This project carried one 6 dB figure until this row, which overcharged \
-clear paths and undercharged blocked ones. The ground decides which \
-applies: a path is clear when the straight line between the ends passes \
-over the terrain and the earth's own curve (ADR-0061). Over Kızılay \
-98,1 % of links are blocked, over Polatlı 79,4 %, in the tunnel none."""
+note = """Yolda bir şey olduğunda yayılım genişliyor. Yayımlanan \
+modellerin hepsi ikisini ayırıyor: TR 38.901 sokak kanyonunda görüş varken \
+4 dB, yokken 7,82; şehir makro hücresinde 4 ve 6; kırsalda 4 ve 8. Sebep \
+fiziksel. Doğrudan ışın varken gelen alan tek bir yoldan geliyor ve sapma \
+o yolun etrafındaki tek tük engellerden ibaret; ışın kesildiğinde gelen \
+şey kenarların üzerinden dolaşan bir toplam ve her kenar kendi şansı. Bu \
+proje bu satıra kadar tek bir 6 dB taşıyordu, yani açık yolları fazla, \
+kapalı yolları eksik cezalandırıyordu. Hangisinin kullanıldığına zemin \
+karar veriyor: iki uç arasındaki düz çizgi araziyi ve dünyanın kendi \
+kavisini geçiyorsa açık. Kızılay'da bağlantıların %98,1'i kapalı, \
+Polatlı'da %79,4'ü, tünelde hiçbiri."""
+note_en = """The spread widens when something is in the way. Every \
+published model splits the two: TR 38.901 gives 4 dB with line of sight \
+and 7,82 without it in a street canyon, 4 and 6 in an urban macrocell, 4 \
+and 8 in a rural one. The reason is physical. With a direct ray the field \
+arrives along one path and the variation is whatever sits beside it; with \
+the ray gone what arrives is a sum over edges and each edge is its own \
+piece of luck. This project carried one 6 dB figure until this row, which \
+overcharged clear paths and undercharged blocked ones. The ground decides \
+which applies: a path is clear when the straight line between the ends \
+passes over the terrain and the earth's own curve. Over Kızılay 98,1 % of \
+links are blocked, over Polatlı 79,4 %, in the tunnel none."""
 affects = """kapalı yollarda her bağlantının kapanıp kapanmadığını, yani şehir ve \
 kırsal satırların neredeyse tamamını"""
 affects_en = """whether each link over a blocked path closes, which is almost all of the \
@@ -843,30 +822,28 @@ unit = "m"
 provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
-note = """Bir bağlantının zemin profilinin kaç metrede bir okunduğu. Sıfır, \
-sabit 64 örnek demek, yani aralık bağlantının boyuna göre değişiyor: \
-1 km'lik bir şehir bağlantısında 15 m, 6,9 km'lik bir kırsal bağlantıda \
-108 m, hücreleri 30 m olan bir ızgaranın üzerinde. Bullington'ın kurgusu \
-örnekler üzerinden bir maksimum aldığı için eksik örnekleme yalnızca \
-eksik okur: Polatlı'da 108 m'de 31,28 dB, 6,7 m'de 37,60. Bir değer \
-verildiğinde profil o aralıkta okunuyor, 32 örnek tabanı ve 2048 \
-tavanıyla. On metre, 30 m'lik hücrenin içine üç örnek düşürüyor ve \
-yakınsamanın 0,3 dB altında kalıyor; yirmi yedi metre 6,32 dB'lik \
-farkın yalnızca üçte ikisini kapatıyor. Bedeli tablonun kendisinde \
-ölçüldü: 4 dk 46 sn yerine 15 dk 33 sn (ADR-0062). Sıfır yazmak sabit \
-64 örneğe döner."""
-note_en = """How many metres apart a link's ground profile is read. Zero means a \
-fixed 64 samples, so the spacing depends on the link's length rather \
-than on the ground: 15 m on a 1 km urban link, 108 m on a 6,9 km rural \
-one, over a grid whose own cells are 30 m across. Bullington's \
+note = """Bir bağlantının zemin profilinin kaç metrede bir okunduğu. \
+Sıfır, sabit 64 örnek demek, yani aralık bağlantının boyuna göre \
+değişiyor: 1 km'lik bir şehir bağlantısında 15 m, 6,9 km'lik bir kırsal \
+bağlantıda 108 m, hücreleri 30 m olan bir ızgaranın üzerinde. \
+Bullington'ın kurgusu örnekler üzerinden bir maksimum aldığı için eksik \
+örnekleme yalnızca eksik okur: Polatlı'da 108 m'de 31,28 dB, 6,7 m'de \
+37,60. Bir değer verildiğinde profil o aralıkta okunuyor, 32 örnek tabanı \
+ve 2048 tavanıyla. On metre, 30 m'lik hücrenin içine üç örnek düşürüyor ve \
+yakınsamanın 0,3 dB altında kalıyor; yirmi yedi metre 6,32 dB'lik farkın \
+yalnızca üçte ikisini kapatıyor. Bedeli: tablo 4 dk 46 sn yerine 15 dk 33 \
+sn sürüyor. Sıfır yazmak sabit 64 örneğe döner."""
+note_en = """How many metres apart a link's ground profile is read. Zero \
+means a fixed 64 samples, so the spacing depends on the link's length \
+rather than on the ground: 15 m on a 1 km urban link, 108 m on a 6,9 km \
+rural one, over a grid whose own cells are 30 m across. Bullington's \
 construction takes a maximum over the samples, so undersampling can only \
 read low: over Polatlı 31,28 dB at 108 m against 37,60 at 6,7 m. Given a \
-value, the profile is read at that spacing, with a floor of 32 samples \
-and a ceiling of 2048. Ten metres puts three samples inside a 30 m cell \
-and lands within 0,3 dB of convergence, where 27 m closes only two \
-thirds of the 6,32 dB gap. The cost was measured on the table itself: \
-15 min 33 s against 4 min 46 s (ADR-0062). Zero returns it to a fixed \
-64 samples."""
+value, the profile is read at that spacing, with a floor of 32 samples and \
+a ceiling of 2048. Ten metres puts three samples inside a 30 m cell and \
+lands within 0,3 dB of convergence, where 27 m closes only two thirds of \
+the 6,32 dB gap. The cost: the table takes 15 min 33 s instead of 4 min 46 \
+s. Zero returns it to a fixed 64 samples."""
 affects = """kırınımın ne kadar okunduğunu, dolayısıyla uzun bağlantıların kapanıp \
 kapanmadığını"""
 affects_en = """how much diffraction is read, and so whether long links close"""
@@ -881,16 +858,16 @@ unit = "m"
 provenance = "ASSUMPTION"
 source = "bu proje, Gudmundson'ın ölçümlerinin mertebesinde"
 source_en = "this project, the order of Gudmundson's measurements"
-note = """Bir alıcının, gölgesi başka bir şey olana kadar ne kadar yol gitmesi \
-gerektiği. Sıfır olsaydı her adım bağımsız bir çekiliş olurdu ve bir tur \
-boyunca ortalamaya giderdi — oysa gölge bir yer hakkında bir olgudur, \
-bir gürültü değil (ADR-0019). Gudmundson'ın ölçümleri şehirde onlarca \
-metre veriyor; elli, o mertebede yuvarlak bir sayı."""
-note_en = """How far a receiver travels before its shadow is something else. At zero \
-every step would be an independent draw and would average away over a \
-round — but a shadow is a fact about a place rather than noise \
-(ADR-0019). Gudmundson's measurements put it at tens of metres in a \
-town; fifty is a round number of that order."""
+note = """Bir alıcının, gölgesi başka bir şey olana kadar ne kadar yol \
+gitmesi gerektiği. Sıfır olsaydı her adım bağımsız bir çekiliş olurdu ve \
+bir tur boyunca ortalamaya giderdi; oysa gölge bir yer hakkında bir \
+olgudur, bir gürültü değil. Gudmundson'ın ölçümleri şehirde onlarca metre \
+veriyor; elli, o mertebede yuvarlak bir sayı."""
+note_en = """How far a receiver travels before its shadow is something \
+else. At zero every step would be an independent draw and would average \
+away over a round, but a shadow is a fact about a place rather than noise. \
+Gudmundson's measurements put it at tens of metres in a town; fifty is a \
+round number of that order."""
 affects = """gölgelemenin bir tur boyunca ortalamaya gidip gitmediğini"""
 affects_en = """whether shadowing averages away over a round"""
 sensitivity = """korelasyon mesafesi tur başına alınan menzil sayısının altına inerse \
@@ -904,25 +881,22 @@ unit = "draws"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir satırın kaç gölge dizilişi üzerinden koşturulacağı. Bir koşu bir \
-çekiliştir ve kırsal satırda tek bir çekiliş yayımlanan bir sayıya karar \
-veriyordu: sekiz çekiliş onun 95. yüzdeliğini 14,6 m ile 279,6 m \
-arasında herhangi bir yere koyuyor, çünkü o kullanılabilirlikte hayatta \
-kalan sabitleme sayısı az ve yüzdelik bir kuyruk. Yüzdelik onun yerine \
-çekilişlerin örnekleri birlikte alınarak hesaplanıyor, çünkü yüzdelik \
-zaten budur. Bir yazmak havuzlamayı kapatır. Sekiz, kuyruğun oturduğu \
-yer: bir çekilişte 279,6 m, üçte 32,0, sekizden yirmi dörde kadar 24 ile \
-26 m arası. Dört çekirdekte tabloyu yetmiş saniyeden 3 dk 50 sn'ye \
-çıkarıyor."""
-note_en = """How many arrangements of shadows a row is run over. One run is one draw, \
-and for the rural row one draw decided a published figure: eight of them \
-put its ninety-fifth percentile anywhere between 14,6 m and 279,6 m, \
-because at that availability the surviving fixes are few and the \
-percentile is a tail. The percentile is taken over the draws' samples \
-together instead, which is what a percentile is. One \
-switches pooling off. Eight is where the tail settles: 279,6 m on one \
-draw, 32,0 over three, and 24 to 26 m from eight through twenty-four. On \
-four cores it takes the table from seventy seconds to 3 min 50 s."""
+note = """Bir satırın kaç gölge dizilişi üzerinden koşturulacağı. Tek bir \
+çekiliş kırsal satırın 95. yüzdeliğini 14,6 m ile 279,6 m arasında \
+herhangi bir yere koyabiliyor, çünkü o kullanılabilirlikte hayatta kalan \
+sabitleme sayısı az ve yüzdelik bir kuyruk. Yüzdelik bu yüzden \
+çekilişlerin örnekleri birlikte alınarak hesaplanıyor. Bir yazmak \
+havuzlamayı kapatır. Sekiz, kuyruğun oturduğu yer: bir çekilişte 279,6 m, \
+üçte 32,0, sekizden yirmi dörde kadar 24 ile 26 m arası. Dört çekirdekte \
+tabloyu yetmiş saniyeden 3 dk 50 sn'ye çıkarıyor."""
+note_en = """How many arrangements of shadows a row is run over. A single \
+draw can put the rural row's ninety-fifth percentile anywhere between 14,6 \
+m and 279,6 m, because at that availability the surviving fixes are few \
+and the percentile is a tail. The percentile is therefore taken over the \
+draws' samples together. One switches pooling off. Eight is where the tail \
+settles: 279,6 m on one draw, 32,0 over three, and 24 to 26 m from eight \
+through twenty-four. On four cores it takes the table from seventy seconds \
+to 3 min 50 s."""
 affects = """yayımlanan yüzdeliklerin tek bir gölge dizilişine ne kadar bağlı olduğunu"""
 affects_en = """how much the published percentiles depend on one arrangement of shadows"""
 sensitivity = """kırsal satırda belirleyici: bir çekilişte 279,6 m, sekizin havuzunda \
@@ -937,13 +911,13 @@ provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
 note = """Hangi gölge dizilişi olduğu. Bir koşu bir çekiliştir ve tek bir \
-çekilişten okunan sayı hiçbir şeyden okunmuş sayıdır; bu proje bundan \
-bir kez yakalandı. Ölçüm tohumundan ayrı tutuluyor, böylece bir koşu \
-gölgeleri sabit tutup gürültüyü, ya da tersini değiştirebiliyor."""
-note_en = """Which arrangement of shadows this is. One run is one draw and a figure \
-read off one draw is a figure read off nothing, which this project has \
-been caught by once. Kept apart from the measurement seed so a run can \
-hold the shadows and vary the noise, or the reverse."""
+çekilişten okunan sayı güvenilir değildir. Ölçüm tohumundan ayrı \
+tutuluyor, böylece bir koşu gölgeleri sabit tutup gürültüyü, ya da tersini \
+değiştirebiliyor."""
+note_en = """Which arrangement of shadows this is. One run is one draw, \
+and a figure read off one draw cannot be trusted. Kept apart from the \
+measurement seed so a run can hold the shadows and vary the noise, or the \
+reverse."""
 affects = """tablonun tek bir gölge dizilişine ne kadar bağlı olduğunu"""
 affects_en = """how much the table depends on one arrangement of shadows"""
 sensitivity = """satır başına birkaç puan: yayımlanan sayı bir çekiliştir ve tohumu \
@@ -957,16 +931,16 @@ unit = "dB/km"
 provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
-note = """Yüksekliğin aşamadığı binalar, bitki örtüsü ve trafiğin soğurması. Otuz, \
-2,4 GHz'de yoğun yapılı alanlar için yayımlanmış aralığın ortasıdır. \
-Yalnızca binasız zeminde işlenir: bir zemin kendi taban alanlarını \
-getiriyorsa engel arazinin içindedir ve ikisini birden saymak aynı \
-binaları iki kez saymaktır (ADR-0038)."""
-note_en = """Absorption by buildings, vegetation and traffic that height does not \
-clear. Thirty is the middle of the published range for dense built-up \
-areas at 2,4 GHz. Charged only where the ground brings no buildings: \
-where it brings its own footprints the obstruction is in the terrain, and \
-charging both counts the same buildings twice (ADR-0038)."""
+note = """Yüksekliğin aşamadığı binalar, bitki örtüsü ve trafiğin \
+soğurması. Otuz, 2,4 GHz'de yoğun yapılı alanlar için yayımlanmış aralığın \
+ortasıdır. Yalnızca binasız zeminde işlenir: bir zemin kendi taban \
+alanlarını getiriyorsa engel arazinin içindedir ve ikisini birden saymak \
+aynı binaları iki kez saymaktır."""
+note_en = """Absorption by buildings, vegetation and traffic that height \
+does not clear. Thirty is the middle of the published range for dense \
+built-up areas at 2,4 GHz. Charged only where the ground brings no \
+buildings: where it brings its own footprints the obstruction is in the \
+terrain, and charging both counts the same buildings twice."""
 affects = """binasız zeminde şehir içi bir direğin ne kadar uzağa eriştiğini; \
 dört Ankara sahası bina taşıdığı için yayımlanan satırlarda okunmuyor"""
 affects_en = """how far an urban anchor reaches over ground with no buildings; the four \
@@ -978,16 +952,17 @@ unit = "m"
 provenance = "DERIVED"
 source = "bu proje, HPE P95 < 10 m hedefinden"
 source_en = "this project, from the HPE P95 < 10 m target"
-note = """Bir konumun "var" sayılması için filtrenin kendi yatay belirsizliğinin \
-(kovaryansın izinin karekökü, bir sigma) en fazla bu olması gerekir. Sunumun \
-hedefi yatay hatada P95 < 10 m. İki boyutlu, eşit dağılımlı bir hata için \
-%95'lik yarıçap her eksende sigmanın 2,448 katıdır; 10 m / 2,448 = 4,08 m her \
-eksende, iki eksenin toplamı olarak 4,08 × √2 = 5,78 m (ADR-0084)."""
-note_en = """For a position to count as available, the filter's own horizontal \
-uncertainty (square root of the covariance trace, one sigma) must be at most \
-this. The deck's target is horizontal P95 < 10 m. For a two-dimensional error \
-equal in both axes the 95 % radius is 2,448 sigma per axis; 10 m / 2,448 = \
-4,08 m per axis, 4,08 × √2 = 5,78 m over both (ADR-0084)."""
+note = """Bir konumun "var" sayılması için filtrenin kendi yatay \
+belirsizliğinin (kovaryansın izinin karekökü, bir sigma) en fazla bu \
+olması gerekir. Sunumun hedefi yatay hatada P95 < 10 m. İki boyutlu, eşit \
+dağılımlı bir hata için %95'lik yarıçap her eksende sigmanın 2,448 \
+katıdır; 10 m / 2,448 = 4,08 m her eksende, iki eksenin toplamı olarak \
+4,08 × √2 = 5,78 m."""
+note_en = """For a position to count as available, the filter's own \
+horizontal uncertainty (square root of the covariance trace, one sigma) \
+must be at most this. The deck's target is horizontal P95 < 10 m. For a \
+two-dimensional error equal in both axes the 95 % radius is 2,448 sigma \
+per axis; 10 m / 2,448 = 4,08 m per axis, 4,08 × √2 = 5,78 m over both."""
 affects = "kullanılabilirliği ve hangi konumların hataya sayıldığını"
 affects_en = "availability, and which positions count towards the error"
 
@@ -998,17 +973,17 @@ provenance = "DERIVED"
 source = "Copernicus DEM ürün el kitabı: mutlak düşey doğruluk < 4 m (LE90)"
 source_en = "Copernicus DEM product handbook: absolute vertical accuracy < 4 m (LE90)"
 note = """Birimin haritasının yolun yüksekliğini ne kadar iyi bildiği, bir \
-sigma. Her turda filtre, kendini bulduğu yerdeki harita yüksekliğine \
-anten yüksekliğini ekleyip bir ölçüm olarak alıyor (harita kısıtı). \
-LE90 4 m, normal dağılımda 4 / 1,645 = 2,43 m. Hata yol boyunca \
-parça parça: her 500 m'de bir çekiliyor. 0 kısıtı kapatır ve \
-yüksekliği yalnız mesafelere bırakır (ADR-0088)."""
-note_en = """How well the unit's map knows the road's height, one sigma. Each \
-round the filter takes the map's height where it thinks it is, plus the \
-antenna height, as a measurement (a map constraint). LE90 4 m is \
-4 / 1,645 = 2,43 m for a normal error. The error comes in patches along \
-the road, drawn every 500 m. 0 switches the aid off and leaves the \
-height to the ranges (ADR-0088)."""
+sigma. Her turda filtre, kendini bulduğu yerdeki harita yüksekliğine anten \
+yüksekliğini ekleyip bir ölçüm olarak alıyor (harita kısıtı). LE90 4 m, \
+normal dağılımda 4 / 1,645 = 2,43 m. Hata yol boyunca parça parça: her 500 \
+m'de bir çekiliyor. 0 kısıtı kapatır ve yüksekliği yalnız mesafelere \
+bırakır."""
+note_en = """How well the unit's map knows the road's height, one sigma. \
+Each round the filter takes the map's height where it thinks it is, plus \
+the antenna height, as a measurement (a map constraint). LE90 4 m is 4 / \
+1,645 = 2,43 m for a normal error. The error comes in patches along the \
+road, drawn every 500 m. 0 switches the aid off and leaves the height to \
+the ranges."""
 affects = "düşey hatayı (VPE), dolaylı olarak yatay hatayı ve kullanılabilirliği"
 affects_en = "the vertical error (VPE), and through it the horizontal error and availability"
 
@@ -1019,13 +994,13 @@ provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
 note = """Harita yükseklik hatasının yol boyunca ne kadar benzer kaldığı. \
-Yükseklik modelleri parça parça yanılır; bir araç 500 m'yi yarım \
-dakikada geçer, filtrenin düşey belleği bundan kısa, yani hata filtre \
-için bir sapma gibi davranır ve ortalamayla silinmez (ADR-0088)."""
-note_en = """How far along a road the map's height error stays alike. Height \
-models are wrong in patches; a vehicle covers 500 m in half a minute, \
-longer than the filter's vertical memory, so to the filter the error \
-behaves like a bias and does not average away (ADR-0088)."""
+Yükseklik modelleri parça parça yanılır; bir araç 500 m'yi yarım dakikada \
+geçer, filtrenin düşey belleği bundan kısa, yani hata filtre için bir \
+sapma gibi davranır ve ortalamayla silinmez."""
+note_en = """How far along a road the map's height error stays alike. \
+Height models are wrong in patches; a vehicle covers 500 m in half a \
+minute, longer than the filter's vertical memory, so to the filter the \
+error behaves like a bias and does not average away."""
 affects = "düşey hatanın ne kadar ortalamayla silinebildiğini"
 affects_en = "how much of the vertical error averages away"
 
@@ -1036,11 +1011,11 @@ provenance = "DESIGN"
 source = "bu proje"
 source_en = "this project"
 note = """Filtrenin beklediğinden bu kadar sigmadan uzak düşen bir mesafe \
-ölçümü atılır (yenilik testi). 0 kapalı demek. Görüş dışı yanlılık açıldığında \
-3 ile birlikte açılır (ADR-0084)."""
-note_en = """A range further than this many sigmas from what the filter expects \
-is dropped (innovation gating). 0 means off. Switched on at 3 together with \
-the non-line-of-sight bias (ADR-0084)."""
+ölçümü atılır (yenilik testi). 0 kapalı demek. Görüş dışı yanlılık \
+açıldığında 3 ile birlikte açılır."""
+note_en = """A range further than this many sigmas from what the filter \
+expects is dropped (innovation gating). 0 means off. Switched on at 3 \
+together with the non-line-of-sight bias."""
 affects = "hangi mesafe ölçümlerinin filtreye girdiğini"
 affects_en = "which ranges the filter accepts"
 
@@ -1050,14 +1025,14 @@ unit = "m"
 provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
-note = """Doğrudan ışını bir engel kestiğinde SX1280'in ölçtüğü mesafeye eklenen \
-pozitif yanlılığın ortalaması; üstel dağılımla çekilir. 0 kapalı demek. \
-Yayımlanmış bir SX1280 görüş dışı ölçümü bulunamadı; pilotta ölçülecek. \
-Karşılaştırma 5 m ve 15 m ile koşuldu (ADR-0084)."""
-note_en = """Mean of the positive bias added to an SX1280 range when an obstacle \
-cuts the direct ray, drawn from an exponential distribution. 0 means off. \
-No published SX1280 non-line-of-sight measurement was found; the pilot will \
-measure it. The comparison was run at 5 m and 15 m (ADR-0084)."""
+note = """Doğrudan ışını bir engel kestiğinde SX1280'in ölçtüğü mesafeye \
+eklenen pozitif yanlılığın ortalaması; üstel dağılımla çekilir. 0 kapalı \
+demek. Yayımlanmış bir SX1280 görüş dışı ölçümü bulunamadı; pilotta \
+ölçülecek."""
+note_en = """Mean of the positive bias added to an SX1280 range when an \
+obstacle cuts the direct ray, drawn from an exponential distribution. 0 \
+means off. No published SX1280 non-line-of-sight measurement was found; \
+the pilot will measure it."""
 affects = "şehir içi doğruluğu; engellenmiş her bağlantının mesafesini"
 affects_en = "urban accuracy; the range of every blocked link"
 
@@ -1067,11 +1042,10 @@ unit = "m"
 provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
-note = """Aynısı, DWM3000 için. Geniş bantlı bir darbe radyosu yansımaları çok \
-daha ince ayırır; karşılaştırma 0,5 m ile koşuldu (ADR-0084)."""
+note = """Aynısı, DWM3000 için. Geniş bantlı bir darbe radyosu yansımaları \
+çok daha ince ayırır."""
 note_en = """The same, for the DWM3000. An impulse radio of this bandwidth \
-resolves reflections far more finely; the comparison was run at 0,5 m \
-(ADR-0084)."""
+resolves reflections far more finely."""
 affects = "tünel doğruluğunu"
 affects_en = "tunnel accuracy"
 
@@ -1155,16 +1129,16 @@ provenance = "MEASUREMENT"
 source = "Copernicus DEM 30 m, Ankara Kızılay 39,91-39,94 N 32,82-32,85 E, 2026-09-10'da getirildi"
 source_en = """Copernicus DEM 30 m, Ankara Kızılay 39,91-39,94 N 32,82-32,85 E, fetched \
 2026-09-10"""
-note = """Şehir içi satırın anlattığı üç kilometrelik şehirde zeminin iniş çıkışı. \
-Yalnızca getirilen saha elde yokken kullanılır: elde varken zemin gerçek \
-ızgaradır ve bu, o ızgaranın ölçtüğü değerdir. Hiçbir yer düz değildir; \
-düz olan bir yedek, şehir içi satırı önbelleğin ürettiğinden farklı bir \
-çalışma hâline getirirdi (ADR-0021)."""
-note_en = """Ground rise and fall across the three kilometres of town the urban row \
-describes. Used only when the fetched site is not on hand: with it, the \
-ground is the real grid and this is what that grid measured. Nowhere is \
-flat, and a fallback that was would make the urban row a different study \
-from the one the cache produces (ADR-0021)."""
+note = """Şehir içi satırın anlattığı üç kilometrelik şehirde zeminin iniş \
+çıkışı. Yalnızca getirilen saha elde yokken kullanılır: elde varken zemin \
+gerçek ızgaradır ve bu, o ızgaranın ölçtüğü değerdir. Hiçbir yer düz \
+değildir; düz olan bir yedek, şehir içi satırı önbelleğin ürettiğinden \
+farklı bir çalışma hâline getirirdi."""
+note_en = """Ground rise and fall across the three kilometres of town the \
+urban row describes. Used only when the fetched site is not on hand: with \
+it, the ground is the real grid and this is what that grid measured. \
+Nowhere is flat, and a fallback that was would make the urban row a \
+different study from the one the cache produces."""
 affects = """hiçbir saha getirilmemişken şehir içi satırın engel ve yansıma \
 geometrisini"""
 affects_en = """the urban row's obstruction and reflection geometry when no site is \
@@ -1199,27 +1173,23 @@ provenance = "MEASUREMENT"
 source = "Copernicus DEM 30 m, Polatlı 39,48-39,66 N 32,02-32,28 E, 2026-09-10'da getirildi"
 source_en = """Copernicus DEM 30 m, Polatlı 39,48-39,66 N 32,02-32,28 E, fetched \
 2026-09-10"""
-note = """Kırsal satırın anlattığı yirmi kilometrelik açık arazide zeminin iniş \
-çıkışı. Şehirlerarası yolların geçtiği Anadolu bozkırı: bu projenin \
-zemini getirmeden önce kullandığı rölyefin on iki katı, Gölbaşı \
-tepelerininse yarısı — ki orada aynı yerleşim %82 yerine %45 oranında \
-konum üretiyor. Satırın gerçekten üzerinde durduğu sahayla uyuşmak \
-zorunda; yoksa önbelleği olmayan bir makine, olanından daha zor bir \
-çalışma koşar ve bunu hiçbir şey söylemez."""
-note_en = """Ground rise and fall across the twenty kilometres of open country the \
-rural row describes. Anatolian steppe where the intercity roads run: \
-twelve times the relief this project used before anybody fetched the \
-ground, and half that of the hills at Gölbaşı, where the same deployment \
-produces a position 45 % of the time instead of 82 %. It has to match \
+note = """Kırsal satırın anlattığı yirmi kilometrelik açık arazide zeminin \
+iniş çıkışı. Şehirlerarası yolların geçtiği Anadolu bozkırı; Gölbaşı \
+tepelerinin rölyefinin yarısı. Satırın gerçekten üzerinde durduğu sahayla \
+uyuşmak zorunda; yoksa önbelleği olmayan bir makine daha zor bir çalışma \
+koşar ve bunu hiçbir şey söylemez."""
+note_en = """Ground rise and fall across the twenty kilometres of open \
+country the rural row describes. Anatolian steppe where the intercity \
+roads run, with half the relief of the hills at Gölbaşı. It has to match \
 the site the row actually stands on, or a machine with no cache runs a \
 harder study than one with it and nothing says so."""
 affects = "hiçbir saha getirilmemişken kırsal satırın engel geometrisini"
 affects_en = "the rural row's obstruction geometry when no site is fetched"
-sensitivity = """eski 40 m'lik değer neredeyse her kırsal bağlantının açıktan geçmesine \
-izin veriyordu; Gölbaşı'nın 907 m'sinde bu projenin göze alabileceği \
+sensitivity = """40 m'lik bir rölyef neredeyse her kırsal bağlantının \
+açıktan geçmesine izin verir; Gölbaşı'nın 907 m'sinde karşılanabilir \
 hiçbir aralık bunu yapamaz"""
-sensitivity_en = """the old 40 m figure let almost every rural link run clear; at Gölbaşı's \
-907 m no spacing this project can afford does"""
+sensitivity_en = """a 40 m relief lets almost every rural link run clear; \
+at Gölbaşı's 907 m no affordable spacing does"""
 
 [values."site.rural_relief_wavelength_m"]
 value = 6000.0
@@ -1290,18 +1260,16 @@ unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Direk taşıyan aydınlatma direklerinin birbirinden ne kadar uzakta \
-durduğu. 500 m idi. 250 ile 800 m arasındaki tarama (docs/MALIYET-\
-KARSILASTIRMASI.md) 600 m'de 36 yerine 25 direk verdi: km² başına \
-CAPEX ve OPEX yaklaşık %23 düştü, HPE P95 10 m hedefinin altında kaldı \
-ve kullanılabilirlik 6 puan kadar düştü. 700 m ve üstünde \
-kullanılabilirlik çöküyor. Proje sahibinin kararı."""
-note_en = """How far apart the lighting columns carrying anchors stand. It was \
-500 m. A sweep from 250 to 800 m (docs/MALIYET-KARSILASTIRMASI.md) gave \
-25 anchors instead of 36 at 600 m: CAPEX and OPEX per km² fell by about \
-23 %, HPE P95 stayed under the 10 m target and availability fell by \
-about 6 points. At 700 m and above availability collapses. The project \
-owner's choice."""
+note = """Direk taşıyan aydınlatma direklerinin birbirinden ne kadar \
+uzakta durduğu. 250 ile 800 m arasındaki taramada 600 m, 500 m'ye göre 36 \
+yerine 25 direk veriyor: km² başına CAPEX ve OPEX yaklaşık %23 düşük, HPE \
+P95 10 m hedefinin altında, kullanılabilirlik 6 puan kadar düşük. 700 m ve \
+üstünde kullanılabilirlik çöküyor."""
+note_en = """How far apart the lighting columns carrying anchors stand. In \
+a sweep from 250 to 800 m, 600 m gives 25 anchors where 500 m gives 36: \
+CAPEX and OPEX per km² about 23 % lower, HPE P95 under the 10 m target, \
+availability about 6 points lower. At 700 m and above availability \
+collapses."""
 affects = "şehir içi satırın direk sayısını, kapsamasını ve maliyetini"
 affects_en = "the urban row's anchor count, coverage and cost"
 sensitivity = "yarıya indirmek direk sayısını, dolayısıyla sermayeyi dörde katlar"
@@ -1341,11 +1309,12 @@ unit = "yes/no"
 provenance = "DESIGN"
 source = "bu proje, bakım ekibi Ankara merkezde"
 source_en = "this project, the maintenance crew is based in central Ankara"
-note = """Kızılay ekibin kendi şehri; şehir dışı görev yok. Harcırah Kanunu'nda büyükşehir içindeki ilçelerin \
-görev yeri dışı sayılıp sayılmadığı doğrulanmadı (ADR-0089)."""
-note_en = """Kızılay is the crew's own city; no travel out of it. Whether districts inside a metropolitan municipality count \
-as outside the place of duty under the travel allowance law is not \
-verified (ADR-0089)."""
+note = """Kızılay ekibin kendi şehri; şehir dışı görev yok. Harcırah \
+Kanunu'nda büyükşehir içindeki ilçelerin görev yeri dışı sayılıp \
+sayılmadığı doğrulanmadı."""
+note_en = """Kızılay is the crew's own city; no travel out of it. Whether \
+districts inside a metropolitan municipality count as outside the place of \
+duty under the travel allowance law is not verified."""
 affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 
@@ -1355,22 +1324,19 @@ unit = "anchors"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir birimin konumlanmadan önce kaç direği yokladığı. 12 idi (ADR-0072); \
-kullanılabilirlik doğruluğa bağlanınca (ADR-0084) sıralama döndü. 600 m \
-ızgarada dört tohumda, tam çözünürlükte: 8 direkle %72,67, %71,99, \
-%73,68, %72,54; 12 direkle %68,66, %69,30, %69,81, %69,94. Dördünde de \
-sekiz önde, ortalama +3,3 puan; P95 tohum saçılımı içinde (6,76 ve 6,70 m). Kısa tur \
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. 600 m \
+ızgarada dört tohumda, tam çözünürlükte: 8 direkle %72,67, %71,99, %73,68, \
+%72,54; 12 direkle %68,66, %69,30, %69,81, %69,94. Dördünde de sekiz önde, \
+ortalama +3,3 puan; P95 tohum saçılımı içinde (6,76 ve 6,70 m). Kısa tur \
 saniyede daha çok tur demek; filtrenin belirsizliği turlar arasında \
-büyüdüğü için sık gelen tur çıtayı daha sık geçiyor. Maliyet değişmiyor \
-(ADR-0085)."""
-note_en = """How many anchors a unit polls before it is fixed. It was 12 \
-(ADR-0072); once availability was tied to accuracy (ADR-0084) the order \
-turned. On the 600 m grid over four seeds at full resolution: with 8, \
-72,67 %, 71,99 %, 73,68 %, 72,54 %; with 12, 68,66 %, 69,30 %, 69,81 %, \
-69,94 %. Eight leads on all four, +3,3 points on average; P95 is the \
-within the seed scatter (6,76 and 6,70 m). A shorter round is more rounds a second, and \
-the filter's uncertainty grows between rounds, so rounds that come \
-often clear the bar more often. The cost does not move (ADR-0085)."""
+büyüdüğü için sık gelen tur çıtayı daha sık geçiyor. Maliyet değişmiyor."""
+note_en = """How many anchors a unit polls before it is fixed. On the 600 \
+m grid over four seeds at full resolution: with 8, 72,67 %, 71,99 %, 73,68 \
+%, 72,54 %; with 12, 68,66 %, 69,30 %, 69,81 %, 69,94 %. Eight leads on \
+all four, +3,3 points on average; P95 is within the seed scatter (6,76 and \
+6,70 m). A shorter round is more rounds a second, and the filter's \
+uncertainty grows between rounds, so rounds that come often clear the bar \
+more often. The cost does not move."""
 affects = "şehir içi satırın güncelleme hızını ve kullanılabilirliğini"
 affects_en = "the urban row's update rate and availability"
 
@@ -1408,18 +1374,14 @@ unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Direklerin birbirinden ne kadar uzakta durduğu. 25 m'lik dikilen \
-direklerle 4000 m idi. Elektrik dağıtım hattının 10 m'deki direklerine \
-geçince kaba okumada 3000 m kazanıyor: 49 direk, kullanılabilirlik \
-%52'den %74,5'e, P95 18,6 m'den 13,0 m'ye, alan 178'den 246 km²'ye. \
-3500 m'de alan 126 km²'ye düşüyor ve kilometrekare başına maliyet \
-artıyor; 2500 m bir şey kazandırmıyor (ADR-0079)."""
-note_en = """How far apart the poles stand. It was 4000 m with 25 m masts \
-raised for the purpose. On the distribution line's own poles at 10 m, \
-3000 m wins on a coarse read: 49 poles, availability from 52 % to \
-74,5 %, P95 from 18,6 m to 13,0 m, area from 178 to 246 km². At 3500 m \
-the area falls to 126 km² and the cost per square kilometre rises; \
-2500 m buys nothing (ADR-0079)."""
+note = """Direklerin birbirinden ne kadar uzakta durduğu. Elektrik dağıtım \
+hattının 10 m'deki direklerinde 3000 m en ucuzu: kaba okumada 3500 m'de \
+alan 126 km²'ye düşüyor ve kilometrekare başına maliyet artıyor, 2500 m \
+bir şey kazandırmıyor."""
+note_en = """How far apart the poles stand. On the distribution line's own \
+poles at 10 m, 3000 m is the cheapest: on a coarse read the area falls to \
+126 km² at 3500 m and the cost per square kilometre rises, and 2500 m buys \
+nothing."""
 affects = "kırsal satırın direk sayısını, kullanılabilirliğini ve sermayesini"
 affects_en = "the rural row's pole count, availability and capital"
 
@@ -1441,20 +1403,18 @@ affects_en = "the rural row's horizontal geometry"
 value = 0.0
 unit = "yes/no"
 provenance = "DESIGN"
-source = "proje sahibinin kararı: yerel teknik firma"
-source_en = "the project owner's decision: a local technical firm"
+source = "bakım modeli: yerel teknik firma"
+source_en = "maintenance model: a local technical firm"
 note = """Hayır: bakımı Polatlı'daki yerel bir teknik firma yapıyor, ekip \
-Ankara'dan gitmiyor ve harcırah yok (proje sahibinin kararı, 24 Eylül). \
-Elektrik dağıtım şirketinin ekiplerine dayanmıyor, çünkü şirket bu işi \
-istemeyebilir. Direkler yine şirketin: direğe çıkmak için onun izni ve \
-koşulları gerekebilir, bu direk kirası anlaşmasının içinde çözülmeli \
-(ADR-0090)."""
-note_en = """No: a local technical firm in Polatlı does the maintenance, no crew \
-travels from Ankara and there is no per diem (the project owner's \
-decision, 24 September). It does not rest on the distribution company's \
-crews, because the company may not want the work. The poles are still \
-the company's: climbing one may need its permission and conditions, to \
-be settled in the pole rental agreement (ADR-0090)."""
+Ankara'dan gitmiyor ve harcırah yok. Elektrik dağıtım şirketinin \
+ekiplerine dayanmıyor, çünkü şirket bu işi istemeyebilir. Direkler yine \
+şirketin: direğe çıkmak için onun izni ve koşulları gerekebilir, bu direk \
+kirası anlaşmasının içinde çözülmeli."""
+note_en = """No: a local technical firm in Polatlı does the maintenance, \
+no crew travels from Ankara and there is no per diem. It does not rest on \
+the distribution company's crews, because the company may not want the \
+work. The poles are still the company's: climbing one may need its \
+permission and conditions, to be settled in the pole rental agreement."""
 affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 
@@ -1464,20 +1424,18 @@ unit = "anchors"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Altı çok az: \
-gerçek rölyefte yoklananın yarısı hiç cevap vermiyor. 12 idi; \
-kullanılabilirlik doğruluğa bağlanınca (ADR-0084) dört tohumda, tam \
-çözünürlükte: 8 direkle %58,15, %57,66, %58,62, %58,66; 12 direkle \
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Altı çok \
+az: gerçek rölyefte yoklananın yarısı hiç cevap vermiyor. Dört tohumda, \
+tam çözünürlükte: 8 direkle %58,15, %57,66, %58,62, %58,66; 12 direkle \
 %55,89, %56,55, %55,82, %55,82. Dördünde de sekiz önde, ortalama +2,3 \
-puan; P95 tohum saçılımı içinde (7,08 ve 6,92 m). On da sekize dört tohumun dördünde kaybediyor \
-(ADR-0085)."""
-note_en = """How many anchors a unit polls before it is fixed. Six is too few: \
-half of what is polled over real relief never answers. It was 12; once \
-availability was tied to accuracy (ADR-0084), over four seeds at full \
-resolution: with 8, 58,15 %, 57,66 %, 58,62 %, 58,66 %; with 12, \
-55,89 %, 56,55 %, 55,82 %, 55,82 %. Eight leads on all four, +2,3 points \
-on average; P95 is within the seed scatter (7,08 and 6,92 m). Ten loses to eight on all four seeds too \
-(ADR-0085)."""
+puan; P95 tohum saçılımı içinde (7,08 ve 6,92 m). On da sekize dört \
+tohumun dördünde kaybediyor."""
+note_en = """How many anchors a unit polls before it is fixed. Six is too \
+few: half of what is polled over real relief never answers. Over four \
+seeds at full resolution: with 8, 58,15 %, 57,66 %, 58,62 %, 58,66 %; with \
+12, 55,89 %, 56,55 %, 55,82 %, 55,82 %. Eight leads on all four, +2,3 \
+points on average; P95 is within the seed scatter (7,08 and 6,92 m). Ten \
+loses to eight on all four seeds too."""
 affects = """kırsal satırın kullanılabilirliğini, güncelleme hızını ve yatay hatasını"""
 affects_en = "the rural row's availability, update rate and horizontal error"
 sensitivity = """altı ile sekiz arasında düz, sekizin üstünde her adımda düşüyor"""
@@ -1519,25 +1477,20 @@ unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. 225 m \
-idi (ADR-0072: 150 m'de geometri kötüydü, 300 m'de bağlantılar \
-kopuyordu). Tam çözünürlükte, sekiz gölge çekilişiyle, doğruluğa bağlı \
-kullanılabilirlikle: 225 m'de 9 askı, P95 3,21 m, %98,25; 250 m'de 9 \
-askı, P95 2,97 m, %98,57; 275 m'de 8 askı, P95 3,80 m, %91,21; 300 m'de \
-7 askı, P95 3,68 m, %88,29. 250 m her ölçüde en az 225 m kadar iyi ve \
-uzun bir tünelde kilometre başına %10 daha az askı istiyor (4,4 yerine \
-4,0). 275 ve 300 m daha ucuz, bedeli kullanılabilirlikte; seçim proje \
-sahibinin (docs/MALIYET-KARSILASTIRMASI.md)."""
-note_en = """How far apart the brackets stand along the bore. It was 225 m \
-(ADR-0072: at 150 m the geometry was bad, at 300 m links broke). At full \
-resolution, eight shadow draws, availability tied to accuracy: at \
-225 m, 9 brackets, P95 3,21 m, 98,25 %; at 250 m, 9 brackets, P95 \
-2,97 m, 98,57 %; at 275 m, 8 brackets, P95 3,80 m, 91,21 %; at 300 m, \
-7 brackets, P95 3,68 m, 88,29 %. 250 m is at least as good as 225 m on \
-every measure and needs 10 % fewer brackets a kilometre in a long bore \
-(4,0 instead of 4,4). 275 and 300 m are cheaper and pay in \
-availability; that choice is the project owner's \
-(docs/MALIYET-KARSILASTIRMASI.md)."""
+note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. 150 \
+m'de geometri kötüleşiyor. Tam çözünürlükte, sekiz gölge çekilişiyle: 225 \
+m'de 9 askı, P95 3,21 m, %98,25; 250 m'de 9 askı, P95 2,97 m, %98,57; 275 \
+m'de 8 askı, P95 3,80 m, %91,21; 300 m'de 7 askı, P95 3,68 m, %88,29. 250 \
+m her ölçüde en az 225 m kadar iyi ve uzun bir tünelde kilometre başına \
+%10 daha az askı istiyor (4,4 yerine 4,0). 275 ve 300 m daha ucuz, bedeli \
+kullanılabilirlikte."""
+note_en = """How far apart the brackets stand along the bore. At 150 m the \
+geometry gets worse. At full resolution, with eight shadow draws: at 225 \
+m, 9 brackets, P95 3,21 m, 98,25 %; at 250 m, 9 brackets, P95 2,97 m, \
+98,57 %; at 275 m, 8 brackets, P95 3,80 m, 91,21 %; at 300 m, 7 brackets, \
+P95 3,68 m, 88,29 %. 250 m is at least as good as 225 m on every measure \
+and needs 10 % fewer brackets a kilometre in a long bore (4,0 instead of \
+4,4). 275 and 300 m are cheaper and pay in availability."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \
 başına en büyük sermaye"""
 affects_en = """the tunnel row's anchor count and its capital, which is the largest per \
@@ -1565,10 +1518,9 @@ provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
 note = """Taşıt yolunun ne kadar geniş olduğu. Tünel bir düzlem değildir; \
-dolayısıyla hizmet verdiği alan uzunluğu çarpı budur, başka bir şey \
-değil (ADR-0012)."""
-note_en = """How wide the carriageway is. A tunnel is not a plane, so its served area \
-is its length times this and nothing else (ADR-0012)."""
+dolayısıyla hizmet verdiği alan uzunluğu çarpı budur, başka bir şey değil."""
+note_en = """How wide the carriageway is. A tunnel is not a plane, so its \
+served area is its length times this and nothing else."""
 affects = """tünel satırının hizmet alanını, dolayısıyla o satırdaki kilometrekare \
 başına her değeri"""
 affects_en = """the tunnel row's service area, and therefore every per-square-kilometre \
@@ -1578,16 +1530,15 @@ figure in that row"""
 value = 0.0
 unit = "yes/no"
 provenance = "DESIGN"
-source = "proje sahibinin kararı: yerel teknik firma"
-source_en = "the project owner's decision: a local technical firm"
+source = "bakım modeli: yerel teknik firma"
+source_en = "maintenance model: a local technical firm"
 note = """Hayır: bakımı Kızılcahamam'daki yerel bir teknik firma yapıyor, \
-harcırah yok (proje sahibinin kararı, 24 Eylül). Tünele giriş ve şerit \
-kapatma yine Karayolları'nın izniyle; ziyaretler onların bakım \
-kapanışlarına denk getirilebilir (ADR-0090)."""
-note_en = """No: a local technical firm in Kızılcahamam does the maintenance, no \
-per diem (the project owner's decision, 24 September). Entering the bore \
-and closing a lane still need the highways authority's permission; \
-visits can be timed to its maintenance closures (ADR-0090)."""
+harcırah yok. Tünele giriş ve şerit kapatma yine Karayolları'nın izniyle; \
+ziyaretler onların bakım kapanışlarına denk getirilebilir."""
+note_en = """No: a local technical firm in Kızılcahamam does the \
+maintenance, no per diem. Entering the bore and closing a lane still need \
+the highways authority's permission; visits can be timed to its \
+maintenance closures."""
 affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 
@@ -1652,17 +1603,16 @@ unit = "fraction"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik değerin \
-katları cinsinden bir log-normalin genişliği olarak. Ortalamaya değil \
-karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü tam \
-olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
-çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar; bu da yerine \
-geçtiği tek değerli modeldir."""
-note_en = """How much rougher or smoother one patch is than another, as the width of \
-a log-normal in multiples of the typical figure. Centred on mean square \
-rather than mean, so the site's measured roughness keeps meaning exactly \
-what it measured and only the variation around it is added. Zero makes \
-every patch identical, which is the single-figure model this replaced."""
+note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik \
+değerin katları cinsinden bir log-normalin genişliği olarak. Ortalamaya \
+değil karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü \
+tam olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
+çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar."""
+note_en = """How much rougher or smoother one patch is than another, as \
+the width of a log-normal in multiples of the typical figure. Centred on \
+mean square rather than mean, so the site's measured roughness keeps \
+meaning exactly what it measured and only the variation around it is \
+added. Zero makes every patch identical."""
 affects = """şehir içi satırda eşevreli yansımanın bağlantıdan bağlantıya ne kadar \
 değiştiğini"""
 affects_en = """how much the coherent reflection varies link to link in the urban row"""
@@ -1711,14 +1661,14 @@ unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Açık arazi \
-tarla sınırlarında değişir — anız, sürülmüş toprak, mera, çalılık — ki \
+note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Açık \
+arazi tarla sınırlarında değişir (anız, sürülmüş toprak, mera, çalılık); \
 Anadolu platosunda bu birkaç yüz metredir. İnce katmanlar bunun altıya \
 bölünmüşüdür, yani tek bir değer bütün merdiveni kurar."""
-note_en = """How far you travel before the ground is something else. Open country \
-changes at field boundaries — stubble, ploughed earth, pasture, scrub — \
-which on the Anatolian plateau is a few hundred metres. The finer levels \
-are this divided by six, so one figure sets the whole ladder."""
+note_en = """How far you travel before the ground is something else. Open \
+country changes at field boundaries (stubble, ploughed earth, pasture, \
+scrub), which on the Anatolian plateau is a few hundred metres. The finer \
+levels are this divided by six, so one figure sets the whole ladder."""
 affects = """kırsal satırda yansıtıcı yüzeyin bir bağlantı boyunca ne çabuk \
 değiştiğini"""
 affects_en = """how quickly the reflecting surface changes along a link in the rural row"""
@@ -1729,17 +1679,16 @@ unit = "fraction"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik değerin \
-katları cinsinden bir log-normalin genişliği olarak. Ortalamaya değil \
-karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü tam \
-olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
-çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar; bu da yerine \
-geçtiği tek değerli modeldir."""
-note_en = """How much rougher or smoother one patch is than another, as the width of \
-a log-normal in multiples of the typical figure. Centred on mean square \
-rather than mean, so the site's measured roughness keeps meaning exactly \
-what it measured and only the variation around it is added. Zero makes \
-every patch identical, which is the single-figure model this replaced."""
+note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik \
+değerin katları cinsinden bir log-normalin genişliği olarak. Ortalamaya \
+değil karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü \
+tam olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
+çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar."""
+note_en = """How much rougher or smoother one patch is than another, as \
+the width of a log-normal in multiples of the typical figure. Centred on \
+mean square rather than mean, so the site's measured roughness keeps \
+meaning exactly what it measured and only the variation around it is \
+added. Zero makes every patch identical."""
 affects = """kırsal satırda eşevreli yansımanın bağlantıdan bağlantıya ne kadar \
 değiştiğini"""
 affects_en = """how much the coherent reflection varies link to link in the rural row"""
@@ -1809,17 +1758,16 @@ unit = "fraction"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik değerin \
-katları cinsinden bir log-normalin genişliği olarak. Ortalamaya değil \
-karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü tam \
-olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
-çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar; bu da yerine \
-geçtiği tek değerli modeldir."""
-note_en = """How much rougher or smoother one patch is than another, as the width of \
-a log-normal in multiples of the typical figure. Centred on mean square \
-rather than mean, so the site's measured roughness keeps meaning exactly \
-what it measured and only the variation around it is added. Zero makes \
-every patch identical, which is the single-figure model this replaced."""
+note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik \
+değerin katları cinsinden bir log-normalin genişliği olarak. Ortalamaya \
+değil karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü \
+tam olarak ölçtüğü şeyi ifade etmeyi sürdürür ve üstüne yalnızca \
+çevresindeki değişim eklenir. Sıfır her yamayı aynı yapar."""
+note_en = """How much rougher or smoother one patch is than another, as \
+the width of a log-normal in multiples of the typical figure. Centred on \
+mean square rather than mean, so the site's measured roughness keeps \
+meaning exactly what it measured and only the variation around it is \
+added. Zero makes every patch identical."""
 affects = """tünel satırında eşevreli yansımanın bağlantıdan bağlantıya ne kadar \
 değiştiğini"""
 affects_en = """how much the coherent reflection varies link to link in the tunnel row"""
@@ -1870,17 +1818,17 @@ unit = "fetched site"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/places/` \
-altındaki klasör adıyla. Ankara'nın merkezi, bir kenarı üç kilometre, \
-üzerinde doksan bir metre iniş çıkışla. Boş bırakılırsa modellenmiş \
-zemine düşer; o da tepelidir ve asla düz değildir (ADR-0021). `yerkon \
-fetch`'in yazdığı her şey — görüntüleyiciden yazdıkları dâhil — buraya \
-gelebilir."""
-note_en = """Which fetched ground this row stands on, by directory name under \
-`src/yerkon/site/places/`. Ankara's centre, three kilometres on a side, \
-rising and falling ninety-one metres across it. Empty falls back to \
-modelled terrain, which is rolling and never flat (ADR-0021). Anything \
-`yerkon fetch` writes — including from the viewer — can go here."""
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; \
+`src/yerkon/site/places/` altındaki klasör adıyla. Ankara'nın merkezi, bir \
+kenarı üç kilometre, üzerinde doksan bir metre iniş çıkışla. Boş \
+bırakılırsa modellenmiş zemine düşer; o da tepelidir ve asla düz değildir. \
+`yerkon fetch`'in yazdığı her şey (görüntüleyiciden yazdıkları dâhil) \
+buraya gelebilir."""
+note_en = """Which fetched ground this row stands on, by directory name \
+under `src/yerkon/site/places/`. Ankara's centre, three kilometres on a \
+side, rising and falling ninety-one metres across it. Empty falls back to \
+modelled terrain, which is rolling and never flat. Anything `yerkon fetch` \
+writes (including from the viewer) can go here."""
 affects = """şehir içi satırın engel geometrisini, dolayısıyla içindeki her değeri"""
 affects_en = """the urban row's obstruction geometry, and therefore every figure in it"""
 sensitivity = """aynı kırsal yerleşim Polatlı'da %89,5, Gölbaşı'nda yaklaşık %45 \
@@ -1894,20 +1842,20 @@ unit = "fetched site"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/places/` \
-altındaki klasör adıyla. Ankara'nın batısındaki, şehirlerarası yolların \
-geçtiği Polatlı ovası. Bunu `golbasi` yaparsan aynı yerleşim 907 m \
-rölyefin üzerine oturur; tasarlanmadığı arazide neye mal olduğu budur. \
-Boş bırakılırsa modellenmiş zemine düşer; o da tepelidir ve asla düz \
-değildir (ADR-0021). `yerkon fetch`'in yazdığı her şey — \
-görüntüleyiciden yazdıkları dâhil — buraya gelebilir."""
-note_en = """Which fetched ground this row stands on, by directory name under \
-`src/yerkon/site/places/`. The Polatlı plain west of Ankara, where the \
-intercity roads run. Set this to `golbasi` to stand the same deployment \
-on 907 m of relief instead, which is what it costs in terrain it was not \
-designed for. Empty falls back to modelled terrain, which is rolling and \
-never flat (ADR-0021). Anything `yerkon fetch` writes — including from \
-the viewer — can go here."""
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; \
+`src/yerkon/site/places/` altındaki klasör adıyla. Ankara'nın batısındaki, \
+şehirlerarası yolların geçtiği Polatlı ovası. Bunu `golbasi` yaparsan aynı \
+yerleşim 907 m rölyefin üzerine oturur; tasarlanmadığı arazide neye mal \
+olduğu budur. Boş bırakılırsa modellenmiş zemine düşer; o da tepelidir ve \
+asla düz değildir. `yerkon fetch`'in yazdığı her şey (görüntüleyiciden \
+yazdıkları dâhil) buraya gelebilir."""
+note_en = """Which fetched ground this row stands on, by directory name \
+under `src/yerkon/site/places/`. The Polatlı plain west of Ankara, where \
+the intercity roads run. Set this to `golbasi` to stand the same \
+deployment on 907 m of relief instead, which is what it costs in terrain \
+it was not designed for. Empty falls back to modelled terrain, which is \
+rolling and never flat. Anything `yerkon fetch` writes (including from the \
+viewer) can go here."""
 affects = "kırsal satırın engel geometrisini, dolayısıyla içindeki her değeri"
 affects_en = """the rural row's obstruction geometry, and therefore every figure in it"""
 sensitivity = """aynı kırsal yerleşim Polatlı'da %89,5, Gölbaşı'nda yaklaşık %45 \
@@ -1921,18 +1869,18 @@ unit = "fetched site"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Bu satırın üzerinde durduğu, getirilmiş zemin; `src/yerkon/site/places/` \
-altındaki klasör adıyla. Tünelin içinden geçtiği dağ. Yalnızca iki \
-portal yüksekliği kullanılır, çünkü bir tünel tepenin üzerinden değil \
-içinden geçer. Boş bırakılırsa modellenmiş zemine düşer; o da tepelidir \
-ve asla düz değildir (ADR-0021). `yerkon fetch`'in yazdığı her şey — \
-görüntüleyiciden yazdıkları dâhil — buraya gelebilir."""
-note_en = """Which fetched ground this row stands on, by directory name under \
-`src/yerkon/site/places/`. The mountain the bore goes through. Only its \
-two portal elevations are used, because a tunnel goes through a hill \
+note = """Bu satırın üzerinde durduğu, getirilmiş zemin; \
+`src/yerkon/site/places/` altındaki klasör adıyla. Tünelin içinden geçtiği \
+dağ. Yalnızca iki portal yüksekliği kullanılır, çünkü bir tünel tepenin \
+üzerinden değil içinden geçer. Boş bırakılırsa modellenmiş zemine düşer; o \
+da tepelidir ve asla düz değildir. `yerkon fetch`'in yazdığı her şey \
+(görüntüleyiciden yazdıkları dâhil) buraya gelebilir."""
+note_en = """Which fetched ground this row stands on, by directory name \
+under `src/yerkon/site/places/`. The mountain the bore goes through. Only \
+its two portal elevations are used, because a tunnel goes through a hill \
 rather than over it. Empty falls back to modelled terrain, which is \
-rolling and never flat (ADR-0021). Anything `yerkon fetch` writes — \
-including from the viewer — can go here."""
+rolling and never flat. Anything `yerkon fetch` writes (including from the \
+viewer) can go here."""
 affects = """tünel satırının engel geometrisini, dolayısıyla içindeki her değeri"""
 affects_en = """the tunnel row's obstruction geometry, and therefore every figure in it"""
 sensitivity = """aynı kırsal yerleşim Polatlı'da %89,5, Gölbaşı'nda yaklaşık %45 \

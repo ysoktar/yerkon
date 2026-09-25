@@ -69,8 +69,29 @@ tablosundakinden biraz yüksek (şehir içi 10176 yerine 10220).
 - **Kanal dolu çıkarsa bekleme modelde yok.** Şehir içinde Wi-Fi
   -70 dBm/MHz eşiğini sık aşarsa paket kaybı artar. Sahada SDR kaydıyla
   ölçülmeli (ADR-0083).
-- **Çubuk anten iç ortam tipi.** Direkte su geçirmez bir sürüm ya da
-  muhafaza gerekir; fiyatı biraz artar.
-- **Çubuk antenin fiyatı bir kademe fiyatı** (Alibaba, 500-49999 adet,
-  1,18 USD); tek adet fiyatı bulunmadığı için 1 ve 100 adet sütunlarında
-  da bu kullanılıyor.
+- **Çubuk anten iç ortam tipiydi;** aşağıdaki ek dış ortam antenine
+  geçişi anlatıyor.
+
+## Ek: dış ortam anteni (25 Eylül 2026)
+
+İlk fiyatlanan çubuk anten (FT-RF RU-245805) üreticiye göre iç ortam
+anteni ve bir IP koruma sınıfı yok. Direkte ve araç tavanında dış ortam
+anteni gerekiyor. Proje sahibi Taoglas GW.22.5151'i seçti: 2,4 GHz,
+5 dBi, RP-SMA(M), IP67 ve UV'ye dayanıklı.
+
+- **Fiyat:** Mouser 1000 adet kademesi 10,07 USD; tek adet 11,51 USD
+  (Westward Sales). Direk birimi 1000 adette 1493,43 TL, kara aracı
+  alıcısı 3739,45 TL.
+- **Hüzme:** üretici dikey hüzme genişliği vermiyor. Model, veri sayfası
+  hüzme vermeyen her antende olduğu gibi McDonald yaklaşımını kullanıyor:
+  5 dBi için 35,3°. Önceki antenin veri sayfası 54° diyordu; daha dar
+  hüzme direğin dibinde daha ihtiyatlı.
+- **Sonuç:**
+
+| | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX/km² | OPEX/km²/yıl |
+|---|---|---|---|---|---|---|---|
+| Şehir içi | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 | 11477 | 2209 |
+| Kırsal | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 | 1350 | 416 |
+
+Doğruluk ve kullanılabilirlik neredeyse aynı; km² başına CAPEX şehir
+içinde %12, kırsalda %5 arttı.

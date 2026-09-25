@@ -139,7 +139,7 @@ class SiteCache:
         if not self.exists:
             raise FileNotFoundError(
                 "No site cached at {}. Run `yerkon fetch` for this area "
-                "first; see ADR-0008.".format(self.directory)
+                "first.".format(self.directory)
             )
         payload = json.loads((self.directory / MANIFEST_NAME).read_text(encoding="utf-8"))
         grid = np.load(self.directory / ELEVATION_NAME)

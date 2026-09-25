@@ -164,9 +164,9 @@ export const SAY = {
   "fetch.open": { tr: "Yeni bir yer getir", en: "Fetch somewhere new" },
   "fetch.note": {
     tr: "Ankara ya da başka bir yer. Ağ kullanan tek şey budur; bir kez "
-        + "getirilir, sonrası çevrimdışı koşar (ADR-0008).",
+        + "getirilir, sonrası çevrimdışı koşar.",
     en: "Ankara or anywhere else. This is the only thing that uses the "
-        + "network; fetched once, everything after it runs offline (ADR-0008).",
+        + "network; fetched once, everything after it runs offline.",
   },
   "fetch.name": { tr: "Ad", en: "Name" },
   "fetch.south": { tr: "Güney", en: "South" },
@@ -177,9 +177,9 @@ export const SAY = {
   "fetch.size": { tr: "Kutunun boyu", en: "Box across" },
   "fetch.size.out": { tr: "{km} km", en: "{km} km" },
   "fetch.box.map": {
-    tr: "{points} ızgara noktası — haritadan seçilen kutu. Kolu geri almak "
+    tr: "{points} ızgara noktası: haritadan seçilen kutu. Kolu geri almak "
         + "için «Bırak».",
-    en: "{points} grid points — the box picked on the map. Press “Drop” to "
+    en: "{points} grid points: the box picked on the map. Press “Drop” to "
         + "get the slider back.",
   },
   "fetch.box": {
@@ -250,7 +250,7 @@ export const SAY = {
     en: "the search placed against {metres} m, measured on this ground",
   },
   "run.disc.ceiling": {
-    tr: "aramanın kullandığı disk: {metres} m, ama ölçülemedi — en yakın "
+    tr: "aramanın kullandığı disk: {metres} m, ama ölçülemedi: en yakın "
         + "bantta bile bağlantıların onda biri kapanmıyor, gerçek menzil "
         + "bunun altında",
     en: "the search placed against {metres} m, but nothing was measured: "
@@ -367,8 +367,8 @@ export const SAY = {
   "figures.undo": { tr: "Geri al", en: "Undo edits" },
   "figures.none_edited": { tr: "Değiştirilmiş sayı yok.",
                            en: "No figure has been changed." },
-  "figures.still_assumed": { tr: "Hâlâ varsayım — kaynağı defaults.toml'a yaz",
-                             en: "Still an assumption — put a source in defaults.toml" },
+  "figures.still_assumed": { tr: "Varsayım: kaynağı defaults.toml'a yaz",
+                             en: "An assumption: put a source in defaults.toml" },
   "figures.source": { tr: "Kaynak: {source}", en: "Source: {source}" },
   "prov.datasheet": { tr: "veri sayfası", en: "datasheet" },
   "prov.measurement": { tr: "ölçüm", en: "measurement" },
@@ -380,11 +380,11 @@ export const SAY = {
   // -- step 6, running it -------------------------------------------------
   "step.run": { tr: "Çalıştır", en: "Run" },
   "run.note": {
-    tr: "Raporun satırlarını, bu sayfadaki sayılarla koşar — ekranda "
+    tr: "Raporun satırlarını bu sayfadaki sayılarla koşar, ekranda "
         + "sürüklediğin yerleşimle değil; onun için aşağıdaki "
         + "\"Simülasyonu çalıştır\" var. Dakikalar sürer; ilerlemesi "
         + "aşağıda görünür.",
-    en: "Runs the report's rows against the figures on this page — not "
+    en: "Runs the report's rows against the figures on this page, not "
         + "against the arrangement you dragged on screen; \"Run the "
         + "simulation\" below does that. Minutes, with progress below.",
   },
@@ -540,22 +540,20 @@ export const SAY = {
   },
   "layer.dilution.note": {
     tr: "Direk geometrisinin menzil hatasını kaç katına çıkardığı. Bir "
-        + "sıra hâlindeki direkler enine yönde bunu sonsuza götürür "
-        + "(ADR-0011).",
+        + "sıra hâlindeki direkler enine yönde bunu sonsuza götürür.",
     en: "How much the anchors' geometry multiplies a ranging error. "
-        + "Anchors in a line take it to infinity across that line "
-        + "(ADR-0011).",
+        + "Anchors in a line take it to infinity across that line.",
   },
   "layer.error_m.note": {
     tr: "Ölçüm hatası × geometri. Bu satırın kendi toleransının "
         + "katlarıyla renklendiriliyor. Bu bir tahmin, simülasyon "
         + "değil: saat kayması, kaybolan mesaj ve gerçekten oradan geçen "
         + "bir alıcı yok. Yayımlanan sayı 'Simülasyonu çalıştır'dan "
-        + "gelir (ADR-0001).",
+        + "gelir.",
     en: "Ranging sigma times geometry, coloured in multiples of this "
         + "row's own tolerance. An estimate and not a simulation: no "
         + "clock drift, no lost packets, no receiver actually driving "
-        + "through. The published number comes from the run (ADR-0001).",
+        + "through. The published number comes from the run.",
   },
   "legend.nothing": { tr: "boyanmayan yer: hiçbir direk erişmiyor",
                       en: "unpainted: no anchor reaches" },
@@ -605,12 +603,12 @@ export const SAY = {
   "budget.note": {
     tr: "\"Tek başına\" o kaynak tek olsaydı kalacak hata; \"kalkarsa\" o "
         + "kaynak gidince toplamın ineceği yer. İkincisi her zaman daha "
-        + "küçüktür, çünkü hatalar kareli toplanır — ve satın alma kararı "
-        + "olan odur.",
+        + "küçüktür, çünkü hatalar kareli toplanır; satın alma kararı "
+        + "ona bakar.",
     en: "\"Alone\" is the error that would remain if that source were the "
         + "only one; \"removed\" is where the total falls to once it is "
         + "gone. The second is always the smaller, because errors add in "
-        + "quadrature — and it is the one a purchase decision turns on.",
+        + "quadrature, and it is the one a purchase decision turns on.",
   },
 
   // -- the solver's search space -------------------------------------------
@@ -637,9 +635,9 @@ export const SAY = {
   "busy.working": { tr: "Çalışıyor…", en: "Working…" },
   "fetch.cannot": {
     tr: "Bu kurulum saha indiremiyor: {missing} eksik. Kurmak için: "
-        + "pip install -e \".[dev,sites]\" — Windows'ta docs/WINDOWS.md.",
+        + "pip install -e \".[dev,sites]\". Windows için docs/WINDOWS.md.",
     en: "This install cannot fetch ground: {missing} missing. Install with: "
-        + "pip install -e \".[dev,sites]\" — on Windows see docs/WINDOWS.md.",
+        + "pip install -e \".[dev,sites]\". On Windows see docs/WINDOWS.md.",
   },
   "say.refused": { tr: "motor kabul etmedi", en: "the engine refused" },
 };

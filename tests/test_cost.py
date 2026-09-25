@@ -73,11 +73,10 @@ def test_what_is_left_of_each_anchor_is_the_same_board():
     assert all(13.0 < usd < 22.0 for usd in left)
 
 
-#: Parts bought for range rather than for price (ADR-0091). The chip's
-#: official sensitivity is 8 dB worse than the model had assumed, and
-#: receive gain is the legal way back: a mast antenna on a short cable on
-#: the pole, and a roof antenna on the vehicle.
-FOR_RANGE = {"tl-ant2412d", "hgv-2409u", "lmr200-pigtail"}
+#: Parts bought for range and for the weather rather than for price
+#: (ADR-0091, ADR-0094): antennas with gain, and the cable to a mast
+#: antenna. The printed antenna on the report's board is neither.
+FOR_RANGE = {"tl-ant2412d", "hgv-2409u", "lmr200-pigtail", "gw-22-5151"}
 
 
 def test_no_part_is_swapped_for_a_dearer_one():

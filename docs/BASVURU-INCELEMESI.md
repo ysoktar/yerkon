@@ -16,9 +16,9 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 1. **Sunumdaki YERKON sayıları eski.** Slayt 16'daki üç satır (ör. şehir
    içi HPE P50 1,28 m, kullanılabilirlik yaklaşık %98, alan 1,00 km²)
-   bugünkü modelin çıktısı değil. Site şehir içi için 1,87 m, %85,47 ve
+   bugünkü modelin çıktısı değil. Site şehir içi için 1,85 m, %85,67 ve
    8,59 km² yayımlıyor (25 Eylül). Kırsalda fark daha büyük: sunum
-   yaklaşık %98,9, site %66,58. Sitenin kullanılabilirliği artık
+   yaklaşık %98,9, site %66,47. Sitenin kullanılabilirliği artık
    doğruluğa bağlı (ADR-0084), sunumunki değil. Sunum, form ve site aynı sayıyı söylemeli; şartnamenin
    "sonuçların tutarlılığı" ölçütü tam olarak buna bakıyor.
 2. **Kırsal birim için "8-10 km" ve 27 dBm'lik modül iddiası ancak
@@ -120,20 +120,20 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 | Satır | Sütun | Sunum | Site (25 Eylül koşusu) |
 |---|---|---|---|
-| Şehir içi | HPE P50 | 1,28 m | 1,87 m |
-| Şehir içi | HPE P95 | 2,99 m | 5,43 m |
+| Şehir içi | HPE P50 | 1,28 m | 1,85 m |
+| Şehir içi | HPE P95 | 2,99 m | 5,47 m |
 | Şehir içi | VPE P95 | 31,47 m | 3,75 m |
-| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %85,47 |
+| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %85,67 |
 | Şehir içi | Alan | 1,00 km² | 8,59 km² |
-| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 10220 TL/km² |
-| Şehir içi | OPEX | boş | 2083 TL/km²/yıl |
+| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 11477 TL/km² |
+| Şehir içi | OPEX | boş | 2209 TL/km²/yıl |
 | Kırsal | HPE P50 | 4,17 m | 1,76 m |
-| Kırsal | HPE P95 | 14,29 m | 4,61 m |
-| Kırsal | VPE P95 | 24,14 m | 4,70 m |
-| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %66,58 |
-| Kırsal | Alan | 1,01 km² | 306,00 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1280 TL/km² |
-| Kırsal | OPEX | boş | 409 TL/km²/yıl |
+| Kırsal | HPE P95 | 14,29 m | 4,65 m |
+| Kırsal | VPE P95 | 24,14 m | 4,71 m |
+| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %66,47 |
+| Kırsal | Alan | 1,01 km² | 305,75 km² |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1350 TL/km² |
+| Kırsal | OPEX | boş | 416 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,79 m |
 | Tünel | HPE P95 | 1,88 m | 2,73 m |
 | Tünel | VPE P95 | 5,53 m | 2,06 m |
@@ -158,15 +158,15 @@ gönderebilir.
 
 | Ürün | Sunum, 1 adet | Sunum, 100 adet | Şimdi, 1 adet | Şimdi, 100 adet | Şimdi, 1000 adet |
 |---|---|---|---|---|---|
-| Şehir içi yayın birimi (bugün belgesiz kart, kullanılmıyor) | 1983,71 | 1366,07 | 1144,03 | 787,83 | 844,49 |
-| Kırsal yayın birimi (E28-2G4M27S; bugün şehir içi ve kırsal) | 1549,67 | 1082,68 | 1367,96 | 955,73 | 1062,80 |
+| Şehir içi yayın birimi (bugün belgesiz kart, kullanılmıyor) | 1983,71 | 1366,07 | 1644,42 | 1132,42 | 1275,13 |
+| Kırsal yayın birimi (E28-2G4M27S; bugün şehir içi ve kırsal) | 1549,67 | 1082,68 | 1868,34 | 1305,32 | 1493,43 |
 | Kritik bölge yayın birimi | 2241,42 | 1634,44 | 1662,69 | 1212,43 | 1691,48 |
 | Yaya alıcısı | 3913,16 | 3117,74 | 2987,03 | 2379,86 | 2724,32 |
-| Kara aracı alıcısı | 5202,69 | 4002,29 | 4016,66 | 3089,91 | 3308,82 |
+| Kara aracı alıcısı | 5202,69 | 4002,29 | 4517,05 | 3474,84 | 3739,45 |
 
 Değişenler (`bom.toml`, ADR-0079): LAMBDA80-24S yerine E28-2G4M12S
 (aynı SX1280), STM32G0B1 yerine yayın birimlerinde STM32G031. Şehir içi
-ve kırsal aynı kart: E28-2G4M27S ve 5 dBi çubuk anten; araç alıcısı da
+ve kırsal aynı kart: E28-2G4M27S ve dış ortam tipi 5 dBi çubuk anten (Taoglas GW.22.5151, IP67); araç alıcısı da
 aynı modül ve anteni taşıyor (ADR-0094). 1000 adet sütunu, doğrulanan
 parçalarda dağıtıcının kademesinden (ADR-0093); bu yüzden bazı
 satırlarda 100 adetten yüksek. Bazı fiyatlar distribütör sitelerine bu
@@ -175,14 +175,14 @@ parçanın satıcısı ve bağlantısı var, siparişten önce doğrulanmalı.
 
 Formdaki pilot bütçesi (10-15 yayın birimi, bir yaya ve bir araç alıcısı,
 tek adet fiyatla) 24600-42700 TL. Aynı hesap bugünkü fiyatlarla
-20683-31944 TL.
+24131-35529 TL.
 
 Formdaki tutarsızlıklar:
 
 - "100 adet üretimde yayın birimlerinin referans ana bileşen maliyeti
   yaklaşık 1.100-1.650 TL" diyor; sunumun kendi tablosu 1082-1634 TL,
-  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 956-1212 TL
-  (100 adet), 1063-1691 TL (1000 adet).
+  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 1212-1305 TL
+  (100 adet), 1493-1691 TL (1000 adet).
 - Kırsal birimi E28-2G4M27S ile anlatıyor. Frekans atlama belgesiyle bu
   doğru (ADR-0094); form belgeyi ve şehir içi birimin de aynı kart
   olduğunu söylemeli.

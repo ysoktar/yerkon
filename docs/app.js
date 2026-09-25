@@ -2443,7 +2443,7 @@ function drawBudget(result, host) {
     const table = document.createElement("table");
     table.className = "out";
     const head =
-      `<tr><th colspan="4">${scenario.name} — HPE P50 ` +
+      `<tr><th colspan="4">${scenario.name}: HPE P50 ` +
       `${scenario.whole_p50_m} m · bir menzil ${scenario.range_sigma_m} m · ` +
       `${say("budget.geometry", { gain: scenario.geometry_gain })}</th></tr>` +
       `<tr><th>${say("budget.source")}</th><th>${say("budget.alone")}</th>` +

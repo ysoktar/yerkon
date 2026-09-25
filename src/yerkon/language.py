@@ -171,11 +171,11 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     "deployment.no_anchors": {
         "tr": "Direk yok: ya her dizi hiç yerleştirmiyor ya da hepsi "
-              "silinmiş. `manual` yerleşimi bilerek hiç koymaz — elle "
+              "silinmiş. `manual` yerleşimi bilerek hiç koymaz: elle "
               "direk sürükle ya da başka bir yöntem seç. (Boş bir düzenleme "
               "çizilebilir; koşturulamaz.)",
         "en": "No anchors: every run either places none or has had them all "
-              "removed. The `manual` layout places none on purpose — drag "
+              "removed. The `manual` layout places none on purpose: drag "
               "anchors in, or choose another method. (An empty arrangement "
               "can be drawn; it cannot be run.)",
     },
@@ -238,7 +238,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "docs/TRY-IT.md.",
     },
     "site.too_many_tiles": {
-        "tr": "{tiles} karo, {zoom} yakınlıkta — sınır {most}. Daha düşük "
+        "tr": "{tiles} karo, {zoom} yakınlıkta; sınır {most}. Daha düşük "
               "bir yakınlık ya da daha küçük bir kutu seç.",
         "en": "{tiles} tiles at zoom {zoom}, and the limit is {most}. Pick a "
               "lower zoom or a smaller box.",
@@ -316,8 +316,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "save",
     },
     "solve.title": {
-        "tr": "{scenario}: {target} — {anchors} direk, {capex} TL",
-        "en": "{scenario}: {target} — {anchors} anchors, {capex} TL",
+        "tr": "{scenario}: {target}, {anchors} direk, {capex} TL",
+        "en": "{scenario}: {target}, {anchors} anchors, {capex} TL",
     },
     "solve.note": {
         "tr": "{scenario} satırının {tried} düzeni, üzerinde durduğu gerçek "
@@ -328,7 +328,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "{hpe_p95} m, saniyede {fixes} sabitleme veriyor.\n\n"
               "Her aday, uydurulmuş bir model değil tam bir benzetimdi; "
               "yani bu sayılar tablonun geldiği motorun ta kendisinden "
-              "geliyor (ADR-0023).",
+              "geliyor.",
         "en": "Found by searching {tried} arrangements of the {scenario} "
               "row against the real ground it stands on, and keeping the "
               "cheapest that met {target}.\n\n"
@@ -337,7 +337,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "at {fixes} fixes a second, from {anchors} anchors.\n\n"
               "Every candidate was a full simulation rather than a fitted "
               "model, so these figures come from the same engine the table "
-              "does (ADR-0023).",
+              "does.",
     },
     # -- the named ways of laying anchors out ------------------------------
     #
@@ -345,20 +345,20 @@ CATALOGUE: dict[str, dict[str, str]] = {
     # "hex" means nothing to somebody who has not read the module and
     # "the fewest anchors that cover an area" means everything.
     "layout.grid": {
-        "tr": "Kare ızgara — kaydırmalı satırlar",
-        "en": "Square grid — staggered rows",
+        "tr": "Kare ızgara: kaydırmalı satırlar",
+        "en": "Square grid: staggered rows",
     },
     "layout.hex": {
-        "tr": "Altıgen kafes — bir alanı en az direkle örter",
-        "en": "Hexagonal lattice — fewest anchors to cover an area",
+        "tr": "Altıgen kafes: bir alanı en az direkle örter",
+        "en": "Hexagonal lattice: fewest anchors to cover an area",
     },
     "layout.corridor": {
-        "tr": "Yol boyunca — iki yanda dönüşümlü",
-        "en": "Along the route — alternating sides",
+        "tr": "Yol boyunca: iki yanda dönüşümlü",
+        "en": "Along the route: alternating sides",
     },
     "layout.perimeter": {
-        "tr": "Çevre — yalnızca sahanın kenarında",
-        "en": "Perimeter — round the edge of the site only",
+        "tr": "Çevre: yalnızca sahanın kenarında",
+        "en": "Perimeter: round the edge of the site only",
     },
     "layout.greedy-coverage": {
         "tr": "Arama: en çok zemini örten (klasik kapsama)",
@@ -373,12 +373,12 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Search: enough anchors over every point",
     },
     "layout.placed": {
-        "tr": "Yöneylem — var olan yüksek yerler (Yerleştir düğmesi)",
-        "en": "Operations research — existing high places (Place button)",
+        "tr": "Yöneylem: var olan yüksek yerler (Yerleştir düğmesi)",
+        "en": "Operations research: existing high places (Place button)",
     },
     "layout.manual": {
-        "tr": "Elle — hiçbiri; boştan başla",
-        "en": "By hand — none; start from empty",
+        "tr": "Elle: hiçbiri, boştan başla",
+        "en": "By hand: none, start from empty",
     },
     "layout.needs_map": {
         "tr": "Bu yöntem yol kenarındaki yapıları kullanır; bu zemin "

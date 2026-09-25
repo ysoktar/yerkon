@@ -353,14 +353,14 @@ def coarsely_read(results: Sequence[Result]) -> str:
         given_up.append(
             "the shadows are drawn once rather than pooled over eight, and "
             "one draw put the open-country row's ninety-fifth percentile "
-            "anywhere between 14,6 and 279,6 m (ADR-0055)"
+            "anywhere between 14,6 and 279,6 m"
         )
     spacing = getattr(first.deployed.scenario.terrain, "profile_spacing_m", 0.0)
     if not spacing:
         given_up.append(
             "the ground profile is read at a fixed 64 samples rather than "
             "every 10 m, which on a 6,9 km link is a reading every 108 m "
-            "and reads diffraction 6,32 dB low (ADR-0062)"
+            "and reads diffraction 6,32 dB low"
         )
     if not given_up:
         return ""
@@ -408,7 +408,7 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row],
             lines.append(
                 "  {}: {} km² is where enough anchors are reachable for a "
                 "position. A packet reaches {} km², which is {} times more "
-                "ground and is not coverage (ADR-0012).".format(
+                "ground and is not coverage.".format(
                     result.deployed.scenario.name,
                     decimal_comma(row.area_km2, 2),
                     decimal_comma(row.reached_km2, 2),
@@ -500,7 +500,7 @@ def footnotes(results: Sequence[Result], rows: Sequence[Row],
     lines.append(
         "  Height comes from the unit's map, one sigma of 2,43 m in patches "
         "along the road, not from the truth; with ranges alone VPE is what "
-        "roadside geometry supports (ADR-0011, ADR-0088)."
+        "roadside geometry supports."
     )
     return "\n".join(lines)
 
@@ -628,7 +628,7 @@ def _breakdown_of(dissection: Dissection) -> str:
 
 BREAKDOWN_NOTE = (
     "Her satır, aynı senaryonun tek bir hata kaynağı susturularak yeniden "
-    "koşturulmasıdır; yeni bir model değil (ADR-0020). Alıcının kendi "
+    "koşturulmasıdır; yeni bir model değil. Alıcının kendi "
     "ölçümüne biçtiği varyans her koşuda aynı bırakılır, yoksa süzgeç "
     "ağırlıklarını da değiştirir ve iki koşu karşılaştırılamaz olurdu.\n"
     "\"Tek başına\" ile \"kalkarsa\" arasındaki uçurum kareli toplamdan "

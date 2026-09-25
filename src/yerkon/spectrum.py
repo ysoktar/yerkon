@@ -304,7 +304,7 @@ def packet_loss(path, key: str = "site.urban_packet_loss",
         note=(
             "Kanal {} kHz, {} ms'lik alışverişler: blokların %{}'i dolu, "
             "alışverişlerin %{}'i başka bir yayına denk geliyor. Eşik sessiz "
-            "seviyenin {} dB üstü (ADR-0083).".format(
+            "seviyenin {} dB üstü.".format(
                 decimal_comma(found.channel_hz / 1e3, 0),
                 decimal_comma(found.exchange_s * 1e3, 1),
                 decimal_comma(100.0 * found.busy_share, 1),

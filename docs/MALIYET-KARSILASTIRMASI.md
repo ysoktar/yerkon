@@ -23,17 +23,18 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 | Satır | Direk | Alan | Güzergâh | CAPEX | OPEX/yıl | On yıl | CAPEX/km² | OPEX/km²/yıl | CAPEX/km | OPEX/km/yıl |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
-| **Şehir içi, 600 m (yeni)** | 25 | 8,59 km² | 12,82 km | **87820** | **17897** | **266790** | **10220** | **2083** | **6853** | **1397** |
-| Kırsal, 3000 m | 49 | 306,00 km² | 86,40 km | 391647 | 125034 | 1641987 | 1280 | 409 | 4533 | 1447 |
+| **Şehir içi, 600 m (yeni)** | 25 | 8,59 km² | 12,82 km | **98586** | **18974** | **288326** | **11477** | **2209** | **7690** | **1480** |
+| Kırsal, 3000 m | 49 | 305,75 km² | 86,40 km | 412748 | 127144 | 1684188 | 1350 | 416 | 4777 | 1472 |
 | Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 69223 | 7009 | 139313 | yok | yok | 34612 | 3504 |
 
 25 Eylül'den beri şehir içi ve kırsal O6 ile (ADR-0094): cihaz
 uyarlamalı frekans atlamalı olarak belgelendiriliyor, direk ve araç
-27 dBm'lik modül ve 5 dBi çubuk antenle çalışıyor; SX1280 resmî
-duyarlılıkta (ADR-0091). Önceki 12 ve 8 dBi antenlere (O4) göre direk
-birimi 2593'ten 1063 TL'ye iniyor, alan büyüyor (şehir içi 7,82'den
-8,59 km²'ye, kırsal 285,83'ten 306,00 km²'ye); km² başına CAPEX şehir
-içinde 16124'ten 10220 TL'ye, kırsalda 1633'ten 1280 TL'ye düştü.
+27 dBm'lik modül ve dış ortam tipi (IP67) 5 dBi çubuk antenle
+(Taoglas GW.22.5151) çalışıyor; SX1280 resmî duyarlılıkta (ADR-0091).
+Önceki 12 ve 8 dBi antenlere (O4) göre direk birimi 2593'ten 1493 TL'ye
+iniyor, alan büyüyor (şehir içi 7,82'den 8,59 km²'ye, kırsal
+285,83'ten 305,75 km²'ye); km² başına CAPEX şehir içinde 16124'ten
+11477 TL'ye, kırsalda 1633'ten 1350 TL'ye düştü.
 
 Tutarlar TL. OPEX 24 Eylül akşamından beri resmî harcırah ve amortisman
 değerleriyle (ADR-0089): kırsalda ve tünelde bakım ekibi şehir dışına

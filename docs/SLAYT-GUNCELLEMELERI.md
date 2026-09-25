@@ -112,7 +112,8 @@ Son güncelleme: 25 Eylül 2026.
 ## Slayt 7: alıcı modülleri
 
 - [ ] Araç alıcısı "3-5 dBi çubuk anten" diyor; model 5 dBi çubuk anten
-  kullanıyor (ADR-0094). "5 dBi çubuk anten, E28-2G4M27S" yazılmalı.
+  kullanıyor (ADR-0094). "5 dBi dış ortam çubuk anteni (IP67),
+  E28-2G4M27S" yazılmalı.
 - [ ] Harita kısıtı artık modelde: yükseklik, birimin haritasından
   2,43 m hatayla alınıyor (ADR-0088). IMU ve odometri hâlâ yok; onlar
   için "kullanılacaktır" yerine "pilotta eklenecek ve etkisi ölçülecek"
@@ -221,17 +222,17 @@ Son güncelleme: 25 Eylül 2026.
 
   | Ürün | 1 adet | 100 adet | 1000 adet |
   |---|---|---|---|
-  | Şehir içi ve kırsal yayın birimi (E28-2G4M27S, 5 dBi anten) | 1367,96 TL | 955,73 TL | 1062,80 TL |
+  | Şehir içi ve kırsal yayın birimi (E28-2G4M27S, 5 dBi IP67 anten) | 1868,34 TL | 1305,32 TL | 1493,43 TL |
   | Kritik bölge yayın birimi | 1662,69 TL | 1212,43 TL | 1691,48 TL |
   | Yaya alıcısı | 2987,03 TL | 2379,86 TL | 2724,32 TL |
-  | Kara aracı alıcısı (E28-2G4M27S, 5 dBi anten) | 4016,66 TL | 3089,91 TL | 3308,82 TL |
+  | Kara aracı alıcısı (E28-2G4M27S, 5 dBi IP67 anten) | 4517,05 TL | 3474,84 TL | 3739,45 TL |
 
 - [ ] Kırsal birim satırı E28-2G4M27S'de kalıyor; gerekçe frekans atlama
   belgesi (ADR-0094). Şehir içi birim de aynı kart: iki satır tek satır
   olabilir.
 - [ ] Kaynak satırı: LAMBDA80-24S yerine E28-2G4M12S (LCSC),
   STM32G0B1 yerine yayın birimlerinde STM32G031 (LCSC).
-- [ ] Bir cümle: "Şehir içinde 25 birim (antenleriyle) 26570 TL, montaj
+- [ ] Bir cümle: "Şehir içinde 25 birim (antenleriyle) 37336 TL, montaj
   61250 TL; tünelde 9 birim 15223 TL, askı montajı 54000 TL."
 
 ## Slayt 16: karşılaştırma tablosu
@@ -240,15 +241,15 @@ Son güncelleme: 25 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 1,87 | 5,43 | 3,75 | %85,47 | 8,59 km² | 10220 TL/km² | 2083 TL/km²/yıl |
-  | Kırsal | 1,76 | 4,61 | 4,70 | %66,58 | 306,00 km² | 1280 TL/km² | 409 TL/km²/yıl |
+  | Şehir içi | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 km² | 11477 TL/km² | 2209 TL/km²/yıl |
+  | Kırsal | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 km² | 1350 TL/km² | 416 TL/km²/yıl |
   | Tünel | 0,79 | 2,73 | 2,06 | %98,61 | güzergâh | 34612 TL/km | 3504 TL/km/yıl |
 
   (25 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
   içi 600 m, turda sekiz direk, tünel 250 m, yükseklik haritadan,
   harcırah ve amortisman resmî kaynaklardan, SX1280'in resmî
   duyarlılığı, uyarlamalı frekans atlama belgesi, direkte ve araçta
-  E28-2G4M27S ve 5 dBi çubuk anten.)
+  E28-2G4M27S ve dış ortam tipi 5 dBi çubuk anten.)
 
 - [ ] TerraPoiNT ve eLoran satırlarının teknoloji sütunundaki İngilizce
   kısaltma → "Karasal konumlandırma".

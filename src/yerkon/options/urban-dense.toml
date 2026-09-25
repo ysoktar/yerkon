@@ -7,35 +7,11 @@
 # figures that differ are listed; everything else stays as it is.
 
 name = 'urban-dense'
-title = 'Şehir içi: 300 m ızgara — daha sık aydınlatma direği'
-title_en = 'Urban: a 300 m grid — anchors on every lighting column'
+title = 'Şehir içi: 300 m ızgara, daha sık aydınlatma direği'
+title_en = 'Urban: a 300 m grid, anchors on more lighting columns'
 origin = 'shipped'
-note = """Her iki aydınlatma direğinden birine değil, hepsine direk. Bir şehirde yapılar zaten vardır; dolayısıyla bu, geometriyi bir sahanın bedeline değil modüllerin ve montajın bedeline satın alır — şehir içi satırın tabloda kilometrekare başına en ucuz olmasının bütün sebebi budur.
-
-Kabaca okunmuş bir tarama, 500 m'den aşağı inmenin ne aldığını ve neye mal olduğunu gösteriyor. Tek çekiliş, yani ADR-0055'in uyardığı gürültü içinde; yayımlanabilir değil:
-
-| aralık | direk | kullanılabilirlik | CAPEX TL/km² |
-|---|---|---|---|
-| 500 m | 36 | %86,24 | 23114 |
-| 450 m | 49 | %87,01 | 27393 |
-| 400 m | 60 | %89,17 | 31562 |
-| 350 m | 77 | %92,80 | 38554 |
-| 300 m | 100 | %89,17 | 49390 |
-
-Kullanılabilirlik sıklaştıkça yükseliyor ama 350 ile 300 arasında geri düşüyor, ki bu tek çekilişin gürültüsüdür: tarama yönü söylüyor, değeri söylemiyor. Sıralamayı bağlamak için tam çözünürlükte üç tohum gerekir (ADR-0022, ADR-0072). Kesin olan tek şey maliyet: direk sayısıyla birlikte doğrusal artıyor, çünkü her direğin bedeli modül artı montajdır."""
-note_en = """Anchors on every lighting column rather than every other one. A town has the structures already, so this buys geometry for the price of the modules and the fitting rather than for the price of a site — which is the whole reason the urban row is the cheapest per square kilometre in the table.
-
-A coarsely read sweep says what going below 500 m buys and what it costs. One draw, so inside the noise ADR-0055 warns about, and not publishable:
-
-| spacing | anchors | availability | CAPEX TL/km² |
-|---|---|---|---|
-| 500 m | 36 | 86,24 % | 23114 |
-| 450 m | 49 | 87,01 % | 27393 |
-| 400 m | 60 | 89,17 % | 31562 |
-| 350 m | 77 | 92,80 % | 38554 |
-| 300 m | 100 | 89,17 % | 49390 |
-
-Availability climbs as the grid tightens but falls back between 350 and 300, which is what one draw does: the sweep gives the direction, not the value. Settling the order needs three seeds at full resolution (ADR-0022, ADR-0072). The only certain part is the cost, which rises with the anchor count because every anchor is a module plus a fitting."""
+note = """Aydınlatma direklerine 600 m yerine 300 m arayla birim. Bir şehirde yapılar zaten var; dolayısıyla bu, geometriyi bir sahanın bedeline değil modüllerin ve montajın bedeline satın alır. Tam çözünürlükteki taramada kullanılabilirlik artıyor, ama direk sayısı dört katına yakın ve maliyet onunla doğrusal artıyor, çünkü her direğin bedeli modül artı montaj."""
+note_en = """Units on lighting columns 300 m apart instead of 600 m. A town has the structures already, so this buys geometry for the price of the modules and the fitting rather than the price of a site. In the full resolution sweep availability rises, but the anchor count nearly quadruples and the cost rises with it, because every anchor is a module plus a fitting."""
 
 [values]
 'urban.anchor_spacing_m' = 300.0

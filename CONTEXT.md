@@ -196,7 +196,7 @@ kutu). Tablo 1000 adetlik fiyatı kullanıyor. ADR-0079'a bak.
 | Kara aracı alıcısı | E28-2G4M12S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran | 4002,29 | 2595,30 |
 
 Şehir içi ve kırsal yayın birimi aynı kart: yükselteçli E28-2G4M27S ve
-5 dBi çubuk anten. Cihaz uyarlamalı frekans atlamalı (FHSS) olarak
+dış ortam tipi 5 dBi çubuk anten (Taoglas GW.22.5151, IP67). Cihaz uyarlamalı frekans atlamalı (FHSS) olarak
 belgelendiriliyor; bu belgeyle yoğunluk sınırı kalkıyor ve 20 dBm e.i.r.p.
 sınırı kalıyor (ADR-0092, ADR-0094). Kara aracı alıcısı da aynı modülü ve
 aynı anteni taşıyor. Yaya alıcısı E28-2G4M12S'de ve baskılı antende

@@ -52,8 +52,8 @@ def _bom(key: str, name: str) -> Product:
             round(bill.price(key), 2), "TL", Provenance.DERIVED,
             "bom.toml, itemised from the YERKON report's page 14",
             note=(
-                "{} units; cheaper parts where the same function was "
-                "found for less; see ADR-0079.".format(bill.used_tier)
+                "{} units, priced part by part from the sellers."
+                .format(bill.used_tier)
             ),
         ),
     )

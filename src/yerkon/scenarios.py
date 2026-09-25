@@ -32,7 +32,7 @@ from yerkon.cost import (
 )
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import (
-    DUCK_5DBI, DWM3000, SX1280, Radio, W24P_U, radios)
+    DWM3000, GW_22_5151, SX1280, Radio, W24P_U, radios)
 from yerkon.ranging import SINGLE_SIDED
 from yerkon.regulatory import REGIONS
 from yerkon.language import say
@@ -239,12 +239,12 @@ ROW_REGIONS = {"urban": "TR-FHSS", "rural": "TR-FHSS", "tunnel": "TR"}
 
 #: Each row's antennas: the pole's, and a unit's by what it is.
 #:
-#: The town and the open country put a 5 dBi rubber duck on the pole and
-#: on the vehicle (ADR-0094). A pedestrian keeps the printed antenna. The
+#: The town and the open country put a sealed 5 dBi rubber duck on the
+#: pole and on the vehicle (ADR-0094). A pedestrian keeps the printed antenna. The
 #: tunnel ranges by ultra-wideband and keeps it everywhere.
 ROW_ANTENNAS = {
-    "urban": (DUCK_5DBI, {"vehicle": DUCK_5DBI}),
-    "rural": (DUCK_5DBI, {"vehicle": DUCK_5DBI}),
+    "urban": (GW_22_5151, {"vehicle": GW_22_5151}),
+    "rural": (GW_22_5151, {"vehicle": GW_22_5151}),
     "tunnel": (W24P_U, {}),
 }
 

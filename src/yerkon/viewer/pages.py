@@ -200,12 +200,14 @@ HOME = Page(
                     "surveyed when it was installed.",
                 ),
                 _w(
-                    "Bir yayın birimi, 100 adetlik üretimde 1000 ile "
-                    "1600 lira arasında. Hedef, AUS noktalarında zaten "
+                    "Bir yayın biriminin ana parçaları 1000 adetlik "
+                    "üretimde 1500 ile 1700 lira arasında. Hedef, AUS "
+                    "noktalarında zaten "
                     "duran elektrik ve haberleşme altyapısını yeniden "
                     "kullanmak; maliyeti aşağıda tutan da bu.",
-                    "A broadcast unit costs between 1000 and 1600 lira "
-                    "at a hundred units. The aim is to reuse the power and "
+                    "A broadcast unit's main parts cost between 1500 and "
+                    "1700 lira at a thousand units. The aim is to reuse "
+                    "the power and "
                     "communications already standing at intelligent "
                     "transport points, and that is what keeps the cost "
                     "down.",
@@ -380,8 +382,8 @@ WHY = Page(
                     "alçaktan uçan bir uçak da birimi duyabilir. "
                     "Havalimanı çevresine kurulan birimler ise uydular "
                     "susturulsa bile yerde çalışmaya devam eden ayrı bir "
-                    "ağ bırakabilir. Bunlar raporun hedefi; bu depo "
-                    "hiçbirini sahada ölçmedi.",
+                    "ağ bırakabilir. Bunlar raporun hedefi; hiçbiri henüz "
+                    "sahada ölçülmedi.",
                     "For the rural unit, 8 to 10 km is a communications "
                     "and coverage target; how accurately it can measure "
                     "distance at that range is to be confirmed by field "
@@ -508,13 +510,13 @@ SYSTEM = Page(
                     "Simülasyon bu farkı ölçtü. Düzeltilmemiş 10 ppm'lik bir "
                     "saat kayması tek yönlü ölçümde 24,1 m hata bırakır, "
                     "çift yönlüde 0,3 mm. Kaymanın kendisi 0,0793 ppm "
-                    "ölçüldü, ve bu projede artık tahmin olmayan tek "
-                    "değerdir.",
+                    "ölçüldü; bu projede tahmin değil ölçüm olan tek "
+                    "değer bu.",
                     "The simulation measured that difference. An "
                     "uncorrected 10 ppm clock offset leaves 24,1 m of "
                     "error one way and 0,3 mm two ways. The offset itself "
-                    "was measured at 0,0793 ppm, and it is the one figure "
-                    "in this project that is no longer a guess.",
+                    "was measured at 0,0793 ppm, the one figure in this "
+                    "project that is a measurement rather than a guess.",
                 ),
                 _w(
                     "Her yayın birimi kendi özel anahtarını gizli tutar ve "
@@ -563,7 +565,8 @@ SYSTEM = Page(
                     "belgelendiriliyor; bu belgeyle 2,4 GHz'de yoğunluk "
                     "sınırı kalkıyor ve 20 dBm yayılan güç kalıyor. Kırsal "
                     "birim şehir içindekiyle aynı kart: yükselteçli modül "
-                    "(E28-2G4M27S) ve 5 dBi çubuk anten. Menzilin geri "
+                    "(E28-2G4M27S) ve dış ortam tipi 5 dBi çubuk anten. "
+                    "Menzilin geri "
                     "kalanını direğin yüksekliği ve açık görüş sağlıyor. "
                     "YERKON'da 8-10 km bir "
                     "haberleşme ve kapsama hedefi olarak alınıyor ve o "
@@ -579,7 +582,8 @@ SYSTEM = Page(
                     "which lifts the 2,4 GHz density limit and leaves "
                     "20 dBm of radiated power. The rural unit is the same "
                     "board as the urban one: the amplified module "
-                    "(E28-2G4M27S) and a 5 dBi rod antenna. The rest of "
+                    "(E28-2G4M27S) and an outdoor 5 dBi rod antenna. The "
+                    "rest of "
                     "its reach comes from the height of the pole it stands "
                     "on and a clear line of sight. YERKON takes 8 to 10 km as a communications and "
                     "coverage target, and how accurately it ranges at that "
@@ -637,7 +641,8 @@ SYSTEM = Page(
                     "taşır: geniş alan için SX1280, kritik bölge için "
                     "DWM3000. DWM3000 kendi dahili antenini kullanır; "
                     "SX1280 yükselteçli modülde (E28-2G4M27S) ve araç "
-                    "tavanındaki 5 dBi çubuk antenle çalışır.",
+                    "tavanındaki dış ortam tipi 5 dBi çubuk antenle "
+                    "çalışır.",
                     "**Road vehicle.** Built on an STM32 with an LCD map "
                     "screen. It connects to the CAN bus of vehicles that "
                     "support one and takes live data from the wheel speed "
@@ -645,8 +650,8 @@ SYSTEM = Page(
                     "module it carries both radios: an SX1280 for wide "
                     "areas and a DWM3000 for critical ones. The DWM3000 "
                     "uses its own on-board antenna; the SX1280 is the "
-                    "amplified module (E28-2G4M27S) with a 5 dBi rod "
-                    "antenna on the vehicle's roof.",
+                    "amplified module (E28-2G4M27S) with an outdoor 5 dBi "
+                    "rod antenna on the vehicle's roof.",
                 ),
                 _w(
                     "**Nesnelerin interneti alıcısı.** Kapalı ve yarı açık "
@@ -673,21 +678,21 @@ SYSTEM = Page(
             kind="points",
             lines=(
                 _w(
-                    "Rapordaki iki sütun, 1 adet ve 100 adet, raporun kendi "
-                    "fiyatları. \"Şimdi\" sütunları aynı işi daha ucuza "
-                    "yapan parçalarla: SX1280 yongasını taşıyan EBYTE "
-                    "E28-2G4M12S, LCSC'den alınan DWM3000 ve daha küçük bir "
-                    "STM32. Tablo 1000 adetlik fiyatla hesaplanıyor, çünkü "
-                    "işletme modeli zaten bin birimlik bir ağ varsayıyor. "
-                    "Her parça, satıcısı ve fiyatı Maliyet sayfasında.",
-                    "The two report columns, one and a hundred, are the "
-                    "report's own prices. The \"now\" columns use parts "
-                    "that do the same job for less: the EBYTE E28-2G4M12S "
-                    "carrying the SX1280 chip, a DWM3000 bought from LCSC, "
-                    "and a smaller STM32. The table prices at a thousand, "
-                    "because the operating model already assumes a network "
-                    "of a thousand units. Every part, its seller and its "
-                    "price are on the Cost page.",
+                    "\"Rapor\" sütunları başvuru raporunun 1 ve 100 adet "
+                    "fiyatları. \"Döküm\" sütunları kartın parça parça "
+                    "satıcı fiyatları: SX1280 yongasını taşıyan EBYTE "
+                    "modülleri, Qorvo DWM3000, STM32 ve anten. Tablo 1000 "
+                    "adetlik fiyatla hesaplanıyor, çünkü işletme modeli "
+                    "bin birimlik bir ağ varsayıyor. Her parça, satıcısı "
+                    "ve fiyatı Maliyet sayfasında.",
+                    "The \"report\" columns are the application report's "
+                    "prices at one and a hundred. The \"itemised\" "
+                    "columns price the board part by part from its "
+                    "sellers: the EBYTE modules carrying the SX1280 chip, "
+                    "the Qorvo DWM3000, the STM32 and the antenna. The "
+                    "table prices at a thousand, because the operating "
+                    "model assumes a network of a thousand units. Every "
+                    "part, its seller and its price are on the Cost page.",
                 ),
                 _w(
                     "Fiyatlar yalnızca ana parçaların maliyeti. Kartın "
@@ -749,7 +754,7 @@ RESEARCH = Page(
                     "**Mevcut altyapıya en az dokunarak, sonradan "
                     "büyütülebilen bir sistem kurulabilir mi?** 12. "
                     "Ulaştırma ve Haberleşme Şurası akıllı ulaşım "
-                    "altyapısının geliştirilmesini hedef koymuştu. Yol "
+                    "altyapısının geliştirilmesini hedef koydu. Yol "
                     "kenarındaki ünitelerin ve trafik kontrol noktalarının "
                     "elektriğini ve hattını kullanmak, montajı ucuza "
                     "getirmenin yolu.",
@@ -1263,11 +1268,9 @@ RESULTS = Page(
                 (
                     _w("OPEX", "OPEX"),
                     _w(
-                        "Bir km²'yi bir yıl işletmenin masrafı. Rapor bu "
-                        "sütunu boş bırakmıştı; buradaki sayı tek tek "
+                        "Bir km²'yi bir yıl işletmenin masrafı; tek tek "
                         "yazılmış gider kalemlerinden çıkıyor.",
-                        "What a year of running one km² costs. The report "
-                        "left this column empty; this figure comes from an "
+                        "What a year of running one km² costs, from an "
                         "itemised list of what recurs.",
                     ),
                 ),
@@ -1283,7 +1286,7 @@ RESULTS = Page(
                     "diğerleri kilometrekare başına.** 12 m genişliğinde "
                     "2 km'lik bir tünel bir km²'nin ellide biri kadar yer "
                     "kaplar; alana bölmek sayıyı tünel pahalı olduğu için "
-                    "değil payda küçük olduğu için büyütüyordu. Tünel bir "
+                    "değil payda küçük olduğu için büyütür. Tünel bir "
                     "alana değil bir hatta hizmet ediyor, o yüzden o iki "
                     "hücre güzergâh kilometresine bölündü ve \"/km\" ile "
                     "işaretli. Aynı ölçü olmadığı için diğer satırlarla "
@@ -1291,8 +1294,8 @@ RESULTS = Page(
                     "**The tunnel row is priced per kilometre, the other "
                     "two per square kilometre.** Twelve metres wide over "
                     "two kilometres is a fiftieth of a square kilometre, "
-                    "so dividing by area made the number large because "
-                    "the denominator was small rather than because a "
+                    "so dividing by area makes the number large because "
+                    "the denominator is small rather than because a "
                     "tunnel is dear. A tunnel serves a line, so those two "
                     "cells are divided by route kilometre and marked "
                     "\"/km\". They are not the same measure as the other "
@@ -1377,13 +1380,13 @@ SIMULATION = Page(
             picture="simulator.png",
             lines=(_w(
                 "Şehir içi satırı, koşusu bitmiş hâlde: Kızılay'ın "
-                "gerçek arazisi, aydınlatma direklerine takılmış 36 yayın "
-                "birimi, ve zemine boyanmış kapsama haritası. Renkler o "
+                "gerçek arazisi, aydınlatma direklerine takılmış yayın "
+                "birimleri, ve zemine boyanmış kapsama haritası. Renkler o "
                 "noktada kaç birimin duyulduğunu gösteriyor; konum hesabı "
                 "için en az dört gerekiyor. Sağdaki panel o sekmenin "
                 "kendi koşusu, sekiz gölge çekilişi havuzlanmış.",
                 "The urban row with its run finished: the real terrain "
-                "at Kızılay, 36 broadcast units on lighting columns, and "
+                "at Kızılay, the broadcast units on lighting columns, and "
                 "the coverage painted onto the ground. The colours show "
                 "how many units can be heard at that point; working out a "
                 "position needs at least four. The panel on the right is "
@@ -1476,16 +1479,16 @@ SIMULATION = Page(
                     "median, sixteen at the worst.",
                 ),
                 _w(
-                    "Arazi on metrede bir okunuyor. Daha önce her "
-                    "bağlantı sabit 64 noktada okunuyordu; 6,9 km'lik bir "
-                    "kırsal bağlantıda bu 108 metrede bir demekti, ve "
-                    "aradaki tümsekleri atladığı için kaybı 37,60 dB "
-                    "yerine 31,28 dB gösteriyordu.",
-                    "The terrain is read every ten metres. Before, every "
-                    "link was read at a fixed 64 points; on a 6,9 km rural "
-                    "link that meant every 108 metres, and skipping the "
-                    "rises in between put the loss at 31,28 dB where the "
-                    "answer is 37,60.",
+                    "Arazi on metrede bir okunuyor. Sabit 64 noktada "
+                    "okunsaydı 6,9 km'lik bir kırsal bağlantıda bu 108 "
+                    "metrede bir demek olurdu; aradaki tümsekler "
+                    "atlandığı için kayıp 37,60 dB yerine 31,28 dB "
+                    "çıkardı.",
+                    "The terrain is read every ten metres. Read at a "
+                    "fixed 64 points, a 6,9 km rural link would be read "
+                    "every 108 metres, and skipping the rises in between "
+                    "would put the loss at 31,28 dB where the answer is "
+                    "37,60.",
                 ),
                 _w(
                     "Bir bağlantı bu iki kaybın toplamını değil, "
@@ -1519,20 +1522,22 @@ SIMULATION = Page(
             lines=(
                 _w(
                     "Mesafe hesapla çıkarılmaz, ölçülür. İki telsiz "
-                    "karşılıklı mesaj gönderir; SX1280'de bir gidiş geliş "
-                    "47,86 milisaniye sürüyor.",
+                    "karşılıklı mesaj gönderir; SX1280'de bir ölçüm "
+                    "alışverişi, frekans atlamanın istediği %5 sessizlikle "
+                    "birlikte 33,4 milisaniye sürüyor.",
                     "A distance is measured rather than calculated. Two "
                     "radios send messages back and forth; on the SX1280 "
-                    "one there-and-back takes 47,86 milliseconds.",
+                    "one ranging exchange takes 33,4 milliseconds, "
+                    "including the 5 % rest frequency hopping asks for.",
                 ),
                 _w(
-                    "Altı birimle sırayla ölçüşmek 239 milisaniye "
-                    "sürüyor. Bu sürede 100 km/sa giden araç 6,7 metre yol "
+                    "Sekiz birimle sırayla ölçüşmek 267 milisaniye "
+                    "sürüyor. Bu sürede 100 km/sa giden araç 7,4 metre yol "
                     "alıyor, yani bir turdaki ölçümler aynı ana ait değil. "
                     "Hesap da onları aynı anda alınmış gibi kabul "
                     "etmiyor.",
-                    "Measuring against six units in turn takes 239 "
-                    "milliseconds. A car doing 100 km/h covers 6,7 metres "
+                    "Measuring against eight units in turn takes 267 "
+                    "milliseconds. A car doing 100 km/h covers 7,4 metres "
                     "in that time, so the measurements in one round do not "
                     "belong to one instant. The calculation does not "
                     "pretend they do.",
@@ -1549,16 +1554,18 @@ SIMULATION = Page(
                     "much that measurement is trusted.",
                 ),
                 _w(
-                    "Hiçbir yerde \"araç yol seviyesindedir\" varsayımı "
-                    "yok. Yol kenarına dizilmiş birimler hep aynı "
-                    "yükseklikte olduğu için yüksekliği ölçmek zor "
-                    "kalıyor. Tablodaki VPE sütunu bunu saklamak yerine "
-                    "olduğu gibi yazıyor.",
-                    "Nowhere is there an assumption that the vehicle sits "
-                    "at road level. Units strung along a roadside are all "
-                    "at much the same height, which leaves the vertical "
-                    "hard to measure. The VPE column writes that down "
-                    "rather than hiding it.",
+                    "Yol kenarına dizilmiş birimler hep aynı yükseklikte "
+                    "olduğu için yüksekliği mesafelerle ölçmek zor. Filtre "
+                    "bu yüzden birimin haritasındaki yol yüksekliğini bir "
+                    "ölçüm olarak alıyor, 2,43 m'lik bir harita hatasıyla; "
+                    "hata yol boyunca parça parça çekiliyor. Tablodaki VPE "
+                    "sütunu bu hesabın sonucu.",
+                    "Units strung along a roadside are all at much the "
+                    "same height, which leaves the vertical hard to "
+                    "measure from ranges. The filter therefore takes the "
+                    "road's height from the unit's map as a measurement, "
+                    "with a map error of 2,43 m drawn in patches along the "
+                    "road. The VPE column is the result.",
                 ),
             ),
         ),
@@ -1613,18 +1620,16 @@ SIMULATION = Page(
             heading=_w("Modele girmeyenler", "What is left out"),
             lines=(
                 _w(
-                    "Aracın kendi sensörleri hesaba katılmadı: hareket "
-                    "sensörü, tekerlek turu, harita ve bunları birleştiren "
-                    "filtre yok. Rapordaki tasarımda bunların hepsi var; "
-                    "buradaki sayılar yalnızca telsiz ölçümünden çıkan "
-                    "konumlar. Yani gerçek bir araçtan daha kötü, çünkü "
-                    "eldeki en zayıf bilgiyle hesaplandı.",
-                    "The vehicle's own sensors are left out: no motion "
-                    "sensor, no wheel turns, no map, no filter combining "
-                    "them. The report's design has all of these; these "
-                    "numbers come from radio measurement alone. So they "
-                    "are worse than a real vehicle's, because they were "
-                    "worked out from the weakest information available.",
+                    "Aracın hareket sensörü ve tekerlek turu hesaba "
+                    "katılmadı. Filtre yalnız telsiz ölçümlerini ve "
+                    "haritadan gelen yüksekliği birleştiriyor. Rapordaki "
+                    "tasarımda ikisi de var; buradaki sayılar bu yüzden "
+                    "gerçek bir araçtan daha kötü.",
+                    "The vehicle's motion sensor and wheel turns are left "
+                    "out. The filter combines only the radio measurements "
+                    "and the height from the map. The report's design has "
+                    "both, so these numbers are worse than a real "
+                    "vehicle's.",
                 ),
                 _w(
                     "Telsizin kendi gürültüsü, sinyalin duvarlardan "
@@ -1775,13 +1780,14 @@ SOURCES = Page(
                    "sayfaları, ve SX1280 uzun menzil testi.",
                    "Semtech SX1280, EBYTE E28-2G4M12S and Qorvo DWM3000 "
                    "datasheets, and the SX1280 long range test."),
-                _w("DigiKey, LCSC, Mouser ve Newhaven liste fiyatları: "
-                   "raporunki 6 Eylül, daha ucuz parçalarınki 23 Eylül "
-                   "2026. Kur Eylül 2026 başı, 48,4 TL/USD.",
-                   "DigiKey, LCSC, Mouser and Newhaven list prices: the "
-                   "report's from 6 September, the cheaper parts' from 23 "
-                   "September 2026. Exchange rate early September 2026, "
-                   "48,4 TL a dollar."),
+                _w("DigiKey, LCSC, Mouser ve diğer satıcıların liste "
+                   "fiyatları, 23-25 Eylül 2026; başvuru raporunun "
+                   "fiyatları 6 Eylül 2026. Kur Eylül 2026 başı, "
+                   "48,4 TL/USD.",
+                   "List prices from DigiKey, LCSC, Mouser and other "
+                   "sellers, 23 to 25 September 2026; the application "
+                   "report's prices from 6 September 2026. Exchange rate "
+                   "early September 2026, 48,4 TL a dollar."),
                 _w("Karşılaştırma tablosunun bizim olmayan satırları "
                    "aşağıdaki kaynakçadan gelir. Tablonun altındaki her "
                    "dipnot, dayandığı girdiye bağlıdır.",
@@ -1837,10 +1843,6 @@ SOURCES = Page(
                    "adı ve raporda kullanılan karşılığı.",
                    "`CONTEXT.md` is the glossary: the name the code uses "
                    "for each term beside the one the report uses."),
-                _w("`docs/adr/` her kararı ve neyin yerine geçtiğini tutar. "
-                   "`docs/HANDOFF.md` açık soruları tutar.",
-                   "`docs/adr/` holds every decision and what it replaced. "
-                   "`docs/HANDOFF.md` holds the open questions."),
             ),
         ),
         Part(
@@ -1931,8 +1933,7 @@ COST = Page(
         ),
         Part(
             kind="shows", shows="bill",
-            heading=_w("Kartlar: raporda ve şimdi",
-                       "The boards: in the report and now"),
+            heading=_w("Kartların fiyatı", "What the boards cost"),
         ),
         Part(
             kind="shows", shows="parts",
@@ -1966,28 +1967,24 @@ COST = Page(
                     "kademe fiyatı doğrulanan parça o fiyatla giriyor; "
                     "doğrulanmayan parçalar ve \"diğer\" satırı 100 "
                     "adetlik fiyatın %90'ı sayılıyor. Doğrulanan kademeler "
-                    "raporun indiriminden çoğu zaman pahalı çıktı.",
+                    "çoğu parçada raporun indiriminden pahalı.",
                     "The price at a hundred uses the report's own discount "
                     "from one to a hundred. At a thousand, a part whose "
                     "distributor tier was verified enters at that price; "
                     "the others and the \"other\" line are taken at 90 % "
-                    "of the hundred price. The verified tiers mostly came "
-                    "out dearer than the report's discount.",
+                    "of the hundred price. For most parts the verified "
+                    "tiers are dearer than the report's discount.",
                 ),
                 _w(
-                    "Parça fiyatları 23 Eylül 2026'da web aramasının "
-                    "döndürdüğü satıcı fiyatlarıdır. Bu çalışmanın yapıldığı "
-                    "ortamın ağ kuralları satıcı sayfalarını açmaya izin "
-                    "vermedi, o yüzden fiyat kademeleri sayfalardan tek tek "
-                    "okunmadı. Bağlantılar yukarıda; bir fiyat tutmazsa "
-                    "bom.toml dosyasındaki tek satır düzeltilir ve bu sayfa "
-                    "da tablo da onu izler.",
-                    "The part prices are the distributor prices a web "
-                    "search returned on 23 September 2026. The network "
-                    "rules of the environment this was done in did not "
-                    "allow opening the seller pages, so no price tier was "
-                    "read off a page directly. The links are above; if a "
-                    "price is wrong, one line in bom.toml fixes it and this "
+                    "Parça fiyatları satıcıların 23-25 Eylül 2026 liste "
+                    "fiyatları; bağlantılar yukarıda. Sipariş öncesinde "
+                    "teklifle doğrulanmalı. Bir fiyat değişirse bom.toml "
+                    "dosyasındaki tek satır değişir, bu sayfa da tablo da "
+                    "onu izler.",
+                    "The part prices are the sellers' list prices of 23 "
+                    "to 25 September 2026; the links are above. They are "
+                    "to be confirmed by quotation before ordering. If a "
+                    "price changes, one line in bom.toml changes and this "
                     "page and the table follow.",
                 ),
             ),
@@ -2115,6 +2112,18 @@ LAW = Page(
                    "Laboratories work by quotation and publish no price. "
                    "A market indication, not a quote: about 7000-16500 € "
                    "for the three, once."),
+                _w("Uyumlaştırılmış standartlar uygulanırsa Onaylanmış "
+                   "Kuruluşa gitmek zorunlu değil: RED 2014/53/AB Madde "
+                   "17(3), Ek II'deki iç üretim kontrolüne izin veriyor. "
+                   "Bu, uygunluğun bedelsiz olduğu anlamına gelmiyor; "
+                   "üretici uygunluğu teknik dosya ve ölçüm sonuçlarıyla "
+                   "göstermek zorunda.",
+                   "Where the harmonised standards are applied, a notified "
+                   "body is not required: Article 17(3) of RED 2014/53/EU "
+                   "allows internal production control under Annex II. "
+                   "That does not make conformity free; the manufacturer "
+                   "still has to show it with a technical file and "
+                   "measurement results."),
             ),
         ),
         Part(
@@ -2189,6 +2198,9 @@ LAW = Page(
                 Link(label=_w("BTK: Sınıf 2 bildirim uygulamasına son verildi",
                               "BTK: the Class 2 notification has ended"),
                      url="https://btk.gov.tr/sinif-2-bildirim-formu-ile-bilgi-teknolojileri-ve-iletisim-kurumuna-basvuruda-bulunulmasi-uygulamasina-son-verilmistir"),
+                Link(label=_w("RED 2014/53/AB (EUR-Lex)",
+                              "RED 2014/53/EU (EUR-Lex)"),
+                     url="https://eur-lex.europa.eu/eli/dir/2014/53/oj"),
                 Link(label=_w("BTK: piyasa gözetimi, sıkça sorulan sorular",
                               "BTK: market surveillance, frequently asked questions"),
                      url="https://www.btk.gov.tr/piyasa-gozetimi-ve-denetimi-sikca-sorulan-sorular"),
@@ -2572,18 +2584,16 @@ SPREAD = _w("Üç satırın hatası: ortancadan en kötü %5'e",
 SPREAD_UNDER = _w(
     "Dolu nokta hataların yüzde 95'inin altında kaldığı değer, boş nokta "
     "ortancası; aradaki çizgi ne kadar dağıldıklarını gösteriyor. "
-    "Baklava, aynı sabitlemenin düşey hatası. Düşey her üç satırda da "
-    "yataydan çok daha kötü, ve sebebi modelde yazıyor: yol kenarına "
-    "dizilmiş birimlerin hepsi aşağı yukarı aynı yükseklikte, o yüzden "
-    "yüksekliği ölçecek geometri yok. Tabloda bunu gizlemek yerine VPE "
-    "sütunu olarak yazılı.",
+    "Baklava, aynı sabitlemenin düşey hatası. Yol kenarına dizilmiş "
+    "birimlerin hepsi aşağı yukarı aynı yükseklikte, o yüzden yüksekliği "
+    "mesafelerden ölçecek geometri yok; düşeyi haritadan gelen yükseklik "
+    "taşıyor.",
     "The filled dot is the value 95 % of the errors stay under, the "
     "hollow one the median; the line between them is how far they "
-    "spread. The diamond is the same fix's vertical error. Vertical is "
-    "far worse than horizontal on all three rows, and the model says "
-    "why: units strung along a roadside are all at much the same "
-    "height, so there is no geometry to measure height with. The table "
-    "writes it down as the VPE column rather than hiding it.",
+    "spread. The diamond is the same fix's vertical error. Units strung "
+    "along a roadside are all at much the same height, so there is no "
+    "geometry to measure height from ranges; the height from the map "
+    "carries the vertical.",
 )
 COST = _w("Kilometrekare başına kurulum maliyeti",
           "Capital per square kilometre")

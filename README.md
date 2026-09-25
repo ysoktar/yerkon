@@ -358,8 +358,8 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 1,87 | 5,43 | 3,75 | %85,47 | 8,59 | 10220 | 2083 |
-| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 1,76 | 4,61 | 4,70 | %66,58 | 306,00 | 1280 | 409 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 | 11477 | 2209 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 | 1350 | 416 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,79 | 2,73 | 2,06 | %98,61 | 0,02 | 34612 /km | 3504 /km |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m

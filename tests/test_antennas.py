@@ -6,7 +6,7 @@ import math
 import pytest
 
 from yerkon.hardware import (
-    DUCK_5DBI, E28_2G4M27S, HGV_2409U, SX1280, TL_ANT2412D, W24P_U)
+    E28_2G4M27S, GW_22_5151, HGV_2409U, SX1280, TL_ANT2412D, W24P_U)
 
 
 def test_the_sensitivity_is_the_one_semtech_publishes_carried_to_sf10():
@@ -44,9 +44,9 @@ def test_the_rows_hear_with_a_duck_and_a_pedestrian_does_not():
 
     for row in ("urban", "rural"):
         deployment = CHOICES[row].scenario.deployment
-        assert deployment.antenna is DUCK_5DBI
+        assert deployment.antenna is GW_22_5151
         for unit in deployment.receivers:
-            expected = DUCK_5DBI if unit.product == "vehicle" else W24P_U
+            expected = GW_22_5151 if unit.product == "vehicle" else W24P_U
             assert unit.antenna is expected, (row, unit.identifier)
     tunnel = CHOICES["tunnel"].scenario.deployment
     assert tunnel.antenna is W24P_U
@@ -88,8 +88,8 @@ def test_the_duck_reaches_the_ceiling_with_the_amplified_module():
     from yerkon.regulatory import TURKEY_FREQUENCY_HOPPING
 
     eirp = TURKEY_FREQUENCY_HOPPING.permitted_eirp_dbm(
-        1625e3, DUCK_5DBI.peak_dbi,
-        float(E28_2G4M27S.max_output_dbm.value) - DUCK_5DBI.feed_loss_db)
+        1625e3, GW_22_5151.peak_dbi,
+        float(E28_2G4M27S.max_output_dbm.value) - GW_22_5151.feed_loss_db)
     assert eirp == pytest.approx(20.0)
 
 

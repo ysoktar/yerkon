@@ -7,11 +7,11 @@
 # figures that differ are listed; everything else stays as it is.
 
 name = 'rural-tall'
-title = 'Kırsal: dağıtım direğinde 12 m — iletkenlere daha yakın'
-title_en = 'Rural: 12 m on the distribution pole — closer to the conductors'
+title = 'Kırsal: dağıtım direğinde 12 m, iletkenlere daha yakın'
+title_en = 'Rural: 12 m on the distribution pole, closer to the conductors'
 origin = 'shipped'
-note = """Aynı kırk dokuz dağıtım direği, birim 10 yerine 12 metrede. Kaba okumada %74,5'e karşı %75,5 kullanılabilirlik, 13,0 m'ye karşı 10,4 m P95, aynı sermaye. Bedeli sahada: orta gerilim direkleri 12-14 m ve iki metre birimi iletkenlere yaklaştırıyor, bu da dağıtım şirketinin iznine ve daha dikkatli bir montaja bağlı. Varsayılan bu yüzden 10 m'de kalıyor (ADR-0079)."""
-note_en = """The same forty nine distribution poles with the unit at 12 metres instead of 10. On a coarse read: 75,5 % availability against 74,5 %, 10,4 m P95 against 13,0 m, for the same capital. The cost is in the field: medium voltage poles are 12 to 14 m, and two metres bring the unit closer to the conductors, which rests on the distribution company's consent and a more careful fitting. That is why the default stays at 10 m (ADR-0079)."""
+note = """Aynı kırk dokuz dağıtım direği, birim 10 yerine 12 metrede, aynı sermayeyle. Yükseklik menzili ve kullanılabilirliği artırıyor. Bedeli sahada: orta gerilim direkleri 12-14 m ve iki metre birimi iletkenlere yaklaştırıyor; bu dağıtım şirketinin iznine ve daha dikkatli bir montaja bağlı. Varsayılan bu yüzden 10 m."""
+note_en = """The same forty nine distribution poles with the unit at 12 metres instead of 10, for the same capital. Height buys reach and availability. The cost is in the field: medium voltage poles are 12 to 14 m, and two metres bring the unit closer to the conductors, which rests on the distribution company's consent and a more careful fitting. That is why the default is 10 m."""
 
 [values]
 'mounting.distribution_pole.height_m' = 12.0

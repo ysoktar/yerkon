@@ -704,7 +704,7 @@ class ViewState:
             if site is None:
                 raise ValueError(
                     "no site fetched at {}. Run `yerkon fetch --into {}` "
-                    "first; see ADR-0008.".format(SITES / self.site, SITES / self.site)
+                    "first.".format(SITES / self.site, SITES / self.site)
                 )
             return terrain_from_site(
                 site, clutter_loss_db_per_km=self.clutter_db_per_km,

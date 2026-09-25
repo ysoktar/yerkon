@@ -173,9 +173,9 @@ def summary(language: str, table) -> str:
 
     bill = read()
     head = [_say(pair, language) for pair in (
-        ("Ürün", "Product"), ("Raporda 1", "Report, 1"),
-        ("Raporda 100", "Report, 100"), ("Şimdi 1", "Now, 1"),
-        ("Şimdi 100", "Now, 100"), ("Şimdi 1000", "Now, 1000"),
+        ("Ürün", "Product"), ("Rapor, 1", "Report, 1"),
+        ("Rapor, 100", "Report, 100"), ("Döküm, 1", "Itemised, 1"),
+        ("Döküm, 100", "Itemised, 100"), ("Döküm, 1000", "Itemised, 1000"),
     )]
     body = [
         [html.escape(board.name(language)), _tl(board.report_one_tl),
@@ -197,7 +197,7 @@ def parts(language: str, table) -> str:
         replaced = {came.key: gone for gone, came in board.swapped}
         head = [_say(pair, language) for pair in (
             ("Parça", "Part"), ("Görevi", "What it does"),
-            ("Satıcı", "Seller"), ("Yerine geçtiği", "Replaces"),
+            ("Satıcı", "Seller"), ("Rapordaki karşılığı", "In the report"),
             ("1 adet", "One"),
         )]
         body = []

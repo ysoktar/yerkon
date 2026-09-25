@@ -239,20 +239,22 @@ HGV_2409U = Antenna(
 not something a person carries."""
 
 
-DUCK_5DBI = Antenna(
-    part="5 dBi RP-SMA dipole",
+GW_22_5151 = Antenna(
+    part="Taoglas GW.22.5151",
     peak_gain_dbi=Sourced(
         5.0, "dBi", Provenance.DATASHEET,
-        "FT-RF RU-245805 datasheet: 2,4 GHz, 5 dBi, omni, vertical "
-        "beamwidth 54 degrees",
+        "Taoglas GW.22.5151: 2,4 GHz rubber duck dipole, up to 5 dBi, "
+        "RP-SMA(M), IP67 and UV resistant, for indoor and outdoor use",
     ),
     efficiency=Sourced(
         1.0, "fraction", Provenance.DATASHEET,
-        "FT-RF RU-245805; the gain already includes it",
+        "Taoglas GW.22.5151; the peak gain already includes it",
     ),
     centre_frequency_hz=2450e6,
     bandwidth_hz=100e6,
-    vertical_beamwidth_deg=54.0,
+    # The maker gives no vertical beamwidth; McDonald's approximation
+    # from the gain, as for every antenna without one.
+    vertical_beamwidth_deg=_omni_beamwidth_deg(5.0),
     # Screwed onto the box's own connector: no cable, two connector
     # joints.
     feed_loss_db=2 * 0.15,
@@ -260,11 +262,10 @@ DUCK_5DBI = Antenna(
 """The pole's and the vehicle's antenna for the town and the open
 country (ADR-0094).
 
-A rubber duck on the unit's own connector. With the equipment certified
-as adaptive frequency hopping the density limit goes away and 20 dBm
-e.i.r.p. is the ceiling, which the 27 dBm module reaches with gain to
-spare; a wide beam then hears a vehicle close to the pole as well as
-one far off, which the 12 dBi collinear did not."""
+A sealed rubber duck on the unit's own connector, rated for outdoor
+use. With the equipment certified as adaptive frequency hopping the
+density limit goes away and 20 dBm e.i.r.p. is the ceiling, which the
+27 dBm module reaches with gain to spare."""
 
 
 # --- Radios ---------------------------------------------------------------
