@@ -108,6 +108,19 @@ def test_a_fixed_point_to_point_link_keeps_more_of_its_antenna_gain():
 
 
 def test_every_region_is_reachable_by_key():
-    assert set(REGIONS) == {"TR", "EU", "US", "US-PTP", "LICENSED"}
+    assert set(REGIONS) == {"TR", "TR-FHSS", "EU", "US", "US-PTP", "LICENSED"}
     for rule in REGIONS.values():
         assert rule.region.strip()
+
+
+def test_certified_frequency_hopping_lifts_only_the_density_limit():
+    """ADR-0092. The same 20 dBm ceiling, no per-megahertz cap."""
+    from yerkon.regulatory import TURKEY, TURKEY_FREQUENCY_HOPPING
+
+    assert TURKEY_FREQUENCY_HOPPING.permitted_eirp_dbm(1625e3, 3.2, 27.0) == (
+        pytest.approx(20.0))
+    assert TURKEY.permitted_eirp_dbm(1625e3, 3.2, 27.0) == pytest.approx(
+        12.1, abs=0.05)
+    # A 12,5 dBm module with a printed antenna cannot reach the new ceiling.
+    assert TURKEY_FREQUENCY_HOPPING.permitted_eirp_dbm(1625e3, 3.2, 12.5) == (
+        pytest.approx(15.7))

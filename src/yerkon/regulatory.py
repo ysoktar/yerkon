@@ -98,6 +98,22 @@ TURKEY = SpectrumRule(
     ),
 )
 
+TURKEY_FREQUENCY_HOPPING = SpectrumRule(
+    region="Türkiye, frekans atlamalı (belgelendirilmiş)",
+    max_eirp_dbm=Sourced(
+        20.0, "dBm", Provenance.STANDARD,
+        "TS EN 300 328, as adopted by the BTK short-range device regulation",
+    ),
+    note=(
+        "The same standard for equipment certified as frequency hopping: "
+        "the density limit applies to other modulations only, so 20 dBm "
+        "e.i.r.p. is the whole ceiling. SX1280 ranging already hops its "
+        "channels; the equipment has to be tested as FHSS by an accredited "
+        "laboratory, and EN 300 328 then sets its own dwell-time and "
+        "medium-utilisation conditions (ADR-0092)."
+    ),
+)
+
 EUROPE = SpectrumRule(
     region="Avrupa (CEPT)",
     max_eirp_dbm=Sourced(
@@ -157,6 +173,7 @@ LICENSED_ASSIGNMENT = SpectrumRule(
 
 REGIONS = {
     "TR": TURKEY,
+    "TR-FHSS": TURKEY_FREQUENCY_HOPPING,
     "EU": EUROPE,
     "US": UNITED_STATES,
     "US-PTP": UNITED_STATES_POINT_TO_POINT,
