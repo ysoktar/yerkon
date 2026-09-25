@@ -928,13 +928,17 @@ class ViewState:
         from yerkon.scenarios import row_deployment_figures
 
         row = self.scenario if self.scenario in MODES else "rural"
+        region = chosen(REGION_CHOICES, self.region, "region")
         return Deployment(
             anchors=anchors,
             receivers=self.receivers(terrain),
             # The scheme is the tab's own: the page offers it. How many
             # anchors a round polls is the row's (ADR-0084).
             scheme=SCHEMES[self.scheme],
-            region=chosen(REGION_CHOICES, self.region, "region"),
+            region=region,
+            # The rest an adaptive rule asks for after each occupancy,
+            # as the table's rows take it (ADR-0094).
+            duty_cycle=region.channel_share,
             max_anchors_per_round=row_deployment_figures(
                 row, self.settings())["max_anchors_per_round"],
             # The row's antennas, so a tab hears as its row does (ADR-0091).
@@ -1187,12 +1191,27 @@ def _grid(prefix: str, stagger: bool = True) -> tuple:
 
 def _units(name: str) -> tuple:
     """The row's own units, from the one list both sides read (ADR-0084)."""
-    from yerkon.scenarios import ROW_UNITS
+    from yerkon.scenarios import ROW_UNITS, unit_radios
 
     return tuple(
-        UnitPlan(name_, kind, speed_km_h, start_m, height_m)
+        UnitPlan(name_, kind, speed_km_h, start_m, height_m,
+                 radios=unit_radios(name, kind))
         for name_, kind, speed_km_h, start_m, height_m in ROW_UNITS[name]
     )
+
+
+def _radio(name: str) -> str:
+    """The row's anchor module, by key (ADR-0094)."""
+    from yerkon.scenarios import ROW_RADIOS
+
+    return ROW_RADIOS[name][0]
+
+
+def _region(name: str) -> str:
+    """The row's spectrum rule, by key (ADR-0094)."""
+    from yerkon.scenarios import ROW_REGIONS
+
+    return ROW_REGIONS[name]
 
 
 def _seed(name: str) -> int:
@@ -1212,11 +1231,11 @@ def _template(name: str) -> ViewState:
     if name == "urban":
         return ViewState(
             scenario="urban", corridor_m=3000.0, width_m=3000.0,
-            site="kizilay",
+            site="kizilay", region=_region("urban"),
             clutter_db_per_km=30.0, roughness_m=0.5, tolerance_m=5.0,
             sweep_m=_sweep_m("urban"), journey_s=_journey_s("urban"),
             runs=(
-                AnchorRun("C", "sx1280", "column", 0.0, 3000.0,
+                AnchorRun("C", _radio("urban"), "column", 0.0, 3000.0,
                           _grid("urban")[0], 0.0,
                           stagger_m=_grid("urban")[1]),
             ),
@@ -1226,12 +1245,12 @@ def _template(name: str) -> ViewState:
     if name == "tunnel":
         return ViewState(
             scenario="tunnel", corridor_m=2000.0,
-            site="kizilcahamam", bore=True,
+            site="kizilcahamam", bore=True, region=_region("tunnel"),
             clutter_db_per_km=0.0, roughness_m=0.05, tolerance_m=1.0,
             # Single-sided, as the table runs it (ADR-0010). The tab
             # carried double-sided after the table moved (ADR-0084).
             sweep_m=100.0, journey_s=_journey_s("tunnel"), scheme="single",
-            runs=(AnchorRun("T", "dwm3000", "tunnel", 0.0, 2000.0,
+            runs=(AnchorRun("T", _radio("tunnel"), "tunnel", 0.0, 2000.0,
                             _grid("tunnel", stagger=False)[0], 4.0),),
             units=_units("tunnel"),
             seed=_seed("tunnel"),
@@ -1239,11 +1258,11 @@ def _template(name: str) -> ViewState:
     if name == "rural":
         return ViewState(
             scenario="rural", corridor_m=20_000.0, width_m=20_000.0,
-            site="polatli", roughness_m=0.2,
+            site="polatli", region=_region("rural"), roughness_m=0.2,
             tolerance_m=5.0, sweep_m=_sweep_m("rural"),
             journey_s=_journey_s("rural"),
             runs=(
-                AnchorRun("M", "sx1280", "pole", 0.0, 20_000.0,
+                AnchorRun("M", _radio("rural"), "pole", 0.0, 20_000.0,
                           _grid("rural")[0], 0.0,
                           stagger_m=_grid("rural")[1]),
             ),

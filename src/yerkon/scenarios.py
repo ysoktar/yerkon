@@ -24,7 +24,7 @@ from yerkon.cost import (
     PEDESTRIAN_RECEIVER,
     anchor_product,
     TUNNEL_ANCHOR,
-    SX1280_ANCHOR,
+    AMPLIFIED_ANCHOR,
     VEHICLE_RECEIVER,
     AnchorSite,
     Inventory,
@@ -32,9 +32,9 @@ from yerkon.cost import (
 )
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import (
-    DWM3000, HGV_2409U, SX1280, TL_ANT2412D, Radio, W24P_U, radios)
+    DUCK_5DBI, DWM3000, SX1280, Radio, W24P_U, radios)
 from yerkon.ranging import SINGLE_SIDED
-from yerkon.regulatory import TURKEY
+from yerkon.regulatory import REGIONS
 from yerkon.language import say
 from yerkon.settings import DEFAULTS, Settings
 from yerkon.site.cache import SiteCache
@@ -215,26 +215,36 @@ def row_figures(row: str, settings: Settings = DEFAULTS) -> dict:
 
 
 def row_deployment_figures(row: str, settings: Settings = DEFAULTS) -> dict:
-    """The deployment-level half of the same: round size, scheme and the
-    anchors' antenna."""
+    """The deployment-level half of the same: round size, scheme, the
+    anchors' antenna, the spectrum rule and the share of time it lets
+    the ranging use."""
+    region = REGIONS[ROW_REGIONS[row]]
     return {
         "max_anchors_per_round": int(
             settings.number("{}.anchors_per_round".format(row))),
         "scheme": SINGLE_SIDED,
         "antenna": ROW_ANTENNAS[row][0],
+        "region": region,
+        "duty_cycle": region.channel_share,
     }
+
+
+#: Each row's spectrum rule, by its key in `regulatory.REGIONS`.
+#:
+#: The town and the open country are certified as adaptive frequency
+#: hopping, which lifts the density limit and leaves 20 dBm e.i.r.p.
+#: (ADR-0094). The tunnel ranges by ultra-wideband under the plain rule.
+ROW_REGIONS = {"urban": "TR-FHSS", "rural": "TR-FHSS", "tunnel": "TR"}
 
 
 #: Each row's antennas: the pole's, and a unit's by what it is.
 #:
-#: The town and the open country hear with mast antennas at both ends,
-#: which is how the range lost to the chip's official sensitivity comes
-#: back within the Turkish limit: transmit gain is paid back in power,
-#: receive gain is not. A pedestrian keeps the printed antenna. The
-#: tunnel ranges by ultra-wideband and keeps it everywhere (ADR-0091).
+#: The town and the open country put a 5 dBi rubber duck on the pole and
+#: on the vehicle (ADR-0094). A pedestrian keeps the printed antenna. The
+#: tunnel ranges by ultra-wideband and keeps it everywhere.
 ROW_ANTENNAS = {
-    "urban": (TL_ANT2412D, {"vehicle": HGV_2409U}),
-    "rural": (TL_ANT2412D, {"vehicle": HGV_2409U}),
+    "urban": (DUCK_5DBI, {"vehicle": DUCK_5DBI}),
+    "rural": (DUCK_5DBI, {"vehicle": DUCK_5DBI}),
     "tunnel": (W24P_U, {}),
 }
 
@@ -242,6 +252,28 @@ ROW_ANTENNAS = {
 def unit_antenna(row: str, product: str):
     """The antenna a unit of this kind carries on this row."""
     return ROW_ANTENNAS.get(row, ROW_ANTENNAS["rural"])[1].get(product, W24P_U)
+
+
+#: Each row's modules, by their key in `hardware.radios`: the pole's,
+#: and a unit's by what it is.
+#:
+#: Under the hopping certificate the pole and the vehicle carry the
+#: 27 dBm module, which reaches the 20 dBm ceiling through any of the
+#: antennas above. A pedestrian keeps the 12,5 dBm one: it is a battery
+#: device, and its link is short (ADR-0094).
+ROW_RADIOS = {
+    "urban": ("e28", {"vehicle": ("e28", "dwm3000")}),
+    "rural": ("e28", {"vehicle": ("e28", "dwm3000")}),
+    "tunnel": ("dwm3000", {}),
+}
+
+#: What a unit carries where its row names nothing for it.
+UNIT_RADIOS = ("sx1280", "dwm3000")
+
+
+def unit_radios(row: str, product: str) -> tuple:
+    """The modules a unit of this kind carries on this row, by key."""
+    return ROW_RADIOS.get(row, ROW_RADIOS["rural"])[1].get(product, UNIT_RADIOS)
 
 
 def site_road(length_m: float, width_m: float, terrain: Terrain) -> Road:
@@ -264,10 +296,11 @@ def site_road(length_m: float, width_m: float, terrain: Terrain) -> Road:
                 surface_m=graded_alignment(list(centreline), terrain))
 
 
-def _units(row: str, road: Road, duration_s: float, radios) -> tuple:
+def _units(row: str, road: Road, duration_s: float, module: dict) -> tuple:
     return tuple(
         _unit(name, road, speed_km_h / 3.6, duration_s, start_m=start_m,
-              antenna_height_m=height_m, product=product, radios=radios,
+              antenna_height_m=height_m, product=product,
+              radios=tuple(module[key] for key in unit_radios(row, product)),
               antenna=unit_antenna(row, product))
         for name, product, speed_km_h, start_m, height_m in ROW_UNITS[row]
     )
@@ -595,7 +628,6 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     # *receiving* terminal, so a unit holding the shipped part made every
     # edit to a radio figure invisible to link closure: the anchors moved
     # and the thing deciding whether the packet arrived did not.
-    both = (module["sx1280"], module["dwm3000"])
     clutter = settings.number("site.urban_clutter_db_per_km")
     # How many arrangements of shadows each row is run over (ADR-0055).
     draws = max(int(settings.number("site.shadow_draws")), 1)
@@ -624,7 +656,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     URBAN_X, URBAN_Y,
                     settings.number("urban.anchor_spacing_m"),
                     mounting["lighting_column"], URBAN_TERRAIN,
-                    radio=module["sx1280"], prefix="C",
+                    radio=module[ROW_RADIOS["urban"][0]], prefix="C",
                     stagger_m=settings.number("urban.anchor_stagger_m"),
                     junction=at_a_signalised_junction(
                         mounting["lighting_column"],
@@ -634,15 +666,14 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                         settings.number("urban.junction_every")
                     ),
                 ),
-                receivers=_units("urban", URBAN_ROAD, 600.0, both),
-                region=TURKEY,
+                receivers=_units("urban", URBAN_ROAD, 600.0, module),
                 **row_deployment_figures("urban", settings),
             ),
             # A town's share of the band is spoken for, so more exchanges
             # are lost here than anywhere else in the study.
             **row_figures("urban", settings),
         ),
-        product=SX1280_ANCHOR,
+        product=AMPLIFIED_ANCHOR,
         mounting=mounting["lighting_column"],
         route_km=URBAN_ROAD.length_m / 1000.0,
         environment="Dış",
@@ -673,14 +704,10 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     # The distribution network's own poles rather than
                     # masts raised for the purpose (ADR-0079).
                     mounting["distribution_pole"], RURAL_TERRAIN,
-                    # The plain module: the amplified one's extra power
-                    # is not legal at this bandwidth in Turkey, and the
-                    # link budget caps it to the same 12,1 dBm either
-                    # way (ADR-0079).
-                    radio=module["sx1280"], prefix="M",
+                    radio=module[ROW_RADIOS["rural"][0]], prefix="M",
                     stagger_m=settings.number("rural.anchor_stagger_m"),
                 ),
-                receivers=_units("rural", RURAL_ROAD, 2400.0, both),
+                receivers=_units("rural", RURAL_ROAD, 2400.0, module),
                 # Twelve, not the eight the other rows use, and the
                 # difference is worth 6,8 points of availability without
                 # a single extra mast (ADR-0022).
@@ -695,12 +722,11 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                 # how many anchors answer, not by how many a position
                 # needs. Sixteen buys only another 0,8 points and costs
                 # more than it returns.
-                region=TURKEY,
                 **row_deployment_figures("rural", settings),
             ),
             **row_figures("rural", settings),
         ),
-        product=SX1280_ANCHOR,
+        product=AMPLIFIED_ANCHOR,
         mounting=mounting["distribution_pole"],
         route_km=RURAL_ROAD.length_m / 1000.0,
         environment="Dış",
@@ -736,9 +762,9 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     settings.number("tunnel.anchor_spacing_m"),
                     settings.number("tunnel.anchor_offset_m"),
                     mounting["tunnel_bracket"], TUNNEL_TERRAIN,
-                    radio=module["dwm3000"],
+                    radio=module[ROW_RADIOS["tunnel"][0]],
                 ),
-                receivers=_units("tunnel", TUNNEL_ROAD, 85.0, both),
+                receivers=_units("tunnel", TUNNEL_ROAD, 85.0, module),
                 # Single-sided, on the strength of a measurement rather
                 # than a preference. At the residual offset this project
                 # assumed, the third frame earned its place on this radio.
@@ -746,7 +772,6 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                 # floor, so the frame buys nothing and costs a third of
                 # the air: 0,72 m at the ninety-fifth percentile instead
                 # of 1,00, and half again as many fixes. See ADR-0010.
-                region=TURKEY,
                 **row_deployment_figures("tunnel", settings),
             ),
             **row_figures("tunnel", settings),

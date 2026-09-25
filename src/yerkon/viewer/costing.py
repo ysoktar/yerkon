@@ -257,10 +257,10 @@ def assumptions(language: str, table) -> str:
 
 def structures(language: str, table) -> str:
     """The town's units on the structures it has, and on masts raised for them."""
-    from yerkon.cost import SX1280_ANCHOR, DEFAULT_RATES
+    from yerkon.cost import AMPLIFIED_ANCHOR, DEFAULT_RATES
     from yerkon.world import LIGHTING_COLUMN, TALL_MAST
 
-    unit = float(SX1280_ANCHOR.unit_price_tl.value)
+    unit = float(AMPLIFIED_ANCHOR.unit_price_tl.value)
     fitting = float(LIGHTING_COLUMN.site_cost_tl.value)
     mast = float(TALL_MAST.site_cost_tl.value)
     supply = float(DEFAULT_RATES.off_grid_supply_tl.value)
@@ -294,10 +294,10 @@ def structures(language: str, table) -> str:
 
 def ratio_on_masts() -> int:
     """How many times the mast costs the column, rounded as the page says."""
-    from yerkon.cost import SX1280_ANCHOR, DEFAULT_RATES
+    from yerkon.cost import AMPLIFIED_ANCHOR, DEFAULT_RATES
     from yerkon.world import LIGHTING_COLUMN, TALL_MAST
 
-    unit = float(SX1280_ANCHOR.unit_price_tl.value)
+    unit = float(AMPLIFIED_ANCHOR.unit_price_tl.value)
     return round(
         (unit + float(TALL_MAST.site_cost_tl.value)
          + float(DEFAULT_RATES.off_grid_supply_tl.value))

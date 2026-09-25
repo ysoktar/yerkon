@@ -110,32 +110,29 @@ def test_the_tunnel_serves_a_bore_and_not_a_plane():
 
 
 def test_the_three_scenarios_use_the_modules_the_bill_assigns():
-    """The town and the open country share a board now (ADR-0079).
-
-    The report gave the open country the amplified E28-2G4M27S. Under
-    the Turkish density limit its amplifier cannot speak at the ranging
-    bandwidth, so the rural row carries the plain module and reads the
-    same to the digit.
+    """The town and the open country share a board (ADR-0079), and under
+    the frequency hopping certificate it is the amplified one (ADR-0094).
     """
-    from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
+    from yerkon.hardware import DWM3000, E28_2G4M27S
 
     def radios(deployed):
         return {a.radio for a in deployed.scenario.deployment.anchors}
 
-    assert radios(URBAN) == {SX1280}
-    assert radios(RURAL) == {SX1280}
-    assert E28_2G4M27S not in radios(RURAL)
+    assert radios(URBAN) == {E28_2G4M27S}
+    assert radios(RURAL) == {E28_2G4M27S}
     assert radios(TUNNEL) == {DWM3000}
 
 
 def test_every_unit_carries_both_modules_as_the_bill_of_materials_says():
-    """Both receivers list an SX1280 and a DWM3000. That is what lets one
-    unit work on the road and in a bore without changing."""
-    from yerkon.hardware import DWM3000, SX1280
+    """Both receivers list an SX1280 module and a DWM3000. That is what
+    lets one unit work on the road and in a bore without changing. On the
+    certified rows the vehicle's SX1280 is the amplified module
+    (ADR-0094)."""
+    from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
 
     for deployed in ALL:
         for unit in deployed.scenario.deployment.receivers:
-            assert SX1280 in unit.radios
+            assert SX1280 in unit.radios or E28_2G4M27S in unit.radios
             assert DWM3000 in unit.radios
 
 

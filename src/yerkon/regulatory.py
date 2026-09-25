@@ -38,6 +38,11 @@ class SpectrumRule:
     power, at ``gain_payback_ratio`` decibels of power per decibel of
     excess gain. A ratio below one is the concession fixed point-to-point
     links get.
+
+    ``idle_after_occupancy`` is how long, as a share of each channel
+    occupancy, the equipment must then stay silent. Adaptive equipment
+    under EN 300 328 listens before it talks and rests afterwards; the
+    rest is time the ranging schedule cannot use.
     """
 
     region: str
@@ -46,7 +51,13 @@ class SpectrumRule:
     max_conducted_dbm: Optional[Sourced] = None
     antenna_gain_allowance_dbi: float = 0.0
     gain_payback_ratio: float = 1.0
+    idle_after_occupancy: float = 0.0
     note: str = ""
+
+    @property
+    def channel_share(self) -> float:
+        """Share of the second a transmitter under this rule may occupy."""
+        return 1.0 / (1.0 + self.idle_after_occupancy)
 
     def permitted_eirp_dbm(
         self, bandwidth_hz: float, antenna_gain_dbi: float, radio_max_dbm: float
@@ -99,11 +110,15 @@ TURKEY = SpectrumRule(
 )
 
 TURKEY_FREQUENCY_HOPPING = SpectrumRule(
-    region="Türkiye, frekans atlamalı (belgelendirilmiş)",
+    region="Türkiye, uyarlamalı frekans atlamalı (belgelendirilmiş)",
     max_eirp_dbm=Sourced(
         20.0, "dBm", Provenance.STANDARD,
         "TS EN 300 328, as adopted by the BTK short-range device regulation",
     ),
+    # Adaptive, because the non-adaptive mode allows 5 ms on a channel
+    # and a ranging frame is about 15 ms: after each occupancy at least
+    # 5 % of it idle (EN 300 328 V2.2.2, 4.3.1.7.2.2; ADR-0092).
+    idle_after_occupancy=0.05,
     note=(
         "The same standard for equipment certified as frequency hopping: "
         "the density limit applies to other modulations only, so 20 dBm "

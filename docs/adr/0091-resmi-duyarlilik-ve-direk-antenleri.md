@@ -2,7 +2,9 @@
 
 ## Durum
 
-Kabul edildi (proje sahibinin kararı, 24 Eylül 2026).
+Kabul edildi (proje sahibinin kararı, 24 Eylül 2026). Duyarlılık kararı
+geçerli; direk ve araç antenlerinin yerini ADR-0094'teki 5 dBi çubuk
+anten aldı.
 
 ## Bağlam
 

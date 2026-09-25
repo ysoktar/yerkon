@@ -327,6 +327,8 @@ export const SAY = {
   "scheme.single": { tr: "Tek yönlü TWR", en: "Single-sided TWR" },
   "scheme.double": { tr: "Çift yönlü TWR", en: "Double-sided TWR" },
   "region.TR": { tr: "Türkiye", en: "Türkiye" },
+  "region.TR-FHSS": { tr: "Türkiye, frekans atlamalı belgeli",
+                     en: "Türkiye, certified frequency hopping" },
   "region.EU": { tr: "Avrupa", en: "Europe" },
   "region.US": { tr: "Amerika", en: "United States" },
   "region.US-PTP": { tr: "Amerika (noktadan noktaya)",

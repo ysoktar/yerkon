@@ -16,13 +16,14 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 1. **Sunumdaki YERKON sayıları eski.** Slayt 16'daki üç satır (ör. şehir
    içi HPE P50 1,28 m, kullanılabilirlik yaklaşık %98, alan 1,00 km²)
-   bugünkü modelin çıktısı değil. Site şehir içi için 2,06 m, %69,33 ve
-   7,82 km² yayımlıyor (24 Eylül). Kırsalda fark daha büyük: sunum
-   yaklaşık %98,9, site %57,74. Sitenin kullanılabilirliği artık
+   bugünkü modelin çıktısı değil. Site şehir içi için 1,87 m, %85,47 ve
+   8,59 km² yayımlıyor (25 Eylül). Kırsalda fark daha büyük: sunum
+   yaklaşık %98,9, site %66,58. Sitenin kullanılabilirliği artık
    doğruluğa bağlı (ADR-0084), sunumunki değil. Sunum, form ve site aynı sayıyı söylemeli; şartnamenin
    "sonuçların tutarlılığı" ölçütü tam olarak buna bakıyor.
-2. **Kırsal birim için "8-10 km" ve 27 dBm'lik modül iddiası Türkiye
-   kuralıyla tutmuyor.** Türkiye'de 2400-2483,5 MHz için genel sınır
+2. **Kırsal birim için "8-10 km" ve 27 dBm'lik modül iddiası ancak
+   frekans atlama belgesiyle tutuyor.** Proje bu belgeyi seçti
+   (ADR-0094); aşağıdaki gerekçe belgesiz durumu anlatıyor. Türkiye'de 2400-2483,5 MHz için genel sınır
    20 dBm e.i.r.p.; frekans atlamasız geniş bant iletimde ayrıca
    10 dBm/MHz güç yoğunluğu sınırı var (TS EN 300 328). SX1280'in en
    doğru mesafe ölçümü ayarı olan 1625 kHz'de ikincisi bağlayıcı:
@@ -32,7 +33,9 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
    E28-2G4M12S ile aynı sonucu veriyor (ADR-0079). Mesafe ölçümü EN 300
    328 anlamında frekans atlamalı yapılırsa yoğunluk sınırı düşer ve
    20 dBm geçerli olur; o zaman amplifikatör yeniden anlam kazanır (bkz.
-   "Model doğruluğu"). Menzil sayıları (bağlantı 7,4 km, 5 m hassasiyet
+   "Model doğruluğu"). Proje bunu seçti: şehir içi ve kırsal birimler
+   uyarlamalı frekans atlamalı olarak belgelendiriliyor ve E28-2G4M27S
+   kullanıyor (ADR-0092, ADR-0094). Menzil sayıları (bağlantı 7,4 km, 5 m hassasiyet
    3,5 km) yasal ya da fiziksel sınır değil, modelin belirli
    varsayımlarla ürettiği sonuç; en çok da doğrulanmamış bir alıcı
    duyarlılığına bağlı.
@@ -115,22 +118,22 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 ### Sonuç tablosu (slayt 16)
 
-| Satır | Sütun | Sunum | Site (24 Eylül koşusu) |
+| Satır | Sütun | Sunum | Site (25 Eylül koşusu) |
 |---|---|---|---|
-| Şehir içi | HPE P50 | 1,28 m | 2,06 m |
-| Şehir içi | HPE P95 | 2,99 m | 5,60 m |
-| Şehir içi | VPE P95 | 31,47 m | 3,72 m |
-| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %69,33 |
-| Şehir içi | Alan | 1,00 km² | 7,82 km² |
-| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 16124 TL/km² |
-| Şehir içi | OPEX | boş | 2778 TL/km²/yıl |
-| Kırsal | HPE P50 | 4,17 m | 1,85 m |
-| Kırsal | HPE P95 | 14,29 m | 4,93 m |
-| Kırsal | VPE P95 | 24,14 m | 4,72 m |
-| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %57,74 |
-| Kırsal | Alan | 1,01 km² | 285,83 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1633 TL/km² |
-| Kırsal | OPEX | boş | 464 TL/km²/yıl |
+| Şehir içi | HPE P50 | 1,28 m | 1,87 m |
+| Şehir içi | HPE P95 | 2,99 m | 5,43 m |
+| Şehir içi | VPE P95 | 31,47 m | 3,75 m |
+| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %85,47 |
+| Şehir içi | Alan | 1,00 km² | 8,59 km² |
+| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 10220 TL/km² |
+| Şehir içi | OPEX | boş | 2083 TL/km²/yıl |
+| Kırsal | HPE P50 | 4,17 m | 1,76 m |
+| Kırsal | HPE P95 | 14,29 m | 4,61 m |
+| Kırsal | VPE P95 | 24,14 m | 4,70 m |
+| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %66,58 |
+| Kırsal | Alan | 1,01 km² | 306,00 km² |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1280 TL/km² |
+| Kırsal | OPEX | boş | 409 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,79 m |
 | Tünel | HPE P95 | 1,88 m | 2,73 m |
 | Tünel | VPE P95 | 5,53 m | 2,06 m |
@@ -155,31 +158,34 @@ gönderebilir.
 
 | Ürün | Sunum, 1 adet | Sunum, 100 adet | Şimdi, 1 adet | Şimdi, 100 adet | Şimdi, 1000 adet |
 |---|---|---|---|---|---|
-| Şehir içi (ve kırsal) yayın birimi | 1983,71 | 1366,07 | 1158,56 | 797,84 | 718,05 |
-| Kırsal yayın birimi (E28-2G4M27S) | 1549,67 | 1082,68 | 1310,80 | 915,79 | 824,21 |
-| Kritik bölge yayın birimi | 2241,42 | 1634,44 | 1662,69 | 1212,43 | 1091,19 |
-| Yaya alıcısı | 3913,16 | 3117,74 | 2987,03 | 2379,86 | 2141,87 |
-| Kara aracı alıcısı | 5202,69 | 4002,29 | 3748,56 | 2883,67 | 2595,30 |
+| Şehir içi yayın birimi (bugün belgesiz kart, kullanılmıyor) | 1983,71 | 1366,07 | 1144,03 | 787,83 | 844,49 |
+| Kırsal yayın birimi (E28-2G4M27S; bugün şehir içi ve kırsal) | 1549,67 | 1082,68 | 1367,96 | 955,73 | 1062,80 |
+| Kritik bölge yayın birimi | 2241,42 | 1634,44 | 1662,69 | 1212,43 | 1691,48 |
+| Yaya alıcısı | 3913,16 | 3117,74 | 2987,03 | 2379,86 | 2724,32 |
+| Kara aracı alıcısı | 5202,69 | 4002,29 | 4016,66 | 3089,91 | 3308,82 |
 
 Değişenler (`bom.toml`, ADR-0079): LAMBDA80-24S yerine E28-2G4M12S
-(aynı SX1280), STM32G0B1 yerine yayın birimlerinde STM32G031. Kırsal
-birim artık amplifikatörsüz kartın aynısı, çünkü amplifikatör Türkiye'de
-hiçbir şey kazandırmıyor. Bazı fiyatlar distribütör sitelerine bu
+(aynı SX1280), STM32G0B1 yerine yayın birimlerinde STM32G031. Şehir içi
+ve kırsal aynı kart: E28-2G4M27S ve 5 dBi çubuk anten; araç alıcısı da
+aynı modül ve anteni taşıyor (ADR-0094). 1000 adet sütunu, doğrulanan
+parçalarda dağıtıcının kademesinden (ADR-0093); bu yüzden bazı
+satırlarda 100 adetten yüksek. Bazı fiyatlar distribütör sitelerine bu
 ortamdan erişilemediği için arama sonuçlarından alındı; dosyada her
 parçanın satıcısı ve bağlantısı var, siparişten önce doğrulanmalı.
 
 Formdaki pilot bütçesi (10-15 yayın birimi, bir yaya ve bir araç alıcısı,
 tek adet fiyatla) 24600-42700 TL. Aynı hesap bugünkü fiyatlarla
-18321-31676 TL.
+20683-31944 TL.
 
 Formdaki tutarsızlıklar:
 
 - "100 adet üretimde yayın birimlerinin referans ana bileşen maliyeti
   yaklaşık 1.100-1.650 TL" diyor; sunumun kendi tablosu 1082-1634 TL,
-  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 798-1212 TL
-  (100 adet), 718-1091 TL (1000 adet).
-- Kırsal birimi E28-2G4M27S ile anlatıyor. Yukarıdaki nedenle
-  E28-2G4M12S olmalı.
+  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 956-1212 TL
+  (100 adet), 1063-1691 TL (1000 adet).
+- Kırsal birimi E28-2G4M27S ile anlatıyor. Frekans atlama belgesiyle bu
+  doğru (ADR-0094); form belgeyi ve şehir içi birimin de aynı kart
+  olduğunu söylemeli.
 
 ### Diğer uyumsuzluklar
 
@@ -296,13 +302,15 @@ Modelde (10 m direk):
 
 | Kural | Modül | e.i.r.p. | 5 m hassasiyet | Bağlantı |
 |---|---|---|---|---|
-| Bugünkü (yoğunluk sınırı) | E28-2G4M12S ya da 27S | 12,11 dBm | 3,5 km | 7,4 km |
+| Belgesiz (yoğunluk sınırı) | E28-2G4M12S ya da 27S | 12,11 dBm | 3,5 km | 7,4 km |
 | Frekans atlamalı | E28-2G4M12S | 15,70 dBm | 4,3 km | 9,1 km |
 | Frekans atlamalı | E28-2G4M27S | 20,00 dBm | 5,5 km | 11,7 km |
 
 Semtech'in yaklaşık 1 m'si zaten 40 kanalda atlayarak elde ediliyor; yani
-atlama doğruluğu da artırıyor. Atlama düzeninin standarttaki tanıma uyup
-uymadığı bir test laboratuvarına ya da BTK'ya sorulmalı.
+atlama doğruluğu da artırıyor. Proje uyarlamalı frekans atlamayı seçti
+(ADR-0092, ADR-0094); bu tablo seçimden önceki baskılı antenli
+karşılaştırma. Atlama düzeninin standarda uyduğunu test laboratuvarı
+doğrulayacak.
 
 
 ## Mevzuat için doğrulanması gerekenler

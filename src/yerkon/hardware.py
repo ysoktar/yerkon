@@ -239,6 +239,34 @@ HGV_2409U = Antenna(
 not something a person carries."""
 
 
+DUCK_5DBI = Antenna(
+    part="5 dBi RP-SMA dipole",
+    peak_gain_dbi=Sourced(
+        5.0, "dBi", Provenance.DATASHEET,
+        "FT-RF RU-245805 datasheet: 2,4 GHz, 5 dBi, omni, vertical "
+        "beamwidth 54 degrees",
+    ),
+    efficiency=Sourced(
+        1.0, "fraction", Provenance.DATASHEET,
+        "FT-RF RU-245805; the gain already includes it",
+    ),
+    centre_frequency_hz=2450e6,
+    bandwidth_hz=100e6,
+    vertical_beamwidth_deg=54.0,
+    # Screwed onto the box's own connector: no cable, two connector
+    # joints.
+    feed_loss_db=2 * 0.15,
+)
+"""The pole's and the vehicle's antenna for the town and the open
+country (ADR-0094).
+
+A rubber duck on the unit's own connector. With the equipment certified
+as adaptive frequency hopping the density limit goes away and 20 dBm
+e.i.r.p. is the ceiling, which the 27 dBm module reaches with gain to
+spare; a wide beam then hears a vehicle close to the pole as well as
+one far off, which the 12 dBi collinear did not."""
+
+
 # --- Radios ---------------------------------------------------------------
 
 def _sx1280_family(
@@ -328,8 +356,8 @@ SX1280 = _sx1280_family(
     12.5,
     "EBYTE E28-2G4M12S user manual, maximum output power",
 )
-"""The town's and the open country's anchor radio, and the one in both
-receivers.
+"""The pedestrian's wide-area radio, and the anchors' where no hopping
+certificate lifts the density limit.
 
 It was an RF Solutions LAMBDA80-24S at 16,49 USD. The EBYTE module
 carries the same Semtech chip at the same 12,5 dBm for 4,39 USD, so
@@ -340,13 +368,14 @@ E28_2G4M27S = _sx1280_family(
     27.0,
     "EBYTE E28-2G4M27S product page, rated output power",
 )
-"""The same silicon behind a power amplifier.
+"""The same silicon behind a power amplifier: the town's and the open
+country's anchor radio, and the vehicle's.
 
-No row uses it any more. In Turkey the density limit caps radiated power
-at 12,1 dBm at the ranging bandwidth, which the plain module already
-reaches, so the amplifier's 27 dBm cannot be used there. Under rules
-that allow it, the United States', it still can, which is why the
-design tool keeps it (ADR-0079)."""
+Without a certificate the Turkish density limit caps radiated power at
+12,1 dBm at the ranging bandwidth, which the plain module already
+reaches (ADR-0079). Certified as adaptive frequency hopping, the ceiling
+is 20 dBm, which only this module reaches through a 5 dBi antenna
+(ADR-0094)."""
 
 DWM3000 = Radio(
     part="Qorvo DWM3000",

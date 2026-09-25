@@ -7,7 +7,7 @@ bir bulgu çıktığında buraya eklenir. Ayrıntılı gerekçe
 
 Sayı biçimi: ondalık virgül, binlik ayırıcı yok (sitedeki gibi).
 
-Son güncelleme: 24 Eylül 2026.
+Son güncelleme: 25 Eylül 2026.
 
 ## Bütün sunum
 
@@ -88,20 +88,18 @@ Son güncelleme: 24 Eylül 2026.
   > TS EN 300 328 kapsamındaki frekans atlamasız geniş bant iletimlerde
   > geçerli 10 dBm/MHz güç yoğunluğu sınırı, SX1280'in 1,625 MHz'lik
   > yüksek doğruluklu mesafe ölçümü ayarında yaklaşık 12,1 dBm e.i.r.p.
-  > üst sınırına karşılık gelir. Bu nedenle 27 dBm çıkışlı
-  > E28-2G4M27S'nin üretici tarafından 27 dBm'de bildirilen 8 km
-  > haberleşme menzili YERKON için doğrudan kullanılamaz. Yasal güç
-  > seviyesindeki haberleşme ve mesafe ölçüm menzili saha testleriyle
+  > üst sınırına karşılık gelir. YERKON birimleri bu yüzden uyarlamalı
+  > frekans atlamalı (dinle, sonra konuş) olarak belgelendirilecektir;
+  > bu belgeyle yoğunluk sınırı kalkar ve 20 dBm e.i.r.p. sınırı kalır.
+  > Direk ve araç birimleri 27 dBm çıkışlı E28-2G4M27S'yi 5 dBi çubuk
+  > antenle bu sınırda kullanır. Üreticinin 27 dBm'de bildirdiği 8 km
+  > haberleşme menzili yasal güçte geçerli değildir; yasal güçteki
+  > haberleşme ve mesafe ölçüm menzili saha testleriyle
   > belirlenecektir."
 
-  Bu metin bir başka değerlendirmeden alındı ve modelle uyumlu: model
-  aynı iki sınırı uygulayıp düşük olanı alıyor (`regulatory.py`).
-- [ ] İsteğe bağlı ek cümle, doğrulanırsa: "Mesafe ölçümü EN 300 328
-  anlamında frekans atlamalı yapılırsa güç yoğunluğu sınırı yerine
-  20 dBm'lik toplam sınır geçerli olur; bu durumda amplifikatörlü modül
-  yeniden anlam kazanır." Modelde bu, 10 m direkte 5 m hassasiyetli
-  menzili 3,5 km'den 5,5 km'ye çıkarıyor. BTK ya da bir test laboratuvarı
-  doğrulamadan sunuma girmemeli.
+  Model aynı sınırları uyguluyor (`regulatory.py`, `TR-FHSS`) ve her
+  kanal kullanımından sonraki %5 sessizliği turun süresine ekliyor
+  (ADR-0092, ADR-0094).
 - [ ] Sayı verilecekse model sonucu olarak verilmeli: "Simülasyonda, düz
   zeminde ve 10 m direkte, bağlantı yaklaşık 7,4 km'ye kadar kuruluyor;
   5 m menzil hassasiyeti yaklaşık 3,5 km'de bitiyor. Bu sayılar alıcı
@@ -113,24 +111,25 @@ Son güncelleme: 24 Eylül 2026.
 
 ## Slayt 7: alıcı modülleri
 
-- [ ] Araç alıcısı "3-5 dBi çubuk anten" diyor; model W24P-U anteniyle
-  çalışıyor. Hangisi olacaksa ikisi aynı olmalı.
+- [ ] Araç alıcısı "3-5 dBi çubuk anten" diyor; model 5 dBi çubuk anten
+  kullanıyor (ADR-0094). "5 dBi çubuk anten, E28-2G4M27S" yazılmalı.
 - [ ] Harita kısıtı artık modelde: yükseklik, birimin haritasından
   2,43 m hatayla alınıyor (ADR-0088). IMU ve odometri hâlâ yok; onlar
   için "kullanılacaktır" yerine "pilotta eklenecek ve etkisi ölçülecek"
   denmeli.
 
-- [ ] Anten: şehir içi ve kırsal yayın birimleri direkte 12 dBi dış ortam
-  anteniyle (TP-Link TL-ANT2412D), araç alıcısı çatıda 8 dBi antenle
-  (L-com HGV-2409U) çalışıyor; araçta telsiz çatıdaki kutuda, kabine CAN
-  ile bağlı. Yaya küçük anteninde kalıyor (ADR-0091).
+- [ ] Anten: şehir içi ve kırsal yayın birimleri ve araç alıcısı 5 dBi
+  çubuk antenle ve E28-2G4M27S ile çalışıyor; cihazlar uyarlamalı
+  frekans atlamalı olarak belgelendiriliyor (ADR-0094). Yaya küçük
+  anteninde ve E28-2G4M12S'de kalıyor.
 
 ## Slayt 8: Ar-Ge soruları
 
 - [ ] TWR ölçeklenebilirlik sorusuna sayı eklenmeli: "SX1280'de bir
   mesafe ölçümü 31,8 ms sürüyor; turda 8 yayın birimi sorulursa bir
-  alıcı yaklaşık 0,25 s'de bir konum alıyor. Aynı kanalı paylaşan her
-  yeni alıcı bu süreyi uzatır." Soru böylece ölçülebilir hâle gelir.
+  alıcı yaklaşık 0,27 s'de bir konum alıyor (frekans atlama belgesinin
+  istediği %5 sessizlikle). Aynı kanalı paylaşan her yeni alıcı bu
+  süreyi uzatır." Soru böylece ölçülebilir hâle gelir.
   (Turda 12 değil 8: antenlerle kırsalda ikisi berabere, 8 havayı üçte
   bir daha az meşgul ediyor; ADR-0085, ADR-0091.)
 - [ ] "SDR vasıtasıyla" ifadesi netleşmeli: TWR-CDMA denemesi, örnek
@@ -163,7 +162,8 @@ Son güncelleme: 24 Eylül 2026.
   > Starter Kit, RAK WisBlock Starter Kit (pil, OLED ve IO modülüyle) ve
   > 17 cm kırbaç anten. Bu cihazlar yalnız prototip içindir. Son ürün,
   > maliyeti düşük tutmak için sunumda verilen bileşenlerle (SX1280
-  > tabanlı E28-2G4M12S, DWM3000, W24P-U anten ve diğerleri)
+  > tabanlı E28-2G4M27S ve E28-2G4M12S, DWM3000, 5 dBi çubuk anten ve
+  > diğerleri)
   > üretilecektir."
 
 - [ ] Adlar düzeltilmeli: "R1" RAKwireless'ın değil Muzi Works'ün
@@ -221,17 +221,18 @@ Son güncelleme: 24 Eylül 2026.
 
   | Ürün | 1 adet | 100 adet | 1000 adet |
   |---|---|---|---|
-  | Şehir içi ve kırsal yayın birimi (direk anteniyle) | 4001,02 TL | 2755,28 TL | 2593,47 TL |
+  | Şehir içi ve kırsal yayın birimi (E28-2G4M27S, 5 dBi anten) | 1367,96 TL | 955,73 TL | 1062,80 TL |
   | Kritik bölge yayın birimi | 1662,69 TL | 1212,43 TL | 1691,48 TL |
   | Yaya alıcısı | 2987,03 TL | 2379,86 TL | 2724,32 TL |
-  | Kara aracı alıcısı (çatı anteniyle) | 7064,28 TL | 5434,36 TL | 5343,78 TL |
+  | Kara aracı alıcısı (E28-2G4M27S, 5 dBi anten) | 4016,66 TL | 3089,91 TL | 3308,82 TL |
 
-- [ ] Kırsal birim satırı E28-2G4M27S'den E28-2G4M12S'ye geçmeli (ya da
-  frekans atlama doğrulanırsa 27S kalıp gerekçesi yazılmalı).
+- [ ] Kırsal birim satırı E28-2G4M27S'de kalıyor; gerekçe frekans atlama
+  belgesi (ADR-0094). Şehir içi birim de aynı kart: iki satır tek satır
+  olabilir.
 - [ ] Kaynak satırı: LAMBDA80-24S yerine E28-2G4M12S (LCSC),
   STM32G0B1 yerine yayın birimlerinde STM32G031 (LCSC).
-- [ ] Bir cümle: "Şehir içinde 25 birim (antenleriyle) 61994 TL, montaj
-  61250 TL; tünelde 9 birim 9821 TL, askı montajı 54000 TL."
+- [ ] Bir cümle: "Şehir içinde 25 birim (antenleriyle) 26570 TL, montaj
+  61250 TL; tünelde 9 birim 15223 TL, askı montajı 54000 TL."
 
 ## Slayt 16: karşılaştırma tablosu
 
@@ -239,14 +240,15 @@ Son güncelleme: 24 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,06 | 5,60 | 3,72 | %69,33 | 7,82 km² | 16124 TL/km² | 2778 TL/km²/yıl |
-  | Kırsal | 1,85 | 4,93 | 4,72 | %57,74 | 285,83 km² | 1633 TL/km² | 464 TL/km²/yıl |
+  | Şehir içi | 1,87 | 5,43 | 3,75 | %85,47 | 8,59 km² | 10220 TL/km² | 2083 TL/km²/yıl |
+  | Kırsal | 1,76 | 4,61 | 4,70 | %66,58 | 306,00 km² | 1280 TL/km² | 409 TL/km²/yıl |
   | Tünel | 0,79 | 2,73 | 2,06 | %98,61 | güzergâh | 34612 TL/km | 3504 TL/km/yıl |
 
-  (24 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
+  (25 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
   içi 600 m, turda sekiz direk, tünel 250 m, yükseklik haritadan,
   harcırah ve amortisman resmî kaynaklardan, SX1280'in resmî
-  duyarlılığı, direkte 12 dBi ve araç çatısında 8 dBi anten.)
+  duyarlılığı, uyarlamalı frekans atlama belgesi, direkte ve araçta
+  E28-2G4M27S ve 5 dBi çubuk anten.)
 
 - [ ] TerraPoiNT ve eLoran satırlarının teknoloji sütunundaki İngilizce
   kısaltma → "Karasal konumlandırma".
@@ -301,8 +303,12 @@ Son güncelleme: 24 Eylül 2026.
 - SX1280'in SF10 ve 1625 kHz'deki duyarlılığı: model −125,9 dBm
   varsayıyordu. **Cevap: resmî değer**, Semtech'in −132 dBm'sinden
   (SF12, 203 kHz) SF10 ve 1625 kHz'e taşınan −118 dBm; kaybolan menzil
-  direkte 12 dBi ve araç çatısında 8 dBi antenle geri kazanıldı
-  (ADR-0091).
+  önce direkte 12 dBi ve araç çatısında 8 dBi antenle geri kazanıldı
+  (ADR-0091), sonra frekans atlama belgesi ve 5 dBi çubuk antenle
+  (ADR-0094).
+- Hangi anten ve belge seçeneği? **Cevap: O6** (25 Eylül): uyarlamalı
+  frekans atlama belgesi, direkte ve araçta E28-2G4M27S ve 5 dBi çubuk
+  anten (`ANTEN-KARSILASTIRMASI.md`).
 
 - Prototipte mesafe ölçümü de denensin mi? Listedeki cihazların hiçbiri
   mesafe ölçemiyor (SX1262, LR1110). İstenirse birkaç E28-2G4M12S modülü

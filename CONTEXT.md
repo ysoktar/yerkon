@@ -195,14 +195,16 @@ kutu). Tablo 1000 adetlik fiyatı kullanıyor. ADR-0079'a bak.
 | Yaya alıcısı | E28-2G4M12S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3117,74 | 2141,87 |
 | Kara aracı alıcısı | E28-2G4M12S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran | 4002,29 | 2595,30 |
 
-Şehir içi ve kırsal yayın birimi artık aynı kart. Raporda iki satırdılar,
-çünkü kırsal olanında yükselteçli E28-2G4M27S vardı; Türkiye'nin 2,4 GHz
-kuralı ölçüm bant genişliğinde yayın gücünü yaklaşık 12 dBm ile sınırladığı
-için o yükseltecin gücü kullanılamıyor.
+Şehir içi ve kırsal yayın birimi aynı kart: yükselteçli E28-2G4M27S ve
+5 dBi çubuk anten. Cihaz uyarlamalı frekans atlamalı (FHSS) olarak
+belgelendiriliyor; bu belgeyle yoğunluk sınırı kalkıyor ve 20 dBm e.i.r.p.
+sınırı kalıyor (ADR-0092, ADR-0094). Kara aracı alıcısı da aynı modülü ve
+aynı anteni taşıyor. Yaya alıcısı E28-2G4M12S'de ve baskılı antende
+(Inventek W24P-U) kalıyor.
 
-LAMBDA80-24S ve E28-2G4M12S anten değil, SX1280 modülüdür. Anten Inventek
-W24P-U; link bütçesi onun yayımlanmış kazancını kullanır. Hiçbir antenin
-rapordakinden iyi olduğu varsayılmaz.
+LAMBDA80-24S, E28-2G4M12S ve E28-2G4M27S anten değil, SX1280 modülüdür.
+Link bütçesi her antenin yayımlanmış kazancını ve hüzme genişliğini
+kullanır.
 
 ## Tablo sütunları ne demek
 

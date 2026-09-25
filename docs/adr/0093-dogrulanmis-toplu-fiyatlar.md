@@ -56,6 +56,9 @@ Raporun oranı toplu alımı olduğundan iyimser gösteriyordu. 1000 adette:
 | Yaya alıcısı | 2141,87 | 2724,32 |
 | Kara aracı alıcısı | 4890,92 | 5343,78 |
 
+Bu tablo O4'ün antenleriyle. O6'ya geçince (ADR-0094) şehir içi ve
+kırsal yayın birimi 1062,80, kara aracı alıcısı 3308,82 TL.
+
 En büyük fark DWM3000: LCSC'nin en yüksek yayımlanmış kademesi 22,58
 USD; oran onu 10,3 USD'ye indiriyordu. Tünel satırının CAPEX'i bu yüzden
 artıyor. 100 adet sütunu hâlâ raporun oranı; bazı ürünlerde 1000 adet

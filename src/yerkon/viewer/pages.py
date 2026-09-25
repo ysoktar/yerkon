@@ -559,11 +559,12 @@ SYSTEM = Page(
                     "**Kırsal.** Az sayıda ama geniş alana ulaşan nokta: "
                     "akıllı ulaşım sistemi ve yol kenarı üniteleri, baz "
                     "istasyonu sahaları, demiryolu ve karayolu altyapısı. "
-                    "Türkiye'de 2,4 GHz'de yayın gücü bu bant genişliğinde "
-                    "yaklaşık 12 dBm ile sınırlı, bu yüzden yükselteçli bir "
-                    "modül (E28-2G4M27S) burada ek menzil vermiyor; kırsal "
-                    "birim şehir içindekiyle aynı kartı kullanıyor ve "
-                    "menzili direğin yüksekliği ve açık görüş sağlıyor. "
+                    "Cihaz uyarlamalı frekans atlamalı olarak "
+                    "belgelendiriliyor; bu belgeyle 2,4 GHz'de yoğunluk "
+                    "sınırı kalkıyor ve 20 dBm yayılan güç kalıyor. Kırsal "
+                    "birim şehir içindekiyle aynı kart: yükselteçli modül "
+                    "(E28-2G4M27S) ve 5 dBi çubuk anten. Menzilin geri "
+                    "kalanını direğin yüksekliği ve açık görüş sağlıyor. "
                     "YERKON'da 8-10 km bir "
                     "haberleşme ve kapsama hedefi olarak alınıyor ve o "
                     "mesafedeki ölçüm doğruluğu saha deneyleriyle "
@@ -573,14 +574,14 @@ SYSTEM = Page(
                     "raporlanacak.",
                     "**Open country.** A few points with wide reach: "
                     "intelligent transport and roadside units, base "
-                    "station sites, rail and road infrastructure. In Turkey "
-                    "the 2,4 GHz limit holds radiated power to about 12 dBm "
-                    "at this bandwidth, so a module with an amplifier "
-                    "(E28-2G4M27S) buys no extra reach here; the rural unit "
-                    "is the same board as the urban one, and its reach "
-                    "comes from the height of the pole it stands on and a "
-                    "clear line "
-                    "of sight. YERKON takes 8 to 10 km as a communications and "
+                    "station sites, rail and road infrastructure. The "
+                    "equipment is certified as adaptive frequency hopping, "
+                    "which lifts the 2,4 GHz density limit and leaves "
+                    "20 dBm of radiated power. The rural unit is the same "
+                    "board as the urban one: the amplified module "
+                    "(E28-2G4M27S) and a 5 dBi rod antenna. The rest of "
+                    "its reach comes from the height of the pole it stands "
+                    "on and a clear line of sight. YERKON takes 8 to 10 km as a communications and "
                     "coverage target, and how accurately it ranges at that "
                     "distance is to be confirmed by field trials. Forest, "
                     "broken ground and blocked sight lines are expected to "
@@ -635,16 +636,17 @@ SYSTEM = Page(
                     "anlık veri alır. Yaya modülü gibi iki telsizi birden "
                     "taşır: geniş alan için SX1280, kritik bölge için "
                     "DWM3000. DWM3000 kendi dahili antenini kullanır; "
-                    "SX1280 için araç tavanına 3-5 dBi kazançlı bir çubuk "
-                    "anten konur.",
+                    "SX1280 yükselteçli modülde (E28-2G4M27S) ve araç "
+                    "tavanındaki 5 dBi çubuk antenle çalışır.",
                     "**Road vehicle.** Built on an STM32 with an LCD map "
                     "screen. It connects to the CAN bus of vehicles that "
                     "support one and takes live data from the wheel speed "
                     "sensors and the steering angle. Like the pedestrian "
                     "module it carries both radios: an SX1280 for wide "
                     "areas and a DWM3000 for critical ones. The DWM3000 "
-                    "uses its own on-board antenna; the SX1280 gets a 3 to "
-                    "5 dBi rod antenna on the vehicle's roof.",
+                    "uses its own on-board antenna; the SX1280 is the "
+                    "amplified module (E28-2G4M27S) with a 5 dBi rod "
+                    "antenna on the vehicle's roof.",
                 ),
                 _w(
                     "**Nesnelerin interneti alıcısı.** Kapalı ve yarı açık "
@@ -1583,13 +1585,15 @@ SIMULATION = Page(
                     "çekiliyor ve sonuna kadar taşınıyor. Tünelde "
                     "hataların ortancası, birimler kusursuz ölçülmüş "
                     "olsaydı 0,24 m çıkıyor; 15 cm'lik bir ölçüm hatasıyla "
-                    "1,76 m. Birimleri ölçtüğünüzden daha iyi konum "
+                    "bunun yedi katından fazla. Birimleri ölçtüğünüzden "
+                    "daha iyi konum "
                     "veremiyorsunuz.",
                     "**If a unit's position is surveyed wrong at "
                     "installation, it stays wrong.** It is drawn once per "
                     "unit and carried to the end. In the tunnel the median "
-                    "error is 0,24 m with a perfect survey and 1,76 m with "
-                    "15 cm of survey error: you cannot position better "
+                    "error is 0,24 m with a perfect survey and more than "
+                    "seven times that with 15 cm of survey error: you "
+                    "cannot position better "
                     "than you surveyed.",
                 ),
                 _w(
@@ -2015,7 +2019,7 @@ LAW = Page(
                 (_w("Kip", "Mode"), _w("Sınır", "Limit"),
                  _w("YERKON için ne demek", "What it means for YERKON")),
                 (
-                    _w("Frekans atlamasız (bugünkü)", "Not hopping (today)"),
+                    _w("Frekans atlamasız", "Not hopping"),
                     _w("20 dBm e.i.r.p. ve 10 dBm/MHz",
                        "20 dBm e.i.r.p. and 10 dBm/MHz"),
                     _w("1625 kHz'lik dalgada yoğunluk sınırı bağlıyor: "
@@ -2047,11 +2051,13 @@ LAW = Page(
                        "-70 dBm/MHz; channel occupancy under 60 ms, then "
                        "silence of at least 5 % of it; able to use at least "
                        "70 % of the band"),
-                    _w("Tek açık yol. Bir ölçüm alışverişi 31,8 ms, 60 ms'ye "
+                    _w("YERKON'un seçtiği kip, şehir içi ve kırsalda: tek "
+                       "açık yol. Bir ölçüm alışverişi 31,8 ms, 60 ms'ye "
                        "sığıyor. Cevap veren direk de kendi yayınından önce "
                        "kanalı kontrol ediyor; bu, alışverişe 0,1 ms'den az "
                        "ekliyor. Laboratuvar testiyle belgelendirilmeli.",
-                       "The one open road. A ranging exchange is 31,8 ms "
+                       "The mode YERKON uses in town and open country, and "
+                       "the one open road. A ranging exchange is 31,8 ms "
                        "and fits in 60 ms. The replying pole checks the "
                        "channel before its own transmission too, which "
                        "adds under 0,1 ms. It must be certified by a test "

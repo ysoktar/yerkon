@@ -256,8 +256,12 @@ def test_no_page_carries_a_copy_of_the_published_table():
         for cell in sorted(typed):
             # On its own rather than inside a longer number: 0,02 and
             # 0,024 are different figures and only one of them is a cell.
+            # Nor inside a part name, nor a part's dollar price: the 1280
+            # in SX1280 and a chip at 1,87 USD are not cells, and no cell
+            # is in dollars.
             found = re.search(
-                r"(?<![\d,%]){}(?![\d,])".format(re.escape(cell)), drawn
+                r"(?<![\w,%]){}(?![\d,])(?! USD)".format(re.escape(cell)),
+                drawn,
             )
             assert not found, "{} quotes the published {}".format(
                 "/" + page.slug, cell
@@ -886,12 +890,12 @@ def test_what_the_town_s_structures_save_is_what_the_model_prices():
     uses instead, and nothing in it is typed. Moving the mast's price
     moves the page.
     """
-    from yerkon.cost import SX1280_ANCHOR, DEFAULT_RATES
+    from yerkon.cost import AMPLIFIED_ANCHOR, DEFAULT_RATES
     from yerkon.numbers import decimal_comma
     from yerkon.viewer.costing import ratio_on_masts
     from yerkon.world import LIGHTING_COLUMN, TALL_MAST
 
-    unit = float(SX1280_ANCHOR.unit_price_tl.value)
+    unit = float(AMPLIFIED_ANCHOR.unit_price_tl.value)
     on_column = unit + float(LIGHTING_COLUMN.site_cost_tl.value)
     on_mast = (unit + float(TALL_MAST.site_cost_tl.value)
                + float(DEFAULT_RATES.off_grid_supply_tl.value))

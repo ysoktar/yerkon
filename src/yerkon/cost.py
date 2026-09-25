@@ -59,16 +59,16 @@ def _bom(key: str, name: str) -> Product:
     )
 
 
+#: The plain module's unit, without the frequency hopping certificate.
+#: No row of the table uses it now; the simulator can (ADR-0094).
+SX1280_ANCHOR = _bom("sx1280-anchor", "Belgesiz yayın birimi")
 #: The broadcast unit the town and the open country both use.
 #:
 #: They were two lines of the report because they carried two radio
-#: modules. The amplifier in the rural one buys nothing in Turkey: the
-#: density limit caps radiated power at 12,1 dBm at the ranging
-#: bandwidth, which the plain module already reaches. With the same
-#: module they are the same board (ADR-0079).
-SX1280_ANCHOR = _bom("sx1280-anchor", "Şehir içi ve kırsal yayın birimi")
-#: The amplified unit, kept for rules that let the amplifier speak.
-AMPLIFIED_ANCHOR = _bom("amplified-anchor", "Yükselteçli yayın birimi")
+#: modules. Certified as adaptive frequency hopping, both may radiate
+#: 20 dBm, which the amplified module reaches; with the same module they
+#: are the same board (ADR-0079, ADR-0094).
+AMPLIFIED_ANCHOR = _bom("amplified-anchor", "Şehir içi ve kırsal yayın birimi")
 TUNNEL_ANCHOR = _bom("tunnel-anchor", "Kritik bölge yayın birimi")
 PEDESTRIAN_RECEIVER = _bom("pedestrian", "Yaya alıcısı")
 VEHICLE_RECEIVER = _bom("vehicle", "Kara aracı alıcısı")

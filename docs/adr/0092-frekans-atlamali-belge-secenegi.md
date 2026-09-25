@@ -2,8 +2,8 @@
 
 ## Durum
 
-Önerildi. Kural modelde (`TR-FHSS`), tabloya uygulanmadı; seçim ve belge
-ücreti proje sahibinin.
+Kabul edildi. Proje sahibi 25 Eylül 2026'da O6'yı seçti; tablo artık
+bu kuralla koşuyor (ADR-0094).
 
 ## Bağlam
 

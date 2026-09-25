@@ -19,7 +19,7 @@ import { decimal, say, speak, speaks } from "/words.js";
  * modules, the rows, the ground — is served already named (ADR-0035).
  */
 const choicesNow = () => ({
-  region: ["TR", "EU", "US", "US-PTP", "LICENSED"]
+  region: ["TR", "TR-FHSS", "EU", "US", "US-PTP", "LICENSED"]
     .map(code => [code, say("region." + code)]),
   scheme: [["single", say("scheme.single")], ["double", say("scheme.double")]],
 });
