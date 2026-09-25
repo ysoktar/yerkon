@@ -65,7 +65,12 @@ role.en = "SX1280 radio module, 12,5 dBm"
 usd = 4.3869
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C411310.html"
-
+volume.usd = 4.2582
+volume.tier = 100
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C411310.html"
+volume.date = "25.09.2026"
+volume.note = "LCSC'nin tablosu 100+ kademesinde bitiyor; 1000'lik makara ambalaj miktarı, kademe değil"
 [[part]]
 key = "e28-2g4m27s"
 name = "EBYTE E28-2G4M27S"
@@ -74,7 +79,12 @@ role.en = "SX1280 radio module with an amplifier, 27 dBm"
 usd = 8.7416
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C411312.html"
-
+volume.usd = 8.4593
+volume.tier = 100
+volume.seller = "LCSC"
+volume.url = "https://lcsc.com/product-detail/Wireless-Modules_Chengdu-Ebyte-Elec-Tech-E28-2G4M27S_C411312.html"
+volume.date = "25.09.2026"
+volume.note = "LCSC'nin tablosu 100+ kademesinde bitiyor"
 [[part]]
 key = "tl-ant2412d"
 name = "TP-Link TL-ANT2412D"
@@ -140,7 +150,12 @@ role.en = "microcontroller, 64 KB"
 usd = 1.9287
 seller = "LCSC"
 url = "https://lcsc.com/product-detail/ST-Microelectronics_STMicroelectronics_C432203.html"
-
+volume.usd = 1.7424
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-image/C432203.html"
+volume.date = "25.09.2026"
+volume.note = "tam 1000 kademesi"
 [[part]]
 key = "atecc608b"
 name = "Microchip ATECC608B"
@@ -237,7 +252,12 @@ role.en = "2,8 inch display"
 usd = 10.90
 seller = "Elecrow"
 url = "https://www.elecrow.com/2-8-inch-320x240-spi-serial-tft-lcd-module-display-with-driver-ic-ili9341.html"
-
+volume.usd = 6.0
+volume.tier = 1000
+volume.seller = "Alibaba"
+volume.url = "https://www.alibaba.com/product-introduction/capacitive-touch-240x320-spi-2-8_60844805677.html"
+volume.date = "25.09.2026"
+volume.note = "ILI9341, SPI, 240x320, kapasitif dokunmatik; 1000+ kademesi"
 # --- Products ---------------------------------------------------------------
 #
 # `report` is the line of page 14 the product is priced from, with its

@@ -54,12 +54,28 @@ beyanı bulunmalı. Bedel yalnız laboratuvar testleri.
 ## Açık
 
 - Test ücreti (EN 300 328, EN 301 489-1/-17, EN 62368-1): TSE'nin
-  sorgusu CAPTCHA istiyor, TÜBİTAK UME teklifle çalışıyor; yayımlanmış
-  bir fiyat bulunamadı.
-- Kanal kontrolünü yanıt veren direk de mi yapmalı, yoksa sorunun
-  kanal kullanım süresi içinde cevap verebilir mi: standardın ilgili
-  maddesi okunmalı. Her iki ucun da kontrol yapması gerekirse tur biraz
-  daha uzar.
+  sorgusu CAPTCHA istiyor, TÜBİTAK UME ve MAM teklifle çalışıyor;
+  yayımlanmış bir laboratuvar fiyatı bulunamadı.
+- Test ücretleri için yalnız piyasa göstergesi var, laboratuvar teklifi
+  değil: EN 300 328 için 2000-3500 €, EN 301 489-1/-17 için 2000-5000 €,
+  EN 62368-1 için 3000-8000 €; toplam yaklaşık 7000-16500 €. Bir kerelik;
+  bin direkli bir ağda direk başına 7-16,5 €.
+
+## Cevap veren direk de dinliyor
+
+EN 300 328 V2.2.2, 4.3.1.7.2.2: her uyarlamalı FHSS cihazı, bir atlama
+frekansında kendi yayınından önce kanalı kontrol ediyor; kanal kullanım
+süresi o cihazın kendi yayınları için tanımlı, sorandan cevap verene
+geçmiyor. Dolayısıyla bir alışveriş: soranın kontrolü, soru, dönüş,
+cevap verenin kontrolü, cevap. 4.3.1.7.4'teki kısa kontrol sinyali
+istisnası (yönetim ve kontrol sinyalleri, en çok %10) mesafe ölçümü
+cevabına uygulanmıyor; temkinli okuma bu.
+
+En kısa kontrol, kanal kullanım süresinin %0,2'si ya da 18 us, hangisi
+büyükse: 20 ms'lik kullanımda 40 us. İkinci kontrol 31,8 ms'lik
+alışverişe 0,1 ms'den az ekliyor; modeldeki %5'lik sessizlik payının
+yanında ölçülemeyecek kadar küçük. Asıl etkisi kanal dolu çıktığında:
+cevap verenin de bekleyebilmesi, şehir içinde kaybı artırabilir.
 - Şehir içinde 2,4 GHz Wi-Fi yoğun; -70 dBm/MHz eşiği sık sık kanalı dolu
   gösterebilir. Bu, paket kaybını artırır. Sahada SDR kaydıyla
   (ADR-0083) ölçülmeli.

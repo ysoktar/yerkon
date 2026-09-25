@@ -32,65 +32,69 @@ bunu kullanmak için direk ve araç 27 dBm'lik modüle (E28-2G4M27S) geçiyor.
 
 | | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | Direk birimi | Araç alıcısı | CAPEX | OPEX/yıl | CAPEX/km² | OPEX/km²/yıl | 10 yıl |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| O1 | 2,13 | 5,63 | 3,61 | %66,55 | 5,96 | 756 | 3064 | 80148 | 17130 | 13440 | 2873 | 251445 |
-| O2 | 2,07 | 5,66 | 3,66 | %69,89 | 6,37 | 955 | 3364 | 85124 | 17627 | 13370 | 2769 | 261399 |
-| O3 | 2,07 | 5,64 | 3,66 | %69,50 | 7,20 | 2741 | 3364 | 129782 | 22093 | 18017 | 3067 | 350714 |
-| **O4** | 2,06 | 5,53 | 3,71 | %69,00 | 7,82 | 2492 | 5360 | 123560 | 21471 | 15801 | 2746 | 338270 |
-| O5 | 1,87 | 5,51 | 3,73 | %83,78 | 8,28 | 887 | 3210 | 83416 | 17457 | 10078 | 2109 | 257982 |
-| O6 | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 | 1086 | 3510 | 88393 | 17954 | 10290 | 2090 | 267935 |
-| O7 | 1,82 | 5,11 | 3,79 | %84,82 | 8,97 | 2623 | 5506 | 126829 | 21798 | 14139 | 2430 | 344807 |
+| O1 | 2,13 | 5,63 | 3,61 | %66,55 | 5,96 | 857 | 3048 | 82674 | 17382 | 13864 | 2915 | 256498 |
+| O2 | 2,09 | 5,73 | 3,70 | %69,02 | 6,38 | 844 | 3105 | 82362 | 17351 | 12903 | 2718 | 255875 |
+| O3 | 2,07 | 5,67 | 3,65 | %68,33 | 7,18 | 2842 | 3105 | 132309 | 22346 | 18436 | 3114 | 355767 |
+| **O4** | 2,06 | 5,60 | 3,72 | %69,33 | 7,82 | 2593 | 5344 | 126087 | 21724 | 16124 | 2778 | 343323 |
+| O5 | 1,87 | 5,51 | 3,73 | %83,78 | 8,28 | 1060 | 3252 | 87762 | 17891 | 10604 | 2162 | 266673 |
+| O6 | 1,87 | 5,43 | 3,75 | %85,47 | 8,59 | 1048 | 3309 | 87450 | 17860 | 10176 | 2078 | 266050 |
+| O7 | 1,82 | 4,99 | 3,79 | %85,00 | 8,97 | 2797 | 5547 | 131174 | 22232 | 14624 | 2479 | 353498 |
 
 ## Kırsal (Polatlı, 3000 m, 49 direk)
 
 | | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | Direk birimi | Araç alıcısı | CAPEX | OPEX/yıl | CAPEX/km² | OPEX/km²/yıl | 10 yıl |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| O1 | 1,91 | 5,42 | 4,76 | %49,13 | 209,00 | 756 | 3064 | 376609 | 123531 | 1802 | 591 | 1611914 |
-| O2 | 1,88 | 5,23 | 4,75 | %52,74 | 222,67 | 955 | 3364 | 386364 | 124506 | 1735 | 559 | 1631423 |
-| O3 | 1,91 | 5,17 | 4,76 | %52,46 | 253,75 | 2741 | 3364 | 473893 | 133259 | 1868 | 525 | 1806482 |
-| **O4** | 1,84 | 5,01 | 4,73 | %57,75 | 285,83 | 2492 | 5360 | 461698 | 132039 | 1615 | 462 | 1782091 |
-| O5 | 1,80 | 4,63 | 4,70 | %64,93 | 290,50 | 887 | 3210 | 383016 | 124171 | 1318 | 427 | 1624727 |
-| O6 | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 | 1086 | 3510 | 392770 | 125147 | 1285 | 409 | 1644235 |
-| O7 | 1,71 | 4,48 | 4,70 | %68,40 | 367,58 | 2623 | 5506 | 468104 | 132680 | 1273 | 361 | 1794904 |
+| O1 | 1,91 | 5,42 | 4,76 | %49,13 | 209,00 | 857 | 3048 | 381561 | 124026 | 1826 | 593 | 1621818 |
+| O2 | 1,90 | 5,21 | 4,76 | %52,97 | 222,83 | 844 | 3105 | 380950 | 123965 | 1710 | 556 | 1620596 |
+| O3 | 1,91 | 5,27 | 4,75 | %52,31 | 253,42 | 2842 | 3105 | 478845 | 133754 | 1890 | 528 | 1816386 |
+| **O4** | 1,85 | 4,93 | 4,72 | %57,74 | 285,83 | 2593 | 5344 | 466650 | 132535 | 1633 | 464 | 1791995 |
+| O5 | 1,80 | 4,63 | 4,70 | %64,93 | 290,50 | 1060 | 3252 | 391533 | 125023 | 1348 | 430 | 1641762 |
+| O6 | 1,76 | 4,61 | 4,70 | %66,58 | 306,00 | 1048 | 3309 | 390922 | 124962 | 1278 | 408 | 1640539 |
+| O7 | 1,72 | 4,53 | 4,72 | %68,36 | 367,58 | 2797 | 5547 | 476621 | 133532 | 1297 | 363 | 1811938 |
 
 Tutarlar TL. Direk birimi ve araç alıcısı 1000 adetlik birim fiyat.
 Alanın birimi km².
 
 ## Fiyatlar
 
-1000 adet fiyatları, dağıtıcının kademesi doğrulanan parçalarda o
-kademeden (ADR-0093): STM32G0B1MET6, ATECC608B, DWM3000, ESP32-S3,
-BNO085, TCAN1051, W24P-U. Doğrulanmayanlar (E28-2G4M12S, E28-2G4M27S,
-STM32G031K8T6, ekran, bütün dış antenler ve kablo) hâlâ tek adet
-perakende fiyatından raporun indirim oranıyla taşınıyor; o satırlar
-değişecek.
+1000 adet fiyatları dağıtıcının kademesinden, kademesi doğrulanan her
+parçada (ADR-0093): E28-2G4M12S ve E28-2G4M27S (LCSC 100+, daha yüksek
+kademe yok), STM32G031K8T6, STM32G0B1MET6, ATECC608B, DWM3000,
+ESP32-S3, BNO085, TCAN1051, ILI9341 ekran, W24P-U ve 5 dBi çubuk anten
+(Alibaba, 500-49999 adet, 1,18 USD).
 
-Kullanılan tek adet fiyatları: AIR802 ANRD2405-SMA 8,95 USD, L-com
-HGV-2409U 58,95 USD, TP-Link TL-ANT2412D 50,66 USD, LMR-200 kablo
-9,50 USD, E28-2G4M12S 4,39 USD, E28-2G4M27S 8,74 USD.
+Doğrulanamayanlar hâlâ tek adet perakende fiyatından raporun indirim
+oranıyla taşınıyor: TP-Link TL-ANT2412D (50,66 USD), L-com HGV-2409U
+(58,95 USD) ve LMR-200 kablo (9,50 USD). Bunların yayımlanmış bir 1000
+adet kademesi bulunamadı; O3, O4 ve O7 bu yüzden en belirsiz satırlar.
 
-**TP-Link TL-ANT2412D üretimden kalkmış** (üretici "End of Life"
-gösteriyor). O4 ve O7 bu anteni kullanıyor; seçilirse yerine eşdeğer bir
-12 dBi dış ortam anteni bulunmalı.
+Hüzme genişlikleri veri sayfalarından: HGV-2409U 15°, 5 dBi çubuk anten
+54° (FT-RF RU-245805). TL-ANT2412D için veri sayfası 12° diyor; model
+kazançtan türetilen 6,5°'yi kullanıyor (aynı sınıftaki TreLink
+TLOD-2400-12V'nin veri sayfası 7°).
 
-**FHSS belgesinin bedeli tabloda yok.** BTK'ya ayrı bir başvuru ya da
-ücret yok (5 Şubat 2021'den beri); bedel yalnız laboratuvar testleri
-(EN 300 328, EN 301 489-1/-17, EN 62368-1) ve onların yayımlanmış bir
-fiyatı bulunamadı.
+**TP-Link TL-ANT2412D üretimden kalkmış.** O4 ve O7 bu anteni kullanıyor.
+
+**Belgelendirme:** BTK'ya ayrı başvuru ya da ücret yok. Laboratuvar
+testleri (EN 300 328, EN 301 489-1/-17, EN 62368-1) teklifle; piyasa
+göstergesi, teklif değil, üçü birlikte yaklaşık 7000-16500 €, bir
+kerelik. Bin direkli bir ağda direk başına 7-16,5 €; tabloya
+eklenmedi.
 
 ## Ne gösteriyor
 
-1. **Uyarlamalı FHSS belgesi hepsinden iyi.** Baskılı antenle bile (O5)
-   şehir içi kullanılabilirlik %66,55'ten %83,78'e, kırsal %49,13'ten
-   %64,93'e çıkıyor; şehir içinde km² başına CAPEX en düşük (10078 TL).
-   Direk birimi yalnız 27 dBm'lik modül farkıyla pahalanıyor (756'dan
-   887 TL'ye). Bedeli: dinle-sonra-konuş yazılımı ve laboratuvar testi.
-2. **Belge olmadan en iyi fiyat/performans 5 dBi çubuk anten (O2).**
-   Bugünkü 12/8 dBi antenlerle (O4) aynı şehir içi kullanılabilirliği
-   km² başına %15 daha ucuza veriyor. Kırsalda O4 daha iyi (%57,75'e
-   %52,74) ve km² başına daha ucuz, çünkü direk başına alanı büyütüyor.
-3. **Kırsalda en yüksek sonuç O7** (uyarlamalı FHSS + 12/8 dBi): %68,40,
-   km² başına en düşük CAPEX ve OPEX.
-4. **O3 (direkte 8 dBi) mantıksız:** 12 dBi'den pahalı, sonucu daha kötü.
+1. **En iyisi O6: uyarlamalı FHSS belgesi ve iki uçta 5 dBi çubuk
+   anten.** Şehir içinde en yüksek kullanılabilirlik (%85,47) ve km²
+   başına en düşük CAPEX (10176 TL) ile OPEX (2078 TL); kırsalda %66,58 ve
+   km² başına 1278 TL. Direk birimi 1048 TL.
+2. **Belge alınmazsa şehir içinde O2** (5 dBi çubuk): bugünkü 12/8 dBi
+   antenlerle (O4) aynı kullanılabilirlik, km² başına %20 daha ucuz.
+   Kırsalda O4 daha iyi (%57,74'e %52,97), km² başına da daha ucuz.
+3. **Kırsalda en yüksek sonuç O7** (%68,36), ama O6'dan yalnız 1,8 puan
+   iyi ve pahalı, üretimden kalkmış bir antene dayanıyor.
+4. **5 dBi çubuk anten doğrulanmış fiyatla baskılı antenden bile ucuz**
+   (1,18'e 1,44 USD); O1'in O2'ye bir üstünlüğü kalmadı.
+5. **O3 (direkte 8 dBi) mantıksız:** 12 dBi'den pahalı, sonucu daha kötü.
 
 ## Açık kalanlar
 

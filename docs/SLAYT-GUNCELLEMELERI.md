@@ -221,10 +221,10 @@ Son güncelleme: 24 Eylül 2026.
 
   | Ürün | 1 adet | 100 adet | 1000 adet |
   |---|---|---|---|
-  | Şehir içi ve kırsal yayın birimi (direk anteniyle) | 4001,02 TL | 2755,28 TL | 2492,40 TL |
-  | Kritik bölge yayın birimi | 1662,69 TL | 1212,43 TL | 1668,40 TL |
-  | Yaya alıcısı | 2987,03 TL | 2379,86 TL | 2670,42 TL |
-  | Kara aracı alıcısı (çatı anteniyle) | 7064,28 TL | 5434,36 TL | 5359,55 TL |
+  | Şehir içi ve kırsal yayın birimi (direk anteniyle) | 4001,02 TL | 2755,28 TL | 2593,47 TL |
+  | Kritik bölge yayın birimi | 1662,69 TL | 1212,43 TL | 1691,48 TL |
+  | Yaya alıcısı | 2987,03 TL | 2379,86 TL | 2724,32 TL |
+  | Kara aracı alıcısı (çatı anteniyle) | 7064,28 TL | 5434,36 TL | 5343,78 TL |
 
 - [ ] Kırsal birim satırı E28-2G4M27S'den E28-2G4M12S'ye geçmeli (ya da
   frekans atlama doğrulanırsa 27S kalıp gerekçesi yazılmalı).
@@ -239,9 +239,9 @@ Son güncelleme: 24 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,06 | 5,53 | 3,71 | %69,00 | 7,82 km² | 15801 TL/km² | 2746 TL/km²/yıl |
-  | Kırsal | 1,84 | 5,01 | 4,73 | %57,75 | 285,83 km² | 1615 TL/km² | 462 TL/km²/yıl |
-  | Tünel | 0,79 | 2,73 | 2,06 | %98,61 | güzergâh | 34508 TL/km | 3494 TL/km/yıl |
+  | Şehir içi | 2,06 | 5,60 | 3,72 | %69,33 | 7,82 km² | 16124 TL/km² | 2778 TL/km²/yıl |
+  | Kırsal | 1,85 | 4,93 | 4,72 | %57,74 | 285,83 km² | 1633 TL/km² | 464 TL/km²/yıl |
+  | Tünel | 0,79 | 2,73 | 2,06 | %98,61 | güzergâh | 34612 TL/km | 3504 TL/km/yıl |
 
   (24 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
   içi 600 m, turda sekiz direk, tünel 250 m, yükseklik haritadan,

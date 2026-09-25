@@ -741,8 +741,8 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,06 m | 5,53 m | %69,00 |
-| Kırsal | 1,84 m | 5,01 m | %57,75 |
+| Şehir içi | 2,06 m | 5,60 m | %69,33 |
+| Kırsal | 1,85 m | 4,93 m | %57,74 |
 | Tünel | 0,79 m | 2,73 m | %98,61 |
 
 24 Eylül koşusu: kullanılabilirlik doğruluğa bağlı (ADR-0084), şehir

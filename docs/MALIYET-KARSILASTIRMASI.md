@@ -23,9 +23,9 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 | Satır | Direk | Alan | Güzergâh | CAPEX | OPEX/yıl | On yıl | CAPEX/km² | OPEX/km²/yıl | CAPEX/km | OPEX/km/yıl |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
-| **Şehir içi, 600 m (yeni)** | 25 | 7,82 km² | 12,82 km | **123560** | **21471** | **338270** | **15801** | **2746** | **9638** | **1675** |
-| Kırsal, 3000 m | 49 | 285,83 km² | 86,40 km | 461698 | 132039 | 1782088 | 1615 | 462 | 5344 | 1528 |
-| Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 69016 | 6988 | 138896 | yok | yok | 34508 | 3494 |
+| **Şehir içi, 600 m (yeni)** | 25 | 7,82 km² | 12,82 km | **126087** | **21724** | **343327** | **16124** | **2778** | **9835** | **1695** |
+| Kırsal, 3000 m | 49 | 285,83 km² | 86,40 km | 466650 | 132535 | 1792000 | 1633 | 464 | 5401 | 1534 |
+| Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 69223 | 7009 | 139313 | yok | yok | 34612 | 3504 |
 
 24 Eylül gecesinden beri şehir içi ve kırsal yayın birimleri direkte
 12 dBi antenle, araçlar çatıda 8 dBi antenle; SX1280 resmî duyarlılıkta

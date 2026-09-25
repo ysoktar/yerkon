@@ -33,9 +33,17 @@ Doğrulananlar (25 Eylül 2026):
 | BNO085 | Mouser | 1000+ | 8,81 |
 | TCAN1051HGVDRQ1 | Mouser | 1000+ | 1,19 |
 | Inventek W24P-U | DigiKey | 500+ (1000 yok) | 1,4375 |
+| EBYTE E28-2G4M12S | LCSC | 100+ (daha yüksek kademe yok) | 4,2582 |
+| EBYTE E28-2G4M27S | LCSC | 100+ (daha yüksek kademe yok) | 8,4593 |
+| STM32G031K8T6 | LCSC | 1000+ | 1,7424 |
+| 2,8 inç ILI9341 SPI TFT | Alibaba | 1000+ | 6,00 |
 
-Bekleyenler: E28-2G4M12S, E28-2G4M27S, STM32G031K8T6, ILI9341 ekran
-(gerçek ILI9341 ilanı bulunamadı), bütün dış antenler ve anten kablosu.
+Bekleyenler: dış antenler (TL-ANT2412D, HGV-2409U ve 12/8 dBi
+fiberglas örnekleri için yayımlanmış 1000 adet kademesi bulunamadı) ve
+anten kablosu. 5 dBi çubuk anten için bir 1000 adet fiyatı var
+(Alibaba, 500-49999 adet, 1,18 USD), ama o ilanın hüzme genişliği
+veri sayfasından doğrulanamadı; hüzme için FT-RF RU-245805'in veri
+sayfası (54°) kullanılıyor.
 
 ## Sonuçlar
 
@@ -43,10 +51,10 @@ Raporun oranı toplu alımı olduğundan iyimser gösteriyordu. 1000 adette:
 
 | Ürün | Önce | Şimdi |
 |---|---|---|
-| Şehir içi ve kırsal yayın birimi | 2479,75 | 2492,40 |
-| Kritik bölge (tünel) yayın birimi | 1091,19 | 1668,40 |
-| Yaya alıcısı | 2141,87 | 2670,42 |
-| Kara aracı alıcısı | 4890,92 | 5359,55 |
+| Şehir içi ve kırsal yayın birimi | 2479,75 | 2593,47 |
+| Kritik bölge (tünel) yayın birimi | 1091,19 | 1691,48 |
+| Yaya alıcısı | 2141,87 | 2724,32 |
+| Kara aracı alıcısı | 4890,92 | 5343,78 |
 
 En büyük fark DWM3000: LCSC'nin en yüksek yayımlanmış kademesi 22,58
 USD; oran onu 10,3 USD'ye indiriyordu. Tünel satırının CAPEX'i bu yüzden

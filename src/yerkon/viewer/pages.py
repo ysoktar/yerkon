@@ -2048,9 +2048,13 @@ LAW = Page(
                        "silence of at least 5 % of it; able to use at least "
                        "70 % of the band"),
                     _w("Tek açık yol. Bir ölçüm alışverişi 31,8 ms, 60 ms'ye "
-                       "sığıyor. Laboratuvar testiyle belgelendirilmeli.",
+                       "sığıyor. Cevap veren direk de kendi yayınından önce "
+                       "kanalı kontrol ediyor; bu, alışverişe 0,1 ms'den az "
+                       "ekliyor. Laboratuvar testiyle belgelendirilmeli.",
                        "The one open road. A ranging exchange is 31,8 ms "
-                       "and fits in 60 ms. It must be certified by a test "
+                       "and fits in 60 ms. The replying pole checks the "
+                       "channel before its own transmission too, which "
+                       "adds under 0,1 ms. It must be certified by a test "
                        "laboratory."),
                 ),
             ),
@@ -2097,12 +2101,14 @@ LAW = Page(
                    "declaration."),
                 _w("Gereken testler: EN 300 328 (telsiz), EN 301 489-1 ve "
                    "-17 (elektromanyetik uyumluluk), EN 62368-1 (güvenlik). "
-                   "Ücretleri yayımlanmış değil: TSE'nin sorgusu doğrulama "
-                   "istiyor, TÜBİTAK UME teklifle çalışıyor.",
+                   "Laboratuvarlar teklifle çalışıyor, yayımlanmış bir "
+                   "fiyat yok. Piyasa göstergesi, teklif değil: üçü "
+                   "birlikte yaklaşık 7000-16500 €, bir kerelik.",
                    "Tests needed: EN 300 328 (radio), EN 301 489-1 and -17 "
                    "(electromagnetic compatibility), EN 62368-1 (safety). "
-                   "Their fees are not published: TSE's query asks for a "
-                   "challenge, TÜBİTAK UME works by quotation."),
+                   "Laboratories work by quotation and publish no price. "
+                   "A market indication, not a quote: about 7000-16500 € "
+                   "for the three, once."),
             ),
         ),
         Part(

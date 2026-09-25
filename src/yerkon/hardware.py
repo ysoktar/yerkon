@@ -216,7 +216,8 @@ HGV_2409U = Antenna(
     part="L-com HGV-2409U",
     peak_gain_dbi=Sourced(
         8.0, "dBi", Provenance.DATASHEET,
-        "L-com HGV-2409U: 2,4 GHz, 8 dBi, omni, N female",
+        "L-com HGV-2409U datasheet: 2400-2500 MHz, 8 dBi, 360 degrees "
+        "horizontal, 15 degrees vertical, N female",
     ),
     efficiency=Sourced(
         1.0, "fraction", Provenance.DATASHEET,
@@ -224,7 +225,9 @@ HGV_2409U = Antenna(
     ),
     centre_frequency_hz=2450e6,
     bandwidth_hz=100e6,
-    vertical_beamwidth_deg=_omni_beamwidth_deg(8.0),
+    # The datasheet's own figure, 15 degrees; McDonald's approximation
+    # from the gain gave 16,8 (ADR-0091).
+    vertical_beamwidth_deg=15.0,
     # The radio sits in a box on the roof beside the antenna and talks to
     # the cab over the CAN bus the vehicle unit already has; 0,3 m of
     # LMR-200 and two connectors. Three metres down into the cab would
