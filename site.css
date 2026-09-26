@@ -1,0 +1,227 @@
+/* The site in front of the simulator.
+ *
+ * Separate from style.css rather than added to it: that one pins the
+ * page to the window and hides the overflow, because a 3D scene fills
+ * the screen and must not scroll. These are documents and have to.
+ *
+ * Two palettes. The page follows the reader's system setting with no
+ * script at all; the button in the header overrides it and the override
+ * is what `data-theme` on the root carries.
+ */
+:root {
+  --ink: #12181f;
+  --dim: #2d3a46;
+  --quiet: #61707e;
+  --paper: #ffffff;
+  --shade: #f4f6f8;
+  --line: #ccd4dc;
+  --accent: #1f6feb;
+  --accent-ink: #ffffff;
+  --warn: #b4551d;
+  --plate: #ffffff;
+  --chart-mark: #1f6feb;
+  --chart-context: #7c8b99;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e8eef4;
+    --dim: #c2cdd8;
+    --quiet: #93a2b0;
+    --paper: #10151b;
+    --shade: #18212a;
+    --line: #2c3742;
+    --accent: #6ba6ff;
+    --accent-ink: #0b1017;
+    --warn: #e2914f;
+    /* Every picture on this site came out of a slide deck and carries a
+     * white background. On a dark page they would each be a lit slab,
+     * so they sit on a plate that is meant to be light in both modes. */
+    --plate: #eef2f6;
+    --chart-mark: #6ba6ff;
+    --chart-context: #5b6b7a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #e8eef4;
+  --dim: #c2cdd8;
+  --quiet: #93a2b0;
+  --paper: #10151b;
+  --shade: #18212a;
+  --line: #2c3742;
+  --accent: #6ba6ff;
+  --accent-ink: #0b1017;
+  --warn: #e2914f;
+  --plate: #eef2f6;
+  --chart-mark: #6ba6ff;
+  --chart-context: #5b6b7a;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* --- the chrome --------------------------------------------------------- */
+
+header {
+  position: sticky; top: 0; z-index: 5;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+  padding: 10px 24px; background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; gap: 10px;
+  text-decoration: none; color: inherit; }
+.brand b { font-size: 17px; letter-spacing: 0.16em; }
+.brand span { font-size: 11px; color: var(--quiet); }
+nav.pages { display: flex; flex-wrap: wrap; gap: 14px; margin-left: auto; }
+nav.pages a { font-size: 13px; color: var(--quiet); text-decoration: none; }
+nav.pages a:hover { color: var(--ink); }
+nav.pages a.here { color: var(--ink); font-weight: 600; }
+nav.tongues { display: flex; gap: 6px; }
+nav.tongues a, button.theme {
+  padding: 2px 7px; border: 1px solid var(--line); border-radius: 4px;
+  background: none; font: inherit; font-size: 11px; color: var(--quiet);
+  text-decoration: none; cursor: pointer;
+}
+nav.tongues a.here { background: var(--ink); border-color: var(--ink);
+  color: var(--paper); }
+button.theme:hover { color: var(--ink); }
+a.run {
+  padding: 7px 14px; border-radius: 4px; background: var(--accent);
+  color: var(--accent-ink); font-size: 13px; font-weight: 600;
+  text-decoration: none;
+}
+a.run:hover { filter: brightness(1.08); }
+
+footer {
+  margin-top: 56px; padding: 22px 24px 40px;
+  border-top: 1px solid var(--line); background: var(--shade);
+}
+footer p { max-width: 720px; margin: 0 auto; color: var(--quiet);
+  font-size: 12px; }
+
+/* --- the page ----------------------------------------------------------- */
+
+main { max-width: 720px; margin: 0 auto; padding: 40px 24px 0; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 14px;
+  letter-spacing: -0.01em; }
+.lead { margin: 0 0 8px; font-size: 17px; color: var(--dim); }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--quiet); margin: 0 0 10px; }
+section { margin-top: 34px; }
+p { margin: 0 0 12px; }
+ul { margin: 0; padding-left: 20px; }
+li { margin-bottom: 9px; }
+strong { font-weight: 650; }
+code { padding: 1px 4px; background: var(--shade); border-radius: 3px;
+  font-size: 0.9em; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto;
+  background: var(--shade); border: 1px solid var(--line);
+  border-radius: 6px; }
+pre code { padding: 0; background: none; }
+.under { margin-top: 10px; color: var(--quiet); font-size: 12px; }
+.warn { color: var(--warn); }
+a { color: var(--accent); }
+
+/* --- figures and tables ------------------------------------------------- */
+
+/* As many equal columns as there are tiles: three on the home page,
+   two where a pair of numbers is the point. A fixed three left the
+   third cell empty and it read as a grey block. */
+.figures { display: grid; grid-auto-flow: column;
+  grid-auto-columns: 1fr; gap: 1px;
+  background: var(--line); border: 1px solid var(--line); border-radius: 6px;
+  overflow: hidden; }
+.figure { padding: 14px 16px; background: var(--paper); }
+.figure b { display: block; font-size: 22px;
+  font-variant-numeric: tabular-nums; }
+.figure span { font-size: 11px; color: var(--quiet); }
+
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { display: block; padding: 14px 16px; border: 1px solid var(--line);
+  border-radius: 6px; color: inherit; text-decoration: none; }
+.card:hover { border-color: var(--accent); }
+.card b { display: block; margin-bottom: 4px; }
+.card span { font-size: 12px; color: var(--quiet); }
+
+/* A picture is centred on the page and allowed past the reading column,
+   because every one of them is a diagram that stops working when it is
+   shrunk to the width of a paragraph. */
+figure { width: min(100vw - 32px, 900px); margin: 0 0 0 50%;
+  transform: translateX(-50%); text-align: center; }
+figure img { display: block; width: 100%; height: auto; margin: 0 auto;
+  padding: 14px; background: var(--plate); border: 1px solid var(--line);
+  border-radius: 8px; }
+figcaption { max-width: 720px; margin: 10px auto 0; color: var(--quiet);
+  font-size: 12px; text-align: left; }
+
+/* The four rows are ten columns wide and the reading column is 720px,
+   so this one block breaks out of it: the table is the thing the whole
+   project exists to produce and it should not arrive pre-scrolled. On a
+   narrow window it scrolls sideways inside itself rather than pushing
+   the page wider. */
+.wide { width: min(100vw - 32px, 1400px); margin-left: 50%;
+  transform: translateX(-50%); }
+/* A table scrolls inside itself rather than pushing the page sideways.
+   Under the published one the note stays put, because a note that slides
+   out of view with the columns it explains is a note nobody reads. */
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line);
+  text-align: left; vertical-align: top; }
+thead th { color: var(--quiet); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.num { text-align: right; font-variant-numeric: tabular-nums;
+  white-space: nowrap; }
+.wide table { min-width: 980px; }
+/* This project's own rows, among the systems they are compared with. */
+tr.ours td { background: var(--shade); }
+tr.ours td:first-child { font-weight: 600; }
+
+/* A note marker, and the list it points into. */
+sup.note { font-size: 10px; line-height: 0; }
+sup.note a { text-decoration: none; padding-left: 1px; }
+ol.notes { margin: 18px 0 0; padding-left: 26px; color: var(--quiet);
+  font-size: 12px; }
+ol.notes li { margin-bottom: 7px; }
+ol.notes li:target { color: var(--ink); }
+a.back { text-decoration: none; }
+
+/* A drawing of the table. Kept at its drawn size and scrolled in a
+ * narrow window, the same way the table itself is: scaling the box
+ * would scale the type with it and leave the labels unreadable. */
+svg.chart { display: block; margin: 0 auto; }
+/* A chart breaks out of the 672px reading column the way the table
+   does, because twelve labelled points need the room. It keeps the
+   picture rule's centring and takes its own width. */
+figure.chart { width: min(100vw - 32px, 900px); text-align: left;
+  margin: 24px 0 24px 50%; }
+figure.chart figcaption { margin: 8px auto 0; max-width: 860px; }
+.only-narrow { display: none; }
+@media (max-width: 760px) {
+  .only-wide { display: none; }
+  .only-narrow { display: block; }
+}
+/* The bibliography entries a note rests on, beside the note itself. */
+.cited a { color: var(--quiet); }
+.cited a:hover { color: var(--ink); }
+
+/* The bibliography, grouped the way the report groups it. */
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--quiet); margin: 22px 0 9px; font-weight: 600; }
+section h3:first-child { margin-top: 0; }
+h3 + ul { font-size: 13px; }
+h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+  header { padding: 10px 16px; }
+  nav.pages { margin-left: 0; order: 4; width: 100%; }
+  main { padding: 28px 16px 0; }
+  h1 { font-size: 24px; }
+  .figures, .cards { grid-template-columns: 1fr 1fr; }
+  .wide, figure { width: calc(100vw - 32px); }
+}

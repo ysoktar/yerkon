@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The research questions · YERKON</title>
+<link rel="stylesheet" href="../site.css">
+<script src="../theme.js" defer></script>
+</head>
+<body>
+<header>
+<a class="brand" href="index.html"><b>YERKON</b> <span>A terrestrial positioning backup layer</span></a>
+<nav class="pages"><a href="index.html">Home</a><a href="sorun.html">The problem</a><a href="sistem.html">The system</a><a href="arge.html" class="here">Research</a><a href="fayda.html">What it is for</a><a href="sonuclar.html">Results</a><a href="maliyet.html">Cost</a><a href="mevzuat.html">Regulation</a><a href="simulasyon.html">The simulation</a><a href="kaynaklar.html">Sources</a></nav>
+<nav class="tongues"><a href="../arge.html">TR</a><a href="arge.html" class="here">EN</a><button class="theme" id="theme" type="button" hidden></button></nav>
+<a class="run" href="../calistir.html?dil=en">Run the simulation →</a>
+</header>
+<main>
+<h1>The research questions</h1>
+<p class="lead">The project is looking for answers to four questions. None of them is closed, and under each one is what will be done.</p>
+<section><h2>Four questions</h2><ul><li><strong>If broadcasts from the ground, vehicle sensors and the map are put together, does a good enough position come out without the satellites?</strong> It gets tried in a city first. What nearby modems call themselves, the distance to base stations and the picture from a camera all get used as well.</li><li><strong>Can a system be built by touching the existing infrastructure as little as possible, and grown later?</strong> The 12th Transport and Communications Council set developing intelligent transport infrastructure as a goal. Using the power and the line already at roadside units and traffic control points is the way to make installation cheap.</li><li><strong>Can two way ranging&#x27;s two drawbacks be brought down?</strong> They are these: more messages travel through the air, and receivers have to wait their turn as their number grows. Systems that broadcast one way expect no answer from the receiver, so they carry neither cost. Approaches such as TWR CDMA and software defined radio will be tried to close that gap. <a href="https://ieeexplore.ieee.org/abstract/document/11435291">The TWR CDMA paper</a></li><li><strong>What does security ask of an infrastructure that gives out position?</strong> Answers get tried against two threats: somebody setting up a fake broadcast unit, and unauthorised receivers filling the system. Every module gets a separate chip that does the encryption (ATECC608B), and a signature verifies who each message came from and that it was not altered on the way.</li></ul></section>
+<section><h2>Seeing spoofing early</h2><p>Under a spoofing attack the receiver gives a position and speed that look flawless from outside and are wrong. YERKON runs entirely apart from the satellites, so it can serve as a reference for integrity. The two positions will be compared continuously and judged on the median error (P50), the ninety fifth percentile (P95) and the worst case, whether the position arrives without gaps, how long reconvergence takes after the signal drops, how often an alarm fires for nothing, and how often spoofing and jamming are caught.</p><p>Installation is itself part of the research. The aim is that somebody who is not an expert can put the units in the right place: personnel setting up a temporary network after a disaster or in a military situation would follow directions on the screen, such as &quot;move 50 metres on a bearing of 120 degrees for the best signal&quot;.</p></section>
+<section><h2>The pilot</h2><ul><li>Between 10 and 15 units will go up along one transport corridor. Vehicle, handheld and fixed receiver prototypes will be tried in the open, in a tunnel, between tall buildings and where coverage runs out.</li><li>In the open, the true position to compare against comes from RTK-GNSS. In tunnels and indoors, where the satellites do not reach, it comes from points and a route surveyed beforehand.</li><li>The target: half the errors under 5 metres, and 95 per cent of them under 10.</li><li>No real jammer will be used: it is both illegal and dangerous. Instead the satellite signal will be cut under control, recorded signals will be played back, and attacks will be imitated in a laboratory.</li></ul></section>
+</main>
+<footer><p>YERKON is a project submitted to the UDHAM idea competition of the Ministry of Transport and Infrastructure. The numbers in the table come from the simulation&#x27;s published run, and what it does not model is written on the simulation page.</p></footer>
+</body>
+</html>
