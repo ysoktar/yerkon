@@ -20,6 +20,7 @@ from yerkon.world import (
     Road,
     ROADSIDE_SIGN,
     TALL_MAST,
+    TUNNEL_BRACKET,
     flat_terrain,
     graded_alignment,
     rolling_terrain,
@@ -439,8 +440,8 @@ def precise_scenario(survey_sigma_m, seed=3):
     road = Road(centreline_m=centreline, terrain=terrain)
     anchors = tuple(
         Anchor("T{}".format(index), (float(x), 4.0 if index % 2 else -4.0),
-               TALL_MAST, terrain, radio=DWM3000)
-        for index, x in enumerate(range(0, 2001, 150))
+               TUNNEL_BRACKET, terrain, radio=DWM3000)
+        for index, x in enumerate(range(0, 2001, 40))
     )
     return Scenario(
         name="precise",
@@ -671,3 +672,22 @@ def test_a_row_is_run_over_the_arrangements_of_shadows_it_asks_for():
         urban.scenario, terrain=replace(urban.scenario.terrain,
                                         shadowing=None)))
     assert len(draws_of(unshadowed)) == 1
+
+
+def test_the_vehicle_reply_is_held_only_toward_anchors_above_it():
+    """ETSI EN 302 065-3, 4.3.4.2: the plane is the device's own mounting
+    height, and it moves with the vehicle, so the gradient does not
+    count: only the heights above the road do."""
+    from yerkon.evaluate import _reply_ceiling_dbm
+    from yerkon.hardware import DWM3000, SX1280
+    from yerkon.scenarios import catalogue
+    from yerkon.settings import DEFAULTS
+
+    deployment = catalogue(DEFAULTS)["tunnel"].scenario.deployment
+    vehicle = next(u for u in deployment.receivers if u.product == "vehicle")
+    walker = next(u for u in deployment.receivers if u.product == "pedestrian")
+
+    assert _reply_ceiling_dbm(vehicle, 4.5, DWM3000) is not None
+    assert _reply_ceiling_dbm(vehicle, 1.2, DWM3000) is None
+    assert _reply_ceiling_dbm(walker, 4.5, DWM3000) is None
+    assert _reply_ceiling_dbm(vehicle, 4.5, SX1280) is None

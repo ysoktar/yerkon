@@ -48,9 +48,12 @@ def test_the_rows_hear_with_a_duck_and_a_pedestrian_does_not():
         for unit in deployment.receivers:
             expected = GW_22_5151 if unit.product == "vehicle" else W24P_U
             assert unit.antenna is expected, (row, unit.identifier)
+    # The tunnel ranges by UWB on the module's own antenna at both ends.
+    from yerkon.hardware import DWM3000_ANTENNA
+
     tunnel = CHOICES["tunnel"].scenario.deployment
-    assert tunnel.antenna is W24P_U
-    assert all(unit.antenna is W24P_U for unit in tunnel.receivers)
+    assert tunnel.antenna is DWM3000_ANTENNA
+    assert all(unit.antenna is DWM3000_ANTENNA for unit in tunnel.receivers)
 
 
 def test_the_town_and_the_open_country_are_certified_as_adaptive_hopping():

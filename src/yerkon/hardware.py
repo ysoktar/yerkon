@@ -8,6 +8,8 @@ than the one in the bill.
 
 from __future__ import annotations
 
+import math
+
 from dataclasses import dataclass
 from typing import Optional
 
@@ -127,6 +129,10 @@ class Radio:
     #: an exponential distribution per exchange. None or zero is off
     #: (ADR-0084).
     nlos_bias_mean_m: Optional[Sourced] = None
+    #: The carrier a link is worked out at, in hertz. Path loss and the
+    #: Fresnel zone both depend on it: at 6,5 GHz free space costs 8,5 dB
+    #: more than at 2,45 GHz over the same distance.
+    carrier_hz: float = 2450e6
 
     @property
     def nlos_bias_m(self) -> float:
@@ -268,6 +274,21 @@ density limit goes away and 20 dBm e.i.r.p. is the ceiling, which the
 27 dBm module reaches with gain to spare."""
 
 
+DWM3000_ANTENNA = Antenna(
+    part="Qorvo DWM3000, integrated antenna",
+    peak_gain_dbi=DEFAULTS.sourced("radio.dwm3000.antenna_gain_dbi"),
+    efficiency=Sourced(
+        1.0, "fraction", Provenance.DERIVED,
+        "radio.dwm3000.antenna_gain_dbi; the gain already includes it",
+    ),
+    centre_frequency_hz=6489.6e6,
+    bandwidth_hz=499.2e6,
+)
+"""The UWB module's own antenna, at both ends of a tunnel link. The
+printed 2,4 GHz antenna the model used there has nothing to do with an
+6,5 GHz link."""
+
+
 # --- Radios ---------------------------------------------------------------
 
 def _sx1280_family(
@@ -380,9 +401,14 @@ is 20 dBm, which only this module reaches through a 5 dBi antenna
 
 DWM3000 = Radio(
     part="Qorvo DWM3000",
+    # An emission limit rather than a conducted power: -41,3 dBm/MHz
+    # over the 499,2 MHz channel is -14,3 dBm e.i.r.p. The unit marks it
+    # as a limit, so the link budget adds no antenna gain on top.
     max_output_dbm=Sourced(
-        -14.0, "dBm/MHz", Provenance.STANDARD,
-        "IEEE 802.15.4z / FCC ultra-wideband emission limit",
+        round(-41.3 + 10.0 * math.log10(499.2), 2), "dBm/MHz",
+        Provenance.STANDARD,
+        "BTK frekans tahsisinden muaf telsiz cihaz ölçütleri, Madde 18(4), "
+        "Tablo 19 (LT1), 6-8,5 GHz: ortalama -41,3 dBm/MHz e.i.r.p.",
     ),
     sensitivity_dbm=Sourced(
         -93.0, "dBm", Provenance.DATASHEET,
@@ -428,5 +454,8 @@ DWM3000 = Radio(
         0.10, "m", Provenance.DATASHEET,
         "Qorvo DW3000 datasheet, stated ranging accuracy class",
     ),
+    # IEEE 802.15.4z HRP channel 5, the one YERKON uses; inside the
+    # 6-8,5 GHz row of the BTK criteria.
+    carrier_hz=6489.6e6,
 )
 """The tunnel anchor's radio, and the short-range radio in both receivers."""

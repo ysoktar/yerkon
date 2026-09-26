@@ -32,7 +32,7 @@ from yerkon.cost import (
 )
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import (
-    DWM3000, GW_22_5151, SX1280, Radio, W24P_U, radios)
+    DWM3000, DWM3000_ANTENNA, GW_22_5151, SX1280, Radio, W24P_U, radios)
 from yerkon.ranging import SINGLE_SIDED
 from yerkon.regulatory import REGIONS
 from yerkon.language import say
@@ -245,7 +245,9 @@ ROW_REGIONS = {"urban": "TR-FHSS", "rural": "TR-FHSS", "tunnel": "TR"}
 ROW_ANTENNAS = {
     "urban": (GW_22_5151, {"vehicle": GW_22_5151}),
     "rural": (GW_22_5151, {"vehicle": GW_22_5151}),
-    "tunnel": (W24P_U, {}),
+    # Ultra-wideband at both ends, on the module's own antenna.
+    "tunnel": (DWM3000_ANTENNA, {"vehicle": DWM3000_ANTENNA,
+                                 "pedestrian": DWM3000_ANTENNA}),
 }
 
 
@@ -561,6 +563,18 @@ def rural_ground(settings: Settings) -> Terrain:
     ), settings, "rural")
 
 
+def tunnel_guide(settings: Settings = DEFAULTS):
+    """How a road tunnel guides the wave, from the settings (ADR-0095)."""
+    from yerkon.rf import GuidedLoss
+
+    return GuidedLoss(
+        pl0_db=settings.number("tunnel.guided_pl0_db"),
+        frequency_exponent=settings.number("tunnel.guided_frequency_exponent"),
+        distance_exponent=settings.number("tunnel.guided_distance_exponent"),
+        from_m=settings.number("tunnel.guided_from_m"),
+    )
+
+
 def tunnel_ground(
     settings: Settings,
     length_m: float,
@@ -586,7 +600,7 @@ def tunnel_ground(
     # clamping would spread a real fall over an unreal distance, so that
     # case takes the measured gradient instead.
     if site is not None and entry_x + length_m <= site.width_m:
-        return varying(bore_terrain(
+        return replace(varying(bore_terrain(
             entry_elevation_m=site.height_at(entry_x, entry_y),
             exit_elevation_m=site.height_at(entry_x + length_m, entry_y),
             length_m=length_m,
@@ -594,14 +608,14 @@ def tunnel_ground(
                 "terrain.bore.through", language,
                 site=site_name, source=site.manifest.elevation_source,
             ),
-        ), settings, "tunnel")
+        ), settings, "tunnel"), guide=tunnel_guide(settings))
     grade = settings.number("site.tunnel_grade")
-    return varying(bore_terrain(
+    return replace(varying(bore_terrain(
         entry_elevation_m=0.0,
         exit_elevation_m=-grade * length_m,
         length_m=length_m,
         language=language,
-    ), settings, "tunnel")
+    ), settings, "tunnel"), guide=tunnel_guide(settings))
 
 
 #: Absorption by buildings, vegetation and traffic that height does not
@@ -739,14 +753,11 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
 
     # --- Tunnel ---------------------------------------------------------------
 
-    #: A tunnel is a waveguide, and a waveguide loses less than open ground.
-    #:
-    #: This project models the bore with no waveguide term, which understates
-    #: what a real tunnel delivers rather than overstating it. The numbers
-    #: that come out are therefore conservative, and the model would need
-    #: that term to claim otherwise. What it does not do any more is model
-    #: the floor as level: the bore falls 1,79 % between real portals, so
-    #: anchors and receivers sit at different heights along it (ADR-0021).
+    #: A tunnel is a waveguide. Beyond 50 m the loss follows the model
+    #: measured in a road tunnel at 2,8-5 GHz (`tunnel_guide`), carried to
+    #: the UWB channel. The floor is not level: the bore falls 1,79 %
+    #: between real portals, so anchors and receivers sit at different
+    #: heights along it (ADR-0021).
     TUNNEL_M = settings.number("tunnel.length_m")
     TUNNEL_TERRAIN = tunnel_ground(settings, TUNNEL_M)
 

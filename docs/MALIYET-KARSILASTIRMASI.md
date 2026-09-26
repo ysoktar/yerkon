@@ -25,7 +25,7 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
 | **Şehir içi, 600 m (yeni)** | 25 | 8,59 km² | 12,82 km | **98586** | **18974** | **288326** | **11477** | **2209** | **7690** | **1480** |
 | Kırsal, 3000 m | 49 | 305,75 km² | 86,40 km | 412748 | 127144 | 1684188 | 1350 | 416 | 4777 | 1472 |
-| Tünel, 250 m | 9 | yalnız tüp | 2,00 km | 69223 | 7009 | 139313 | yok | yok | 34612 | 3504 |
+| Tünel, 60 m | 34 | yalnız tüp | 2,00 km | 261510 | 26477 | 526280 | yok | yok | 130755 | 13239 |
 
 25 Eylül'den beri şehir içi ve kırsal O6 ile (ADR-0094): cihaz
 uyarlamalı frekans atlamalı olarak belgelendiriliyor, direk ve araç
@@ -94,19 +94,27 @@ sürede gidecekleri anlaşmaya bağlı.
 
 ## Tünel (Kızılcahamam, güzergâh km başına)
 
-Tam okuma, sekiz gölge çekilişi, turda sekiz direk, A seçeneği.
+Tam okuma, sekiz gölge çekilişi, turda sekiz direk. UWB kanal 5, birimler
+yoldan 1,2 m yüksekte, tünelde ölçülmüş kayıp modeliyle (ADR-0095).
 
 | Aralık | Askı | CAPEX TL/km | OPEX TL/km/yıl | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|---|---|---|
-| 225 m (eski) | 9 | 31910 | 3357 | 0,79 m | 3,21 m | %98,25 |
-| **250 m (yeni)** | 9 | 31910 | 3357 | 0,85 m | 2,97 m | %98,57 |
-| 275 m | 8 | 28365 | 2984 | 1,04 m | 3,80 m | %91,21 |
-| 300 m | 7 | 24819 | 2611 | 0,80 m | 3,68 m | %88,29 |
+| 40 m | 51 | 196133 | 19858 | 0,37 m | 1,07 m | %99,66 |
+| 50 m | 41 | 157675 | 15964 | 0,54 m | 1,30 m | %92,04 |
+| 55 m | 37 | 142292 | 14407 | 0,49 m | 1,59 m | %91,90 |
+| **60 m** | 34 | 130755 | 13239 | 0,58 m | 2,43 m | %94,32 |
+| 65 m | 31 | 119218 | 12071 | 0,69 m | 2,89 m | %89,50 |
+| 70 m | 29 | 111526 | 11292 | 0,62 m | 2,61 m | %83,46 |
+| 75 m | 27 | 103835 | 10513 | 0,81 m | 2,79 m | %86,87 |
+| 90 m | 23 | 88452 | 8956 | 1,02 m | 3,18 m | %70,03 |
 
-2 km'lik tünelde 225 ve 250 m aynı sayıda askı veriyor. Uzun bir tünelde
-250 m kilometre başına 4,4 yerine 4,0 askı demek: aynı doğrulukla %10
-daha ucuz. Tünel CAPEX'inin %85'i askı montajı (askı başına 6000 TL,
-varsayım); birim yalnızca 1091 TL. En büyük kaldıraç aralık değil montaj.
+50-65 m arası bir düzlük, 70 m'den sonra kullanılabilirlik düşüyor. 60 m
+düzlüğün en ucuz noktası: 40 m'den km başına %33 ucuz, bedeli 5 puan
+kullanılabilirlik. Bir UWB bağlantısı, BTK'nın konum izleme sınırı
+(-14,32 dBm e.i.r.p.) ve Qorvo'nun duyarlılığıyla açıkta yaklaşık 50-60 m
+kapanıyor; aralığı bu belirliyor. Tünel CAPEX'inin büyük kısmı askı
+montajı (askı başına 6000 TL, varsayım); birim yalnızca 1091 TL. En büyük
+kaldıraç montaj.
 
 ## Ne gösteriyor
 

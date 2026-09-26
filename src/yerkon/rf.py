@@ -64,6 +64,33 @@ class Terminal:
 
 
 @dataclass(frozen=True)
+class GuidedLoss:
+    """Mean path loss inside a road tunnel, where the bore guides the wave.
+
+    Molina-Garcia-Pardo, Lienard and Degauque (EURASIP JWCN 2009, article
+    560571, equation 2) fitted PL = PL0 + 10 n_f log10(f in GHz) + 10 n_d
+    log10(d) to measurements in a straight two-lane road tunnel between
+    50 and 500 m, 2,8 to 5 GHz: PL0 = 86 dB, n_f = 0,82, n_d = 0,57. The
+    equation reproduces the paper's own figure 5 with d in kilometres, so
+    that is the unit here. Below ``from_m`` the paper says nothing and
+    the loss is free space.
+    """
+
+    pl0_db: float
+    frequency_exponent: float
+    distance_exponent: float
+    from_m: float
+
+    def loss_db(self, distance_m: float, frequency_hz: float) -> Optional[float]:
+        """The mean loss at this distance, or nothing where free space holds."""
+        if distance_m < self.from_m:
+            return None
+        return (self.pl0_db
+                + 10.0 * self.frequency_exponent * math.log10(frequency_hz / 1e9)
+                + 10.0 * self.distance_exponent * math.log10(distance_m / 1000.0))
+
+
+@dataclass(frozen=True)
 class Obstruction:
     """What the ground does to a link between two terminals.
 
@@ -133,6 +160,9 @@ class Obstruction:
     #: on ``profile`` when it is absent (ADR-0082).
     profile_array: Optional[np.ndarray] = field(
         default=None, compare=False, repr=False)
+    #: Inside a tunnel, the loss the bore's guiding gives instead of free
+    #: space and the floor reflection. Nothing in the open.
+    guide: Optional[GuidedLoss] = None
 
     def __post_init__(self) -> None:
         if not 0.0 < self.peak_at_fraction < 1.0:
@@ -666,10 +696,11 @@ def _elevation_deg(
 def evaluate_link(
     transmitter: Terminal,
     receiver: Terminal,
-    frequency_hz: float = 2450e6,
+    frequency_hz: Optional[float] = None,
     obstruction: Optional[Obstruction] = None,
     respect_regulatory_limit: bool = True,
     region: SpectrumRule = DEFAULT_REGION,
+    eirp_ceiling_dbm: Optional[float] = None,
 ) -> LinkBudget:
     """The whole chain, for one pair of terminals at one instant.
 
@@ -678,6 +709,10 @@ def evaluate_link(
     explicitly wherever the result is reported.
     """
     obstruction = obstruction or Obstruction()
+    if frequency_hz is None:
+        # The transmitter's own carrier. A UWB link worked out at the
+        # 2,4 GHz default was 10,3 dB too kind.
+        frequency_hz = transmitter.radio.carrier_hz
     tx, rx = transmitter.position_m, receiver.position_m
     distance_m = math.dist(tx, rx)
     if distance_m <= 0.0:
@@ -710,6 +745,12 @@ def evaluate_link(
             else output_dbm + peak,
         )
         eirp_dbm = peak_eirp_dbm - (peak - tx_gain)
+    if eirp_ceiling_dbm is not None:
+        # A ceiling a rule sets for this direction, such as the vehicle
+        # UWB exterior limit above the device's own mounting plane
+        # (ETSI EN 302 065-3, 4.3.4.2). The caller decides whether the
+        # direction is one the rule covers.
+        eirp_dbm = min(eirp_dbm, eirp_ceiling_dbm)
 
     # Geometry of the obstruction: how far the path clears the highest
     # ground between the ends, once the earth's own curvature is added to
@@ -768,10 +809,19 @@ def evaluate_link(
     # answer is whichever is worse. Summed, a blocked path at range paid
     # 65 dB where the two terms were 40 and 25 (ADR-0058).
     free_space_db = free_space_path_loss_db(distance_m, frequency_hz)
-    path_loss_db = (free_space_db
-                    + max(spread_db - free_space_db, diffraction_db)
-                    + obstruction.clutter_loss_db
-                    + obstruction.shadow_db)
+    guided_db = (obstruction.guide.loss_db(distance_m, frequency_hz)
+                 if obstruction.guide is not None else None)
+    if guided_db is not None:
+        # The measured mean over the bore's modes already holds what the
+        # floor and the walls return, so no reflection term goes on top.
+        path_loss_db = (guided_db + diffraction_db
+                        + obstruction.clutter_loss_db
+                        + obstruction.shadow_db)
+    else:
+        path_loss_db = (free_space_db
+                        + max(spread_db - free_space_db, diffraction_db)
+                        + obstruction.clutter_loss_db
+                        + obstruction.shadow_db)
 
     received_dbm = eirp_dbm + rx_gain - path_loss_db
     noise_dbm = (
@@ -825,7 +875,7 @@ DEFAULT_SEARCH_LIMIT_M = 60_000.0
 def closure_range_m(
     transmitter: Terminal,
     receiver_prototype: Terminal,
-    frequency_hz: float = 2450e6,
+    frequency_hz: Optional[float] = None,
     obstruction: Optional[Obstruction] = None,
     search_limit_m: float = DEFAULT_SEARCH_LIMIT_M,
     region: SpectrumRule = TURKEY,
@@ -868,7 +918,7 @@ def usable_range_m(
     receiver_prototype: Terminal,
     radio: Radio,
     target_sigma_m: float,
-    frequency_hz: float = 2450e6,
+    frequency_hz: Optional[float] = None,
     obstruction: Optional[Obstruction] = None,
     search_limit_m: float = DEFAULT_SEARCH_LIMIT_M,
     region: SpectrumRule = TURKEY,

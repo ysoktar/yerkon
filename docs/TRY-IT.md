@@ -743,12 +743,13 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 |---|---|---|---|
 | Şehir içi | 1,85 m | 5,47 m | %85,67 |
 | Kırsal | 1,76 m | 4,65 m | %66,47 |
-| Tünel | 0,79 m | 2,73 m | %98,61 |
+| Tünel | 0,58 m | 2,43 m | %94,32 |
 
 24 Eylül koşusu: kullanılabilirlik doğruluğa bağlı (ADR-0084), şehir
-içi 600 m, turda sekiz direk (ADR-0085), tünel 250 m, yükseklik
-haritadan (ADR-0088), harcırah ve amortisman resmî (ADR-0089), SX1280'in resmî duyarlılığı ve
-direk ile araç çatısı antenleri (ADR-0091).
+içi 600 m, turda sekiz direk (ADR-0085), yükseklik haritadan
+(ADR-0088), harcırah ve amortisman resmî (ADR-0089), SX1280'in resmî
+duyarlılığı ve direk ile araç çatısı antenleri (ADR-0091). Tünel 60 m,
+UWB kanal 5, birimler yoldan 1,2 m yüksekte (ADR-0095).
 
 Kırsal satır ADR-0079'dan önce 25 m'lik 28 dikilen direkte %41,83 ve
 22,72 m diyordu; elektrik dağıtım hattının 10 m'deki 49 direğine geçince

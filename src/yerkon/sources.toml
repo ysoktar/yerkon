@@ -26,6 +26,11 @@ name.tr = "Telsiz modülleri ve makaleler"
 name.en = "Radio modules and papers"
 
 [[group]]
+key = "rules"
+name.tr = "Mevzuat ve standartlar"
+name.en = "Regulation and standards"
+
+[[group]]
 key = "project"
 name.tr = "YERKON, fiyatlar ve kur"
 name.en = "YERKON, prices and exchange rates"
@@ -272,6 +277,34 @@ group = "radio"
 label.tr = "SX1280 Uzun Menzil Testi"
 label.en = "SX1280 long range test"
 url = "https://stuartsprojects.github.io/2019/04/26/Semtech-SX1280-2-4Ghz-LoRa-ranging-tranceivers.html"
+
+[[source]]
+key = "dw3000-datasheet"
+group = "radio"
+label.tr = "Qorvo DW3000 Data Sheet Rev 1.3, alıcı duyarlılığı (Tablo 9)"
+label.en = "Qorvo DW3000 Data Sheet Rev 1.3, receiver sensitivity (table 9)"
+url = "https://www.mouser.com/pdfDocs/DW3000DataSheet5.pdf"
+
+[[source]]
+key = "tunnel-propagation"
+group = "radio"
+label.tr = "Molina-Garcia-Pardo, Lienard, Degauque: Propagation in Tunnels, EURASIP JWCN 2009"
+label.en = "Molina-Garcia-Pardo, Lienard, Degauque: Propagation in Tunnels, EURASIP JWCN 2009"
+url = "https://jwcn-eurasipjournals.springeropen.com/articles/10.1155/2009/560571"
+
+[[source]]
+key = "etsi-302065-3"
+group = "rules"
+label.tr = "ETSI EN 302 065-3 V2.1.1: kara ve demiryolu taşıtlarında UWB"
+label.en = "ETSI EN 302 065-3 V2.1.1: UWB in road and rail vehicles"
+url = "https://www.etsi.org/deliver/etsi_en/302000_302099/30206503/02.01.01_60/en_30206503v020101p.pdf"
+
+[[source]]
+key = "btk-exempt-criteria"
+group = "rules"
+label.tr = "BTK: Frekans Tahsisinden Muaf Telsiz Cihaz ve Sistemlerine İlişkin Teknik Ölçütler"
+label.en = "BTK: technical criteria for radio equipment exempt from frequency assignment"
+url = "https://www.btk.gov.tr/uploads/pages/frekans-tahsisinden-muaf-telsiz-cihaz-sistemleri-olcutler-633d4ca68c0b1.pdf"
 
 [[source]]
 key = "dwm3000-datasheet"

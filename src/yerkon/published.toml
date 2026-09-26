@@ -4,7 +4,7 @@
 # the tests that keep the README from drifting away from it.
 # Edit the model and run it again rather than editing this.
 
-run_on = "2026-09-25"
+run_on = "2026-09-26"
 source = "defaults.toml"
 shadow_draws = 8
 profile_spacing_m = 10
@@ -46,12 +46,12 @@ key = "tunnel"
 system = "YERKON (Tünel)"
 technology = "Karasal konumlandırma (UWB/DWM3000 TWR)"
 environment = "İç + dış"
-hpe_p50_m = 0.7921
-hpe_p95_m = 2.7268
-vpe_p95_m = 2.0617
-availability = 0.9861
+hpe_p50_m = 0.576
+hpe_p95_m = 2.4267
+vpe_p95_m = 3.3122
+availability = 0.9432
 area_km2 = 0.024
-capex_tl_per_unit = 34611.66
-opex_tl_per_unit_year = 3504.366
+capex_tl_per_unit = 130755.16
+opex_tl_per_unit_year = 13238.716
 costed_by = "route"
 assumed_share = 0.7792

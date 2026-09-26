@@ -124,7 +124,8 @@ def test_the_measured_residual_makes_double_sided_ranging_pointless():
     radio now has a reason to spend the third frame.
     """
     for radio, height_m, distance_m in (
-        (DWM3000, 6.0, 100.0), (SX1280, 25.0, 3000.0)
+        # 30 m: in the open a UWB link closes to about 50 m.
+        (DWM3000, 6.0, 30.0), (SX1280, 25.0, 3000.0)
     ):
         budget = budget_at(distance_m, radio, anchor_height_m=height_m)
         single = measurement_sigma_m(budget, radio, scheme=SINGLE_SIDED)
@@ -150,7 +151,7 @@ def test_the_clock_term_would_still_matter_if_the_residual_were_assumed():
             note="what this project assumed before it was measured",
         ),
     )
-    budget = budget_at(100.0, DWM3000, anchor_height_m=6.0)
+    budget = budget_at(30.0, DWM3000, anchor_height_m=6.0)
     single = measurement_sigma_m(
         budget, DWM3000, clock=assumed, scheme=SINGLE_SIDED
     )
@@ -406,3 +407,28 @@ def test_none_of_the_biases_change_what_the_receiver_believes():
     plain = measure(anchor, receiver, 0.0, rng)
     biased = measure(anchor, receiver, 0.0, rng, survey_error_m=5.0)
     assert biased.variance_m2 == pytest.approx(plain.variance_m2)
+
+
+def test_a_range_needs_the_reply_to_close_as_well():
+    """A vehicle held to the exterior limit replies 12 dB lower; where that
+    no longer closes there is no range, though the anchor's way does."""
+    import numpy as np
+
+    from yerkon.hardware import DWM3000, DWM3000_ANTENNA
+    from yerkon.ranging import SINGLE_SIDED, measure
+    from yerkon.regulatory import vehicle_uwb_ceiling_dbm
+    from yerkon.rf import Terminal
+
+    anchor = Terminal(DWM3000, DWM3000_ANTENNA, (0.0, 0.0, 4.5))
+    ceiling = vehicle_uwb_ceiling_dbm(DWM3000)
+    closes_both = None
+    for x in range(5, 200, 5):
+        unit = Terminal(DWM3000, DWM3000_ANTENNA, (float(x), 0.0, 1.5))
+        one_way = measure(anchor, unit, 0.0, np.random.default_rng(1),
+                          scheme=SINGLE_SIDED)
+        both = measure(anchor, unit, 0.0, np.random.default_rng(1),
+                       scheme=SINGLE_SIDED, reply_ceiling_dbm=ceiling)
+        if one_way is not None and both is None:
+            closes_both = x
+            break
+    assert closes_both is not None

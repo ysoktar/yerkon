@@ -38,12 +38,12 @@ def a_scenario(seed=7, survey_sigma_m=0.0, packet_loss=0.0, duration_s=45.0):
     anchors = tuple(
         Anchor(
             "T{}".format(index),
-            (float(x), 30.0 if index % 2 else -30.0),
+            (float(x), 4.0 if index % 2 else -4.0),
             TALL_MAST,
             TERRAIN,
             radio=DWM3000,
         )
-        for index, x in enumerate(range(0, 1201, 150))
+        for index, x in enumerate(range(0, 1201, 40))
     )
     return Scenario(
         name="deneme",
@@ -51,10 +51,14 @@ def a_scenario(seed=7, survey_sigma_m=0.0, packet_loss=0.0, duration_s=45.0):
         deployment=Deployment(
             anchors=anchors,
             receivers=(
+                # A handheld: the masts stand above it, and a vehicle's
+                # reply would be held to the exterior limit and not reach
+                # them. The masts are what make the vertical observable.
                 Receiver(
-                    "araç",
+                    "yaya",
                     Journey(road=road, speed_m_s=15.0, duration_s=duration_s),
                     radios=(DWM3000,),
+                    product="pedestrian",
                 ),
             ),
         ),
@@ -68,7 +72,7 @@ def a_scenario(seed=7, survey_sigma_m=0.0, packet_loss=0.0, duration_s=45.0):
 # --- The split itself -----------------------------------------------------
 
 
-def a_budget(distance_m=400.0, radio=DWM3000):
+def a_budget(distance_m=30.0, radio=DWM3000):
     anchor = Terminal(radio, W24P_U, (0.0, 0.0, 6.0))
     receiver = Terminal(radio, W24P_U, (distance_m, 0.0, 1.5))
     return evaluate_link(anchor, receiver), radio
@@ -77,10 +81,10 @@ def a_budget(distance_m=400.0, radio=DWM3000):
 #: Distances each radio actually closes at these antenna heights.
 #:
 #: Not a round number each: an impulse radio six metres up is spent well
-#: inside a kilometre, and asking for its ranging precision beyond that
+#: inside a hundred metres, and asking for its ranging precision beyond that
 #: raises rather than returning a large number, which is the correct
 #: behaviour and not something to test around.
-CLOSES_AT = {DWM3000: (20.0, 50.0, 200.0), SX1280: (50.0, 200.0, 1000.0, 3000.0)}
+CLOSES_AT = {DWM3000: (10.0, 20.0, 40.0), SX1280: (50.0, 200.0, 1000.0, 3000.0)}
 
 
 @pytest.mark.parametrize(
@@ -137,7 +141,7 @@ def test_silencing_a_source_does_not_change_what_the_receiver_believes():
     """
     radio = DWM3000
     anchor = Terminal(radio, W24P_U, (0.0, 0.0, 6.0))
-    receiver = Terminal(radio, W24P_U, (300.0, 0.0, 1.5))
+    receiver = Terminal(radio, W24P_U, (30.0, 0.0, 1.5))
 
     whole = measure(anchor, receiver, 0.0, np.random.default_rng(1), terms=ALL)
     quiet = measure(

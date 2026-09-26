@@ -571,13 +571,25 @@ measurements at short range. Its long range result is therefore a model \
 output rather than a direct field measurement."""
 
 [note.tunnel-run]
-sources = ["dwm3000-datasheet", "yerkon-github"]
-tr = """Tünel satırı, DWM3000 için tanımlanan Gaussian hata ve görüş \
-hattı dışı yanlılık modeliyle üretilmiştir. Sonuç bir Monte Carlo \
+sources = ["dwm3000-datasheet", "dw3000-datasheet", "tunnel-propagation", "btk-exempt-criteria", "etsi-302065-3", "yerkon-github"]
+tr = """Tünel satırı DWM3000 ile kanal 5'te (6489,6 MHz) hesaplanıyor: BTK \
+konum izleme sınırı (-41,3 dBm/MHz), Qorvo'nun kanal 5 duyarlılığı (-100 \
+dBm) ve modülün kendi anteni (kazancı yayımlanmadığı için 0 dBi). Tünelde \
+kayıp, Molina-Garcia-Pardo ve arkadaşlarının karayolu tünelinde 2,8-5 \
+GHz'de, 50-500 m arasında ölçtüğü modelle (Denklem 2) hesaplanıyor; 6,5 \
+GHz'e taşınmış bir ölçüm, 6,5 GHz'de ölçülmemiş. Araçtaki UWB, kendi \
+yüksekliğinin üstüne -53,3 dBm/MHz ile sınırlı (ETSI EN 302 065-3, \
+4.3.4.2); birimler bu yüzden yoldan 1,2 m yüksekte. Sonuç bir Monte Carlo \
 benzetimidir; saha ölçümü değildir."""
-en = """The tunnel row was produced with the Gaussian error and non line \
-of sight bias model defined for the DWM3000. The result is a Monte Carlo \
-simulation rather than a field measurement."""
+en = """The tunnel row is worked out with the DWM3000 on channel 5 (6489,6 \
+MHz): the BTK location tracking limit (-41,3 dBm/MHz), Qorvo's channel 5 \
+sensitivity (-100 dBm) and the module's own antenna (0 dBi, as no gain is \
+published). The loss in the bore follows the model Molina-Garcia-Pardo and \
+colleagues measured in a road tunnel at 2,8 to 5 GHz between 50 and 500 m \
+(equation 2), carried to 6,5 GHz rather than measured there. The vehicle's \
+UWB is held to -53,3 dBm/MHz above its own height (ETSI EN 302 065-3, \
+4.3.4.2), so the units sit 1,2 m above the road. The result is a Monte \
+Carlo simulation rather than a field measurement."""
 
 [note.yerkon-availability]
 sources = ["yerkon-github"]

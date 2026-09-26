@@ -192,7 +192,7 @@ const VALUE_WORDS = {
   "billboard": "pano (10 m)",
   "lighting column": "aydınlatma direği (12 m)",
   "tall mast": "direk (25 m)",
-  "tunnel bracket": "tünel askısı (4,5 m)",
+  "tunnel bracket": "tünel askısı (1,2 m)",
 };
 
 const value = text => VALUE_WORDS[text] || text;
@@ -991,6 +991,11 @@ const TERMS = {
   manoeuvre_m_s2: "manevra ivmesi",
   mounting: "montaj",
   noise_figure_db: "gürültü katsayısı",
+  antenna_gain_dbi: "anten kazancı",
+  guided_pl0_db: "tünel kayıp modelinin sabiti",
+  guided_frequency_exponent: "tünel kaybının frekans üssü",
+  guided_distance_exponent: "tünel kaybının uzaklık üssü",
+  guided_from_m: "tünel kayıp modelinin başladığı uzaklık",
   off_grid_supply_tl: "şebeke dışı besleme",
   operating: "işletme",
   nlos_bias_mean_m: "görüş dışı yanlılık, ortalama",
@@ -1841,8 +1846,8 @@ const pinch = new Map();
 let pinchSpan = null;
 
 /* How far the camera can get from what it is looking at. The lower bound
- * is close enough to stand between two tunnel brackets a hundred and
- * fifty metres apart; the upper is a rural region with room around it.
+ * is close enough to stand between two tunnel brackets sixty metres
+ * apart; the upper is a rural region with room around it.
  * Four hundred metres was the old floor, and at that distance a bore is
  * a thin line whatever the wheel is told. */
 const NEAREST_M = 25;

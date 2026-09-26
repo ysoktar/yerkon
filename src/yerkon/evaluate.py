@@ -40,7 +40,7 @@ from yerkon.ranging import (
     measure,
     share_a_waveform,
 )
-from yerkon.regulatory import TURKEY, SpectrumRule
+from yerkon.regulatory import TURKEY, SpectrumRule, vehicle_uwb_ceiling_dbm
 from yerkon.rf import Terminal, evaluate_link, ranging_sigma_m
 from yerkon.terms import ALL as ALL_TERMS, Terms
 from yerkon.world import Anchor, Road, Terrain
@@ -355,6 +355,23 @@ def pooled(draws: Sequence[Samples], name: str) -> Samples:
     )
 
 
+def _reply_ceiling_dbm(unit: "Receiver", anchor_above_road_m: float,
+                       radio: Radio):
+    """What a unit may send back to this anchor, where a rule holds it.
+
+    A vehicle's UWB radio may send above its own mounting plane only at
+    the exterior limit (ETSI EN 302 065-3, 4.3.4.2). That plane moves with
+    the vehicle, so on a graded road what counts is the height above the
+    road: an anchor mounted higher than the vehicle's antenna is above
+    it, one mounted lower is below it, whatever the gradient between.
+    """
+    if unit.product != "vehicle":
+        return None
+    if anchor_above_road_m <= unit.journey.antenna_height_m:
+        return None
+    return vehicle_uwb_ceiling_dbm(radio)
+
+
 def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
     """Drive every unit, fix as often as the medium allows, count errors.
 
@@ -455,6 +472,11 @@ def run_scenario(scenario: Scenario, terms: Terms = ALL_TERMS) -> Samples:
                     survey_error_m=along,
                     packet_loss=scenario.packet_loss,
                     terms=terms,
+                    reply_ceiling_dbm=_reply_ceiling_dbm(
+                        unit,
+                        anchor.position_m[2] - scenario.terrain.height_at(
+                            anchor.position_m[0], anchor.position_m[1]),
+                        radio),
                 )
                 slot_at_s += exchange_duration_s(
                     anchor.radio, deployment.scheme

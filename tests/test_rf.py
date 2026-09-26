@@ -648,3 +648,92 @@ def test_the_construction_is_the_recommendation_s_arithmetic():
     assert v == pytest.approx(2.983, abs=0.001)
     assert said == pytest.approx(by_hand, abs=0.01)
     assert said == pytest.approx(32.17, abs=0.05)
+
+
+# --- Each radio at its own carrier ------------------------------------------
+
+
+def test_a_link_is_worked_out_at_the_transmitters_own_carrier():
+    """Free space at UWB channel 5 costs 20 log10(6489,6 / 2450) more than
+    at the 2,4 GHz default over the same path."""
+    from yerkon.hardware import DWM3000, SX1280, W24P_U
+    from yerkon.rf import Terminal, evaluate_link
+
+    def loss(radio, frequency_hz=None):
+        anchor = Terminal(radio, W24P_U, (0.0, 0.0, 4.0))
+        unit = Terminal(radio, W24P_U, (100.0, 0.0, 1.5))
+        return evaluate_link(anchor, unit, frequency_hz).path_loss_db
+
+    assert DWM3000.carrier_hz == 6489.6e6
+    assert SX1280.carrier_hz == 2450e6
+    assert loss(DWM3000) == pytest.approx(loss(DWM3000, 6489.6e6))
+    assert loss(DWM3000) - loss(DWM3000, 2450e6) == pytest.approx(
+        20.0 * math.log10(6489.6 / 2450.0), abs=0.5)
+
+
+def test_the_uwb_power_is_the_btk_location_tracking_limit():
+    """-41,3 dBm/MHz over 499,2 MHz (BTK criteria, Article 18(4), Table 19)."""
+    from yerkon.hardware import DWM3000
+
+    assert float(DWM3000.max_output_dbm.value) == pytest.approx(
+        -41.3 + 10.0 * math.log10(499.2), abs=0.01)
+    assert "Tablo 19" in DWM3000.max_output_dbm.source
+
+
+# --- The tunnel guides the wave (ADR-0095) -----------------------------------
+
+
+def test_the_tunnel_model_is_the_papers_equation_with_d_in_kilometres():
+    """Molina-Garcia-Pardo et al. 2009, equation (2): at 3 GHz the model
+    runs from about 81 dB at 50 m to about 87 dB at 500 m in their figure
+    5, which the equation gives only with d in kilometres."""
+    from yerkon.rf import GuidedLoss
+
+    guide = GuidedLoss(86.0, 0.82, 0.57, 50.0)
+    assert guide.loss_db(49.0, 3e9) is None
+    assert guide.loss_db(50.0, 3e9) == pytest.approx(82.5, abs=0.1)
+    assert guide.loss_db(500.0, 3e9) == pytest.approx(88.2, abs=0.1)
+    # 100 to 500 m costs only about 4 dB, as the paper says.
+    assert guide.loss_db(500.0, 3e9) - guide.loss_db(100.0, 3e9) == pytest.approx(
+        5.7 * math.log10(5.0), abs=0.01)
+
+
+def test_a_tunnel_link_pays_the_guided_loss_and_an_open_one_does_not():
+    from yerkon.hardware import DWM3000, DWM3000_ANTENNA
+    from yerkon.rf import GuidedLoss, Obstruction, Terminal, evaluate_link
+
+    anchor = Terminal(DWM3000, DWM3000_ANTENNA, (0.0, 0.0, 1.2))
+    unit = Terminal(DWM3000, DWM3000_ANTENNA, (200.0, 0.0, 1.5))
+    guide = GuidedLoss(86.0, 0.82, 0.57, 50.0)
+    inside = evaluate_link(anchor, unit, obstruction=Obstruction(guide=guide))
+    outside = evaluate_link(anchor, unit)
+    assert inside.path_loss_db == pytest.approx(
+        guide.loss_db(inside.distance_m, DWM3000.carrier_hz), abs=0.01)
+    assert outside.path_loss_db != pytest.approx(inside.path_loss_db, abs=0.5)
+
+
+# --- A vehicle's UWB radio is held down above its own height -----------------
+
+
+def test_the_vehicle_uwb_ceiling_is_the_exterior_limit_over_the_channel():
+    """-53,3 dBm/MHz above the device's mounting plane (ETSI EN 302 065-3,
+    4.3.4.2 and table 4), 12 dB under the -41,3 the anchor may use."""
+    from yerkon.regulatory import vehicle_uwb_ceiling_dbm
+
+    assert vehicle_uwb_ceiling_dbm(DWM3000) == pytest.approx(
+        -53.3 + 10.0 * math.log10(499.2), abs=0.01)
+    assert vehicle_uwb_ceiling_dbm(SX1280) is None
+
+
+def test_a_ceiling_holds_the_transmitter_to_it():
+    from yerkon.hardware import DWM3000_ANTENNA
+    from yerkon.regulatory import vehicle_uwb_ceiling_dbm
+    from yerkon.rf import Terminal, evaluate_link
+
+    ceiling = vehicle_uwb_ceiling_dbm(DWM3000)
+    vehicle = Terminal(DWM3000, DWM3000_ANTENNA, (0.0, 0.0, 1.5))
+    anchor = Terminal(DWM3000, DWM3000_ANTENNA, (40.0, 0.0, 4.5))
+    free = evaluate_link(vehicle, anchor).eirp_dbm
+    held = evaluate_link(vehicle, anchor, eirp_ceiling_dbm=ceiling).eirp_dbm
+    assert held == pytest.approx(ceiling)
+    assert free - held == pytest.approx(12.0, abs=0.05)

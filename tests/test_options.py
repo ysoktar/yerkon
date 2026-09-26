@@ -281,10 +281,10 @@ def test_a_search_finds_a_real_arrangement_and_writes_it_back(tmp_path):
     found = search(
         "tunnel",
         Target(availability=0.99, hpe_p50_m=1.0),
-        over={"tunnel.anchor_spacing_m": (150.0, 120.0)},
+        over={"tunnel.anchor_spacing_m": (60.0, 40.0)},
     )
     assert found.best is not None
-    assert found.best.values["tunnel.anchor_spacing_m"] == 120.0
+    assert found.best.values["tunnel.anchor_spacing_m"] == 40.0
 
     write(found.as_option("found", DEFAULTS), where=tmp_path)
     saved = read("found", where=tmp_path)
@@ -379,7 +379,7 @@ def test_the_solver_reports_what_an_ordinary_run_of_its_answer_gives():
 
     found = search(
         "tunnel", Target(availability=0.99, hpe_p50_m=1.0),
-        over={"tunnel.anchor_spacing_m": (150.0, 120.0)},
+        over={"tunnel.anchor_spacing_m": (60.0, 40.0)},
     )
     best = found.best
     assert best is not None
@@ -397,7 +397,7 @@ def test_the_solver_reports_what_an_ordinary_run_of_its_answer_gives():
 
 @pytest.mark.slow
 def test_more_anchors_are_not_always_better_which_is_why_cheapest_wins():
-    """A hundred metre spacing is worse than a hundred and twenty.
+    """A fifty metre spacing is worse than fifty five.
 
     Not noise: closer anchors shorten every link and the geometry that
     results is not monotonic in density. A search that maximised
@@ -408,13 +408,13 @@ def test_more_anchors_are_not_always_better_which_is_why_cheapest_wins():
     from yerkon.solve import Target, search
 
     found = search(
-        "tunnel", Target(availability=0.99, hpe_p50_m=1.0),
-        over={"tunnel.anchor_spacing_m": (120.0, 100.0)},
+        "tunnel", Target(availability=0.98, hpe_p50_m=1.0),
+        over={"tunnel.anchor_spacing_m": (55.0, 50.0)},
     )
     by_spacing = {
         o.values["tunnel.anchor_spacing_m"]: o for o in found.tried
     }
-    assert by_spacing[100.0].anchors > by_spacing[120.0].anchors
-    assert by_spacing[100.0].hpe_p50_m > by_spacing[120.0].hpe_p50_m
+    assert by_spacing[50.0].anchors > by_spacing[55.0].anchors
+    assert by_spacing[50.0].hpe_p50_m > by_spacing[55.0].hpe_p50_m
 
-    assert found.best is by_spacing[120.0], "the cheapest that met"
+    assert found.best is by_spacing[55.0], "the cheapest that met"

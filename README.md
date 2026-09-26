@@ -360,7 +360,7 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 |---|---|---|---|---|---|---|---|---|---|
 | YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 | 11477 | 2209 |
 | YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 | 1350 | 416 |
-| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,79 | 2,73 | 2,06 | %98,61 | 0,02 | 34612 /km | 3504 /km |
+| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,58 | 2,43 | 3,31 | %94,32 | 0,02 | 130755 /km | 13239 /km |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
 DEM'inden bir kez getirilmiş ve paketin içine işlenmiştir, böylece bir

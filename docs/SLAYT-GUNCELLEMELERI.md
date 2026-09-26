@@ -243,10 +243,11 @@ Son güncelleme: 25 Eylül 2026.
   |---|---|---|---|---|---|---|---|
   | Şehir içi | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 km² | 11477 TL/km² | 2209 TL/km²/yıl |
   | Kırsal | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 km² | 1350 TL/km² | 416 TL/km²/yıl |
-  | Tünel | 0,79 | 2,73 | 2,06 | %98,61 | güzergâh | 34612 TL/km | 3504 TL/km/yıl |
+  | Tünel | 0,58 | 2,43 | 3,31 | %94,32 | güzergâh | 130755 TL/km | 13239 TL/km/yıl |
 
   (25 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
-  içi 600 m, turda sekiz direk, tünel 250 m, yükseklik haritadan,
+  içi 600 m, turda sekiz direk, tünel 60 m ve UWB kanal 5, birimler
+  yoldan 1,2 m yüksekte, yükseklik haritadan,
   harcırah ve amortisman resmî kaynaklardan, SX1280'in resmî
   duyarlılığı, uyarlamalı frekans atlama belgesi, direkte ve araçta
   E28-2G4M27S ve dış ortam tipi 5 dBi çubuk anten.)
@@ -328,4 +329,5 @@ Son güncelleme: 25 Eylül 2026.
 - Kullanılabilirlik tanımı değişti; tablo 24 Eylül'de A seçeneğiyle
   yeniden yayımlandı. Slayt 16 yukarıdaki sayılarla güncellenmeli.
 - Şehir içi 600 m (500 idi), turda sekiz direk (12 idi, ADR-0085), tünel
-  250 m (225 idi).
+  60 m (250 idi; UWB bağlantısı artık kendi frekansında ve BTK gücüyle
+  hesaplanıyor, ADR-0095).

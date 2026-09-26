@@ -2111,13 +2111,23 @@ LAW = Page(
                        "MHz, with an exterior limit of -53,3 dBm/MHz at "
                        "elevation angles above 0°. TS EN 302 065-3"),
                     _w("Araç alıcısı bu satırda ve gücünü denetleyebilmeli "
-                       "(TPC). DWM3000'in çıkış gücü yazılımla "
-                       "ayarlanabiliyor; uygunluğu TS EN 302 065-3 testinde "
-                       "gösterilir.",
+                       "(TPC). Harici sınır, araç dışına ve cihazın kendi "
+                       "yüksekliğinin üstüne giden yayına uygulanıyor; "
+                       "altına -41,3 dBm/MHz serbest (EN 302 065-3, "
+                       "4.3.4.2 ve Tablo 4). Tünel birimi araçtaki cihazdan "
+                       "alçakta durursa sınır bağlamıyor; model bu kuralı "
+                       "uyguluyor. Kapalı alan için otomatik bir istisna "
+                       "yok, Ek C.1 eşdeğer korumanın kanıtlanmasına izin "
+                       "veriyor.",
                        "The vehicle receiver is in this row and has to "
-                       "control its power (TPC). The DWM3000's output "
-                       "power is set in firmware; conformity is shown in "
-                       "the TS EN 302 065-3 test."),
+                       "control its power (TPC). The exterior limit applies "
+                       "to emissions outside the vehicle above the device's "
+                       "own height; below it -41,3 dBm/MHz holds (EN 302 "
+                       "065-3, 4.3.4.2 and table 4). A tunnel unit mounted "
+                       "lower than the vehicle's device is not held by it; "
+                       "the model applies this rule. There is no automatic "
+                       "exemption for enclosed spaces; Annex C.1 allows "
+                       "equivalent protection to be demonstrated."),
                 ),
             ),
         ),
@@ -2280,6 +2290,9 @@ LAW = Page(
                 Link(label=_w("BTK: Sınıf 2 bildirim uygulamasına son verildi",
                               "BTK: the Class 2 notification has ended"),
                      url="https://btk.gov.tr/sinif-2-bildirim-formu-ile-bilgi-teknolojileri-ve-iletisim-kurumuna-basvuruda-bulunulmasi-uygulamasina-son-verilmistir"),
+                Link(label=_w("ETSI EN 302 065-3 V2.1.1 (2016-11), taşıtlarda UWB",
+                              "ETSI EN 302 065-3 V2.1.1 (2016-11), UWB in vehicles"),
+                     url="https://www.etsi.org/deliver/etsi_en/302000_302099/30206503/02.01.01_60/en_30206503v020101p.pdf"),
                 Link(label=_w("RED 2014/53/AB (EUR-Lex)",
                               "RED 2014/53/EU (EUR-Lex)"),
                      url="https://eur-lex.europa.eu/eli/dir/2014/53/oj"),

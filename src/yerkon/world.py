@@ -27,7 +27,7 @@ from yerkon.hardware import SPEED_OF_LIGHT_M_S, Radio, SX1280
 from yerkon.language import say
 from yerkon.numbers import decimal_comma
 from yerkon.settings import DEFAULTS, Settings
-from yerkon.rf import EARTH_RADIUS_M, FOUR_THIRDS_EARTH, Obstruction
+from yerkon.rf import EARTH_RADIUS_M, FOUR_THIRDS_EARTH, GuidedLoss, Obstruction
 
 if TYPE_CHECKING:  # pragma: no cover
     from yerkon.site.model import Site
@@ -93,6 +93,9 @@ class Terrain:
     #: so it can only be biased low. Measured over Polatlı it reads 31,28
     #: dB where the same link at 6,7 m spacing reads 37,60.
     profile_spacing_m: float = 0.0
+    #: Inside a bore, how the tunnel guides the wave; nothing in the open.
+    #: Last in the field list for the reason `extent_m` is (ADR-0035).
+    guide: Optional[GuidedLoss] = None
 
     def __post_init__(self) -> None:
         if self.clutter_loss_db_per_km < 0.0:
@@ -252,6 +255,7 @@ class Terrain:
             surface_roughness_m=roughness_m,
             reflection_tilt_rad=tilt_rad,
             reflection_at_fraction=at_fraction,
+            guide=self.guide,
         )
 
     def _reflection_surface(

@@ -186,6 +186,31 @@ LICENSED_ASSIGNMENT = SpectrumRule(
     ),
 )
 
+#: What a UWB device in a road or rail vehicle may radiate upward.
+#:
+#: Above the plane of the device's own mounting height, emissions outside
+#: the vehicle stay at or under -53,3 dBm/MHz in 6-8,5 GHz, whether or not
+#: the device has LDC or TPC. Below that plane -41,3 dBm/MHz holds.
+VEHICLE_UWB_EXTERIOR_LIMIT = Sourced(
+    -53.3, "dBm/MHz", Provenance.STANDARD,
+    "ETSI EN 302 065-3 V2.1.1, 4.3.4.2 and table 4; BTK teknik ölçütler, "
+    "Madde 18(2), Tablo 17",
+)
+
+
+def vehicle_uwb_ceiling_dbm(radio) -> Optional[float]:
+    """The upward e.i.r.p. a vehicle's UWB radio may use, over its channel.
+
+    Nothing for a radio that is not UWB: the rule is about ultra-wideband
+    devices only. The radio's rating is already an emission limit, marked
+    by its unit, so the ceiling is the limit's density over the channel.
+    """
+    if not radio.max_output_dbm.unit.endswith("/MHz"):
+        return None
+    channel_mhz = float(radio.ranging_bandwidth_hz.value) / 1e6
+    return float(VEHICLE_UWB_EXTERIOR_LIMIT.value) + 10.0 * math.log10(channel_mhz)
+
+
 REGIONS = {
     "TR": TURKEY,
     "TR-FHSS": TURKEY_FREQUENCY_HOPPING,

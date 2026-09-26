@@ -249,8 +249,18 @@ def test_no_page_carries_a_copy_of_the_published_table():
     that goes stale on the run after next, and prose that explains a
     finding without restating a cell does not.
     """
+    from yerkon.numbers import decimal_comma
+    from yerkon.settings import DEFAULTS
+
     record = read()
     typed = {cell for row in record.rows for cell in row.cells()[3:]}
+    # A page may quote a setting, and a setting can equal a cell by
+    # chance: the 2,43 m map error is not the tunnel's 2,43 m HPE P95.
+    typed -= {
+        decimal_comma(entry.sourced.value)
+        for entry in DEFAULTS.entries.values()
+        if isinstance(entry.sourced.value, float)
+    }
     for page in PAGES:
         drawn = render(page, "tr", None) + render(page, "en", None)
         for cell in sorted(typed):

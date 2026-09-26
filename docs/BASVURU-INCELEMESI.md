@@ -100,7 +100,7 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
   senkronizasyonundan kurtulmak, GNSS bütünlük haritası. Sitedeki
   yöneylem yerleşimi (ADR-0081) bu fikrin sayısal karşılığı: direkleri
   zaten yüksek olan yerlere koyarak aynı parayla daha çok alan.
-- **İhtiyaca çözüm.** Tünel satırı en ikna edici: %98,61 kullanılabilirlik
+- **İhtiyaca çözüm.** Tünel satırı en ikna edici: %94,32 kullanılabilirlik
   ve metre altı P50. Sunumun ilk ticarileşme alanı olarak tünelleri
   seçmesi modelle uyumlu.
 - **Sürdürülebilirlik.** Çevresel boyut zayıf anlatılmış. Modelde bir birim
@@ -134,12 +134,12 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 | Kırsal | Alan | 1,01 km² | 305,75 km² |
 | Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1350 TL/km² |
 | Kırsal | OPEX | boş | 416 TL/km²/yıl |
-| Tünel | HPE P50 | 0,25 m | 0,79 m |
-| Tünel | HPE P95 | 1,88 m | 2,73 m |
-| Tünel | VPE P95 | 5,53 m | 2,06 m |
-| Tünel | Kullanılabilirlik | yaklaşık %97,0 | %98,61 |
-| Tünel | CAPEX | yaklaşık 545903 TL/km² | 34612 TL/km (güzergâh) |
-| Tünel | OPEX | boş | 3504 TL/km/yıl |
+| Tünel | HPE P50 | 0,25 m | 0,58 m |
+| Tünel | HPE P95 | 1,88 m | 2,43 m |
+| Tünel | VPE P95 | 5,53 m | 3,31 m |
+| Tünel | Kullanılabilirlik | yaklaşık %97,0 | %94,32 |
+| Tünel | CAPEX | yaklaşık 545903 TL/km² | 130755 TL/km (güzergâh) |
+| Tünel | OPEX | boş | 13239 TL/km/yıl |
 
 Farkın nedenleri modelde değişenler: gerçek Ankara zemini ve binaları,
 ITU-R P.526 kırınımı, gölgelenme, sekiz çekiliş, sahanın çevresinden ve

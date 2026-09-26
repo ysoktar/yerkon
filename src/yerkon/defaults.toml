@@ -281,13 +281,28 @@ affects = "çatıdaki birimlerin OPEX'ini"
 affects_en = "OPEX of units on roofs"
 
 [values."mounting.tunnel_bracket.height_m"]
-value = 4.5
+value = 1.2
 unit = "m"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = "Bir birimin tünelde askıya alındığı yükseklik."
-note_en = "The height a unit is bracketed at in a tunnel."
+provenance = "DESIGN"
+source = """bu proje; ETSI EN 302 065-3 V2.1.1, 4.3.4.2 ve Tablo 4; BTK \
+Kısa Mesafeli Telsiz Cihazları için Muafiyet Kriterleri, Madde 18(2), \
+Tablo 17"""
+source_en = """this project; ETSI EN 302 065-3 V2.1.1, 4.3.4.2 and table 4; \
+BTK exemption criteria for short range devices, Article 18(2), table 17"""
+note = """Bir birimin tünelde, yol yüzeyinin üstünde askıya alındığı \
+yükseklik. Araçtaki UWB, anteninin montaj düzleminin üstüne -53,3 \
+dBm/MHz'den fazla yayamıyor; altına -41,3 dBm/MHz yayabiliyor. Birim araç \
+anteninin (1,5 m) altında durunca aracın cevabı bu sınıra takılmıyor. \
+Daha alçak bir birim menzili uzatmıyor: 50 m aralıkta 0,5 m ile 1,2 m \
+aynı kullanılabilirliği veriyor. Ağır araçların birimin önünü kapatması \
+modelde yok."""
+note_en = """The height a unit is bracketed at in a tunnel, above the road \
+surface. A vehicle's UWB may send no more than -53,3 dBm/MHz above the \
+plane its antenna is mounted in, and -41,3 dBm/MHz below it. A unit below \
+the vehicle's antenna (1,5 m) keeps the vehicle's reply clear of that \
+limit. A lower unit does not add reach: at 50 m spacing 0,5 m and 1,2 m \
+give the same availability. Heavy vehicles blocking a unit are not \
+modelled."""
 affects = "tünel içinde kullanılabilir menzili"
 affects_en = "usable range inside a bore"
 
@@ -607,6 +622,23 @@ threshold = -117,97, so the threshold is -12,08 dB."""
 affects = "SX1280 bağlantılarının menzilini; şehir içi ve kırsal satırların her şeyini"
 affects_en = "the reach of every SX1280 link; everything in the urban and rural rows"
 
+[values."radio.dwm3000.antenna_gain_dbi"]
+value = 0.0
+unit = "dBi"
+provenance = "ASSUMPTION"
+source = "bu proje"
+source_en = "this project"
+note = """Qorvo DWM3000 Data Sheet Rev B, §5, Tablo 10 ve 11: anten dikey \
+kutuplu ve XZ düzleminde yaklaşık her yöne eşit; örüntü veriliyor, dBi \
+verilmiyor. Ölçülene kadar 0 dBi, izotropik anten; verim bu kazancın \
+içinde."""
+note_en = """Qorvo DWM3000 Data Sheet Rev B, section 5, tables 10 and 11: \
+the antenna is vertically polarised and roughly omnidirectional in the XZ \
+plane; patterns are given, a gain in dBi is not. 0 dBi, an isotropic \
+antenna, until one is measured; the efficiency is folded into it."""
+affects = "tünel bağlantısının iki ucundaki kazancı; tünel satırının menzilini"
+affects_en = "the gain at both ends of a tunnel link; the tunnel row's reach"
+
 [values."radio.dwm3000.noise_figure_db"]
 value = 6.0
 unit = "dB"
@@ -619,18 +651,26 @@ affects = "tünel satırının menzilini ve kullanılabilirliğini"
 affects_en = "the tunnel row's range and availability"
 
 [values."radio.dwm3000.demodulation_threshold_db"]
-value = 4.0
+value = 11.12
 unit = "dB"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = """Qorvo eşik değil, hassasiyet yayımlıyor. 4 dB, eşevreli bir alıcının \
-olağan çalışma noktasıdır."""
-note_en = """Qorvo publishes sensitivity rather than a threshold. 4 dB is a coherent \
-receiver's usual working point."""
-affects = """tünel bağlantısının nerede kapanmayı bıraktığını: yaklaşık 375 m'de sert \
-bir duvar"""
-affects_en = "where the tunnel link stops closing: a hard wall at about 375 m"
+provenance = "DATASHEET"
+source = """Qorvo DW3000 Data Sheet Rev 1.3, §3.4, Tablo 8, s. 13: kanal 5, \
+1024 preamble, 850 kbps, -100 dBm"""
+source_en = """Qorvo DW3000 Data Sheet Rev 1.3, section 3.4, table 8, p. \
+13: channel 5, 1024 preamble, 850 kbps, -100 dBm"""
+note = """Qorvo eşik değil, duyarlılık yayımlıyor: kanal 5, 1024 sembollük \
+preamble ve 850 kbps'de %1 paket hatasıyla -100 dBm/500 MHz (Tablo 7'deki \
+koşullarda: 25 °C, 3,0 V, 64 MHz PRF). 499,2 MHz'de ısıl gürültü ve 6 dB \
+gürültü sayısıyla -81,02 dBm; 30,1 dB'lik preamble kazancıyla eşik -100 + \
+81,02 + 30,1 = 11,12 dB. Kanal 9'da aynı satır -99,3 dBm (Tablo 9)."""
+note_en = """Qorvo publishes a sensitivity rather than a threshold: -100 \
+dBm/500 MHz on channel 5 with a 1024 symbol preamble at 850 kbps and 1 % \
+packet error (under table 7's conditions: 25 °C, 3,0 V, 64 MHz PRF). \
+Thermal noise over 499,2 MHz with a 6 dB noise figure is -81,02 dBm; with \
+the 30,1 dB preamble gain the threshold is -100 + 81,02 + 30,1 = 11,12 dB. \
+On channel 9 the same row is -99,3 dBm (table 9)."""
+affects = "tünel bağlantısının nerede kapanmayı bıraktığını"
+affects_en = "where the tunnel link stops closing"
 
 # --------------------------------------------------------------------------
 # Saatlerin davranışı
@@ -1472,25 +1512,25 @@ maliyetini"""
 affects_en = "the tunnel row's served area and cost per route kilometre"
 
 [values."tunnel.anchor_spacing_m"]
-value = 250.0
+value = 60.0
 unit = "m"
 provenance = "DESIGN"
 source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
-note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. 150 \
-m'de geometri kötüleşiyor. Tam çözünürlükte, sekiz gölge çekilişiyle: 225 \
-m'de 9 askı, P95 3,21 m, %98,25; 250 m'de 9 askı, P95 2,97 m, %98,57; 275 \
-m'de 8 askı, P95 3,80 m, %91,21; 300 m'de 7 askı, P95 3,68 m, %88,29. 250 \
-m her ölçüde en az 225 m kadar iyi ve uzun bir tünelde kilometre başına \
-%10 daha az askı istiyor (4,4 yerine 4,0). 275 ve 300 m daha ucuz, bedeli \
-kullanılabilirlikte."""
-note_en = """How far apart the brackets stand along the bore. At 150 m the \
-geometry gets worse. At full resolution, with eight shadow draws: at 225 \
-m, 9 brackets, P95 3,21 m, 98,25 %; at 250 m, 9 brackets, P95 2,97 m, \
-98,57 %; at 275 m, 8 brackets, P95 3,80 m, 91,21 %; at 300 m, 7 brackets, \
-P95 3,68 m, 88,29 %. 250 m is at least as good as 225 m on every measure \
-and needs 10 % fewer brackets a kilometre in a long bore (4,0 instead of \
-4,4). 275 and 300 m are cheaper and pay in availability."""
+note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. \
+Kanal 5, 1,2 m yükseklik, tam çözünürlük: 40 m'de %99,66 ve km başına \
+196133 TL; 50 m'de %92,04; 55 m'de %91,90; 60 m'de %94,32, HPE P95 2,43 m \
+ve 130755 TL; 65 m'de %89,50; 70 m'de %83,46; 75 m'de %86,87; 90 m'de \
+%70,03. 50-65 m arası bir düzlük, 70 m'den sonra kullanılabilirlik \
+düşüyor. 60 m düzlüğün en ucuz noktası: 40 m'den km başına %33 ucuz, \
+bedeli 5 puan kullanılabilirlik."""
+note_en = """How far apart the brackets stand along the bore. Channel 5, \
+1,2 m high, full resolution: at 40 m 99,66 % and 196133 TL per km; at 50 \
+m 92,04 %; at 55 m 91,90 %; at 60 m 94,32 %, HPE P95 2,43 m and 130755 \
+TL; at 65 m 89,50 %; at 70 m 83,46 %; at 75 m 86,87 %; at 90 m 70,03 %. \
+50 to 65 m is a plateau, and past 70 m availability falls. 60 m is the \
+cheapest point on the plateau: 33 % cheaper per km than 40 m, at a cost of \
+5 points of availability."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \
 başına en büyük sermaye"""
 affects_en = """the tunnel row's anchor count and its capital, which is the largest per \
@@ -1510,6 +1550,98 @@ affects = """tünel satırının yatay geometrisini; bir menzil hatasını on se
 çıkaran şey budur"""
 affects_en = """the tunnel row's horizontal geometry, which amplifies a range error \
 eighteenfold"""
+
+[values."tunnel.guided_pl0_db"]
+value = 86.0
+unit = "dB"
+provenance = "MEASUREMENT"
+source = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, makale 560571, \
+Denklem (2)"""
+source_en = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, article 560571, \
+equation (2)"""
+note = """Tünelde ortalama yol kaybı modelinin sabiti: PL = PL0 + 10 nf \
+log10(f, GHz) + 10 nd log10(d). 3,4 km'lik düz, iki şeritli bir karayolu \
+tünelinde (yarım daire kesit, çap 8,6 m), 2,8-5 GHz'de ve 50-500 m \
+arasında ölçülmüş. Denklem d'nin birimini yazmıyor; makalenin kendi Şekil \
+5'indeki model eğrisini d kilometreyle veriyor, model de öyle kullanıyor. \
+Kanal 5'in 6,5 GHz'i ölçülen aralığın dışında: frekans terimi oraya \
+taşınıyor."""
+note_en = """The constant of the tunnel's mean path loss model: PL = PL0 + \
+10 nf log10(f, GHz) + 10 nd log10(d). Measured in a straight 3,4 km \
+two-lane road tunnel (semicircular section, 8,6 m across), 2,8 to 5 GHz, \
+between 50 and 500 m. The equation does not state d's unit; it reproduces \
+the paper's own figure 5 with d in kilometres, and the model uses it so. \
+Channel 5's 6,5 GHz is outside the measured range: the frequency term \
+is carried there."""
+affects = "tünel bağlantısının ne kadar uzağa kapandığını"
+affects_en = "how far a tunnel link closes"
+
+[values."tunnel.guided_frequency_exponent"]
+value = 0.82
+unit = "exponent"
+provenance = "MEASUREMENT"
+source = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, makale 560571, \
+Denklem (2)"""
+source_en = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, article 560571, \
+equation (2)"""
+note = """Tünel kaybının frekansla artış hızı. 3,4 km'lik düz, iki şeritli \
+bir karayolu tünelinde (yarım daire kesit, çap 8,6 m), 2,8-5 GHz'de ve \
+50-500 m arasında ölçülmüş."""
+note_en = """How fast the tunnel's loss rises with frequency. Measured in \
+a straight 3,4 km two-lane road tunnel (semicircular section, 8,6 m \
+across), 2,8 to 5 GHz, between 50 and 500 m."""
+affects = "tünel bağlantısının ne kadar uzağa kapandığını"
+affects_en = "how far a tunnel link closes"
+
+[values."tunnel.guided_distance_exponent"]
+value = 0.57
+unit = "exponent"
+provenance = "MEASUREMENT"
+source = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, makale 560571, \
+Denklem (2)"""
+source_en = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, article 560571, \
+equation (2)"""
+note = """Tünel kaybının mesafeyle artış hızı. Açık havada 2; tünelin \
+yönlendirmesi bunu düşürüyor. 3,4 km'lik düz, iki şeritli bir karayolu \
+tünelinde (yarım daire kesit, çap 8,6 m), 2,8-5 GHz'de ve 50-500 m \
+arasında ölçülmüş."""
+note_en = """How fast the tunnel's loss rises with distance. 2 in the \
+open; the tunnel's guiding brings it down. Measured in a straight 3,4 km \
+two-lane road tunnel (semicircular section, 8,6 m across), 2,8 to 5 GHz, \
+between 50 and 500 m."""
+affects = "tünel bağlantısının ne kadar uzağa kapandığını"
+affects_en = "how far a tunnel link closes"
+
+[values."tunnel.guided_from_m"]
+value = 50.0
+unit = "m"
+provenance = "MEASUREMENT"
+source = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, makale 560571, \
+§3.1"""
+source_en = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, article 560571, \
+section 3.1"""
+note = """Modelin geçerli olduğu en kısa mesafe; makale 50 m'nin altında \
+ölçmüyor. Daha yakında kayıp açık havadaki gibi hesaplanıyor."""
+note_en = """The shortest distance the model holds for; the paper measures \
+nothing below 50 m. Closer in, the loss is worked out as in the open."""
+affects = "tünelde yakın bağlantıların kaybını"
+affects_en = "the loss of short tunnel links"
 
 [values."tunnel.width_m"]
 value = 12.0
