@@ -259,9 +259,14 @@ def test_a_unit_that_names_no_route_drives_the_road_its_row_publishes(mode):
     from yerkon.scenarios import CHOICES
     from yerkon.viewer.state import from_scenario
 
+    from yerkon.settings import DEFAULTS
+
     state = from_scenario(mode)
     terrain = state.terrain()
-    assert all(unit.route == "" for unit in state.units)
+    # The row's own route: the real streets over an area (ADR-0096), the
+    # bore's own line in the tunnel.
+    wanted = DEFAULTS.text(mode + ".route") if mode != "tunnel" else ""
+    assert all(unit.route == wanted for unit in state.units)
 
     published = CHOICES[mode].scenario.deployment.receivers[0].journey.road
     drove = state.receivers(terrain)[0].journey.road.centreline_m

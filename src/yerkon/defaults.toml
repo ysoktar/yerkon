@@ -1944,6 +1944,40 @@ affects_en = "which patches are rough and which are smooth in the tunnel row"
 
 # --- Her satırın hangi zeminin üzerinde durduğu ---------------------------
 
+[values."urban.layout"]
+value = "placed"
+unit = "choice"
+provenance = "DESIGN"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Direklerin nereye konduğu: \"placed\", yerleşim aramasının seçtiği ve \
+`src/yerkon/placements/urban.toml`'a yazdığı yerler (mevcut direk ve \
+levhalar, yol kenarı, ölçülmüş çatılar, tepeler); \"grid\", kaydırmalı ızgara. \
+Şehir içinde arama \"daha ucuz\" hedefiyle koşuldu: ızgaranın kapsamasını en \
+az maliyetle. Izgaranın 25 noktasından 10'u bina içine düşüyordu."""
+note_en = """Where the anchors go: \"placed\", the spots the placement search chose \
+and wrote to `src/yerkon/placements/urban.toml` (standing columns and \
+signs, the road side, measured roofs, hilltops); \"grid\", the staggered \
+lattice. In town the search was asked \"cheaper\": the lattice's cover for \
+the least cost. Ten of the lattice's 25 spots fell inside a building."""
+affects = "şehir içi satırın direk sayısını, maliyetini ve geometrisini"
+affects_en = "the urban row's anchor count, cost and geometry"
+
+[values."urban.route"]
+value = "road"
+unit = "choice"
+provenance = "DESIGN"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Alıcıların sürdüğü güzergâh: \"road\", tur köşelerini getirilmiş yol ağı \
+üstünde en kısa yollarla birleştiren gerçek sokaklar; \"circuit\", alanın \
+çevresinden ve köşegeninden geçen düz çizgiler."""
+note_en = """The route the units drive: \"road\", the circuit's corners joined by the \
+shortest way along the fetched streets; \"circuit\", straight lines round \
+the area and across it."""
+affects = "şehir içi satırın doğruluğunu ve kullanılabilirliğini"
+affects_en = "the urban row's accuracy and availability"
+
 [values."urban.site"]
 value = "kizilay"
 unit = "fetched site"
@@ -1967,6 +2001,32 @@ sensitivity = """aynı kırsal yerleşim Polatlı'da %89,5, Gölbaşı'nda yakla
 kullanılabilirlik verir; bundan başka hiçbir şey değişmeden"""
 sensitivity_en = """the same rural deployment gives 89,5 % availability on Polatlı and about \
 45 % on Gölbaşı, with nothing changed but this"""
+
+[values."rural.layout"]
+value = "placed"
+unit = "choice"
+provenance = "DESIGN"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Direklerin nereye konduğu, şehir içindekiyle aynı anlamda; yer \
+`src/yerkon/placements/rural.toml`. Kırsalda arama \"daha iyi\" hedefiyle \
+koşuldu: ızgaranın maliyetiyle en çok kapsama."""
+note_en = """Where the anchors go, as for the urban row; the spots are in \
+`src/yerkon/placements/rural.toml`. In open country the search was asked \
+\"better\": the most cover for the lattice's cost."""
+affects = "kırsal satırın direk sayısını, maliyetini ve geometrisini"
+affects_en = "the rural row's anchor count, cost and geometry"
+
+[values."rural.route"]
+value = "road"
+unit = "choice"
+provenance = "DESIGN"
+source = "bu proje, bir yerleşim kararı olarak"
+source_en = "this project, as a deployment choice"
+note = """Alıcıların sürdüğü güzergâh, şehir içindekiyle aynı anlamda."""
+note_en = """The route the units drive, as for the urban row."""
+affects = "kırsal satırın doğruluğunu ve kullanılabilirliğini"
+affects_en = "the rural row's accuracy and availability"
 
 [values."rural.site"]
 value = "polatli"

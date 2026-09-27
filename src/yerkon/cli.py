@@ -1332,9 +1332,13 @@ def place(argv: list[str] | None = None) -> int:
                              "cheaper: the grid's cover for least cost")
     parser.add_argument("--no-simulation", action="store_true",
                         help="stop at the search's own count")
+    parser.add_argument("--save", action="store_true",
+                        help="write the answer to src/yerkon/placements/, "
+                             "where the row and its tab read it (ADR-0096)")
     _add_defaults_flag(parser)
     args = parser.parse_args(argv)
 
+    from yerkon import placed
     from yerkon.cost import operating_rates
     from yerkon.placement import deployed_with, mix, search
     from yerkon.scenarios import catalogue, fetched
@@ -1342,7 +1346,9 @@ def place(argv: list[str] | None = None) -> int:
 
     settings = _settings_from(args) or DEFAULTS
     row = args.scenario
-    deployed = catalogue(settings)[row]
+    # Searched against the lattice, whatever the row stands on now: the
+    # lattice's spots are candidates, and its cost is the budget.
+    deployed = catalogue(settings.with_values({row + ".layout": "grid"}))[row]
     site = fetched(settings.text(row + ".site"))
     if site is None:
         print("The {} row stands on no fetched ground, and the search reads "
@@ -1368,6 +1374,16 @@ def place(argv: list[str] | None = None) -> int:
     print("chosen: {}".format(", ".join(
         "{} {}".format(n, origin)
         for origin, n in mix(p, answer.chosen).items())))
+    if args.save:
+        chosen = deployed_with(deployed, p, answer.chosen)
+        written = placed.write(placed.Placement(
+            row=row, aim=args.aim, site=settings.text(row + ".site"),
+            made="yerkon place --scenario {} --aim {} --save".format(
+                row, args.aim),
+            spots=placed.spots_of(chosen.scenario.deployment.anchors),
+            mix=mix(p, answer.chosen),
+        ))
+        print("saved to {}".format(written))
     if args.no_simulation:
         return 0
 

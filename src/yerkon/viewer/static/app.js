@@ -991,6 +991,8 @@ const TERMS = {
   manoeuvre_m_s2: "manevra ivmesi",
   mounting: "montaj",
   noise_figure_db: "gürültü katsayısı",
+  layout: "yerleşim",
+  route: "güzergâh",
   antenna_gain_dbi: "anten kazancı",
   guided_pl0_db: "tünel kayıp modelinin sabiti",
   guided_frequency_exponent: "tünel kaybının frekans üssü",

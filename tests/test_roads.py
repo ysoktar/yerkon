@@ -247,8 +247,14 @@ def test_carrying_a_road_network_is_not_the_same_as_having_one_to_drive():
     assert not drivable(bore.course()), "and none of it is on the site"
     assert "road" not in scene(bore)["choices"]["routes_live"]
 
+    from yerkon.routes import Trip, trace
+
     with pytest.raises(ValueError, match="inside the site"):
-        bore.road(bore.terrain(), "road")
+        trace(Trip(method="road"), bore.course())
+    # Asked for anyway, a unit drives the bore's own line.
+    terrain = bore.terrain()
+    assert (bore.road(terrain, "road").centreline_m
+            == bore.road(terrain).centreline_m)
 
 
 def test_a_search_now_bolts_anchors_to_structures_that_already_stand():

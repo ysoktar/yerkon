@@ -28,7 +28,7 @@ where = ["src"]
 # Named deployment options, shipped and saved. See `yerkon options`.
 "yerkon" = ["defaults.toml", "published.toml", "comparison.toml",
             "sources.toml",
-            "options/*.toml"]
+            "options/*.toml", "placements/*.toml"]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]

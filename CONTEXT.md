@@ -84,6 +84,12 @@ sayılıyor. Seçim lira başına açgözlü, sonra bırakma ve değiş tokuş.
 Simülatörde "Yerleştir", komut satırında `yerkon place`. Cevap `placed`
 yöntemli bir direk grubu olarak gelir. ADR-0081'e bak.
 
+**Placement** (kayıtlı yerleşim): `placed.py`. Aramanın cevabı veri
+olarak, `src/yerkon/placements/<satır>.toml`: her direğin yeri, üstünde
+durduğu yapı ve kavşakta olup olmadığı. Şehir içi ve kırsal satırlar
+`<satır>.layout = "placed"` iken buradan okuyor; simülatörün sekmesi de.
+Başka bir zeminde satır ızgaraya döner. ADR-0096'ya bak.
+
 **Row figures** (satırın değerleri): `scenarios.row_figures`,
 `ROW_SEEDS`, `ROW_UNITS` ve `site_road`. Bir satırın konum dışında neyle
 koşturulduğu tek yerde duruyor; tablonun kataloğu da simülatörün sekmesi

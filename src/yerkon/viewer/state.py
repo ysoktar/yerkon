@@ -849,9 +849,16 @@ class ViewState:
         fact about the site, not about which pattern one receiver was
         told to drive (ADR-0045).
         """
+        from yerkon.routes import drivable
+
+        course = self.course()
         shape = route or ("line" if self.width_m <= 0.0 else "circuit")
+        # Ground with no streets on it cannot carry the street route; the
+        # row falls back to its own shape the same way (`site_road`).
+        if shape == "road" and not drivable(course):
+            shape = "line" if self.width_m <= 0.0 else "circuit"
         centreline = trace(
-            Trip(method=shape, step_m=self._route_step_m()), self.course())
+            Trip(method=shape, step_m=self._route_step_m()), course)
         return Road(
             centreline_m=centreline,
             terrain=terrain,
@@ -1189,13 +1196,42 @@ def _grid(prefix: str, stagger: bool = True) -> tuple:
     return (spacing, DEFAULTS.number("{}.anchor_stagger_m".format(prefix)))
 
 
+def _laid(name: str, lattice: AnchorRun) -> AnchorRun:
+    """The row's anchors as the table stands them (ADR-0096).
+
+    The placement search's spots where the settings ask for them and one
+    was saved for this ground, as one `placed` run named ``P`` so the tab
+    and the row are the same anchors down to the name; else the lattice.
+    """
+    from yerkon import placed
+    from yerkon.settings import DEFAULTS
+
+    if DEFAULTS.text(name + ".layout") != "placed":
+        return lattice
+    found = placed.read(name)
+    if found is None or found.site != DEFAULTS.text(name + ".site"):
+        return lattice
+    return replace(lattice, identifier="P", offset_m=0.0, stagger_m=0.0,
+                   method="placed",
+                   spots=tuple((x, y, key) for x, y, key, _ in found.spots))
+
+
+def _route(name: str) -> str:
+    """The route the row's units drive; empty for the site's own shape."""
+    from yerkon.settings import DEFAULTS
+
+    route = DEFAULTS.text(name + ".route")
+    return "" if route == "circuit" else route
+
+
 def _units(name: str) -> tuple:
     """The row's own units, from the one list both sides read (ADR-0084)."""
     from yerkon.scenarios import ROW_UNITS, unit_radios
 
+    route = _route(name) if name in ("urban", "rural") else ""
     return tuple(
         UnitPlan(name_, kind, speed_km_h, start_m, height_m,
-                 radios=unit_radios(name, kind))
+                 radios=unit_radios(name, kind), route=route)
         for name_, kind, speed_km_h, start_m, height_m in ROW_UNITS[name]
     )
 
@@ -1235,9 +1271,9 @@ def _template(name: str) -> ViewState:
             clutter_db_per_km=30.0, roughness_m=0.5, tolerance_m=5.0,
             sweep_m=_sweep_m("urban"), journey_s=_journey_s("urban"),
             runs=(
-                AnchorRun("C", _radio("urban"), "column", 0.0, 3000.0,
-                          _grid("urban")[0], 0.0,
-                          stagger_m=_grid("urban")[1]),
+                _laid("urban", AnchorRun(
+                    "C", _radio("urban"), "column", 0.0, 3000.0,
+                    _grid("urban")[0], 0.0, stagger_m=_grid("urban")[1])),
             ),
             units=_units("urban"),
             seed=_seed("urban"),
@@ -1262,9 +1298,9 @@ def _template(name: str) -> ViewState:
             tolerance_m=5.0, sweep_m=_sweep_m("rural"),
             journey_s=_journey_s("rural"),
             runs=(
-                AnchorRun("M", _radio("rural"), "pole", 0.0, 20_000.0,
-                          _grid("rural")[0], 0.0,
-                          stagger_m=_grid("rural")[1]),
+                _laid("rural", AnchorRun(
+                    "M", _radio("rural"), "pole", 0.0, 20_000.0,
+                    _grid("rural")[0], 0.0, stagger_m=_grid("rural")[1])),
             ),
             units=_units("rural"),
             seed=_seed("rural"),

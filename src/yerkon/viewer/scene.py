@@ -286,7 +286,8 @@ def scene(state: ViewState) -> dict:
     # drawing a straight line instead showed a deployment nobody was
     # simulating — the picture and the run disagreeing with nothing on
     # screen to say which was real.
-    driven = state.road(terrain)
+    driven = state.road(
+        terrain, state.units[0].route if state.units else "")
     route = [
         driven.point_at(along)
         for along in np.linspace(0.0, driven.length_m, 160)

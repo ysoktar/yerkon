@@ -278,9 +278,11 @@ def unit_radios(row: str, product: str) -> tuple:
     return ROW_RADIOS.get(row, ROW_RADIOS["rural"])[1].get(product, UNIT_RADIOS)
 
 
-def site_road(length_m: float, width_m: float, terrain: Terrain) -> Road:
+def site_road(length_m: float, width_m: float, terrain: Terrain,
+              method: str = "", roads=()) -> Road:
     """The route a row's units drive: round an area and across it, or
-    down a corridor.
+    down a corridor. ``method`` names another route from `yerkon.routes`,
+    and ``roads`` is the fetched street network the `road` route drives.
 
     The same shape, the same inset and the same sampling the simulator's
     tabs draw with (`yerkon.routes`), because a second circuit written
@@ -289,11 +291,16 @@ def site_road(length_m: float, width_m: float, terrain: Terrain) -> Road:
     """
     from yerkon.routes import Course, Trip, area_step_m, trace
 
+    from yerkon.routes import drivable
+
+    own = "line" if width_m <= 0.0 else "circuit"
+    course = Course(length_m=length_m, width_m=width_m, road=tuple(roads))
+    method = method or own
+    # Ground with no streets on it cannot carry the street route.
+    if method == "road" and not drivable(course):
+        method = own
     centreline = trace(
-        Trip(method="line" if width_m <= 0.0 else "circuit",
-             step_m=area_step_m(length_m, width_m)),
-        Course(length_m=length_m, width_m=width_m),
-    )
+        Trip(method=method, step_m=area_step_m(length_m, width_m)), course)
     return Road(centreline_m=list(centreline), terrain=terrain,
                 surface_m=graded_alignment(list(centreline), terrain))
 
@@ -361,6 +368,27 @@ def _anchors_over(
             )
             index += 1
     return tuple(placed)
+
+
+def _row_anchors(row: str, settings: Settings, lattice: tuple,
+                 mounting: dict, terrain: Terrain, radio) -> tuple:
+    """The row's anchors: the placement search's, where one was saved for
+    this ground and the settings ask for it, else the lattice (ADR-0096).
+    """
+    from yerkon import placed
+
+    if settings.text(row + ".layout") != "placed":
+        return lattice
+    found = placed.read(row)
+    if found is None or found.site != settings.text(row + ".site"):
+        return lattice
+    return placed.anchors(found, mounting, terrain, radio)
+
+
+def _roads_of(name: str):
+    """The fetched streets of a site, or none."""
+    site = fetched(name) if name else None
+    return tuple(getattr(site, "roads_m", ()) or ())
 
 
 def _anchors_along(
@@ -659,14 +687,16 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     URBAN_X, URBAN_Y = fits_on(
         fetched(settings.text("urban.site")),
         settings.number("urban.extent_m"), settings.number("urban.extent_m"))
-    URBAN_ROAD = site_road(URBAN_X, URBAN_Y, URBAN_TERRAIN)
+    URBAN_ROAD = site_road(URBAN_X, URBAN_Y, URBAN_TERRAIN,
+                           settings.text("urban.route"),
+                           _roads_of(settings.text("urban.site")))
 
     URBAN = Deployed(
         scenario=Scenario(
             name="Şehir içi",
             terrain=URBAN_TERRAIN,
             deployment=Deployment(
-                anchors=_anchors_over(
+                anchors=_row_anchors("urban", settings, _anchors_over(
                     URBAN_X, URBAN_Y,
                     settings.number("urban.anchor_spacing_m"),
                     mounting["lighting_column"], URBAN_TERRAIN,
@@ -679,7 +709,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     junction_every=int(
                         settings.number("urban.junction_every")
                     ),
-                ),
+                ), mounting, URBAN_TERRAIN, module[ROW_RADIOS["urban"][0]]),
                 receivers=_units("urban", URBAN_ROAD, 600.0, module),
                 **row_deployment_figures("urban", settings),
             ),
@@ -705,14 +735,16 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
     RURAL_X, RURAL_Y = fits_on(
         fetched(settings.text("rural.site")),
         settings.number("rural.extent_m"), settings.number("rural.extent_m"))
-    RURAL_ROAD = site_road(RURAL_X, RURAL_Y, RURAL_TERRAIN)
+    RURAL_ROAD = site_road(RURAL_X, RURAL_Y, RURAL_TERRAIN,
+                           settings.text("rural.route"),
+                           _roads_of(settings.text("rural.site")))
 
     RURAL = Deployed(
         scenario=Scenario(
             name="Kırsal",
             terrain=RURAL_TERRAIN,
             deployment=Deployment(
-                anchors=_anchors_over(
+                anchors=_row_anchors("rural", settings, _anchors_over(
                     RURAL_X, RURAL_Y,
                     settings.number("rural.anchor_spacing_m"),
                     # The distribution network's own poles rather than
@@ -720,7 +752,7 @@ def catalogue(settings: Settings = DEFAULTS) -> dict:
                     mounting["distribution_pole"], RURAL_TERRAIN,
                     radio=module[ROW_RADIOS["rural"][0]], prefix="M",
                     stagger_m=settings.number("rural.anchor_stagger_m"),
-                ),
+                ), mounting, RURAL_TERRAIN, module[ROW_RADIOS["rural"][0]]),
                 receivers=_units("rural", RURAL_ROAD, 2400.0, module),
                 # Twelve, not the eight the other rows use, and the
                 # difference is worth 6,8 points of availability without

@@ -281,8 +281,8 @@ url = "https://stuartsprojects.github.io/2019/04/26/Semtech-SX1280-2-4Ghz-LoRa-r
 [[source]]
 key = "dw3000-datasheet"
 group = "radio"
-label.tr = "Qorvo DW3000 Data Sheet Rev 1.3, alıcı duyarlılığı (Tablo 9)"
-label.en = "Qorvo DW3000 Data Sheet Rev 1.3, receiver sensitivity (table 9)"
+label.tr = "Qorvo DW3000 Data Sheet Rev 1.3, alıcı duyarlılığı (Tablo 7, 8 ve 9)"
+label.en = "Qorvo DW3000 Data Sheet Rev 1.3, receiver sensitivity (tables 7, 8 and 9)"
 url = "https://www.mouser.com/pdfDocs/DW3000DataSheet5.pdf"
 
 [[source]]
@@ -459,3 +459,73 @@ group = "news"
 label.tr = "Karadeniz'de Toplu Gemi Yanıltması / Spoofing (2017)"
 label.en = "Mass ship spoofing in the Black Sea (2017)"
 url = "https://galileognss.eu/mass-gps-spoofing-attack-in-black-sea/"
+
+[[source]]
+key = "semtech-sx1280-datasheet"
+group = "radio"
+label.tr = "Semtech SX1280/SX1281 Data Sheet Rev 3.2: SX1281'de ölçüm motoru yok (Tablo 1-1), paket işareti (Şekil 17-2)"
+label.en = "Semtech SX1280/SX1281 Data Sheet Rev 3.2: no ranging engine on the SX1281 (table 1-1), package marking (figure 17-2)"
+url = "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/483/SX1280-81_Rev3.2_Mar2020.pdf"
+
+[[source]]
+key = "ebyte-e28-27s-manual"
+group = "radio"
+label.tr = "EBYTE E28-2G4M27S kullanım kılavuzu v1.3 (2024): yongayı SX1281 diye veriyor"
+label.en = "EBYTE E28-2G4M27S user manual v1.3 (2024): names the chip SX1281"
+url = "https://www.cdebyte.com/pdf-down.aspx?id=2969"
+
+[[source]]
+key = "ebyte-e28-20s-manual"
+group = "radio"
+label.tr = "EBYTE E28-2G4M20S kullanım kılavuzu v1.30: SX1280, 20 dBm, uçuş süresi"
+label.en = "EBYTE E28-2G4M20S user manual v1.30: SX1280, 20 dBm, time of flight"
+url = "https://www.f1depo.com/class/INNOVAEditor/assets/E28-2G4M20S_Usermanual_EN_v1.30.pdf"
+
+[[source]]
+key = "ebyte-e28-12s-manual"
+group = "radio"
+label.tr = "EBYTE E28-2G4M12S veri sayfası: SX1280, 12,5 dBm"
+label.en = "EBYTE E28-2G4M12S datasheet: SX1280, 12,5 dBm"
+url = "https://www.cdebyte.com/pdf-down.aspx?id=2264"
+
+[[source]]
+key = "ebyte-e28-27s-page"
+group = "radio"
+label.tr = "EBYTE E28-2G4M27S ürün sayfası (yonga: SX1281)"
+label.en = "EBYTE E28-2G4M27S product page (chip: SX1281)"
+url = "https://www.cdebyte.com/products/E28-2G4M27S"
+
+[[source]]
+key = "nicerf-lora1280f27"
+group = "radio"
+label.tr = "NiceRF LoRa1280F27: SX1280, 27 dBm, CE-RED ve FCC belgeli"
+label.en = "NiceRF LoRa1280F27: SX1280, 27 dBm, CE-RED and FCC certified"
+url = "https://www.nicerf.com/lora-module/sx1280-lora-module-lora1280f27.html"
+
+[[source]]
+key = "nicerf-sx1280-choice"
+group = "radio"
+label.tr = "NiceRF: SX1280 modülleri karşılaştırması (ölçme özelliği)"
+label.en = "NiceRF: comparing its SX1280 modules (ranging)"
+url = "https://www.nicerf.com/how-to-choose-the-sx1280-lora-module.html"
+
+[[source]]
+key = "lcsc-lora1280-tcxo"
+group = "project"
+label.tr = "LCSC: NiceRF LORA1280-TCXO fiyatı (27 Eylül 2026)"
+label.en = "LCSC: NiceRF LORA1280-TCXO price (27 September 2026)"
+url = "https://www.lcsc.com/product-detail/C19632391.html"
+
+[[source]]
+key = "jlcpcb-e28-27s"
+group = "project"
+label.tr = "JLCPCB: EBYTE E28-2G4M27S fiyatı (27 Eylül 2026)"
+label.en = "JLCPCB: EBYTE E28-2G4M27S price (27 September 2026)"
+url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M27S/C411312"
+
+[[source]]
+key = "esri-world-imagery"
+group = "project"
+label.tr = "Esri World Imagery (Esri, Maxar, Earthstar Geographics, GIS User Community): simülatörün uydu görüntüsü"
+label.en = "Esri World Imagery (Esri, Maxar, Earthstar Geographics, GIS User Community): the simulator's photograph"
+url = "https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9"

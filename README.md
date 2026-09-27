@@ -358,8 +358,8 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 | 11477 | 2209 |
-| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 | 1350 | 416 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,14 | 9,35 | 3,89 | %95,40 | 8,51 | 10658 | 2051 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,00 | 8,22 | 4,97 | %93,34 | 359,58 | 1331 | 335 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,58 | 2,43 | 3,31 | %94,32 | 0,02 | 130755 /km | 13239 /km |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
@@ -532,6 +532,18 @@ Her aday bağlantı bütçesiyle denenir, seçim ömür boyu maliyete göre bir
 örtmeyi, `cheaper` ızgaranın örtmesini en az parayla arar. Simülatörde
 "Yöneylem yerleşimi" bölümündeki "Yerleştir" düğmesi aynı işi gösterilen
 sekme için yapar. Sonuçlar ve sınırları ADR-0081'de.
+
+Tablonun şehir içi ve kırsal satırları bu aramanın yerleşimini kullanıyor
+(ADR-0096): şehir içinde `cheaper`, kırsalda `better`. Sonuç
+`src/yerkon/placements/` altında saklanıyor; `--save` onu yeniden yazar:
+
+```bash
+yerkon place --scenario urban --aim cheaper --save
+yerkon place --scenario rural --aim better --save
+```
+
+Bu iki satırda alıcılar da gerçek yollarda sürüyor: tur köşeleri,
+getirilen yol ağı üstünde en kısa yollarla birleştiriliyor.
 
 ### Bandın doluluğunu ölçmek (SDR++ ve SDRangel)
 

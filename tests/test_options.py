@@ -75,11 +75,13 @@ def test_a_deployment_choice_is_not_counted_as_an_assumption():
 
 def test_moving_a_geometry_figure_moves_the_deployment():
     """The check that the wiring is real rather than declared."""
-    denser = DEFAULTS.with_values({"rural.anchor_spacing_m": 2000.0,
-                                   "rural.anchor_stagger_m": 1000.0})
+    # On the lattice: the placement search's spots move with no spacing.
+    lattice = DEFAULTS.with_values({"rural.layout": "grid"})
+    denser = lattice.with_values({"rural.anchor_spacing_m": 2000.0,
+                                  "rural.anchor_stagger_m": 1000.0})
     assert (
         len(catalogue(denser)["rural"].scenario.deployment.anchors)
-        > len(catalogue(DEFAULTS)["rural"].scenario.deployment.anchors)
+        > len(catalogue(lattice)["rural"].scenario.deployment.anchors)
     )
 
 

@@ -1024,9 +1024,12 @@ def test_a_run_uses_the_arrangement_the_tab_holds():
     from yerkon.viewer.tasks import deployments_of
 
     prepared = from_scenario("urban")
+    # A lattice at 250 m: the row's own anchors are the placement
+    # search's, which no spacing moves (ADR-0096).
     denser = prepared.merged({
         "runs": tuple(
-            {**run.as_json(), "spacing_m": 250.0} for run in prepared.runs
+            {**run.as_json(), "method": "grid", "spacing_m": 250.0}
+            for run in prepared.runs
         )
     })
     standard = deployments_of([("urban", prepared)])[0]
@@ -1982,7 +1985,9 @@ def test_two_groups_are_told_apart_rather_than_merged():
     from yerkon.viewer.state import from_scenario
 
     state = from_scenario("rural")
-    one = state.runs[0]
+    # Two lattices: the row's own run is the placement search's spots,
+    # which stand where they were chosen whatever range the run is given.
+    one = replace(state.runs[0], method="grid")
     two = replace(state, runs=(
         replace(one, identifier="A", from_m=0.0, to_m=8000.0),
         replace(one, identifier="B", from_m=12000.0, to_m=20000.0),
@@ -2022,8 +2027,8 @@ def test_the_same_arrangement_is_not_placed_twice():
 @pytest.mark.parametrize("change", [
     {"width_m": 1000.0},
     {"spacing_m": 900.0},
-    {"removed": ("C0",)},
-    {"moved": {"C1": (10.0, 10.0)}},
+    {"removed": ("P0",)},
+    {"moved": {"P1": (10.0, 10.0)}},
     {"tolerance_m": 1.0},
 ])
 def test_what_is_remembered_is_what_placing_again_would_say(change):

@@ -16,9 +16,9 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 1. **Sunumdaki YERKON sayıları eski.** Slayt 16'daki üç satır (ör. şehir
    içi HPE P50 1,28 m, kullanılabilirlik yaklaşık %98, alan 1,00 km²)
-   bugünkü modelin çıktısı değil. Site şehir içi için 1,85 m, %85,67 ve
-   8,59 km² yayımlıyor (25 Eylül). Kırsalda fark daha büyük: sunum
-   yaklaşık %98,9, site %66,47. Sitenin kullanılabilirliği artık
+   bugünkü modelin çıktısı değil. Site şehir içi için 2,14 m, %95,40 ve
+   8,51 km² yayımlıyor (27 Eylül). Kırsalda: sunum yaklaşık %98,9, site
+   %93,34. Sitenin kullanılabilirliği artık
    doğruluğa bağlı (ADR-0084), sunumunki değil. Sunum, form ve site aynı sayıyı söylemeli; şartnamenin
    "sonuçların tutarlılığı" ölçütü tam olarak buna bakıyor.
 2. **Kırsal birim için "8-10 km" ve 27 dBm'lik modül iddiası ancak
@@ -118,22 +118,22 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 ### Sonuç tablosu (slayt 16)
 
-| Satır | Sütun | Sunum | Site (25 Eylül koşusu) |
+| Satır | Sütun | Sunum | Site (27 Eylül koşusu) |
 |---|---|---|---|
-| Şehir içi | HPE P50 | 1,28 m | 1,85 m |
-| Şehir içi | HPE P95 | 2,99 m | 5,47 m |
-| Şehir içi | VPE P95 | 31,47 m | 3,75 m |
-| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %85,67 |
-| Şehir içi | Alan | 1,00 km² | 8,59 km² |
-| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 11477 TL/km² |
-| Şehir içi | OPEX | boş | 2209 TL/km²/yıl |
-| Kırsal | HPE P50 | 4,17 m | 1,76 m |
-| Kırsal | HPE P95 | 14,29 m | 4,65 m |
-| Kırsal | VPE P95 | 24,14 m | 4,71 m |
-| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %66,47 |
-| Kırsal | Alan | 1,01 km² | 305,75 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1350 TL/km² |
-| Kırsal | OPEX | boş | 416 TL/km²/yıl |
+| Şehir içi | HPE P50 | 1,28 m | 2,14 m |
+| Şehir içi | HPE P95 | 2,99 m | 9,35 m |
+| Şehir içi | VPE P95 | 31,47 m | 3,89 m |
+| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %95,40 |
+| Şehir içi | Alan | 1,00 km² | 8,51 km² |
+| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 10658 TL/km² |
+| Şehir içi | OPEX | boş | 2051 TL/km²/yıl |
+| Kırsal | HPE P50 | 4,17 m | 2,00 m |
+| Kırsal | HPE P95 | 14,29 m | 8,22 m |
+| Kırsal | VPE P95 | 24,14 m | 4,97 m |
+| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %93,34 |
+| Kırsal | Alan | 1,01 km² | 359,58 km² |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1331 TL/km² |
+| Kırsal | OPEX | boş | 335 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,58 m |
 | Tünel | HPE P95 | 1,88 m | 2,43 m |
 | Tünel | VPE P95 | 5,53 m | 3,31 m |

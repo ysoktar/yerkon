@@ -1178,7 +1178,7 @@ RESULTS = Page(
                     "Işıklı bir kavşakta sinyal dolabı durur: hem besleme "
                     "hem de trafik yönetim merkezine giden bir hat. "
                     "Belediyenin kameraları o hattı zaten kullanıyor. "
-                    "Izgaranın dörtte biri böyle bir kavşakta duruyor ve "
+                    "Birimlerin bir kısmı böyle bir kavşakta duruyor ve "
                     "merkeze oradan bağlanıyor. Hiçbir birime SIM kartı "
                     "konmuyor: geri kalanları, onlara karşı ölçüm yapan "
                     "telefonlar ve araç alıcıları izliyor, cevap vermeyen "
@@ -1188,29 +1188,22 @@ RESULTS = Page(
                     "gives. A signalised junction carries a controller "
                     "cabinet: mains for the heads and a line to the "
                     "traffic management centre. The municipality's cameras "
-                    "already use that line. A quarter of the grid stands "
-                    "at such a junction and reaches the centre through "
-                    "it. No unit carries a SIM card: the rest are watched "
+                    "already use that line. Some of the units stand at "
+                    "such a junction and reach the centre through it. No unit carries a SIM card: the rest are watched "
                     "by the phones and vehicle receivers that range "
                     "against them, and a unit that stops answering shows "
                     "up that way. The line by line breakdown is on the "
                     "Cost page.",
                 ),
                 _w(
-                    "Sıklaştırmak kullanılabilirliği yükseltiyor ama "
-                    "bedava değil: kaba bir tarama 500 m'den 350 m'ye "
-                    "inmenin kullanılabilirliği yaklaşık altı puan "
-                    "artırdığını, direk sayısını da iki katından fazlasına "
-                    "çıkardığını söylüyor. Mevcut yapıların yaptığı şey bu "
+                    "Direk eklemek kullanılabilirliği yükseltiyor ama "
+                    "bedava değil. Mevcut yapıların yaptığı şey bu "
                     "alışverişi karşılanabilir kılmak: her ek birim bir "
                     "kart ve bir montaj, bir saha değil.",
-                    "Tightening the grid raises availability, but not for "
-                    "nothing: a coarse sweep says going from 500 m to "
-                    "350 m buys about six points of availability and more "
-                    "than doubles the number of units. What the existing "
-                    "structures do is make that trade affordable, because "
-                    "each extra unit is a board and a fitting rather than "
-                    "a site.",
+                    "Adding anchors raises availability, but not for "
+                    "nothing. What the existing structures do is make that "
+                    "trade affordable, because each extra unit is a board "
+                    "and a fitting rather than a site.",
                 ),
             ),
         ),
@@ -1658,13 +1651,15 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Izgara yerine zaten yüksek yerler",
-                       "Already high places instead of a grid"),
+            heading=_w("Zaten yüksek yerler",
+                       "Places that are already high"),
             lines=(
                 _w(
-                    "Tablonun satırları direkleri bir ızgaraya koyar. "
-                    "Simülatördeki **Yöneylem yerleşimi** bölümü aynı "
-                    "satırı ızgarasız kurar: aday yerler var olan "
+                    "Şehir içi ve kırsal satırlarda direkler bir ızgarada "
+                    "değil, bir yerleşim aramasının seçtiği yerlerde "
+                    "durur; simülatördeki **Yöneylem yerleşimi** bölümü "
+                    "aynı aramayı başka bir yer için koşar. Aday yerler "
+                    "var olan "
                     "aydınlatma direkleri ve tabelalar, yüksekliği "
                     "ölçülmüş binaların çatıları, tepeler ve yol kenarıdır. "
                     "Her aday bağlantı bütçesiyle denenir; seçim, ömür "
@@ -1672,9 +1667,11 @@ SIMULATION = Page(
                     "dört direk ona ulaştığında ve bu direkler çevresinin "
                     "en az üç çeyreğinde durduğunda sayılır, çünkü aynı "
                     "caddeye dizilmiş dört direk cadde boyunca ölçmez.",
-                    "The table's rows put their anchors on a grid. The "
-                    "simulator's **Placement search** section builds the "
-                    "same row without one: the candidates are existing "
+                    "In the urban and rural rows the anchors do not stand "
+                    "on a grid but where a placement search put them; the "
+                    "simulator's **Placement search** section runs the "
+                    "same search for other ground. The candidates are "
+                    "existing "
                     "lighting columns and signs, the roofs of buildings "
                     "with a measured height, hilltops and the road side. "
                     "Every candidate is tried with the link budget, and "
@@ -1687,12 +1684,12 @@ SIMULATION = Page(
                 _w(
                     "Arama kendi sayımını verir; karar simülasyonundur. "
                     "Önerilen yerleşimi uygulayıp **Simülasyonu çalıştır** "
-                    "düğmesine basınca ızgarayla aynı yolculukta "
+                    "düğmesine basınca eski yerleşimle aynı yolculukta "
                     "karşılaştırılır.",
                     "The search gives its own count; the simulation "
                     "decides. Apply the proposed layout and press **Run the "
-                    "simulation** to compare it with the grid on the same "
-                    "journey.",
+                    "simulation** to compare it with the layout it replaces "
+                    "on the same journey.",
                 ),
             ),
         ),

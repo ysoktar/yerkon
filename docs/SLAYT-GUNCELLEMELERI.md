@@ -241,12 +241,14 @@ Son güncelleme: 25 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 1,85 | 5,47 | 3,75 | %85,67 | 8,59 km² | 11477 TL/km² | 2209 TL/km²/yıl |
-  | Kırsal | 1,76 | 4,65 | 4,71 | %66,47 | 305,75 km² | 1350 TL/km² | 416 TL/km²/yıl |
+  | Şehir içi | 2,14 | 9,35 | 3,89 | %95,40 | 8,51 km² | 10658 TL/km² | 2051 TL/km²/yıl |
+  | Kırsal | 2,00 | 8,22 | 4,97 | %93,34 | 359,58 km² | 1331 TL/km² | 335 TL/km²/yıl |
   | Tünel | 0,58 | 2,43 | 3,31 | %94,32 | güzergâh | 130755 TL/km | 13239 TL/km/yıl |
 
-  (25 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik, şehir
-  içi 600 m, turda sekiz direk, tünel 60 m ve UWB kanal 5, birimler
+  (27 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik,
+  alıcılar gerçek yollarda, şehir içi ve kırsalda direkler yerleşim
+  aramasının yerlerinde (23 ve 50 direk), turda sekiz direk, tünel 60 m
+  ve UWB kanal 5, birimler
   yoldan 1,2 m yüksekte, yükseklik haritadan,
   harcırah ve amortisman resmî kaynaklardan, SX1280'in resmî
   duyarlılığı, uyarlamalı frekans atlama belgesi, direkte ve araçta
