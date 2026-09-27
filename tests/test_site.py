@@ -97,6 +97,49 @@ def test_only_buildings_the_path_crosses_obstruct_it():
     assert fraction == pytest.approx(0.5, abs=0.05)
 
 
+def _an_l_and_a_square():
+    """An L-shaped block round a courtyard, beside a plain square one."""
+    l_shape = [(0.0, 0.0), (40.0, 0.0), (40.0, 10.0), (10.0, 10.0),
+               (10.0, 40.0), (0.0, 40.0)]
+    square = [(100.0, 0.0), (110.0, 0.0), (110.0, 10.0), (100.0, 10.0)]
+    return Buildings(
+        centre_x_m=np.array([20.0, 105.0]),
+        centre_y_m=np.array([20.0, 5.0]),
+        radius_m=np.array([20.0, 5.0]),
+        height_m=np.array([18.0, 9.0]),
+        outline_points_m=np.array(l_shape + square),
+        outline_lengths=np.array([6, 4]),
+    )
+
+
+def test_a_footprint_is_its_outline_not_a_disc():
+    """The courtyard of an L is open ground; the L's arm is roof."""
+    buildings = _an_l_and_a_square()
+    assert buildings.tallest_at(20.0, 20.0) == 0.0, "the L's courtyard"
+    assert buildings.tallest_at(35.0, 5.0) == pytest.approx(18.0), (
+        "the end of the L's arm, outside its disc")
+    assert buildings.tallest_at(104.0, 9.0) == pytest.approx(9.0)
+    assert buildings.tallest_at(112.0, 5.0) == 0.0
+    xs = np.array([20.0, 35.0, 104.0, 112.0, 5.0])
+    ys = np.array([20.0, 5.0, 9.0, 5.0, 35.0])
+    assert list(buildings.tallest_at_many(xs, ys)) == [0.0, 18.0, 9.0, 0.0, 18.0]
+
+
+def test_a_path_through_a_courtyard_is_not_blocked():
+    buildings = _an_l_and_a_square()
+    assert buildings.tallest_along((20.0, 15.0, 2.0), (20.0, 60.0, 2.0))[0] == 0.0
+    assert buildings.tallest_along((5.0, -20.0, 2.0), (5.0, 60.0, 2.0))[0] == (
+        pytest.approx(18.0))
+
+
+def test_a_roof_point_is_on_the_roof():
+    """The centre of an L is in its courtyard; a roof anchor is not."""
+    buildings = _an_l_and_a_square()
+    x, y = buildings.roof_point(0)
+    assert buildings.tallest_at(x, y) == pytest.approx(18.0)
+    assert buildings.roof_point(1) == (105.0, 5.0)
+
+
 def test_no_buildings_means_no_obstruction():
     empty = Buildings(*(np.array([]) for _ in range(4)))
     assert empty.is_empty

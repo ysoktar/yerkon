@@ -14,15 +14,15 @@ key = "urban"
 system = "YERKON (Şehir içi)"
 technology = "Karasal konumlandırma (SX1280/LoRa TWR)"
 environment = "Dış"
-hpe_p50_m = 2.14
-hpe_p95_m = 9.3508
-vpe_p95_m = 3.8894
-availability = 0.954
-area_km2 = 8.51
-capex_tl_per_unit = 10657.9189
-opex_tl_per_unit_year = 2051.1973
+hpe_p50_m = 2.0278
+hpe_p95_m = 9.8449
+vpe_p95_m = 3.9993
+availability = 0.9686
+area_km2 = 8.3233
+capex_tl_per_unit = 9949.3829
+opex_tl_per_unit_year = 1914.8342
 costed_by = "area"
-reached_km2 = 8.99
+reached_km2 = 8.9733
 assumed_share = 0.6486
 
 [[row]]
@@ -30,15 +30,15 @@ key = "rural"
 system = "YERKON (Kırsal)"
 technology = "Karasal konumlandırma (E28-SX1280 TWR)"
 environment = "Dış"
-hpe_p50_m = 1.9973
-hpe_p95_m = 8.2214
-vpe_p95_m = 4.9681
-availability = 0.9334
-area_km2 = 359.5833
-capex_tl_per_unit = 1330.7666
-opex_tl_per_unit_year = 335.2768
+hpe_p50_m = 1.9658
+hpe_p95_m = 8.5837
+vpe_p95_m = 4.9645
+availability = 0.9421
+area_km2 = 361.8333
+capex_tl_per_unit = 1322.4915
+opex_tl_per_unit_year = 333.1919
 costed_by = "area"
-reached_km2 = 438.4167
+reached_km2 = 440.25
 assumed_share = 0.8414
 
 [[row]]

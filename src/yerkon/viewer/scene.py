@@ -170,15 +170,15 @@ def site_blocks(name: str) -> tuple:
     """Every fetched building of a site, largest first, for the page.
 
     Each as [x, y, half side, height, lowest ground, highest ground,
-    outline]. The outline is the footprint the fetch brought, a flat run
-    of whole metres x0, y0, x1, y1...; where there is none it is empty,
-    and the page draws the disc the link budget reads as the square of
-    the same area. The page stands a block from the lowest ground under
+    outline]. The outline is the footprint the fetch brought and the link
+    budget reads (ADR-0097), a flat run of whole metres x0, y0, x1, y1...;
+    where there is none it is empty, and the page draws the disc the
+    link budget reads instead as the square of the same area. The page stands a block from the lowest ground under
     it, so on a slope it is sunk rather than hanging off the hill.
 
     Asked for once per site rather than sent with every scene: Polatlı's
     twenty thousand outlines are a megabyte and a half, and the scene is
-    rebuilt on every drag. Drawn, never read, like the photograph.
+    rebuilt on every drag.
     """
     from yerkon.scenarios import fetched
 

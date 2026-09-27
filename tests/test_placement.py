@@ -166,6 +166,7 @@ def test_a_roof_at_the_default_height_is_not_a_candidate():
         centre_y_m=np.array([500.0, 1000.0]),
         height_m=np.array([30.0, DEFAULT_BUILDING_HEIGHT_M + 20.0]),
         tallest_at=lambda x, y: 0.0,
+        roof_point=lambda i: ((500.0, 1000.0)[i], (500.0, 1000.0)[i]),
     )
     site = SimpleNamespace(
         furniture=None, buildings=buildings, roads_m=(),

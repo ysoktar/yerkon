@@ -358,8 +358,8 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,14 | 9,35 | 3,89 | %95,40 | 8,51 | 10658 | 2051 |
-| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,00 | 8,22 | 4,97 | %93,34 | 359,58 | 1331 | 335 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,03 | 9,84 | 4,00 | %96,86 | 8,32 | 9949 | 1915 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 1,97 | 8,58 | 4,96 | %94,21 | 361,83 | 1322 | 333 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,58 | 2,43 | 3,31 | %94,32 | 0,02 | 130755 /km | 13239 /km |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
@@ -390,7 +390,9 @@ bütün profil üzerinden hesaplanır: ITU-R P.526-15 4.5.2, delta-Bullington
 (ADR-0053). Kızılay'da bir bağlantının ortanca üç engeli var, en
 kötüsünün on altı; tek bir bıçak sırtı bunların yalnızca birini sayıyordu.
 Zeminin yüzeyi çatıları da içerir, yani binalar ayrıca bir katsayı olarak
-değil, engel olarak sayılır (ADR-0046).
+değil, engel olarak sayılır (ADR-0046). Bir bina, Overture'ın getirdiği
+gerçek ayak izidir; ayak izi olmayan bina merkezinin çevresinde bir
+dairedir (ADR-0097).
 
 Zemin profili **on metrede bir** okunuyor. Sabit bir örnek sayısı
 aralığı bağlantının boyuna bağlar ve bir örnek sayısı bir zemin

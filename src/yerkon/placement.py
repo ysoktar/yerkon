@@ -272,10 +272,11 @@ def candidates(deployed, site, row: str, settings: Settings = DEFAULTS,
         # is all but twelve of 20899 buildings. A building tagged at
         # exactly the default is dropped with them, which errs towards
         # fewer roofs.
+        # A point on the roof itself: the centre of an L-shaped building
+        # can be in its courtyard.
         tall = [
-            (float(x), float(y), float(h))
-            for x, y, h in zip(buildings.centre_x_m, buildings.centre_y_m,
-                               buildings.height_m)
+            buildings.roof_point(index) + (float(h),)
+            for index, h in enumerate(buildings.height_m)
             if h >= sizing["roof_min_m"] and h != DEFAULT_BUILDING_HEIGHT_M
         ]
         tall.sort(key=lambda b: -(site.height_at(b[0], b[1]) + b[2]))

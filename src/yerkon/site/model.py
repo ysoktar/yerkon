@@ -127,9 +127,9 @@ def box_around(latitude: float, longitude: float, size_km: float) -> BoundingBox
 class Buildings:
     """Footprints with heights, in local metres.
 
-    Stored as flat arrays rather than polygons because the link budget
-    only ever asks whether something blocks a path and by how much, and
-    a footprint's outline does not change that answer.
+    Stored as flat arrays. A building is its outline where the fetch
+    brought one, and a disc about its centre where it did not: the link
+    budget asks whether a point stands inside either (ADR-0097).
     """
 
     #: One row per building: centre x, centre y, footprint radius, height.
@@ -139,8 +139,9 @@ class Buildings:
     height_m: np.ndarray
     #: Each footprint's outline, where the fetch brought one: every ring's
     #: points one after another, and how many points each building has
-    #: (zero where it has none). Drawn, never read: the link budget asks
-    #: about the disc above. Empty for a fetch that brought no outlines.
+    #: (zero where it has none). Where a building has one, the link
+    #: budget asks about it rather than the disc above (ADR-0097). Empty
+    #: for a fetch that brought no outlines.
     outline_points_m: np.ndarray = field(
         default_factory=lambda: np.zeros((0, 2)))
     outline_lengths: np.ndarray = field(
@@ -196,6 +197,7 @@ class Buildings:
         state.pop("_cell_m", None)
         state.pop("_occupied", None)
         state.pop("_outline_starts", None)
+        state.pop("_reach", None)
         return state
 
     def _index(self) -> tuple:
@@ -206,18 +208,85 @@ class Buildings:
         # Wide enough that a typical footprint touches one cell or four,
         # narrow enough that a cell holds few buildings.
         cell_m = max(float(np.median(self.radius_m)) * 4.0, 20.0)
-        cells: dict = {}
+        west, south, east, north = self._reach()
+        found: dict = {}
         for index in range(len(self)):
-            x, y, r = (float(self.centre_x_m[index]),
-                       float(self.centre_y_m[index]),
-                       float(self.radius_m[index]))
-            for column in range(int((x - r) // cell_m), int((x + r) // cell_m) + 1):
-                for row in range(int((y - r) // cell_m), int((y + r) // cell_m) + 1):
-                    cells.setdefault((column, row), []).append(index)
-        packed = {key: np.array(value, dtype=int) for key, value in cells.items()}
+            for column in range(int(west[index] // cell_m),
+                                int(east[index] // cell_m) + 1):
+                for row in range(int(south[index] // cell_m),
+                                 int(north[index] // cell_m) + 1):
+                    found.setdefault((column, row), []).append(index)
+        packed = {key: self._cell(np.array(value, dtype=int))
+                  for key, value in found.items()}
         object.__setattr__(self, "_cells", packed)
         object.__setattr__(self, "_cell_m", cell_m)
         return packed, cell_m
+
+    def _reach(self) -> tuple:
+        """Each building's box: its outline's, or its disc's."""
+        found = self.__dict__.get("_reach")
+        if found is not None:
+            return found
+        x, y, r = self.centre_x_m, self.centre_y_m, self.radius_m
+        west, south, east, north = x - r, y - r, x + r, y + r
+        for index in range(len(self)):
+            ring = self.outline(index)
+            if ring is not None:
+                (west[index], south[index]), (east[index], north[index]) = (
+                    ring.min(axis=0), ring.max(axis=0))
+        found = (west, south, east, north)
+        object.__setattr__(self, "_reach", found)
+        return found
+
+    def _cell(self, near: np.ndarray) -> tuple:
+        """What one cell needs to answer "which roofs cover this point".
+
+        The buildings with no outline, as discs, and every edge of the
+        ones with an outline, flattened with the building each edge
+        belongs to, so a point is tested against all of them in one pass.
+        """
+        discs, shaped, edges, owners = [], [], [], []
+        for index in near:
+            ring = self.outline(int(index))
+            if ring is None:
+                discs.append(index)
+                continue
+            owners.append(np.full(len(ring), len(shaped)))
+            edges.append(np.hstack((ring, np.roll(ring, -1, axis=0))))
+            shaped.append(index)
+        discs = np.array(discs, dtype=int)
+        shaped = np.array(shaped, dtype=int)
+        edges = (np.vstack(edges) if edges else np.zeros((0, 4))).T.copy()
+        owners = (np.concatenate(owners) if owners
+                  else np.zeros(0, dtype=int))
+        firsts = np.flatnonzero(np.diff(owners, prepend=-1)) if len(owners) \
+            else np.zeros(0, dtype=int)
+        return (discs, self.centre_x_m[discs], self.centre_y_m[discs],
+                self.radius_m[discs] ** 2, self.height_m[discs],
+                shaped, edges, owners, self.height_m[shaped], firsts)
+
+    @staticmethod
+    def _tallest_in(cell: tuple, xs, ys):
+        """The tallest roof of one cell's buildings over each point."""
+        (discs, disc_x, disc_y, disc_r2, disc_h,
+         shaped, edges, _, shaped_h, firsts) = cell
+        xs = np.asarray(xs, dtype=float)[:, None]
+        ys = np.asarray(ys, dtype=float)[:, None]
+        best = np.zeros(len(xs))
+        if len(discs):
+            inside = (xs - disc_x) ** 2 + (ys - disc_y) ** 2 <= disc_r2
+            best = np.maximum(best, np.where(inside, disc_h, 0.0).max(axis=1))
+        if len(shaped):
+            # Even-odd rule: a ray from the point towards +x crosses the
+            # outline an odd number of times when the point is inside.
+            x0, y0, x1, y1 = edges
+            spans = (y0 > ys) != (y1 > ys)
+            with np.errstate(divide="ignore", invalid="ignore"):
+                crossing = x0 + (ys - y0) * (x1 - x0) / (y1 - y0)
+            hits = np.add.reduceat(spans & (xs < crossing), firsts, axis=1)
+            inside = (hits % 2) == 1
+            best = np.maximum(best, np.where(inside, shaped_h, 0.0).max(axis=1))
+        return best
 
     def _occupancy(self) -> tuple:
         """Which index cells hold any building, as a dense grid.
@@ -244,15 +313,10 @@ class Buildings:
         if self.is_empty:
             return 0.0
         cells, cell_m = self._index()
-        near = cells.get((int(x // cell_m), int(y // cell_m)))
-        if near is None:
+        cell = cells.get((int(x // cell_m), int(y // cell_m)))
+        if cell is None:
             return 0.0
-        inside = (
-            (x - self.centre_x_m[near]) ** 2 + (y - self.centre_y_m[near]) ** 2
-        ) <= self.radius_m[near] ** 2
-        if not inside.any():
-            return 0.0
-        return float(self.height_m[near][inside].max())
+        return float(self._tallest_in(cell, [x], [y])[0])
 
     def tallest_at_many(self, xs, ys):
         """`tallest_at` for a whole line of points at once.
@@ -278,17 +342,41 @@ class Buildings:
                    & (up >= 0) & (up < occupied.shape[1]))
         worth_asking = np.zeros(len(xs), dtype=bool)
         worth_asking[on_grid] = occupied[across[on_grid], up[on_grid]]
-        for index in np.flatnonzero(worth_asking):
-            near = cells.get((int(columns[index]), int(rows[index])))
-            if near is None:
-                continue
-            inside = (
-                (xs[index] - self.centre_x_m[near]) ** 2
-                + (ys[index] - self.centre_y_m[near]) ** 2
-            ) <= self.radius_m[near] ** 2
-            if inside.any():
-                out[index] = float(self.height_m[near][inside].max())
+        # The rest are asked a cell at a time: every point in a cell
+        # against every building in it at once.
+        asked = np.flatnonzero(worth_asking)
+        if not len(asked):
+            return out
+        order = asked[np.lexsort((rows[asked], columns[asked]))]
+        keys = np.stack((columns[order], rows[order]), axis=1)
+        breaks = np.flatnonzero(np.any(np.diff(keys, axis=0) != 0, axis=1)) + 1
+        for group in np.split(order, breaks):
+            cell = cells.get((int(columns[group[0]]), int(rows[group[0]])))
+            if cell is not None:
+                out[group] = self._tallest_in(cell, xs[group], ys[group])
         return out
+
+    def roof_point(self, index: int) -> tuple[float, float]:
+        """A point on this building's roof.
+
+        The centre, unless the outline bends around it (an L or a U),
+        in which case the middle of the widest stretch of roof on a line
+        across the building at the centre's height.
+        """
+        x, y = float(self.centre_x_m[index]), float(self.centre_y_m[index])
+        ring = self.outline(index)
+        if ring is None:
+            return x, y
+        x0, y0 = ring[:, 0], ring[:, 1]
+        x1, y1 = np.roll(x0, -1), np.roll(y0, -1)
+        spans = (y0 > y) != (y1 > y)
+        crossings = np.sort(x0[spans] + (y - y0[spans])
+                            * (x1[spans] - x0[spans]) / (y1[spans] - y0[spans]))
+        if (np.sum(crossings > x) % 2) == 1 or len(crossings) < 2:
+            return x, y
+        pairs = crossings[: len(crossings) // 2 * 2].reshape(-1, 2)
+        widest = pairs[int(np.argmax(pairs[:, 1] - pairs[:, 0]))]
+        return float(widest.mean()), y
 
     def tallest_along(
         self,
@@ -309,13 +397,12 @@ class Buildings:
         xs = a[0] + (b[0] - a[0]) * fractions
         ys = a[1] + (b[1] - a[1]) * fractions
 
-        best_height = 0.0
-        best_fraction = 0.5
-        for fraction, x, y in zip(fractions, xs, ys):
-            height = self.tallest_at(float(x), float(y))
-            if height > best_height:
-                best_height, best_fraction = height, float(fraction)
-        return best_height, best_fraction
+        heights = self.tallest_at_many(xs, ys)
+        if not heights.any():
+            return 0.0, 0.5
+        # The first of the highest, as walking the path would find it.
+        at = int(np.argmax(heights))
+        return float(heights[at]), float(fractions[at])
 
 
 @dataclass(frozen=True)

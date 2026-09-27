@@ -54,6 +54,10 @@ eğimi vardır, dolayısıyla bir alıcının yüksekliği yol boyunca değişir
 kod tabanında hiçbir şey bir yolu sabit bir yüksekliğe sabitlemez.
 ADR-0004'e bak.
 
+**Buildings** (binalar): `site/model.py`. Her bina bir yükseklik ve
+getirilen gerçek ayak izi; ayak izi yoksa merkezinin çevresinde bir
+daire. Ayak izinin içindeki bir nokta çatıyı okur. ADR-0097'ye bak.
+
 Kodda `Site` her zaman budur. Tarayıcıda açılan **web sitesi** başka bir
 şeydir ve kodda o adı taşımaz: sayfaları `viewer/pages.py` içinde durur
 (ADR-0064).

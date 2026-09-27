@@ -19,22 +19,20 @@ spots = [
   [2100.0, 1800.0, "column", false],
   [2400.0, 0.0, "column", true],
   [372.6, 133.0, "column", false],
-  [1222.9, 1954.7, "column", false],
-  [2556.5, 2169.3, "column", false],
+  [1800.0, 2400.0, "column", false],
   [361.1, 1107.0, "column", false],
-  [1647.2, 511.8, "column", false],
-  [111.7, 2274.6, "column", false],
-  [2112.0, 1599.5, "column", false],
-  [1662.4, 2342.2, "column", false],
-  [171.2, 67.9, "column", false],
-  [2205.5, 480.5, "column", false],
-  [155.1, 1134.8, "column", false],
-  [2276.9, 1091.1, "column", false],
-  [821.9, 468.1, "column", false],
-  [2674.9, 1969.3, "column", false],
+  [8.1, 2189.1, "column", false],
+  [2569.0, 2313.8, "column", false],
+  [1535.4, 129.0, "column", false],
+  [361.5, 1636.5, "column", false],
+  [2584.7, 616.3, "column", false],
+  [123.6, 52.4, "column", false],
+  [1471.8, 1391.0, "column", false],
+  [1846.5, 1996.8, "column", false],
+  [475.6, 742.2, "column", false],
 ]
 
 [mix]
-furniture = 3
-grid = 4
-road = 16
+furniture = 1
+grid = 5
+road = 15
