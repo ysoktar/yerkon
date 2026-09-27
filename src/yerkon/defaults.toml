@@ -249,17 +249,17 @@ affects = "bu yapıdaki birimlerin montaj ve bakım bedelini"
 affects_en = "the fitting and maintenance cost of units on this structure"
 
 [values."mounting.distribution_pole.rent_tl_per_year"]
-value = 1200.0
+value = 0.0
 unit = "TL/year"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = """Dağıtım şirketinin direğine birim taşıtmanın yıllık bedeli. Dağıtım şirketlerinin direğe cihaz konması için yayımladığı bir bedel bulunamadı: Ulaştırma Bakanlığı'nın geçiş hakkı usul ve esasları ile Türk Telekom'un bağlantı ve nakil ücretleri direk başına bir bedel yazmıyor, Genel Aydınlatma Yönetmeliği de yazmıyor. Ayda 100 TL varsayıldı. Karşılaştırma için bulunanlar: dağıtım şirketleri 2015'ten beri EPDK izniyle direklerde reklam alanı kiralıyor, en küçük afiş ayda 4700 TL (Tr724, 11 Mayıs 2019); İstanbul Büyükşehir Belediyesi 2025 tarifesi belediye mülküne konan bir repeater ya da small cell için yıllık 24500 TL alıyor, BEDAŞ ve AYEDAŞ aydınlatma direğindeki bir kabinet için yer seçim belgesi ücretinin iki katını. Bunların hepsi ticari kullanıcılara uygulanan bedeller. Sayılırsa bu tek satır değişir."""
-note_en = """What the distribution company charges a year to carry a unit on its pole. No published fee from a distribution company for equipment on its poles was found: the transport ministry's rights-of-way rules and Türk Telekom's connection fees name no per-pole fee, nor does the General Lighting Regulation. 100 TL a month is assumed. What was found, for comparison: distribution companies have rented advertising space on their poles since 2015 with the regulator's leave, the smallest poster 4700 TL a month (Tr724, 11 May 2019); Istanbul Metropolitan Municipality's 2025 tariff charges 24500 TL a year for a repeater or small cell on its property, and twice the site selection fee for a cabinet on a BEDAŞ or AYEDAŞ lighting column. All of these are fees for commercial users. When it is known, this one line changes."""
+provenance = "DESIGN"
+source = "bu proje, bir işletme kararı olarak: kamu protokolü"
+source_en = "this project, as an operating choice: a public-sector agreement"
+note = """Dağıtım şirketinin direğine birim taşıtmanın yıllık bedeli: sıfır. Birimler kamu protokolüyle konuyor; AUS kabinleri, yol kenarı üniteleri ve dağıtım direkleri gibi hazır kamu yapılarına dahil edilebilmeleri öngörülüyor. Dağıtım şirketlerinin direğe cihaz için yayımladığı bir bedel de yok: Ulaştırma Bakanlığı'nın geçiş hakkı usul ve esasları, Türk Telekom'un bağlantı ve nakil ücretleri ve Genel Aydınlatma Yönetmeliği direk başına bir bedel yazmıyor. Ticari kullanıcılara uygulanan bedeller karşılaştırma için: dağıtım şirketleri 2015'ten beri EPDK izniyle direklerde reklam alanı kiralıyor, en küçük afiş ayda 4700 TL (Tr724, 11 Mayıs 2019); İstanbul Büyükşehir Belediyesi 2025 tarifesi belediye mülküne konan bir repeater ya da small cell için yıllık 24500 TL, BEDAŞ ve AYEDAŞ aydınlatma direğindeki bir kabinet için yer seçim belgesi ücretinin iki katını alıyor. Protokol olmazsa direk başına yıllık 1200 TL kırsal OPEX'i yaklaşık yarı yarıya artırır."""
+note_en = """What the distribution company charges a year to carry a unit on its pole: nothing. The units go up under a public-sector agreement, with the prospect of being included in public structures that already stand, such as ITS cabinets, roadside units and distribution poles. Nor has any distribution company published a fee for equipment on its poles: the transport ministry's rights-of-way rules, Türk Telekom's connection fees and the General Lighting Regulation name no per-pole fee. Fees charged to commercial users, for comparison: distribution companies have rented advertising space on their poles since 2015 with the regulator's leave, the smallest poster 4700 TL a month (Tr724, 11 May 2019); Istanbul Metropolitan Municipality's 2025 tariff charges 24500 TL a year for a repeater or small cell on its property, and twice the site selection fee for a cabinet on a BEDAŞ or AYEDAŞ lighting column. Without the agreement, 1200 TL a pole a year would raise rural OPEX by about half."""
 affects = "dağıtım direğindeki direklerin OPEX'ini"
 affects_en = "OPEX of anchors on distribution poles"
-sensitivity = "iki katına çıkarmak kırsal OPEX'i kabaca üçte bir artırır"
-sensitivity_en = "doubling it raises rural OPEX by roughly a third"
+sensitivity = "direk başına yıllık 1200 TL kırsal OPEX'i yaklaşık %47 artırır"
+sensitivity_en = "1200 TL a pole a year raises rural OPEX by about 47 %"
 
 [values."mounting.rooftop.height_m"]
 value = 2.0

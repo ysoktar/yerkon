@@ -328,6 +328,13 @@ label.en = "CIA World Factbook, the world's land and water area (archived copy, 
 url = "https://web.archive.org/web/20250428071847/https://www.cia.gov/the-world-factbook/static/6c4d9b9a41b27707b6720720df7161d6/Physical_World.pdf"
 
 [[source]]
+key = "nasa-earth-area"
+group = "gnss"
+label.tr = "NASA, Ay sayılarla (Dünya sütunu: okyanuslar dahil yüzey alanı 510064472 km²)"
+label.en = "NASA, the Moon by the numbers (Earth column: surface area with the oceans, 510064472 km²)"
+url = "https://science.nasa.gov/moon/by-the-numbers/"
+
+[[source]]
 key = "gps-standards"
 group = "gnss"
 label.tr = "GPS.gov, performans standartları"

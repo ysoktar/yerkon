@@ -36,10 +36,10 @@ vpe_p95_m = 4.9334
 availability = 0.9626
 area_km2 = 361.8333
 capex_tl_per_unit = 1286.6587
-opex_tl_per_unit_year = 457.8495
+opex_tl_per_unit_year = 311.9259
 costed_by = "area"
 reached_km2 = 440.25
-assumed_share = 0.566
+assumed_share = 0.5263
 
 [[row]]
 key = "tunnel"

@@ -509,3 +509,12 @@ def test_the_amplifier_buys_nothing_under_the_turkish_rule():
 
     assert legal(TURKEY, E28_2G4M27S) == pytest.approx(legal(TURKEY, SX1280))
     assert legal(UNITED_STATES, E28_2G4M27S) > legal(UNITED_STATES, SX1280)
+
+
+def test_no_product_costs_less_at_fewer_units():
+    """A verified tier price is a floor below its tier (ADR-0102): the
+    hundred never undercuts the thousand, nor the one the hundred."""
+    from yerkon import bom
+
+    for board in bom.read().boards.values():
+        assert board.one_tl >= board.hundred_tl >= board.thousand_tl, board.key

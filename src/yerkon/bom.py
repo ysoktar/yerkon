@@ -43,6 +43,21 @@ class Part:
     def role(self, language: Optional[str] = None) -> str:
         return self.role_en if language == "en" else self.role_tr
 
+    def at(self, quantity: int, carried: float) -> float:
+        """This part's price in USD when `quantity` are bought.
+
+        A verified tier price applies from its tier up. Below its tier
+        it is a floor: nobody sells fewer of a part for less than more
+        of it. Otherwise the part is carried from one unit by `carried`,
+        the report's own discount (ADR-0102).
+        """
+        estimate = self.usd * carried
+        if self.volume_usd is None:
+            return estimate
+        if self.volume_tier is not None and self.volume_tier <= quantity:
+            return self.volume_usd
+        return max(estimate, self.volume_usd)
+
 
 @dataclass(frozen=True)
 class Board:
@@ -76,11 +91,15 @@ class Board:
 
     @property
     def one_tl(self) -> float:
-        return (self.other_usd + sum(p.usd for p in self.parts)) * self.usd_try
+        return (self.other_usd + sum(p.at(1, 1.0) for p in self.parts)) * self.usd_try
 
     @property
     def hundred_tl(self) -> float:
-        return self.one_tl * self.hundred_over_one
+        """A hundred units: the report's discount from one to a hundred,
+        except where a part's verified tier price says otherwise."""
+        carried = self.hundred_over_one
+        return (self.other_usd * carried + sum(
+            p.at(100, carried) for p in self.parts)) * self.usd_try
 
     @property
     def thousand_tl(self) -> float:
@@ -94,10 +113,7 @@ class Board:
         """
         carried = self.hundred_over_one * self.thousand_over_hundred
         total = self.other_usd * carried + sum(
-            part.volume_usd if part.volume_usd is not None
-            else part.usd * carried
-            for part in self.parts
-        )
+            part.at(1000, carried) for part in self.parts)
         return total * self.usd_try
 
     def at(self, tier: int) -> float:

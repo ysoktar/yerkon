@@ -26,7 +26,7 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 | Şehir içi, 600 m ızgara | 25 | 8,59 km² | 12,82 km | 98586 | 18974 | 288326 | 11477 | 2209 | 7690 | 1480 |
 | **Şehir içi, yerleşim araması (yeni)** | 19 | 8,14 km² | 19,70 km | **73437** | **15763** | **231067** | **9022** | **1936** | **3728** | **800** |
 | Kırsal, 3000 m ızgara | 49 | 305,75 km² | 86,40 km | 412748 | 127144 | 1684188 | 1350 | 416 | 4777 | 1472 |
-| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **465556** | **165665** | **2122206** | **1287** | **458** | **4456** | **1586** |
+| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **465556** | **112865** | **1594206** | **1287** | **312** | **4456** | **1080** |
 | Tünel, 60 m | 34 | yalnız tüp | 2,00 km | 216970 | 44251 | 659480 | yok | yok | 108485 | 22126 |
 
 27 Eylül'den beri şehir içi ve kırsalda alıcılar gerçek yollarda sürüyor
@@ -48,8 +48,11 @@ direği ve tünelde günde 4 birim (4392 TL). Elektrik 3,20'den 5,62 TL/kWh'ye
 2330'dan 2090 TL'ye, merkezî sistem 240000'den 237000 TL'ye. Sonuç: şehir
 içi OPEX 1928'den 1936 TL/km²'ye, kırsal CAPEX 1317'den 1287 TL/km²'ye,
 kırsal OPEX 352'den 458 TL/km²'ye, tünel OPEX 14599'dan 22126 TL/km'ye.
-Kırsal ve tünel OPEX'i arttı, çünkü oradaki ziyaret daha önce şehirdeki
-gibi günde 8 birimden fiyatlanıyordu.
+Kırsalda ve tünelde bakım kalemi arttı, çünkü bakım ziyareti artık
+montajla aynı hızda (günde 4 birim) sayılıyor. Doğruluk ve
+kullanılabilirlik değişmedi. 28 Eylül'de dağıtım direği kirası kamu
+protokolüyle sıfırlandı (birimlerin AUS gibi hazır kamu yapılarına dahil
+edilebilmesi öngörülüyor): kırsal OPEX 458'den 312 TL/km²'ye indi.
 
 25 Eylül'den beri şehir içi ve kırsal O6 ile (ADR-0094): cihaz
 uyarlamalı frekans atlamalı olarak belgelendiriliyor, direk ve araç

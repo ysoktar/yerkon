@@ -32,7 +32,7 @@ system = "GPS"
 technology = "GNSS"
 environment = "Dış"
 cells = ["-^gnss-p50", "≤ 8 / ≤ 15^gps-performance", "≤ 13 / ≤ 33",
-         "≥ %99 / ≥ %90", "≈ 148940000^land-area",
+         "≥ %99 / ≥ %90", "≈ 148,94 milyon^land-area",
          "≈ 2341,76^gps-capex", "≈ 130,10^gps-opex"]
 
 [[row]]
@@ -40,7 +40,7 @@ system = "Galileo OS"
 technology = "GNSS"
 environment = "Dış"
 cells = ["-", "≤ 1,41^galileo-performance", "≤ 2,40",
-         "≥ %99,58^galileo-availability", "≈ 148940000",
+         "≥ %99,58^galileo-availability", "≈ 148,94 milyon",
          "≈ 2109,23^galileo-capex", "≈ 223,01^galileo-opex"]
 
 [[row]]
@@ -48,7 +48,7 @@ system = "GLONASS"
 technology = "GNSS"
 environment = "Dış"
 cells = ["-", "≤ 5 / ≤ 12^glonass-pair", "≤ 9 / ≤ 25^glonass-pair",
-         "≥ %99 / ≥ %90^glonass-pair", "≈ 148940000",
+         "≥ %99 / ≥ %90^glonass-pair", "≈ 148,94 milyon",
          "-^glonass-capex", "≈ 61,10^glonass-opex"]
 
 [[row]]
@@ -56,7 +56,7 @@ system = "BeiDou BDS"
 technology = "GNSS"
 environment = "Dış"
 cells = ["-", "≈ 1,52^beidou-accuracy", "≈ 2,64^beidou-accuracy",
-         "> %95^beidou-availability", "≈ 148940000",
+         "> %95^beidou-availability", "≈ 148,94 milyon",
          "≥ 2714,05^beidou-capex", "-^beidou-opex"]
 
 [[row]]
@@ -138,9 +138,11 @@ way is published for GPS, Galileo, GLONASS or BeiDou. No P50 was \
 derived from a P95."""
 
 [note.land-area]
-sources = ["cia-land"]
+sources = ["cia-land", "nasa-earth-area"]
 tr = """Küresel uydu sistemlerinde alan paydası olarak okyanuslar ve \
-denizler çıkarılmış Dünya kara yüzeyi, yaklaşık 148940000 km² kullanıldı. \
+denizler çıkarılmış Dünya kara yüzeyi, yaklaşık 148,94 milyon km² \
+(148940000 km²) kullanıldı. Dünya'nın okyanuslar dahil tüm yüzeyi yaklaşık \
+510,06 milyon km²; kara bunun yaklaşık %29'u. \
 GPS, Galileo, GLONASS ve BeiDou denizde de hizmet verir; bu seçim hizmet \
 alanını karayla sınırlamıyor, yalnızca karada kurulan YERKON ve diğer \
 karasal sistemlerle aynı paydada karşılaştırmayı sağlıyor. Karada GNSS'nin \
@@ -149,8 +151,9 @@ yapıları, bina içleri, derin şehir kanyonları, dağ gölgeleri, sık bitki 
 örtüsü, çok yollu yayılım ve yerel parazit çözümü bozar, ama bunlar \
 alıcıya, antene, uydu geometrisine ve zamana bağlıdır."""
 en = """For the global satellite systems the area denominator is the \
-earth's land surface with the oceans and seas taken out, about 148940000 \
-km². GPS, Galileo, GLONASS and BeiDou serve the sea as well; the choice \
+earth's land surface with the oceans and seas taken out, about 148,94 \
+million km² (148940000 km²). The earth's whole surface, oceans included, is \
+about 510,06 million km²; land is about 29 % of it. GPS, Galileo, GLONASS and BeiDou serve the sea as well; the choice \
 does not limit their service to land, it only puts them on the same \
 denominator as YERKON and the other terrestrial systems, which are built \
 on land. Nor can a single area where GNSS certainly fails on land be \
@@ -572,12 +575,17 @@ tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yollarında sürüyor;
 direk bir yerleşim aramasının seçtiği yerlerde (çoğu elektrik direği, \
 biri tepede, biri çatıda). Hata modeli kısa menzilde yayımlanmış SX1280 \
 ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
-saha ölçümü değil, model çıktısıdır."""
+saha ölçümü değil, model çıktısıdır. Dağıtım direği kirası sıfır alındı: \
+birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
+edilebilmeleri öngörülüyor."""
 en = """In the rural row the units drive Polatlı's real roads; the 50 \
 anchors stand where a placement search put them (mostly distribution \
 poles, one on a hilltop, one on a roof). Its error model is derived from \
 published SX1280 measurements at short range. Its long range result is \
-therefore a model output rather than a direct field measurement."""
+therefore a model output rather than a direct field measurement. The \
+distribution pole rent is taken as nothing: the units go up under a \
+public-sector agreement, with the prospect of being included in public \
+structures that already stand, such as ITS cabinets."""
 
 [note.tunnel-run]
 sources = ["dwm3000-datasheet", "dw3000-datasheet", "tunnel-propagation", "btk-exempt-criteria", "etsi-302065-3", "yerkon-github"]
@@ -634,7 +642,7 @@ kilometre is the figure a tunnel operator would ask for. The other two \
 rows are divided by area, so this cell is not the same measure as theirs."""
 
 [note.yerkon-capex]
-sources = ["digikey", "lcsc", "mouser", "banque-de-france"]
+sources = ["digikey", "lcsc", "mouser", "banque-de-france", "sepetli-ankara", "yevmiye-2026", "dicle-surici", "forelektrik-2026", "zam-nisan-2026", "yazilimci-maaslari-2026", "vds-2026"]
 tr = """YERKON CAPEX, senaryodaki yayın birimlerinin 1000 adetlik malzeme \
 listesi fiyatı ile her birimin yapıya takılma bedelinin (tutucu, işçilik, \
 gerekiyorsa şebeke dışı besleme) toplamının senaryo alanına bölünmesidir. \
@@ -642,11 +650,30 @@ Birim fiyatı yalnız ana parçaları kapsar: kartın basılması ve dizgisi, \
 pasifler, test, kalibrasyon, belgelendirme, vergi ve kargo dahil değildir. \
 Konum, radyo mesafe ölçümlerini ve haritadan gelen yüksekliği birleştiren \
 bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
-kullanılmamıştır."""
+kullanılmamıştır. YERKON OPEX, yıllık işletme bedelidir: elektrik \
+(ticarethane tarifesi, Nisan 2026 zammıyla 5,62 TL/kWh), yenileme (vergi \
+amortisman ömürleri), bakım ve merkezî sistem. Bir bakım ziyareti, bir \
+ekip gününün (sepetli araç, usta ve yardımcı, 17570 TL) ekibin o yapıda \
+günde uğradığı birim sayısına bölünmüşüdür: şehirde 8 aydınlatma direği, \
+kırsalda 4 dağıtım direği, tünelde 4 birim. Merkezî sistem bir \
+yazılımcının haftada bir günü ve iki sunucudur, yılda 237000 TL, 1000 \
+birime yayılır. Kırsalda ve tünelde bakım kalemi arttı, çünkü bakım \
+ziyareti artık montajla aynı hızda (günde 4 birim) sayılıyor. Doğruluk ve \
+kullanılabilirlik değişmedi."""
 en = """YERKON CAPEX is the thousand unit bill of materials price of a \
 scenario's broadcast units plus what fitting each one costs (bracket, \
 labour and, where needed, a standalone supply), divided by the scenario's \
 area. The unit price covers the main parts only: board manufacture and \
 assembly, the passives, test, calibration, certification, tax and shipping \
 are excluded. The position comes from a Kalman filter that combines radio \
-ranges with the height from a map; no inertial unit or odometry is used."""
+ranges with the height from a map; no inertial unit or odometry is used. \
+YERKON OPEX is the yearly running cost: electricity (the commercial tariff, \
+5,62 TL/kWh after the April 2026 increase), replacement (tax depreciation \
+lives), maintenance and the central system. A maintenance visit is a crew \
+day (bucket truck, electrician and helper, 17570 TL) divided by the sites \
+the crew reaches on that structure in a day: 8 lighting columns in town, \
+4 distribution poles in open country, 4 units in a tunnel. The central \
+system is one day a week of a developer and two servers, 237000 TL a year \
+spread over 1000 units. In open country and the tunnel the maintenance line \
+rose, because a maintenance visit is now counted at the same pace as a \
+fitting (4 units a day). Accuracy and availability did not change."""

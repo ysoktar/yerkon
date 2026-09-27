@@ -52,15 +52,18 @@ aynı ekip ve aynı araç olduğu için bu tutarsızdı. Artık:
 
 ## Kaynağı bulunamayanlar
 
-- **Dağıtım direği ve çatı kirası (1200 TL/yıl):** dağıtım şirketlerinin
-  direğe cihaz için yayımladığı bir bedel yok. Ulaştırma Bakanlığı'nın
-  geçiş hakkı usul ve esasları, Türk Telekom'un bağlantı ve nakil
-  ücretleri ve Genel Aydınlatma Yönetmeliği direk başına bir bedel
-  yazmıyor. Karşılaştırma için bulunanlar: dağıtım şirketleri 2015'ten
-  beri EPDK izniyle direkte reklam alanı kiralıyor (en küçük afiş ayda
-  4700 TL, Tr724, 2019); İBB 2025 tarifesi small cell için yıllık
-  24500 TL, BEDAŞ/AYEDAŞ aydınlatma direğindeki kabinet için yer seçim
-  belgesi ücretinin iki katı. Değer proje sahibinin kararına bırakıldı.
+- **Dağıtım direği kirası:** dağıtım şirketlerinin direğe cihaz için
+  yayımladığı bir bedel yok. Ulaştırma Bakanlığı'nın geçiş hakkı usul ve
+  esasları, Türk Telekom'un bağlantı ve nakil ücretleri ve Genel
+  Aydınlatma Yönetmeliği direk başına bir bedel yazmıyor. Karşılaştırma
+  için bulunanlar: dağıtım şirketleri 2015'ten beri EPDK izniyle direkte
+  reklam alanı kiralıyor (en küçük afiş ayda 4700 TL, Tr724, 2019); İBB
+  2025 tarifesi small cell için yıllık 24500 TL, BEDAŞ/AYEDAŞ aydınlatma
+  direğindeki kabinet için yer seçim belgesi ücretinin iki katı.
+  **Karar (proje sahibi, 28 Eylül 2026): kira sıfır**, kamu protokolüyle;
+  birimlerin AUS gibi hazır kamu yapılarına dahil edilebilmesi
+  öngörülüyor. Dipnotlarda (site, sunum) belirtiliyor. Çatı kirası
+  (1200 TL/yıl, bina sahibine) varsayım olarak kaldı; kırsalda bir çatı var.
 - **25 m direk (85000 TL):** 25 m için yayımlanmış bir fiyat bulunamadı
   (yayımlanan aydınlatma direği fiyatları 10 m'ye kadar; projektör direği
   üreticileri teklifle satıyor). Kırsal satırda bir tane var.
@@ -79,4 +82,17 @@ aynı ekip ve aynı araç olduğu için bu tutarsızdı. Artık:
 Doğruluk ve kullanılabilirlik değişmedi. Kırsal ve tünel OPEX'i arttı,
 çünkü oradaki ziyaret artık montajla aynı hızda, günde dört birimden
 fiyatlanıyor. Kırsal satırda varsayıma dayanan pay %78,5'ten %56,6'ya indi;
-kalanı 25 m direk ve kira.
+kalanı 25 m direk ve kira. Kira sıfırlandıktan sonra kırsal OPEX 458'den
+312 TL/km²/yıl'a indi (bkz. aşağı).
+
+## Kira sıfır (28 Eylül 2026)
+
+`mounting.distribution_pole.rent_tl_per_year` 1200'den 0'a indi,
+dayanağı "tasarım kararı: kamu protokolü". Kırsal OPEX yılda 52800 TL
+azaldı: 165665'ten 112865 TL'ye, 458'den 312 TL/km²/yıl'a. Protokol
+olmazsa direk başına 1200 TL kırsal OPEX'i yaklaşık %47 artırır.
+
+Sitede ve sunumda alan hücreleri "≈ 148,94 milyon" oldu; dipnot 4
+okyanuslar dahil tüm yüzeyi (yaklaşık 510,06 milyon km², NASA) ve karanın
+payını (yaklaşık %29) veriyor. YERKON CAPEX dipnotu OPEX'i de açıklıyor ve
+OPEX hücrelerine de bağlı.

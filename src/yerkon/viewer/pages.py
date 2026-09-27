@@ -1959,18 +1959,25 @@ COST = Page(
                     "says the breakdown agrees with the report.",
                 ),
                 _w(
-                    "100 adetlik fiyat, raporun kendi 1'den 100'e "
-                    "indirimiyle hesaplandı. 1000 adette, dağıtıcının "
-                    "kademe fiyatı doğrulanan parça o fiyatla giriyor; "
+                    "Satıcının kademe fiyatı doğrulanan bir parça, o "
+                    "kademeden büyük her adette o fiyatla giriyor. Daha "
+                    "küçük adette o fiyat bir taban: bir parça az "
+                    "alındığında çok alındığından ucuz olamaz. Kademesi "
                     "doğrulanmayan parçalar ve \"diğer\" satırı 100 "
-                    "adetlik fiyatın %90'ı sayılıyor. Doğrulanan kademeler "
-                    "çoğu parçada raporun indiriminden pahalı.",
-                    "The price at a hundred uses the report's own discount "
-                    "from one to a hundred. At a thousand, a part whose "
-                    "distributor tier was verified enters at that price; "
-                    "the others and the \"other\" line are taken at 90 % "
-                    "of the hundred price. For most parts the verified "
-                    "tiers are dearer than the report's discount.",
+                    "adette raporun kendi 1'den 100'e indirimiyle, 1000 "
+                    "adette 100 adetlik fiyatın %90'ıyla hesaplanıyor. "
+                    "Böylece her üründe 1 adet, 100 adetten, 100 adet de "
+                    "1000 adetten pahalı. Maliyet tablosu 1000 adeti "
+                    "kullanıyor.",
+                    "A part whose distributor tier was verified enters at "
+                    "that price at every quantity from its tier up. Below "
+                    "it, that price is a floor: fewer of a part never cost "
+                    "less than more of it. Parts with no verified tier and "
+                    "the \"other\" line use the report's own discount "
+                    "from one to a hundred, and 90 % of the hundred price "
+                    "at a thousand. So for every product one unit costs "
+                    "more than a hundred, and a hundred more than a "
+                    "thousand. The cost table uses the thousand.",
                 ),
                 _w(
                     "Parça fiyatları satıcıların 23-25 Eylül 2026 liste "
@@ -2996,6 +3003,8 @@ def _published(published, language: str, table=None) -> str:
         rest = [html.escape(one) for one in cells[3:]]
         rest[3] += mark(table.yerkon["availability"])
         rest[5] += mark(table.yerkon["capex"])
+        # The same note says what the running cost is made of.
+        rest[6] += mark(table.yerkon["capex"])
         # A row priced by its length says so on both cost cells: the
         # column head says TL/km² and for this one row it is not.
         if row.costed_by == "route":
