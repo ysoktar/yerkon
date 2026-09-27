@@ -67,10 +67,19 @@ export const SAY = {
                     en: "Drape the photograph over the ground" },
   "ground.photo.from": { tr: "Kaynak: {source}", en: "From {source}" },
   "ground.photo.none": {
-    tr: "Bu yer fotoğrafsız getirilmiş. Yeni bir yer getirirken karo "
-        + "adresi verilirse görüntü de iner.",
-    en: "This place was fetched without one. Give a tile address when "
-        + "fetching somewhere new and the photograph comes with it.",
+    tr: "Bu yer fotoğrafsız getirilmiş. Yeni bir yer getirirken \"Uydu "
+        + "görüntüsünü de getir\" kutusu işaretliyse görüntü de gelir.",
+    en: "This place was fetched without one. Tick \"Fetch the satellite "
+        + "photograph too\" when fetching somewhere new and it comes along.",
+  },
+  "ground.roads": { tr: "Yolları göster", en: "Show the roads" },
+  "ground.roads.from": {
+    tr: "Getirilen yol ağı; araçlar kalın çizgideki güzergâhı sürüyor.",
+    en: "The fetched road network; the units drive the route drawn thick.",
+  },
+  "ground.roads.none": {
+    tr: "Bu zeminde getirilmiş yol yok.",
+    en: "This ground carries no fetched roads.",
   },
   "ground.photo.modelled": {
     tr: "Modellenmiş zeminin fotoğrafı yoktur: orası hiçbir yer değil.",
@@ -526,6 +535,13 @@ export const SAY = {
   "layer.margin_db": { tr: "Sinyal marjı", en: "Signal margin" },
   "layer.dilution": { tr: "Geometri (HDOP)", en: "Geometry (HDOP)" },
   "layer.error_m": { tr: "Beklenen konum hatası", en: "Expected position error" },
+  "layer.ground": { tr: "Yalnız zemin (uydu ve yollar)",
+                    en: "Ground only (photograph and roads)" },
+  "layer.ground.note": {
+    tr: "Kapsama renkleri kapalı; zemin, uydu görüntüsü ve yollar görünür.",
+    en: "Coverage colours off, so the ground, the photograph and the "
+        + "roads show.",
+  },
   "layer.anchors.note": {
     tr: "Bir hücreye kaç direğin eriştiği. Üçü bir konum için en az; "
         + "dördüncüsü onu denetler.",

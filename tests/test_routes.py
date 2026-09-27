@@ -82,6 +82,26 @@ def test_a_network_is_walked_rather_than_driven_in_the_order_it_was_stored():
     assert ys == {1900}, "it drives the longer one, not both"
 
 
+def test_the_road_route_goes_round_the_site_on_its_streets():
+    """The circuit's corners, joined along the streets rather than
+    through the blocks between them."""
+    streets = []
+    for at in range(0, 3001, 500):
+        streets.append(((float(at), 0.0), (float(at), 3000.0)))
+        streets.append(((0.0, float(at)), (3000.0, float(at))))
+    town = Course(length_m=3000.0, width_m=3000.0, road=tuple(streets))
+    drawn = trace(Trip(method="road", step_m=100.0), town)
+    xs = [x for x, _ in drawn]
+    ys = [y for _, y in drawn]
+    assert min(xs) <= 500.0 and max(xs) >= 2500.0
+    assert min(ys) <= 500.0 and max(ys) >= 2500.0
+    # Every point on a street: a grid of streets 500 m apart leaves the
+    # route on a multiple of 500 in one of its two coordinates.
+    assert all(min(x % 500.0, 500.0 - x % 500.0) < 1.0
+               or min(y % 500.0, 500.0 - y % 500.0) < 1.0
+               for x, y in drawn)
+
+
 def test_a_road_is_cut_to_the_site_rather_than_pulled_back_to_it():
     """A road pulled back to the boundary is a road that bends where it
     does not (ADR-0037)."""

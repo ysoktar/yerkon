@@ -149,6 +149,57 @@ def drawable(terrain, west: float, east: float,
 MAP_TILES = ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]
 
 
+#: How far apart the drawn road network's points stand, at least, in
+#: metres, and as a share of the drawn ground's longer side. A fetched
+#: network is thousands of vertices; this keeps every bend a person can
+#: see at that scale, and a twenty kilometre site's streets under a
+#: hundred and fifty kilobytes.
+ROAD_STEP_M = 20.0
+ROAD_STEP_SHARE = 1.0 / 150.0
+
+
+def _roads(measured, terrain, box) -> list:
+    """The fetched road network over the drawn ground, for the page.
+
+    Drawn, never read: the units drive the route, and this is the
+    streets around it, so a layout can be judged against where the
+    roads actually are. Empty where the ground is modelled or the fetch
+    brought no roads, and the page greys its switch (ADR-0036).
+    """
+    if measured is None:
+        return []
+    west, east, south, north = box
+    step = max(ROAD_STEP_M, max(east - west, north - south) * ROAD_STEP_SHARE)
+    drawn = []
+
+    def point(x, y):
+        return [round(float(x), 1), round(float(y), 1),
+                round(terrain.height_at(float(x), float(y)), 1)]
+
+    def close(run, tail):
+        # A street's last point always, so a short one is still a line.
+        if tail is not None and (not run or run[-1][:2] != point(*tail)[:2]):
+            run.append(point(*tail))
+        # A stub shorter than a step is a driveway at this scale.
+        if len(run) >= 2 and math.dist(run[0][:2], run[-1][:2]) >= step:
+            drawn.append(run)
+
+    for line in getattr(measured, "roads_m", ()) or ():
+        run, last, tail = [], None, None
+        for x, y in line:
+            if not (west <= x <= east and south <= y <= north):
+                close(run, tail)
+                run, last, tail = [], None, None
+                continue
+            tail = (x, y)
+            if last is not None and math.dist(last, (x, y)) < step:
+                continue
+            run.append(point(x, y))
+            last = (x, y)
+        close(run, tail)
+    return drawn
+
+
 def _aerial(state: ViewState, measured) -> Optional[dict]:
     """Where the site's photograph is and what ground it covers.
 
@@ -346,6 +397,10 @@ def scene(state: ViewState) -> dict:
             # megabyte on the wire on every drag, to say what one PNG the
             # browser caches says once.
             "aerial": _aerial(state, measured),
+            # The streets, beside the route the units drive.
+            "roads": _roads(measured, terrain,
+                            (float(xs[0]), float(xs[-1]),
+                             float(ys[0]), float(ys[-1]))),
         },
         # Where the map picker fetches its tiles. Named by the engine
         # rather than written into the page, so `--map-tiles` can point

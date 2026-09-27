@@ -255,17 +255,20 @@ def _waypoints(trip: Trip, course: Course):
 
 
 def _road(trip: Trip, course: Course):
-    """The carriageway a fetch actually brought.
+    """The circuit, driven on the carriageway a fetch actually brought.
 
-    The only route here that is a measurement rather than a shape. Every
-    other one is a pattern somebody would drive; this is where the road
-    goes.
+    The only route here that is a measurement rather than a shape: the
+    same corners as `circuit` (round the edge and across the middle), but
+    joined by the shortest way along real roads instead of straight lines
+    through buildings and fields.
 
     What arrives is a network, not a path: a road is split at every
-    junction, so Kızılay is 1 638 segments and driving the list in the
-    order it was stored would teleport a vehicle between roads that do
-    not meet. This walks the network instead — joining segments that
-    share an end — and drives the longest continuous run it can find.
+    junction, so Kızılay is 1 638 segments. The segments become a graph
+    joined where their ends meet, each corner is moved to the nearest
+    point of the largest connected part, and consecutive corners are
+    joined by Dijkstra's shortest path. Where the corners all land on
+    one point, the network is too small to go round, and the route
+    drives the longest continuous run it can find instead.
 
     Segments are first cut to the site, because a segment whose box
     overlaps the site can run a long way past it and nothing drives on
@@ -280,7 +283,101 @@ def _road(trip: Trip, course: Course):
             "the road this ground carries does not run inside the site. "
             "Widen the site, or pick another route."
         )
-    return _along(_longest_run(pieces), trip.step_m)
+    nodes, edges = _graph(pieces)
+    part = _largest_part(nodes, edges)
+    inset = course.inset_m
+    left, right = inset, course.length_m - inset
+    bottom, top = inset, course.width_m - inset
+    corners = [(left, bottom), (right, bottom), (right, top), (left, top),
+               (left, bottom), (right, top)]
+    stops = [_nearest(nodes, part, corner) for corner in corners]
+    path = []
+    for start, finish in zip(stops, stops[1:]):
+        leg = _shortest(nodes, edges, start, finish)
+        path.extend(leg if not path else leg[1:])
+    points = [nodes[index] for index in path]
+    if _walked(points) <= 0.0:
+        inside = [piece for piece in pieces
+                  if _key(piece[0]) in part or _key(piece[-1]) in part]
+        points = _longest_run(inside or pieces)
+    return _along(points, trip.step_m)
+
+
+def _key(point, join_m: float = 1.0):
+    """Where a point lands on a lattice fine enough that ends a metre
+    apart are one junction."""
+    return (round(point[0] / join_m), round(point[1] / join_m))
+
+
+def _graph(pieces):
+    """The road network as a graph: a node per distinct vertex, an edge
+    per stretch between two, weighted by its length."""
+    nodes, edges = {}, {}
+    for piece in pieces:
+        keys = [_key(point) for point in piece]
+        for key, point in zip(keys, piece):
+            nodes.setdefault(key, (float(point[0]), float(point[1])))
+        for a, b in zip(keys, keys[1:]):
+            if a == b:
+                continue
+            length = math.dist(nodes[a], nodes[b])
+            edges.setdefault(a, {})[b] = length
+            edges.setdefault(b, {})[a] = length
+    return nodes, edges
+
+
+def _largest_part(nodes, edges):
+    """The connected part of the network with the most road in it."""
+    seen, best, best_length = set(), set(), -1.0
+    for start in nodes:
+        if start in seen:
+            continue
+        part, stack, length = {start}, [start], 0.0
+        seen.add(start)
+        while stack:
+            here = stack.pop()
+            for there, span in edges.get(here, {}).items():
+                length += span / 2.0
+                if there not in seen:
+                    seen.add(there)
+                    part.add(there)
+                    stack.append(there)
+        if length > best_length:
+            best, best_length = part, length
+    return best
+
+
+def _nearest(nodes, part, point):
+    return min(part, key=lambda key: math.dist(nodes[key], point))
+
+
+def _shortest(nodes, edges, start, finish):
+    """Dijkstra's shortest path between two nodes, as the nodes on it."""
+    import heapq
+
+    if start == finish:
+        return [start]
+    best = {start: 0.0}
+    came = {}
+    queue = [(0.0, start)]
+    while queue:
+        distance, here = heapq.heappop(queue)
+        if here == finish:
+            break
+        if distance > best.get(here, math.inf):
+            continue
+        for there, span in edges.get(here, {}).items():
+            through = distance + span
+            if through < best.get(there, math.inf):
+                best[there] = through
+                came[there] = here
+                heapq.heappush(queue, (through, there))
+    if finish not in came:
+        return [start]
+    path = [finish]
+    while path[-1] != start:
+        path.append(came[path[-1]])
+    return path[::-1]
 
 
 def drivable(course: Course) -> bool:

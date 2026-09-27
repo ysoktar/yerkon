@@ -172,11 +172,17 @@ function face(view, corners, colour, alpha, grow = 0, bias = 0) {
  * to be drawn as ground with no photograph over it, and clamping would
  * smear the edge row of pixels out across the countryside instead.
  */
-export function photoSampler(pixels, width, height, extent) {
+export function photoSampler(pixels, width, height, extent, sheet = null) {
   const [west, south, east, north] = extent;
   const across = Math.max(east - west, 1e-9);
   const down = Math.max(north - south, 1e-9);
   return {
+    // The picture itself, for the painter to lay across the ground once
+    // the camera is still.
+    image: sheet,
+    pixelOf(x, y) {
+      return [(x - west) / across * width, (north - y) / down * height];
+    },
     colourAt(x, y) {
       const u = (x - west) / across;
       const v = (north - y) / down;           // rows run north to south
@@ -228,6 +234,15 @@ export function groundFaces(view, terrain, light, photo) {
         `rgb(${Math.round(ink[0] * lit)},${Math.round(ink[1] * lit)},${Math.round(ink[2] * lit)})`,
         1, 0.6,
       );
+      if (painted && photo && photo.image && painted.screen.length === 4) {
+        // Where the quad's corners fall on the picture, so a still frame
+        // can lay the photograph itself across it rather than one colour.
+        painted.texture = {
+          image: photo.image,
+          source: corners.map(point => photo.pixelOf(point[0], point[1])),
+          shade: 1 - lit,
+        };
+      }
       if (painted) out.push(painted);
     }
   }
@@ -428,6 +443,67 @@ export function ring(view, centre, radius, colour, bias = 0) {
   return polyline(view, points, colour, 1.5, bias);
 }
 
+/* Lay a slice of the photograph across one ground quad.
+ *
+ * The affine map that takes three of the quad's corners on the picture to
+ * the same corners on screen, clipped to the quad. Affine rather than
+ * projective: a quad is a few pixels to a few dozen across, and the
+ * difference is under a pixel. Only the picture's own rectangle under
+ * the quad is drawn, not the whole sheet, which is what keeps ten
+ * thousand of these to a frame a person does not wait for.
+ */
+function textured(context, item) {
+  const [s0, s1, , s3] = item.screen;
+  const [t0, t1, , t3] = item.texture.source;
+  const u1 = [t1[0] - t0[0], t1[1] - t0[1]];
+  const u3 = [t3[0] - t0[0], t3[1] - t0[1]];
+  const det = u1[0] * u3[1] - u3[0] * u1[1];
+  if (Math.abs(det) < 1e-9) return false;
+  const d1 = [s1[0] - s0[0], s1[1] - s0[1]];
+  const d3 = [s3[0] - s0[0], s3[1] - s0[1]];
+  const a = (d1[0] * u3[1] - d3[0] * u1[1]) / det;
+  const c = (d3[0] * u1[0] - d1[0] * u3[0]) / det;
+  const b = (d1[1] * u3[1] - d3[1] * u1[1]) / det;
+  const d = (d3[1] * u1[0] - d1[1] * u3[0]) / det;
+  const e = s0[0] - a * t0[0] - c * t0[1];
+  const f = s0[1] - b * t0[0] - d * t0[1];
+  const xs = item.texture.source.map(p => p[0]);
+  const ys = item.texture.source.map(p => p[1]);
+  const image = item.texture.image;
+  const left = Math.max(0, Math.floor(Math.min(...xs)) - 1);
+  const top = Math.max(0, Math.floor(Math.min(...ys)) - 1);
+  const right = Math.min(image.width, Math.ceil(Math.max(...xs)) + 1);
+  const bottom = Math.min(image.height, Math.ceil(Math.max(...ys)) + 1);
+  if (right <= left || bottom <= top) return false;
+  context.beginPath();
+  context.moveTo(item.screen[0][0], item.screen[0][1]);
+  for (const point of item.screen.slice(1)) context.lineTo(point[0], point[1]);
+  context.closePath();
+  // The quad's own colour underneath: where the fourth corner does not
+  // sit where the affine map puts it (a wall, a steep slope), the slice
+  // leaves a sliver, and a sliver of the page behind reads as a hole.
+  context.fillStyle = item.colour;
+  context.fill();
+  context.save();
+  context.clip();
+  context.setTransform(a, b, c, d, e, f);
+  context.drawImage(image, left, top, right - left, bottom - top,
+                    left, top, right - left, bottom - top);
+  context.restore();
+  // The same shading the flat colour carries, so a hill reads as a hill.
+  if (item.texture.shade > 0.01) {
+    context.globalAlpha = item.texture.shade * 0.8;
+    context.fillStyle = "#000";
+    context.fill();
+  }
+  return true;
+}
+
+/* Whether ground quads carrying a photograph are drawn with it. Off
+ * while the camera moves, when a flat colour per quad keeps the frame
+ * rate; the page turns it on once the view is still. */
+export const texturing = { on: false };
+
 export function paint(context, width, height, items) {
   context.clearRect(0, 0, width, height);
   items.sort((a, b) => b.depth - a.depth);
@@ -460,6 +536,10 @@ export function paint(context, width, height, items) {
       context.arc(item.top[0], item.top[1], 4.5, 0, Math.PI * 2);
       context.fill();
       continue;
+    }
+    if (item.kind === "face" && item.texture && texturing.on) {
+      context.globalAlpha = 1;
+      if (textured(context, item)) continue;
     }
     if (item.kind === "face") {
       context.globalAlpha = item.alpha;

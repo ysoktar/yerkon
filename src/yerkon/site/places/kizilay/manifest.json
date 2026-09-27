@@ -7,6 +7,15 @@
   },
   "grid_spacing_m": 30.0,
   "aerial": null,
+  "drape": {
+    "template": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    "zoom": 17,
+    "west_x": 77485,
+    "north_y": 49650,
+    "east_x": 77497,
+    "south_y": 49663,
+    "source": "Esri World Imagery z17 (Esri, Maxar, Earthstar Geographics, GIS User Community)"
+  },
   "manifest": {
     "elevation_source": "Copernicus DEM 30 m \u00d71",
     "elevation_resolution_m": 30.0,

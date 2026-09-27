@@ -279,16 +279,30 @@ def test_the_photograph_survives_being_written_out_and_read_back(
 # --- What the page is handed ---------------------------------------------
 
 
-def test_a_site_with_no_photograph_tells_the_page_so_rather_than_nothing():
+def test_a_site_with_no_photograph_tells_the_page_so_rather_than_nothing(
+        monkeypatch):
     """The scene carries the picture's address, not its pixels, and says
     plainly when there is none so the page can grey its tick (ADR-0036)."""
     from dataclasses import replace
 
     from yerkon.viewer.scene import scene
-    from yerkon.viewer.state import fetched_sites, from_scenario
+    from yerkon.viewer.state import ViewState, fetched_sites, from_scenario
 
     state = replace(from_scenario("urban"), site=fetched_sites()[0])
+    bare = replace(state.measured(), drape=None, aerial=None)
+    monkeypatch.setattr(ViewState, "measured", lambda self: bare)
     assert scene(state)["terrain"]["aerial"] is None
+
+
+def test_every_shipped_site_carries_its_photograph():
+    """The ground the table stands on is the ground a person looks at, so
+    the photograph switch is live on every tab rather than greyed."""
+    from yerkon.viewer.scene import scene
+    from yerkon.viewer.state import from_scenario
+
+    for row in ("urban", "rural", "tunnel"):
+        aerial = scene(from_scenario(row))["terrain"]["aerial"]
+        assert aerial is not None and aerial["tiles"]["zoom"] >= 14, row
 
 
 def test_the_photograph_is_addressed_by_site_rather_than_served_as_colours(

@@ -1446,6 +1446,11 @@ function wireControls() {
     render();
   };
 
+  document.getElementById("show-roads").onchange = event => {
+    showRoads = event.target.checked;
+    render();
+  };
+
   document.getElementById("only-assumed").onchange = event => {
     onlyAssumed = event.target.checked;
     drawFigures();
@@ -1523,6 +1528,8 @@ function drawnTerrain() {
 let photograph = null;
 let photographUrl = "";
 let showPhotograph = true;
+/* Whether the fetched streets are drawn beside the route. */
+let showRoads = true;
 
 function aerialOf() {
   return (latest && latest.terrain && latest.terrain.aerial) || null;
@@ -1597,7 +1604,7 @@ function takePhotograph(sheet, aerial) {
     return;
   }
   photograph = draw.photoSampler(
-    pixels, sheet.width, sheet.height, aerial.extent_m);
+    pixels, sheet.width, sheet.height, aerial.extent_m, sheet);
   render();
 }
 
@@ -1642,6 +1649,17 @@ function stitchTiles(tiles) {
 /* The photograph the painter should use this frame, if any. */
 function drawnPhotograph() {
   return showPhotograph ? photograph : null;
+}
+
+/* Grey the roads tick where the ground carries none, and say why. */
+function lockRoadsTick() {
+  const tick = document.getElementById("roads-tick");
+  const box = document.getElementById("show-roads");
+  if (!tick || !box) return;
+  const any = ((terrainData && terrainData.roads) || []).length > 0;
+  box.disabled = !any;
+  tick.classList.toggle("dead", !any);
+  tick.title = say(any ? "ground.roads.from" : "ground.roads.none");
 }
 
 /* Grey the tick where this ground has no photograph, and say why.
@@ -1745,15 +1763,38 @@ window.addEventListener("resize", resize);
  * events in between collapse into it.
  */
 let framePending = false;
+/* The pending still frame, and whether this frame is it. */
+let stillTimer = null;
+let stillFrame = false;
 
 function render() {
   // Every path that redraws also reconsiders how fine the ground under
   // the camera should be. Cheap: it only resets a timer, and the window
   // it would ask for is compared with the one already in hand.
   scheduleDetail();
+  scheduleStill();
   if (framePending) return;
   framePending = true;
   requestAnimationFrame(() => { framePending = false; paintScene(); });
+}
+
+/* Flat colours while anything moves, the photograph once it stops.
+ *
+ * Laying the picture across every quad is a clipped image draw apiece,
+ * too slow to repeat on every step of a drag; a quarter of a second
+ * after the last change the same frame is painted once more with it. */
+function scheduleStill() {
+  if (stillFrame) return;
+  draw.texturing.on = false;
+  clearTimeout(stillTimer);
+  stillTimer = setTimeout(() => {
+    if (!drawnPhotograph()) return;
+    stillFrame = true;
+    draw.texturing.on = true;
+    paintScene();
+    draw.texturing.on = false;
+    stillFrame = false;
+  }, 250);
 }
 
 function paintScene() {
@@ -1776,7 +1817,15 @@ function paintScene() {
 
   const items = [
     ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
-    ...draw.cellFaces(view, sweepData, groundAt, bias, shownLayer),
+    ...(shownLayer === "ground" ? []
+      : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer)),
+    // The streets under the route, thin and pale: context, not a result.
+    ...(showRoads ? (latest.terrain.roads || []).flatMap(street =>
+      draw.polyline(
+        view,
+        street.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 4]),
+        "#9aa4ae", 1, bias,
+      )) : []),
     ...draw.masts(view, latest.anchors, colourOf),
     ...draw.polyline(
       view,
@@ -1954,7 +2003,7 @@ function scheduleDetail() {
       // Pulled back far enough that the site's own mesh is the finer of
       // the two. Dropping it keeps one mesh on screen rather than a
       // sharp patch left behind in the middle of a coarse one.
-      if (detail) { detail = null; detailAsked = null; paintScene(); }
+      if (detail) { detail = null; detailAsked = null; paintScene(); scheduleStill(); }
       return;
     }
     const key = [box.west, box.east, box.south, box.north]
@@ -1966,6 +2015,7 @@ function scheduleDetail() {
         Object.entries(box).map(([edge, at]) => [edge, String(at)]));
       detail = await ask("/api/ground?" + query.toString());
       paintScene();
+      scheduleStill();
     } catch (error) {
       detail = null;
       detailAsked = null;
@@ -2767,7 +2817,8 @@ function wireTasks() {
 /* Which of the sweep's four readings is painted. */
 let shownLayer = "anchors";
 
-const LAYERS = ["anchors", "margin_db", "dilution", "error_m"];
+/* "ground" draws no cells, so the photograph and the streets show. */
+const LAYERS = ["anchors", "margin_db", "dilution", "error_m", "ground"];
 
 /* How each band's range is written, in the layer's own units. */
 const BAND_UNITS = {
@@ -3286,6 +3337,7 @@ async function refreshScene() {
   // this scene just became.
   loadPhotograph();
   lockPhotographTick();
+  lockRoadsTick();
   // The finer mesh described the ground before this edit. Dropped rather
   // than kept, or a change of site leaves the old hill drawn in the
   // middle of the new one.
