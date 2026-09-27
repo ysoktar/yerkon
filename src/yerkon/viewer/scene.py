@@ -96,12 +96,14 @@ def ground(
     columns, rows = mesh_shape(east - west, north - south)
     xs = np.linspace(west, east, columns)
     ys = np.linspace(south, north, rows)
+    bare = bare_height(terrain)
     return {
         "xs": [float(x) for x in xs],
         "ys": [float(y) for y in ys],
-        "heights": [
-            [terrain.height_at(float(x), float(y)) for x in xs] for y in ys
-        ],
+        "heights": [[bare(float(x), float(y)) for x in xs] for y in ys],
+        "blocks": [] if state.bore else _blocks(
+            state.measured(), terrain,
+            (float(xs[0]), float(xs[-1]), float(ys[0]), float(ys[-1]))),
     }
 
 
@@ -147,6 +149,62 @@ def drawable(terrain, west: float, east: float,
 #: the handful of tiles their policy describes as ordinary use, unlike
 #: draping a city (ADR-0041, ADR-0042).
 MAP_TILES = ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]
+
+
+#: The most buildings one scene carries: Kızılay's 5 231 nearly all; Polatlı's
+#: 20 899 are mostly houses a few metres across that no one sees from
+#: twenty kilometres, so the largest are kept.
+MOST_BUILDINGS = 5000
+
+
+def bare_height(terrain):
+    """The ground without what stands on it, for drawing.
+
+    The link budget reads a roof where a footprint stands (`Fetched`), and
+    a mesh sampling that draws every building as a spike from wherever a
+    sample happened to land. The page draws the bare ground and the
+    buildings on it as blocks instead (`_blocks`).
+    """
+    from yerkon.world import Fetched
+
+    elevation = terrain.elevation_m
+    if isinstance(elevation, Fetched):
+        return elevation.site.height_at
+    return terrain.height_at
+
+
+def _blocks(measured, terrain, box) -> list:
+    """The fetched buildings over the drawn ground, largest first.
+
+    Each as [x, y, half side, height, lowest ground, highest ground]
+    under its corners: the footprint the model reads is a disc, drawn as
+    the square of the same area. The page stands it from the lowest
+    corner, so a block on a slope is sunk into it rather than hanging
+    off it. Drawn, never read, like the photograph.
+    """
+    buildings = getattr(measured, "buildings", None)
+    if buildings is None or buildings.is_empty:
+        return []
+    west, east, south, north = box
+    xs = np.asarray(buildings.centre_x_m, dtype=float)
+    ys = np.asarray(buildings.centre_y_m, dtype=float)
+    inside = np.flatnonzero((xs >= west) & (xs <= east)
+                            & (ys >= south) & (ys <= north))
+    radii = np.asarray(buildings.radius_m, dtype=float)
+    kept = inside[np.argsort(-radii[inside])][:MOST_BUILDINGS]
+    ground = bare_height(terrain)
+    share = math.sqrt(math.pi) / 2.0
+    out = []
+    for i in kept:
+        x, y = float(xs[i]), float(ys[i])
+        half = float(radii[i]) * share
+        corners = [ground(x + dx, y + dy)
+                   for dx in (-half, half) for dy in (-half, half)]
+        out.append([int(round(x)), int(round(y)), round(half, 1),
+                    round(float(buildings.height_m[i]), 1),
+                    int(math.floor(min(corners))),
+                    int(math.ceil(max(corners)))])
+    return out
 
 
 #: How far apart the drawn road network's points stand, at least, in
@@ -311,7 +369,8 @@ def scene(state: ViewState) -> dict:
     columns, rows = mesh_shape(east - west, north - south)
     xs = np.linspace(west, east, columns)
     ys = np.linspace(south, north, rows)
-    heights = [[terrain.height_at(float(x), float(y)) for x in xs] for y in ys]
+    bare = bare_height(terrain)
+    heights = [[bare(float(x), float(y)) for x in xs] for y in ys]
 
     # One reach per run, because a UWB bracket and a mast on the same
     # corridor do not cover remotely the same ground.
@@ -339,6 +398,9 @@ def scene(state: ViewState) -> dict:
             "x": float(x),
             "y": float(y),
             "ground_z": terrain.height_at(x, y),
+            # The ground without the building under a roof anchor, which
+            # the page draws as a block on it.
+            "bare_z": bare_height(terrain)(x, y),
             "z": anchor.position_m[2],
             "mounting": anchor.mounting.kind,
             "radio": anchor.radio.part,
@@ -398,10 +460,15 @@ def scene(state: ViewState) -> dict:
             # megabyte on the wire on every drag, to say what one PNG the
             # browser caches says once.
             "aerial": _aerial(state, measured),
-            # The streets, beside the route the units drive.
-            "roads": _roads(measured, terrain,
-                            (float(xs[0]), float(xs[-1]),
-                             float(ys[0]), float(ys[-1]))),
+            # The buildings, as blocks on the bare ground, and the streets
+            # beside the route the units drive. None inside a bore: what
+            # stands on the mountain is not in the tunnel.
+            "blocks": [] if state.bore else _blocks(
+                measured, terrain,
+                (float(xs[0]), float(xs[-1]), float(ys[0]), float(ys[-1]))),
+            "roads": [] if state.bore else _roads(
+                measured, terrain,
+                (float(xs[0]), float(xs[-1]), float(ys[0]), float(ys[-1]))),
         },
         # Where the map picker fetches its tiles. Named by the engine
         # rather than written into the page, so `--map-tiles` can point

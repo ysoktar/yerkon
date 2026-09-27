@@ -73,6 +73,17 @@ export const SAY = {
         + "photograph too\" when fetching somewhere new and it comes along.",
   },
   "ground.roads": { tr: "Yolları göster", en: "Show the roads" },
+  "ground.buildings": { tr: "Binaları göster", en: "Show the buildings" },
+  "ground.buildings.from": {
+    tr: "Getirilen binalar; model her birini aynı alanda bir blok olarak "
+        + "görüyor.",
+    en: "The fetched buildings; the model sees each as a block of the "
+        + "same area.",
+  },
+  "ground.buildings.none": {
+    tr: "Bu zeminde getirilmiş bina yok.",
+    en: "This ground carries no fetched buildings.",
+  },
   "ground.roads.from": {
     tr: "Getirilen yol ağı; araçlar kalın çizgideki güzergâhı sürüyor.",
     en: "The fetched road network; the units drive the route drawn thick.",

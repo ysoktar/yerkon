@@ -1453,6 +1453,11 @@ function wireControls() {
     render();
   };
 
+  document.getElementById("show-buildings").onchange = event => {
+    showBuildings = event.target.checked;
+    render();
+  };
+
   document.getElementById("only-assumed").onchange = event => {
     onlyAssumed = event.target.checked;
     drawFigures();
@@ -1532,6 +1537,8 @@ let photographUrl = "";
 let showPhotograph = true;
 /* Whether the fetched streets are drawn beside the route. */
 let showRoads = true;
+/* Whether the fetched buildings stand on the ground. */
+let showBuildings = true;
 
 function aerialOf() {
   return (latest && latest.terrain && latest.terrain.aerial) || null;
@@ -1651,6 +1658,43 @@ function stitchTiles(tiles) {
 /* The photograph the painter should use this frame, if any. */
 function drawnPhotograph() {
   return showPhotograph ? photograph : null;
+}
+
+/* The streets over the ground being drawn, cut where it ends.
+ *
+ * Zoomed in, the ground is the finer window under the camera and not
+ * the whole site, and a street drawn past its edge hangs in the sky. */
+function onDrawnGround(streets) {
+  const ground = drawnTerrain();
+  if (!ground || !ground.xs || !ground.ys) return streets;
+  const west = ground.xs[0], east = ground.xs[ground.xs.length - 1];
+  const south = ground.ys[0], north = ground.ys[ground.ys.length - 1];
+  const inside = p => p[0] >= west && p[0] <= east && p[1] >= south && p[1] <= north;
+  const out = [];
+  for (const street of streets) {
+    let run = [];
+    for (const point of street) {
+      if (inside(point)) {
+        run.push(point);
+      } else {
+        if (run.length >= 2) out.push(run);
+        run = [];
+      }
+    }
+    if (run.length >= 2) out.push(run);
+  }
+  return out;
+}
+
+/* Grey the buildings tick where the ground carries none. */
+function lockBuildingsTick() {
+  const tick = document.getElementById("buildings-tick");
+  const box = document.getElementById("show-buildings");
+  if (!tick || !box) return;
+  const any = ((terrainData && terrainData.blocks) || []).length > 0;
+  box.disabled = !any;
+  tick.classList.toggle("dead", !any);
+  tick.title = say(any ? "ground.buildings.from" : "ground.buildings.none");
 }
 
 /* Grey the roads tick where the ground carries none, and say why. */
@@ -1819,21 +1863,25 @@ function paintScene() {
 
   const items = [
     ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
+    ...(showBuildings ? draw.blocks(
+      view, (drawnTerrain().blocks || latest.terrain.blocks), light,
+      drawnPhotograph()) : []),
     ...(shownLayer === "ground" ? []
       : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer)),
     // The streets under the route, thin and pale: context, not a result.
-    ...(showRoads ? (latest.terrain.roads || []).flatMap(street =>
-      draw.polyline(
+    ...(showRoads ? onDrawnGround(latest.terrain.roads || []).flatMap(
+      street => draw.polyline(
         view,
         street.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 4]),
         "#9aa4ae", 1, bias,
       )) : []),
     ...draw.masts(view, latest.anchors, colourOf),
-    ...draw.polyline(
-      view,
-      latest.road.map(p => [p.x, p.y, p.z * draw.VERTICAL + 10]),
-      "#22282e", 2, bias,
-    ),
+    ...onDrawnGround([latest.road.map(p => [p.x, p.y, p.z])]).flatMap(
+      run => draw.polyline(
+        view,
+        run.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 10]),
+        "#22282e", 2, bias,
+      )),
   ];
 
   // Each group's reach, in its own colour, once for the group.
@@ -1857,7 +1905,7 @@ function paintScene() {
   for (const anchor of shown) {
     items.push(...draw.ring(
       view,
-      [anchor.x, anchor.y, anchor.ground_z * draw.VERTICAL + 6],
+      [anchor.x, anchor.y, draw.standingZ(anchor) + 6],
       anchor.reach_m,
       colourOf(anchor.run).replace("rgb(", "rgba(").replace(")", ",0.45)"),
       bias,
@@ -1865,11 +1913,13 @@ function paintScene() {
   }
 
   for (const unit of latest.units || []) {
-    items.push(...draw.polyline(
-      view,
-      unit.trail.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 20]),
-      "rgba(180,85,29,0.55)", 1.5, bias,
-    ));
+    for (const run of onDrawnGround([unit.trail])) {
+      items.push(...draw.polyline(
+        view,
+        run.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 20]),
+        "rgba(180,85,29,0.55)", 1.5, bias,
+      ));
+    }
   }
   items.push(...draw.units(view, latest.units || []));
 
@@ -3340,6 +3390,7 @@ async function refreshScene() {
   loadPhotograph();
   lockPhotographTick();
   lockRoadsTick();
+  lockBuildingsTick();
   // The finer mesh described the ground before this edit. Dropped rather
   // than kept, or a change of site leaves the old hill drawn in the
   // middle of the new one.

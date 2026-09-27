@@ -249,6 +249,68 @@ export function groundFaces(view, terrain, light, photo) {
   return out;
 }
 
+/* The walls' colour, a pale render. */
+const WALL = [196, 190, 180];
+
+/* Buildings as blocks standing on the bare ground.
+ *
+ * Each is [x, y, half side, height, lowest and highest ground under
+ * it] in the site's metres, drawn at its true height on the exaggerated
+ * ground: the
+ * disc the link budget reads, drawn as the square of the same area.
+ * The roof takes the photograph under it, like the ground, and each
+ * wall the shading of the way it faces. Walls facing away from the eye
+ * are left out, which is half of them and nothing a person would see.
+ */
+export function blocks(view, list, light, photo) {
+  const out = [];
+  for (const [x, y, half, height, low, high] of list || []) {
+    // The relief is exaggerated so a hill reads as a hill; a building is
+    // not, or a nine metre block stands forty five metres tall. It rises
+    // its own height over the middle of the exaggerated ground under it,
+    // from the lowest corner, so on a slope it is sunk rather than
+    // hanging off the hill.
+    const base = low * VERTICAL;
+    const top = ((low + (high ?? low)) / 2) * VERTICAL + height;
+    const at = [[x - half, y - half], [x + half, y - half],
+                [x + half, y + half], [x - half, y + half]];
+    const roof = at.map(([px, py]) => [px, py, top]);
+    const ink = (photo && photo.colourAt(x, y)) || WALL;
+    const lit = 0.45 + 0.55 * Math.max(0, light[2]);
+    const painted = face(
+      view, roof,
+      `rgb(${Math.round(ink[0] * lit)},${Math.round(ink[1] * lit)},${Math.round(ink[2] * lit)})`,
+      1, 0.4,
+    );
+    if (painted && photo && photo.image && painted.screen.length === 4) {
+      painted.texture = {
+        image: photo.image,
+        source: roof.map(point => photo.pixelOf(point[0], point[1])),
+        shade: 1 - lit,
+      };
+    }
+    if (painted) out.push(painted);
+    for (let side = 0; side < 4; side++) {
+      const [ax, ay] = at[side];
+      const [bx, by] = at[(side + 1) % 4];
+      // Outward normal of this wall, in the ground plane.
+      const normal = [by - ay, ax - bx, 0].map(v => v / (2 * half || 1));
+      const middle = [(ax + bx) / 2, (ay + by) / 2, (base + top) / 2];
+      if (dot(sub(view.eye, middle), normal) > 0) {
+        const shade = 0.5 + 0.5 * Math.max(0, dot(normal, light));
+        const wall = face(
+          view,
+          [[ax, ay, base], [bx, by, base], [bx, by, top], [ax, ay, top]],
+          `rgb(${Math.round(WALL[0] * shade)},${Math.round(WALL[1] * shade)},${Math.round(WALL[2] * shade)})`,
+          1, 0.4,
+        );
+        if (wall) out.push(wall);
+      }
+    }
+  }
+  return out;
+}
+
 /* Four colours, worst to best.
  *
  * Four and no more. A continuous ramp looks like more information than a
@@ -337,6 +399,13 @@ export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors") {
   return out;
 }
 
+/* Where an anchor's foot is drawn: the bare ground exaggerated, plus
+ * whatever structure under it (a roof) at its true height. */
+export function standingZ(anchor) {
+  const bare = anchor.bare_z ?? anchor.ground_z;
+  return bare * VERTICAL + (anchor.ground_z - bare);
+}
+
 export function masts(view, anchors, colourOf) {
   /* Drawn in screen space, not world space.
    *
@@ -349,9 +418,12 @@ export function masts(view, anchors, colourOf) {
    */
   const out = [];
   for (const anchor of anchors) {
-    const base = view.project([anchor.x, anchor.y, anchor.ground_z * VERTICAL]);
+    // On the exaggerated ground, with what it stands on (a roof) at its
+    // true height, the way the buildings are drawn.
+    const foot = standingZ(anchor);
+    const base = view.project([anchor.x, anchor.y, foot]);
     if (!base) continue;
-    const scaled = view.project([anchor.x, anchor.y, anchor.z * VERTICAL]);
+    const scaled = view.project([anchor.x, anchor.y, foot + anchor.z - anchor.ground_z]);
     // Mounting height still shows through, so a three metre sign reads as
     // shorter than a twenty-five metre mast without either vanishing.
     const drawn = Math.max(12, Math.min(46,

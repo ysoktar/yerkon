@@ -406,3 +406,24 @@ def test_fetching_again_without_a_photograph_takes_the_old_one_off_the_disk(
     cache.save(replace(site, aerial=None))
     assert not (tmp_path / "again" / "aerial.png").exists()
     assert cache.load().aerial is None
+
+
+def test_buildings_are_blocks_on_the_bare_ground_and_not_in_the_bore():
+    """The mesh drew a spike wherever a sample landed on a roof. The page
+    now draws the bare ground and each building as a block on it, and a
+    bore carries neither the mountain's buildings nor its streets."""
+    from yerkon.viewer.scene import bare_height, scene
+    from yerkon.viewer.state import from_scenario
+
+    town = from_scenario("urban")
+    drawn = scene(town)["terrain"]
+    assert drawn["blocks"], "Kızılay's buildings reach the page"
+    bare = bare_height(town.terrain())
+    x, y = drawn["xs"][10], drawn["ys"][10]
+    assert drawn["heights"][10][10] == pytest.approx(bare(x, y))
+    for block in drawn["blocks"][:50]:
+        _, _, half, height, low, high = block
+        assert half > 0.0 and height > 0.0 and low <= high
+
+    bore = scene(from_scenario("tunnel"))["terrain"]
+    assert bore["blocks"] == [] and bore["roads"] == []
