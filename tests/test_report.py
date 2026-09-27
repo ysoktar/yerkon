@@ -113,13 +113,13 @@ def test_the_three_scenarios_use_the_modules_the_bill_assigns():
     """The town and the open country share a board (ADR-0079), and under
     the frequency hopping certificate it is the amplified one (ADR-0094).
     """
-    from yerkon.hardware import DWM3000, E28_2G4M27S
+    from yerkon.hardware import DWM3000, E28_2G4M20S
 
     def radios(deployed):
         return {a.radio for a in deployed.scenario.deployment.anchors}
 
-    assert radios(URBAN) == {E28_2G4M27S}
-    assert radios(RURAL) == {E28_2G4M27S}
+    assert radios(URBAN) == {E28_2G4M20S}
+    assert radios(RURAL) == {E28_2G4M20S}
     assert radios(TUNNEL) == {DWM3000}
 
 
@@ -128,11 +128,11 @@ def test_every_unit_carries_both_modules_as_the_bill_of_materials_says():
     lets one unit work on the road and in a bore without changing. On the
     certified rows the vehicle's SX1280 is the amplified module
     (ADR-0094)."""
-    from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
+    from yerkon.hardware import DWM3000, E28_2G4M20S, SX1280
 
     for deployed in ALL:
         for unit in deployed.scenario.deployment.receivers:
-            assert SX1280 in unit.radios or E28_2G4M27S in unit.radios
+            assert SX1280 in unit.radios or E28_2G4M20S in unit.radios
             assert DWM3000 in unit.radios
 
 

@@ -741,13 +741,13 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,03 m | 9,80 m | %96,37 |
-| Kırsal | 1,97 m | 8,58 m | %94,21 |
+| Şehir içi | 2,28 m | 8,94 m | %96,64 |
+| Kırsal | 2,14 m | 7,45 m | %96,26 |
 | Tünel | 0,58 m | 2,43 m | %94,32 |
 
 27 Eylül koşusu: kullanılabilirlik doğruluğa bağlı (ADR-0084), alıcılar
 gerçek yollarda ve direkler yerleşim aramasının yerlerinde (ADR-0096),
-turda sekiz direk (ADR-0085), yükseklik haritadan
+şehir içi ve kırsalda turda on iki direk ve E28-2G4M20S (ADR-0099), yükseklik haritadan
 (ADR-0088), harcırah ve amortisman resmî (ADR-0089), SX1280'in resmî
 duyarlılığı ve direk ile araç çatısı antenleri (ADR-0091). Tünel 60 m,
 UWB kanal 5, birimler yoldan 1,2 m yüksekte (ADR-0095).

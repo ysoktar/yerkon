@@ -88,6 +88,21 @@ volume.url = "https://lcsc.com/product-detail/Wireless-Modules_Chengdu-Ebyte-Ele
 volume.date = "25.09.2026"
 volume.note = "LCSC'nin tablosu 100+ kademesinde bitiyor"
 [[part]]
+key = "e28-2g4m20s"
+name = "EBYTE E28-2G4M20S"
+role.tr = "SX1280 telsiz modülü, yükselteçli, 20 dBm"
+role.en = "SX1280 radio module with an amplifier, 20 dBm"
+usd = 5.9566
+seller = "JLCPCB"
+url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M20S/C411311"
+volume.usd = 5.8105
+volume.tier = 10
+volume.seller = "JLCPCB"
+volume.url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M20S/C411311"
+volume.date = "27.09.2026"
+volume.note = "JLCPCB'nin tablosu 10+ kademesinde bitiyor; LCSC'nin sayfası kaldırılmış. 1000 adet için bu fiyat kullanılıyor"
+
+[[part]]
 key = "tl-ant2412d"
 name = "TP-Link TL-ANT2412D"
 role.tr = "direk anteni, 2,4 GHz, 12 dBi, dış ortam, çok yönlü"
@@ -307,10 +322,10 @@ report_one_tl = 1549.67
 report_hundred_tl = 1082.68
 was = ["e28-2g4m27s", "stm32g0b1met6", "atecc608b"]
 # Certified as adaptive frequency hopping, the unit may radiate 20 dBm
-# at any bandwidth: the 27 dBm module reaches it through a sealed 5 dBi
-# rubber duck on the box's own connector (ADR-0094). The town used the 12,5 dBm
+# at any bandwidth: the 20 dBm module reaches it through a sealed 5 dBi
+# rubber duck on the box's own connector (ADR-0094, ADR-0099). The town used the 12,5 dBm
 # module with a 12 dBi mast antenna on a cable (ADR-0091).
-parts = ["e28-2g4m27s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
+parts = ["e28-2g4m20s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
 
 [[product]]
 key = "tunnel-anchor"
@@ -344,5 +359,5 @@ report_one_tl = 5202.69
 report_hundred_tl = 4002.29
 was = ["lambda80-24s", "dwm3000-digikey", "stm32g0b1met6", "bno085",
        "atecc608b", "tcan1051", "nhd-2.8"]
-parts = ["e28-2g4m27s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
          "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151"]

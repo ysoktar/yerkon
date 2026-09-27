@@ -113,3 +113,13 @@ eklenmedi.
   sahada SDR kaydıyla ölçülmeli (ADR-0083).
 - **Dış ortam anteninin hüzme genişliği.** Taoglas GW.22.5151 için
   üretici değer vermiyor; model McDonald yaklaşımıyla 35,3° kullanıyor.
+
+## Ek: 20 dBm'lik modül (27 Eylül 2026)
+
+O6'da direk ve araç E28-2G4M27S taşıyordu. 20 dBm e.i.r.p. sınırına 5 dBi
+antenle modülde 15,3 dBm yetiyor; bunu 20 dBm'lik E28-2G4M20S de
+veriyor ve model iki modülde aynı bağlantıyı hesaplıyor. Proje 20S'e
+geçti (ADR-0099): direk birimi 1000 adette 1493,43'ten 1365,12 TL'ye,
+araç alıcısı 3739,45'ten 3611,14 TL'ye indi. İki modülün de yongası
+EBYTE'ın güncel sayfalarında SX1281 yazıyor; siparişte paketteki 1280
+yazısı doğrulanmalı (`bom.toml`).

@@ -243,11 +243,13 @@ def test_a_round_is_sized_by_how_many_anchors_answer():
     turned in both rows: a position now has to be accurate, the filter's
     uncertainty grows between rounds, and a shorter round comes back
     sooner. Eight beat twelve on four seeds out of four in each row, by
-    3,3 points in the town and 2,3 in open country (ADR-0085). Every row
-    polls eight now; the tunnel always did.
+    3,3 points in the town and 2,3 in open country (ADR-0085). On the
+    real roads, with the search's anchors and real footprints, twelve
+    pulled ahead again, and the owner chose twelve for the town and the
+    open country (ADR-0099). The tunnel polls eight.
     """
-    for name in ("rural", "urban", "tunnel"):
-        assert CHOICES[name].scenario.deployment.max_anchors_per_round == 8
+    for name, polled in (("rural", 12), ("urban", 12), ("tunnel", 8)):
+        assert CHOICES[name].scenario.deployment.max_anchors_per_round == polled
 
 
 def test_the_town_takes_its_link_from_the_junctions_it_already_has():
@@ -342,7 +344,7 @@ def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
     from yerkon.parallel import spread
 
     base = CHOICES["rural"].scenario
-    assert base.deployment.max_anchors_per_round == 8
+    assert base.deployment.max_anchors_per_round == 12
     seeds = (202, 404, 606, 808)
 
     runs = spread(run_scenario, [
@@ -366,9 +368,9 @@ def test_how_long_a_rural_round_runs_is_measured_over_seeds_not_one():
     effect = statistics.mean(gaps)
 
     # The seventh pulled twelve clear: on the real roads, with anchors
-    # where the search put them, twelve buy about two points. Eight stays
-    # until the owner weighs those two points against a round half again
-    # as long, so what is held is that the gap has not grown past that.
+    # where the search put them, twelve buy about two points, and the
+    # owner took them for a round half again as long (ADR-0099). What is
+    # held is that the gap has not grown past that.
     assert effect > -0.03, (
         "twelve anchors win by more than they did: "
         "{:+.4f} against a spread of {:.4f} — {}".format(effect, scatter, got)

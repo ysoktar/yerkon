@@ -201,12 +201,12 @@ HOME = Page(
                 ),
                 _w(
                     "Bir yayın biriminin ana parçaları 1000 adetlik "
-                    "üretimde 1500 ile 1700 lira arasında. Hedef, AUS "
+                    "üretimde 1365 ile 1691 lira arasında. Hedef, AUS "
                     "noktalarında zaten "
                     "duran elektrik ve haberleşme altyapısını yeniden "
                     "kullanmak; maliyeti aşağıda tutan da bu.",
-                    "A broadcast unit's main parts cost between 1500 and "
-                    "1700 lira at a thousand units. The aim is to reuse "
+                    "A broadcast unit's main parts cost between 1365 and "
+                    "1691 lira at a thousand units. The aim is to reuse "
                     "the power and "
                     "communications already standing at intelligent "
                     "transport points, and that is what keeps the cost "
@@ -565,7 +565,7 @@ SYSTEM = Page(
                     "belgelendiriliyor; bu belgeyle 2,4 GHz'de yoğunluk "
                     "sınırı kalkıyor ve 20 dBm yayılan güç kalıyor. Kırsal "
                     "birim şehir içindekiyle aynı kart: yükselteçli modül "
-                    "(E28-2G4M27S) ve dış ortam tipi 5 dBi çubuk anten. "
+                    "(E28-2G4M20S) ve dış ortam tipi 5 dBi çubuk anten. "
                     "Menzilin geri "
                     "kalanını direğin yüksekliği ve açık görüş sağlıyor. "
                     "YERKON'da 8-10 km bir "
@@ -582,7 +582,7 @@ SYSTEM = Page(
                     "which lifts the 2,4 GHz density limit and leaves "
                     "20 dBm of radiated power. The rural unit is the same "
                     "board as the urban one: the amplified module "
-                    "(E28-2G4M27S) and an outdoor 5 dBi rod antenna. The "
+                    "(E28-2G4M20S) and an outdoor 5 dBi rod antenna. The "
                     "rest of "
                     "its reach comes from the height of the pole it stands "
                     "on and a clear line of sight. YERKON takes 8 to 10 km as a communications and "
@@ -640,7 +640,7 @@ SYSTEM = Page(
                     "anlık veri alır. Yaya modülü gibi iki telsizi birden "
                     "taşır: geniş alan için SX1280, kritik bölge için "
                     "DWM3000. DWM3000 kendi dahili antenini kullanır; "
-                    "SX1280 yükselteçli modülde (E28-2G4M27S) ve araç "
+                    "SX1280 yükselteçli modülde (E28-2G4M20S) ve araç "
                     "tavanındaki dış ortam tipi 5 dBi çubuk antenle "
                     "çalışır.",
                     "**Road vehicle.** Built on an STM32 with an LCD map "
@@ -650,7 +650,7 @@ SYSTEM = Page(
                     "module it carries both radios: an SX1280 for wide "
                     "areas and a DWM3000 for critical ones. The DWM3000 "
                     "uses its own on-board antenna; the SX1280 is the "
-                    "amplified module (E28-2G4M27S) with an outdoor 5 dBi "
+                    "amplified module (E28-2G4M20S) with an outdoor 5 dBi "
                     "rod antenna on the vehicle's roof.",
                 ),
                 _w(
@@ -1524,13 +1524,13 @@ SIMULATION = Page(
                     "including the 5 % rest frequency hopping asks for.",
                 ),
                 _w(
-                    "Sekiz birimle sırayla ölçüşmek 267 milisaniye "
-                    "sürüyor. Bu sürede 100 km/sa giden araç 7,4 metre yol "
+                    "On iki birimle sırayla ölçüşmek 401 milisaniye "
+                    "sürüyor. Bu sürede 100 km/sa giden araç 11,1 metre yol "
                     "alıyor, yani bir turdaki ölçümler aynı ana ait değil. "
                     "Hesap da onları aynı anda alınmış gibi kabul "
                     "etmiyor.",
-                    "Measuring against eight units in turn takes 267 "
-                    "milliseconds. A car doing 100 km/h covers 7,4 metres "
+                    "Measuring against twelve units in turn takes 401 "
+                    "milliseconds. A car doing 100 km/h covers 11,1 metres "
                     "in that time, so the measurements in one round do not "
                     "belong to one instant. The calculation does not "
                     "pretend they do.",

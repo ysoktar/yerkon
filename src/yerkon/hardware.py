@@ -356,8 +356,8 @@ def radios(settings: Settings = DEFAULTS) -> dict:
         settings,
     )
     rural = _sx1280_family(
-        "EBYTE E28-2G4M27S", 27.0,
-        "EBYTE E28-2G4M27S product page, rated output power",
+        "EBYTE E28-2G4M20S", 20.0,
+        "EBYTE E28-2G4M20S product page, transmit power 20 dBm",
         settings,
     )
     from dataclasses import replace as _replace
@@ -390,14 +390,25 @@ E28_2G4M27S = _sx1280_family(
     27.0,
     "EBYTE E28-2G4M27S product page, rated output power",
 )
-"""The same silicon behind a power amplifier: the town's and the open
+"""The same silicon behind a 27 dBm amplifier. It was the town's and the
+open country's anchor radio, and the vehicle's, until the 20 dBm module
+below proved to reach the same ceiling (ADR-0099). Kept for rules that
+allow more than 20 dBm."""
+
+E28_2G4M20S = _sx1280_family(
+    "EBYTE E28-2G4M20S",
+    20.0,
+    "EBYTE E28-2G4M20S product page, transmit power 20 dBm",
+)
+"""The same silicon behind a 20 dBm amplifier: the town's and the open
 country's anchor radio, and the vehicle's.
 
 Without a certificate the Turkish density limit caps radiated power at
 12,1 dBm at the ranging bandwidth, which the plain module already
 reaches (ADR-0079). Certified as adaptive frequency hopping, the ceiling
-is 20 dBm, which only this module reaches through a 5 dBi antenna
-(ADR-0094)."""
+is 20 dBm e.i.r.p. (ADR-0094): through a 5 dBi antenna and its 0,3 dB
+feed that is 15,3 dBm at the module, which this one reaches with room
+to spare (ADR-0099)."""
 
 DWM3000 = Radio(
     part="Qorvo DWM3000",

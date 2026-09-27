@@ -358,8 +358,8 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,03 | 9,80 | 3,96 | %96,37 | 8,14 | 9205 | 1771 |
-| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 1,97 | 8,58 | 4,96 | %94,21 | 361,83 | 1322 | 333 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,28 | 8,94 | 3,92 | %96,64 | 8,14 | 8905 | 1742 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,14 | 7,45 | 4,93 | %96,26 | 361,83 | 1305 | 331 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,58 | 2,43 | 3,31 | %94,32 | 0,02 | 130755 /km | 13239 /km |
 
 Her satır **gerçek Ankara zemininin** üzerinde durur; Copernicus 30 m
@@ -770,7 +770,7 @@ direğe ihtiyacı olur.
 
 `tests/test_rf.py` içinde sınanabilir iki sonuç daha:
 
-Kırsal modülün 27 dBm yükselticisi Türkiye'de hiçbir şey satın almaz,
+27 dBm'lik yükselteçli bir modül (E28-2G4M27S) belgesiz Türkiye'de hiçbir şey satın almaz,
 çünkü band yayılan gücü yoğunlukla sınırlar ve sınır bu bant genişliğinde
 12,1 dBm'de bağlar. Dolayısıyla iki direk telsizi de aynı gücü yayar ve
 aynı mesafeye erişir. İletilen gücü sınırlayan Amerikan kuralları altında

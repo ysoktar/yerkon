@@ -24,23 +24,24 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
 | Şehir içi, 600 m ızgara | 25 | 8,59 km² | 12,82 km | 98586 | 18974 | 288326 | 11477 | 2209 | 7690 | 1480 |
-| **Şehir içi, yerleşim araması (yeni)** | 19 | 8,14 km² | 19,70 km | **74925** | **14420** | **219125** | **9205** | **1771** | **3803** | **732** |
+| **Şehir içi, yerleşim araması (yeni)** | 19 | 8,14 km² | 19,70 km | **72487** | **14176** | **214247** | **8905** | **1742** | **3680** | **720** |
 | Kırsal, 3000 m ızgara | 49 | 305,75 km² | 86,40 km | 412748 | 127144 | 1684188 | 1350 | 416 | 4777 | 1472 |
-| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **478521** | **120560** | **1684121** | **1322** | **333** | **4580** | **1154** |
+| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **472106** | **119918** | **1671286** | **1305** | **331** | **4518** | **1148** |
 | Tünel, 60 m | 34 | yalnız tüp | 2,00 km | 261510 | 26477 | 526280 | yok | yok | 130755 | 13239 |
 
 27 Eylül'den beri şehir içi ve kırsalda alıcılar gerçek yollarda sürüyor
 ve direkler yerleşim aramasının seçtiği yerlerde duruyor (ADR-0096):
 şehir içinde "daha ucuz" (19 direk), kırsalda "daha iyi" (50 direk). Km²
-başına CAPEX şehir içinde 11477'den 9205 TL'ye, kırsalda 1350'den 1322
+başına CAPEX şehir içinde 11477'den 8905 TL'ye, kırsalda 1350'den 1305
 TL'ye indi; kırsalda alan 361,83 km²'ye çıktı. Binalar gerçek ayak
 izleriyle hesaplanıyor (ADR-0097); bina içine düşen ızgara noktaları
-en yakın sokağa taşınıyor (ADR-0098). Güzergâh km'leri yeni
+en yakın sokağa taşınıyor (ADR-0098). Direk ve araç modülü E28-2G4M20S:
+direk birimi 1000 adette 1493'ten 1365 TL'ye indi (ADR-0099). Güzergâh km'leri yeni
 turun, gerçek sokakların uzunluğu.
 
 25 Eylül'den beri şehir içi ve kırsal O6 ile (ADR-0094): cihaz
 uyarlamalı frekans atlamalı olarak belgelendiriliyor, direk ve araç
-27 dBm'lik modül ve dış ortam tipi (IP67) 5 dBi çubuk antenle
+yükselteçli modül (27 Eylül'den beri 20 dBm'lik E28-2G4M20S) ve dış ortam tipi (IP67) 5 dBi çubuk antenle
 (Taoglas GW.22.5151) çalışıyor; SX1280 resmî duyarlılıkta (ADR-0091).
 Önceki 12 ve 8 dBi antenlere (O4) göre direk birimi 2593'ten 1493 TL'ye
 iniyor, alan büyüyor (şehir içi 7,82'den 8,59 km²'ye, kırsal

@@ -66,7 +66,7 @@ SX1280_ANCHOR = _bom("sx1280-anchor", "Belgesiz yayın birimi")
 #:
 #: They were two lines of the report because they carried two radio
 #: modules. Certified as adaptive frequency hopping, both may radiate
-#: 20 dBm, which the amplified module reaches; with the same module they
+#: 20 dBm, which the amplified module reaches (ADR-0099); with the same module they
 #: are the same board (ADR-0079, ADR-0094).
 AMPLIFIED_ANCHOR = _bom("amplified-anchor", "Şehir içi ve kırsal yayın birimi")
 TUNNEL_ANCHOR = _bom("tunnel-anchor", "Kritik bölge yayın birimi")
@@ -89,6 +89,7 @@ PRODUCTS = {
 #: thousand lira of difference per anchor in the wrong place.
 ANCHOR_PRODUCT_BY_PART = {
     "Semtech SX1280 (EBYTE E28-2G4M12S)": SX1280_ANCHOR,
+    "EBYTE E28-2G4M20S": AMPLIFIED_ANCHOR,
     "EBYTE E28-2G4M27S": AMPLIFIED_ANCHOR,
     "Qorvo DWM3000": TUNNEL_ANCHOR,
 }

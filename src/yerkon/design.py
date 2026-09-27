@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
-from yerkon.hardware import Antenna, DWM3000, E28_2G4M27S, Radio, SX1280, W24P_U
+from yerkon.hardware import Antenna, DWM3000, E28_2G4M20S, Radio, SX1280, W24P_U
 from yerkon.regulatory import REGIONS, SpectrumRule, TURKEY
 from yerkon.rf import (
     Obstruction,
@@ -160,7 +160,7 @@ REGION_CHOICES = dict(REGIONS)
 #: The three anchor modules the report's bill of materials names.
 RADIO_CHOICES = {
     "sx1280": SX1280,
-    "e28": E28_2G4M27S,
+    "e28": E28_2G4M20S,
     "dwm3000": DWM3000,
 }
 

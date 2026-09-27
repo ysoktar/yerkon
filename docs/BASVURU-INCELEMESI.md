@@ -16,9 +16,9 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 1. **Sunumdaki YERKON sayıları eski.** Slayt 16'daki üç satır (ör. şehir
    içi HPE P50 1,28 m, kullanılabilirlik yaklaşık %98, alan 1,00 km²)
-   bugünkü modelin çıktısı değil. Site şehir içi için 2,03 m, %96,37 ve
+   bugünkü modelin çıktısı değil. Site şehir içi için 2,28 m, %96,64 ve
    8,14 km² yayımlıyor (27 Eylül). Kırsalda: sunum yaklaşık %98,9, site
-   %94,21. Sitenin kullanılabilirliği artık
+   %96,26. Sitenin kullanılabilirliği artık
    doğruluğa bağlı (ADR-0084), sunumunki değil. Sunum, form ve site aynı sayıyı söylemeli; şartnamenin
    "sonuçların tutarlılığı" ölçütü tam olarak buna bakıyor.
 2. **Kırsal birim için "8-10 km" ve 27 dBm'lik modül iddiası ancak
@@ -34,8 +34,8 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
    328 anlamında frekans atlamalı yapılırsa yoğunluk sınırı düşer ve
    20 dBm geçerli olur; o zaman amplifikatör yeniden anlam kazanır (bkz.
    "Model doğruluğu"). Proje bunu seçti: şehir içi ve kırsal birimler
-   uyarlamalı frekans atlamalı olarak belgelendiriliyor ve E28-2G4M27S
-   kullanıyor (ADR-0092, ADR-0094). Menzil sayıları (bağlantı 7,4 km, 5 m hassasiyet
+   uyarlamalı frekans atlamalı olarak belgelendiriliyor ve 20 dBm'lik
+   E28-2G4M20S kullanıyor (ADR-0092, ADR-0094, ADR-0099). Menzil sayıları (bağlantı 7,4 km, 5 m hassasiyet
    3,5 km) yasal ya da fiziksel sınır değil, modelin belirli
    varsayımlarla ürettiği sonuç; en çok da doğrulanmamış bir alıcı
    duyarlılığına bağlı.
@@ -120,20 +120,20 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 | Satır | Sütun | Sunum | Site (27 Eylül koşusu) |
 |---|---|---|---|
-| Şehir içi | HPE P50 | 1,28 m | 2,03 m |
-| Şehir içi | HPE P95 | 2,99 m | 9,80 m |
-| Şehir içi | VPE P95 | 31,47 m | 3,96 m |
-| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %96,37 |
+| Şehir içi | HPE P50 | 1,28 m | 2,28 m |
+| Şehir içi | HPE P95 | 2,99 m | 8,94 m |
+| Şehir içi | VPE P95 | 31,47 m | 3,92 m |
+| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %96,64 |
 | Şehir içi | Alan | 1,00 km² | 8,14 km² |
-| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 9205 TL/km² |
-| Şehir içi | OPEX | boş | 1771 TL/km²/yıl |
-| Kırsal | HPE P50 | 4,17 m | 1,97 m |
-| Kırsal | HPE P95 | 14,29 m | 8,58 m |
-| Kırsal | VPE P95 | 24,14 m | 4,96 m |
-| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %94,21 |
+| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 8905 TL/km² |
+| Şehir içi | OPEX | boş | 1742 TL/km²/yıl |
+| Kırsal | HPE P50 | 4,17 m | 2,14 m |
+| Kırsal | HPE P95 | 14,29 m | 7,45 m |
+| Kırsal | VPE P95 | 24,14 m | 4,93 m |
+| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %96,26 |
 | Kırsal | Alan | 1,01 km² | 361,83 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1322 TL/km² |
-| Kırsal | OPEX | boş | 333 TL/km²/yıl |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1305 TL/km² |
+| Kırsal | OPEX | boş | 331 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,58 m |
 | Tünel | HPE P95 | 1,88 m | 2,43 m |
 | Tünel | VPE P95 | 5,53 m | 3,31 m |
@@ -159,15 +159,15 @@ gönderebilir.
 | Ürün | Sunum, 1 adet | Sunum, 100 adet | Şimdi, 1 adet | Şimdi, 100 adet | Şimdi, 1000 adet |
 |---|---|---|---|---|---|
 | Şehir içi yayın birimi (bugün belgesiz kart, kullanılmıyor) | 1983,71 | 1366,07 | 1644,42 | 1132,42 | 1275,13 |
-| Kırsal yayın birimi (E28-2G4M27S; bugün şehir içi ve kırsal) | 1549,67 | 1082,68 | 1868,34 | 1305,32 | 1493,43 |
+| Kırsal yayın birimi (bugün E28-2G4M20S; şehir içi ve kırsal) | 1549,67 | 1082,68 | 1733,44 | 1211,07 | 1365,12 |
 | Kritik bölge yayın birimi | 2241,42 | 1634,44 | 1662,69 | 1212,43 | 1691,48 |
 | Yaya alıcısı | 3913,16 | 3117,74 | 2987,03 | 2379,86 | 2724,32 |
-| Kara aracı alıcısı | 5202,69 | 4002,29 | 4517,05 | 3474,84 | 3739,45 |
+| Kara aracı alıcısı | 5202,69 | 4002,29 | 4382,14 | 3371,06 | 3611,14 |
 
 Değişenler (`bom.toml`, ADR-0079): LAMBDA80-24S yerine E28-2G4M12S
 (aynı SX1280), STM32G0B1 yerine yayın birimlerinde STM32G031. Şehir içi
-ve kırsal aynı kart: E28-2G4M27S ve dış ortam tipi 5 dBi çubuk anten (Taoglas GW.22.5151, IP67); araç alıcısı da
-aynı modül ve anteni taşıyor (ADR-0094). 1000 adet sütunu, doğrulanan
+ve kırsal aynı kart: E28-2G4M20S ve dış ortam tipi 5 dBi çubuk anten (Taoglas GW.22.5151, IP67); araç alıcısı da
+aynı modül ve anteni taşıyor (ADR-0094, ADR-0099). 1000 adet sütunu, doğrulanan
 parçalarda dağıtıcının kademesinden (ADR-0093); bu yüzden bazı
 satırlarda 100 adetten yüksek. Bazı fiyatlar distribütör sitelerine bu
 ortamdan erişilemediği için arama sonuçlarından alındı; dosyada her
@@ -181,10 +181,11 @@ Formdaki tutarsızlıklar:
 
 - "100 adet üretimde yayın birimlerinin referans ana bileşen maliyeti
   yaklaşık 1.100-1.650 TL" diyor; sunumun kendi tablosu 1082-1634 TL,
-  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 1212-1305 TL
-  (100 adet), 1493-1691 TL (1000 adet).
-- Kırsal birimi E28-2G4M27S ile anlatıyor. Frekans atlama belgesiyle bu
-  doğru (ADR-0094); form belgeyi ve şehir içi birimin de aynı kart
+  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 1211-1212 TL
+  (100 adet), 1365-1691 TL (1000 adet).
+- Kırsal birimi E28-2G4M27S ile anlatıyor. Frekans atlama belgesiyle 20
+  dBm'e 20 dBm'lik E28-2G4M20S de ulaşıyor ve daha ucuz; proje ona geçti
+  (ADR-0099). Form modülü, belgeyi ve şehir içi birimin de aynı kart
   olduğunu söylemeli.
 
 ### Diğer uyumsuzluklar

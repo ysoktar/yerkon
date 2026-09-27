@@ -1359,24 +1359,21 @@ affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 
 [values."urban.anchors_per_round"]
-value = 8.0
+value = 12.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
-note = """Bir birimin konumlanmadan önce kaç direği yokladığı. 600 m \
-ızgarada dört tohumda, tam çözünürlükte: 8 direkle %72,67, %71,99, %73,68, \
-%72,54; 12 direkle %68,66, %69,30, %69,81, %69,94. Dördünde de sekiz önde, \
-ortalama +3,3 puan; P95 tohum saçılımı içinde (6,76 ve 6,70 m). Kısa tur \
-saniyede daha çok tur demek; filtrenin belirsizliği turlar arasında \
-büyüdüğü için sık gelen tur çıtayı daha sık geçiyor. Maliyet değişmiyor."""
-note_en = """How many anchors a unit polls before it is fixed. On the 600 \
-m grid over four seeds at full resolution: with 8, 72,67 %, 71,99 %, 73,68 \
-%, 72,54 %; with 12, 68,66 %, 69,30 %, 69,81 %, 69,94 %. Eight leads on \
-all four, +3,3 points on average; P95 is within the seed scatter (6,76 and \
-6,70 m). A shorter round is more rounds a second, and the filter's \
-uncertainty grows between rounds, so rounds that come often clear the bar \
-more often. The cost does not move."""
+source = "bu proje, bir yerleşim kararı olarak (proje sahibi, 27 Eylül 2026)"
+source_en = "this project, as a deployment choice (the owner, 27 September 2026)"
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Gerçek \
+yollarda, aramanın 19 direğiyle, tam çözünürlükte: 8 direkle HPE P50 2,03, \
+P95 9,80 m, %96,37; 12 direkle 2,28, 8,94 m, %96,64. On iki P95'i 0,86 m \
+iyileştiriyor; bedeli P50'de 0,25 m ve saniyede 1,87 yerine 1,25 konum. \
+Maliyet değişmiyor (ADR-0098, ADR-0099)."""
+note_en = """How many anchors a unit polls before it is fixed. On the real \
+roads, with the search's 19 anchors, at full resolution: with 8, HPE P50 \
+2,03, P95 9,80 m, 96,37 %; with 12, 2,28, 8,94 m, 96,64 %. Twelve improve \
+P95 by 0,86 m, at 0,25 m of P50 and 1,25 fixes a second instead of 1,87. \
+The cost does not move (ADR-0098, ADR-0099)."""
 affects = "şehir içi satırın güncelleme hızını ve kullanılabilirliğini"
 affects_en = "the urban row's update rate and availability"
 
@@ -1459,23 +1456,21 @@ affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 
 [values."rural.anchors_per_round"]
-value = 8.0
+value = 12.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
-note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Altı çok \
-az: gerçek rölyefte yoklananın yarısı hiç cevap vermiyor. Dört tohumda, \
-tam çözünürlükte: 8 direkle %58,15, %57,66, %58,62, %58,66; 12 direkle \
-%55,89, %56,55, %55,82, %55,82. Dördünde de sekiz önde, ortalama +2,3 \
-puan; P95 tohum saçılımı içinde (7,08 ve 6,92 m). On da sekize dört \
-tohumun dördünde kaybediyor."""
-note_en = """How many anchors a unit polls before it is fixed. Six is too \
-few: half of what is polled over real relief never answers. Over four \
-seeds at full resolution: with 8, 58,15 %, 57,66 %, 58,62 %, 58,66 %; with \
-12, 55,89 %, 56,55 %, 55,82 %, 55,82 %. Eight leads on all four, +2,3 \
-points on average; P95 is within the seed scatter (7,08 and 6,92 m). Ten \
-loses to eight on all four seeds too."""
+source = "bu proje, bir yerleşim kararı olarak (proje sahibi, 27 Eylül 2026)"
+source_en = "this project, as a deployment choice (the owner, 27 September 2026)"
+note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Gerçek \
+yollarda, aramanın 50 direğiyle, tam çözünürlükte: 8 direkle HPE P50 1,97, \
+P95 8,58 m, %94,21; 12 direkle 2,14, 7,45 m, %96,26. On iki P95'i 1,13 m \
+iyileştiriyor, kullanılabilirliği 2,1 puan artırıyor; bedeli P50'de \
+0,17 m ve saniyede 1,87 yerine 1,25 konum (ADR-0098, ADR-0099)."""
+note_en = """How many anchors a unit polls before it is fixed. On the real \
+roads, with the search's 50 anchors, at full resolution: with 8, HPE P50 \
+1,97, P95 8,58 m, 94,21 %; with 12, 2,14, 7,45 m, 96,26 %. Twelve improve \
+P95 by 1,13 m and availability by 2,1 points, at 0,17 m of P50 and 1,25 \
+fixes a second instead of 1,87 (ADR-0098, ADR-0099)."""
 affects = """kırsal satırın kullanılabilirliğini, güncelleme hızını ve yatay hatasını"""
 affects_en = "the rural row's availability, update rate and horizontal error"
 sensitivity = """altı ile sekiz arasında düz, sekizin üstünde her adımda düşüyor"""

@@ -6,7 +6,7 @@ import math
 import pytest
 
 from yerkon.hardware import (
-    E28_2G4M27S, GW_22_5151, HGV_2409U, SX1280, TL_ANT2412D, W24P_U)
+    E28_2G4M20S, GW_22_5151, HGV_2409U, SX1280, TL_ANT2412D, W24P_U)
 
 
 def test_the_sensitivity_is_the_one_semtech_publishes_carried_to_sf10():
@@ -65,12 +65,12 @@ def test_the_town_and_the_open_country_are_certified_as_adaptive_hopping():
         deployment = CHOICES[row].scenario.deployment
         assert deployment.region is TURKEY_FREQUENCY_HOPPING
         assert deployment.duty_cycle == pytest.approx(1.0 / 1.05)
-        assert all(a.radio.part == E28_2G4M27S.part
+        assert all(a.radio.part == E28_2G4M20S.part
                    for a in deployment.anchors)
         for unit in deployment.receivers:
             wide_area = unit.radios[0].part
             if unit.product == "vehicle":
-                assert wide_area == E28_2G4M27S.part, (row, unit.identifier)
+                assert wide_area == E28_2G4M20S.part, (row, unit.identifier)
             else:
                 assert wide_area == SX1280.part, (row, unit.identifier)
     tunnel = CHOICES["tunnel"].scenario.deployment
@@ -86,13 +86,13 @@ def test_the_rest_after_each_occupancy_is_time_the_schedule_loses():
 
 
 def test_the_duck_reaches_the_ceiling_with_the_amplified_module():
-    """20 dBm e.i.r.p. from a 27 dBm module through 5 dBi: the rule, not
-    the hardware, binds."""
+    """20 dBm e.i.r.p. from a 20 dBm module through 5 dBi: the rule, not
+    the hardware, binds (ADR-0099)."""
     from yerkon.regulatory import TURKEY_FREQUENCY_HOPPING
 
     eirp = TURKEY_FREQUENCY_HOPPING.permitted_eirp_dbm(
         1625e3, GW_22_5151.peak_dbi,
-        float(E28_2G4M27S.max_output_dbm.value) - GW_22_5151.feed_loss_db)
+        float(E28_2G4M20S.max_output_dbm.value) - GW_22_5151.feed_loss_db)
     assert eirp == pytest.approx(20.0)
 
 

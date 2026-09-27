@@ -260,8 +260,8 @@ def unit_antenna(row: str, product: str):
 #: and a unit's by what it is.
 #:
 #: Under the hopping certificate the pole and the vehicle carry the
-#: 27 dBm module, which reaches the 20 dBm ceiling through any of the
-#: antennas above. A pedestrian keeps the 12,5 dBm one: it is a battery
+#: 20 dBm module, which reaches the 20 dBm ceiling through any of the
+#: antennas above (ADR-0099). A pedestrian keeps the 12,5 dBm one: it is a battery
 #: device, and its link is short (ADR-0094).
 ROW_RADIOS = {
     "urban": ("e28", {"vehicle": ("e28", "dwm3000")}),

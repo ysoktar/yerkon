@@ -557,10 +557,10 @@ sources = ["sx1280-datasheet", "sx1280-range", "yerkon-github"]
 tr = """Şehir içi satır, Kızılay'ın gerçek zemini üzerinde koşuldu. Alıcılar \
 gerçek sokaklarda sürüyor. Direkler, bir yerleşim aramasının mevcut \
 direk ve levhalar, yol kenarı, ölçülmüş çatılar ve tepeler arasından \
-seçtiği 23 yerde. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
+seçtiği 19 yerde. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
 türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir."""
 en = """The urban row was run over the real ground at Kızılay. The units \
-drive the real streets. The anchors stand on 23 spots a placement \
+drive the real streets. The anchors stand on 19 spots a placement \
 search chose among standing columns and signs, the road side, measured \
 roofs and hilltops. Its range error model is derived from published \
 SX1280 measurements, so the result is a model output rather than a field \

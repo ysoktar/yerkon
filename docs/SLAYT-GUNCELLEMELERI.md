@@ -91,18 +91,19 @@ Son güncelleme: 25 Eylül 2026.
   > üst sınırına karşılık gelir. YERKON birimleri bu yüzden uyarlamalı
   > frekans atlamalı (dinle, sonra konuş) olarak belgelendirilecektir;
   > bu belgeyle yoğunluk sınırı kalkar ve 20 dBm e.i.r.p. sınırı kalır.
-  > Direk ve araç birimleri 27 dBm çıkışlı E28-2G4M27S'yi 5 dBi çubuk
-  > antenle bu sınırda kullanır. Üreticinin 27 dBm'de bildirdiği 8 km
-  > haberleşme menzili yasal güçte geçerli değildir; yasal güçteki
+  > Direk ve araç birimleri 20 dBm çıkışlı E28-2G4M20S'yi 5 dBi çubuk
+  > antenle bu sınırda kullanır. Üreticinin bildirdiği 6 km haberleşme
+  > menzili en yüksek güçte ve 5 dBi antenle, yani 25 dBm e.i.r.p. ile
+  > ölçülmüştür ve yasal güçte geçerli değildir; yasal güçteki
   > haberleşme ve mesafe ölçüm menzili saha testleriyle
   > belirlenecektir."
 
   Model aynı sınırları uyguluyor (`regulatory.py`, `TR-FHSS`) ve her
   kanal kullanımından sonraki %5 sessizliği turun süresine ekliyor
-  (ADR-0092, ADR-0094).
+  (ADR-0092, ADR-0094, ADR-0099).
 - [ ] Sayı verilecekse model sonucu olarak verilmeli: "Simülasyonda, düz
-  zeminde ve 10 m direkte, bağlantı yaklaşık 7,4 km'ye kadar kuruluyor;
-  5 m menzil hassasiyeti yaklaşık 3,5 km'de bitiyor. Bu sayılar alıcı
+  zeminde ve 10 m direkte, bağlantı yaklaşık 8,1 km'ye kadar kuruluyor;
+  5 m menzil hassasiyeti yaklaşık 6,0 km'de bitiyor. Bu sayılar alıcı
   duyarlılığı varsayımına çok bağlı ve saha ölçümüyle doğrulanacak."
   Bu bir yasal ya da fiziksel sınır değil, model çıktısı.
 - [ ] Grup 3, DWM3000 "yaklaşık 10 cm": tek bir mesafe ölçümünün sınıfı
@@ -113,14 +114,14 @@ Son güncelleme: 25 Eylül 2026.
 
 - [ ] Araç alıcısı "3-5 dBi çubuk anten" diyor; model 5 dBi çubuk anten
   kullanıyor (ADR-0094). "5 dBi dış ortam çubuk anteni (IP67),
-  E28-2G4M27S" yazılmalı.
+  E28-2G4M20S" yazılmalı (ADR-0099).
 - [ ] Harita kısıtı artık modelde: yükseklik, birimin haritasından
   2,43 m hatayla alınıyor (ADR-0088). IMU ve odometri hâlâ yok; onlar
   için "kullanılacaktır" yerine "pilotta eklenecek ve etkisi ölçülecek"
   denmeli.
 
 - [ ] Anten: şehir içi ve kırsal yayın birimleri ve araç alıcısı 5 dBi
-  çubuk antenle ve E28-2G4M27S ile çalışıyor; cihazlar uyarlamalı
+  çubuk antenle ve E28-2G4M20S ile çalışıyor; cihazlar uyarlamalı
   frekans atlamalı olarak belgelendiriliyor (ADR-0094). Yaya küçük
   anteninde ve E28-2G4M12S'de kalıyor.
 
@@ -163,7 +164,7 @@ Son güncelleme: 25 Eylül 2026.
   > Starter Kit, RAK WisBlock Starter Kit (pil, OLED ve IO modülüyle) ve
   > 17 cm kırbaç anten. Bu cihazlar yalnız prototip içindir. Son ürün,
   > maliyeti düşük tutmak için sunumda verilen bileşenlerle (SX1280
-  > tabanlı E28-2G4M27S ve E28-2G4M12S, DWM3000, 5 dBi çubuk anten ve
+  > tabanlı E28-2G4M20S ve E28-2G4M12S, DWM3000, 5 dBi çubuk anten ve
   > diğerleri)
   > üretilecektir."
 
@@ -222,13 +223,14 @@ Son güncelleme: 25 Eylül 2026.
 
   | Ürün | 1 adet | 100 adet | 1000 adet |
   |---|---|---|---|
-  | Şehir içi ve kırsal yayın birimi (E28-2G4M27S, 5 dBi IP67 anten) | 1868,34 TL | 1305,32 TL | 1493,43 TL |
+  | Şehir içi ve kırsal yayın birimi (E28-2G4M20S, 5 dBi IP67 anten) | 1733,44 TL | 1211,07 TL | 1365,12 TL |
   | Kritik bölge yayın birimi | 1662,69 TL | 1212,43 TL | 1691,48 TL |
   | Yaya alıcısı | 2987,03 TL | 2379,86 TL | 2724,32 TL |
-  | Kara aracı alıcısı (E28-2G4M27S, 5 dBi IP67 anten) | 4517,05 TL | 3474,84 TL | 3739,45 TL |
+  | Kara aracı alıcısı (E28-2G4M20S, 5 dBi IP67 anten) | 4382,14 TL | 3371,06 TL | 3611,14 TL |
 
-- [ ] Kırsal birim satırı E28-2G4M27S'de kalıyor; gerekçe frekans atlama
-  belgesi (ADR-0094). Şehir içi birim de aynı kart: iki satır tek satır
+- [ ] Kırsal birim satırı E28-2G4M20S'de; gerekçe frekans atlama
+  belgesi (ADR-0094) ve 20 dBm'lik modülün aynı sınıra ulaşması
+  (ADR-0099). Şehir içi birim de aynı kart: iki satır tek satır
   olabilir.
 - [ ] Kaynak satırı: LAMBDA80-24S yerine E28-2G4M12S (LCSC),
   STM32G0B1 yerine yayın birimlerinde STM32G031 (LCSC).
@@ -241,18 +243,18 @@ Son güncelleme: 25 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,03 | 9,80 | 3,96 | %96,37 | 8,14 km² | 9205 TL/km² | 1771 TL/km²/yıl |
-  | Kırsal | 1,97 | 8,58 | 4,96 | %94,21 | 361,83 km² | 1322 TL/km² | 333 TL/km²/yıl |
+  | Şehir içi | 2,28 | 8,94 | 3,92 | %96,64 | 8,14 km² | 8905 TL/km² | 1742 TL/km²/yıl |
+  | Kırsal | 2,14 | 7,45 | 4,93 | %96,26 | 361,83 km² | 1305 TL/km² | 331 TL/km²/yıl |
   | Tünel | 0,58 | 2,43 | 3,31 | %94,32 | güzergâh | 130755 TL/km | 13239 TL/km/yıl |
 
   (27 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik,
   alıcılar gerçek yollarda, şehir içi ve kırsalda direkler yerleşim
-  aramasının yerlerinde (19 ve 50 direk), turda sekiz direk, tünel 60 m
+  aramasının yerlerinde (19 ve 50 direk), turda on iki direk (tünelde sekiz), tünel 60 m
   ve UWB kanal 5, birimler
   yoldan 1,2 m yüksekte, yükseklik haritadan,
   harcırah ve amortisman resmî kaynaklardan, SX1280'in resmî
   duyarlılığı, uyarlamalı frekans atlama belgesi, direkte ve araçta
-  E28-2G4M27S ve dış ortam tipi 5 dBi çubuk anten.)
+  E28-2G4M20S ve dış ortam tipi 5 dBi çubuk anten.)
 
 - [ ] TerraPoiNT ve eLoran satırlarının teknoloji sütunundaki İngilizce
   kısaltma → "Karasal konumlandırma".
@@ -312,7 +314,8 @@ Son güncelleme: 25 Eylül 2026.
   (ADR-0094).
 - Hangi anten ve belge seçeneği? **Cevap: O6** (25 Eylül): uyarlamalı
   frekans atlama belgesi, direkte ve araçta E28-2G4M27S ve 5 dBi çubuk
-  anten (`ANTEN-KARSILASTIRMASI.md`).
+  anten (`ANTEN-KARSILASTIRMASI.md`). 27 Eylül'de modül E28-2G4M20S
+  oldu (ADR-0099).
 
 - Prototipte mesafe ölçümü de denensin mi? Listedeki cihazların hiçbiri
   mesafe ölçemiyor (SX1262, LR1110). İstenirse birkaç E28-2G4M12S modülü
@@ -330,6 +333,8 @@ Son güncelleme: 25 Eylül 2026.
   tünelde yöntem, tohum, tur, kamyon anteni). Düzeltildi (ADR-0084).
 - Kullanılabilirlik tanımı değişti; tablo 24 Eylül'de A seçeneğiyle
   yeniden yayımlandı. Slayt 16 yukarıdaki sayılarla güncellenmeli.
+- 27 Eylül: şehir içi ve kırsal turda on iki direk yokluyor, direk ve
+  araç modülü E28-2G4M20S (ADR-0099).
 - Şehir içi 600 m (500 idi), turda sekiz direk (12 idi, ADR-0085), tünel
   60 m (250 idi; UWB bağlantısı artık kendi frekansında ve BTK gücüyle
   hesaplanıyor, ADR-0095).

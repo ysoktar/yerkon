@@ -3,7 +3,7 @@
 import pytest
 
 from yerkon.design import Design, derive
-from yerkon.hardware import E28_2G4M27S, SX1280
+from yerkon.hardware import E28_2G4M20S, E28_2G4M27S, SX1280
 from yerkon.regulatory import EUROPE, TURKEY, UNITED_STATES
 from yerkon.rf import DEFAULT_SEARCH_LIMIT_M
 from yerkon.world import BILLBOARD, ROADSIDE_SIGN, TALL_MAST
@@ -134,7 +134,7 @@ def test_every_setting_can_be_chosen_by_a_typed_name():
     )
 
     assert chosen(REGION_CHOICES, "TR", "region") is TURKEY
-    assert chosen(RADIO_CHOICES, "e28", "radio") is E28_2G4M27S
+    assert chosen(RADIO_CHOICES, "e28", "radio") is E28_2G4M20S
     assert chosen(MOUNTING_CHOICES, "mast", "mounting") is TALL_MAST
     assert ANTENNA_CHOICES
 
