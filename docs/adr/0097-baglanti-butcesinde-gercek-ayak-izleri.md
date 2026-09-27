@@ -71,7 +71,8 @@ Aramanın kendi değerlendirmesi; yayımlanan satırdan farklı gölge
 - **Şehir içinde 4 direk bina içinde.** Şehir içi 21 direğin 5'i ızgara
   noktası; bunlardan 4'ü gerçek ayak izinde bir binanın içinde kalıyor
   (dairelerle 3'tü). Arama ızgara noktalarını her zaman aday tutuyor.
-  Onları ayıklamak ya da en yakın sokağa taşımak ayrı bir karar.
+  Onları ayıklamak ya da en yakın sokağa taşımak ayrı bir karar
+  (ADR-0098: en yakın sokağa taşındı).
 - **Kırsal:** 26 yol kenarı, 18 ızgara noktası, 4 mevcut yapı, 1 çatı,
   1 tepe. Şehir içi: 15 yol kenarı, 5 ızgara noktası, 1 mevcut yapı.
 

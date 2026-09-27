@@ -524,6 +524,48 @@ label.en = "JLCPCB: EBYTE E28-2G4M27S price (27 September 2026)"
 url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M27S/C411312"
 
 [[source]]
+key = "ebyte-e28-20s-page"
+group = "radio"
+label.tr = "EBYTE E28-2G4M20S ürün sayfası (Çince): yonga SX1281, 20 dBm, 6 km (açık alan, 5 dBi, 2 m, 125 kbps), özellik olarak ölçüm"
+label.en = "EBYTE E28-2G4M20S product page (Chinese): chip SX1281, 20 dBm, 6 km (open ground, 5 dBi, 2 m, 125 kbps), ranging listed as a feature"
+url = "https://www.ebyte.com/product/304.html"
+
+[[source]]
+key = "ebyte-e22-lbt"
+group = "radio"
+label.tr = "EBYTE: E22 serisi LoRa modüllerinin işlevleri (LBT dahil); E28-2G4M20S sayfasındaki LBT bağlantısı bu yazıya gidiyor"
+label.en = "EBYTE: what the E22 LoRa modules do (LBT among it); the LBT link on the E28-2G4M20S page leads here"
+url = "https://www.ebyte.com/news/2386.html"
+
+[[source]]
+key = "jlcpcb-e28-20s"
+group = "project"
+label.tr = "JLCPCB: EBYTE E28-2G4M20S fiyatı (27 Eylül 2026)"
+label.en = "JLCPCB: EBYTE E28-2G4M20S price (27 September 2026)"
+url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M20S/C411311"
+
+[[source]]
+key = "semtech-an1200-85"
+group = "radio"
+label.tr = "Semtech AN1200.85 v2.0 (Nisan 2024), kanal etkinliği algılama (CAD): önsöz algılama tam bir taşıyıcı algılama değil"
+label.en = "Semtech AN1200.85 v2.0 (April 2024), channel activity detection: preamble detection is not a full-fledged carrier sense"
+url = "https://www.semtech.com/uploads/technology/LoRa/cad-ensuring-lora-packets.pdf"
+
+[[source]]
+key = "etsi-en-300-328"
+group = "rules"
+label.tr = "ETSI EN 300 328 V2.2.2 (2019-07): 2,4 GHz geniş bantlı iletim; uyarlamalı frekans atlamada dinle, sonra konuş (4.3.1.7.2.2)"
+label.en = "ETSI EN 300 328 V2.2.2 (2019-07): 2,4 GHz wideband transmission; listen before talk for adaptive frequency hopping (4.3.1.7.2.2)"
+url = "https://www.etsi.org/deliver/etsi_en/300300_300399/300328/02.02.02_60/en_300328v020202p.pdf"
+
+[[source]]
+key = "expresslrs-lbt"
+group = "radio"
+label.tr = "ExpressLRS, çekme isteği 1243: SX1280 ile dinle, sonra konuş (anlık RSSI ile), yazılımda"
+label.en = "ExpressLRS, pull request 1243: listen before talk on the SX1280 (instantaneous RSSI), in firmware"
+url = "https://github.com/ExpressLRS/ExpressLRS/pull/1243"
+
+[[source]]
 key = "esri-world-imagery"
 group = "project"
 label.tr = "Esri World Imagery (Esri, Maxar, Earthstar Geographics, GIS User Community): simülatörün uydu görüntüsü"

@@ -16,8 +16,8 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 
 1. **Sunumdaki YERKON sayıları eski.** Slayt 16'daki üç satır (ör. şehir
    içi HPE P50 1,28 m, kullanılabilirlik yaklaşık %98, alan 1,00 km²)
-   bugünkü modelin çıktısı değil. Site şehir içi için 2,03 m, %96,86 ve
-   8,32 km² yayımlıyor (27 Eylül). Kırsalda: sunum yaklaşık %98,9, site
+   bugünkü modelin çıktısı değil. Site şehir içi için 2,03 m, %96,37 ve
+   8,14 km² yayımlıyor (27 Eylül). Kırsalda: sunum yaklaşık %98,9, site
    %94,21. Sitenin kullanılabilirliği artık
    doğruluğa bağlı (ADR-0084), sunumunki değil. Sunum, form ve site aynı sayıyı söylemeli; şartnamenin
    "sonuçların tutarlılığı" ölçütü tam olarak buna bakıyor.
@@ -121,12 +121,12 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 | Satır | Sütun | Sunum | Site (27 Eylül koşusu) |
 |---|---|---|---|
 | Şehir içi | HPE P50 | 1,28 m | 2,03 m |
-| Şehir içi | HPE P95 | 2,99 m | 9,84 m |
-| Şehir içi | VPE P95 | 31,47 m | 4,00 m |
-| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %96,86 |
-| Şehir içi | Alan | 1,00 km² | 8,32 km² |
-| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 9949 TL/km² |
-| Şehir içi | OPEX | boş | 1915 TL/km²/yıl |
+| Şehir içi | HPE P95 | 2,99 m | 9,80 m |
+| Şehir içi | VPE P95 | 31,47 m | 3,96 m |
+| Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %96,37 |
+| Şehir içi | Alan | 1,00 km² | 8,14 km² |
+| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 9205 TL/km² |
+| Şehir içi | OPEX | boş | 1771 TL/km²/yıl |
 | Kırsal | HPE P50 | 4,17 m | 1,97 m |
 | Kırsal | HPE P95 | 14,29 m | 8,58 m |
 | Kırsal | VPE P95 | 24,14 m | 4,96 m |

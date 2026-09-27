@@ -741,7 +741,7 @@ bağlantıların %98,1'i kapalı, Polatlı'da %79,4'ü, tünelde hiçbiri
 
 | | HPE P50 | HPE P95 | Kullanılabilirlik |
 |---|---|---|---|
-| Şehir içi | 2,03 m | 9,84 m | %96,86 |
+| Şehir içi | 2,03 m | 9,80 m | %96,37 |
 | Kırsal | 1,97 m | 8,58 m | %94,21 |
 | Tünel | 0,58 m | 2,43 m | %94,32 |
 

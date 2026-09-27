@@ -173,6 +173,14 @@ def _along_roads(roads: Sequence, step_m: float) -> list:
     return out
 
 
+def _open_street_points(site, inside) -> np.ndarray:
+    """Points every five metres along the streets, outside every building."""
+    buildings = site.buildings
+    points = [(x, y) for x, y in _along_roads(site.roads_m, 5.0)
+              if inside(x, y) and buildings.tallest_at(float(x), float(y)) <= 0.0]
+    return np.array(points, dtype=float).reshape(-1, 2)
+
+
 def _high_points(site, window_m: float, how_many: int) -> list:
     """The bare ground's local summits, most prominent first.
 
@@ -253,8 +261,20 @@ def candidates(deployed, site, row: str, settings: Settings = DEFAULTS,
                    radio=radio),
             origin, cost_of(mounting)))
 
-    # The grid itself, so the search can always do at least as well.
+    # The grid itself, so the search can always do at least as well. A
+    # lattice point that falls inside a building is moved to the nearest
+    # street, where a column can stand (ADR-0098).
+    streets = None
     for anchor in incumbent:
+        x, y = anchor.ground_position_m[:2]
+        if built and buildings.tallest_at(float(x), float(y)) > 0.0:
+            if streets is None:
+                streets = _open_street_points(site, inside)
+            if len(streets):
+                nearest = int(np.argmin(np.hypot(streets[:, 0] - x,
+                                                 streets[:, 1] - y)))
+                anchor = replace(anchor, ground_position_m=(
+                    float(streets[nearest, 0]), float(streets[nearest, 1])))
         out.append(Candidate(replace(anchor), "grid", cost_of(anchor.mounting)))
     grid = tuple(range(len(out)))
 

@@ -56,7 +56,7 @@ url = "https://www.digikey.co.uk/en/products/detail/rf-solutions/LAMBDA80-24S/97
 # 3.2, table 1-1, p. 15). EBYTE's own pages name the chip in the E28
 # modules both SX1280 and SX1281: the E28-2G4M12S and E28-2G4M20S user
 # manuals say SX1280, the E28-2G4M27S manual v1.3 (2024) and the product
-# pages say SX1281. Order against the chip, not the module name: the
+# pages of all three say SX1281, while listing ranging among the features. Order against the chip, not the module name: the
 # package reads 1280 or 1281 (datasheet figure 17-2), and a module that
 # cannot range is no use here.
 [[part]]

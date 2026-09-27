@@ -358,7 +358,7 @@ yerkon table --publish  # koşulanı published.toml'a yaz
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,03 | 9,84 | 4,00 | %96,86 | 8,32 | 9949 | 1915 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,03 | 9,80 | 3,96 | %96,37 | 8,14 | 9205 | 1771 |
 | YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 1,97 | 8,58 | 4,96 | %94,21 | 361,83 | 1322 | 333 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,58 | 2,43 | 3,31 | %94,32 | 0,02 | 130755 /km | 13239 /km |
 

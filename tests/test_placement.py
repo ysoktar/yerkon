@@ -211,17 +211,52 @@ def test_a_street_structure_inside_a_building_is_not_a_candidate():
     assert all(tallest_at(x, y) == 0.0 for x, y in road)
 
 
+def test_a_grid_point_inside_a_building_moves_to_the_nearest_street():
+    """A column cannot stand in a building; the lattice keeps its place
+    in the search, on the street beside it (ADR-0098)."""
+    from yerkon.scenarios import catalogue
+
+    deployed = catalogue(hurried())["urban"]
+    x0, y0 = deployed.scenario.deployment.anchors[0].ground_position_m[:2]
+
+    def tallest_at(x, y):
+        return 20.0 if abs(x - x0) <= 30.0 and abs(y - y0) <= 30.0 else 0.0
+
+    site = SimpleNamespace(
+        furniture=None, roads_m=([(x0 - 200.0, y0 + 40.0),
+                                  (x0 + 200.0, y0 + 40.0)],),
+        buildings=SimpleNamespace(
+            is_empty=False, centre_x_m=np.array([]), centre_y_m=np.array([]),
+            height_m=np.array([]), tallest_at=tallest_at),
+        elevation_grid_m=np.zeros((4, 4)), grid_spacing_m=1000.0,
+        height_at=lambda x, y: 0.0,
+    )
+    found, grid = P.candidates(deployed, site, "urban")
+    x, y = found[grid[0]].anchor.ground_position_m[:2]
+    assert tallest_at(x, y) == 0.0
+    assert y == pytest.approx(y0 + 40.0)
+    assert abs(x - x0) <= 5.0
+    assert len(grid) == len(deployed.scenario.deployment.anchors)
+
+
 def test_the_grid_is_always_among_the_candidates():
     """So the search can never do worse than the layout it replaces."""
     from yerkon.scenarios import catalogue, fetched
 
     settings = hurried()
     deployed = catalogue(settings)["urban"]
-    found, grid = P.candidates(deployed, fetched("kizilay"), "urban",
-                               settings)
+    site = fetched("kizilay")
+    found, grid = P.candidates(deployed, site, "urban", settings)
     assert len(grid) == len(deployed.scenario.deployment.anchors)
-    assert [found[i].anchor.ground_position_m for i in grid] == [
-        a.ground_position_m for a in deployed.scenario.deployment.anchors]
+    # Where it stands, or on the street beside it where that is a building.
+    for i, a in zip(grid, deployed.scenario.deployment.anchors):
+        x, y = found[i].anchor.ground_position_m[:2]
+        assert site.buildings.tallest_at(x, y) == 0.0
+        if site.buildings.tallest_at(*a.ground_position_m[:2]) == 0.0:
+            assert (x, y) == tuple(a.ground_position_m[:2])
+        else:
+            assert np.hypot(x - a.ground_position_m[0],
+                            y - a.ground_position_m[1]) < 100.0
     kinds = {c.origin for c in found}
     assert {"furniture", "rooftop", "hilltop", "road"} <= kinds
 
