@@ -323,9 +323,9 @@ url = "https://ieeexplore.ieee.org/abstract/document/11435291"
 [[source]]
 key = "cia-land"
 group = "gnss"
-label.tr = "CIA World Factbook, Dünya kara ve su alanı"
-label.en = "CIA World Factbook, the world's land and water area"
-url = "https://www.cia.gov/the-world-factbook/static/6c4d9b9a41b27707b6720720df7161d6/Physical_World.pdf"
+label.tr = "CIA World Factbook, Dünya kara ve su alanı (arşiv kopyası, 28 Nisan 2025; Factbook 4 Şubat 2026'da yayından kalktı)"
+label.en = "CIA World Factbook, the world's land and water area (archived copy, 28 April 2025; the Factbook was retired on 4 February 2026)"
+url = "https://web.archive.org/web/20250428071847/https://www.cia.gov/the-world-factbook/static/6c4d9b9a41b27707b6720720df7161d6/Physical_World.pdf"
 
 [[source]]
 key = "gps-standards"
@@ -564,6 +564,48 @@ group = "radio"
 label.tr = "ExpressLRS, çekme isteği 1243: SX1280 ile dinle, sonra konuş (anlık RSSI ile), yazılımda"
 label.en = "ExpressLRS, pull request 1243: listen before talk on the SX1280 (instantaneous RSSI), in firmware"
 url = "https://github.com/ExpressLRS/ExpressLRS/pull/1243"
+
+[[source]]
+key = "sepetli-ankara"
+group = "project"
+label.tr = "Ankara Sepetli Vinç Kiralama: fiyat rehberi (20 m sepetli araç saati yaklaşık 2000 TL, günlükte %30 indirim)"
+label.en = "Ankara Sepetli Vinç Kiralama: price guide (a 20 m bucket truck about 2000 TL an hour, 30 % off by the day)"
+url = "https://ankarasepetlivinckirala.com/blog/ankara-sepetli-vinc-kiralama-fiyatlari"
+
+[[source]]
+key = "yevmiye-2026"
+group = "project"
+label.tr = "Yapı Arenası: 2026 usta yevmiyeleri (12 Ağustos 2026)"
+label.en = "Yapı Arenası: 2026 trade wages (12 August 2026)"
+url = "https://yapiarenasi.com/insaat-yevmiye-ucretleri"
+
+[[source]]
+key = "ibb-tariff-2025"
+group = "project"
+label.tr = "İBB Elektronik Sistemler Şube Müdürlüğü, 2025 ücret tarifesi (repeater ve small cell için yıllık tesis yeri bedeli)"
+label.en = "Istanbul Metropolitan Municipality, electronic systems, 2025 tariff (yearly site fee for a repeater or small cell)"
+url = "https://uploads.ibb.istanbul/uploads/Elektronik_Sistemler_Sube_Mudurlugu_d9e4213fc3.pdf"
+
+[[source]]
+key = "harcirah-kanunu"
+group = "rules"
+label.tr = "6245 sayılı Harcırah Kanunu: görev yeri (Madde 3/g), günübirlik görevde gündelik (Madde 39)"
+label.en = "Travel Allowance Law 6245: place of duty (Article 3(g)), allowance on a day trip (Article 39)"
+url = "https://www.mevzuat.gov.tr/mevzuatmetin/1.3.6245.pdf"
+
+[[source]]
+key = "gvk-24"
+group = "rules"
+label.tr = "193 sayılı Gelir Vergisi Kanunu, Madde 24/2: gündeliklerin vergiden istisna kısmı"
+label.en = "Income Tax Law 193, Article 24(2): the tax-exempt part of daily allowances"
+url = "https://www.mevzuat.gov.tr/mevzuatmetin/1.4.193.pdf"
+
+[[source]]
+key = "ebyte-e28-20s-antenna"
+group = "radio"
+label.tr = "EBYTE E28-2G4M20S kullanım kılavuzu v1.30, 9. bölüm: kart üstü PCB anten (varsayılan) ya da IPEX; PCB antenin kazancı verilmiyor"
+label.en = "EBYTE E28-2G4M20S user manual v1.30, section 9: on-board PCB antenna (default) or IPEX; no gain given for the PCB antenna"
+url = "https://www.f1depo.com/class/INNOVAEditor/assets/E28-2G4M20S_Usermanual_EN_v1.30.pdf"
 
 [[source]]
 key = "esri-world-imagery"

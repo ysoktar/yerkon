@@ -950,6 +950,7 @@ const TERMS = {
   crew_travels: "ekip şehir dışına gidiyor",
   off_grid_life_years: "güneş beslemesi ömrü (amortisman)",
   per_diem_tl: "harcırah, kişi başı gündelik",
+  per_diem_share: "günübirlik görevde gündeliğin payı",
   anchor_kwh_per_year: "yıllık elektrik",
   anchor_offset_m: "yoldan uzaklık",
   anchor_spacing_m: "direk aralığı",

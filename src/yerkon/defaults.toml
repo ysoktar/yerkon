@@ -114,33 +114,17 @@ affects = """aydınlatma direğinden kullanılabilir menzili: 5 m toleransta 3,8
 affects_en = "usable range from a column: 3,83 km at a 5 m tolerance"
 
 [values."mounting.lighting_column.site_cost_tl"]
-value = 2450.0
+value = 2500.0
 unit = "TL"
-provenance = "ASSUMPTION"
-source = """20 m sepetli araç saati 2000 TL'den, günlükte %30 indirim; usta \
-yevmiyesi 3000-4000 TL (Ankara, 2026 arama sonuçları); günde sekiz \
-birim ve malzeme bu projenin varsayımı"""
-source_en = """20 m bucket truck from 2000 TL an hour, 30 % off by the day; \
-electrician's day 3000 to 4000 TL (Ankara, 2026 search results); eight \
-units a day and the materials are this project's assumption"""
-note = """Zaten duran bir aydınlatma direğine birim takmanın bedeli, \
-kalemleriyle: sepetli araç günü 11200 TL, usta ve yardımcısı 6000 TL, bir \
-ekip günde sekiz birim takar, yani birim başına 2150 TL; paslanmaz \
-kelepçe, kablo ve sigorta 300 TL. Toplam 2450 TL. Kutu ve güç kaynağı \
-zaten birimin içinde (malzeme listesinde "diğer")."""
-note_en = """What fitting a unit to a lighting column that already stands \
-costs, item by item: a bucket truck day is 11200 TL, an electrician and a \
-helper 6000 TL, a crew fits eight units a day, so 2150 TL a unit; \
-stainless clamps, cable and a fuse 300 TL. 2450 TL in all. The enclosure \
-and the power supply are already inside the unit (the "other" line of the \
-bill of materials)."""
+provenance = "DERIVED"
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+note = """Bir ekip günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL; usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Bir ekip zaten duran direklere günde sekiz birim takar (bu projenin varsayımı): 17570 / 8 = 2196 TL; paslanmaz kelepçe, kablo ve sigorta 300 TL. Toplam 2496, yuvarlanarak 2500 TL. Kutu ve güç kaynağı birimin içinde."""
+note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. A crew fits eight units a day to columns that already stand (this project's assumption): 17570 / 8 = 2196 TL; stainless clamps, cable and a fuse 300 TL. 2496, rounded to 2500 TL. The enclosure and power supply are inside the unit."""
 affects = "aydınlatma direğindeki her direğin CAPEX'ini; şehir içi sermayenin çoğu"
 affects_en = "CAPEX of every anchor on a column; most of the urban capital"
-sensitivity = """günde sekiz yerine dört birim takılırsa 4600 TL olur ve şehir \
-içi CAPEX yarıdan fazla artar"""
-sensitivity_en = """four units a day instead of eight makes it 4600 TL and \
-raises urban CAPEX by more than half"""
-
+sensitivity = """günde sekiz yerine dört birim takılırsa 4690 TL olur ve şehir içi CAPEX yarıdan fazla artar"""
+sensitivity_en = """four units a day instead of eight makes it 4690 TL and raises urban CAPEX by more than half"""
 [values."mounting.tall_mast.height_m"]
 value = 25.0
 unit = "m"
@@ -188,25 +172,13 @@ affects = "kırsal satırın menzilini ve kapsamasını"
 affects_en = "the rural row's reach and coverage"
 
 [values."mounting.distribution_pole.site_cost_tl"]
-value = 4600.0
+value = 4690.0
 unit = "TL"
-provenance = "ASSUMPTION"
-source = """aydınlatma direğiyle aynı sepetli araç ve ekip günü (Ankara, 2026 \
-arama sonuçları); köyler arası yol yüzünden günde dört birim, bu projenin \
-varsayımı"""
-source_en = """the same bucket truck and crew day as for a lighting column \
-(Ankara, 2026 search results); four units a day because of the distance \
-between villages, this project's assumption"""
-note = """Zaten duran bir dağıtım direğine birim ve güneş setini takmak. \
-Sepetli araç günü 11200 TL, usta ve yardımcısı 6000 TL; sahalar \
-kilometrelerce ayrı olduğu için bir ekip günde dört birim takar, yani \
-birim başına 4300 TL; kelepçe ve kablo 300 TL. Toplam 4600 TL. Panel ve \
-akünün bedeli ayrı: operating.off_grid_supply_tl."""
-note_en = """Fitting a unit and its solar kit to a distribution pole that \
-already stands. A bucket truck day is 11200 TL, an electrician and a \
-helper 6000 TL; the sites are kilometres apart, so a crew fits four a \
-day, 4300 TL a unit; clamps and cable 300 TL. 4600 TL in all. The panel \
-and battery are priced apart: operating.off_grid_supply_tl."""
+provenance = "DERIVED"
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+note = """Bir ekip günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL; usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Sahalar kilometrelerce ayrı olduğu için ekip günde dört birim takar (bu projenin varsayımı): 17570 / 4 = 4392 TL; kelepçe ve kablo 300 TL. Toplam 4692, yuvarlanarak 4690 TL. Panel ve akü ayrı: operating.off_grid_supply_tl."""
+note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. The sites are kilometres apart, so a crew fits four a day (this project's assumption): 17570 / 4 = 4392 TL; clamps and cable 300 TL. 4692, rounded to 4690 TL. The panel and battery are priced apart: operating.off_grid_supply_tl."""
 affects = "dağıtım direğindeki her direğin CAPEX'ini; kırsal sermayenin çoğu"
 affects_en = "CAPEX of every anchor on a distribution pole; most of the rural capital"
 
@@ -217,11 +189,17 @@ provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
 note = """Dağıtım şirketinin direğine birim taşıtmanın yıllık bedeli. \
-Yayımlanmış bir ortak kullanım bedeli bulunamadı; ayda 100 TL varsayıldı. \
-Sayılırsa bu tek satır değişir."""
+Dağıtım şirketleri için yayımlanmış bir ortak kullanım bedeli bulunamadı; \
+ayda 100 TL varsayıldı. Karşılaştırma için bir örnek: İstanbul Büyükşehir \
+Belediyesi 2025 tarifesinde belediye mülküne konan bir repeater ya da \
+small cell için yıllık 24500 TL alıyor; bu ticari operatörlere uygulanan \
+bir bedel. Sayılırsa bu tek satır değişir."""
 note_en = """What the distribution company charges a year to carry a unit \
-on its pole. No published sharing fee was found; 100 TL a month is \
-assumed. When it is known, this one line changes."""
+on its pole. No published sharing fee for distribution companies was \
+found; 100 TL a month is assumed. One example for comparison: Istanbul \
+Metropolitan Municipality's 2025 tariff charges 24500 TL a year for a \
+repeater or small cell on its property; that is a fee for commercial \
+operators. When it is known, this one line changes."""
 affects = "dağıtım direğindeki direklerin OPEX'ini"
 affects_en = "OPEX of anchors on distribution poles"
 sensitivity = "iki katına çıkarmak kırsal OPEX'i kabaca üçte bir artırır"
@@ -244,22 +222,13 @@ affects = "çatıdaki birimlerin menzilini"
 affects_en = "the reach of units on roofs"
 
 [values."mounting.rooftop.site_cost_tl"]
-value = 1800.0
+value = 1890.0
 unit = "TL"
-provenance = "ASSUMPTION"
-source = """usta yevmiyesi 3000-4000 TL (2026 arama sonuçları); günde dört \
-çatı ve malzeme bu projenin varsayımı"""
-source_en = """electrician's day 3000 to 4000 TL (2026 search results); four \
-roofs a day and the materials are this project's assumption"""
-note = """Zaten duran bir binanın çatısına birim takmak. Sepetli araç \
-gerekmiyor, çatıya merdivenle çıkılıyor; ama izin ve erişim yüzünden bir \
-ekip günde dört çatı yapar. Usta ve yardımcısı 6000 TL / 4 = 1500 TL, \
-tutucu, kablo ve binanın beslemesinden bir hat 300 TL: 1800 TL."""
-note_en = """Fitting a unit to the roof of a building that already stands. \
-No bucket truck: the roof is reached by the stairs; but permission and \
-access mean a crew does four roofs a day. An electrician and a helper \
-6000 TL / 4 = 1500 TL, a bracket, cable and a tap into the building's \
-supply 300 TL: 1800 TL."""
+provenance = "DERIVED"
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+note = """Sepetli araç gerekmiyor, çatıya merdivenle çıkılıyor. Usta 3170 TL ve yardımcı 3200 TL, izin ve erişim yüzünden günde dört çatı (bu projenin varsayımı): 6370 / 4 = 1592 TL; tutucu, kablo ve binanın beslemesinden bir hat 300 TL. Toplam 1892, yuvarlanarak 1890 TL."""
+note_en = """No bucket truck: the roof is reached by the stairs. An electrician 3170 TL and a helper 3200 TL, four roofs a day because of permission and access (this project's assumption): 6370 / 4 = 1592 TL; a bracket, cable and a tap into the building's supply 300 TL. 1892, rounded to 1890 TL."""
 affects = "çatıdaki her birimin CAPEX'ini"
 affects_en = "CAPEX of every unit on a roof"
 
@@ -307,15 +276,15 @@ affects = "tünel içinde kullanılabilir menzili"
 affects_en = "usable range inside a bore"
 
 [values."mounting.tunnel_bracket.site_cost_tl"]
-value = 6000.0
+value = 4690.0
 unit = "TL"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = "Bir birimi tünel kaplamasına askıyla tutturmak."
-note_en = "Bracketing a unit to a tunnel lining."
-affects = "tünel satırının sermayesinin %78,6'sı"
-affects_en = "78,6 % of the tunnel row's capital"
+provenance = "DERIVED"
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+note = """Bir ekip günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL; usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Tünelde iş Karayolları'nın şerit kapatmasına bağlı olduğu için ekip günde dört birim takar (bu projenin varsayımı): 17570 / 4 = 4392 TL; paslanmaz askı, dübel ve kablo 300 TL. Toplam 4692, yuvarlanarak 4690 TL. Şerit kapatmanın kendisi Karayolları'nın bakım kapanışına denk getiriliyor, ayrı fiyatlanmadı."""
+note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. In the tunnel the work depends on the highways authority's lane closure, so a crew fits four a day (this project's assumption): 17570 / 4 = 4392 TL; a stainless bracket, anchors and cable 300 TL. 4692, rounded to 4690 TL. The closure itself is timed to the authority's maintenance closures and not priced apart."""
+affects = "tünel satırının sermayesinin çoğu"
+affects_en = "most of the tunnel row's capital"
 
 # --------------------------------------------------------------------------
 # İşletmeyi sürdürmek neye mal olur
@@ -463,18 +432,17 @@ sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
 sensitivity_en = "no effect on an anchor on a structure with mains"
 
 [values."operating.maintenance_tl_per_visit"]
-value = 1800.0
+value = 2200.0
 unit = "TL/visit"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = "Bir ekip, bir araç ve trafik yönetimi."
-note_en = "A crew, a vehicle and traffic management."
+provenance = "DERIVED"
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+note = """Bir ekip günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL; usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Bir bakım ziyareti montajla aynı ekip ve araç; ekip günde sekiz birime uğrar (bu projenin varsayımı): 17570 / 8 = 2196, yuvarlanarak 2200 TL. Kırsalda sahalar uzak olduğu için gerçek bedel daha yüksek olabilir (günde dört ziyarette 4390 TL); model tek değer kullanıyor."""
+note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. A maintenance visit is the same crew and truck as a fitting; the crew calls at eight units a day (this project's assumption): 17570 / 8 = 2196, rounded to 2200 TL. In open country the sites are far apart and the real figure may be higher (4390 TL at four visits a day); the model uses one figure."""
 affects = "OPEX'i; her senaryodaki en büyük tek kalem"
 affects_en = "OPEX; the single largest line in every scenario"
-sensitivity = "iki katına çıkarmak kırsal OPEX'i %45,4 artırır"
-sensitivity_en = "doubling it raises rural OPEX by 45,4 %"
-
+sensitivity = "iki katına çıkarmak kırsal OPEX'i kabaca %45 artırır"
+sensitivity_en = "doubling it raises rural OPEX by roughly 45 %"
 [values."operating.battery_tl"]
 value = 524.40
 unit = "TL"
@@ -522,13 +490,13 @@ source = """7567 sayılı 2026 Merkezi Yönetim Bütçe Kanunu, H Cetveli, B-e: 
 aylık/kadro derecesi 5-15, yurt içi gündelik 850 TL"""
 source_en = """Law 7567, 2026 Central Government Budget, Schedule H, B-e: grades \
 5-15, domestic daily allowance 850 TL"""
-note = """Bakım ekibinden bir kişinin şehir dışında geçirdiği bir günün \
-gündeliği. Özel sektörde vergiden istisna kısım GVK 24/2'ye göre aynı \
-aylık seviyesindeki devlet memurunun gündeliği; bir saha teknisyeni için \
-en yakın seviye 5-15. derece (850 TL) varsayıldı. Günübirlik görevde \
-tamamının mı bir kısmının mı ödendiği doğrulanmadı; tamamı alındı, maliyet \
-açısından ihtiyatlı taraf. Konaklama yok: iki saha da aynı gün dönülecek \
-uzaklıkta."""
+note = """Bakım ekibinden bir kişinin görev yeri dışında geçirdiği bir \
+günün tam gündeliği. Harcırah, 6245 sayılı Harcırah Kanunu'na göre görev \
+yeri dışına geçici görevle gönderilene ödenir; özel sektörde vergiden \
+istisna kısım 193 sayılı Gelir Vergisi Kanunu 24/2'ye göre aynı aylık \
+seviyesindeki devlet memurunun gündeliğidir. Cetvelde 5-15. derece 850 TL; \
+bir saha teknisyeninin maaşı bu aralığa düştüğü için bu satır alındı. \
+Günübirlik görevde bunun yalnız bir kısmı ödenir: operating.per_diem_share."""
 note_en = """The daily allowance of one crew member for a day out of the \
 city. In the private sector the tax-exempt part follows Income Tax Law \
 24/2: the allowance of a civil servant on the same salary level; grades \
@@ -538,6 +506,26 @@ is used, the cautious side for cost. No lodging: both sites are a day \
 trip."""
 affects = "kırsal ve tünel satırlarının OPEX'ini"
 affects_en = "OPEX of the rural and tunnel rows"
+
+[values."operating.per_diem_share"]
+value = 0.3333
+unit = "fraction"
+provenance = "STANDARD"
+source = """6245 sayılı Harcırah Kanunu, Madde 39: öğle (13.00) ya da akşam \
+(19.00) yemeği zamanlarından birini geçirene 1/3, ikisini geçirene 2/3, \
+geceyi de geçirene tam gündelik"""
+source_en = """Travel Allowance Law 6245, Article 39: a third of the daily \
+allowance for one of the lunch (13.00) or dinner (19.00) times away, two \
+thirds for both, all of it for a night"""
+note = """Bir bakım ziyareti günübirlik: ekip sabah çıkıp öğleden sonra \
+dönüyor, yani öğle yemeği zamanını görevde geçiriyor: gündeliğin 1/3'ü \
+(kişi başı 283,33 TL). Akşam 19.00'u da geçerse 2/3'ü olur."""
+note_en = """A maintenance visit is a day trip: the crew leaves in the \
+morning and is back in the afternoon, so it spends the lunch time away: a \
+third of the allowance (283,33 TL a person). Past 19.00 it would be two \
+thirds."""
+affects = "görev yeri dışına giden ekibin harcırahını"
+affects_en = "the per diem of a crew that leaves its place of duty"
 
 [values."operating.crew_size"]
 value = 2.0
@@ -1349,12 +1337,14 @@ unit = "yes/no"
 provenance = "DESIGN"
 source = "bu proje, bakım ekibi Ankara merkezde"
 source_en = "this project, the maintenance crew is based in central Ankara"
-note = """Kızılay ekibin kendi şehri; şehir dışı görev yok. Harcırah \
-Kanunu'nda büyükşehir içindeki ilçelerin görev yeri dışı sayılıp \
-sayılmadığı doğrulanmadı."""
-note_en = """Kızılay is the crew's own city; no travel out of it. Whether \
-districts inside a metropolitan municipality count as outside the place of \
-duty under the travel allowance law is not verified."""
+note = """Hayır. Harcırah Kanunu Madde 3(g): büyükşehirde görev yeri, \
+çalışanın bağlı olduğu ilçenin belediye sınırı ve onun devamı olan \
+yerleşim yerleridir. Kızılay'a Çankaya'daki bir ekip gidiyor; görev yeri \
+içinde gündelik yok (Madde 39)."""
+note_en = """No. Travel Allowance Law, Article 3(g): in a metropolitan \
+province the place of duty is the district the worker belongs to and the \
+built-up area that continues it. A crew based in Çankaya serves Kızılay; \
+no allowance inside the place of duty (Article 39)."""
 affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 

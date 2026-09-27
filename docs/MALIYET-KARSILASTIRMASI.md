@@ -24,18 +24,19 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
 | Şehir içi, 600 m ızgara | 25 | 8,59 km² | 12,82 km | 98586 | 18974 | 288326 | 11477 | 2209 | 7690 | 1480 |
-| **Şehir içi, yerleşim araması (yeni)** | 19 | 8,14 km² | 19,70 km | **72487** | **14176** | **214247** | **8905** | **1742** | **3680** | **720** |
+| **Şehir içi, yerleşim araması (yeni)** | 19 | 8,14 km² | 19,70 km | **73437** | **15696** | **230397** | **9022** | **1928** | **3728** | **797** |
 | Kırsal, 3000 m ızgara | 49 | 305,75 km² | 86,40 km | 412748 | 127144 | 1684188 | 1350 | 416 | 4777 | 1472 |
-| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **472106** | **119918** | **1671286** | **1305** | **331** | **4518** | **1148** |
-| Tünel, 60 m | 34 | yalnız tüp | 2,00 km | 261510 | 26477 | 526280 | yok | yok | 130755 | 13239 |
+| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **476356** | **127518** | **1751536** | **1317** | **352** | **4559** | **1220** |
+| Tünel, 60 m | 34 | yalnız tüp | 2,00 km | 216970 | 29197 | 508940 | yok | yok | 108485 | 14599 |
 
 27 Eylül'den beri şehir içi ve kırsalda alıcılar gerçek yollarda sürüyor
 ve direkler yerleşim aramasının seçtiği yerlerde duruyor (ADR-0096):
 şehir içinde "daha ucuz" (19 direk), kırsalda "daha iyi" (50 direk). Km²
-başına CAPEX şehir içinde 11477'den 8905 TL'ye, kırsalda 1350'den 1305
+başına CAPEX şehir içinde 11477'den 9022 TL'ye, kırsalda 1350'den 1317
 TL'ye indi; kırsalda alan 361,83 km²'ye çıktı. Binalar gerçek ayak
 izleriyle hesaplanıyor (ADR-0097); bina içine düşen ızgara noktaları
-en yakın sokağa taşınıyor (ADR-0098). Direk ve araç modülü E28-2G4M20S:
+en yakın sokağa taşınıyor (ADR-0098). Montaj ve bakım bedelleri 27 Eylül'den beri kaynaklı bileşenlerden
+türetiliyor (sepetli araç ve işçilik fiyatları, ADR-0100). Direk ve araç modülü E28-2G4M20S:
 direk birimi 1000 adette 1493'ten 1365 TL'ye indi (ADR-0099). Güzergâh km'leri yeni
 turun, gerçek sokakların uzunluğu.
 

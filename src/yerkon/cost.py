@@ -189,6 +189,8 @@ class OperatingRates:
     central_operation_tl_per_year: Sourced
     #: What a crew member is paid a day away from the base city (H Cetveli).
     per_diem_tl: Sourced
+    #: The part of it a same-day trip earns (Harcırah Kanunu, Madde 39).
+    per_diem_share: Sourced
     #: People in a maintenance crew.
     crew_size: Sourced
     #: The battery's part of the standalone supply, which wears out first.
@@ -391,6 +393,7 @@ def price(
     maintenance_tl = visits * float(rates.maintenance_tl_per_visit.value)
     per_diem_tl = (
         visits * float(rates.crew_size.value) * float(rates.per_diem_tl.value)
+        * float(rates.per_diem_share.value)
         if inventory.crew_travels else 0.0
     )
     central_tl = (

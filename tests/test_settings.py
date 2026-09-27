@@ -185,7 +185,8 @@ def test_the_operating_rates_are_built_from_the_file(tmp_path):
     from yerkon.cost import operating_rates
 
     text = pathlib.Path(DEFAULT_FILE).read_text(encoding="utf-8").replace(
-        "value = 1800.0", "value = 99.0"
+        '[values."operating.maintenance_tl_per_visit"]\nvalue = 2200.0',
+        '[values."operating.maintenance_tl_per_visit"]\nvalue = 99.0',
     )
     rebuilt = operating_rates(load(write(tmp_path, text)))
     assert float(rebuilt.maintenance_tl_per_visit.value) == 99.0

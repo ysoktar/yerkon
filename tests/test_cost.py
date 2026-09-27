@@ -269,14 +269,16 @@ def test_each_part_of_an_off_grid_site_is_replaced_on_its_own_life():
 
 
 def test_a_crew_that_leaves_its_city_draws_a_per_diem():
-    """850 TL a person a day from the 2026 budget law's Schedule H."""
+    """850 TL a person a day from the 2026 budget law's Schedule H, a
+    third of it on a day trip that spans lunch (Travel Allowance Law,
+    Article 39)."""
     home = price(an_inventory(), DEFAULT_RATES)
     away = price(an_inventory(crew_travels=True), DEFAULT_RATES)
     per_diem = {i.label: i.tl for i in away.operating}["per diem"]
     assert {i.label: i.tl for i in home.operating}["per diem"] == 0.0
     visits = next(i for i in away.operating if i.label == "maintenance").tl / float(
         DEFAULT_RATES.maintenance_tl_per_visit.value)
-    assert per_diem == pytest.approx(visits * 2 * 850.0)
+    assert per_diem == pytest.approx(visits * 2 * 850.0 * 0.3333)
     assert away.opex_tl_per_year - home.opex_tl_per_year == pytest.approx(per_diem)
 
 

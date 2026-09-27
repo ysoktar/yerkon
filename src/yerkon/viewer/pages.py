@@ -2238,19 +2238,77 @@ LAW = Page(
         ),
         Part(
             kind="points",
+            heading=_w("Harcırah", "Per diem"),
+            lines=(
+                _w("Harcırah, görev yeri dışına geçici bir görevle "
+                   "gönderilen çalışana yol gideriyle birlikte ödenen "
+                   "gündeliktir (6245 sayılı Harcırah Kanunu). Kanun kamu "
+                   "görevlileri için; özel sektörde işveren ödemeyi "
+                   "kendisi belirler, ama vergiden istisna kısım 193 "
+                   "sayılı Gelir Vergisi Kanunu'nun 24. maddesinin 2. "
+                   "bendine göre aynı aylık seviyesindeki devlet "
+                   "memuruna ödenen gündeliktir. Model bu yüzden kamu "
+                   "cetvelini kullanıyor.",
+                   "A per diem is the daily allowance paid, with the "
+                   "fare, to a worker sent on a temporary duty outside "
+                   "the place of duty (Travel Allowance Law 6245). The "
+                   "law is for public servants; a private employer sets "
+                   "its own, but the tax-exempt part is the allowance of "
+                   "a civil servant on the same salary level (Income Tax "
+                   "Law 193, Article 24(2)). The model uses the public "
+                   "schedule for that reason."),
+                _w("Ne kadar: 2026 Merkezi Yönetim Bütçe Kanunu'nun (7567) "
+                   "H Cetveli, aylık/kadro derecesi 5-15 için yurt içi "
+                   "gündelik 850 TL. Bir saha teknisyeninin maaşı bu "
+                   "aralığa düşüyor.",
+                   "How much: Schedule H of the 2026 Central Government "
+                   "Budget Law (7567), grades 5-15, domestic allowance "
+                   "850 TL a day. A field technician's salary falls in "
+                   "this range."),
+                _w("Nerede: büyükşehirlerde görev yeri, çalışanın bağlı "
+                   "olduğu ilçenin belediye sınırı ve onun devamı olan "
+                   "yerleşim yerleridir (Madde 3/g). Çankaya'daki bir ekip "
+                   "Kızılay'a giderken görev yerinde; Polatlı'ya ya da "
+                   "Kızılcahamam'a giderken görev yeri dışında. Görev yeri "
+                   "içinde gündelik ödenmez (Madde 39).",
+                   "Where: in a metropolitan province the place of duty "
+                   "is the district the worker belongs to and the "
+                   "built-up area that continues it (Article 3(g)). A "
+                   "crew based in Çankaya is at its place of duty in "
+                   "Kızılay and away from it in Polatlı or Kızılcahamam. "
+                   "No allowance is paid inside the place of duty "
+                   "(Article 39)."),
+                _w("Günübirlik görevde: öğle (13.00) ya da akşam (19.00) "
+                   "yemeği zamanlarından birini dışarıda geçirene "
+                   "gündeliğin 1/3'ü, ikisini geçirene 2/3'ü, geceyi de "
+                   "geçirene tamamı (Madde 39). Bir bakım ziyareti sabah "
+                   "çıkıp öğleden sonra dönüyor: kişi başı 283,33 TL, "
+                   "iki kişilik ekip için ziyaret başına 566,67 TL.",
+                   "On a day trip: a third of the allowance for being "
+                   "away over one of the lunch (13.00) or dinner (19.00) "
+                   "times, two thirds for both, all of it for a night "
+                   "(Article 39). A maintenance visit leaves in the "
+                   "morning and is back in the afternoon: 283,33 TL a "
+                   "person, 566,67 TL a visit for a crew of two."),
+                _w("YERKON'da bugün sıfır: şehir içinde ekip kendi "
+                   "ilçesinde; kırsalda ve tünelde bakımı o ilçedeki "
+                   "yerel bir teknik firma yapıyor, yani kimse görev "
+                   "yeri dışına çıkmıyor. Bakım Ankara merkezden "
+                   "yapılsaydı her ziyarete 566,67 TL eklenirdi; kural "
+                   "modelde bu yüzden duruyor.",
+                   "Zero in YERKON today: in town the crew is in its own "
+                   "district; in open country and the tunnel a local "
+                   "firm in that district does the maintenance, so "
+                   "nobody leaves the place of duty. Were it done from "
+                   "central Ankara, each visit would add 566,67 TL; "
+                   "that is why the rule stays in the model."),
+            ),
+        ),
+        Part(
+            kind="points",
             heading=_w("Bakım maliyetinde mevzuat",
                        "Regulation in the maintenance cost"),
             lines=(
-                _w("Harcırah: 2026 Bütçe Kanunu H Cetveli, 5-15. derece "
-                   "için yurt içi gündelik 850 TL. Özel sektörde vergiden "
-                   "istisna kısım GVK 24/2'ye göre aynı aylık seviyesindeki "
-                   "memurun gündeliği. Bakımı yerel bir firma yaptığı için "
-                   "bugün harcırah ödenmiyor; kural modelde duruyor.",
-                   "Per diem: 2026 Budget Law Schedule H, domestic "
-                   "allowance for grades 5-15, 850 TL. In the private "
-                   "sector the tax-exempt part follows Income Tax Law "
-                   "24/2. A local firm does the maintenance, so no per "
-                   "diem is paid today; the rule stays in the model."),
                 _w("Amortisman (GİB listesi): telsiz cihaz ve sistemleri "
                    "10 yıl (3.49.4), akümülatörler 5 yıl (3.14.7), güneş "
                    "enerjisi santrali 10 yıl (45.1.9). Yenileme kalemi her "
@@ -2299,6 +2357,12 @@ LAW = Page(
                 Link(label=_w("BTK: frekans tahsisinden muaf telsiz cihazların teknik ölçütleri",
                               "BTK: technical criteria for licence-exempt radio devices"),
                      url="https://www.btk.gov.tr/uploads/pages/frekans-tahsisinden-muaf-telsiz-cihaz-sistemleri-olcutler-633d4ca68c0b1.pdf"),
+                Link(label=_w("6245 sayılı Harcırah Kanunu (Madde 3/g ve 39)",
+                              "Travel Allowance Law 6245 (Articles 3(g) and 39)"),
+                     url="https://www.mevzuat.gov.tr/mevzuatmetin/1.3.6245.pdf"),
+                Link(label=_w("193 sayılı Gelir Vergisi Kanunu (Madde 24)",
+                              "Income Tax Law 193 (Article 24)"),
+                     url="https://www.mevzuat.gov.tr/mevzuatmetin/1.4.193.pdf"),
                 Link(label=_w("SBB: 2026 H Cetveli", "SBB: 2026 Schedule H"),
                      url="https://www.sbb.gov.tr/wp-content/uploads/2025/12/8-H-Cetveli_2026Butcesi.pdf"),
                 Link(label=_w("GİB: amortisman oranları tablosu",

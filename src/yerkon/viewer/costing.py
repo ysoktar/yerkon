@@ -26,6 +26,7 @@ LINES = {
     "replacement": ("Yenileme", "Replacement"),
     "maintenance": ("Bakım", "Maintenance"),
     "central operation": ("Merkezî işletme payı", "Share of central operation"),
+    "per diem": ("Harcırah", "Per diem"),
 }
 
 #: What each structure is called, in the page's two languages.
@@ -40,6 +41,20 @@ STRUCTURES = {
     "roadside sign": ("yol levhası", "roadside sign"),
     "sign gantry": ("levha portalı", "sign gantry"),
     "billboard": ("reklam panosu", "billboard"),
+    "rooftop": ("çatı", "rooftop"),
+}
+
+#: The settings file's units, in the page's two languages.
+UNITS = {
+    "TL/year": ("TL/yıl", "TL/year"),
+    "TL/visit": ("TL/ziyaret", "TL/visit"),
+    "TL/day": ("TL/gün", "TL/day"),
+    "kWh/year": ("kWh/yıl", "kWh/year"),
+    "visits/year": ("ziyaret/yıl", "visits/year"),
+    "years": ("yıl", "years"),
+    "anchors": ("birim", "units"),
+    "people": ("kişi", "people"),
+    "fraction": ("oran", "fraction"),
 }
 
 #: The rows, in table order, with what each is called.
@@ -81,6 +96,12 @@ ASSUMED = (
      ("Şebeke dışı ek ziyaret", "Extra off-grid visits")),
     ("operating.maintenance_tl_per_visit",
      ("Bir bakım ziyareti", "One maintenance visit")),
+    ("operating.crew_size",
+     ("Bakım ekibi", "Maintenance crew")),
+    ("operating.per_diem_tl",
+     ("Harcırah, kişi başı gündelik", "Per diem, a person a day")),
+    ("operating.per_diem_share",
+     ("Günübirlik görevde gündeliğin payı", "Share of it on a day trip")),
     ("operating.central_operation_tl_per_year",
      ("Merkezî sistem, yıllık", "Central system, a year")),
     ("operating.anchors_sharing_central_operation",
@@ -246,7 +267,9 @@ def assumptions(language: str, table) -> str:
         shown = decimal_comma(value, 2 if value != int(value) else 0)
         body.append([
             html.escape(_say(name, language)),
-            html.escape("{} {}".format(shown, sourced.unit)),
+            html.escape("{} {}".format(
+                shown, _say(UNITS.get(sourced.unit, (sourced.unit, sourced.unit)),
+                            language))),
             html.escape("{}: {}".format(
                 _say(KINDS[sourced.provenance], language), sourced.source)),
             html.escape(sourced.note),
