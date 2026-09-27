@@ -410,20 +410,63 @@ def test_fetching_again_without_a_photograph_takes_the_old_one_off_the_disk(
 
 def test_buildings_are_blocks_on_the_bare_ground_and_not_in_the_bore():
     """The mesh drew a spike wherever a sample landed on a roof. The page
-    now draws the bare ground and each building as a block on it, and a
-    bore carries neither the mountain's buildings nor its streets."""
-    from yerkon.viewer.scene import bare_height, scene
+    now draws the bare ground and each building as a block on it, asked
+    for once per site, and a bore carries neither the mountain's
+    buildings nor its streets."""
+    from yerkon.viewer.scene import bare_height, scene, site_blocks
     from yerkon.viewer.state import from_scenario
 
     town = from_scenario("urban")
     drawn = scene(town)["terrain"]
-    assert drawn["blocks"], "Kızılay's buildings reach the page"
+    assert drawn["blocks_site"] == "kizilay"
     bare = bare_height(town.terrain())
     x, y = drawn["xs"][10], drawn["ys"][10]
     assert drawn["heights"][10][10] == pytest.approx(bare(x, y))
-    for block in drawn["blocks"][:50]:
-        _, _, half, height, low, high = block
+
+    blocks = site_blocks("kizilay")
+    assert len(blocks) == 5231
+    for _, _, half, height, low, high, outline in blocks[:200]:
         assert half > 0.0 and height > 0.0 and low <= high
+        # The footprint the fetch brought, whole metres, three corners
+        # at least.
+        assert len(outline) >= 6 and len(outline) % 2 == 0
 
     bore = scene(from_scenario("tunnel"))["terrain"]
-    assert bore["blocks"] == [] and bore["roads"] == []
+    assert bore["blocks_site"] == "" and bore["roads"] == []
+
+
+def test_a_footprint_is_read_out_of_its_wkb():
+    """Overture stores a building's shape as WKB; the outer ring of the
+    largest part is what the page draws."""
+    import struct
+
+    from yerkon.site.fetch import outline_of
+
+    def polygon(points):
+        ring = struct.pack("<I", len(points)) + b"".join(
+            struct.pack("<dd", *p) for p in points)
+        return struct.pack("<BII", 1, 3, 1) + ring
+
+    square = [(0, 0), (1, 0), (1, 1), (0, 1), (0, 0)]
+    assert outline_of(polygon(square)) == square
+
+    small = [(5, 5), (6, 5), (5, 6), (5, 5)]
+    parts = [polygon(small), polygon(square)]
+    many = struct.pack("<BII", 1, 6, len(parts)) + b"".join(parts)
+    assert outline_of(many) == square
+    assert outline_of(b"") == []
+
+
+def test_a_cached_site_keeps_its_outlines(tmp_path):
+    """Written and read back, a footprint is the same footprint."""
+    from dataclasses import replace
+
+    from yerkon.scenarios import fetched
+    from yerkon.site.cache import SiteCache
+
+    site = fetched("kizilcahamam")
+    SiteCache(tmp_path / "copy").save(site)
+    again = SiteCache(tmp_path / "copy").load()
+    assert len(again.buildings) == len(site.buildings)
+    assert np.allclose(again.buildings.outline(0), site.buildings.outline(0),
+                       atol=0.06)

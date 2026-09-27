@@ -12,6 +12,7 @@ instant, the sweep takes seconds, and the run takes longer still.
 from __future__ import annotations
 
 import math
+from functools import lru_cache
 from typing import Optional
 from urllib.parse import quote
 
@@ -101,9 +102,6 @@ def ground(
         "xs": [float(x) for x in xs],
         "ys": [float(y) for y in ys],
         "heights": [[bare(float(x), float(y)) for x in xs] for y in ys],
-        "blocks": [] if state.bore else _blocks(
-            state.measured(), terrain,
-            (float(xs[0]), float(xs[-1]), float(ys[0]), float(ys[-1]))),
     }
 
 
@@ -151,19 +149,13 @@ def drawable(terrain, west: float, east: float,
 MAP_TILES = ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]
 
 
-#: The most buildings one scene carries: Kızılay's 5 231 nearly all; Polatlı's
-#: 20 899 are mostly houses a few metres across that no one sees from
-#: twenty kilometres, so the largest are kept.
-MOST_BUILDINGS = 5000
-
-
 def bare_height(terrain):
     """The ground without what stands on it, for drawing.
 
     The link budget reads a roof where a footprint stands (`Fetched`), and
     a mesh sampling that draws every building as a spike from wherever a
     sample happened to land. The page draws the bare ground and the
-    buildings on it as blocks instead (`_blocks`).
+    buildings on it as blocks instead (`site_blocks`).
     """
     from yerkon.world import Fetched
 
@@ -173,38 +165,77 @@ def bare_height(terrain):
     return terrain.height_at
 
 
-def _blocks(measured, terrain, box) -> list:
-    """The fetched buildings over the drawn ground, largest first.
+@lru_cache(maxsize=4)
+def site_blocks(name: str) -> tuple:
+    """Every fetched building of a site, largest first, for the page.
 
-    Each as [x, y, half side, height, lowest ground, highest ground]
-    under its corners: the footprint the model reads is a disc, drawn as
-    the square of the same area. The page stands it from the lowest
-    corner, so a block on a slope is sunk into it rather than hanging
-    off it. Drawn, never read, like the photograph.
+    Each as [x, y, half side, height, lowest ground, highest ground,
+    outline]. The outline is the footprint the fetch brought, a flat run
+    of whole metres x0, y0, x1, y1...; where there is none it is empty,
+    and the page draws the disc the link budget reads as the square of
+    the same area. The page stands a block from the lowest ground under
+    it, so on a slope it is sunk rather than hanging off the hill.
+
+    Asked for once per site rather than sent with every scene: Polatlı's
+    twenty thousand outlines are a megabyte and a half, and the scene is
+    rebuilt on every drag. Drawn, never read, like the photograph.
     """
-    buildings = getattr(measured, "buildings", None)
+    from yerkon.scenarios import fetched
+
+    site = fetched(name) if name else None
+    buildings = getattr(site, "buildings", None)
     if buildings is None or buildings.is_empty:
-        return []
-    west, east, south, north = box
+        return ()
     xs = np.asarray(buildings.centre_x_m, dtype=float)
     ys = np.asarray(buildings.centre_y_m, dtype=float)
-    inside = np.flatnonzero((xs >= west) & (xs <= east)
-                            & (ys >= south) & (ys <= north))
     radii = np.asarray(buildings.radius_m, dtype=float)
-    kept = inside[np.argsort(-radii[inside])][:MOST_BUILDINGS]
-    ground = bare_height(terrain)
+    heights = np.asarray(buildings.height_m, dtype=float)
     share = math.sqrt(math.pi) / 2.0
-    out = []
-    for i in kept:
-        x, y = float(xs[i]), float(ys[i])
-        half = float(radii[i]) * share
-        corners = [ground(x + dx, y + dy)
-                   for dx in (-half, half) for dy in (-half, half)]
-        out.append([int(round(x)), int(round(y)), round(half, 1),
-                    round(float(buildings.height_m[i]), 1),
-                    int(math.floor(min(corners))),
-                    int(math.ceil(max(corners)))])
-    return out
+    rings = [_drawn_outline(buildings.outline(i)) for i in range(len(xs))]
+    # One pass over the ground for every corner and vertex there is.
+    corners_x, corners_y, owner = [], [], []
+    for i, ring in enumerate(rings):
+        if ring:
+            corners_x += ring[0::2]
+            corners_y += ring[1::2]
+            owner += [i] * (len(ring) // 2)
+        else:
+            half = radii[i] * share
+            for dx in (-half, half):
+                for dy in (-half, half):
+                    corners_x.append(xs[i] + dx)
+                    corners_y.append(ys[i] + dy)
+                    owner.append(i)
+    under = site.heights_at(np.asarray(corners_x, dtype=float),
+                            np.asarray(corners_y, dtype=float))
+    owner = np.asarray(owner, dtype=int)
+    low = np.full(len(xs), np.inf)
+    high = np.full(len(xs), -np.inf)
+    np.minimum.at(low, owner, under)
+    np.maximum.at(high, owner, under)
+    return tuple(
+        (int(round(xs[i])), int(round(ys[i])), round(float(radii[i] * share), 1),
+         round(float(heights[i]), 1), int(math.floor(low[i])),
+         int(math.ceil(high[i])), rings[i])
+        for i in np.argsort(-radii)
+    )
+
+
+def _drawn_outline(points) -> list:
+    """A footprint to whole metres, with the points a metre from their
+    neighbour dropped: a flat x0, y0, x1, y1... run, or empty."""
+    if points is None or len(points) < 3:
+        return []
+    kept = []
+    for px, py in points:
+        here = (int(round(float(px))), int(round(float(py))))
+        if not kept or abs(here[0] - kept[-1][0]) + abs(here[1] - kept[-1][1]) >= 1:
+            kept.append(here)
+    if len(kept) > 1 and kept[0] == kept[-1]:
+        kept.pop()
+    if len(kept) < 3:
+        return []
+    return [value for point in kept for value in point]
 
 
 #: How far apart the drawn road network's points stand, at least, in
@@ -463,9 +494,9 @@ def scene(state: ViewState) -> dict:
             # The buildings, as blocks on the bare ground, and the streets
             # beside the route the units drive. None inside a bore: what
             # stands on the mountain is not in the tunnel.
-            "blocks": [] if state.bore else _blocks(
-                measured, terrain,
-                (float(xs[0]), float(xs[-1]), float(ys[0]), float(ys[-1]))),
+            # Which site's buildings stand on this ground, asked for once
+            # from `/api/blocks` (`site_blocks`); nothing inside a bore.
+            "blocks_site": "" if state.bore or measured is None else state.site,
             "roads": [] if state.bore else _roads(
                 measured, terrain,
                 (float(xs[0]), float(xs[-1]), float(ys[0]), float(ys[-1]))),

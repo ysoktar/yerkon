@@ -74,6 +74,9 @@ export const SAY = {
   },
   "ground.roads": { tr: "Yolları göster", en: "Show the roads" },
   "ground.buildings": { tr: "Binaları göster", en: "Show the buildings" },
+  "relief.true": { tr: "Yükseklik: gerçek ölçek", en: "Height: true scale" },
+  "relief.two": { tr: "Rölyef 2 kat", en: "Relief doubled" },
+  "relief.five": { tr: "Rölyef 5 kat", en: "Relief five times" },
   "ground.buildings.from": {
     tr: "Getirilen binalar; model her birini aynı alanda bir blok olarak "
         + "görüyor.",

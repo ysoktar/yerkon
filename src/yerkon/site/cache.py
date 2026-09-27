@@ -51,12 +51,18 @@ class SiteCache:
         np.save(self.directory / ELEVATION_NAME, site.elevation_grid_m)
 
         if site.buildings is not None and not site.buildings.is_empty:
-            np.savez(
+            # Compressed, and the outlines to a tenth of a metre in single
+            # precision: they are drawn, and twenty thousand of them are
+            # most of the file.
+            np.savez_compressed(
                 self.directory / BUILDINGS_NAME,
                 centre_x_m=site.buildings.centre_x_m,
                 centre_y_m=site.buildings.centre_y_m,
                 radius_m=site.buildings.radius_m,
                 height_m=site.buildings.height_m,
+                outline_points_m=np.round(
+                    site.buildings.outline_points_m, 1).astype(np.float32),
+                outline_lengths=site.buildings.outline_lengths.astype(np.int32),
             )
 
         if site.aerial is not None:
@@ -148,9 +154,14 @@ class SiteCache:
         buildings_path = self.directory / BUILDINGS_NAME
         if buildings_path.exists():
             stored = np.load(buildings_path)
+            outlines = {}
+            if "outline_lengths" in stored.files:
+                outlines = dict(outline_points_m=stored["outline_points_m"],
+                                outline_lengths=stored["outline_lengths"])
             buildings = Buildings(
                 centre_x_m=stored["centre_x_m"], centre_y_m=stored["centre_y_m"],
                 radius_m=stored["radius_m"], height_m=stored["height_m"],
+                **outlines,
             )
 
         aerial: Optional[Aerial] = None

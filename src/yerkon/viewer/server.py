@@ -60,6 +60,7 @@ from yerkon.viewer.state import (
     CASCADING,
     MODES,
     ViewState,
+    fetched_sites,
     from_scenario,
 )
 
@@ -383,6 +384,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(lambda: scene(self.session.read()))
         if path == "/api/ground":
             return self._json(lambda: self._ground())
+        if path == "/api/blocks":
+            return self._json(lambda: self._blocks())
         if path == "/api/sweep":
             return self._json(lambda: sweep(self.session.read()))
         if path == "/api/simulate":
@@ -440,6 +443,17 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/run":
             return self._json(lambda: self._run(body))
         self.send_error(404)
+
+    def _blocks(self) -> dict:
+        """A site's buildings for the page, once per site (`site_blocks`)."""
+        from urllib.parse import parse_qs, urlsplit
+
+        from yerkon.viewer.scene import site_blocks
+
+        name = (parse_qs(urlsplit(self.path).query).get("site") or [""])[0]
+        if name not in fetched_sites():
+            raise ValueError("no fetched site called {!r}".format(name))
+        return {"site": name, "blocks": [list(b) for b in site_blocks(name)]}
 
     def _ground(self) -> dict:
         """A finer mesh over the window the page says it is looking at."""
@@ -721,7 +735,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def _json(self, produce) -> None:
         try:
-            payload = json.dumps(produce()).encode("utf-8")
+            payload = json.dumps(
+                produce(), separators=(",", ":")).encode("utf-8")
         except ValueError as error:
             return self._fail(str(error))
         except Exception as error:  # noqa: BLE001

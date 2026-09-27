@@ -1458,6 +1458,15 @@ function wireControls() {
     render();
   };
 
+  const relief = document.getElementById("relief-pick");
+  if (relief) {
+    relief.value = String(draw.VERTICAL);
+    relief.onchange = () => {
+      draw.setVertical(relief.value);
+      render();
+    };
+  }
+
   document.getElementById("only-assumed").onchange = event => {
     onlyAssumed = event.target.checked;
     drawFigures();
@@ -1539,6 +1548,46 @@ let showPhotograph = true;
 let showRoads = true;
 /* Whether the fetched buildings stand on the ground. */
 let showBuildings = true;
+/* The buildings of the site on screen, asked for once per site. */
+let blockSet = { site: "", blocks: [] };
+
+/* How many buildings one frame draws at most, largest first. Kızılay's
+ * five thousand fit; zoomed in, every one on the drawn ground does. */
+const MOST_BLOCKS = 6000;
+
+/* Ask for the site's buildings when the ground becomes another site. */
+async function loadBlocks() {
+  const wanted = (latest && latest.terrain.blocks_site) || "";
+  if (wanted === blockSet.site) return;
+  blockSet = { site: wanted, blocks: [] };
+  lockBuildingsTick();
+  if (!wanted) return;
+  try {
+    const found = await ask("/api/blocks?site=" + encodeURIComponent(wanted));
+    if (blockSet.site !== wanted) return;
+    blockSet = { site: wanted, blocks: found.blocks || [] };
+    lockBuildingsTick();
+    render();
+  } catch {
+    // No buildings is a picture without buildings, not a broken page.
+  }
+}
+
+/* The buildings over the ground being drawn, at most `MOST_BLOCKS`. */
+function blocksOnDrawnGround() {
+  const ground = drawnTerrain();
+  if (!ground || !ground.xs) return [];
+  const west = ground.xs[0], east = ground.xs[ground.xs.length - 1];
+  const south = ground.ys[0], north = ground.ys[ground.ys.length - 1];
+  const out = [];
+  for (const block of blockSet.blocks) {
+    const [x, y] = block;
+    if (x < west || x > east || y < south || y > north) continue;
+    out.push(block);
+    if (out.length >= MOST_BLOCKS) break;
+  }
+  return out;
+}
 
 function aerialOf() {
   return (latest && latest.terrain && latest.terrain.aerial) || null;
@@ -1691,7 +1740,7 @@ function lockBuildingsTick() {
   const tick = document.getElementById("buildings-tick");
   const box = document.getElementById("show-buildings");
   if (!tick || !box) return;
-  const any = ((terrainData && terrainData.blocks) || []).length > 0;
+  const any = blockSet.blocks.length > 0;
   box.disabled = !any;
   tick.classList.toggle("dead", !any);
   tick.title = say(any ? "ground.buildings.from" : "ground.buildings.none");
@@ -1864,8 +1913,7 @@ function paintScene() {
   const items = [
     ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
     ...(showBuildings ? draw.blocks(
-      view, (drawnTerrain().blocks || latest.terrain.blocks), light,
-      drawnPhotograph()) : []),
+      view, blocksOnDrawnGround(), light, drawnPhotograph(), bias) : []),
     ...(shownLayer === "ground" ? []
       : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer)),
     // The streets under the route, thin and pale: context, not a result.
@@ -3390,7 +3438,7 @@ async function refreshScene() {
   loadPhotograph();
   lockPhotographTick();
   lockRoadsTick();
-  lockBuildingsTick();
+  loadBlocks();
   // The finer mesh described the ground before this edit. Dropped rather
   // than kept, or a change of site leaves the old hill drawn in the
   // middle of the new one.

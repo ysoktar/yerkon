@@ -11,7 +11,15 @@
  * World axes: x runs along the corridor, y across it, z is elevation.
  */
 
-export const VERTICAL = 5;   // relief is exaggerated, or hills read as flat
+/* How much the relief is stretched. True scale by default, where a
+ * building on a hillside has its real shape; the page offers more, where
+ * a hill in open country otherwise reads as flat. Buildings and what
+ * stands on them keep their true height whatever this is. */
+export let VERTICAL = 1;
+
+export function setVertical(times) {
+  VERTICAL = Math.max(1, Number(times) || 1);
+}
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const cross = (a, b) => [
@@ -254,35 +262,51 @@ const WALL = [196, 190, 180];
 
 /* Buildings as blocks standing on the bare ground.
  *
- * Each is [x, y, half side, height, lowest and highest ground under
- * it] in the site's metres, drawn at its true height on the exaggerated
- * ground: the
- * disc the link budget reads, drawn as the square of the same area.
- * The roof takes the photograph under it, like the ground, and each
- * wall the shading of the way it faces. Walls facing away from the eye
- * are left out, which is half of them and nothing a person would see.
+ * Each is [x, y, half side, height, lowest and highest ground under it,
+ * outline] in the site's metres. The outline is the footprint the fetch
+ * brought, a flat x0, y0, x1, y1... run; where there is none the block is
+ * the disc the link budget reads, drawn as the square of the same area.
+ * The relief is exaggerated so a hill reads as a hill; a building is
+ * not, or a nine metre block stands forty five metres tall. It stands
+ * from the lowest ground under it and rises its own height over the
+ * highest, so on a slope it is sunk rather than hanging off the hill and
+ * no hilltop pokes through its roof. The roof takes the photograph under it, like the ground, and
+ * each wall the shading of the way it faces. Walls facing away from the
+ * eye are left out, which is half of them and nothing a person would see.
  */
-export function blocks(view, list, light, photo) {
+export function blocks(view, list, light, photo, bias = 0) {
   const out = [];
-  for (const [x, y, half, height, low, high] of list || []) {
-    // The relief is exaggerated so a hill reads as a hill; a building is
-    // not, or a nine metre block stands forty five metres tall. It rises
-    // its own height over the middle of the exaggerated ground under it,
-    // from the lowest corner, so on a slope it is sunk rather than
-    // hanging off the hill.
+  for (const [x, y, half, height, low, high, outline] of list || []) {
     const base = low * VERTICAL;
-    const top = ((low + (high ?? low)) / 2) * VERTICAL + height;
-    const at = [[x - half, y - half], [x + half, y - half],
-                [x + half, y + half], [x - half, y + half]];
+    const top = (high ?? low) * VERTICAL + height;
+    // Sorted a little nearer than its middle, by its own size: a roof a
+    // hundred metres across sits over ground quads ten metres across, and
+    // at the depth of its middle it is painted before the ones under it.
+    const nearer = bias + half;
+    let at = [];
+    if (outline && outline.length >= 6) {
+      for (let i = 0; i < outline.length; i += 2) at.push([outline[i], outline[i + 1]]);
+      // Anticlockwise, so each wall's outward side is on its right.
+      let area = 0;
+      for (let i = 0; i < at.length; i++) {
+        const [ax, ay] = at[i];
+        const [bx, by] = at[(i + 1) % at.length];
+        area += ax * by - bx * ay;
+      }
+      if (area < 0) at.reverse();
+    } else {
+      at = [[x - half, y - half], [x + half, y - half],
+            [x + half, y + half], [x - half, y + half]];
+    }
     const roof = at.map(([px, py]) => [px, py, top]);
     const ink = (photo && photo.colourAt(x, y)) || WALL;
     const lit = 0.45 + 0.55 * Math.max(0, light[2]);
     const painted = face(
       view, roof,
       `rgb(${Math.round(ink[0] * lit)},${Math.round(ink[1] * lit)},${Math.round(ink[2] * lit)})`,
-      1, 0.4,
+      1, 0.4, nearer,
     );
-    if (painted && photo && photo.image && painted.screen.length === 4) {
+    if (painted && photo && photo.image && painted.screen.length === roof.length) {
       painted.texture = {
         image: photo.image,
         source: roof.map(point => photo.pixelOf(point[0], point[1])),
@@ -290,22 +314,23 @@ export function blocks(view, list, light, photo) {
       };
     }
     if (painted) out.push(painted);
-    for (let side = 0; side < 4; side++) {
+    for (let side = 0; side < at.length; side++) {
       const [ax, ay] = at[side];
-      const [bx, by] = at[(side + 1) % 4];
+      const [bx, by] = at[(side + 1) % at.length];
+      const span = Math.hypot(bx - ax, by - ay);
+      if (span < 0.5) continue;
       // Outward normal of this wall, in the ground plane.
-      const normal = [by - ay, ax - bx, 0].map(v => v / (2 * half || 1));
+      const normal = [(by - ay) / span, (ax - bx) / span, 0];
       const middle = [(ax + bx) / 2, (ay + by) / 2, (base + top) / 2];
-      if (dot(sub(view.eye, middle), normal) > 0) {
-        const shade = 0.5 + 0.5 * Math.max(0, dot(normal, light));
-        const wall = face(
-          view,
-          [[ax, ay, base], [bx, by, base], [bx, by, top], [ax, ay, top]],
-          `rgb(${Math.round(WALL[0] * shade)},${Math.round(WALL[1] * shade)},${Math.round(WALL[2] * shade)})`,
-          1, 0.4,
-        );
-        if (wall) out.push(wall);
-      }
+      if (dot(sub(view.eye, middle), normal) <= 0) continue;
+      const shade = 0.5 + 0.5 * Math.max(0, dot(normal, light));
+      const wall = face(
+        view,
+        [[ax, ay, base], [bx, by, base], [bx, by, top], [ax, ay, top]],
+        `rgb(${Math.round(WALL[0] * shade)},${Math.round(WALL[1] * shade)},${Math.round(WALL[2] * shade)})`,
+        1, 0.4, nearer,
+      );
+      if (wall) out.push(wall);
     }
   }
   return out;
@@ -525,8 +550,13 @@ export function ring(view, centre, radius, colour, bias = 0) {
  * thousand of these to a frame a person does not wait for.
  */
 function textured(context, item) {
-  const [s0, s1, , s3] = item.screen;
-  const [t0, t1, , t3] = item.texture.source;
+  // Three of its corners fix the map: the first, the second and the
+  // last, which for a quad are three of its four and for a roof any
+  // three that are not in a line.
+  const last = item.screen.length - 1;
+  const [s0, s1, s3] = [item.screen[0], item.screen[1], item.screen[last]];
+  const [t0, t1, t3] = [item.texture.source[0], item.texture.source[1],
+                        item.texture.source[last]];
   const u1 = [t1[0] - t0[0], t1[1] - t0[1]];
   const u3 = [t3[0] - t0[0], t3[1] - t0[1]];
   const det = u1[0] * u3[1] - u3[0] * u1[1];

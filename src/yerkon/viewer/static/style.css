@@ -65,7 +65,9 @@ dd.warn { color: var(--warn); }
 #status.on { opacity: 1; }
 #status.bad { background: var(--warn); }
 
-#legend { position: absolute; left: 14px; top: 14px; padding: 9px 12px;
+/* Below the camera hint, which sits over the same corner: at the top the
+ * hint covered the legend's own chooser. */
+#legend { position: absolute; left: 14px; top: 52px; padding: 9px 12px;
   background: rgba(255,255,255,0.9); border: 1px solid var(--line);
   border-radius: 5px; font-size: 11px; display: grid; gap: 4px; }
 #legend i { display: inline-block; width: 11px; height: 11px; margin-right: 7px;

@@ -137,6 +137,14 @@ class Buildings:
     centre_y_m: np.ndarray
     radius_m: np.ndarray
     height_m: np.ndarray
+    #: Each footprint's outline, where the fetch brought one: every ring's
+    #: points one after another, and how many points each building has
+    #: (zero where it has none). Drawn, never read: the link budget asks
+    #: about the disc above. Empty for a fetch that brought no outlines.
+    outline_points_m: np.ndarray = field(
+        default_factory=lambda: np.zeros((0, 2)))
+    outline_lengths: np.ndarray = field(
+        default_factory=lambda: np.zeros(0, dtype=int))
 
     def __post_init__(self) -> None:
         lengths = {
@@ -145,6 +153,22 @@ class Buildings:
         }
         if len(lengths) != 1:
             raise ValueError("building arrays must be the same length")
+        if len(self.outline_lengths) not in (0, len(self.centre_x_m)):
+            raise ValueError("one outline length per building, or none")
+
+    def outline(self, index: int):
+        """The footprint of one building as (x, y) points, or nothing."""
+        if not len(self.outline_lengths):
+            return None
+        count = int(self.outline_lengths[index])
+        if count < 3:
+            return None
+        starts = self.__dict__.get("_outline_starts")
+        if starts is None:
+            starts = np.concatenate(([0], np.cumsum(self.outline_lengths)[:-1]))
+            object.__setattr__(self, "_outline_starts", starts)
+        first = int(starts[index])
+        return self.outline_points_m[first:first + count]
 
     def __len__(self) -> int:
         return len(self.centre_x_m)
@@ -171,6 +195,7 @@ class Buildings:
         state.pop("_cells", None)
         state.pop("_cell_m", None)
         state.pop("_occupied", None)
+        state.pop("_outline_starts", None)
         return state
 
     def _index(self) -> tuple:

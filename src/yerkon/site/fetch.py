@@ -951,13 +951,20 @@ class OvertureBuildings:
 
     def buildings_for(self, bounds: BoundingBox) -> tuple[Buildings, tuple[str, ...]]:
         reader = _OvertureReader(self)
-        rows = reader.rows_in(bounds)
+        rows = reader.rows_in(bounds, outlines=True)
 
         per_lat, per_lon = bounds.metres_per_degree()
         xs, ys, radii, heights = [], [], [], []
+        points, lengths = [], []
         from_height_tag = from_levels = from_default = 0
 
-        for xmin, ymin, xmax, ymax, height, floors in rows:
+        for xmin, ymin, xmax, ymax, height, floors, ring in rows:
+            # The outline for drawing, in the site's metres, without the
+            # ring's closing point.
+            ring = ring[:-1] if len(ring) > 1 and ring[0] == ring[-1] else ring
+            points.extend(((lon - bounds.west) * per_lon,
+                           (lat - bounds.south) * per_lat) for lon, lat in ring)
+            lengths.append(len(ring))
             if height is not None and height > 0.0:
                 from_height_tag += 1
             elif floors is not None and floors > 0:
@@ -988,6 +995,8 @@ class OvertureBuildings:
             Buildings(
                 centre_x_m=np.array(xs), centre_y_m=np.array(ys),
                 radius_m=np.array(radii), height_m=np.array(heights),
+                outline_points_m=np.array(points, dtype=float).reshape(-1, 2),
+                outline_lengths=np.array(lengths, dtype=int),
             ),
             notes,
         )
@@ -1084,7 +1093,7 @@ class _OvertureReader:
             )[0]
             yield table, box, inside
 
-    def rows_in(self, bounds: BoundingBox) -> list:
+    def rows_in(self, bounds: BoundingBox, outlines: bool = False) -> list:
         try:
             import pyarrow.parquet as pq
         except ImportError as error:
@@ -1097,7 +1106,8 @@ class _OvertureReader:
             handle = _RangeFile(self.source.bucket + keys[index],
                                 self.source.name)
             table = pq.ParquetFile(handle).read_row_groups(
-                groups, columns=["bbox", "height", "num_floors"])
+                groups, columns=["bbox", "height", "num_floors"]
+                + (["geometry"] if outlines else []))
             box = table.column("bbox").combine_chunks()
             xmin = box.field("xmin").to_numpy()
             xmax = box.field("xmax").to_numpy()
@@ -1111,10 +1121,15 @@ class _OvertureReader:
             )[0]
             height = table.column("height").to_pylist()
             floors = table.column("num_floors").to_pylist()
+            shapes = (table.column("geometry").to_pylist() if outlines
+                      else None)
             for row in inside:
-                rows.append((float(xmin[row]), float(ymin[row]),
-                             float(xmax[row]), float(ymax[row]),
-                             height[row], floors[row]))
+                found = (float(xmin[row]), float(ymin[row]),
+                         float(xmax[row]), float(ymax[row]),
+                         height[row], floors[row])
+                if shapes is not None:
+                    found += (outline_of(shapes[row]),)
+                rows.append(found)
         return rows
 
     def _row_groups_over(self, keys, bounds: BoundingBox, pq) -> list:
@@ -1471,6 +1486,55 @@ def lines_in(blob: bytes) -> list:
         "WKB type {} is not a line. This reads roads, which are lines "
         "and collections of lines.".format(kind)
     )
+
+
+#: The two WKB type codes a footprint can be.
+_POLYGON = 3
+_MULTIPOLYGON = 6
+
+
+def outline_of(blob: bytes) -> list:
+    """A footprint's outer ring, as (longitude, latitude) points.
+
+    The largest part's outer ring where the shape comes in parts, and no
+    holes: a courtyard is ground the drawing does not need. Nothing for
+    a shape that is not a polygon, which a building row should never be.
+    """
+    if not blob:
+        return []
+    order = "<" if blob[0] == 1 else ">"
+    (raw,) = struct.unpack_from(order + "I", blob, 1)
+    at = 5 + (4 if raw & _HAS_SRID else 0)
+    ordinates = 2 + (1 if raw & _HAS_Z else 0) + (1 if raw & _HAS_M else 0)
+    kind = raw & 0xFF
+
+    def rings(at, order, ordinates):
+        (count,) = struct.unpack_from(order + "I", blob, at)
+        at += 4
+        found = []
+        for _ in range(count):
+            points, at = _points(blob, at, order, ordinates)
+            found.append(points)
+        return found, at
+
+    if kind == _POLYGON:
+        found, _ = rings(at, order, ordinates)
+        return found[0] if found else []
+    if kind == _MULTIPOLYGON:
+        (count,) = struct.unpack_from(order + "I", blob, at)
+        at += 4
+        best = []
+        for _ in range(count):
+            inner = "<" if blob[at] == 1 else ">"
+            (inner_raw,) = struct.unpack_from(inner + "I", blob, at + 1)
+            inner_at = at + 5 + (4 if inner_raw & _HAS_SRID else 0)
+            inner_ords = (2 + (1 if inner_raw & _HAS_Z else 0)
+                          + (1 if inner_raw & _HAS_M else 0))
+            found, at = rings(inner_at, inner, inner_ords)
+            if found and len(found[0]) > len(best):
+                best = found[0]
+        return best
+    return []
 
 
 def _points(blob: bytes, at: int, order: str, ordinates: int):
