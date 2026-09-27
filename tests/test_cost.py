@@ -25,6 +25,7 @@ def site(mounting=TALL_MAST, product=SX1280_ANCHOR):
         product=product,
         structure=mounting.kind,
         site_cost_tl=mounting.site_cost_tl,
+        per_crew_day=float(mounting.per_crew_day.value),
         has_power=mounting.has_power,
         has_backhaul=mounting.has_backhaul,
     )
@@ -276,10 +277,29 @@ def test_a_crew_that_leaves_its_city_draws_a_per_diem():
     away = price(an_inventory(crew_travels=True), DEFAULT_RATES)
     per_diem = {i.label: i.tl for i in away.operating}["per diem"]
     assert {i.label: i.tl for i in home.operating}["per diem"] == 0.0
-    visits = next(i for i in away.operating if i.label == "maintenance").tl / float(
-        DEFAULT_RATES.maintenance_tl_per_visit.value)
-    assert per_diem == pytest.approx(visits * 2 * 850.0 * 0.3333)
+    crew_days = next(i for i in away.operating if i.label == "maintenance").tl / float(
+        DEFAULT_RATES.crew_day_tl.value)
+    assert per_diem == pytest.approx(crew_days * 2 * 850.0 * 0.3333)
     assert away.opex_tl_per_year - home.opex_tl_per_year == pytest.approx(per_diem)
+
+
+def test_a_visit_is_the_share_of_a_crew_day_its_structure_allows():
+    """Eight columns a day in town, four poles kilometres apart (ADR-0101):
+    a visit to a pole costs twice a visit to a column, per diem included."""
+    from yerkon.world import DISTRIBUTION_POLE
+
+    def line(mounting, label):
+        costing = price(an_inventory(count=1, mounting=mounting, crew_travels=True),
+                        DEFAULT_RATES)
+        return {i.label: i.tl for i in costing.operating}[label]
+
+    day = float(DEFAULT_RATES.crew_day_tl.value)
+    visits = float(DEFAULT_RATES.maintenance_visits_per_year.value)
+    assert line(LIGHTING_COLUMN, "maintenance") == pytest.approx(visits * day / 8)
+    assert line(DISTRIBUTION_POLE, "per diem") == pytest.approx(
+        2 * line(SIGNALLED_COLUMN, "per diem")
+        * (visits + float(DEFAULT_RATES.extra_off_grid_visits_per_year.value))
+        / visits)
 
 
 def _rate_of(value, unit="years"):

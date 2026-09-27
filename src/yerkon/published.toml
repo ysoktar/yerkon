@@ -20,10 +20,10 @@ vpe_p95_m = 3.921
 availability = 0.9664
 area_km2 = 8.14
 capex_tl_per_unit = 9021.7789
-opex_tl_per_unit_year = 1928.2713
+opex_tl_per_unit_year = 1936.4641
 costed_by = "area"
 reached_km2 = 8.9767
-assumed_share = 0.0512
+assumed_share = 0
 
 [[row]]
 key = "rural"
@@ -35,11 +35,11 @@ hpe_p95_m = 7.4545
 vpe_p95_m = 4.9334
 availability = 0.9626
 area_km2 = 361.8333
-capex_tl_per_unit = 1316.5067
-opex_tl_per_unit_year = 352.423
+capex_tl_per_unit = 1286.6587
+opex_tl_per_unit_year = 457.8495
 costed_by = "area"
 reached_km2 = 440.25
-assumed_share = 0.7851
+assumed_share = 0.566
 
 [[row]]
 key = "tunnel"
@@ -52,6 +52,6 @@ vpe_p95_m = 3.3122
 availability = 0.9432
 area_km2 = 0.024
 capex_tl_per_unit = 108485.16
-opex_tl_per_unit_year = 14598.716
+opex_tl_per_unit_year = 22125.636
 costed_by = "route"
-assumed_share = 0.0331
+assumed_share = 0

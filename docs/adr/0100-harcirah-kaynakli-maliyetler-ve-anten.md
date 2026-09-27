@@ -45,7 +45,7 @@ Tek bir ekip günü iki kaynaktan hesaplanıyor:
 | Dağıtım direğine montaj | 4600 | 4690 | 17570 / 4 + 300 |
 | Çatıya montaj | 1800 | 1890 | 6370 / 4 + 300 (araç yok) |
 | Tünel askısı | 6000 | 4690 | 17570 / 4 + 300 (şerit kapatmaya bağlı) |
-| Bakım ziyareti | 1800 | 2200 | 17570 / 8 |
+| Bakım ziyareti | 1800 | 2200 | 17570 / 8 (ADR-0101 ile yapıya göre: kırsalda ve tünelde 17570 / 4) |
 
 Tutarlar TL. Hâlâ bu projenin varsayımı olanlar: günde kaç birim (8 ya
 da 4), birim başına 300 TL malzeme, dağıtım direği kirası (ayda 100 TL;

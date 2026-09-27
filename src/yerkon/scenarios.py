@@ -133,6 +133,8 @@ class Deployed:
                     product=anchor_product(anchor.radio.part),
                     structure=anchor.mounting.kind,
                     site_cost_tl=anchor.mounting.site_cost_tl,
+                    per_crew_day=float(anchor.mounting.per_crew_day.value),
+                    crew_day_tl=anchor.mounting.crew_day_value,
                     has_power=anchor.mounting.has_power,
                     has_backhaul=anchor.mounting.has_backhaul,
                     rent_tl_per_year=(

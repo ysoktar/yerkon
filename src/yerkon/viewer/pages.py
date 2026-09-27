@@ -2283,24 +2283,29 @@ LAW = Page(
                    "gündeliğin 1/3'ü, ikisini geçirene 2/3'ü, geceyi de "
                    "geçirene tamamı (Madde 39). Bir bakım ziyareti sabah "
                    "çıkıp öğleden sonra dönüyor: kişi başı 283,33 TL, "
-                   "iki kişilik ekip için ziyaret başına 566,67 TL.",
+                   "iki kişilik ekip için gün başına 566,67 TL. Ekip o gün "
+                   "birkaç birime uğradığı için bu, ziyaretlere bölünüyor: "
+                   "kırsalda günde dört direk, ziyaret başına 141,67 TL.",
                    "On a day trip: a third of the allowance for being "
                    "away over one of the lunch (13.00) or dinner (19.00) "
                    "times, two thirds for both, all of it for a night "
                    "(Article 39). A maintenance visit leaves in the "
                    "morning and is back in the afternoon: 283,33 TL a "
-                   "person, 566,67 TL a visit for a crew of two."),
+                   "person, 566,67 TL a day for a crew of two. The crew "
+                   "calls at several units that day, so this is shared "
+                   "among the visits: four poles a day in open country, "
+                   "141,67 TL a visit."),
                 _w("YERKON'da bugün sıfır: şehir içinde ekip kendi "
                    "ilçesinde; kırsalda ve tünelde bakımı o ilçedeki "
                    "yerel bir teknik firma yapıyor, yani kimse görev "
                    "yeri dışına çıkmıyor. Bakım Ankara merkezden "
-                   "yapılsaydı her ziyarete 566,67 TL eklenirdi; kural "
+                   "yapılsaydı ekip gününe 566,67 TL eklenirdi; kural "
                    "modelde bu yüzden duruyor.",
                    "Zero in YERKON today: in town the crew is in its own "
                    "district; in open country and the tunnel a local "
                    "firm in that district does the maintenance, so "
                    "nobody leaves the place of duty. Were it done from "
-                   "central Ankara, each visit would add 566,67 TL; "
+                   "central Ankara, each crew day would add 566,67 TL; "
                    "that is why the rule stays in the model."),
             ),
         ),

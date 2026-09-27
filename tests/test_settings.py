@@ -185,11 +185,11 @@ def test_the_operating_rates_are_built_from_the_file(tmp_path):
     from yerkon.cost import operating_rates
 
     text = pathlib.Path(DEFAULT_FILE).read_text(encoding="utf-8").replace(
-        '[values."operating.maintenance_tl_per_visit"]\nvalue = 2200.0',
-        '[values."operating.maintenance_tl_per_visit"]\nvalue = 99.0',
+        '[values."operating.crew_day_tl"]\nvalue = 17570.0',
+        '[values."operating.crew_day_tl"]\nvalue = 99.0',
     )
     rebuilt = operating_rates(load(write(tmp_path, text)))
-    assert float(rebuilt.maintenance_tl_per_visit.value) == 99.0
+    assert float(rebuilt.crew_day_tl.value) == 99.0
 
 
 def test_the_radios_take_their_unpublished_figures_from_the_file(tmp_path):

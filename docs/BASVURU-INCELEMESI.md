@@ -126,20 +126,20 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 | Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %96,64 |
 | Şehir içi | Alan | 1,00 km² | 8,14 km² |
 | Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 9022 TL/km² |
-| Şehir içi | OPEX | boş | 1928 TL/km²/yıl |
+| Şehir içi | OPEX | boş | 1936 TL/km²/yıl |
 | Kırsal | HPE P50 | 4,17 m | 2,14 m |
 | Kırsal | HPE P95 | 14,29 m | 7,45 m |
 | Kırsal | VPE P95 | 24,14 m | 4,93 m |
 | Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %96,26 |
 | Kırsal | Alan | 1,01 km² | 361,83 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1317 TL/km² |
-| Kırsal | OPEX | boş | 352 TL/km²/yıl |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1287 TL/km² |
+| Kırsal | OPEX | boş | 458 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,58 m |
 | Tünel | HPE P95 | 1,88 m | 2,43 m |
 | Tünel | VPE P95 | 5,53 m | 3,31 m |
 | Tünel | Kullanılabilirlik | yaklaşık %97,0 | %94,32 |
 | Tünel | CAPEX | yaklaşık 545903 TL/km² | 108485 TL/km (güzergâh) |
-| Tünel | OPEX | boş | 14599 TL/km/yıl |
+| Tünel | OPEX | boş | 22126 TL/km/yıl |
 
 Farkın nedenleri modelde değişenler: gerçek Ankara zemini ve binaları,
 ITU-R P.526 kırınımı, gölgelenme, sekiz çekiliş, sahanın çevresinden ve
@@ -357,12 +357,15 @@ Sırayla, en büyük kaldıraçtan başlayarak:
    kavşaklar, baz istasyonu sahaları ve AUS kabinleri gibi elektriği olan
    yerler bu kalemi sıfırlar. Yöneylem yerleşimi (ADR-0081) bu seçimi
    maliyetle birlikte yapıyor.
-3. **Direk kirası.** Kırsal işletmenin en büyük kalemi (yılda 58800 TL).
-   Değer bir varsayım (direk başına yılda 1200 TL). Dağıtım şirketiyle
+3. **Direk kirası.** Kırsal işletmenin büyük kalemlerinden biri (yılda
+   54000 TL, 45 kiralık yapı). Değer bir varsayım (direk başına yılda
+   1200 TL): dağıtım şirketlerinin direğe cihaz için yayımladığı bir bedel
+   bulunamadı (ADR-0101). Dağıtım şirketiyle
    kamu yararı gerekçesiyle kirasız ya da toplu bir anlaşma, satırın
    işletme maliyetini yarıya yakın düşürür.
-4. **Bakım ziyaretleri.** Yılda birim başına 0,2 ziyaret, ziyaret başına
-   1800 TL. Uzaktan izleme (birim her yayınında kendi durumunu da
+4. **Bakım ziyaretleri.** Yılda birim başına 0,2 ziyaret; ziyaret bir
+   ekip gününün (17570 TL) o yapıda ekibin günde uğradığı birime
+   bölünmüşü: şehirde 2196, kırsalda ve tünelde 4392 TL (ADR-0101). Uzaktan izleme (birim her yayınında kendi durumunu da
    bildirirse) ve bakımı var olan tur programlarına bağlamak bu kalemi
    düşürür.
 5. **Daha az direkle aynı hizmet.** Yöneylem yerleşimi şehirde

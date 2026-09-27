@@ -49,6 +49,7 @@ UNITS = {
     "TL/year": ("TL/yıl", "TL/year"),
     "TL/visit": ("TL/ziyaret", "TL/visit"),
     "TL/day": ("TL/gün", "TL/day"),
+    "sites/day": ("birim/gün", "sites/day"),
     "kWh/year": ("kWh/yıl", "kWh/year"),
     "visits/year": ("ziyaret/yıl", "visits/year"),
     "years": ("yıl", "years"),
@@ -66,6 +67,16 @@ ROWS = (
 
 #: Every figure a cost rests on, in the order a reader meets them.
 ASSUMED = (
+    ("operating.crew_day_tl",
+     ("Bir ekip günü", "One crew day")),
+    ("mounting.lighting_column.per_crew_day",
+     ("Aydınlatma direği, günde", "Lighting columns a day")),
+    ("mounting.distribution_pole.per_crew_day",
+     ("Kırsal dağıtım direği, günde", "Rural distribution poles a day")),
+    ("mounting.tunnel_bracket.per_crew_day",
+     ("Tünel, günde", "Tunnel units a day")),
+    ("mounting.rooftop.per_crew_day",
+     ("Çatı, günde", "Roofs a day")),
     ("mounting.lighting_column.site_cost_tl",
      ("Aydınlatma direğine montaj", "Fitting to a lighting column")),
     ("mounting.tall_mast.site_cost_tl",
@@ -94,8 +105,6 @@ ASSUMED = (
      ("Yıllık bakım ziyareti", "Maintenance visits a year")),
     ("operating.extra_off_grid_visits_per_year",
      ("Şebeke dışı ek ziyaret", "Extra off-grid visits")),
-    ("operating.maintenance_tl_per_visit",
-     ("Bir bakım ziyareti", "One maintenance visit")),
     ("operating.crew_size",
      ("Bakım ekibi", "Maintenance crew")),
     ("operating.per_diem_tl",

@@ -24,21 +24,32 @@ on yıllık OPEX, faizsiz. A, B ve C'de aynı.
 |---|---|---|---|---|---|---|---|---|---|---|
 | Şehir içi, 500 m (eski) | 36 | 6,68 km² | 12,82 km | 114050 | 25177 | 365820 | 17065 | 3767 | 8899 | 1965 |
 | Şehir içi, 600 m ızgara | 25 | 8,59 km² | 12,82 km | 98586 | 18974 | 288326 | 11477 | 2209 | 7690 | 1480 |
-| **Şehir içi, yerleşim araması (yeni)** | 19 | 8,14 km² | 19,70 km | **73437** | **15696** | **230397** | **9022** | **1928** | **3728** | **797** |
+| **Şehir içi, yerleşim araması (yeni)** | 19 | 8,14 km² | 19,70 km | **73437** | **15763** | **231067** | **9022** | **1936** | **3728** | **800** |
 | Kırsal, 3000 m ızgara | 49 | 305,75 km² | 86,40 km | 412748 | 127144 | 1684188 | 1350 | 416 | 4777 | 1472 |
-| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **476356** | **127518** | **1751536** | **1317** | **352** | **4559** | **1220** |
-| Tünel, 60 m | 34 | yalnız tüp | 2,00 km | 216970 | 29197 | 508940 | yok | yok | 108485 | 14599 |
+| **Kırsal, yerleşim araması (yeni)** | 50 | 361,83 km² | 104,49 km | **465556** | **165665** | **2122206** | **1287** | **458** | **4456** | **1586** |
+| Tünel, 60 m | 34 | yalnız tüp | 2,00 km | 216970 | 44251 | 659480 | yok | yok | 108485 | 22126 |
 
 27 Eylül'den beri şehir içi ve kırsalda alıcılar gerçek yollarda sürüyor
 ve direkler yerleşim aramasının seçtiği yerlerde duruyor (ADR-0096):
 şehir içinde "daha ucuz" (19 direk), kırsalda "daha iyi" (50 direk). Km²
-başına CAPEX şehir içinde 11477'den 9022 TL'ye, kırsalda 1350'den 1317
+başına CAPEX şehir içinde 11477'den 9022 TL'ye, kırsalda 1350'den 1287
 TL'ye indi; kırsalda alan 361,83 km²'ye çıktı. Binalar gerçek ayak
 izleriyle hesaplanıyor (ADR-0097); bina içine düşen ızgara noktaları
 en yakın sokağa taşınıyor (ADR-0098). Montaj ve bakım bedelleri 27 Eylül'den beri kaynaklı bileşenlerden
 türetiliyor (sepetli araç ve işçilik fiyatları, ADR-0100). Direk ve araç modülü E28-2G4M20S:
 direk birimi 1000 adette 1493'ten 1365 TL'ye indi (ADR-0099). Güzergâh km'leri yeni
 turun, gerçek sokakların uzunluğu.
+
+27 Eylül akşamından beri bakım ziyareti yapıya göre (ADR-0101): bir ekip
+günü (17570 TL) ekibin o yapıda günde uğradığı birim sayısına bölünüyor.
+Şehirde günde 8 aydınlatma direği (2196 TL), kırsalda günde 4 dağıtım
+direği ve tünelde günde 4 birim (4392 TL). Elektrik 3,20'den 5,62 TL/kWh'ye
+(ticarethane, Nisan 2026 zammıyla), güneş seti parça parça fiyatlanarak
+2330'dan 2090 TL'ye, merkezî sistem 240000'den 237000 TL'ye. Sonuç: şehir
+içi OPEX 1928'den 1936 TL/km²'ye, kırsal CAPEX 1317'den 1287 TL/km²'ye,
+kırsal OPEX 352'den 458 TL/km²'ye, tünel OPEX 14599'dan 22126 TL/km'ye.
+Kırsal ve tünel OPEX'i arttı, çünkü oradaki ziyaret daha önce şehirdeki
+gibi günde 8 birimden fiyatlanıyordu.
 
 25 Eylül'den beri şehir içi ve kırsal O6 ile (ADR-0094): cihaz
 uyarlamalı frekans atlamalı olarak belgelendiriliyor, direk ve araç

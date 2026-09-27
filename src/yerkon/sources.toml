@@ -613,3 +613,101 @@ group = "project"
 label.tr = "Esri World Imagery (Esri, Maxar, Earthstar Geographics, GIS User Community): simülatörün uydu görüntüsü"
 label.en = "Esri World Imagery (Esri, Maxar, Earthstar Geographics, GIS User Community): the simulator's photograph"
 url = "https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9"
+
+[[source]]
+key = "forelektrik-2026"
+group = "project"
+label.tr = "forelektrik.com: 1 kWh kaç TL, 2026 (ticarethane, tek zamanlı, vergiler dahil 4,78 TL/kWh), 26 Aralık 2025"
+label.en = "forelektrik.com: what a kWh costs, 2026 (commercial, single rate, taxes included 4,78 TL/kWh), 26 December 2025"
+url = "https://forelektrik.com/1-kwh-kac-tl/"
+
+[[source]]
+key = "zam-nisan-2026"
+group = "project"
+label.tr = "Milliyet Uzmanpara: Nisan 2026 elektrik zammı (alçak gerilim kamu ve özel hizmetler sektörü %17,5), 4 Nisan 2026"
+label.en = "Milliyet Uzmanpara: the April 2026 electricity increase (low-voltage public and private services 17,5 %), 4 April 2026"
+url = "https://uzmanpara.milliyet.com.tr/uzmanpara/elektrik-zammi-2026-nisanda-ne-kadar-oldu-elektrige-ne-kadar-zam-geldi-iste-yeni-tarife-7565631"
+
+[[source]]
+key = "genel-aydinlatma"
+group = "rules"
+label.tr = "Genel Aydınlatma Yönetmeliği (bağlantı noktasından genel aydınlatma dışında bir amaca enerji verilmez)"
+label.en = "General Lighting Regulation (no energy from the connection for any purpose but public lighting)"
+url = "https://www.mevzuat.gov.tr/File/GeneratePdf?mevzuatNo=18646&mevzuatTur=KurumVeKurulusYonetmeligi&mevzuatTertip=5"
+
+[[source]]
+key = "dicle-surici"
+group = "project"
+label.tr = "Dicle Elektrik, Suriçi: 11 ekip ve 11 sepetli araçla bir hafta sonunda 207 direkte 414 armatür, 25 Haziran 2026"
+label.en = "Dicle Elektrik, Suriçi: 414 luminaires on 207 poles in one weekend with 11 crews and 11 bucket trucks, 25 June 2026"
+url = "https://www.midyatgundem.com/dicle-elektrikten-suricine-estetik-dokunus"
+
+[[source]]
+key = "yazilimci-maaslari-2026"
+group = "project"
+label.tr = "Yazılımcı Maaşları 2026 anketi (1223 katılımcı, Türkiye'deki şirketlerde net medyan 95000 TL), Şubat 2026"
+label.en = "Yazılımcı Maaşları 2026 survey (1223 respondents, net median 95000 TL at companies in Türkiye), February 2026"
+url = "https://yazilimcimaaslari.org/"
+
+[[source]]
+key = "vds-2026"
+group = "project"
+label.tr = "Karekod: en ucuz VDS fiyatları 2026 (6 vCPU, 8 GB, aylık 374,90 TL), 25 Eylül 2026"
+label.en = "Karekod: cheapest VDS prices 2026 (6 vCPU, 8 GB, 374,90 TL a month), 25 September 2026"
+url = "https://www.karekod.org/blog/en-ucuz-vds-fiyatlari/"
+
+[[source]]
+key = "akakce-controller"
+group = "project"
+label.tr = "Akakçe: 10 A PWM solar şarj kontrol cihazı (en ucuz 276,67 TL), Eylül 2026"
+label.en = "Akakçe: 10 A PWM solar charge controller (cheapest 276,67 TL), September 2026"
+url = "https://www.akakce.com/sarj-kontrol-cihazi/10-amper-sarj-kontrol-cihazi.html"
+
+[[source]]
+key = "akakce-bracket"
+group = "project"
+label.tr = "Akakçe: solar montaj ekipmanları (ABS panel braket seti 421,01 TL), Eylül 2026"
+label.en = "Akakçe: solar mounting equipment (ABS panel bracket set 421,01 TL), September 2026"
+url = "https://www.akakce.com/solar-montaj-ekipmanlari.html"
+
+[[source]]
+key = "akakce-box"
+group = "project"
+label.tr = "Akakçe: Çet-San termoplastik sıva üstü buat 260x180x75 (147,41 TL), Eylül 2026"
+label.en = "Akakçe: Çet-San thermoplastic surface box 260x180x75 (147,41 TL), September 2026"
+url = "https://www.akakce.com/buat-kutusu-kapagi/en-ucuz-cet-san-termoplastik-buat-siva-ustu-260x180x75-fiyati,1267194391.html"
+
+[[source]]
+key = "solar-kablo-2026"
+group = "project"
+label.tr = "Power Enerji: solar kablo fiyatları 2026 (4 mm² metresi 25-40 TL)"
+label.en = "Power Enerji: solar cable prices 2026 (4 mm² 25-40 TL a metre)"
+url = "https://satis.powerenerji.com/solar-kablo/"
+
+[[source]]
+key = "direk-reklam"
+group = "project"
+label.tr = "Tr724: elektrik direkleri reklamları (dağıtım şirketleri 2015'ten beri direkte reklam alanı kiralıyor, en küçük afiş ayda 4700 TL), 11 Mayıs 2019"
+label.en = "Tr724: advertising on electricity poles (distribution companies have rented pole space since 2015, the smallest poster 4700 TL a month), 11 May 2019"
+url = "https://www.tr724.com/elektrik-direkleri-reklamlari-kimin-cebine-giriyor/"
+
+[[source]]
+key = "uab-gecis-hakki"
+group = "rules"
+label.tr = "Ulaştırma Bakanlığı: geçiş hakkı yönetmeliğinin uygulanması hakkında usul ve esaslar (direk başına bedel yok)"
+label.en = "Transport ministry: rules applying the rights-of-way regulation (no per-pole fee)"
+url = "https://hgm.uab.gov.tr/uploads/pages/usul-ve-esaslar/gecis-hakki-yonetmeliginin-uygulanmasihakkinda-usul-ve-esaslar.pdf"
+
+[[source]]
+key = "akakce-panel"
+group = "project"
+label.tr = "Akakçe: 10 W güneş paneli (en ucuz 518,72 TL), Eylül 2026"
+label.en = "Akakçe: 10 W solar panel (cheapest 518,72 TL), September 2026"
+url = "https://www.akakce.com/gunes-paneli/10-watt-gunes-paneli.html"
+
+[[source]]
+key = "akakce-battery"
+group = "project"
+label.tr = "Akakçe: 12 V 7 Ah kuru akü (en ucuz 524,40 TL), Eylül 2026"
+label.en = "Akakçe: 12 V 7 Ah sealed battery (cheapest 524,40 TL), September 2026"
+url = "https://www.akakce.com/kesintisiz-guc-kaynagi-akusu.html"

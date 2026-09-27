@@ -17,6 +17,7 @@ hides that is worse than no total.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional
 
 from yerkon.evidence import Provenance, Sourced
 from yerkon.numbers import decimal_comma
@@ -118,6 +119,9 @@ class AnchorSite:
     product: Product
     structure: str
     site_cost_tl: Sourced
+    #: How many of these sites a crew visits in a day. A visit costs this
+    #: share of a crew day, per diem included.
+    per_crew_day: float
     #: True when the structure already has mains power, so the anchor
     #: draws from it and pays a bill instead of carrying its own supply.
     has_power: bool = False
@@ -125,6 +129,12 @@ class AnchorSite:
     has_backhaul: bool = False
     #: What the structure's owner charges a year, where it is rented.
     rent_tl_per_year: float = 0.0
+    #: A crew day here, where it differs from the operating one.
+    crew_day_tl: Optional[float] = None
+
+    def __post_init__(self) -> None:
+        if self.per_crew_day <= 0.0:
+            raise ValueError("a crew reaches at least part of a site a day")
 
 
 @dataclass(frozen=True)
@@ -185,7 +195,8 @@ class OperatingRates:
     maintenance_visits_per_year: Sourced
     #: Off-grid sites need more attendance: batteries age and panels foul.
     extra_off_grid_visits_per_year: Sourced
-    maintenance_tl_per_visit: Sourced
+    #: A day of the fitting and maintenance crew: truck, electrician, helper.
+    crew_day_tl: Sourced
     central_operation_tl_per_year: Sourced
     #: What a crew member is paid a day away from the base city (H Cetveli).
     per_diem_tl: Sourced
@@ -387,12 +398,23 @@ def price(
         + off_grid * (float(rates.off_grid_supply_tl.value) - battery_tl)
         / max(float(rates.off_grid_life_years.value), 1e-9)
     )
-    visits = anchors * float(rates.maintenance_visits_per_year.value) + (
-        off_grid * float(rates.extra_off_grid_visits_per_year.value)
-    )
-    maintenance_tl = visits * float(rates.maintenance_tl_per_visit.value)
+    # Each site's visits are a share of a crew day: a crew reaches eight
+    # columns in town but four poles kilometres apart (ADR-0101). The
+    # per diem is paid by the day too, so it is shared the same way.
+    visits = 0.0
+    crew_days = 0.0
+    maintenance_tl = 0.0
+    for anchor in inventory.anchors:
+        here = float(rates.maintenance_visits_per_year.value) + (
+            0.0 if anchor.has_power
+            else float(rates.extra_off_grid_visits_per_year.value))
+        day_tl = (anchor.crew_day_tl if anchor.crew_day_tl is not None
+                  else float(rates.crew_day_tl.value))
+        visits += here
+        crew_days += here / anchor.per_crew_day
+        maintenance_tl += here * day_tl / anchor.per_crew_day
     per_diem_tl = (
-        visits * float(rates.crew_size.value) * float(rates.per_diem_tl.value)
+        crew_days * float(rates.crew_size.value) * float(rates.per_diem_tl.value)
         * float(rates.per_diem_share.value)
         if inventory.crew_travels else 0.0
     )
@@ -429,12 +451,12 @@ def price(
         LineItem(
             "maintenance", maintenance_tl,
             "{} visits a year".format(decimal_comma(visits, 1)),
-            rates.maintenance_tl_per_visit.provenance,
+            rates.crew_day_tl.provenance,
         ),
         LineItem(
             "per diem", per_diem_tl,
-            "{} crew-days away from the base city".format(
-                decimal_comma(visits * float(rates.crew_size.value), 1))
+            "{} person-days away from the base city".format(
+                decimal_comma(crew_days * float(rates.crew_size.value), 1))
             if inventory.crew_travels else "the crew stays in its city",
             rates.per_diem_tl.provenance,
         ),

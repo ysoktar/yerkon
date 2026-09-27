@@ -533,7 +533,8 @@ def test_simulating_from_the_viewer_gives_what_the_table_gives():
     assert 0.0 < result["availability"] <= 1.0
     assert result["capex_tl"] > 0.0
     assert result["opex_tl_per_year"] > 0.0
-    assert 0.0 < result["assumed_share"] <= 1.0
+    # Zero once every rate a row rests on has a source (ADR-0101).
+    assert 0.0 <= result["assumed_share"] <= 1.0
 
 
 def test_one_press_gives_one_draw_and_says_which():
@@ -807,7 +808,7 @@ def test_the_edits_can_be_written_back_as_a_file(tmp_path):
             "mounting.tall_mast.site_cost_tl": {
                 "value": 5000.0, "source": "a quotation",
             },
-            "operating.maintenance_tl_per_visit": 2200.0,
+            "operating.crew_day_tl": 17570.0,
         }
     })
     path = tmp_path / "written.toml"
@@ -815,7 +816,7 @@ def test_the_edits_can_be_written_back_as_a_file(tmp_path):
 
     back = load(str(path))
     assert back.number("mounting.tall_mast.site_cost_tl") == 5000.0
-    assert back.number("operating.maintenance_tl_per_visit") == 2200.0
+    assert back.number("operating.crew_day_tl") == 17570.0
     assert not back.entry("mounting.tall_mast.site_cost_tl").is_assumed
 
 

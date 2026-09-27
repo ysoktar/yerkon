@@ -925,6 +925,13 @@ class MountingOption:
     has_power: bool
     #: True when the structure already carries a data connection.
     has_backhaul: bool
+    #: How many of these sites a crew fits or visits in a day. Sites a
+    #: crew reaches in minutes are done more often in a day than sites
+    #: kilometres apart or behind a lane closure (ADR-0101).
+    per_crew_day: Sourced
+    #: What a crew day costs here, where it is not the operating crew day:
+    #: a roof is reached by the stairs, with no bucket truck.
+    crew_day_tl: Optional[Sourced] = None
     #: What the structure's owner charges a year to carry the unit, where
     #: the structure is somebody else's to rent. None for the town's own
     #: columns and for structures this project builds.
@@ -935,6 +942,14 @@ class MountingOption:
             raise ValueError("a mounting height must be positive")
         if float(self.site_cost_tl.value) < 0.0:
             raise ValueError("a site cannot pay you to use it")
+        if float(self.per_crew_day.value) <= 0.0:
+            raise ValueError("a crew reaches at least part of a site a day")
+
+    @property
+    def crew_day_value(self) -> Optional[float]:
+        """This structure's own crew day in lira, or None for the usual one."""
+        return (float(self.crew_day_tl.value)
+                if self.crew_day_tl is not None else None)
 
 
 def mountings(settings: Settings = DEFAULTS) -> dict:
@@ -952,6 +967,13 @@ def mountings(settings: Settings = DEFAULTS) -> dict:
             site_cost_tl=settings.sourced("mounting.{}.site_cost_tl".format(key)),
             has_power=has_power,
             has_backhaul=has_backhaul,
+            per_crew_day=settings.sourced(
+                "mounting.{}.per_crew_day".format(key)),
+            crew_day_tl=(
+                settings.sourced("mounting.{}.crew_day_tl".format(key))
+                if "mounting.{}.crew_day_tl".format(key) in settings.entries
+                else None
+            ),
             rent_tl_per_year=(
                 settings.sourced("mounting.{}.rent_tl_per_year".format(key))
                 if rented else None

@@ -243,9 +243,9 @@ Son güncelleme: 25 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,28 | 8,94 | 3,92 | %96,64 | 8,14 km² | 9022 TL/km² | 1928 TL/km²/yıl |
-  | Kırsal | 2,14 | 7,45 | 4,93 | %96,26 | 361,83 km² | 1317 TL/km² | 352 TL/km²/yıl |
-  | Tünel | 0,58 | 2,43 | 3,31 | %94,32 | güzergâh | 108485 TL/km | 14599 TL/km/yıl |
+  | Şehir içi | 2,28 | 8,94 | 3,92 | %96,64 | 8,14 km² | 9022 TL/km² | 1936 TL/km²/yıl |
+  | Kırsal | 2,14 | 7,45 | 4,93 | %96,26 | 361,83 km² | 1287 TL/km² | 458 TL/km²/yıl |
+  | Tünel | 0,58 | 2,43 | 3,31 | %94,32 | güzergâh | 108485 TL/km | 22126 TL/km/yıl |
 
   (27 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik,
   alıcılar gerçek yollarda, şehir içi ve kırsalda direkler yerleşim

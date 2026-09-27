@@ -131,6 +131,8 @@ def lifecycle_tl(mounting: MountingOption, part: str,
         product=anchor_product(part),
         structure=mounting.kind,
         site_cost_tl=mounting.site_cost_tl,
+        per_crew_day=float(mounting.per_crew_day.value),
+        crew_day_tl=mounting.crew_day_value,
         has_power=mounting.has_power,
         has_backhaul=mounting.has_backhaul,
         rent_tl_per_year=(float(mounting.rent_tl_per_year.value)
