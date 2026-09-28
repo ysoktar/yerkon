@@ -769,6 +769,13 @@ label.en = "Revenue Administration: depreciation rates table (3.49.4 radio equip
 url = "https://cdn.gib.gov.tr/api/gibportal-file/file/getFileResources?objectKey=arsiv/yardim-kaynaklar/yararli-bilgiler/AmortismanOranlariTablosu.pdf"
 
 [[source]]
+key = "lcas-red"
+group = "project"
+label.tr = "LCAS v1.0 (Multicert, Haziran 2026): RED telsiz uygunluğu, EN 300 328, EN 301 489-1/-17, EN 62368-1 ve EN 62311 birlikte 2500-8000 € (vergi hariç, gösterge); EN 18031 siber güvenlik ayrıca"
+label.en = "LCAS v1.0 (Multicert, June 2026): RED radio compliance, EN 300 328, EN 301 489-1/-17, EN 62368-1 and EN 62311 together 2500-8000 € (before tax, indicative); EN 18031 cybersecurity extra"
+url = "https://lcas.info/"
+
+[[source]]
 key = "pana-direk"
 group = "project"
 label.tr = "Pana Bayrak Direği: TEDAŞ tipi galvaniz poligon direkler 6-15 m (6500-27500 TL), galvaniz direk 20 m 120000 TL, 30 m 475000 TL, Eylül 2026"
