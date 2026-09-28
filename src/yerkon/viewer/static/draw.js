@@ -260,10 +260,52 @@ export function groundFaces(view, terrain, light, photo) {
             ? most => slices(view, corners, sheet, most) : null,
         };
       }
-      if (painted) out.push(painted);
+      if (painted) {
+        painted.ground = [row, column];
+        out.push(painted);
+      }
     }
   }
   return out;
+}
+
+/* The ground as a few hundred large patches, for a moving frame.
+ *
+ * Far out, the ground is thousands of quads a few pixels across, and no
+ * moving frame can lay the picture on each of them: the ones it could
+ * not came out as flat squares and the drag looked like a mosaic. So
+ * while moving, the ground can instead be drawn as a coarse grid over
+ * the same mesh, `across` patches a side, each laid with the picture as
+ * two triangles whose corners are mesh nodes and so sit on the ground.
+ * Everything else is painted over it as usual; the one thing given up,
+ * until the camera stops, is a hill hiding what stands behind it.
+ *
+ * Returns the triangles and which patches were drawn: a patch reaching
+ * behind the eye is left to its own quads.
+ */
+export function groundPatches(view, terrain, photo, across = 16) {
+  if (!terrain || !photo || !photo.image) return null;
+  const { xs, ys, heights } = terrain;
+  const step = Math.max(1, Math.ceil(Math.max(xs.length, ys.length) / across));
+  const node = (row, column) => {
+    const r = Math.min(row, ys.length - 1), c = Math.min(column, xs.length - 1);
+    return [xs[c], ys[r], heights[r][c] * VERTICAL];
+  };
+  const triangles = [];
+  const covered = new Set();
+  for (let row = 0; row < ys.length - 1; row += step) {
+    for (let column = 0; column < xs.length - 1; column += step) {
+      const corners = [node(row, column), node(row, column + step),
+                       node(row + step, column + step), node(row + step, column)];
+      if (!corners.every(point => view.depthOf(point) >= NEAR)) continue;
+      const sheet = photo.pick ? photo.pick(corners) : photo;
+      const cut = slices(view, corners, sheet, 1);
+      if (!cut) continue;
+      for (const corner of cut) triangles.push({ image: sheet.image, corners: corner });
+      covered.add(Math.floor(row / step) + "," + Math.floor(column / step));
+    }
+  }
+  return { triangles, covered, step };
 }
 
 /* A ground quad cut into triangles for the photograph to lie on.
@@ -659,7 +701,6 @@ function triangle(context, image, corners) {
  * colour and the picture cannot be told apart, and a moving frame is
  * one that has to be quick. */
 const MOVING_MIN_PX = 12;
-const MOVING_SLICES = 1;
 
 function longestSide(screen) {
   let longest = 0;
@@ -673,8 +714,11 @@ function longestSide(screen) {
 function textured(context, item) {
   const moving = texturing.moving && !texturing.still;
   if (moving && !item.pictured) return false;
-  const triangles = item.texture.slice
-    ? item.texture.slice(moving ? MOVING_SLICES : MOST_SLICES) : null;
+  // A moving frame lays each quad with one draw rather than two
+  // triangles: the seam that leaves is not visible while the ground is
+  // moving, and the same frame time covers twice the quads.
+  const triangles = !moving && item.texture.slice
+    ? item.texture.slice(MOST_SLICES) : null;
   if (triangles) {
     context.beginPath();
     context.moveTo(item.screen[0][0], item.screen[0][1]);
@@ -744,6 +788,7 @@ function textured(context, item) {
   context.drawImage(image, left, top, right - left, bottom - top,
                     left, top, right - left, bottom - top);
   context.restore();
+  texturing.drawn += 1;
   // The same shading the flat colour carries, so a hill reads as a hill.
   if (item.texture.shade > 0.01) {
     context.globalAlpha = item.texture.shade * 0.8;
@@ -767,6 +812,8 @@ export const texturing = {
   budget: 0,
   // How many were drawn in the last frame, for the page to time.
   drawn: 0,
+  // The coarse ground a moving frame may draw instead of every quad.
+  patches: null,
 };
 
 /* Which quads a moving frame lays the picture on: the largest on screen
@@ -780,21 +827,39 @@ function chooseForMoving(items) {
     const size = longestSide(item.screen);
     if (size >= MOVING_MIN_PX) candidates.push([size, item]);
   }
+  // More quads than the budget: the coarse ground covers all of it in a
+  // few hundred draws, where the quads would leave most of it flat.
+  const patches = texturing.patches;
+  if (patches && candidates.length > texturing.budget
+      && patches.triangles.length <= Math.max(texturing.budget, 600)) {
+    return patches;
+  }
   candidates.sort((a, b) => b[0] - a[0]);
   let left = texturing.budget;
   for (const [, item] of candidates) {
-    if (left < 2) break;
+    if (left < 1) break;
     item.pictured = true;
-    left -= 2;
+    left -= 1;
   }
+  return null;
 }
 
 export function paint(context, width, height, items) {
   context.clearRect(0, 0, width, height);
   items.sort((a, b) => b.depth - a.depth);
   texturing.drawn = 0;
-  if (texturing.on && texturing.moving && !texturing.still) chooseForMoving(items);
+  const coarse = texturing.on && texturing.moving && !texturing.still
+    ? chooseForMoving(items) : null;
+  if (coarse) {
+    // The coarse ground first, under everything else in the frame.
+    context.globalAlpha = 1;
+    for (const piece of coarse.triangles) triangle(context, piece.image, piece.corners);
+    texturing.drawn += coarse.triangles.length;
+  }
   for (const item of items) {
+    if (coarse && item.ground && coarse.covered.has(
+      Math.floor(item.ground[0] / coarse.step) + ","
+      + Math.floor(item.ground[1] / coarse.step))) continue;
     if (item.kind === "unit") {
       context.globalAlpha = 1;
       context.fillStyle = "#b4551d";

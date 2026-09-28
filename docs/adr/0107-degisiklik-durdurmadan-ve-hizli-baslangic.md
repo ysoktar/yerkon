@@ -93,7 +93,13 @@ paneli, zemin seçimi, altıncı adımdaki yerleştirme araması ve en alttaki
   sığan sayıda üçgeni ekranda en büyük karelerden başlayarak fotoğrafla
   çiziyor, kalanı tek renk. Bütçe her karede süreye göre büyüyüp
   küçülüyor: hızlı bir bilgisayarda neredeyse her kare, yavaş bir
-  cihazda en yakın kareler fotoğraflı.
+  cihazda en yakın kareler fotoğraflı. Akıcı kare 33 ms (saniyede 30).
+  Kareler bütçeden fazlaysa zemin hareket sırasında 16×16 büyük parçadan
+  oluşan kaba bir ızgarayla, köşeleri zeminin kendi noktalarında,
+  fotoğraflı çiziliyor; sahnede kaç kare olursa olsun yaklaşık 500
+  üçgen. Bunun bedeli, kamera durana kadar tepenin arkasındaki binayı
+  örtmemesi. Ekran kartı olmayan bir test makinesinde sürükleme boyunca
+  her ara görüntü fotoğraflı çıktı.
 - Sahnenin köşesinde "Arka planda" paneli, motorun her işini, uzun
   görevleri ve fotoğraf indirmelerini süresiyle gösteriyor. Tarayıcıda
   motor soruları sırayla yanıtlıyor; sırada bekleyen iş, hangisinin

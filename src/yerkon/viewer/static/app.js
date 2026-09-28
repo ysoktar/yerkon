@@ -2152,7 +2152,8 @@ let stillFrame = false;
  * shrinks, well inside it and it grows. A fast computer ends up drawing
  * nearly every quad with the picture while moving; a slow phone draws
  * the nearest ones. */
-const SMOOTH_MS = 20;
+//: About thirty frames a second while dragging.
+const SMOOTH_MS = 33;
 const FEWEST_MOVING = 60;
 const MOST_MOVING = 20000;
 
@@ -2228,6 +2229,13 @@ function paintScene() {
   // camera to sort in front of the quad it lies on: one mesh cell, which
   // is how much a quad's own depth varies across itself.
   const bias = meshCell();
+
+  // The coarse, photographed ground a moving frame can fall back on when
+  // there are more quads than it can lay the picture on one by one.
+  draw.texturing.patches = draw.texturing.on && draw.texturing.moving
+      && !draw.texturing.still
+    ? draw.groundPatches(view, drawnTerrain(), drawnPhotograph())
+    : null;
 
   const items = [
     ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
