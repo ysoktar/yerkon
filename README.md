@@ -121,6 +121,7 @@ tablonun şehir içi ve kırsal satırları onu kullanır (ADR-0096).
 | `yerkon calibrate KAYIT` | SDR kaydından paket kaybını ya da MATLAB çıktısından saat kaymasını okur |
 | `yerkon design` | Bir ayar değişikliğinin başka neleri değiştirdiğini gösterir ve bir kez sorar |
 | `python tools/hardware.py` | Telsiz donanımı seçeneklerini (EBYTE 12S, 20S, 27S, belgesiz 12S ve eski O4 kurulumu) şehir içi ve kırsal satırda, bütün sütunlarla ve iki yönü de sınayarak karşılaştırır. Yalnız yerel; site ve tarayıcıdaki simülatör bunu görmez. `--list` seçenekleri sayar |
+| `python tools/units.py` | Her direk ve alıcı eşleşmesinin iki yönlü menzili (tünelde kendi borusu boyunca), alıcıların parçaları ve fiyatları, ve km² başına en çok kaç alıcı taşınabildiği. Yalnız yerel |
 
 ## Yeni bir saha getirmek
 

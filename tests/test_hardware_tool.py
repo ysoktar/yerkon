@@ -48,3 +48,22 @@ def test_the_mast_antenna_price_moves_only_o4(tool):
 def test_the_tool_stays_out_of_the_package():
     # The site and the browser simulator are built from src/yerkon.
     assert "src" not in TOOL.parts
+
+
+def test_capacity_is_the_air_time_shared_out():
+    import sys
+
+    sys.path.insert(0, str(TOOL.parent))
+    import units
+
+    from yerkon.ranging import exchange_duration_s
+    from yerkon.scenarios import catalogue
+    from yerkon.settings import DEFAULTS
+
+    rows = {row[0]: row for row in units.capacity(1.0)}
+    dep = catalogue(DEFAULTS)["urban"].scenario.deployment
+    per_second = dep.duty_cycle / exchange_duration_s(dep.anchors[0].radio, dep.scheme)
+    one_channel = rows["urban"][7]
+    assert one_channel == pytest.approx(per_second / dep.max_anchors_per_round)
+    # Every pole busy carries more than one channel, never less.
+    assert rows["urban"][9] * rows["urban"][5] >= one_channel
