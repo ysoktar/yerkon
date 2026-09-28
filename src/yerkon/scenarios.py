@@ -33,7 +33,7 @@ from yerkon.cost import (
 from yerkon.evaluate import Deployment, Journey, Receiver, Scenario
 from yerkon.hardware import (
     DWM3000, DWM3000_ANTENNA, GW_22_5151, SX1280, Radio, W24P_U, radios)
-from yerkon.ranging import SINGLE_SIDED
+from yerkon.ranging import SINGLE_SIDED, clocks
 from yerkon.regulatory import REGIONS
 from yerkon.language import say
 from yerkon.settings import DEFAULTS, Settings
@@ -218,13 +218,18 @@ def row_figures(row: str, settings: Settings = DEFAULTS) -> dict:
 
 def row_deployment_figures(row: str, settings: Settings = DEFAULTS) -> dict:
     """The deployment-level half of the same: round size, scheme, the
-    anchors' antenna, the spectrum rule and the share of time it lets
-    the ranging use."""
+    clock, the anchors' antenna, the spectrum rule and the share of time
+    it lets the ranging use.
+
+    The clock is built from the settings in hand rather than taken from
+    the module's copy of the shipped defaults, or a settings file that
+    changes the crystal would change nothing."""
     region = REGIONS[ROW_REGIONS[row]]
     return {
         "max_anchors_per_round": int(
             settings.number("{}.anchors_per_round".format(row))),
         "scheme": SINGLE_SIDED,
+        "clock": clocks(settings)["crystal"],
         "antenna": ROW_ANTENNAS[row][0],
         "region": region,
         "duty_cycle": region.channel_share,

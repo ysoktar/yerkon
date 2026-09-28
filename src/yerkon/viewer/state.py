@@ -950,6 +950,7 @@ class ViewState:
                 row, self.settings())["max_anchors_per_round"],
             # The row's antennas, so a tab hears as its row does (ADR-0091).
             antenna=row_deployment_figures(row, self.settings())["antenna"],
+            clock=row_deployment_figures(row, self.settings())["clock"],
         )
 
     def scenario_object(self) -> Scenario:

@@ -302,3 +302,16 @@ def test_fast_applies_over_a_settings_file_rather_than_replacing_it():
     quick = hurried(theirs)
     assert quick.number("mounting.tall_mast.site_cost_tl") == 999.0
     assert quick.number("site.shadow_draws") == 1.0
+
+
+def test_a_settings_file_reaches_the_rows_clock():
+    """The rows used the module's crystal, built once from the shipped
+    defaults, so a settings file that changed the residual changed
+    nothing in the table while the help said the clocks were rebuilt."""
+    from yerkon.scenarios import row_deployment_figures
+    from yerkon.settings import DEFAULTS
+
+    theirs = DEFAULTS.with_values({"clock.crystal.residual_ppm": 0.793})
+    for row in ("urban", "rural", "tunnel"):
+        clock = row_deployment_figures(row, theirs)["clock"]
+        assert clock.offset_ppm() == 0.793, row
