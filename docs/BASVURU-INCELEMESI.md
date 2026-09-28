@@ -128,12 +128,12 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 | Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 8844 TL/km² |
 | Şehir içi | OPEX | boş | 1919 TL/km²/yıl |
 | Kırsal | HPE P50 | 4,17 m | 2,16 m |
-| Kırsal | HPE P95 | 14,29 m | 8,02 m |
-| Kırsal | VPE P95 | 24,14 m | 4,95 m |
-| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %94,85 |
-| Kırsal | Alan | 1,01 km² | 354,83 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1107 TL/km² |
-| Kırsal | OPEX | boş | 329 TL/km²/yıl |
+| Kırsal | HPE P95 | 14,29 m | 8,16 m |
+| Kırsal | VPE P95 | 24,14 m | 4,96 m |
+| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %94,52 |
+| Kırsal | Alan | 1,01 km² | 354,00 km² |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1125 TL/km² |
+| Kırsal | OPEX | boş | 328 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,58 m |
 | Tünel | HPE P95 | 1,88 m | 2,43 m |
 | Tünel | VPE P95 | 5,53 m | 3,31 m |

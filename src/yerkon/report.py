@@ -364,16 +364,17 @@ def coarsely_read(results: Sequence[Result]) -> str:
         )
     if not given_up:
         return ""
-    # Which way it is wrong, not only that it is. Both coarse readings
-    # understate loss, so a fast run flatters the system: over the
-    # shipped rows it read the open-country percentile 18,59 m against
-    # the published 22,72 and its availability %52,00 against %41,83.
-    # A row that looks bad read fast really is bad (ADR-0063).
+    # Which way it is wrong, not only that it is. The coarse ground
+    # understates loss, so a fast run mostly flatters the system
+    # (ADR-0063). One shadow draw is noise, not bias: on the placement
+    # of 28 September the fast tunnel percentile read 7,58 m against the
+    # published 2,43.
     return (
         "These numbers were read coarsely for speed and are not the "
-        "published ones: " + "; ".join(given_up) + ". Both read loss low, "
-        "so a fast answer flatters the deployment rather than erring the "
-        "safe way. Run it without --fast to publish anything."
+        "published ones: " + "; ".join(given_up) + ". The coarse ground "
+        "reads loss low, so a fast answer mostly flatters the deployment "
+        "rather than erring the safe way; the single shadow draw can err "
+        "either way. Run it without --fast to publish anything."
     )
 
 

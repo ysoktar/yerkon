@@ -122,6 +122,15 @@ GROUPS = (
          ("Harcırah, kişi başı gündelik", "Per diem, a person a day")),
         ("operating.per_diem_share",
          ("Günübirlik görevde gündeliğin payı", "Share of it on a day trip")),
+        ("urban.crew_travels",
+         ("Şehir içinde ekip görev yeri dışına çıkıyor mu",
+          "Does the town crew leave its duty station")),
+        ("rural.crew_travels",
+         ("Kırsalda ekip görev yeri dışına çıkıyor mu",
+          "Does the open-country crew leave its duty station")),
+        ("tunnel.crew_travels",
+         ("Tünelde ekip görev yeri dışına çıkıyor mu",
+          "Does the tunnel crew leave its duty station")),
     )),
     (("Kira ve veri hattı", "Rent and data"), (
         ("mounting.distribution_pole.rent_tl_per_year",
@@ -130,8 +139,6 @@ GROUPS = (
          ("Çatı kirası, yıllık", "Roof rent, a year")),
         ("operating.connectivity_tl_per_year",
          ("Hücresel veri hattı, yıllık", "Cellular data line, a year")),
-        ("urban.junction_every",
-         ("Işıklı kavşak aralığı", "Signalised junction spacing")),
     )),
     (("Ömür ve merkezî sistem", "Service life and the central system"), (
         ("operating.service_life_years", ("Birimin ömrü", "A unit's service life")),
@@ -335,12 +342,16 @@ def assumptions(language: str, table) -> str:
             shown = decimal_comma(value, 2 if value != int(value) else 0)
             unit = _say(UNITS.get(sourced.unit, (sourced.unit, sourced.unit)),
                         language)
+            if sourced.unit == "yes/no":
+                shown = _say(("evet", "yes") if value else ("hayır", "no"),
+                             language)
+                unit = ""
             entries.append(
-                "<li><p><b>{name}: {value} {unit}</b> <span class=\"kind\">"
+                "<li><p><b>{name}: {value}</b> <span class=\"kind\">"
                 "({kind})</span></p><p>{note}</p><p class=\"source\">{said}: "
                 "{source}</p></li>".format(
                     name=html.escape(_say(name, language)),
-                    value=html.escape(shown), unit=html.escape(unit),
+                    value=html.escape((shown + " " + unit).strip()),
                     kind=html.escape(_say(KINDS[sourced.provenance], language)),
                     note=html.escape(sourced.note),
                     said=html.escape(_say(("Kaynak", "Source"), language)),

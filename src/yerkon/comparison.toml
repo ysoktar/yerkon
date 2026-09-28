@@ -559,28 +559,30 @@ the accuracy was measured."""
 sources = ["sx1280-datasheet", "sx1280-range", "yerkon-github"]
 tr = """Şehir içi satır, Kızılay'ın gerçek zemini üzerinde koşuldu. Alıcılar \
 gerçek sokaklarda sürüyor. Direkler, bir yerleşim aramasının mevcut \
-direk ve levhalar, yol kenarı, ölçülmüş çatılar ve tepeler arasından \
+direk ve levhalar, yol kenarı ve tepeler arasından \
 seçtiği 19 yerde. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
 türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir."""
 en = """The urban row was run over the real ground at Kızılay. The units \
 drive the real streets. The anchors stand on 19 spots a placement \
-search chose among standing columns and signs, the road side, measured \
-roofs and hilltops. Its range error model is derived from published \
+search chose among standing columns and signs, the road side and \
+hilltops. Its range error model is derived from published \
 SX1280 measurements, so the result is a model output rather than a field \
 measurement."""
 
 [note.rural-run]
 sources = ["sx1280-range", "yerkon-github"]
 tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yollarında sürüyor; 52 \
-birim bir yerleşim aramasının seçtiği yerlerde (46 elektrik dağıtım \
-direği, 4 aydınlatma direği, 2 çatı). Hata modeli kısa menzilde yayımlanmış SX1280 \
+birim bir yerleşim aramasının seçtiği yerlerde (47 elektrik dağıtım \
+direği, 5 aydınlatma direği). Çatılar kiralık olduğu için aramaya \
+sokulmuyor. Hata modeli kısa menzilde yayımlanmış SX1280 \
 ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
 saha ölçümü değil, model çıktısıdır. Dağıtım direği kirası sıfır alındı: \
 birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
 edilebilmeleri öngörülüyor."""
 en = """In the rural row the units drive Polatlı's real roads; the 52 \
-anchors stand where a placement search put them (46 distribution poles, \
-4 lighting columns, 2 roofs). Its error model is derived from \
+anchors stand where a placement search put them (47 distribution poles, \
+5 lighting columns). Roofs are rented, so the search is not offered \
+them. Its error model is derived from \
 published SX1280 measurements at short range. Its long range result is \
 therefore a model output rather than a direct field measurement. The \
 distribution pole rent is taken as nothing: the units go up under a \

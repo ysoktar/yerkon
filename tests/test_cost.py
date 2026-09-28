@@ -95,6 +95,21 @@ def test_no_part_is_swapped_for_a_dearer_one():
         assert board.one_tl - for_range_tl <= board.report_one_tl, board.key
 
 
+def test_each_part_sits_beside_the_one_it_replaced():
+    """The cost page pairs `was` and `parts` in order. The antenna the
+    report never named once came between the module and the
+    microcontroller, and the page put the old microcontroller beside
+    the antenna."""
+    from yerkon.bom import read
+
+    pairs = {(gone.key, came.key)
+             for board in read().boards.values()
+             for gone, came in board.swapped}
+    assert ("stm32g0b1met6", "stm32g031k8t6") in pairs
+    assert not any(came == "gw-22-5151" and gone.startswith("stm32")
+                   for gone, came in pairs)
+
+
 def test_the_table_prices_hardware_for_the_network_it_runs():
     """A thousand units, because the operating model runs a thousand.
 

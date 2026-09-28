@@ -440,14 +440,18 @@ export const SAY = {
   "place.head": { tr: "Yöneylem yerleşimi", en: "Placement search" },
   "place.note": {
     tr: "Direkleri ızgaraya değil zaten yüksek olan yerlere koyar: var olan "
-        + "aydınlatma direkleri ve tabelalar, yüksekliği ölçülmüş binaların "
-        + "çatıları, tepeler ve yol kenarı. Her aday bağlantı bütçesiyle "
+        + "aydınlatma direkleri ve tabelalar, yol kenarındaki direkler "
+        + "(şehirde aydınlatma, kırsalda elektrik dağıtım direği) ve "
+        + "tepelere dikilecek 25 m'lik direkler. Çatılar kiralık olduğu için "
+        + "aday sayılmaz. Her aday bağlantı bütçesiyle "
         + "denenir; bir hücre, dört direk ona ulaştığında ve bu direkler "
         + "çevresindeki dört çeyreğin en az üçünde durduğunda sayılır. "
         + "Ölçülmüş zemin ister ve birkaç dakika sürer.",
     en: "Puts the anchors on places that are already high rather than on "
-        + "a grid: existing lighting columns and signs, the roofs of "
-        + "buildings with a measured height, hilltops and the road side. "
+        + "a grid: existing lighting columns and signs, poles along the "
+        + "road (lighting columns in town, electricity distribution poles in "
+        + "open country) and 25 m masts to be put up on hilltops. Roofs are "
+        + "rented, so they are not offered. "
         + "Every candidate is tried with the link budget; a cell counts "
         + "once four anchors reach it and they stand in at least three of "
         + "the four quarters around it. Needs measured ground and takes a "

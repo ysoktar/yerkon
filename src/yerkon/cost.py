@@ -62,7 +62,7 @@ def _bom(key: str, name: str) -> Product:
 
 #: The plain module's unit, without the frequency hopping certificate.
 #: No row of the table uses it now; the simulator can (ADR-0094).
-SX1280_ANCHOR = _bom("sx1280-anchor", "Belgesiz yayın birimi")
+SX1280_ANCHOR = _bom("sx1280-anchor", "Frekans atlama belgesi olmayan yayın birimi")
 #: The broadcast unit the town and the open country both use.
 #:
 #: They were two lines of the report because they carried two radio

@@ -210,8 +210,8 @@ unit = "m"
 provenance = "ASSUMPTION"
 source = """direk boyları: TEDAŞ-MLZ/99-34 santrifüj betonarme direk şartnamesi (9,3-10-11 m, 12-13-14 m, 15-16 m ve üstü); iletkene mesafe: Elektrik Kuvvetli Akım Tesisleri Yönetmeliği, hava hattı iletkenlerinin haberleşme hatlarına en küçük düşey uzaklığı orta gerilimde 2,5 m, alçak gerilimde 1 m; gömülme derinliği için bir kaynak bulunamadı"""
 source_en = """pole lengths: TEDAŞ-MLZ/99-34, spun concrete pole specification (9,3-10-11 m, 12-13-14 m, 15-16 m and up); distance from the conductors: the Regulation on Electrical Power Installations, least vertical distance from overhead conductors to communication lines 2,5 m at medium voltage and 1 m at low voltage; no source was found for the buried depth"""
-note = """Kırsal dağıtım direğinde birimin yerden yüksekliği: direğin toprak üstündeki boyu eksi orta gerilim iletkenlerine 2,5 m. Direk boyları bir küme (TEDAŞ), mesafe yönetmelikten; direğin ne kadarının toprağa gömüldüğü için kaynak bulunamadı, bu yüzden değer hâlâ varsayım. Kırsal satır, 25 m direkli önceki yerleşimiyle, üç yükseklikte koşuldu: 6 m'de HPE P95 7,99 m, kullanılabilirlik %94,29, alan 337,67 km²; 8 m'de 7,64 m, %95,27, 352,67 km²; 10 m'de 7,45 m, %96,26, 361,83 km²."""
-note_en = """How high a unit stands on a rural distribution pole: the pole's height above ground less 2,5 m to the medium-voltage conductors. The pole lengths are a set (TEDAŞ) and the distance comes from the regulation; no source was found for how much of the pole is buried, so the value is still an assumption. The rural row, on its earlier arrangement with a 25 m mast, was run at three heights: at 6 m HPE P95 7,99 m, availability 94,29 %, area 337,67 km²; at 8 m 7,64 m, 95,27 %, 352,67 km²; at 10 m 7,45 m, 96,26 %, 361,83 km²."""
+note = """Kırsal dağıtım direğinde birimin yerden yüksekliği: direğin toprak üstündeki boyu eksi orta gerilim iletkenlerine 2,5 m. Direk boyları bir küme (TEDAŞ), mesafe yönetmelikten; direğin ne kadarının toprağa gömüldüğü için kaynak bulunamadı, bu yüzden değer hâlâ varsayım. Kırsal satır aynı yerleşimle üç yükseklikte koşuldu: 6 m'de HPE P95 8,58 m, kullanılabilirlik %91,11, alan 327,50 km², CAPEX 1216 TL/km²; 8 m'de 8,15 m, %93,17, 344,58 km², 1156 TL/km²; 10 m'de tablodaki değerler. Birim alçaldıkça kapsama ve kullanılabilirlik düşüyor."""
+note_en = """How high a unit stands on a rural distribution pole: the pole's height above ground less 2,5 m to the medium-voltage conductors. The pole lengths are a set (TEDAŞ) and the distance comes from the regulation; no source was found for how much of the pole is buried, so the value is still an assumption. The rural row was run at three heights on the same placement: at 6 m HPE P95 8,58 m, availability 91,11 %, area 327,50 km², CAPEX 1216 TL/km²; at 8 m 8,15 m, 93,17 %, 344,58 km², 1156 TL/km²; at 10 m the table's own figures. The lower the unit, the less it covers and the less often it gives a position."""
 affects = "kırsal satırın menzilini ve kapsamasını"
 affects_en = "the rural row's reach and coverage"
 
@@ -270,8 +270,8 @@ affects_en = "the reach of units on roofs"
 value = 1890.0
 unit = "TL"
 provenance = "DERIVED"
-source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Sepetli araç gerekmiyor, çatıya merdivenle çıkılıyor. Usta 3170 TL ve yardımcı 3200 TL, izin ve erişim yüzünden günde dört çatı (çatıda günde uğranan birim): 6370 / 4 = 1592 TL; tutucu, kablo ve binanın beslemesinden bir hat 300 TL. Toplam 1892, yuvarlanarak 1890 TL."""
 note_en = """No bucket truck: the roof is reached by the stairs. An electrician 3170 TL and a helper 3200 TL, four roofs a day because of permission and access (roofs a crew reaches in a day): 6370 / 4 = 1592 TL; a bracket, cable and a tap into the building's supply 300 TL. 1892, rounded to 1890 TL."""
 affects = "çatıdaki her birimin CAPEX'ini"
@@ -281,8 +281,8 @@ affects_en = "CAPEX of every unit on a roof"
 value = 6370.0
 unit = "TL"
 provenance = "DERIVED"
-source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Çatıda bir ekip günü: sepetli araç gerekmiyor, çatıya merdivenle çıkılıyor. Usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 6370 TL."""
 note_en = """A crew day on roofs: no bucket truck, the roof is reached by the stairs. Electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 6370 TL in all."""
 affects = "çatıdaki birimlerin bakım bedelini"
@@ -306,13 +306,17 @@ provenance = "ASSUMPTION"
 source = "bu proje"
 source_en = "this project"
 note = """Bina sahibine çatı için ödenen yıllık bedel. Yayımlanmış bir \
-sayı bulunamadı; dağıtım direği kirasıyla aynı, ayda 100 TL varsayıldı. \
-Baz istasyonu çatı kiraları bunun çok üstünde, ama onlar kilovatlar \
-çeken dolaplar için; bu birim avuç içi kadar."""
+sayı bulunamadı; ayda 100 TL varsayıldı, dağıtım direği için protokol \
+olmazsa karşılaştırmada kullanılan tutar. Baz istasyonu çatı kiraları \
+bunun çok üstünde, ama onlar kilovatlar çeken dolaplar için; bu birim avuç \
+içi kadar. Çatılar kiralık olduğu için yerleşim aramasına girmiyor; bu \
+değer tablodaki hiçbir satırı etkilemiyor."""
 note_en = """What the building's owner is paid a year for the roof. No \
-published figure was found; the same 100 TL a month as a distribution \
-pole is assumed. Base station roof rents are far above this, but those \
-are for cabinets drawing kilowatts; this unit fits in a palm."""
+published figure was found; 100 TL a month is assumed, the sum used for a \
+distribution pole as a comparison should there be no protocol. Base \
+station roof rents are far above this, but those are for cabinets drawing \
+kilowatts; this unit fits in a palm. Roofs are rented, so the placement \
+search does not offer them; this figure touches no row of the table."""
 affects = "çatıdaki birimlerin OPEX'ini"
 affects_en = "OPEX of units on roofs"
 
@@ -1154,8 +1158,8 @@ goes straight into every fix that anchor contributes to. Fixed per \
 anchor rather than drawn per measurement: a survey error does not change \
 between exchanges and does not average out. Fifteen centimetres is what \
 a careful GNSS survey of a roadside structure achieves."""
-affects = "HPE'nin altındaki, hiçbir ölçümün kaldıramadığı tabanı"
-affects_en = "a floor under HPE that no amount of ranging removes"
+affects = "HPE'nin altındaki, hiçbir ölçümün kaldıramadığı tabanı: sıfır alınırsa tünelde HPE P50 0,12 m, P95 0,46 m olur"
+affects_en = "a floor under HPE that no amount of ranging removes: set to zero, the tunnel's HPE P50 becomes 0,12 m and P95 0,46 m"
 
 [values."ranging.packet_loss"]
 value = 0.05
@@ -1385,8 +1389,8 @@ source = "bu proje, bir yerleşim kararı olarak"
 source_en = "this project, as a deployment choice"
 note = """Izgaranın kaçta kaçı ışıklı bir kavşakta duruyor: her ikinci sıranın her ikinci noktası, yani dörtte biri. Bir şehrin ana caddeleri ışıklıdır ve ışıklı bir kavşakta sinyal dolabı zaten durur: hem şebeke beslemesi hem de trafik yönetim merkezine giden bir hat. Oradaki direk, belediyenin kameralarının ve dedektörlerinin yaptığının aynısını yapar, hattını o dolaptan alır ve kendine bir veri paketi satın almaz. Yapı, yükseklik ve montaj bedeli aynı aydınlatma direğidir; dolayısıyla geometride hiçbir şey kımıldamaz. Dörtte bir, ihtiyatlı okuma: Ankara merkezinde ana cadde kavşaklarının yarısı da savunulabilir ve iki katı tasarruf eder."""
 note_en = """How much of the grid stands at a signalised junction: every second spot of every second row, so a quarter. A town's main streets are signalised, and a signalised junction already carries a controller cabinet: mains for the heads and a line to the traffic management centre. An anchor there does what the municipality's cameras and detectors already do, takes its link from that cabinet, and buys no data plan of its own. The structure, the height and the fitting cost are the same lighting column, so nothing about the geometry moves. A quarter is the conservative reading: half of the main-street junctions in Ankara's centre is defensible too, and saves twice as much."""
-affects = "şehir içi satırın OPEX'ini: bağlantı kalemi"
-affects_en = "the urban row's OPEX: the connectivity line"
+affects = "yalnız ızgara yerleşiminde şehir içi satırın bağlantı kalemini; tablodaki satır arama yerleşimini kullanıyor ve kavşaktaki birimi o yerleşim kendisi işaretliyor"
+affects_en = "the urban row's connectivity line on the grid layout only; the table's row uses the searched placement, which marks its own junction unit"
 sensitivity = """1 yapmak her direği bağlar ve bağlantı kalemini sıfırlar; 0 yapmak hiçbirini bağlamaz"""
 sensitivity_en = """setting it to 1 connects every anchor and zeroes the connectivity line; 0 connects none"""
 
@@ -1494,13 +1498,13 @@ source_en = "maintenance model: a local technical firm"
 note = """Hayır: bakımı Polatlı'daki yerel bir teknik firma yapıyor, ekip \
 Ankara'dan gitmiyor ve harcırah yok. Elektrik dağıtım şirketinin \
 ekiplerine dayanmıyor, çünkü şirket bu işi istemeyebilir. Direkler yine \
-şirketin: direğe çıkmak için onun izni ve koşulları gerekebilir, bu direk \
-kirası anlaşmasının içinde çözülmeli."""
+şirketin: direğe çıkmak için onun izni ve koşulları gerekebilir, bu kamu \
+protokolünün içinde çözülmeli."""
 note_en = """No: a local technical firm in Polatlı does the maintenance, \
 no crew travels from Ankara and there is no per diem. It does not rest on \
 the distribution company's crews, because the company may not want the \
 work. The poles are still the company's: climbing one may need its \
-permission and conditions, to be settled in the pole rental agreement."""
+permission and conditions, to be settled in the public protocol."""
 affects = "bu satırın harcırah kalemini"
 affects_en = "this row's per diem line"
 

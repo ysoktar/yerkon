@@ -582,24 +582,10 @@ url = "https://ydlbattery.com/products/50pcs-3-7v-1000mah-803040-lithium-polymer
 
 # `report` is the line of page 14 the product is priced from, with its
 # two totals. `was` is what that line contains; `parts` is what goes in
-# now. The difference is priced at one unit and carried to 100 and 1000
+# now, a replacement in the same place as what it replaced, because the
+# cost page pairs the two in order (`Board.swapped`); a part the report
+# did not name goes after them. The difference is priced at one unit and carried to 100 and 1000
 # by the report's own ratio between its two columns.
-
-[[product]]
-key = "sx1280-anchor"
-name.tr = "Belgesiz yayın birimi"
-name.en = "Broadcast unit without the hopping certificate"
-report.tr = "Şehir içi yayın birimi"
-report.en = "Urban broadcast unit"
-report_one_tl = 1983.71
-report_hundred_tl = 1366.07
-was = ["lambda80-24s", "w24p-u", "stm32g0b1met6", "atecc608b"]
-# The unit as it would be without the frequency hopping certificate: the
-# density limit holds it to 12,1 dBm, which the plain module reaches. No
-# row of the table uses it now (ADR-0094); it stays for the simulator,
-# where a module can be chosen per run.
-parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
-other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "amplified-anchor"
@@ -614,7 +600,7 @@ was = ["e28-2g4m27s", "stm32g0b1met6", "atecc608b"]
 # at any bandwidth: the 20 dBm module reaches it through a sealed 5 dBi
 # rubber duck on the box's own connector (ADR-0094, ADR-0099). The town used the 12,5 dBm
 # module with a 12 dBi mast antenna on a cable (ADR-0091).
-parts = ["e28-2g4m20s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
+parts = ["e28-2g4m20s", "stm32g031k8t6", "atecc608b", "gw-22-5151"]
 other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]
 
 [[product]]
@@ -655,3 +641,18 @@ parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
          "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151"]
 other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-sma", "gainta-g212", "passives", "pcb-2l", "smt"]
 
+[[product]]
+key = "sx1280-anchor"
+name.tr = "Frekans atlama belgesi olmayan yayın birimi (yalnız simülatörde)"
+name.en = "Broadcast unit without the hopping certificate (simulator only)"
+report.tr = "Şehir içi yayın birimi"
+report.en = "Urban broadcast unit"
+report_one_tl = 1983.71
+report_hundred_tl = 1366.07
+was = ["lambda80-24s", "w24p-u", "stm32g0b1met6", "atecc608b"]
+# The unit as it would be without the frequency hopping certificate: the
+# density limit holds it to 12,1 dBm, which the plain module reaches. No
+# row of the table uses it now (ADR-0094); it stays for the simulator,
+# where a module can be chosen per run.
+parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
+other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]

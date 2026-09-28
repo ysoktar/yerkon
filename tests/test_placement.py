@@ -173,15 +173,33 @@ def test_a_roof_at_the_default_height_is_not_a_candidate():
         elevation_grid_m=np.zeros((4, 4)), grid_spacing_m=1000.0,
         height_at=lambda x, y: 0.0,
     )
-    found, _ = P.candidates(deployed, site, "urban")
+    found, _ = P.candidates(deployed, site, "urban", roofs=True)
     roofs = [c for c in found if c.origin == "rooftop"]
     assert len(roofs) == 2
 
     site.buildings = SimpleNamespace(
         **{**vars(buildings),
            "height_m": np.array([30.0, DEFAULT_BUILDING_HEIGHT_M])})
-    found, _ = P.candidates(deployed, site, "urban")
+    found, _ = P.candidates(deployed, site, "urban", roofs=True)
     assert len([c for c in found if c.origin == "rooftop"]) == 1
+
+
+def test_roofs_are_left_out_unless_asked_for():
+    """A roof is rented from a private owner; use it as little as possible
+    (ADR-0104)."""
+    from yerkon.scenarios import catalogue
+
+    deployed = catalogue(hurried())["urban"]
+    buildings = SimpleNamespace(
+        is_empty=False, centre_x_m=np.array([500.0]),
+        centre_y_m=np.array([500.0]), height_m=np.array([30.0]),
+        tallest_at=lambda x, y: 0.0, roof_point=lambda i: (500.0, 500.0))
+    site = SimpleNamespace(
+        furniture=None, buildings=buildings, roads_m=(),
+        elevation_grid_m=np.zeros((4, 4)), grid_spacing_m=1000.0,
+        height_at=lambda x, y: 0.0)
+    found, _ = P.candidates(deployed, site, "urban")
+    assert not [c for c in found if c.origin == "rooftop"]
 
 
 def test_a_street_structure_inside_a_building_is_not_a_candidate():
@@ -246,7 +264,7 @@ def test_the_grid_is_always_among_the_candidates():
     settings = hurried()
     deployed = catalogue(settings)["urban"]
     site = fetched("kizilay")
-    found, grid = P.candidates(deployed, site, "urban", settings)
+    found, grid = P.candidates(deployed, site, "urban", settings, roofs=True)
     assert len(grid) == len(deployed.scenario.deployment.anchors)
     # Where it stands, or on the street beside it where that is a building.
     for i, a in zip(grid, deployed.scenario.deployment.anchors):

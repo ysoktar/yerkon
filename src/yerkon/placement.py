@@ -211,13 +211,23 @@ def _high_points(site, window_m: float, how_many: int) -> list:
     ]
 
 
+#: Whether roofs are offered to the search. A roof is a private owner's
+#: and is rented, so it is left out unless asked for: the project owner's
+#: decision of 28 September 2026 was to use roofs as little as possible
+#: (ADR-0104).
+OFFER_ROOFS = False
+
+
 def candidates(deployed, site, row: str, settings: Settings = DEFAULTS,
-               rates: Optional[OperatingRates] = None) -> tuple[list, tuple]:
+               rates: Optional[OperatingRates] = None,
+               roofs: Optional[bool] = None) -> tuple[list, tuple]:
     """Every place the search may choose, and which of them are the grid.
 
     Kept inside the ground the row stands on: a candidate past the edge
-    of the fetched grid would stand on the clamp (ADR-0037).
+    of the fetched grid would stand on the clamp (ADR-0037). Roofs are
+    offered only when ``roofs`` says so, and `OFFER_ROOFS` otherwise.
     """
+    roofs = OFFER_ROOFS if roofs is None else roofs
     from yerkon.cost import operating_rates
 
     rates = rates or operating_rates(settings)
@@ -287,7 +297,7 @@ def candidates(deployed, site, row: str, settings: Settings = DEFAULTS,
             if key is not None:
                 add(x, y, catalogue[key], "furniture")
 
-    if built:
+    if built and roofs:
         # Only roofs whose height somebody measured. A footprint with no
         # height tag gets the fetch's default, and a roof at an invented
         # height is not a place that is already high: over Polatlı that

@@ -268,9 +268,10 @@ def test_no_page_carries_a_copy_of_the_published_table():
             # 0,024 are different figures and only one of them is a cell.
             # Nor inside a part name, nor a part's dollar price: the 1280
             # in SX1280 and a chip at 1,87 USD are not cells, and no cell
-            # is in dollars.
+            # is in dollars. Nor a standard's number: EN 300 328 is not a
+            # cost of 328.
             found = re.search(
-                r"(?<![\w,%]){}(?![\d,])(?! USD)".format(re.escape(cell)),
+                r"(?<![\w,%])(?<!300 ){}(?![\d,])(?! USD)".format(re.escape(cell)),
                 drawn,
             )
             assert not found, "{} quotes the published {}".format(
