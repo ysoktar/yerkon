@@ -678,3 +678,100 @@ i.prov.assumption { background: var(--warn); }
 }
 #legend .note { max-width: 260px; color: #61707e; font-size: 10px;
   line-height: 1.35; margin: 2px 0 5px; }
+
+/* The scene's gestures are its own: without this a finger on a phone
+   scrolls the page instead of turning the ground. */
+#scene canvas { touch-action: none; }
+
+
+/* ---------- what a change also moved, without stopping anybody ----------
+ *
+ * It used to be a sheet over the whole page with Apply and Cancel, and
+ * nothing could be done until it was answered. Now the change is made at
+ * once and this says, at the foot of the scene, what else moved with it
+ * and how to take it back.
+ */
+
+#notice {
+  position: absolute;
+  left: 14px;
+  right: 354px;
+  bottom: 44px;
+  z-index: 5;
+  max-width: 560px;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 10px 12px 6px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 10px 28px rgba(18, 24, 31, 0.22);
+  font-size: 12px;
+}
+#notice h2 { margin: 0 0 4px; color: var(--ink); font-size: 11px; }
+#notice .change { padding: 4px 0; }
+#notice .row { margin: 6px 0 2px; }
+#notice button { flex: 0 0 auto; padding: 4px 10px; font-size: 11px; }
+
+
+/* ---------- the first-time path: a place, a layout, a run ---------- */
+
+#quick {
+  margin: 0 0 12px;
+  padding: 10px 11px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: #fff;
+}
+#quick h2 { margin: 0 0 4px; color: var(--ink); font-size: 12px;
+  text-transform: none; letter-spacing: 0; }
+#quick .hint { margin: 4px 0 6px; }
+#quick ol { margin: 6px 0 0; padding-left: 18px; font-size: 11px; color: #61707e; }
+#quick li.now { color: var(--ink); font-weight: 600; }
+#quick li.done { color: #2f9e57; }
+#quick li.bad { color: var(--warn); }
+
+
+/* ---------- a phone ----------
+ *
+ * The panel was a fixed 340 px column on the right with the scene
+ * beside it, so on a phone the panel covered the whole screen and the
+ * scene was a sliver nobody could touch. Below this width the scene
+ * takes the top of the screen and the panel scrolls underneath it.
+ */
+
+@media (max-width: 760px) {
+  #scene { right: 0; bottom: auto; height: 46vh; height: 46dvh; }
+  #panel { top: 46vh; top: 46dvh; width: auto; left: 0;
+    border-left: none; border-top: 1px solid var(--line);
+    padding: 12px 14px 40px; }
+  /* Nothing pinned: in half a screen the pinned header and the pinned
+     result left no room between them for the steps themselves. */
+  #top { position: static; margin: 0 -14px; padding: 12px 14px 0;
+    box-shadow: none; }
+  #readout { position: static; margin: 12px -14px -40px;
+    padding: 2px 14px 12px; box-shadow: none; }
+  #controls-hint { top: 8px; left: 8px; padding: 4px 6px; }
+  #controls-hint button { min-height: 0; font-size: 12px; padding: 3px 8px; }
+  #gestures { display: none; }
+  #legend { top: 44px; left: 8px; max-width: 46vw; padding: 5px 7px;
+    font-size: 10px; gap: 2px; }
+  #legend select { min-height: 0; font-size: 11px; padding: 2px 3px;
+    margin-bottom: 3px; }
+  #legend .note { display: none; }
+  #legend > span { display: none; }
+  #legend-bands { gap: 1px; }
+  #status { left: 8px; right: 8px; bottom: auto; top: calc(46dvh - 34px); }
+  #notice { left: 8px; right: 8px; bottom: 8px; max-width: none; max-height: 34vh; }
+  .sheet { width: calc(100vw - 24px); max-height: 86vh; padding: 16px; }
+  .row { flex-wrap: wrap; }
+  .map-bar { flex-wrap: wrap; }
+  .map-bar input[type=search] { flex-basis: 100%; }
+  label.knob { grid-template-columns: 1fr 72px; }
+  /* Fingers, not a mouse: controls a thumb can hit. */
+  button, select, input[type=text], input[type=search], input[type=number] {
+    min-height: 34px; font-size: 14px; }
+  .card select, #presets select { font-size: 14px; }
+  #tabs button { padding: 9px 4px; font-size: 13px; }
+}

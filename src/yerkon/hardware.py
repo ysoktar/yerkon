@@ -351,7 +351,7 @@ def radios(settings: Settings = DEFAULTS) -> dict:
     come from the settings file like every other figure nobody supplied.
     """
     urban = _sx1280_family(
-        "Semtech SX1280 (EBYTE E28-2G4M12S)", 12.5,
+        "EBYTE E28-2G4M12S", 12.5,
         "EBYTE E28-2G4M12S user manual, maximum output power",
         settings,
     )
@@ -374,7 +374,7 @@ def radios(settings: Settings = DEFAULTS) -> dict:
 
 
 SX1280 = _sx1280_family(
-    "Semtech SX1280 (EBYTE E28-2G4M12S)",
+    "EBYTE E28-2G4M12S",
     12.5,
     "EBYTE E28-2G4M12S user manual, maximum output power",
 )

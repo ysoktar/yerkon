@@ -66,6 +66,16 @@ export const SAY = {
   "ground.photo": { tr: "Uydu görüntüsünü zemine giydir",
                     en: "Drape the photograph over the ground" },
   "ground.photo.from": { tr: "Kaynak: {source}", en: "From {source}" },
+  // The photograph is under the coverage colours until they are turned
+  // off, which read as a photograph that had not loaded.
+  "ground.photo.plain": {
+    tr: "Uydu görüntüsü kapsama renklerinin altında kalır. Renksiz görmek "
+        + "için sahnenin sol üstündeki listeden «Yalnız zemin (uydu ve "
+        + "yollar)» seç.",
+    en: "The photograph sits under the coverage colours. To see it plain, "
+        + "choose “Ground only (photograph and roads)” in the list at the "
+        + "top left of the scene.",
+  },
   "ground.photo.none": {
     tr: "Bu yer fotoğrafsız getirilmiş. Yeni bir yer getirirken \"Uydu "
         + "görüntüsünü de getir\" kutusu işaretliyse görüntü de gelir.",
@@ -115,15 +125,15 @@ export const SAY = {
   "preset.save": { tr: "Kaydet", en: "Save" },
   "preset.drop": { tr: "Sil", en: "Delete" },
   "preset.name": { tr: "Bu düzenlemenin adı…", en: "Name this arrangement…" },
-  "preset.replaces": {
-    tr: "{name} yüklenecek. Bu sekmedeki her şeyin yerine geçer: zemin, "
-        + "sahanın boyu ve eni, bütün direk dizileri ve alıcılar, elle "
+  "preset.replaced": {
+    tr: "{name} yüklendi. Bu sekmedeki her şeyin yerine geçti: zemin, "
+        + "sahanın boyu ve eni, bütün direk grupları ve alıcılar, elle "
         + "taşınmış ve silinmiş direkler ve elle değiştirilmiş bütün "
-        + "değerler. Diğer sekmelere dokunulmaz.",
-    en: "{name} will be loaded. It replaces everything in this tab: the "
-        + "ground, the site's length and width, every anchor run and "
+        + "değerler. Diğer sekmelere dokunulmadı.",
+    en: "{name} is loaded. It replaced everything in this tab: the "
+        + "ground, the site's length and width, every anchor group and "
         + "receiver, anchors moved and deleted by hand, and every figure "
-        + "edited by hand. No other tab is touched.",
+        + "edited by hand. No other tab was touched.",
   },
   "preset.saved": { tr: "{name} kaydedildi → {path}",
                     en: "Saved {name} → {path}" },
@@ -437,7 +447,7 @@ export const SAY = {
   "solve.go": { tr: "Ara", en: "Search" },
 
   // -- the placement search (ADR-0081) -------------------------------------
-  "place.head": { tr: "Yöneylem yerleşimi", en: "Placement search" },
+  "place.head": { tr: "En iyi yerleşimi bul", en: "Find the best layout" },
   "place.note": {
     tr: "Direkleri ızgaraya değil zaten yüksek olan yerlere koyar: var olan "
         + "aydınlatma direkleri ve tabelalar, yol kenarındaki direkler "
@@ -526,15 +536,60 @@ export const SAY = {
   "result.opex_km2": { tr: "OPEX / km²·yıl", en: "OPEX / km²·year" },
   "result.assumed_share": { tr: "Varsayıma dayanan pay", en: "Resting on assumptions" },
 
-  // -- the confirmation sheet ---------------------------------------------
-  "confirm.head": { tr: "Bu değişiklik başka değerleri de değiştiriyor",
-                    en: "This change moves other figures too" },
+  // -- what a change also moved (ADR-0107) --------------------------------
+  "notice.head": { tr: "Bu değişiklik başka değerleri de değiştirdi",
+                   en: "This change moved other figures too" },
+  "notice.undo": { tr: "Geri al", en: "Undo" },
+  "notice.close": { tr: "Tamam", en: "OK" },
+  "notice.undone": { tr: "Geri alındı.", en: "Undone." },
   "confirm.asked": { tr: "İstediğin değişiklik", en: "What you asked for" },
-  "confirm.follows": { tr: "Bunlar da değişiyor", en: "These follow" },
+  "confirm.follows": { tr: "Bunlar da değişti", en: "These followed" },
   "confirm.group": { tr: "{run} grubu", en: "group {run}" },
-  "confirm.yes": { tr: "Uygula", en: "Apply" },
+  // The one question left: deleting a saved arrangement's file.
+  "confirm.head": { tr: "Emin misin?", en: "Are you sure?" },
+  "confirm.yes": { tr: "Sil", en: "Delete" },
   "confirm.no": { tr: "Vazgeç", en: "Cancel" },
-  "confirm.nothing": { tr: "Hiçbir şey değişmedi.", en: "Nothing changed." },
+
+  // -- the first-time path: a place, a layout, a run -----------------------
+  "quick.head": { tr: "Hızlı başla: seçtiğin yer için en iyi yerleşim",
+                  en: "Quick start: the best layout for a place you pick" },
+  "quick.note": {
+    tr: "Haritada bir yer seç. Sayfa oranın zeminini, binalarını, yollarını "
+        + "ve uydu görüntüsünü getirir, yayın birimlerini var olan yüksek "
+        + "yerlere en iyi biçimde yerleştirir ve hızlı bir simülasyon koşar. "
+        + "2 km'lik bir kutu birkaç dakika sürer; kutu büyüdükçe süre uzar.",
+    en: "Pick a place on the map. The page fetches its ground, buildings, "
+        + "roads and satellite photograph, puts the broadcast units on the "
+        + "best of the high places already there, and runs a quick "
+        + "simulation. A 2 km box takes a few minutes; a bigger one longer.",
+  },
+  "quick.go": { tr: "Haritadan yer seç ve başla", en: "Pick a place and start" },
+  "quick.map": {
+    tr: "Yeri ara ya da haritayı kaydır, kutuyu yerleştir ve «Bu alanı al» "
+        + "düğmesine bas. 2-3 km önerilir.",
+    en: "Search for the place or drag the map, set the box and press "
+        + "“Take this ground”. 2 to 3 km is best.",
+  },
+  "quick.fetch": { tr: "Zemin, binalar, yollar ve uydu görüntüsü getiriliyor",
+                   en: "Fetching the ground, buildings, roads and photograph" },
+  "quick.ground": { tr: "Yeni zemine geçiliyor", en: "Moving onto the new ground" },
+  "quick.place": { tr: "Yayın birimleri en iyi yerlere yerleştiriliyor",
+                   en: "Placing the broadcast units on the best spots" },
+  "quick.run": { tr: "Hızlı simülasyon koşuluyor",
+                 en: "Running a quick simulation" },
+  "quick.done": {
+    tr: "Bitti. Sonuç aşağıda. Yayımlanacak doğrulukta sayı için «Hızlı: "
+        + "açık» düğmesini kapatıp «Simülasyonu çalıştır»a bas.",
+    en: "Done. The result is below. For publication-grade figures, turn "
+        + "“Fast: on” off and press “Run the simulation”.",
+  },
+  "quick.failed": { tr: "Durdu: {why}", en: "Stopped: {why}" },
+  "quick.big": {
+    tr: "Bu kutu {area} km². Büyük kutularda yerleştirme uzun sürer; 2-3 km "
+        + "daha hızlıdır.",
+    en: "This box is {area} km². Placing takes long on big boxes; 2 to 3 km "
+        + "is quicker.",
+  },
 
   // -- the scene ----------------------------------------------------------
   "scene.drag": { tr: "Sürükle", en: "Drag" },

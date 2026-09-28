@@ -346,41 +346,48 @@ CATALOGUE: dict[str, dict[str, str]] = {
     # "hex" means nothing to somebody who has not read the module and
     # "the fewest anchors that cover an area" means everything.
     "layout.grid": {
-        "tr": "Kare ızgara: kaydırmalı satırlar",
-        "en": "Square grid: staggered rows",
+        "tr": "Düzenli ızgara",
+        "en": "Regular grid",
     },
     "layout.hex": {
-        "tr": "Altıgen kafes: bir alanı en az direkle örter",
-        "en": "Hexagonal lattice: fewest anchors to cover an area",
+        "tr": "Petek ızgara: alanı en az birimle örter",
+        "en": "Honeycomb grid: covers the area with the fewest units",
     },
     "layout.corridor": {
-        "tr": "Yol boyunca: iki yanda dönüşümlü",
-        "en": "Along the route: alternating sides",
+        "tr": "Yol boyunca, iki yanda sırayla",
+        "en": "Along the road, taking each side in turn",
     },
     "layout.perimeter": {
-        "tr": "Çevre: yalnızca sahanın kenarında",
-        "en": "Perimeter: round the edge of the site only",
+        "tr": "Yalnız sahanın kenarında",
+        "en": "Only round the edge of the site",
     },
     "layout.greedy-coverage": {
-        "tr": "Arama: en çok zemini örten (klasik kapsama)",
-        "en": "Search: most ground covered (the coverage classic)",
+        "tr": "Otomatik: sinyal en geniş alana ulaşsın",
+        "en": "Automatic: the signal reaches the widest area",
     },
     "layout.greedy-dop": {
-        "tr": "Arama: en iyi geometri (konum için doğru ölçüt)",
-        "en": "Search: best geometry (the right score for a fix)",
+        "tr": "Otomatik: en iyi konum geometrisi",
+        "en": "Automatic: the best geometry for a position",
     },
     "layout.k-cover": {
-        "tr": "Arama: her noktaya yeter sayıda direk",
-        "en": "Search: enough anchors over every point",
+        "tr": "Otomatik: her noktaya dört birim",
+        "en": "Automatic: four units over every point",
     },
     "layout.placed": {
-        "tr": "Yöneylem: var olan yüksek yerler (Yerleştir düğmesi)",
-        "en": "Operations research: existing high places (Place button)",
+        "tr": "En iyi yerleşim: var olan direk ve yapılar (tablonun kullandığı)",
+        "en": "Best layout: existing poles and structures (what the table uses)",
     },
     "layout.manual": {
-        "tr": "Elle: hiçbiri, boştan başla",
-        "en": "By hand: none, start from empty",
+        "tr": "Elle: boş başla, birimleri kendin koy",
+        "en": "By hand: start empty and put the units yourself",
     },
+    # The four kinds the list is grouped under, so the nine read as four
+    # decisions rather than nine names.
+    "layout.group.pattern": {"tr": "Hazır desenler", "en": "Ready patterns"},
+    "layout.group.search": {"tr": "Otomatik arama", "en": "Automatic search"},
+    "layout.group.standing": {"tr": "Var olan yapılar",
+                              "en": "Structures already standing"},
+    "layout.group.hand": {"tr": "Elle", "en": "By hand"},
     "layout.needs_map": {
         "tr": "Bu yöntem yol kenarındaki yapıları kullanır; bu zemin "
               "getirilmiş yol verisi taşımıyor.",
@@ -471,7 +478,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "(current layout {grid_cost} TL).",
     },
     "task.place.needs_ground": {
-        "tr": "Yöneylem araması ölçülmüş bir zemin ister: yapıları, "
+        "tr": "En iyi yerleşim araması ölçülmüş bir zemin ister: yapıları, "
               "binaları ve yolları oradan okur.",
         "en": "The placement search needs measured ground: it reads the "
               "structures, buildings and roads from it.",

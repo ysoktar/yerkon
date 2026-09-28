@@ -45,6 +45,16 @@ from yerkon.viewer.state import (
     fetched_sites,
 )
 
+#: Which of the chooser's four groups each layout method sits under.
+#: A method missing here is a ready pattern, the plainest of the four.
+_LAYOUT_GROUP = {
+    "greedy-coverage": "search",
+    "greedy-dop": "search",
+    "k-cover": "search",
+    "placed": "standing",
+    "manual": "hand",
+}
+
 #: About how many quads the ground mesh is allowed.
 #:
 #: Enough that hills three kilometres apart read as hills, and few enough
@@ -515,8 +525,11 @@ def scene(state: ViewState) -> dict:
             # Named here rather than in the page, like every other list
             # the engine owns: a method that exists can be chosen and one
             # that does not cannot be offered (ADR-0028).
+            # Each with the kind it is grouped under in the chooser.
             "layouts": [
-                [name, say("layout." + name, state.language)]
+                [name, say("layout." + name, state.language),
+                 say("layout.group." + _LAYOUT_GROUP.get(name, "pattern"),
+                     state.language)]
                 for name in LAYOUT_METHODS
             ],
             # Routes a unit can drive. The empty one first, because it is

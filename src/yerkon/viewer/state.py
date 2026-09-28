@@ -88,7 +88,7 @@ def design_of(state: ViewState, run=None) -> Design:
     mounting_of, radio_of = state.catalogues()
     return Design(
         region=chosen(REGION_CHOICES, state.region, "region"),
-        anchor_radio=chosen(radio_of, run.radio if run else "sx1280", "radio"),
+        anchor_radio=chosen(radio_of, run.radio if run else "e28", "radio"),
         mounting=chosen(
             mounting_of, run.mounting if run else "mast", "mounting"
         ),
@@ -518,8 +518,10 @@ class UnitPlan:
     speed_km_h: float = 100.0
     start_m: float = 0.0
     antenna_height_m: float = 1.5
-    #: Which modules it carries. Both, for either receiver in the bill.
-    radios: tuple = ("sx1280", "dwm3000")
+    #: Which modules it carries. Both, for either receiver in the bill;
+    #: the 20 dBm one by default, as the table's vehicle carries. A
+    #: pedestrian's 12,5 dBm module is named where the row names it.
+    radios: tuple = ("e28", "dwm3000")
     #: Which route it drives, by name (`yerkon.routes`).
     #:
     #: Empty means the site's own shape, which is what every unit did

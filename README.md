@@ -90,8 +90,11 @@ yayımlamak bir push. Simülatör ziyaretçinin tarayıcısında Pyodide ile
 İngilizce.
 
 Simülatörde üç satır aynı anda tutulur. Zemin, yerleşim, hedef ve
-dayanaklar paneldeki altı adımda değiştirilir; başka ayarları da
-değiştiren bir değişiklik önce onay ister (ADR-0009).
+dayanaklar paneldeki altı adımda değiştirilir. Başka ayarları da
+değiştiren bir değişiklik hemen uygulanır; neyi değiştirdiği sahnenin
+altındaki notta yazar ve oradan geri alınabilir (ADR-0107). Panelin
+başındaki **Hızlı başla** kutusu, haritadan seçilen bir yeri getirir, en
+iyi yerleşimi bulur ve hızlı bir simülasyon koşar.
 
 ## Yerleşim araması
 

@@ -1656,8 +1656,9 @@ SIMULATION = Page(
                 _w(
                     "Şehir içi ve kırsal satırlarda direkler bir ızgarada "
                     "değil, bir yerleşim aramasının seçtiği yerlerde "
-                    "durur; simülatördeki **Yöneylem yerleşimi** bölümü "
-                    "aynı aramayı başka bir yer için koşar. Aday yerler "
+                    "durur; simülatördeki **En iyi yerleşimi bul** bölümü "
+                    "ve **Hızlı başla** kutusu aynı aramayı haritadan "
+                    "seçilen başka bir yer için koşar. Aday yerler "
                     "var olan "
                     "aydınlatma direkleri ve tabelalar, yol kenarındaki "
                     "direkler (şehirde aydınlatma, kırsalda elektrik "
@@ -1673,8 +1674,9 @@ SIMULATION = Page(
                     "yöne dizilirse konum o cadde boyunca belirlenemez.",
                     "In the urban and rural rows the anchors do not stand "
                     "on a grid but where a placement search put them; the "
-                    "simulator's **Placement search** section runs the "
-                    "same search for other ground. The candidates are "
+                    "simulator's **Find the best layout** section and its "
+                    "**Quick start** box run the same search for another "
+                    "place picked on the map. The candidates are "
                     "existing "
                     "lighting columns and signs, poles along the road "
                     "(lighting columns in town, electricity distribution "

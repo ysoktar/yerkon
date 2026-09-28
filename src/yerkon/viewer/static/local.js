@@ -11,20 +11,22 @@
  */
 (() => {
   const english = new URLSearchParams(location.search).get("dil") === "en";
+  // Said in the reader's terms: somebody opening the page does not need
+  // to know what Pyodide or numpy is, only how far along it is.
   const words = english ? {
-    python: "Loading Python in your browser…",
-    numpy: "Loading numpy…",
-    package: "Loading the YERKON model…",
-    ready: "",
-    failed: "The simulator could not start in this browser: ",
-    note: "Everything runs on this computer. The first load takes a while; after that the browser keeps it.",
+    python: "Getting the simulator ready (1 of 4): downloading the calculation engine…",
+    numpy: "Getting the simulator ready (2 of 4): loading the maths library…",
+    package: "Getting the simulator ready (3 of 4): unpacking the YERKON model and the Ankara maps…",
+    ready: "Getting the simulator ready (4 of 4): drawing the first scene…",
+    failed: "The simulator could not start in this browser. Try a current Chrome, Edge, Firefox or Safari. Detail: ",
+    note: "The simulation runs on this device; nothing is sent anywhere. The first visit can take a minute or two; later visits are quicker, because the downloaded files stay in the browser.",
   } : {
-    python: "Python tarayıcınızda yükleniyor…",
-    numpy: "numpy yükleniyor…",
-    package: "YERKON modeli yükleniyor…",
-    ready: "",
-    failed: "Simülatör bu tarayıcıda başlatılamadı: ",
-    note: "Her şey bu bilgisayarda çalışıyor. İlk açılış biraz sürer; sonra tarayıcı saklar.",
+    python: "Simülatör hazırlanıyor (1/4): hesap motoru indiriliyor…",
+    numpy: "Simülatör hazırlanıyor (2/4): matematik kütüphanesi yükleniyor…",
+    package: "Simülatör hazırlanıyor (3/4): YERKON modeli ve Ankara haritaları açılıyor…",
+    ready: "Simülatör hazırlanıyor (4/4): ilk sahne çiziliyor…",
+    failed: "Simülatör bu tarayıcıda açılamadı. Güncel bir Chrome, Edge, Firefox ya da Safari ile dene. Ayrıntı: ",
+    note: "Simülasyon bu cihazda çalışıyor, hiçbir veri dışarı gönderilmiyor. İlk açılış bir iki dakika sürebilir; indirilen dosyalar tarayıcıda kaldığı için sonraki açılışlar daha hızlıdır.",
   };
 
   const cover = document.createElement("div");
@@ -54,11 +56,20 @@
   const waiting = new Map();
   let next = 1;
 
+  // The cover stays until the page has its first real answer, not just
+  // until Python is up: the first scene takes seconds of its own, and a
+  // blank page with a grey box in it reads as broken.
+  let answered = false;
+  const uncover = () => {
+    if (answered) return;
+    answered = true;
+    cover.remove();
+  };
+
   worker.onmessage = event => {
     const message = event.data;
     if (message.stage) {
-      if (message.stage === "ready") cover.remove();
-      else if (message.stage === "failed") {
+      if (message.stage === "failed") {
         line.textContent = words.failed + message.detail;
       } else line.textContent = words[message.stage] || message.stage;
       return;
@@ -86,8 +97,10 @@
     const at = url.indexOf("/api/");
     if (at < 0) return network(input, init);
     const options = init || {};
+    const path = url.slice(at);
     const reply = await ask((options.method || "GET").toUpperCase(),
-                            url.slice(at), options.body);
+                            path, options.body);
+    if (!path.startsWith("/api/language")) uncover();
     // The photograph of a fetched site is the one answer that is not
     // text; it crosses from the worker as base64 (ADR-0086).
     const body = reply.encoding === "base64"

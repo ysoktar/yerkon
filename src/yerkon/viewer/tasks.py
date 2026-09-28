@@ -363,7 +363,7 @@ def placed_run(state: ViewState, answer) -> dict:
     ]
     run = {
         "identifier": "P",
-        "radio": first.radio if first else "sx1280",
+        "radio": first.radio if first else "e28",
         "mounting": first.mounting if first else "column",
         "from_m": 0.0,
         "to_m": state.corridor_m,

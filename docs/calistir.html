@@ -48,6 +48,19 @@
   <p class="hint no-hits" id="find-empty" data-say="find.empty" hidden></p>
 
   <!--
+    The way in for somebody who has never seen this page: a place on a
+    map, and the page does the rest — fetches it, places the units on
+    what already stands there, and runs a quick simulation (ADR-0107).
+    Everything below is still there for whoever wants to take it apart.
+  -->
+  <section id="quick" data-find="hızlı başla yer harita en iyi yerleşim quick start map best">
+    <h2 data-say="quick.head"></h2>
+    <p class="hint" data-say="quick.note"></p>
+    <div class="row"><button id="quick-go" data-say="quick.go"></button></div>
+    <ol id="quick-steps" hidden></ol>
+  </section>
+
+  <!--
     Named arrangements. Under the tabs because that is what it is about:
     which arrangement this tab is showing. One per tab, separately —
     loading one replaces this tab and touches no other (ADR-0043).
@@ -130,6 +143,7 @@
     <label class="tick" id="photo-tick" data-find="uydu fotoğraf hava görüntüsü harita satellite aerial photograph imagery">
       <input type="checkbox" id="show-photo" checked>
       <span data-say="ground.photo"></span></label>
+    <p class="hint" data-say="ground.photo.plain"></p>
     <label class="tick" id="roads-tick" data-find="yol sokak cadde ağ roads streets network">
       <input type="checkbox" id="show-roads" checked>
       <span data-say="ground.roads"></span></label>
@@ -315,6 +329,18 @@
     </div>
   </section>
 </aside>
+
+<!--
+  What a change also moved, said after it was made rather than asked
+  before: nothing on the page waits on it, and "Undo" takes it back.
+-->
+<div id="notice" hidden role="status" aria-live="polite">
+  <div id="notice-body"></div>
+  <div class="row">
+    <button id="notice-undo" class="quiet" data-say="notice.undo"></button>
+    <button id="notice-close" class="quiet" data-say="notice.close"></button>
+  </div>
+</div>
 
 <div id="confirm" hidden>
   <div class="sheet">

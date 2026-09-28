@@ -4,10 +4,10 @@
  * from the Python engine that builds the report, so the picture and the
  * table cannot disagree (ADR-0001).
  *
- * The one rule about editing is ADR-0009. A control marked data-cascades
- * changes something the link budget reads, so it goes through the
- * confirmation sheet first and the whole batch is answered once. Anything
- * else applies immediately.
+ * The one rule about editing is ADR-0009, as ADR-0107 revised it. A
+ * control marked data-cascades changes something the link budget reads,
+ * so the engine is asked what else it moves; the change is made at once
+ * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
 import { decimal, say, speak, speaks } from "/words.js";
@@ -68,7 +68,6 @@ const cssColour = rgb => `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
 let state = null;
 let latest = null;
 let sweepData = null;
-let pendingChanges = null;
 
 /* ---------- talking to the engine ---------- */
 
@@ -92,7 +91,9 @@ async function ask(path, body) {
 function flash(text, bad) {
   const el = document.getElementById("status");
   el.textContent = text;
-  el.className = "on" + (bad ? " bad" : "");
+  // Nothing to say is no pill at all: an empty one stayed on screen as
+  // a dark bar until the timer ran out.
+  el.className = text ? "on" + (bad ? " bad" : "") : "";
   clearTimeout(flash.timer);
   if (text) flash.timer = setTimeout(() => { el.className = ""; }, 2600);
 }
@@ -100,11 +101,71 @@ function flash(text, bad) {
 /* ---------- editing ---------- */
 
 async function edit(changes, cascading) {
+  // What else this change moves is still asked for, but no longer as a
+  // question: the change is made at once and a note at the foot of the
+  // scene says what followed it, with a way back. A sheet over the page
+  // that had to be answered before anything else could be done stopped
+  // people for a list most of them only wanted to glance at.
+  let cascades = null;
   if (cascading) {
-    const { cascades } = await ask("/api/propose", { changes });
-    if (cascades) { showConfirm(changes, cascades); return; }
+    try {
+      ({ cascades } = await ask("/api/propose", { changes }));
+    } catch {
+      cascades = null;
+    }
   }
+  const before = state;
   await apply(changes);
+  if (cascades) tellWhatMoved(cascades, undoOf(before, changes));
+}
+
+/* What puts the page back where it was before a change.
+ *
+ * The keys the change named, and the ones the engine may have moved in
+ * its wake: a smaller ground pulls the site's length and width and the
+ * anchor runs in, and anchors moved by hand belonged to the old runs.
+ */
+function undoOf(before, changes) {
+  if (!before) return null;
+  const keys = new Set(Object.keys(changes)
+    .concat(["corridor_m", "width_m", "runs", "moved", "removed"]));
+  const back = {};
+  for (const key of keys) if (key in before) back[key] = before[key];
+  return back;
+}
+
+/* The note at the foot of the scene: what else moved, and how to undo it.
+ *
+ * `fill` writes the body; `undo` is the change that reverses it, or
+ * nothing where there is no way back. A newer note replaces an older
+ * one, because the older one's undo no longer describes the page.
+ */
+function showNotice(fill, undo) {
+  const host = document.getElementById("notice");
+  const body = document.getElementById("notice-body");
+  const back = document.getElementById("notice-undo");
+  if (!host || !body) return;
+  body.innerHTML = "";
+  fill(body);
+  back.hidden = !undo;
+  back.onclick = async () => {
+    host.hidden = true;
+    try {
+      await apply(undo);
+      flash(say("notice.undone"));
+    } catch (error) { flash(error.message, true); }
+  };
+  document.getElementById("notice-close").onclick = () => { host.hidden = true; };
+  host.hidden = false;
+}
+
+function tellWhatMoved(cascades, undo) {
+  showNotice(body => {
+    const head = document.createElement("h2");
+    head.textContent = say("notice.head");
+    body.appendChild(head);
+    listChanges(body, cascades);
+  }, undo);
 }
 
 /* The last simulation, while it still describes what is on screen.
@@ -205,11 +266,8 @@ function words(change) {
   };
 }
 
-function showConfirm(changes, cascades) {
-  pendingChanges = changes;
-  const body = document.getElementById("confirm-body");
-  body.innerHTML = "";
-
+/* The engine's list of what a change moves, grouped as it grouped it. */
+function listChanges(body, cascades) {
   const block = (items, heading) => {
     if (!items.length) return;
     const h = document.createElement("h2");
@@ -245,16 +303,13 @@ function showConfirm(changes, cascades) {
     block(group.asked, say("confirm.asked"));
     block(group.follows, say("confirm.follows"));
   }
-  document.getElementById("confirm").hidden = false;
 }
 
-/* One sentence and a yes/no, through the same sheet as the diff.
+/* One sentence and a yes/no.
  *
- * Loading an arrangement is a change like any other and deserves the
- * same "here is what will happen, say yes" (ADR-0009) — but it replaces
- * a whole tab rather than moving three figures, and a sheet listing
- * forty rows says less than one sentence does. Same sheet, same buttons,
- * so there is one thing to recognise rather than two.
+ * Only for what cannot be undone from this page: deleting a saved
+ * arrangement takes its file off the disk. Every change to the study
+ * itself is made at once and can be taken back from the note it leaves.
  */
 let pendingPlainly = null;
 
@@ -277,9 +332,6 @@ document.getElementById("confirm-yes").onclick = async () => {
     pendingPlainly = null;
     return answer(true);
   }
-  const changes = pendingChanges;
-  pendingChanges = null;
-  await apply(changes);
 };
 
 document.getElementById("confirm-no").onclick = () => {
@@ -289,9 +341,6 @@ document.getElementById("confirm-no").onclick = () => {
     pendingPlainly = null;
     return answer(false);
   }
-  pendingChanges = null;
-  fillControls();          // put the control back where it was
-  flash(say("confirm.nothing"));
 };
 
 /* ---------- controls ---------- */
@@ -324,6 +373,21 @@ function options(list, selected) {
   return list.map(([value, label]) =>
     `<option value="${value}"${value === selected ? " selected" : ""}>${label}</option>`
   ).join("");
+}
+
+/* The same, under the group each entry names third, in the order the
+ * groups first appear. An entry with no group goes in unlabelled. */
+function grouped(list, selected) {
+  const order = [];
+  const under = new Map();
+  for (const [value, label, group] of list) {
+    const key = group || "";
+    if (!under.has(key)) { under.set(key, []); order.push(key); }
+    under.get(key).push([value, label]);
+  }
+  return order.map(key => (key
+    ? `<optgroup label="${key}">${options(under.get(key), selected)}</optgroup>`
+    : options(under.get(key), selected))).join("");
 }
 
 function number(label, value, step, onChange) {
@@ -487,6 +551,7 @@ function sayIfItCannotFetch() {
   const note = document.getElementById("fetch-cannot");
   const go = document.getElementById("run-fetch");
   const map = document.getElementById("open-map");
+  const quick = document.getElementById("quick-go");
   const short = FETCH_MISSING.length > 0;
   if (note) {
     note.hidden = !short;
@@ -495,7 +560,7 @@ function sayIfItCannotFetch() {
   }
   // Left in place and disabled rather than hidden, so somebody can see
   // what this page would do on a machine that has them.
-  for (const button of [go, map]) if (button) button.disabled = short;
+  for (const button of [go, map, quick]) if (button) button.disabled = short;
 }
 
 /* The three modelled-hill figures, and whether this state reads them.
@@ -679,7 +744,7 @@ function drawRuns() {
     const how = document.createElement("label");
     how.textContent = say("run.method");
     const method = document.createElement("select");
-    method.innerHTML = options(LAYOUTS, run.method || "grid");
+    method.innerHTML = grouped(LAYOUTS, run.method || "grid");
     method.onchange = () => change({ method: method.value });
     how.appendChild(method);
     card.appendChild(how);
@@ -1411,7 +1476,9 @@ function wireControls() {
     const start = last ? Math.min(last.to_m + 500, edge) : 0;
     edit({ runs: state.runs.concat([{
       identifier,
-      radio: last ? last.radio : "sx1280",
+      // The 20 dBm module the table's poles carry, not the 12,5 dBm one
+      // only a pedestrian keeps.
+      radio: last ? last.radio : "e28",
       mounting: last ? last.mounting : "mast",
       stagger_m: last ? last.stagger_m : 0,
       from_m: start,
@@ -1428,7 +1495,7 @@ function wireControls() {
     while (used.has(identifier)) identifier = `${say("unit.new")} ${n++}`;
     edit({ units: state.units.concat([{
       identifier, kind: "vehicle", speed_km_h: 80, start_m: 0,
-      antenna_height_m: 1.5, radios: ["sx1280", "dwm3000"],
+      antenna_height_m: 1.5, radios: ["e28", "dwm3000"],
     }]) }, false).catch(e => flash(e.message, true));
   };
 
@@ -3034,11 +3101,22 @@ function wirePresets() {
     const name = pick.value;
     if (!name) return;
     const shown = PRESETS.find(p => p.name === name);
-    const yes = await askPlainly(
-      say("preset.replaces", { name: (shown && shown.label) || name }));
-    if (!yes) return;
+    // Loaded at once, with the whole tab as it was kept for the way back.
+    // The scenario and the language are the tab's and the session's, not
+    // the arrangement's, so they are not part of either.
+    const before = state;
     try {
       await ask("/api/preset/load", { name });
+      const back = {};
+      for (const [key, was] of Object.entries(before || {})) {
+        if (key !== "scenario" && key !== "language") back[key] = was;
+      }
+      showNotice(body => {
+        const line = document.createElement("p");
+        line.textContent = say("preset.replaced",
+                               { name: (shown && shown.label) || name });
+        body.appendChild(line);
+      }, before ? back : null);
       await refreshScene();
       fillControls();
       await loadFigures();
@@ -3164,7 +3242,10 @@ function wireMap() {
   };
 
   const shut = () => { sheet.hidden = true; };
-  document.getElementById("map-close").onclick = shut;
+  document.getElementById("map-close").onclick = () => {
+    quickMode = false;
+    shut();
+  };
 
   document.getElementById("map-draw").onclick = event => {
     picker.drawing = !picker.drawing;
@@ -3192,6 +3273,10 @@ function wireMap() {
     // that is now this one.
     redrawFetchBox();
     shut();
+    if (quickMode) {
+      quickMode = false;
+      quickStart(box, span);
+    }
   };
 
   // Typing a centre by hand drops the drawn box.
@@ -3213,6 +3298,164 @@ function wireMap() {
   document.getElementById("map-search").addEventListener("keydown", event => {
     if (event.key === "Enter") { event.preventDefault(); find(); }
   });
+}
+
+/* ---------- the first-time path (ADR-0107) ----------
+ *
+ * A place on a map, then everything else by itself: fetch the ground,
+ * stand the row on it, search for the best of what already stands there,
+ * and run the simulation read coarsely so the answer comes in minutes.
+ * Each step is the same one the panel offers by hand, called in order;
+ * nothing here computes anything the engine does not.
+ */
+
+/* Whether the next box taken from the map starts the quick path. */
+let quickMode = false;
+
+/* The side a quick box is opened at, in kilometres. Large enough for a
+ * town centre, small enough that the search is minutes, not an hour. */
+const QUICK_KM = 2;
+
+/* Past this area the search is slow enough to say so first. */
+const QUICK_LARGE_KM2 = 16;
+
+/* An area row for the box: a town-sized box is the urban row, anything
+ * larger is open country. The two differ in the structures the search
+ * may use and in how coarsely it samples the ground. */
+const quickRow = span => (span.across * span.along <= QUICK_LARGE_KM2
+  ? "urban" : "rural");
+
+function wireQuick() {
+  const go = document.getElementById("quick-go");
+  if (!go) return;
+  go.onclick = () => {
+    quickMode = true;
+    if (!pickedBox) {
+      document.getElementById("fetch-size").value = QUICK_KM;
+      if (picker) picker.setSquare(QUICK_KM);
+    }
+    document.getElementById("open-map").onclick();
+    flash(say("quick.map"));
+  };
+}
+
+/* Run a long task and hand back what it returned, saying its last line. */
+async function jobResult(kind, body, onLine) {
+  let { job } = await ask("/api/run", Object.assign({ kind }, body));
+  while (!job.done) {
+    await new Promise(resume => setTimeout(resume, 1000));
+    ({ job } = await ask(`/api/job?id=${job.id}`));
+    if (onLine && job.progress.length) onLine(job.progress[job.progress.length - 1]);
+  }
+  if (job.error) throw new Error(job.error);
+  return job.result;
+}
+
+async function quickStart(box, span) {
+  const list = document.getElementById("quick-steps");
+  const go = document.getElementById("quick-go");
+  const steps = ["quick.fetch", "quick.ground", "quick.place", "quick.run"];
+  list.hidden = false;
+  list.innerHTML = "";
+  const items = steps.map(key => {
+    const item = document.createElement("li");
+    item.textContent = say(key);
+    list.appendChild(item);
+    return item;
+  });
+  const area = span.across * span.along;
+  if (area > QUICK_LARGE_KM2) {
+    const warn = document.createElement("li");
+    warn.className = "bad";
+    warn.textContent = say("quick.big", { area: decimal(area, 1) });
+    list.prepend(warn);
+  }
+  const doing = (index, line) => {
+    items.forEach((item, at) => item.classList.toggle("now", at === index));
+    if (line) items[index].textContent = `${say(steps[index])} · ${line}`;
+  };
+  const done = index => {
+    items[index].classList.remove("now");
+    items[index].classList.add("done");
+    items[index].textContent = `✓ ${say(steps[index])}`;
+  };
+
+  go.disabled = true;
+  // A note about an earlier change would sit over the new ground and
+  // offer to undo something this path is about to replace anyway.
+  document.getElementById("notice").hidden = true;
+  let at = 0;
+  try {
+    // 1. The ground, its buildings, its roads and its photograph.
+    doing(0);
+    const name = "yer-" + Date.now().toString(36);
+    const fetched = await jobResult("fetch", {
+      where: {
+        name,
+        centre: `${(box.south + box.north) / 2} ${(box.west + box.east) / 2}`,
+        size_km: Math.max(span.across, span.along),
+        spacing_m: 30,
+        buildings: true,
+        imagery: true,
+        ...box,
+      },
+    }, line => doing(0, line));
+    done(0);
+
+    // 2. The row that fits the box, standing on the whole of it.
+    at = 1;
+    doing(1);
+    const row = quickRow(span);
+    if (state.scenario !== row) await showRow(row);
+    framed = false;
+    // A plain lattice over the whole of the new ground, as the search's
+    // starting point. The tab's own layout was found for other ground and
+    // keeps that ground's coordinates, which is not where this one is.
+    const lattice = Object.assign({}, state.runs[0], {
+      identifier: "A", method: "grid", spots: [],
+      from_m: 0, to_m: fetched.width_m, offset_m: 0,
+    });
+    await apply({
+      site: fetched.name,
+      corridor_m: fetched.width_m,
+      width_m: fetched.height_m,
+      runs: [lattice],
+      moved: {},
+      removed: [],
+    });
+    done(1);
+
+    // 3. The best of what already stands there. The town is searched for
+    // the same cover at less cost and the country for more cover at the
+    // same cost, as the table's own rows were (ADR-0096).
+    at = 2;
+    doing(2);
+    const placed = await jobResult("place",
+      { aim: row === "urban" ? "cheaper" : "better" }, line => doing(2, line));
+    await apply(placed.changes);
+    done(2);
+
+    // 4. A quick run: the model read coarsely, not a different model.
+    at = 3;
+    doing(3);
+    if (!hurrying()) {
+      await apply({ overrides: Object.assign({}, state.overrides, HURRIED) });
+      drawHurry();
+    }
+    await runSimulation();
+    done(3);
+    const last = document.createElement("li");
+    last.className = "done";
+    last.textContent = say("quick.done");
+    list.appendChild(last);
+  } catch (error) {
+    items[at].classList.remove("now");
+    items[at].classList.add("bad");
+    items[at].textContent = say("quick.failed", { why: error.message });
+    flash(error.message, true);
+  } finally {
+    go.disabled = false;
+  }
 }
 
 /* Where the map opens: whatever is in the centre box, else Ankara.
@@ -3583,6 +3826,7 @@ async function runSimulation() {
   wireTasks();
   wireSteps();
   wireFind();
+  wireQuick();
   resize();
   await refreshScene();
   fillControls();

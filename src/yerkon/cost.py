@@ -88,7 +88,7 @@ PRODUCTS = {
 #: is three different products, and pricing it as one would put a
 #: thousand lira of difference per anchor in the wrong place.
 ANCHOR_PRODUCT_BY_PART = {
-    "Semtech SX1280 (EBYTE E28-2G4M12S)": SX1280_ANCHOR,
+    "EBYTE E28-2G4M12S": SX1280_ANCHOR,
     "EBYTE E28-2G4M20S": AMPLIFIED_ANCHOR,
     "EBYTE E28-2G4M27S": AMPLIFIED_ANCHOR,
     "Qorvo DWM3000": TUNNEL_ANCHOR,

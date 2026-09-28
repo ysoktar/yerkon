@@ -239,6 +239,12 @@ def candidates(deployed, site, row: str, settings: Settings = DEFAULTS,
     xs = [a.ground_position_m[0] for a in incumbent]
     ys = [a.ground_position_m[1] for a in incumbent]
     west, east, south, north = min(xs), max(xs), min(ys), max(ys)
+    # And inside the measured ground itself. The incumbent can reach past
+    # it: a layout carried over from other ground keeps its coordinates,
+    # and a search over a new 2 km box chose columns 700 m outside it.
+    if getattr(site, "width_m", None) and getattr(site, "height_m", None):
+        west, east = max(west, 0.0), min(east, float(site.width_m))
+        south, north = max(south, 0.0), min(north, float(site.height_m))
 
     def inside(x, y):
         return west <= x <= east and south <= y <= north

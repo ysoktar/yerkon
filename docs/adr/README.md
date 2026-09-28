@@ -18,7 +18,7 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0006](0006-opex-from-an-inventory.md) | OPEX bir envanterden gelir, bir yüzdeden değil | Geçerli |
 | [0007](0007-ground-reflection-dominates.md) | Zemin yansıması, ve erişmek ile ölçmek arasındaki fark | Geçerli |
 | [0008](0008-fetch-once-run-offline.md) | Saha verisi bir kez önbelleğe getirilir, sonra çevrimdışı okunur | Geçerli |
-| [0009](0009-changes-are-confirmed-as-a-batch.md) | Bir değişiklik ve zorladığı her şey birlikte onaylanır | Geçerli |
+| [0009](0009-changes-are-confirmed-as-a-batch.md) | Bir değişiklik ve zorladığı her şey birlikte onaylanır | Onay kısmı yerini aldı: ADR-0107 |
 | [0010](0010-the-clock-is-part-of-the-ranging-error.md) | Saat, ölçüm hatasının parçasıdır ve ne kadarına alışveriş karar verir | Geçerli |
 | [0011](0011-the-vertical-is-unobservable-from-a-road.md) | Düşey, bir yoldan gözlenemez ve cevap budur | Yerini aldı: ADR-0088 |
 | [0012](0012-service-area-is-where-a-position-is-available.md) | Hizmet alanı, bir konumun alınabildiği yerdir; bir paketin vardığı yer değil | Geçerli |
@@ -116,3 +116,4 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0104](0104-catilar-aramada-yok.md) | Çatılar aramada yok; yükseklikler 12 m ve 10 m | Geçerli |
 | [0105](0105-satici-kademeleri-rapor-yok.md) | Fiyatlar satıcı kademelerinden; raporun fiyatları kullanılmıyor | Geçerli |
 | [0106](0106-yasam-sinyali-ve-telsizle-aktarma.md) | Yaşam sinyali; hattı olmayan birim telsizle aktarıyor | Geçerli |
+| [0107](0107-degisiklik-durdurmadan-ve-hizli-baslangic.md) | Değişiklik kullanıcıyı durdurmadan uygulanır; haritadan hızlı başlangıç | Geçerli |

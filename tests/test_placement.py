@@ -139,7 +139,7 @@ def test_the_lifecycle_cost_comes_from_the_cost_model():
     it reaches the table.
     """
     roof = mountings()["rooftop"]
-    part = "Semtech SX1280 (EBYTE E28-2G4M12S)"
+    part = "EBYTE E28-2G4M12S"
     base = P.lifecycle_tl(roof, part, DEFAULT_RATES)
     dearer = replace(roof, rent_tl_per_year=replace(
         roof.rent_tl_per_year, value=float(roof.rent_tl_per_year.value) + 100))
