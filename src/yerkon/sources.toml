@@ -790,6 +790,13 @@ label.en = "LCAS v1.0 (Multicert, June 2026): RED radio compliance, EN 300 328, 
 url = "https://lcas.info/"
 
 [[source]]
+key = "csac-sa65-price"
+group = "project"
+label.tr = "Analog IC Tips (Bill Schweber, 28 Eylül 2021): Microchip SA65 çip ölçekli atomik saat, tek adette yaklaşık 5500 USD"
+label.en = "Analog IC Tips (Bill Schweber, 28 September 2021): Microchip SA65 chip-scale atomic clock, about 5500 USD for one"
+url = "https://www.analogictips.com/the-pc-board-atomic-clock-part-3-the-csac-cesium-physics-cell-faq/"
+
+[[source]]
 key = "ege-test-center"
 group = "project"
 label.tr = "Ege Test Center: akredite RED ve EMC testleri (ETSI EN 300 328, EN 301 489-1, -3, -17, -52; EN 17025); fiyat yayımlamıyor, çevrim içi başvuruyla teklif"
