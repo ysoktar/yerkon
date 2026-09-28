@@ -142,7 +142,7 @@ def test_the_site_links_to_nothing_the_server_does_not_serve():
         address = reference.split("?")[0]
         if address == SIMULATOR:
             assert (STATIC / "simulator.html").exists()
-        elif address.rsplit(".", 1)[-1] in ("css", "js", "png"):
+        elif address.rsplit(".", 1)[-1] in ("css", "js", "png", "webp"):
             # On disk, and routed: a picture the server does not serve is
             # a broken image on a page that otherwise looks finished.
             assert (STATIC / address.lstrip("/")).exists(), reference

@@ -167,7 +167,7 @@ HOME = Page(
     parts=(
         Part(
             kind="picture",
-            picture="road.png",
+            picture="road.webp",
             lines=(_w(
                 "Rapordan. Yayın birimleri yol kenarında zaten duran "
                 "noktalara takılıyor. Alıcı hem uyduyu hem yerdeki "
@@ -257,7 +257,7 @@ WHY = Page(
     parts=(
         Part(
             kind="picture",
-            picture="gnss.png",
+            picture="gnss.webp",
             lines=(_w(
                 "Dördü de yabancı devletlerin elinde ve dördünün de "
                 "aynı zayıf noktası var: uydudan gelen sinyal yere "
@@ -435,7 +435,7 @@ SYSTEM = Page(
     parts=(
         Part(
             kind="picture",
-            picture="architecture.png",
+            picture="architecture.webp",
             lines=(_w(
                 "Rapordan. Alıcı mesafeyi karşılıklı mesajlaşarak "
                 "ölçüyor. Merkezi yönetim sistemiyle birimler arasındaki "
@@ -1362,7 +1362,7 @@ SIMULATION = Page(
     parts=(
         Part(
             kind="picture",
-            picture="simulator.png",
+            picture="simulator.webp",
             lines=(_w(
                 "Şehir içi satırı, koşusu bitmiş hâlde: Kızılay'ın "
                 "gerçek arazisi, aydınlatma direklerine takılmış yayın "
@@ -2853,9 +2853,14 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         drawn = '<div class="cards">{}</div>'.format(drawn)
     elif part.kind == "picture":
         where = where or Where(language=language)
-        drawn = '<figure><img src="{}" alt="{}"><figcaption>{}</figcaption>' \
-            "</figure>".format(
+        # The size is given so the page does not jump when the picture
+        # arrives, and a picture below the fold waits until it is near.
+        wide, high = PICTURE_SIZES.get(part.picture, (0, 0))
+        size = ' width="{}" height="{}"'.format(wide, high) if wide else ""
+        drawn = '<figure><img src="{}"{} loading="lazy" decoding="async" ' \
+            'alt="{}"><figcaption>{}</figcaption></figure>'.format(
                 html.escape(where.asset(part.picture), quote=True),
+                size,
                 html.escape(part.lines[0].said(language), quote=True),
                 _said(part.lines[0], language),
             )
@@ -3335,8 +3340,18 @@ def _table(
 # --- writing it out -------------------------------------------------------
 
 #: Files copied beside the pages rather than rendered.
-CARRIED = ("site.css", "theme.js", "road.png", "gnss.png",
-           "architecture.png", "simulator.png")
+CARRIED = ("site.css", "theme.js", "road.webp", "gnss.webp",
+           "architecture.webp", "simulator.webp")
+
+#: Each picture's pixel size. WebP rather than PNG: the four came to
+#: 1,5 MB as PNG and 216 KB as WebP at quality 85, with the lettering in
+#: the diagrams still sharp.
+PICTURE_SIZES = {
+    "road.webp": (1200, 900),
+    "gnss.webp": (700, 701),
+    "architecture.webp": (1200, 800),
+    "simulator.webp": (1600, 1000),
+}
 
 STATIC = pathlib.Path(__file__).parent / "static"
 

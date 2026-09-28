@@ -588,7 +588,11 @@ function textured(context, item) {
   context.fill();
   context.save();
   context.clip();
-  context.setTransform(a, b, c, d, e, f);
+  // Composed with the transform already on the context, not put in its
+  // place. The page scales the canvas by the screen's pixel ratio, and
+  // replacing that drew the picture at two thirds of its size on a
+  // 150 % screen, outside the clip: every quad came out its flat colour.
+  context.transform(a, b, c, d, e, f);
   context.drawImage(image, left, top, right - left, bottom - top,
                     left, top, right - left, bottom - top);
   context.restore();

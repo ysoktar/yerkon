@@ -373,9 +373,9 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path in ("/style.css", "/site.css"):
             return self._file(path.lstrip("/"), "text/css; charset=utf-8")
-        if path in ("/road.png", "/gnss.png", "/architecture.png",
-                    "/simulator.png"):
-            return self._file(path.lstrip("/"), "image/png")
+        if path in ("/road.webp", "/gnss.webp", "/architecture.webp",
+                    "/simulator.webp"):
+            return self._file(path.lstrip("/"), "image/webp")
         if path == "/api/figures":
             return self._json(lambda: figures(self.session.read()))
         if path == "/api/figures.toml":
