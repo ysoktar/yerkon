@@ -1031,6 +1031,8 @@ def test_the_archive_the_browser_imports_answers_on_its_own(tmp_path):
     assert "yerkon/viewer/server.py" in names
     assert "yerkon/site/places/kizilay/elevation.npy" in names
     assert not any("_tiles" in n or "__pycache__" in n for n in names)
+    # A place somebody fetched in the simulator is theirs, not the site's.
+    assert not any("/places/yer-" in n for n in names)
 
     zipfile.ZipFile(io.BytesIO(archive)).extractall(tmp_path)
     script = (

@@ -3420,6 +3420,10 @@ BROWSER_SCRIPTS = ("app.js", "draw.js", "words.js", "map.js", "style.css",
 #: cache of raw elevation tiles, and the files the server sends.
 LEFT_OUT = ("__pycache__", "_tiles", "static")
 
+#: A place the simulator fetched is saved under this prefix. It belongs to
+#: whoever fetched it, so it stays out of the published package.
+FETCHED = "yer-"
+
 
 def _loose(text: str, swaps) -> str:
     """Absolute addresses made relative, refusing any that has moved.
@@ -3496,7 +3500,8 @@ def package_zip() -> bytes:
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(root.rglob("*")):
             relative = path.relative_to(root)
-            if path.is_dir() or any(part in LEFT_OUT for part in relative.parts):
+            if path.is_dir() or any(part in LEFT_OUT or part.startswith(FETCHED)
+                                    for part in relative.parts):
                 continue
             if path.suffix == ".pyc":
                 continue

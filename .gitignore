@@ -7,3 +7,5 @@ dist/
 *.egg-info/
 sites/_tiles/
 src/yerkon/site/places/_tiles/
+.ruff_cache/
+src/yerkon/site/places/yer-*/
