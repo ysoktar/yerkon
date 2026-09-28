@@ -65,6 +65,56 @@ ladder = [[1, 11.51], [1000, 10.07]]
 date = "25.09.2026"
 note = "100 adet kademesi okunamadı; 1000'e kadar tek adet fiyatı"
 
+# The parts below are on no board of the table. The simulator can choose
+# them: the 27 dBm module, and the antennas the town and the open country
+# used before the hopping certificate (ADR-0091), each on a short cable.
+# No seller publishes a volume price for the antennas or the cable, so
+# the single price holds at every quantity.
+
+[[part]]
+key = "e28-2g4m27s"
+name = "EBYTE E28-2G4M27S"
+role.tr = "SX1280 telsiz modülü, yükselteçli, 27 dBm"
+role.en = "SX1280 radio module with an amplifier, 27 dBm"
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C411312.html"
+ladder = [[1, 8.7416], [100, 8.4593]]
+date = "25.09.2026"
+note = "güncel kılavuz ve ürün sayfası yongayı SX1281 diye veriyor"
+
+[[part]]
+key = "tl-ant2412d"
+name = "TP-Link TL-ANT2412D"
+role.tr = "direk anteni, 2,4 GHz, 12 dBi, dış ortam, çok yönlü"
+role.en = "pole antenna, 2,4 GHz, 12 dBi, outdoor omni"
+seller = "Amazon"
+url = "https://www.amazon.com/TP-Link-Outdoor-Omni-directional-Antenna-TL-ANT2412D/dp/B003CFATO2"
+ladder = [[1, 50.66]]
+date = "24.09.2026"
+note = "üretimden kalkmış; 28 Eylül'de ServerBlink 97,32 USD"
+
+[[part]]
+key = "hgv-2409u"
+name = "L-com HGV-2409U"
+role.tr = "araç çatı anteni, 2,4 GHz, 8 dBi, çok yönlü"
+role.en = "vehicle roof antenna, 2,4 GHz, 8 dBi, omni"
+seller = "Microcom"
+url = "https://www.microcom.us/hgv2409u.html"
+ladder = [[1, 58.95]]
+date = "28.09.2026"
+note = "toplu fiyat yayımlanmamış"
+
+[[part]]
+key = "lmr200-pigtail"
+name = "LMR-200 anten kablosu"
+role.tr = "karttan antene 0,3 m kablo (LMR-200)"
+role.en = "0,3 m cable from board to antenna (LMR-200)"
+seller = "Amazon"
+url = "https://www.amazon.com/LMR200-Double-Shielded-LMR-200-Pigtail/dp/B0DQ61NXP9"
+ladder = [[1, 9.50]]
+date = "24.09.2026"
+note = "toplu fiyat yayımlanmamış"
+
 [[part]]
 key = "stm32g0b1met6"
 name = "STM32G0B1MET6"

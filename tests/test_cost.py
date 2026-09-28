@@ -429,12 +429,55 @@ def test_a_rate_looks_sourced_only_when_it_names_its_source():
 
 
 def test_each_module_is_priced_as_its_own_line_of_the_bill():
-    from yerkon.cost import TUNNEL_ANCHOR, anchor_product
+    from yerkon.cost import E28_27S_ANCHOR, TUNNEL_ANCHOR, anchor_product
     from yerkon.hardware import DWM3000, E28_2G4M27S, SX1280
 
     assert anchor_product(SX1280.part) is SX1280_ANCHOR
-    assert anchor_product(E28_2G4M27S.part) is AMPLIFIED_ANCHOR
+    assert anchor_product(E28_2G4M27S.part) is E28_27S_ANCHOR
     assert anchor_product(DWM3000.part) is TUNNEL_ANCHOR
+
+
+def test_the_27_dbm_board_costs_the_difference_between_the_modules():
+    from yerkon.bom import read
+    from yerkon.cost import E28_27S_ANCHOR
+
+    bill = read()
+    difference = (bill.parts["e28-2g4m27s"].at(1000)
+                   - bill.parts["e28-2g4m20s"].at(1000)) * bill.usd_try
+    assert float(E28_27S_ANCHOR.unit_price_tl.value) == pytest.approx(
+        float(AMPLIFIED_ANCHOR.unit_price_tl.value) + difference, abs=0.01)
+
+
+def test_a_mast_antenna_takes_the_rods_place_with_its_cable():
+    from yerkon.bom import read
+    from yerkon.cost import anchor_product
+
+    bill = read()
+    mast = anchor_product("EBYTE E28-2G4M12S", "TP-Link TL-ANT2412D")
+    swap = (bill.parts["tl-ant2412d"].at(1000) + bill.parts["lmr200-pigtail"].at(1000)
+            - bill.parts["gw-22-5151"].at(1000)) * bill.usd_try
+    assert float(mast.unit_price_tl.value) == pytest.approx(
+        float(SX1280_ANCHOR.unit_price_tl.value) + swap, abs=0.01)
+    # The rod the boards already carry, and an antenna the bill does not
+    # price, leave the board as it is.
+    assert anchor_product("EBYTE E28-2G4M20S", "Taoglas GW.22.5151") is AMPLIFIED_ANCHOR
+    assert anchor_product("Qorvo DWM3000", "anything") is not None
+
+
+def test_a_receiver_is_priced_with_what_it_carries():
+    from yerkon.cost import PEDESTRIAN_RECEIVER, VEHICLE_RECEIVER, receiver_product
+
+    as_built = receiver_product("vehicle", ("EBYTE E28-2G4M20S", "Qorvo DWM3000"),
+                                "Taoglas GW.22.5151")
+    assert as_built is VEHICLE_RECEIVER
+    assert receiver_product("pedestrian", ("EBYTE E28-2G4M12S", "Qorvo DWM3000"),
+                            "Inventek W24P-U") is PEDESTRIAN_RECEIVER
+    o4 = receiver_product("vehicle", ("EBYTE E28-2G4M12S", "Qorvo DWM3000"),
+                          "L-com HGV-2409U")
+    assert float(o4.unit_price_tl.value) > float(VEHICLE_RECEIVER.unit_price_tl.value)
+    louder = receiver_product("pedestrian", ("EBYTE E28-2G4M20S", "Qorvo DWM3000"),
+                              "Inventek W24P-U")
+    assert float(louder.unit_price_tl.value) > float(PEDESTRIAN_RECEIVER.unit_price_tl.value)
 
 
 def test_a_module_the_report_does_not_name_is_refused_with_the_list():

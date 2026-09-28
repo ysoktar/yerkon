@@ -81,6 +81,52 @@ PRODUCTS = {
     "vehicle": VEHICLE_RECEIVER,
 }
 
+def _board(key: str, remove=(), add=()):
+    """A board of the bill with some parts taken off and others put on.
+
+    For what the simulator can choose and no row of the table uses: the
+    27 dBm module, a louder module on a receiver, and the antennas the
+    rows carried before the hopping certificate (ADR-0091).
+    """
+    from dataclasses import replace
+
+    from yerkon.bom import read
+
+    bill = read()
+    board = bill.boards[key]
+    if not remove and not add:
+        return board
+    parts = list(board.parts)
+    for gone in remove:
+        parts.remove(next(p for p in parts if p.key == gone))
+    parts += [bill.parts[extra] for extra in add]
+    return replace(board, parts=tuple(parts))
+
+
+def _priced(board, name: str, key: str, remove=(), add=()) -> Product:
+    """A board as a line of the bill, at the tier the table uses."""
+    from yerkon.bom import read
+
+    tier = read().used_tier
+    return Product(
+        name=name,
+        unit_price_tl=Sourced(
+            round(board.at(tier), 2), "TL", Provenance.DERIVED,
+            "bom.toml, {} with {} in place of {}".format(
+                key, " and ".join(add) or "nothing", " and ".join(remove)),
+            note="{} units, priced part by part from the sellers.".format(tier),
+        ),
+    )
+
+
+#: The 27 dBm module's unit: the amplified board with the 27 dBm module
+#: in place of the 20 dBm one. It used to be priced as the 20 dBm board,
+#: which put 128 TL a unit on the wrong side.
+E28_27S_ANCHOR = _priced(
+    _board("amplified-anchor", ("e28-2g4m20s",), ("e28-2g4m27s",)),
+    "Yayın birimi, E28-2G4M27S", "amplified-anchor",
+    ("e28-2g4m20s",), ("e28-2g4m27s",))
+
 #: Which line of the bill of materials a module is sold as.
 #:
 #: Keyed by part name rather than by the object, so this module still
@@ -90,20 +136,125 @@ PRODUCTS = {
 ANCHOR_PRODUCT_BY_PART = {
     "EBYTE E28-2G4M12S": SX1280_ANCHOR,
     "EBYTE E28-2G4M20S": AMPLIFIED_ANCHOR,
-    "EBYTE E28-2G4M27S": AMPLIFIED_ANCHOR,
+    "EBYTE E28-2G4M27S": E28_27S_ANCHOR,
     "Qorvo DWM3000": TUNNEL_ANCHOR,
 }
 
+#: The board each module is built on, and what goes on it in place of
+#: what the board carries as built.
+_ANCHOR_BOARD = {
+    "EBYTE E28-2G4M12S": ("sx1280-anchor", (), ()),
+    "EBYTE E28-2G4M20S": ("amplified-anchor", (), ()),
+    "EBYTE E28-2G4M27S": ("amplified-anchor", ("e28-2g4m20s",), ("e28-2g4m27s",)),
+    "Qorvo DWM3000": ("tunnel-anchor", (), ()),
+}
 
-def anchor_product(part: str) -> Product:
-    """The bill-of-materials line for a module, by its part name."""
-    try:
-        return ANCHOR_PRODUCT_BY_PART[part]
-    except KeyError:
+#: What an antenna puts on a board, by its part name. The 5 dBi rod sits
+#: on the box's own connector; a mast or roof antenna needs a cable.
+ANTENNA_PARTS = {
+    "Taoglas GW.22.5151": ("gw-22-5151",),
+    "TP-Link TL-ANT2412D": ("tl-ant2412d", "lmr200-pigtail"),
+    "L-com HGV-2409U": ("hgv-2409u", "lmr200-pigtail"),
+}
+
+_ROD = ANTENNA_PARTS["Taoglas GW.22.5151"]
+_SWAPPED: dict = {}
+
+
+def _anchor_swaps(part: str, antenna: str) -> tuple:
+    """The board a pole is built on, and the parts taken off and put on."""
+    if part not in _ANCHOR_BOARD:
         raise ValueError(
             "no anchor product for {!r}. The bill of materials names: "
-            "{}".format(part, ", ".join(sorted(ANCHOR_PRODUCT_BY_PART)))
-        ) from None
+            "{}".format(part, ", ".join(sorted(ANCHOR_PRODUCT_BY_PART))))
+    key, remove, add = _ANCHOR_BOARD[part]
+    remove, add = list(remove), list(add)
+    extra = ANTENNA_PARTS.get(antenna, _ROD)
+    if extra != _ROD and key != "tunnel-anchor":
+        remove.append("gw-22-5151")
+        add.extend(extra)
+    return key, tuple(remove), tuple(add)
+
+
+def anchor_board(part: str, antenna: str = ""):
+    """A pole's board as the bill builds it, with its antenna swapped in."""
+    return _board(*_anchor_swaps(part, antenna))
+
+
+def anchor_product(part: str, antenna: str = "") -> Product:
+    """The bill-of-materials line for a module, by its part name.
+
+    ``antenna`` is the pole antenna's part name. The boards in the bill
+    carry the 5 dBi rod, so any other antenna the bill prices swaps it
+    out; one it does not price, and the tunnel's module antenna, leave
+    the board as it is.
+    """
+    key, remove, add = _anchor_swaps(part, antenna)
+    product = ANCHOR_PRODUCT_BY_PART[part]
+    if ANTENNA_PARTS.get(antenna, _ROD) == _ROD or key == "tunnel-anchor":
+        return product
+    cached = (part, antenna)
+    if cached not in _SWAPPED:
+        _SWAPPED[cached] = _priced(_board(key, remove, add),
+                                   "{}, {}".format(product.name, antenna),
+                                   key, remove, add)
+    return _SWAPPED[cached]
+
+
+#: The receiver boards, and the bill's keys for the 2,4 GHz module and
+#: antenna each carries as built.
+_RECEIVER_BOARD = {
+    "vehicle": ("vehicle", "e28-2g4m20s", "gw-22-5151"),
+    "pedestrian": ("pedestrian", "e28-2g4m12s", None),
+}
+_MODULE_KEY = {
+    "EBYTE E28-2G4M12S": "e28-2g4m12s",
+    "EBYTE E28-2G4M20S": "e28-2g4m20s",
+    "EBYTE E28-2G4M27S": "e28-2g4m27s",
+}
+
+
+def _receiver_swaps(kind: str, parts, antenna: str) -> tuple:
+    key, module, rod = _RECEIVER_BOARD[kind]
+    remove, add = [], []
+    carried = [_MODULE_KEY[p] for p in parts if p in _MODULE_KEY]
+    if carried and carried[0] != module:
+        remove.append(module)
+        add.append(carried[0])
+    wanted = ANTENNA_PARTS.get(antenna)
+    if wanted and rod and wanted != _ROD:
+        remove.append(rod)
+        add.extend(wanted)
+    return key, tuple(remove), tuple(add)
+
+
+def receiver_board(kind: str, parts=(), antenna: str = ""):
+    """A receiver's board with the modules and antenna it carries."""
+    kind = kind if kind in _RECEIVER_BOARD else "vehicle"
+    return _board(*_receiver_swaps(kind, parts, antenna))
+
+
+def receiver_product(kind: str, parts=(), antenna: str = "",
+                     base: Optional[Product] = None) -> Product:
+    """A receiver's line of the bill, with the modules and antenna it
+    carries.
+
+    ``base`` is the board as built. A unit carrying another SX1280
+    module, or another antenna the bill prices, swaps it in; anything
+    else leaves the board as it is.
+    """
+    base = base or PRODUCTS.get(kind, VEHICLE_RECEIVER)
+    if kind not in _RECEIVER_BOARD:
+        return base
+    key, remove, add = _receiver_swaps(kind, parts, antenna)
+    if not remove:
+        return base
+    cached = (kind, remove, add)
+    if cached not in _SWAPPED:
+        _SWAPPED[cached] = _priced(_board(key, remove, add),
+                                   "{}, {}".format(base.name, ", ".join(add)),
+                                   key, remove, add)
+    return _SWAPPED[cached]
 
 
 @dataclass(frozen=True)

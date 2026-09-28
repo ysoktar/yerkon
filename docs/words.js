@@ -352,6 +352,24 @@ export const SAY = {
 
   // -- step 4, the target -------------------------------------------------
   "step.target": { tr: "Hedef", en: "Target" },
+  "target.setup": { tr: "Donanım kurulumu", en: "Hardware setup" },
+  "target.setup.note": {
+    tr: "Direğin, aracın ve yayanın modülünü, direk ve araç antenini ve kuralı birlikte seçer. UWB grupları değişmez.",
+    en: "Picks the pole's, the vehicle's and the pedestrian's module, the pole and vehicle antennas and the rule together. UWB groups stay as they are.",
+  },
+  "target.pole_antenna": { tr: "Direk anteni", en: "Pole antenna" },
+  "target.vehicle_antenna": { tr: "Araç anteni", en: "Vehicle antenna" },
+  "antenna.pole.row": { tr: "5 dBi çubuk (Taoglas GW.22.5151)", en: "5 dBi rod (Taoglas GW.22.5151)" },
+  "antenna.pole.mast": { tr: "12 dBi direk anteni, kabloyla (TP-Link TL-ANT2412D)", en: "12 dBi mast antenna on a cable (TP-Link TL-ANT2412D)" },
+  "antenna.vehicle.row": { tr: "5 dBi çubuk (Taoglas GW.22.5151)", en: "5 dBi rod (Taoglas GW.22.5151)" },
+  "antenna.vehicle.roof": { tr: "8 dBi tavan anteni, kabloyla (L-com HGV-2409U)", en: "8 dBi roof antenna on a cable (L-com HGV-2409U)" },
+  "setup.custom": { tr: "Elle ayarlanmış", en: "Set by hand" },
+  "setup.e28-20s": { tr: "E28-2G4M20S direkte, frekans atlama belgeli (tablonun)", en: "E28-2G4M20S on the pole, hopping certificate (the table's)" },
+  "setup.e28-20s-everywhere": { tr: "E28-2G4M20S direkte, araçta ve yayada", en: "E28-2G4M20S on the pole, vehicle and pedestrian" },
+  "setup.e28-12s": { tr: "E28-2G4M12S direkte, frekans atlama belgeli", en: "E28-2G4M12S on the pole, hopping certificate" },
+  "setup.e28-27s": { tr: "E28-2G4M27S direkte, frekans atlama belgeli", en: "E28-2G4M27S on the pole, hopping certificate" },
+  "setup.e28-12s-uncertified": { tr: "E28-2G4M12S direkte, belgesiz", en: "E28-2G4M12S on the pole, no certificate" },
+  "setup.o4": { tr: "Eski kurulum (O4): E28-2G4M12S, 12 dBi direk ve 8 dBi tavan anteni, belgesiz", en: "Old setup (O4): E28-2G4M12S, 12 dBi mast and 8 dBi roof antennas, no certificate" },
   "target.region": { tr: "Bölge", en: "Region" },
   "target.scheme": { tr: "Ölçüm şeması", en: "Ranging scheme" },
   "knob.tolerance": { tr: "Menzil toleransı", en: "Ranging tolerance" },
@@ -511,6 +529,8 @@ export const SAY = {
   "result.units": { tr: "Alıcı sayısı", en: "Receivers" },
   "result.round": { tr: "Tur süresi", en: "Round" },
   "result.rate": { tr: "Konum sıklığı", en: "Fix rate" },
+  "result.board.run": { tr: "{name} yayın birimi (1 / 100 / 1000 adet)", en: "{name} broadcast unit (1 / 100 / 1000)" },
+  "result.board.unit": { tr: "{name} alıcısı (1 / 100 / 1000 adet)", en: "{name} receiver (1 / 100 / 1000)" },
   "result.unit_range": { tr: "{unit} ↔ {run}: menzil", en: "{unit} ↔ {run}: range" },
   "result.unit_range.value": {
     tr: "bağlantı {closes} km, hassas {precise} km",

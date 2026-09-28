@@ -5,6 +5,7 @@
     python tools/hardware.py --forward-only       as the published table runs
     python tools/hardware.py --search cheaper     place the poles for each setup
     python tools/hardware.py --tl-ant2412d-usd 97.32
+    python tools/hardware.py --set urban.anchors_per_round=6 --row urban
 
 Each setup names the pole's module and antenna, the vehicle's and the
 pedestrian's modules and antennas, and the spectrum rule, and prices the
@@ -171,7 +172,8 @@ def prices(setup: Setup, bill=None) -> dict:
 
 # --- One run ----------------------------------------------------------------
 
-def run_one(setup: Setup, row: str, both_ways: bool, aim: str) -> dict:
+def run_one(setup: Setup, row: str, both_ways: bool, aim: str,
+            values: dict = None, fix_rate: float = 1.0) -> dict:
     """One row with one setup, in this process. Patches the model's module
     tables, so each run gets a process of its own (see `main`)."""
     import time
@@ -183,6 +185,7 @@ def run_one(setup: Setup, row: str, both_ways: bool, aim: str) -> dict:
 
     bill = bom.read()
     priced = prices(setup, bill)
+    settings = DEFAULTS.with_values(values) if values else DEFAULTS
 
     original = scenarios.radios
 
@@ -243,20 +246,34 @@ def run_one(setup: Setup, row: str, both_ways: bool, aim: str) -> dict:
         from yerkon.placement import deployed_with, mix, search
 
         grid = scenarios.catalogue(
-            DEFAULTS.with_values({row + ".layout": "grid"}))[row]
-        answer = search(grid, scenarios.fetched(DEFAULTS.text(row + ".site")),
-                        row, aim, DEFAULTS)
+            settings.with_values({row + ".layout": "grid"}))[row]
+        answer = search(grid, scenarios.fetched(settings.text(row + ".site")),
+                        row, aim, settings)
         deployed = deployed_with(grid, answer.problem, answer.chosen)
         extra = {"placed": {str(k): v for k, v in
                             mix(answer.problem, answer.chosen).items()}}
-        rates = operating_rates(DEFAULTS)
+        rates = operating_rates(settings)
     else:
-        deployed = scenarios.catalogue(DEFAULTS)[row]
+        deployed = scenarios.catalogue(settings)[row]
         rates = None
     deployed = dataclasses.replace(deployed, product=product)
     terrain["ground"] = deployed.scenario.terrain
     _, rows = build((deployed,), rates=rates)
     record = dataclasses.asdict(rows[0])
+    from yerkon.ranging import exchange_duration_s
+
+    dep = deployed.scenario.deployment
+    exchange_s = exchange_duration_s(dep.anchors[0].radio, dep.scheme)
+    per_second = dep.duty_cycle / exchange_s
+    per_fix = dep.max_anchors_per_round
+    record.update(
+        exchange_ms=1000 * exchange_s, per_fix=per_fix, fix_rate=fix_rate,
+        # The model's own assumption: every receiver of the row on one
+        # medium, one exchange at a time.
+        one_channel=per_second / (per_fix * fix_rate),
+        # The ceiling: every pole answering at once.
+        busy_per_km2=len(dep.anchors) / rows[0].area_km2 * per_second / (per_fix * fix_rate),
+        values=values or {})
     record.update(setup=setup.key, row=row, both_ways=both_ways, aim=aim,
                   anchors=len(deployed.scenario.deployment.anchors),
                   prices=priced, seconds=round(time.time() - start), **extra)
@@ -276,15 +293,19 @@ def table(records, chosen) -> str:
         if not mine:
             continue
         out += ["## " + title, "",
-                "| Setup | Poles | Pole unit, 1000 | HPE P50 | HPE P95 | VPE P95 | "
-                "Availability | Area km² | CAPEX TL/km² | OPEX TL/km²/yr |",
-                "|---|---|---|---|---|---|---|---|---|---|"]
-        for r in sorted(mine, key=lambda r: list(chosen).index(r["setup"])):
-            out.append("| {} | {} | {} | {} | {} | {} | %{} | {} | {} | {} |".format(
-                r["setup"], r["anchors"], c(r["prices"]["pole"]["1000"]),
+                "| Setup | Poles | Poles a fix | Pole unit, 1000 | HPE P50 | HPE P95 | VPE P95 | "
+                "Availability | Area km² | CAPEX TL/km² | OPEX TL/km²/yr | "
+                "Receivers, one channel | Receivers/km², every pole busy |",
+                "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+        for r in mine:
+            out.append("| {} | {} | {} | {} | {} | {} | {} | %{} | {} | {} | {} | {} | {} |".format(
+                r["setup"] + (" ({})".format(", ".join(
+                    "{}={}".format(k, v) for k, v in r["values"].items())) if r.get("values") else ""),
+                r["anchors"], r["per_fix"], c(r["prices"]["pole"]["1000"]),
                 c(r["hpe_p50_m"]), c(r["hpe_p95_m"]), c(r["vpe_p95_m"]),
                 c(100 * r["availability"]), c(r["area_km2"]),
-                c(r["capex_tl_per_unit"], 0), c(r["opex_tl_per_unit_year"], 0)))
+                c(r["capex_tl_per_unit"], 0), c(r["opex_tl_per_unit_year"], 0),
+                c(r["one_channel"], 1), c(r["busy_per_km2"], 2)))
         out.append("")
     out += ["## Boards (TL)", "",
             "| Setup | Pole 1 / 100 / 1000 | Vehicle 1 / 100 / 1000 | Pedestrian 1 / 100 / 1000 |",
@@ -301,6 +322,18 @@ def table(records, chosen) -> str:
     return "\n".join(out)
 
 
+def _values(pairs) -> dict:
+    """KEY=VALUE pairs as settings values, numbers where they parse."""
+    out = {}
+    for pair in pairs:
+        key, _, value = pair.partition("=")
+        try:
+            out[key] = float(value)
+        except ValueError:
+            out[key] = value
+    return out
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(
         description="Compare radio hardware setups on the city and country rows.")
@@ -314,6 +347,11 @@ def main(argv=None) -> int:
                         help="search each setup's own poles before running it")
     parser.add_argument("--tl-ant2412d-usd", type=float, default=TL_ANT2412D_USD,
                         help="the O4 pole antenna's price (default %(default)s)")
+    parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE",
+                        help="change a settings value for every run, e.g. "
+                             "urban.anchors_per_round=6; repeat for several")
+    parser.add_argument("--fix-rate", type=float, default=1.0,
+                        help="fixes a second each receiver needs, for capacity (default 1)")
     parser.add_argument("--list", action="store_true", help="list the setups and stop")
     parser.add_argument("--out", help="also write the tables to this Markdown file")
     parser.add_argument("--one", nargs=2, metavar=("SETUP", "ROW"), help=argparse.SUPPRESS)
@@ -326,7 +364,8 @@ def main(argv=None) -> int:
         return 0
     if args.one:
         record = run_one(known[args.one[0]], args.one[1],
-                         not args.forward_only, args.search or "")
+                         not args.forward_only, args.search or "",
+                         values=_values(args.set), fix_rate=args.fix_rate)
         print(json.dumps(record, ensure_ascii=False))
         return 0
 
@@ -345,6 +384,9 @@ def main(argv=None) -> int:
                 command.append("--forward-only")
             if args.search:
                 command += ["--search", args.search]
+            for pair in args.set:
+                command += ["--set", pair]
+            command += ["--fix-rate", str(args.fix_rate)]
             done = subprocess.run(command, capture_output=True, text=True)
             if done.returncode != 0:
                 print(done.stderr[-2000:], file=sys.stderr)
@@ -355,6 +397,8 @@ def main(argv=None) -> int:
     if args.out:
         with open(args.out, "w") as handle:
             handle.write(text + "\n")
+        with open(os.path.splitext(args.out)[0] + ".json", "w") as handle:
+            json.dump(records, handle, ensure_ascii=False, indent=1)
     return 0
 
 

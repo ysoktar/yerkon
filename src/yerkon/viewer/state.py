@@ -547,6 +547,19 @@ class UnitPlan:
 #: bare ground (ADR-0081).
 ONLY_WHERE_PLACED = ("roof",)
 
+
+def _antennas() -> tuple:
+    from yerkon.hardware import GW_22_5151, HGV_2409U, TL_ANT2412D
+
+    return ({"rod": GW_22_5151, "mast": TL_ANT2412D},
+            {"rod": GW_22_5151, "roof": HGV_2409U})
+
+
+#: What a tab may put on its poles and on its vehicles: the 5 dBi rod the
+#: table carries, and the mast and roof antennas the rows carried before
+#: the hopping certificate (ADR-0091, ADR-0094).
+POLE_ANTENNAS, VEHICLE_ANTENNAS = _antennas()
+
 DEFAULT_RUNS = (
     AnchorRun("M", "e28", "mast", 0.0, 24_000.0, 2000.0, 400.0),
 )
@@ -643,7 +656,32 @@ class ViewState:
     #: an assumption (ADR-0016).
     overrides: dict = field(default_factory=dict)
 
+    #: The pole's antenna and the vehicle's, by key in `POLE_ANTENNAS`
+    #: and `VEHICLE_ANTENNAS`. Empty is the row's own, which is what
+    #: every tab did before there was a choice. Last, like `route`, so an
+    #: arrangement saved before this loads as it was (ADR-0035, ADR-0043).
+    pole_antenna: str = ""
+    vehicle_antenna: str = ""
+
     # -- the world --------------------------------------------------------
+
+    def pole_antenna_object(self):
+        """The antenna on every pole of this tab."""
+        from yerkon.scenarios import row_deployment_figures
+
+        if self.pole_antenna:
+            return chosen(POLE_ANTENNAS, self.pole_antenna, "antenna")
+        row = self.scenario if self.scenario in MODES else "rural"
+        return row_deployment_figures(row, self.settings())["antenna"]
+
+    def unit_antenna_object(self, kind: str):
+        """The antenna a unit of this kind carries on this tab."""
+        from yerkon.scenarios import unit_antenna
+
+        if kind == "vehicle" and self.vehicle_antenna:
+            return chosen(VEHICLE_ANTENNAS, self.vehicle_antenna, "antenna")
+        row = self.scenario if self.scenario in MODES else "rural"
+        return unit_antenna(row, kind)
 
     def settings(self) -> Settings:
         """The figures this run uses: the shipped file, plus any edits."""
@@ -910,7 +948,7 @@ class ViewState:
                 radios=tuple(
                     chosen(radio_of, name, "radio") for name in unit.radios
                 ),
-                antenna=unit_antenna(row, unit.kind),
+                antenna=self.unit_antenna_object(unit.kind),
                 product=unit.kind,
             )
             for unit in self.units
@@ -950,8 +988,9 @@ class ViewState:
             duty_cycle=region.channel_share,
             max_anchors_per_round=row_deployment_figures(
                 row, self.settings())["max_anchors_per_round"],
-            # The row's antennas, so a tab hears as its row does (ADR-0091).
-            antenna=row_deployment_figures(row, self.settings())["antenna"],
+            # The row's antennas, so a tab hears as its row does
+            # (ADR-0091), unless the tab has chosen another.
+            antenna=self.pole_antenna_object(),
             clock=row_deployment_figures(row, self.settings())["clock"],
         )
 

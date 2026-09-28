@@ -23,6 +23,7 @@ import numpy as np
 from yerkon.cost import (
     PEDESTRIAN_RECEIVER,
     anchor_product,
+    receiver_product,
     TUNNEL_ANCHOR,
     AMPLIFIED_ANCHOR,
     VEHICLE_RECEIVER,
@@ -121,7 +122,12 @@ class Deployed:
     def inventory(self, service_area_km2: float) -> Inventory:
         units: dict = {}
         for unit in self.scenario.deployment.receivers:
-            product = RECEIVER_PRODUCTS.get(unit.product, VEHICLE_RECEIVER)
+            # As built unless the unit carries another module or antenna
+            # the bill prices.
+            product = receiver_product(
+                unit.product, tuple(radio.part for radio in unit.radios),
+                unit.antenna.part,
+                base=RECEIVER_PRODUCTS.get(unit.product, VEHICLE_RECEIVER))
             units[product] = units.get(product, 0) + self.receivers
         return Inventory(
             anchors=tuple(
@@ -130,7 +136,9 @@ class Deployed:
                     # corridor carrying three modules is three products,
                     # and pricing it as one puts hundreds of lira per
                     # anchor in the wrong place.
-                    product=anchor_product(anchor.radio.part),
+                    product=anchor_product(
+                        anchor.radio.part,
+                        self.scenario.deployment.antenna.part),
                     structure=anchor.mounting.kind,
                     site_cost_tl=anchor.mounting.site_cost_tl,
                     per_crew_day=float(anchor.mounting.per_crew_day.value),

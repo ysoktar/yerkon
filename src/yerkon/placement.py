@@ -121,14 +121,15 @@ class Problem:
 
 
 def lifecycle_tl(mounting: MountingOption, part: str,
-                 rates: OperatingRates, settings: Settings = DEFAULTS) -> float:
+                 rates: OperatingRates, settings: Settings = DEFAULTS,
+                 antenna: str = "") -> float:
     """What one anchor costs over its service life, from the cost model.
 
     Priced through `cost.price` rather than added up here, so a change to
     any rate reaches the search the same way it reaches the table.
     """
     site = AnchorSite(
-        product=anchor_product(part),
+        product=anchor_product(part, antenna),
         structure=mounting.kind,
         site_cost_tl=mounting.site_cost_tl,
         per_crew_day=float(mounting.per_crew_day.value),
@@ -253,8 +254,9 @@ def candidates(deployed, site, row: str, settings: Settings = DEFAULTS,
 
     def cost_of(mounting):
         if mounting.kind not in priced:
-            priced[mounting.kind] = lifecycle_tl(mounting, radio.part, rates,
-                                                 settings)
+            priced[mounting.kind] = lifecycle_tl(
+                mounting, radio.part, rates, settings,
+                deployed.scenario.deployment.antenna.part)
         return priced[mounting.kind]
 
     out: list[Candidate] = []

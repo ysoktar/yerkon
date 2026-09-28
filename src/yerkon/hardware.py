@@ -344,7 +344,7 @@ def _sx1280_family(
 
 
 def radios(settings: Settings = DEFAULTS) -> dict:
-    """The three modules the bill of materials names, from a settings file.
+    """The modules the bill of materials names, from a settings file.
 
     The published figures are written here because they are published.
     The two that are not — a noise figure and a demodulation threshold —
@@ -370,7 +370,15 @@ def radios(settings: Settings = DEFAULTS) -> dict:
         ),
         nlos_bias_mean_m=settings.sourced("radio.dwm3000.nlos_bias_mean_m"),
     )
-    return {"sx1280": urban, "e28": rural, "dwm3000": tunnel}
+    # The 27 dBm module, for the simulator: no row of the table carries
+    # it, because under the hopping certificate the 20 dBm one already
+    # reaches the ceiling (ADR-0099).
+    louder = _sx1280_family(
+        "EBYTE E28-2G4M27S", 27.0,
+        "EBYTE E28-2G4M27S product page, rated output power",
+        settings,
+    )
+    return {"sx1280": urban, "e28": rural, "e28-27s": louder, "dwm3000": tunnel}
 
 
 SX1280 = _sx1280_family(

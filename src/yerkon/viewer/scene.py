@@ -417,6 +417,81 @@ def unit_ranges(state: ViewState, deployment) -> list:
     return out
 
 
+#: Ways of equipping a tab's 2,4 GHz anchors and units, all at once: the
+#: pole's module, the vehicle's and the pedestrian's, the pole and
+#: vehicle antennas, and the spectrum rule. The same six the local
+#: hardware comparison runs (`tools/hardware.py`). An empty antenna is
+#: the row's own, the 5 dBi rod.
+HARDWARE_SETUPS = (
+    ("e28-20s", "e28", "e28", "sx1280", "", "", "TR-FHSS"),
+    ("e28-20s-everywhere", "e28", "e28", "e28", "", "", "TR-FHSS"),
+    ("e28-12s", "sx1280", "e28", "sx1280", "", "", "TR-FHSS"),
+    ("e28-27s", "e28-27s", "e28", "sx1280", "", "", "TR-FHSS"),
+    ("e28-12s-uncertified", "sx1280", "e28", "sx1280", "", "", "TR"),
+    ("o4", "sx1280", "sx1280", "sx1280", "mast", "roof", "TR"),
+)
+
+
+def setups(state: ViewState) -> list:
+    """Each hardware setup as the edit it makes to this tab.
+
+    Only the 2,4 GHz groups and units move; a UWB group keeps its module.
+    A tab with no 2,4 GHz group is offered none, because a setup would
+    only change its spectrum rule.
+    """
+    if not any(run.radio != "dwm3000" for run in state.runs):
+        return []
+    out = []
+    for key, pole, vehicle, pedestrian, pole_ant, vehicle_ant, rule in HARDWARE_SETUPS:
+        runs = [
+            {**run.as_json(), "radio": pole} if run.radio != "dwm3000"
+            else run.as_json()
+            for run in state.runs
+        ]
+        units = []
+        for unit in state.units:
+            module = vehicle if unit.kind == "vehicle" else pedestrian
+            radios = [module] + [r for r in unit.radios if r == "dwm3000"]
+            units.append({**unit.as_json(), "radios": radios})
+        changes = {"runs": runs, "units": units, "region": rule,
+                   "pole_antenna": pole_ant, "vehicle_antenna": vehicle_ant}
+        current = (
+            state.region == rule
+            and state.pole_antenna in (pole_ant, "rod" if not pole_ant else pole_ant)
+            and state.vehicle_antenna in (vehicle_ant, "rod" if not vehicle_ant else vehicle_ant)
+            and all(run.radio == pole for run in state.runs if run.radio != "dwm3000")
+            and all(list(u.radios) == c["radios"] for u, c in zip(state.units, units))
+        )
+        out.append({"key": key, "changes": changes, "current": current})
+    return out
+
+
+def boards(state: ViewState, deployment) -> list:
+    """What every group's units and every receiver are built from, and
+    what one costs at one, a hundred and a thousand."""
+    from yerkon.bom import TIERS
+    from yerkon.cost import anchor_board, receiver_board
+
+    if deployment is None:
+        return []
+    _, radio_of = state.catalogues()
+    out = []
+    for run in state.runs:
+        radio = chosen(radio_of, run.radio, "radio")
+        board = anchor_board(radio.part, deployment.antenna.part)
+        out.append({"of": "run", "name": run.identifier,
+                    "parts": [part.name for part in board.parts],
+                    "tl": [board.at(tier) for tier in TIERS]})
+    for unit in deployment.receivers:
+        board = receiver_board(unit.product,
+                               tuple(radio.part for radio in unit.radios),
+                               unit.antenna.part)
+        out.append({"of": "unit", "name": unit.identifier,
+                    "parts": [part.name for part in board.parts],
+                    "tl": [board.at(tier) for tier in TIERS]})
+    return out
+
+
 def scene(state: ViewState) -> dict:
     """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
@@ -659,6 +734,8 @@ def scene(state: ViewState) -> dict:
         # at, and the panel draws a dash for what does not exist.
         "round_s": None if deployment is None else deployment.round_duration_s(),
         "ranges": unit_ranges(state, deployment),
+        "setups": setups(state),
+        "boards": boards(state, deployment),
         "assumed": len(state.settings().assumed),
         "assumed_total": len(state.settings().entries),
         "state": state.as_json(),

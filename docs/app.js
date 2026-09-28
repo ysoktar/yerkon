@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=08325285fd";
+import { decimal, say, speak, speaks } from "./words.js?v=c5f86fc6da";
 
 /* The choices whose names are this page's to give.
  *
@@ -22,6 +22,8 @@ const choicesNow = () => ({
   region: ["TR", "TR-FHSS", "EU", "US", "US-PTP", "LICENSED"]
     .map(code => [code, say("region." + code)]),
   scheme: [["single", say("scheme.single")], ["double", say("scheme.double")]],
+  pole_antenna: ["", "mast"].map(key => [key, say("antenna.pole." + (key || "row"))]),
+  vehicle_antenna: ["", "roof"].map(key => [key, say("antenna.vehicle." + (key || "row"))]),
 });
 let CHOICES = {};
 
@@ -1671,8 +1673,8 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=08325285fd";
-import * as pick from "./map.js?v=08325285fd";
+import * as draw from "./draw.js?v=c5f86fc6da";
+import * as pick from "./map.js?v=c5f86fc6da";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -2730,6 +2732,13 @@ function showNumbers(drawn, result, pending) {
                  : say("result.unit_range.value", {
                      closes: tr(pair.closes_m / 1000),
                      precise: tr(pair.precise_m / 1000) })]);
+  }
+
+  // What each group's units and each receiver are built from, and what
+  // one costs at one, a hundred and a thousand, from the bill.
+  for (const board of drawn.boards || []) {
+    rows.push([say("result.board." + board.of, { name: board.name }),
+               `${board.parts.join(", ")}: ${board.tl.map(v => tr(v, 0)).join(" / ")} TL`]);
   }
 
   rows.push([say("result.units"), (drawn.units || []).length]);
@@ -3934,6 +3943,27 @@ function wireFetchBox() {
 
 /* ---------- the loop ---------- */
 
+/* The hardware setups, each served as the edit it makes to this tab: the
+ * page picks one and applies it like any other change, with the note
+ * and the way back. A tab that matches none says so rather than showing
+ * the first as if it were chosen. */
+function drawSetups(setups) {
+  const select = document.getElementById("hardware-setup");
+  if (!select) return;
+  const label = select.closest("label");
+  if (label) label.hidden = !setups.length;
+  const note = document.getElementById("setup-note");
+  if (note) note.hidden = !setups.length;
+  const current = setups.find(s => s.current);
+  select.innerHTML = (current ? "" : `<option value="">${say("setup.custom")}</option>`)
+    + setups.map(s => `<option value="${s.key}">${say("setup." + s.key)}</option>`).join("");
+  select.value = current ? current.key : "";
+  select.onchange = () => {
+    const chosen = setups.find(s => s.key === select.value);
+    if (chosen) edit(chosen.changes, true).catch(e => flash(e.message, true));
+  };
+}
+
 async function refreshScene() {
   // Only if it actually takes a moment: most scenes are milliseconds,
   // and a panel that blinks on every drag is harder to read than one
@@ -3949,6 +3979,7 @@ async function refreshScene() {
     clearTimeout(slow);
   }
   state = latest.state;
+  drawSetups(latest.setups || []);
   // The server finds what ground has been fetched; the page never keeps
   // its own list, so a place fetched while this is running turns up on
   // the next refresh.
