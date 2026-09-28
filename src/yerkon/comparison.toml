@@ -557,32 +557,45 @@ the accuracy was measured."""
 
 [note.urban-run]
 sources = ["sx1280-datasheet", "sx1280-range", "yerkon-github"]
-tr = """Şehir içi satır, Kızılay'ın gerçek zemini üzerinde koşuldu. Alıcılar \
-gerçek sokaklarda sürüyor. Direkler, bir yerleşim aramasının mevcut \
-direk ve levhalar, yol kenarı ve tepeler arasından \
-seçtiği 19 yerde. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
+tr = """Şehir içi satır, Kızılay'ın gerçek zemini üzerinde koşuldu; alıcılar \
+gerçek sokaklarda sürüyor. Birimlerin yeri için var olan aydınlatma \
+direkleri, trafik ışıkları, levhalar ve duraklar ile tepelere dikilecek \
+direkler denendi; arama bunlar arasından 19 aydınlatma direğini seçti. \
+Simülasyondaki yerleşim maliyet yapılabilirliğini göstermek için: birim \
+sayısı ve yeri değiştirilerek istenilen yerde istenilen doğruluğa \
+ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
 türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir."""
-en = """The urban row was run over the real ground at Kızılay. The units \
-drive the real streets. The anchors stand on 19 spots a placement \
-search chose among standing columns and signs, the road side and \
-hilltops. Its range error model is derived from published \
-SX1280 measurements, so the result is a model output rather than a field \
+en = """The urban row was run over the real ground at Kızılay; the units \
+drive the real streets. Standing lighting columns, traffic lights, signs \
+and stops, and masts to be put up on hilltops, were all tried as places \
+for the units; the search chose 19 lighting columns among them. The \
+placement in the simulation is there to show cost feasibility: with more \
+units, or units elsewhere, the accuracy wanted can be had where it is \
+wanted. Its range error model is derived from published SX1280 \
+measurements, so the result is a model output rather than a field \
 measurement."""
 
 [note.rural-run]
 sources = ["sx1280-range", "yerkon-github"]
 tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yollarında sürüyor; 52 \
 birim bir yerleşim aramasının seçtiği yerlerde (47 elektrik dağıtım \
-direği, 5 aydınlatma direği). Çatılar kiralık olduğu için aramaya \
-sokulmuyor. Hata modeli kısa menzilde yayımlanmış SX1280 \
+direği, 5 aydınlatma direği). Yol boyundaki elektrik dağıtım direkleri, \
+var olan aydınlatma direkleri ve levhalar ile tepelere dikilecek direkler \
+denendi; çatılar kiralık olduğu için aramaya sokulmuyor. Simülasyondaki \
+yerleşim maliyet yapılabilirliğini göstermek için: birim sayısı ve yeri \
+değiştirilerek istenilen yerde istenilen doğruluğa ulaşılabilir. Hata modeli kısa menzilde yayımlanmış SX1280 \
 ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
 saha ölçümü değil, model çıktısıdır. Dağıtım direği kirası sıfır alındı: \
 birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
 edilebilmeleri öngörülüyor."""
 en = """In the rural row the units drive Polatlı's real roads; the 52 \
 anchors stand where a placement search put them (47 distribution poles, \
-5 lighting columns). Roofs are rented, so the search is not offered \
-them. Its error model is derived from \
+5 lighting columns). Distribution poles along the roads, standing \
+lighting columns and signs, and masts to be put up on hilltops were \
+tried; roofs are rented, so the search is not offered them. The \
+placement in the simulation is there to show cost feasibility: with more \
+units, or units elsewhere, the accuracy wanted can be had where it is \
+wanted. Its error model is derived from \
 published SX1280 measurements at short range. Its long range result is \
 therefore a model output rather than a direct field measurement. The \
 distribution pole rent is taken as nothing: the units go up under a \
@@ -596,9 +609,10 @@ konum izleme sınırı (-41,3 dBm/MHz), Qorvo'nun kanal 5 duyarlılığı (-100 
 dBm) ve modülün kendi anteni (kazancı yayımlanmadığı için 0 dBi). Tünelde \
 kayıp, Molina-Garcia-Pardo ve arkadaşlarının karayolu tünelinde 2,8-5 \
 GHz'de, 50-500 m arasında ölçtüğü modelle (Denklem 2) hesaplanıyor; 6,5 \
-GHz'e taşınmış bir ölçüm, 6,5 GHz'de ölçülmemiş. Araçtaki UWB, kendi \
-yüksekliğinin üstüne -53,3 dBm/MHz ile sınırlı (ETSI EN 302 065-3, \
-4.3.4.2); birimler bu yüzden yoldan 1,2 m yüksekte. Sonuç bir Monte Carlo \
+GHz'e taşınmış bir ölçüm, 6,5 GHz'de ölçülmemiş. Araçtaki UWB cihazı \
+kendi yüksekliğinin üstüne daha az güç yayabiliyor (-53,3 dBm/MHz, ETSI \
+EN 302 065-3, 4.3.4.2); birimler araç anteninin altında, yoldan 1,2 m \
+yüksekte durunca bu sınıra takılmıyor. Sonuç bir Monte Carlo \
 benzetimidir; saha ölçümü değildir."""
 en = """The tunnel row is worked out with the DWM3000 on channel 5 (6489,6 \
 MHz): the BTK location tracking limit (-41,3 dBm/MHz), Qorvo's channel 5 \
@@ -606,22 +620,29 @@ sensitivity (-100 dBm) and the module's own antenna (0 dBi, as no gain is \
 published). The loss in the bore follows the model Molina-Garcia-Pardo and \
 colleagues measured in a road tunnel at 2,8 to 5 GHz between 50 and 500 m \
 (equation 2), carried to 6,5 GHz rather than measured there. The vehicle's \
-UWB is held to -53,3 dBm/MHz above its own height (ETSI EN 302 065-3, \
-4.3.4.2), so the units sit 1,2 m above the road. The result is a Monte \
+UWB device may send less power above its own height (-53,3 dBm/MHz, ETSI \
+EN 302 065-3, 4.3.4.2); units below the vehicle's antenna, 1,2 m above \
+the road, stay clear of that limit. The result is a Monte \
 Carlo simulation rather than a field measurement."""
 
 [note.yerkon-availability]
 sources = ["yerkon-github"]
-tr = """YERKON kullanılabilirliği, denenen turlardan konum üreten ve \
-filtrenin kendi yatay belirsizliği 5,78 m'yi geçmeyenlerin oranıdır; bu \
-çıta HPE P95 < 10 m hedefinden türetilir. Uydu sağlayıcılarının \
-yayımladığı hizmet kullanılabilirliği farklı test tanımlarına dayanır; \
-yüzdeler aynı metrik gibi okunmamalıdır."""
-en = """YERKON availability is the share of attempted rounds that produced \
-a position with the filter's own horizontal uncertainty at most 5,78 m, a \
-bar derived from the HPE P95 < 10 m target. The service availability the \
-satellite providers publish rests on different test definitions, and the \
-percentages must not be read as the same metric."""
+tr = """YERKON kullanılabilirliği, konumun 10 m hedefini tutacak kadar \
+güvenilir çıktığı ölçüm turlarının oranıdır. Konumu hesaplayan filtre \
+kendi hatasını da tahmin ediyor; bu tahmin yatayda 5,78 m'yi geçerse o \
+turda konum verilmiyor. 5,78 m, hataların %95'inin 10 m içinde kalmasına \
+karşılık gelen sınır: her eksende 10 / 2,45 = 4,08 m, iki eksen birlikte \
+4,08 x 1,41 = 5,78 m. Uydu sağlayıcılarının yayımladığı hizmet \
+kullanılabilirliği farklı test tanımlarına dayanır; yüzdeler aynı ölçü \
+gibi okunmamalıdır."""
+en = """YERKON availability is the share of ranging rounds whose position \
+came out reliable enough to hold the 10 m target. The filter that works \
+out the position also estimates its own error; where that estimate is \
+over 5,78 m across, the round gives no position. 5,78 m is the bound \
+that matches 95 % of errors within 10 m: 10 / 2,45 = 4,08 m on each \
+axis, 4,08 x 1,41 = 5,78 m for both together. The service availability \
+the satellite providers publish rests on different test definitions, and \
+the percentages must not be read as the same metric."""
 
 [note.tunnel-per-km]
 # A definition rather than a claim: it says what the cell is divided
@@ -655,10 +676,10 @@ Konum, radyo mesafe ölçümlerini ve haritadan gelen yüksekliği birleştiren 
 bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
 kullanılmamıştır. YERKON OPEX, yıllık işletme bedelidir: elektrik \
 (ticarethane tarifesi, Nisan 2026 zammıyla 5,62 TL/kWh), yenileme (vergi \
-amortisman ömürleri), bakım ve merkezî sistem. Bir bakım ziyareti, bir \
-ekip gününün (sepetli araç, usta ve yardımcı, 17570 TL) ekibin o yapıda \
-günde uğradığı birim sayısına bölünmüşüdür: şehirde 8 aydınlatma direği, \
-kırsalda 4 dağıtım direği, tünelde 4 birim. Merkezî sistem bir \
+amortisman ömürleri), bakım ve merkezî sistem. Bir bakım ziyaretinin \
+bedeli, bir ekip gününün (sepetli araç, usta ve yardımcı, 17570 TL) o gün \
+uğranan birim sayısına bölünmesiyle bulunuyor: şehirde 8 aydınlatma \
+direği, kırsalda 4 dağıtım direği, tünelde 4 birim. Merkezî sistem bir \
 yazılımcının haftada bir günü ve iki sunucudur, yılda 237000 TL, 1000 \
 birime yayılır. Kırsalda ve tünelde bakım kalemi arttı, çünkü bakım \
 ziyareti artık montajla aynı hızda (günde 4 birim) sayılıyor. Doğruluk ve \

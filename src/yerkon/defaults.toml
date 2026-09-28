@@ -420,18 +420,18 @@ provenance = "DESIGN"
 source = "bu proje, bir tasarım kararı olarak"
 source_en = "this project, as a design choice"
 note = """Kendi hattı olmayan bir birimin yıllık veri bedeli: sıfır, çünkü \
-birimlere SIM kartı konmuyor. Merkeze bağ, tünelde tünelin haberleşme \
-omurgasından, şehirde ışıklı kavşağın sinyal dolabından geçiyor. Geri \
-kalan birimleri, onlara karşı ölçüm yapan telefonlar ve araç alıcıları \
-izliyor: hangi birimin cevap verdiğini zaten biliyorlar, dolayısıyla cevap \
-vermeyen birim hattı olmadan da görünüyor."""
+birimlere SIM kartı konmuyor. Merkeze bağ, birimin takıldığı yapının \
+hattından geçiyor: tünelde tünelin haberleşme omurgası, şehirde ışıklı \
+kavşağın sinyal dolabı. Alıcılar GPS karıştırması ya da aldatması \
+gördüğünde bunu yakındaki yayın birimine iletiyor, birim de bu hattan \
+merkeze ulaştırıyor."""
 note_en = """What a year of data costs an anchor with no line of its own: \
 nothing, because no unit carries a SIM card. The tie to the centre runs \
-through the tunnel's own communications spine in a tunnel and a signalised \
-junction's cabinet in town. The other units are watched by the phones and \
-vehicle receivers that range against them: those already know which unit \
-answered, so a unit that stops answering shows up without a line of its \
-own."""
+over the line of the structure the unit is fitted to: the tunnel's own \
+communications spine in a tunnel, a signalised junction's cabinet in \
+town. When a receiver sees GPS jamming or spoofing it passes that to a \
+nearby broadcast unit, and the unit carries it to the centre over that \
+line."""
 affects = "kendi hattı olmayan direklerin OPEX'ini"
 affects_en = "OPEX of anchors with no line of their own"
 
@@ -476,8 +476,8 @@ source = "bu proje, bir işletme kararı olarak"
 source_en = "this project, as an operating choice"
 note = """Bir direğe yılda kaç kez gidildiği. Merkezî sistem her birimin \
 durumunu görüyor (rapor: yayın birimlerinin kayıtları izlenir), bu yüzden \
-ekip takvimle değil arıza olduğunda gider. Beş yılda bir arıza, kapalı bir \
-kart için kötümser bir sayı."""
+ekip takvimle değil arıza olduğunda gider. Kutusu kapalı, hareketli \
+parçası olmayan bir kart için beş yılda bir arıza kötümser bir sayı."""
 note_en = """How often an anchor is visited a year. The central system \
 sees every unit's status (the report: the units' records are monitored), \
 so a crew goes when one fails rather than by the calendar. One failure in \
@@ -506,7 +506,7 @@ unit = "TL/day"
 provenance = "DERIVED"
 source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
 source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
-note = """Montaj ve bakım ekibinin bir günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL (sertifikalı operatör kiraya dahil); usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Bir bakım ziyareti bunun, ekibin o yapıda günde uğradığı birim sayısına bölünmüşü: aydınlatma direğinde 17570 / 8 = 2196 TL, kırsaldaki dağıtım direğinde ve tünelde 17570 / 4 = 4392 TL. Çatıda sepetli araç yok: 6370 / 4 = 1592 TL."""
+note = """Montaj ve bakım ekibinin bir günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL (sertifikalı operatör kiraya dahil); usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Bir bakım ziyaretinin bedeli, ekip gününün o gün uğranan birim sayısına bölünmesiyle bulunuyor: aydınlatma direğinde 17570 / 8 = 2196 TL, kırsaldaki dağıtım direğinde ve tünelde 17570 / 4 = 4392 TL. Çatıda sepetli araç yok: 6370 / 4 = 1592 TL."""
 note_en = """A day of the fitting and maintenance crew: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL (a certified operator comes with the hire); electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. A maintenance visit is this divided by the sites the crew reaches on that structure in a day: 17570 / 8 = 2196 TL on a lighting column, 17570 / 4 = 4392 TL on a rural distribution pole and in a tunnel. A roof needs no bucket truck: 6370 / 4 = 1592 TL."""
 affects = "OPEX'in bakım kalemini; her senaryodaki en büyük tek kalem"
 affects_en = "OPEX, the maintenance line; the single largest line in every scenario"
