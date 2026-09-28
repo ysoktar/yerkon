@@ -2307,7 +2307,14 @@ LAW = Page(
                    "€, bir kerelik ([LCAS v1.0, Multicert, Haziran 2026]"
                    "(https://lcas.info/)). Birim merkeze bağlandığı için "
                    "RED Madde 3(3) siber güvenlik şartı (EN 18031) da "
-                   "kapsama girebilir; o kanıtın bedeli bu aralığın dışında.",
+                   "kapsama girebilir; o kanıtın bedeli bu aralığın dışında. "
+                   "Türkiye'de bu testleri akredite yapan laboratuvarlar "
+                   "var, örneğin [Ege Test Center]"
+                   "(https://www.egetestcenter.com/akredite-red-emc-testleri/) "
+                   "ve [TSE Elektroteknik Laboratuvarı]"
+                   "(https://www.tse.org.tr/deney-kalibrasyon-lak-yt-onaylanmis-laboratuvar-hizmetleri/); "
+                   "hiçbiri fiyat yayımlamıyor, bedel teklifle belli "
+                   "olacak.",
                    "Tests needed: EN 300 328 (radio), EN 301 489-1 and -17 "
                    "(electromagnetic compatibility), EN 62368-1 (safety) "
                    "and EN 62311 (human exposure to electromagnetic "
@@ -2317,7 +2324,13 @@ LAW = Page(
                    "(https://lcas.info/)). The unit is connected to the "
                    "centre, so the RED Article 3(3) cybersecurity "
                    "requirement (EN 18031) may apply as well; that "
-                   "evidence costs extra."),
+                   "evidence costs extra. Accredited laboratories in "
+                   "Türkiye run these tests, for instance [Ege Test Center]"
+                   "(https://www.egetestcenter.com/akredite-red-emc-testleri/) "
+                   "and the [TSE Electrotechnical Laboratory]"
+                   "(https://www.tse.org.tr/deney-kalibrasyon-lak-yt-onaylanmis-laboratuvar-hizmetleri/); "
+                   "none publishes a price, so the cost will come from a "
+                   "quotation."),
                 _w("Uyumlaştırılmış standartlar uygulanırsa Onaylanmış "
                    "Kuruluşa gitmek zorunlu değil: RED 2014/53/AB Madde "
                    "17(3), Ek II'deki iç üretim kontrolüne izin veriyor. "

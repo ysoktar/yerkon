@@ -776,6 +776,20 @@ label.en = "LCAS v1.0 (Multicert, June 2026): RED radio compliance, EN 300 328, 
 url = "https://lcas.info/"
 
 [[source]]
+key = "ege-test-center"
+group = "project"
+label.tr = "Ege Test Center: akredite RED ve EMC testleri (ETSI EN 300 328, EN 301 489-1, -3, -17, -52; EN 17025); fiyat yayımlamıyor, çevrim içi başvuruyla teklif"
+label.en = "Ege Test Center: accredited RED and EMC tests (ETSI EN 300 328, EN 301 489-1, -3, -17, -52; EN 17025); no published prices, quotation by online application"
+url = "https://www.egetestcenter.com/akredite-red-emc-testleri/"
+
+[[source]]
+key = "tse-deney"
+group = "project"
+label.tr = "TSE: deney, kalibrasyon ve onaylanmış laboratuvar hizmetleri (Elektroteknik Laboratuvarı Ankara ve Gebze; ücret laboratuvar hizmet profili sorgusundan)"
+label.en = "TSE: testing, calibration and approved laboratory services (Electrotechnical Laboratory, Ankara and Gebze; fees through the laboratory service profile query)"
+url = "https://www.tse.org.tr/deney-kalibrasyon-lak-yt-onaylanmis-laboratuvar-hizmetleri/"
+
+[[source]]
 key = "pana-direk"
 group = "project"
 label.tr = "Pana Bayrak Direği: TEDAŞ tipi galvaniz poligon direkler 6-15 m (6500-27500 TL), galvaniz direk 20 m 120000 TL, 30 m 475000 TL, Eylül 2026"
