@@ -436,7 +436,7 @@ other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-s
 # module can be chosen per run.
 [[product]]
 key = "sx1280-anchor"
-name.tr = "Frekans atlama belgesi olmayan yayın birimi (yalnız simülatörde)"
-name.en = "Broadcast unit without the hopping certificate (simulator only)"
+name.tr = "Frekans atlama belgesi olmayan yayın birimi"
+name.en = "Broadcast unit without the hopping certificate"
 parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
 other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]

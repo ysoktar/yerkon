@@ -233,6 +233,12 @@ def rows(published, language: str, table) -> str:
     return "".join(out)
 
 
+#: Products the model keeps but no row of the table uses: the plain
+#: module without the hopping certificate stays so a simulator run can
+#: choose it, and is left off the price tables (ADR-0094).
+UNSHOWN = {"sx1280-anchor"}
+
+
 def summary(language: str, table) -> str:
     """Each product at one, a hundred and a thousand."""
     from yerkon.bom import read
@@ -245,7 +251,7 @@ def summary(language: str, table) -> str:
     body = [
         [html.escape(board.name(language)), _tl(board.one_tl),
          _tl(board.hundred_tl), "<b>{}</b>".format(_tl(board.thousand_tl))]
-        for board in bill.boards.values()
+        for board in bill.boards.values() if board.key not in UNSHOWN
     ]
     return '<div class="scroll">{}</div>'.format(
         table([head] + body, numeric_from=1))
@@ -259,6 +265,8 @@ def parts(language: str, table) -> str:
     bill = read()
     out = []
     for board in bill.boards.values():
+        if board.key in UNSHOWN:
+            continue
         head = [_say(pair, language) for pair in (
             ("Parça", "Part"), ("Görevi", "What it does"),
             ("Satıcı", "Seller"), ("1 adet", "One"),
@@ -292,6 +300,57 @@ def parts(language: str, table) -> str:
     return "".join(out)
 
 
+#: The bibliography entries behind each figure on the list, so a source
+#: named in words is also a link a reader can open. A figure resting on
+#: this project's own choice has none.
+LINKS = {
+    "operating.crew_day_tl": ("sepetli-ankara", "yevmiye-2026"),
+    "operating.crew_size": ("yevmiye-2026",),
+    "mounting.rooftop.crew_day_tl": ("yevmiye-2026",),
+    "mounting.lighting_column.per_crew_day": ("dicle-surici",),
+    "mounting.distribution_pole.per_crew_day": ("dicle-surici",),
+    "mounting.tunnel_bracket.per_crew_day": ("dicle-surici",),
+    "mounting.rooftop.per_crew_day": ("dicle-surici",),
+    "mounting.tall_mast.per_crew_day": ("dicle-surici",),
+    "mounting.lighting_column.site_cost_tl": ("sepetli-ankara", "yevmiye-2026"),
+    "mounting.distribution_pole.site_cost_tl": ("sepetli-ankara", "yevmiye-2026"),
+    "mounting.rooftop.site_cost_tl": ("yevmiye-2026",),
+    "mounting.tunnel_bracket.site_cost_tl": ("sepetli-ankara", "yevmiye-2026"),
+    "mounting.tall_mast.site_cost_tl": ("pana-direk",),
+    "mounting.lighting_column.height_m": ("tedas-led-yol",),
+    "mounting.distribution_pole.height_m": ("tedas-beton-direk", "ekaty"),
+    "operating.anchor_kwh_per_year": ("semtech-sx1280-datasheet",),
+    "operating.electricity_tl_per_kwh": ("genel-aydinlatma", "forelektrik-2026",
+                                         "zam-nisan-2026"),
+    "operating.off_grid_supply_tl": ("akakce-panel", "akakce-battery",
+                                     "akakce-controller", "akakce-bracket",
+                                     "akakce-box", "solar-kablo-2026"),
+    "operating.extra_off_grid_visits_per_year": ("gib-amortisman",),
+    "operating.per_diem_tl": ("harcirah-kanunu", "gvk-24",
+                              "sbb-h-cetveli-2026"),
+    "operating.per_diem_share": ("harcirah-kanunu",),
+    "urban.crew_travels": ("harcirah-kanunu",),
+    "mounting.distribution_pole.rent_tl_per_year": (
+        "uab-gecis-hakki", "genel-aydinlatma", "direk-reklam",
+        "ibb-tariff-2025"),
+    "mounting.rooftop.rent_tl_per_year": ("ibb-tariff-2025", "tarim-orman-2025"),
+    "operating.service_life_years": ("gib-amortisman",),
+    "operating.battery_life_years": ("gib-amortisman",),
+    "operating.central_operation_tl_per_year": ("yazilimci-maaslari-2026",
+                                                "vds-2026"),
+}
+
+
+def _links(key: str, language: str) -> str:
+    from yerkon.sources import read
+
+    known = read().by_key
+    return " · ".join(
+        '<a href="{}">{}</a>'.format(html.escape(known[cited].url, quote=True),
+                                     html.escape(known[cited].said(language)))
+        for cited in LINKS.get(key, ()))
+
+
 def assumptions(language: str, table) -> str:
     """Every figure a cost rests on, grouped and numbered, one by one:
     what it is, its value, what kind of figure it is, how it was worked
@@ -318,7 +377,9 @@ def assumptions(language: str, table) -> str:
             entries.append(
                 "<li><p><b>{name}: {value}</b> <span class=\"kind\">"
                 "({kind})</span></p><p>{note}</p><p class=\"source\">{said}: "
-                "{source}</p></li>".format(
+                "{source}</p>{links}</li>".format(
+                    links=('<p class="source">{}</p>'.format(_links(key, language))
+                           if key in LINKS else ""),
                     name=html.escape(_say(name, language)),
                     value=html.escape((shown + " " + unit).strip()),
                     kind=html.escape(_say(KINDS[sourced.provenance], language)),

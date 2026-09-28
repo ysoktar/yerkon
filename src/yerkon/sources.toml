@@ -755,6 +755,20 @@ label.en = "Ministry of Agriculture and Forestry: 2025 base station rent rates (
 url = "https://www.tarimorman.gov.tr/DKMP/Belgeler/KORUNAN%20ALANLAR%20%C3%9CCRET%20TAR%C4%B0FES%C4%B0/2025/Ek-11%20Baz%20ve%20Radyo%20Verici%20%C4%B0stasyonlar%C4%B1%20Y%C4%B1ll%C4%B1k%20Kira%20Rayi%C3%A7%20Bedeli-2025-1.pdf"
 
 [[source]]
+key = "sbb-h-cetveli-2026"
+group = "rules"
+label.tr = "SBB: 7567 sayılı 2026 Merkezi Yönetim Bütçe Kanunu, H Cetveli (yurt içi gündelikler; 5-15. derece 850 TL)"
+label.en = "Presidency of Strategy and Budget: 2026 Central Government Budget Law No. 7567, Schedule H (domestic daily allowances; grades 5-15, 850 TL)"
+url = "https://www.sbb.gov.tr/wp-content/uploads/2025/12/8-H-Cetveli_2026Butcesi.pdf"
+
+[[source]]
+key = "gib-amortisman"
+group = "rules"
+label.tr = "GİB: amortisman oranları tablosu (3.49.4 telsiz cihaz ve sistemleri 10 yıl, 3.14.7 akümülatörler 5 yıl)"
+label.en = "Revenue Administration: depreciation rates table (3.49.4 radio equipment and systems 10 years, 3.14.7 accumulators 5 years)"
+url = "https://cdn.gib.gov.tr/api/gibportal-file/file/getFileResources?objectKey=arsiv/yardim-kaynaklar/yararli-bilgiler/AmortismanOranlariTablosu.pdf"
+
+[[source]]
 key = "pana-direk"
 group = "project"
 label.tr = "Pana Bayrak Direği: TEDAŞ tipi galvaniz poligon direkler 6-15 m (6500-27500 TL), galvaniz direk 20 m 120000 TL, 30 m 475000 TL, Eylül 2026"

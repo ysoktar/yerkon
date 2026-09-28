@@ -1090,3 +1090,23 @@ def test_a_straight_axis_starts_at_nought_on_round_steps():
     assert ticks[0] == 0 and ticks[-1] >= 9061 * 1.05
     steps = {round(b - a, 6) for a, b in zip(ticks, ticks[1:])}
     assert steps == {2000.0}
+
+
+def test_every_sourced_figure_on_the_cost_page_links_its_source():
+    """A source named in words only cannot be opened."""
+    from yerkon.settings import defaults_in
+    from yerkon.sources import read as read_sources
+    from yerkon.viewer.costing import GROUPS, LINKS
+
+    known = read_sources().by_key
+    settings = defaults_in("tr")
+    for _, items in GROUPS:
+        for key, _ in items:
+            for cited in LINKS.get(key, ()):
+                assert cited in known, (key, cited)
+            source = settings.sourced(key).source
+            if not source.startswith("bu proje") and "tasarım" not in source \
+                    and "bakım modeli" not in source:
+                assert key in LINKS, key
+    page = render(page_at("maliyet"), "tr", read())
+    assert known["dicle-surici"].url in html.unescape(page)
