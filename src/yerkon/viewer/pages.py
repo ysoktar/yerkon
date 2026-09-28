@@ -1482,14 +1482,15 @@ SIMULATION = Page(
                     "Bunların üstüne bir de gölgeleme biniyor: aynı "
                     "mesafedeki iki bağlantının, arada ne olduğuna göre "
                     "farklı çıkması. Yol açıkken 4 dB, kapalıyken 7,8 dB kadar "
-                    "(3GPP TR 38.901). Rastgele olduğu için tablo tek bir "
-                    "çekilişi değil, sekiz çekilişin hepsini birden "
-                    "gösteriyor.",
+                    "(3GPP TR 38.901). Rastgele olduğu için hesap sekiz kez "
+                    "tekrarlanıyor ve sekiz denemenin bütün sonuçları bir "
+                    "arada değerlendiriliyor.",
                     "Shadowing sits on top of those: two links the same "
                     "distance apart come out different depending on what "
                     "stands between. 4 dB with a clear path, about 7,8 dB without "
-                    "(3GPP TR 38.901). It is random, so the table pools "
-                    "all eight draws rather than showing one.",
+                    "(3GPP TR 38.901). It is random, so the calculation "
+                    "is repeated eight times and all the results of the "
+                    "eight are read together.",
                 ),
             ),
         ),
@@ -1680,12 +1681,14 @@ SIMULATION = Page(
                     "that street.",
                 ),
                 _w(
-                    "Arama kendi sayımını verir; karar simülasyonundur. "
+                    "Arama yerleri bulur ve kendi hızlı tahminini verir; o "
+                    "yerleşimin gerçek doğruluğunu simülasyon ölçer. "
                     "Önerilen yerleşimi uygulayıp **Simülasyonu çalıştır** "
                     "düğmesine basınca eski yerleşimle aynı yolculukta "
                     "karşılaştırılır.",
-                    "The search gives its own count; the simulation "
-                    "decides. Apply the proposed layout and press **Run the "
+                    "The search finds the places and gives its own quick "
+                    "estimate; the simulation measures how accurate that "
+                    "placement really is. Apply the proposed layout and press **Run the "
                     "simulation** to compare it with the layout it replaces "
                     "on the same journey.",
                 ),
@@ -1942,7 +1945,10 @@ COST = Page(
                     "oradadır ve belediyenin kameraları o hattı zaten "
                     "kullanıyor. Birimler merkeze takıldıkları yapının "
                     "hattından bağlanıyor; hiçbir birime SIM kartı "
-                    "konmuyor. Alıcılar GPS karıştırması ya da aldatması "
+                    "konmuyor. Her birim bu hattan merkeze düzenli "
+                    "aralıklarla kısa bir \"çalışıyorum\" mesajı (yaşam "
+                    "sinyali) gönderiyor; mesajı gelmeyen birim arızalı "
+                    "sayılıyor ve ekip gönderiliyor. Alıcılar GPS karıştırması ya da aldatması "
                     "gördüğünde bunu yakındaki yayın birimine iletiyor, "
                     "birim de bu hattan merkeze ulaştırıyor.",
                     "A structure gives two things: power and a line to the "
@@ -1951,7 +1957,10 @@ COST = Page(
                     "management centre, which the municipality's cameras "
                     "already use. The units reach the centre over the line "
                     "of the structure they are fitted to; no unit carries a "
-                    "SIM card. When a receiver sees GPS jamming or spoofing "
+                    "SIM card. Each unit sends the centre a short \"still "
+                    "working\" message over that line at regular intervals, "
+                    "and a unit whose message stops coming is taken as "
+                    "failed and a crew is sent. When a receiver sees GPS jamming or spoofing "
                     "it passes that to a nearby broadcast unit, and the "
                     "unit carries it to the centre over that line.",
                 ),
@@ -2866,7 +2875,7 @@ LANDSCAPE = _w(
 )
 LANDSCAPE_UNDER = _w(
     "Yatayda kilometrekare başına kurulum maliyeti, dikeyde yatay hata. "
-    "İkisi de logaritmik. Sola ve aşağıya doğru daha iyi: ucuz ve "
+    "İki eksen de sıfırdan başlıyor. Sola ve aşağıya doğru daha iyi: ucuz ve "
     "hassas. Uydu sistemlerinin paydası dünyanın bütün kara yüzeyi, "
     "YERKON'unki satırın kendi alanı. YERKON'un kırsal satırı uydu "
     "sistemlerinden ucuz, şehir içi satırı pahalı: şehirde binalar "
@@ -2877,7 +2886,7 @@ LANDSCAPE_UNDER = _w(
     "kilometreye bölünüyor, yani aynı eksene konamaz. Hem maliyetini "
     "hem doğruluğunu yayımlamayan sistem de çizilemedi.",
     "Capital per square kilometre across, horizontal error up, both "
-    "logarithmic. Left and down is better: cheap and precise. The "
+    "from nought. Left and down is better: cheap and precise. The "
     "satellite systems are divided by all the land on earth, YERKON by "
     "each row's own area. YERKON's rural row costs less than the "
     "satellite systems and its town row more: in town buildings cut the "
@@ -2961,23 +2970,25 @@ ACCURACY = _w("Yatay hata, en kötü %5 hariç (HPE P95)",
               "Horizontal error, worst 5 % excluded (HPE P95)")
 ACCURACY_UNDER = _w(
     "Sola doğru daha iyi. Oklu işaret, kaynağın \"en fazla şu kadar\" "
-    "dediği bir değer; gerçek değer okun gösterdiği yönde. Bir hücre iki "
-    "değer taşıyorsa (ortalama ve en kötü durum) nokta ilkinde durur ve "
-    "yazan da odur; ikincisi tablonun dipnotunda. Hücresi boş olan "
+    "dediği bir değer; gerçek değer okun gösterdiği yönde. İki değer "
+    "verilmişse (ortalama ve en kötü konum) nokta ortalamada duruyor, "
+    "ince çizgi en kötü konuma kadar uzanıyor. Eksen logaritmik, çünkü "
+    "değerler santimetreden on beş metreye uzanıyor. Hücresi boş olan "
     "sistem çizilmedi.",
     "Further left is better. A mark with an arrow is a value the source "
     "gave as \"at most this\"; the true value lies the way the arrow "
-    "points. Where a cell holds two "
-    "figures, an average and a worst case, the mark sits on the first "
-    "and prints it; the second is in the table's note. A system with an "
-    "empty cell is not drawn.",
+    "points. Where two figures are given, an average and a worst "
+    "place, the dot sits on the average and a thin line runs to the "
+    "worst. The axis is logarithmic because the figures run from "
+    "centimetres to fifteen metres. A system with an empty cell is not "
+    "drawn.",
 )
 
 
 def _marks(published, language: str, at: int):
     """Every system's figure for one column, ours among the others."""
     from yerkon import comparison
-    from yerkon.viewer.charts import Mark, figure_in
+    from yerkon.viewer.charts import Mark, figure_in, second_in
 
     table = comparison.read()
     out = []
@@ -2987,7 +2998,8 @@ def _marks(published, language: str, at: int):
         if figure is not None:
             out.append(Mark(label=row.system, figure=figure,
                             shown=figure.text,
-                            short=row.system.split()[0]))
+                            short=row.system.split()[0],
+                            second=second_in(cell)))
     for row in published.rows:
         cells = list(row.cells())
         # The two cost columns. A row priced by its length is not on
@@ -3055,12 +3067,13 @@ def _landscape(published, language: str) -> str:
         charts.scatter(
             points, title=LANDSCAPE.said(language),
             across_title="TL/km²", up_title="HPE P95 [m]",
+            logarithmic=False,
         ),
         LANDSCAPE_UNDER, language,
         narrow=charts.scatter(
             points, title=LANDSCAPE.said(language),
             across_title="TL/km²", up_title="HPE P95 [m]",
-            width=344.0, height=430.0, narrow=True,
+            width=344.0, height=430.0, narrow=True, logarithmic=False,
         ),
     )
 
@@ -3124,10 +3137,11 @@ def _cost(published, language: str) -> str:
     marks = _marks(published, language, 5)
     return _figure(
         charts.bars(marks, title=COST.said(language), unit="TL/km²",
-                    label_width=160.0),
+                    label_width=160.0, logarithmic=False),
         COST_UNDER, language,
         narrow=charts.bars(marks, title=COST.said(language), unit="TL/km²",
-                           width=344.0, label_width=96.0, narrow=True),
+                           width=344.0, label_width=96.0, narrow=True,
+                           logarithmic=False),
     )
 
 

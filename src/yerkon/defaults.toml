@@ -422,15 +422,19 @@ source_en = "this project, as a design choice"
 note = """Kendi hattı olmayan bir birimin yıllık veri bedeli: sıfır, çünkü \
 birimlere SIM kartı konmuyor. Merkeze bağ, birimin takıldığı yapının \
 hattından geçiyor: tünelde tünelin haberleşme omurgası, şehirde ışıklı \
-kavşağın sinyal dolabı. Alıcılar GPS karıştırması ya da aldatması \
+kavşağın sinyal dolabı. Her birim bu hattan merkeze düzenli aralıklarla \
+kısa bir "çalışıyorum" mesajı (yaşam sinyali) gönderiyor; mesajı gelmeyen \
+birim arızalı sayılıyor. Alıcılar GPS karıştırması ya da aldatması \
 gördüğünde bunu yakındaki yayın birimine iletiyor, birim de bu hattan \
 merkeze ulaştırıyor."""
 note_en = """What a year of data costs an anchor with no line of its own: \
 nothing, because no unit carries a SIM card. The tie to the centre runs \
 over the line of the structure the unit is fitted to: the tunnel's own \
 communications spine in a tunnel, a signalised junction's cabinet in \
-town. When a receiver sees GPS jamming or spoofing it passes that to a \
-nearby broadcast unit, and the unit carries it to the centre over that \
+town. Each unit sends the centre a short "still working" message over \
+that line at regular intervals, and a unit whose message stops coming is \
+taken as failed. When a receiver sees GPS jamming or spoofing it passes \
+that to a nearby broadcast unit, and the unit carries it to the centre over that \
 line."""
 affects = "kendi hattı olmayan direklerin OPEX'ini"
 affects_en = "OPEX of anchors with no line of their own"
@@ -475,12 +479,12 @@ provenance = "DESIGN"
 source = "bu proje, bir işletme kararı olarak"
 source_en = "this project, as an operating choice"
 note = """Bir direğe yılda kaç kez gidildiği. Merkezî sistem her birimin \
-durumunu görüyor (rapor: yayın birimlerinin kayıtları izlenir), bu yüzden \
-ekip takvimle değil arıza olduğunda gider. Kutusu kapalı, hareketli \
+durumunu görüyor (her birim düzenli bir yaşam sinyali gönderiyor), bu \
+yüzden ekip takvimle değil arıza olduğunda gider. Kutusu kapalı, hareketli \
 parçası olmayan bir kart için beş yılda bir arıza kötümser bir sayı."""
 note_en = """How often an anchor is visited a year. The central system \
-sees every unit's status (the report: the units' records are monitored), \
-so a crew goes when one fails rather than by the calendar. One failure in \
+sees every unit's status (each unit sends a regular "still working" \
+message), so a crew goes when one fails rather than by the calendar. One failure in \
 five years is a pessimistic figure for a sealed board."""
 affects = "her direğin OPEX'ini"
 affects_en = "OPEX of every anchor"

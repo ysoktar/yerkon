@@ -1067,3 +1067,26 @@ def test_the_home_page_quotes_the_bill_s_own_unit_prices():
     page = render(page_at(""), "tr", read())
     for key in ("amplified-anchor", "tunnel-anchor"):
         assert str(round(boards[key].thousand_tl)) in page, key
+
+
+def test_a_cell_with_two_figures_draws_a_line_to_the_second():
+    """GPS gives an average and a worst place; the worst is drawn, not
+    left to a footnote."""
+    from yerkon.viewer.charts import Mark, bars, figure_in, second_in
+
+    cell = "≤ 8 / ≤ 15"
+    paired = bars([Mark(label="GPS", figure=figure_in(cell),
+                        second=second_in(cell))], title="t", unit="m")
+    single = bars([Mark(label="GPS", figure=figure_in(cell))],
+                  title="t", unit="m")
+    assert paired.count("<line") > single.count("<line")
+    assert ">≤ 8 / ≤ 15<" in paired
+
+
+def test_a_straight_axis_starts_at_nought_on_round_steps():
+    from yerkon.viewer.charts import _nice_ticks
+
+    ticks = _nice_ticks(9061 * 1.05, 5)
+    assert ticks[0] == 0 and ticks[-1] >= 9061 * 1.05
+    steps = {round(b - a, 6) for a, b in zip(ticks, ticks[1:])}
+    assert steps == {2000.0}

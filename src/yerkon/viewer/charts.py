@@ -67,6 +67,12 @@ class Figure:
         return self.kind in ("at_most", "at_least", "over", "under")
 
 
+def second_in(cell: str) -> Optional[Figure]:
+    """The figure after the slash in a cell holding two, or nothing."""
+    head, slash, tail = cell.partition("/")
+    return figure_in(tail) if slash else None
+
+
 def figure_in(cell: str) -> Optional[Figure]:
     """The first figure a cell holds, or nothing.
 
@@ -105,6 +111,9 @@ class Mark:
     shown: str = ""
     #: What a phone calls it, where the full name will not fit.
     short: str = ""
+    #: The second figure of a cell holding two, such as an average and
+    #: a worst case. Drawn as a line from the first, not as a second dot.
+    second: Optional["Figure"] = None
 
     def named(self, narrow: bool) -> str:
         return (self.short or self.label) if narrow else self.label
@@ -115,6 +124,20 @@ def _tick_decades(low: float, high: float) -> list[float]:
     first = math.floor(math.log10(low))
     last = math.ceil(math.log10(high))
     return [10.0 ** power for power in range(int(first), int(last) + 1)]
+
+
+def _nice_ticks(high: float, count: int = 5) -> list[float]:
+    """Round steps from nought to at least `high` on a straight axis.
+
+    A step of 1, 2, 2,5 or 5 times a power of ten, so the gridlines
+    land on numbers somebody would write down.
+    """
+    raw = high / count
+    power = 10.0 ** math.floor(math.log10(raw))
+    step = next(power * k for k in (1.0, 2.0, 2.5, 5.0, 10.0)
+                if power * k >= raw)
+    top = step * math.ceil(high / step)
+    return [step * i for i in range(int(round(top / step)) + 1)]
 
 
 def _labelled(ticks: Sequence[float], place, stop: float,
@@ -200,8 +223,9 @@ def bars(marks: Sequence[Mark], *, title: str, unit: str,
     if not drawn:
         return ""
     drawn = sorted(drawn, key=lambda mark: mark.figure.value, reverse=True)
-    values = [mark.figure.value for mark in drawn]
-    row_height, gap, top, bottom = 26.0, 8.0, 34.0, 34.0
+    values = [mark.figure.value for mark in drawn] + [
+        mark.second.value for mark in drawn if mark.second is not None]
+    row_height, gap, top, bottom = 26.0, 8.0, 34.0, 48.0 if narrow else 34.0
     plot_left = label_width
     plot_width = width - plot_left - (58.0 if narrow else 92.0)
     height = top + len(drawn) * (row_height + gap) + bottom
@@ -217,12 +241,11 @@ def bars(marks: Sequence[Mark], *, title: str, unit: str,
             )
         ticks = _tick_decades(low, high)
     else:
-        high = max(values) * 1.12
-        low = 0.0
+        ticks = _nice_ticks(max(values) * 1.05, 4 if narrow else 5)
+        low, high = 0.0, ticks[-1]
 
         def across(value: float) -> float:
             return plot_left + plot_width * (value / high)
-        ticks = [high * step / 4 for step in range(5)]
 
     out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600")]
     # Gridlines first and hairline, so the data sits on top of them.
@@ -237,8 +260,10 @@ def bars(marks: Sequence[Mark], *, title: str, unit: str,
         )
         out.append(_text(at, height - bottom + 22, _said(tick), size=11,
                          anchor="middle"))
-    out.append(_text(width, height - bottom + 22, unit, size=11,
-                     anchor="end"))
+    # Under the last tick on a phone, where beside it the two run into
+    # each other.
+    out.append(_text(width, height - bottom + (36 if narrow else 22), unit,
+                     size=11, anchor="end"))
 
     for index, mark in enumerate(drawn):
         y = top + index * (row_height + gap) + 11
@@ -257,6 +282,20 @@ def bars(marks: Sequence[Mark], *, title: str, unit: str,
             'stroke="var(--line)" stroke-width="1"/>'.format(
                 plot_left, y, at - 7, y)
         )
+        # A cell holding two figures (an average and a worst case): a
+        # thin line from the first to the second with a stop at its end,
+        # so the worst case is seen rather than left to a footnote.
+        end = at
+        if mark.second is not None:
+            end = across(mark.second.value)
+            out.append(
+                '<line x1="{0:.1f}" y1="{2:.1f}" x2="{1:.1f}" y2="{2:.1f}" '
+                'stroke="{3}" stroke-width="2" stroke-opacity="0.55" '
+                'stroke-linecap="round"/>'
+                '<line x1="{1:.1f}" y1="{4:.1f}" x2="{1:.1f}" y2="{5:.1f}" '
+                'stroke="{3}" stroke-width="2" stroke-linecap="round"/>'
+                .format(at, end, y, colour, y - 5, y + 5)
+            )
         out.append(
             '<circle cx="{:.1f}" cy="{:.1f}" r="{}" fill="{}" '
             'stroke="var(--paper)" stroke-width="2"/>'.format(
@@ -273,7 +312,11 @@ def bars(marks: Sequence[Mark], *, title: str, unit: str,
                     -6 if back else 6, 6 if back else -6, colour)
             )
         shown = mark.shown or mark.figure.text or _said(mark.figure.value)
-        out.append(_text(at + (22 if mark.figure.bounded else 14), y + 4,
+        if mark.second is not None:
+            shown = "{} / {}".format(shown, mark.second.text
+                                     or _said(mark.second.value))
+        out.append(_text(max(at + (22 if mark.figure.bounded else 14),
+                             end + 12), y + 4,
                          shown, size=10 if narrow else 11, fill=lit,
                          weight=weight))
     return _frame(width, height, "".join(out), title)
@@ -281,8 +324,10 @@ def bars(marks: Sequence[Mark], *, title: str, unit: str,
 
 def scatter(points: Sequence[tuple[Mark, Figure]], *, title: str,
             across_title: str, up_title: str, width: float = 860.0,
-            height: float = 500.0, narrow: bool = False) -> str:
-    """Two measures against each other, both logarithmic, ours lit.
+            height: float = 500.0, narrow: bool = False,
+            logarithmic: bool = True) -> str:
+    """Two measures against each other, ours lit; logarithmic where the
+    figures run over decades, straight from nought where they do not.
 
     The one drawing that shows the trade the table is about: a system
     is precise because it covers a room, or wide because it covers a
@@ -299,27 +344,40 @@ def scatter(points: Sequence[tuple[Mark, Figure]], *, title: str,
         (38.0, 12.0, 40.0, 50.0) if narrow else (62.0, 20.0, 42.0, 54.0))
     plot_w = width - left - right
     plot_h = height - top - bottom
-    x_low, x_high = min(xs) / 6.0, max(xs) * 14.0
-    y_low, y_high = min(ys) / 2.4, max(ys) * 2.4
+    if logarithmic:
+        x_low, x_high = min(xs) / 6.0, max(xs) * 14.0
+        y_low, y_high = min(ys) / 2.4, max(ys) * 2.4
+        x_ticks = _tick_decades(x_low, x_high)
+        y_ticks = _tick_decades(y_low, y_high)
 
-    def across(value: float) -> float:
-        return left + plot_w * (
-            (math.log10(value) - math.log10(x_low))
-            / (math.log10(x_high) - math.log10(x_low))
-        )
+        def across(value: float) -> float:
+            return left + plot_w * (
+                (math.log10(value) - math.log10(x_low))
+                / (math.log10(x_high) - math.log10(x_low))
+            )
 
-    def up(value: float) -> float:
-        return top + plot_h * (
-            1 - (math.log10(value) - math.log10(y_low))
-            / (math.log10(y_high) - math.log10(y_low))
-        )
+        def up(value: float) -> float:
+            return top + plot_h * (
+                1 - (math.log10(value) - math.log10(y_low))
+                / (math.log10(y_high) - math.log10(y_low))
+            )
+    else:
+        x_ticks = _nice_ticks(max(xs) * 1.15, 4 if narrow else 5)
+        y_ticks = _nice_ticks(max(ys) * 1.15, 5)
+        x_low, x_high = 0.0, x_ticks[-1]
+        y_low, y_high = 0.0, y_ticks[-1]
+
+        def across(value: float) -> float:
+            return left + plot_w * (value / x_high)
+
+        def up(value: float) -> float:
+            return top + plot_h * (1 - value / y_high)
 
     out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600")]
-    inside = [t for t in _tick_decades(x_low, x_high)
-              if x_low <= t <= x_high]
+    inside = [t for t in x_ticks if x_low <= t <= x_high]
     across_labels = _labelled(inside, across, left + plot_w - 22.0,
                               44.0 if narrow else 54.0)
-    for tick in _tick_decades(x_low, x_high):
+    for tick in x_ticks:
         if tick < x_low or tick > x_high:
             continue
         at = across(tick)
@@ -331,7 +389,7 @@ def scatter(points: Sequence[tuple[Mark, Figure]], *, title: str,
         if tick in across_labels:
             out.append(_text(at, top + plot_h + 18, _said(tick), size=size,
                              anchor="middle"))
-    for tick in _tick_decades(y_low, y_high):
+    for tick in y_ticks:
         if tick < y_low or tick > y_high:
             continue
         at = up(tick)
@@ -378,6 +436,16 @@ def scatter(points: Sequence[tuple[Mark, Figure]], *, title: str,
                     moved = True
         if not moved:
             break
+    # A label must not cover another system's dot either: where it
+    # would, it goes above its own dot instead of beside it.
+    for one in laid:
+        for two in laid:
+            if one is two:
+                continue
+            inside = one["x0"] - 6 <= two["x"] <= one["x1"] + 6
+            if inside and abs(one["label_y"] - 4 - two["y"]) < size:
+                one["label_y"] = one["y"] - 10
+                break
 
     for spot in laid:
         mark, x, y = spot["mark"], spot["x"], spot["y"]
@@ -478,17 +546,16 @@ def spread(rows: Sequence[tuple[str, Figure, Figure, Optional[Figure]]], *,
     plot_left = label_width
     plot_width = width - plot_left - (58.0 if narrow else 92.0)
     height = top + len(drawn) * (row_height + gap) + bottom
-    low_end, high_end = min(values) / 1.5, max(values) * 1.5
-    span = math.log10(high_end) - math.log10(low_end)
+    # Straight from nought: the three rows sit within one decade, and a
+    # reader compares their lengths.
+    ticks = _nice_ticks(max(values) * 1.05, 4 if narrow else 5)
+    high_end = ticks[-1]
 
     def across(value: float) -> float:
-        return plot_left + plot_width * (
-            (math.log10(value) - math.log10(low_end)) / span)
+        return plot_left + plot_width * (value / high_end)
 
     out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600")]
-    for tick in _tick_decades(low_end, high_end):
-        if tick < low_end or tick > high_end:
-            continue
+    for tick in ticks:
         at = across(tick)
         out.append(
             '<line x1="{0:.1f}" y1="{1:g}" x2="{0:.1f}" y2="{2:.1f}" '
@@ -517,9 +584,20 @@ def spread(rows: Sequence[tuple[str, Figure, Figure, Optional[Figure]]], *,
                     across(figure.value), y,
                     "var(--chart-mark)" if filled else "var(--paper)")
             )
-        out.append(_text(across(high.value) + 13, y + 4,
-                         high.text or _said(high.value), size=11,
-                         fill="var(--ink)", weight="600"))
+        crowded = tall is not None and \
+            0 <= across(tall.value) - across(high.value) < 48
+        if crowded:
+            out.append(_text(across(high.value), y - 10,
+                             high.text or _said(high.value), size=11,
+                             anchor="middle", fill="var(--ink)",
+                             weight="600"))
+        else:
+            out.append(_text(across(high.value) + 13, y + 4,
+                             high.text or _said(high.value), size=11,
+                             fill="var(--ink)", weight="600"))
+        out.append(_text(across(low.value), y + 20,
+                         low.text or _said(low.value), size=11,
+                         anchor="middle", fill="var(--quiet)"))
         if tall is not None:
             at = across(tall.value)
             out.append(
