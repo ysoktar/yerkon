@@ -293,6 +293,20 @@ label.en = "Molina-Garcia-Pardo, Lienard, Degauque: Propagation in Tunnels, EURA
 url = "https://jwcn-eurasipjournals.springeropen.com/articles/10.1155/2009/560571"
 
 [[source]]
+key = "etsi-302065-1"
+group = "rules"
+label.tr = "ETSI EN 302 065-1 V2.1.1: genel amaçlı UWB"
+label.en = "ETSI EN 302 065-1 V2.1.1: generic UWB"
+url = "https://www.etsi.org/deliver/etsi_en/302000_302099/30206501/02.01.01_60/en_30206501v020101p.pdf"
+
+[[source]]
+key = "etsi-302065-2"
+group = "rules"
+label.tr = "ETSI EN 302 065-2 V2.1.1: UWB ile konum izleme"
+label.en = "ETSI EN 302 065-2 V2.1.1: UWB location tracking"
+url = "https://www.etsi.org/deliver/etsi_en/302000_302099/30206502/02.01.01_60/en_30206502v020101p.pdf"
+
+[[source]]
 key = "etsi-302065-3"
 group = "rules"
 label.tr = "ETSI EN 302 065-3 V2.1.1: kara ve demiryolu taşıtlarında UWB"
