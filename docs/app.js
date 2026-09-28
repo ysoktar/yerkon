@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=ecafa85d3d";
+import { decimal, say, speak, speaks } from "./words.js?v=08325285fd";
 
 /* The choices whose names are this page's to give.
  *
@@ -1671,8 +1671,8 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=ecafa85d3d";
-import * as pick from "./map.js?v=ecafa85d3d";
+import * as draw from "./draw.js?v=08325285fd";
+import * as pick from "./map.js?v=08325285fd";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -2721,6 +2721,17 @@ function showNumbers(drawn, result, pending) {
                `${tr(run.closure_m / 1000)} km`]);
   }
 
+  // Each unit against each group, with the radios, antennas and heights
+  // the run uses, both ways and over open ground: the most the pairing
+  // gives, where the group's reach above uses a stock antenna at both ends.
+  for (const pair of drawn.ranges || []) {
+    rows.push([say("result.unit_range", { unit: pair.unit, run: pair.run }),
+               pair.closes_m == null ? say("result.unit_range.none")
+                 : say("result.unit_range.value", {
+                     closes: tr(pair.closes_m / 1000),
+                     precise: tr(pair.precise_m / 1000) })]);
+  }
+
   rows.push([say("result.units"), (drawn.units || []).length]);
   // A dash for what does not exist, rather than a number computed from
   // nothing. An arrangement with no anchors has no round and no covered
@@ -2730,6 +2741,26 @@ function showNumbers(drawn, result, pending) {
   rows.push([say("result.round"),
              round ? `${tr(round * 1000, 0)} ms` : NOTHING]);
   rows.push([say("result.rate"), round ? `${tr(1 / round)} /s` : NOTHING]);
+
+  // How many receivers this arrangement carries at one fix a second.
+  // A fix is one exchange with each anchor of a round, and the round
+  // above is every unit's exchanges one after another on one channel,
+  // which is how the model runs: so a second holds units / round
+  // receivers. The ceiling lets every anchor answer at once, as it could
+  // on another hopping channel or far enough away: anchors × units /
+  // round, over the ground served (a corridor over its length).
+  const unitCount = (drawn.units || []).length;
+  const anchorCount = drawn.anchors.length;
+  const oneChannel = round && unitCount ? unitCount / round : null;
+  rows.push([say("result.capacity.one"),
+             oneChannel ? tr(oneChannel, 1) : NOTHING]);
+  const corridor = !(drawn.state && drawn.state.width_m > 0);
+  const extent = corridor
+    ? (drawn.state ? drawn.state.corridor_m / 1000 : null)
+    : (sweepData ? sweepData.served_km2 : null);
+  rows.push([say(corridor ? "result.capacity.busy_km" : "result.capacity.busy_km2"),
+             oneChannel && extent ? tr(anchorCount * oneChannel / extent, 1)
+               : (oneChannel && !corridor && !sweepData ? WORKING : NOTHING)]);
 
   // Both rows are always here, because a row that comes and goes moves
   // everything under it and reads as a change in the answer.

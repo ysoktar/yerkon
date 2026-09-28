@@ -365,6 +365,58 @@ def _bar_json(bar) -> Optional[dict]:
     }
 
 
+@lru_cache(maxsize=512)
+def _both_ways(pole: Terminal, unit: Terminal, region, target_sigma_m: float):
+    """How far a pole and a unit reach each other, over open ground.
+
+    Both ways: an exchange is a question and an answer, so a range
+    counts only where the pole reaches the unit and the unit's reply
+    reaches the pole. Flat ground with nothing on it, so the most this
+    pairing gives; the run itself stands on the real ground.
+    """
+    closes = min(closure_range_m(pole, unit, region=region),
+                 closure_range_m(unit, pole, region=region))
+    precise = min(
+        usable_range_m(pole, unit, pole.radio, target_sigma_m, region=region),
+        usable_range_m(unit, pole, pole.radio, target_sigma_m, region=region))
+    return closes, precise
+
+
+def unit_ranges(state: ViewState, deployment) -> list:
+    """Every unit against every group of anchors, with the radios,
+    antennas and heights the run itself uses.
+
+    Not the group's reach ring above it, which is quoted for a stock
+    antenna at both ends: this is what this unit and these anchors do.
+    A unit carrying no radio the group speaks gets no range.
+    """
+    from yerkon.ranging import share_a_waveform
+
+    if deployment is None:
+        return []
+    mounting_of, radio_of = state.catalogues()
+    out = []
+    for run in state.runs:
+        radio = chosen(radio_of, run.radio, "radio")
+        mounting = chosen(mounting_of, run.mounting, "mounting")
+        pole = Terminal(radio, deployment.antenna,
+                        (0.0, 0.0, float(mounting.height_m.value)))
+        for unit in deployment.receivers:
+            spoken = [r for r in unit.radios if share_a_waveform(radio, r)]
+            entry = {"run": run.identifier, "unit": unit.identifier,
+                     "radio": spoken[0].part if spoken else None,
+                     "antenna": unit.antenna.part,
+                     "closes_m": None, "precise_m": None}
+            if spoken:
+                me = Terminal(spoken[0], unit.antenna,
+                              (0.0, 0.0, unit.journey.antenna_height_m))
+                closes, precise = _both_ways(pole, me, deployment.region,
+                                             float(state.tolerance_m))
+                entry.update(closes_m=closes, precise_m=precise)
+            out.append(entry)
+    return out
+
+
 def scene(state: ViewState) -> dict:
     """Ground, road, anchors and units. Cheap enough to redraw on every drag."""
     terrain = state.terrain()
@@ -606,6 +658,7 @@ def scene(state: ViewState) -> dict:
         # nothing. There is no round when there is nothing to take a turn
         # at, and the panel draws a dash for what does not exist.
         "round_s": None if deployment is None else deployment.round_duration_s(),
+        "ranges": unit_ranges(state, deployment),
         "assumed": len(state.settings().assumed),
         "assumed_total": len(state.settings().entries),
         "state": state.as_json(),

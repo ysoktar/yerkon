@@ -511,6 +511,24 @@ export const SAY = {
   "result.units": { tr: "Alıcı sayısı", en: "Receivers" },
   "result.round": { tr: "Tur süresi", en: "Round" },
   "result.rate": { tr: "Konum sıklığı", en: "Fix rate" },
+  "result.unit_range": { tr: "{unit} ↔ {run}: menzil", en: "{unit} ↔ {run}: range" },
+  "result.unit_range.value": {
+    tr: "bağlantı {closes} km, hassas {precise} km",
+    en: "link {closes} km, precise {precise} km",
+  },
+  "result.unit_range.none": { tr: "ortak telsiz yok", en: "no shared radio" },
+  "result.capacity.one": {
+    tr: "En çok alıcı, tek kanal (saniyede 1 konum)",
+    en: "Most receivers, one channel (one fix a second)",
+  },
+  "result.capacity.busy_km2": {
+    tr: "En çok alıcı / km², her direk meşgul",
+    en: "Most receivers per km², every anchor busy",
+  },
+  "result.capacity.busy_km": {
+    tr: "En çok alıcı / km, her direk meşgul",
+    en: "Most receivers per km, every anchor busy",
+  },
   "result.reach": { tr: "{run}: menzil", en: "{run}: reach" },
   "result.closure": { tr: "{run}: kopma", en: "{run}: closure" },
   "result.reached": { tr: "Sinyalin ulaştığı alan",
