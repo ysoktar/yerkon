@@ -84,6 +84,21 @@ paneli, zemin seçimi, altıncı adımdaki yerleştirme araması ve en alttaki
   karolar isteniyor: en fazla 48 karoya sığan en ince düzey, sahanın
   kendi düzeyinin en çok üç üstü ve en fazla 19. Kızılay'da bu 0,9
   m/pikselden yaklaşık 0,2 m/piksele iniyor.
+- Fotoğraf her karenin üçgenlerine döşeniyor. Tek bir dönüşümle döşenen
+  kare, perspektifte köşelerinden birini tutturamıyordu ve yakında komşu
+  kareler arasında dikiş görünüyordu. Kareler ekranda ne kadar büyükse o
+  kadar alt kareye (en çok 8×8) ve her biri iki üçgene bölünüyor.
+- Sürüklerken de fotoğraf görünüyor. Durağan bir karede üçgen başına
+  süre ölçülüyor; sürükleme karesi, akıcı bir kareye (yaklaşık 20 ms)
+  sığan sayıda üçgeni ekranda en büyük karelerden başlayarak fotoğrafla
+  çiziyor, kalanı tek renk. Bütçe her karede süreye göre büyüyüp
+  küçülüyor: hızlı bir bilgisayarda neredeyse her kare, yavaş bir
+  cihazda en yakın kareler fotoğraflı.
+- Sahnenin köşesinde "Arka planda" paneli, motorun her işini, uzun
+  görevleri ve fotoğraf indirmelerini süresiyle gösteriyor. Tarayıcıda
+  motor soruları sırayla yanıtlıyor; sırada bekleyen iş, hangisinin
+  bitmesini beklediğini söylüyor. Birden fazla iş aynı anda çalışıyorsa
+  başlık kaç tane olduğunu yazıyor. 400 ms'den kısa işler gösterilmiyor.
 - Tarayıcının eski bir çizim dosyasını kullanmaması için simülatörün
   dosyaları, içeriklerinden hesaplanan bir sürüm etiketiyle
   isteniyor; bir dosya değişince adresi de değişiyor.

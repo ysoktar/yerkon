@@ -252,9 +252,64 @@ export function groundFaces(view, terrain, light, photo) {
           image: sheet.image,
           source: corners.map(point => sheet.pixelOf(point[0], point[1])),
           shade: 1 - lit,
+          // Triangles that follow the ground, where the whole quad is in
+          // front of the eye: see `slices`. Worked out only when the
+          // quad is actually laid with the picture, which a flat frame
+          // never asks for.
+          slice: corners.every(point => view.depthOf(point) >= NEAR)
+            ? most => slices(view, corners, sheet, most) : null,
         };
       }
       if (painted) out.push(painted);
+    }
+  }
+  return out;
+}
+
+/* A ground quad cut into triangles for the photograph to lie on.
+ *
+ * One affine map per quad is exact at three of its corners and wrong at
+ * the fourth, and a quad seen in perspective is not a parallelogram on
+ * screen: close to the ground, where one quad is hundreds of pixels
+ * across, neighbouring quads laid the picture down out of step and every
+ * edge showed as a seam. Two triangles share their corners exactly, so
+ * they meet without one; cutting a large quad into smaller ones keeps
+ * the perspective from bending the picture inside each. The cut follows
+ * how big the quad is on screen, so a far quad costs two triangles and
+ * only the few under the camera cost more.
+ */
+const SLICE_PX = 64;
+const MOST_SLICES = 8;
+
+function slices(view, corners, sheet, most = MOST_SLICES) {
+  const onScreen = corners.map(view.project);
+  if (onScreen.some(point => point === null)) return null;
+  let longest = 0;
+  for (let i = 0; i < 4; i++) {
+    const [a, b] = [onScreen[i], onScreen[(i + 1) % 4]];
+    longest = Math.max(longest, Math.hypot(b[0] - a[0], b[1] - a[1]));
+  }
+  const n = Math.min(most, Math.max(1, Math.ceil(longest / SLICE_PX)));
+  const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t,
+                             a[2] + (b[2] - a[2]) * t];
+  const grid = [];
+  for (let j = 0; j <= n; j++) {
+    const row = [];
+    for (let i = 0; i <= n; i++) {
+      const point = lerp(lerp(corners[0], corners[1], i / n),
+                         lerp(corners[3], corners[2], i / n), j / n);
+      const screen = view.project(point);
+      if (!screen) return null;
+      row.push({ screen, source: sheet.pixelOf(point[0], point[1]) });
+    }
+    grid.push(row);
+  }
+  const out = [];
+  for (let j = 0; j < n; j++) {
+    for (let i = 0; i < n; i++) {
+      const [a, b, c, d] = [grid[j][i], grid[j][i + 1], grid[j + 1][i + 1],
+                            grid[j + 1][i]];
+      out.push([a, b, c], [a, c, d]);
     }
   }
   return out;
@@ -553,7 +608,96 @@ export function ring(view, centre, radius, colour, bias = 0) {
  * the quad is drawn, not the whole sheet, which is what keeps ten
  * thousand of these to a frame a person does not wait for.
  */
+/* One triangle of the photograph, exact at its three corners.
+ *
+ * The clip is pushed out by under a pixel so that two triangles sharing
+ * an edge overlap on it; clipped exactly, each edge is antialiased on
+ * both sides and a faint line of the flat colour shows through. */
+function triangle(context, image, corners) {
+  const [s0, s1, s2] = corners.map(corner => corner.screen);
+  const [t0, t1, t2] = corners.map(corner => corner.source);
+  const u1 = [t1[0] - t0[0], t1[1] - t0[1]];
+  const u2 = [t2[0] - t0[0], t2[1] - t0[1]];
+  const det = u1[0] * u2[1] - u2[0] * u1[1];
+  if (Math.abs(det) < 1e-9) return;
+  const d1 = [s1[0] - s0[0], s1[1] - s0[1]];
+  const d2 = [s2[0] - s0[0], s2[1] - s0[1]];
+  const a = (d1[0] * u2[1] - d2[0] * u1[1]) / det;
+  const c = (d2[0] * u1[0] - d1[0] * u2[0]) / det;
+  const b = (d1[1] * u2[1] - d2[1] * u1[1]) / det;
+  const d = (d2[1] * u1[0] - d1[1] * u2[0]) / det;
+  const e = s0[0] - a * t0[0] - c * t0[1];
+  const f = s0[1] - b * t0[0] - d * t0[1];
+  const mx = (s0[0] + s1[0] + s2[0]) / 3;
+  const my = (s0[1] + s1[1] + s2[1]) / 3;
+  const out = point => {
+    const dx = point[0] - mx, dy = point[1] - my;
+    const length = Math.hypot(dx, dy) || 1;
+    return [point[0] + dx / length * 0.7, point[1] + dy / length * 0.7];
+  };
+  const left = Math.max(0, Math.floor(Math.min(t0[0], t1[0], t2[0])) - 1);
+  const top = Math.max(0, Math.floor(Math.min(t0[1], t1[1], t2[1])) - 1);
+  const right = Math.min(image.width, Math.ceil(Math.max(t0[0], t1[0], t2[0])) + 1);
+  const bottom = Math.min(image.height, Math.ceil(Math.max(t0[1], t1[1], t2[1])) + 1);
+  if (right <= left || bottom <= top) return;
+  context.save();
+  context.beginPath();
+  const [p0, p1, p2] = [out(s0), out(s1), out(s2)];
+  context.moveTo(p0[0], p0[1]);
+  context.lineTo(p1[0], p1[1]);
+  context.lineTo(p2[0], p2[1]);
+  context.closePath();
+  context.clip();
+  context.transform(a, b, c, d, e, f);
+  context.drawImage(image, left, top, right - left, bottom - top,
+                    left, top, right - left, bottom - top);
+  context.restore();
+}
+
+/* How large a quad has to be on screen before a moving frame lays the
+ * picture on it, and how finely it is cut then. Smaller than this a flat
+ * colour and the picture cannot be told apart, and a moving frame is
+ * one that has to be quick. */
+const MOVING_MIN_PX = 12;
+const MOVING_SLICES = 1;
+
+function longestSide(screen) {
+  let longest = 0;
+  for (let i = 0; i < screen.length; i++) {
+    const [a, b] = [screen[i], screen[(i + 1) % screen.length]];
+    longest = Math.max(longest, Math.hypot(b[0] - a[0], b[1] - a[1]));
+  }
+  return longest;
+}
+
 function textured(context, item) {
+  const moving = texturing.moving && !texturing.still;
+  if (moving && !item.pictured) return false;
+  const triangles = item.texture.slice
+    ? item.texture.slice(moving ? MOVING_SLICES : MOST_SLICES) : null;
+  if (triangles) {
+    context.beginPath();
+    context.moveTo(item.screen[0][0], item.screen[0][1]);
+    for (const point of item.screen.slice(1)) context.lineTo(point[0], point[1]);
+    context.closePath();
+    context.fillStyle = item.colour;
+    context.fill();
+    for (const corners of triangles) {
+      triangle(context, item.texture.image, corners);
+    }
+    texturing.drawn += triangles.length;
+    if (item.texture.shade > 0.01) {
+      context.beginPath();
+      context.moveTo(item.screen[0][0], item.screen[0][1]);
+      for (const point of item.screen.slice(1)) context.lineTo(point[0], point[1]);
+      context.closePath();
+      context.globalAlpha = item.texture.shade * 0.8;
+      context.fillStyle = "#000";
+      context.fill();
+      context.globalAlpha = 1;
+    }
+    return true;
+  }
   // Three of its corners fix the map: the first, the second and the
   // last, which for a quad are three of its four and for a roof any
   // three that are not in a line.
@@ -609,14 +753,47 @@ function textured(context, item) {
   return true;
 }
 
-/* Whether ground quads carrying a photograph are drawn with it. Off
- * while the camera moves, when a flat colour per quad keeps the frame
- * rate; the page turns it on once the view is still. */
-export const texturing = { on: false };
+/* Whether quads carrying a photograph are drawn with it.
+ *
+ * `still` is the frame painted once the camera stops: every quad, cut
+ * as finely as it needs. `moving` is a frame during a drag, where only
+ * the quads large enough to show the difference carry the picture and
+ * are cut coarsely; the page turns it on where such frames prove quick
+ * enough. With neither, every quad is its flat colour. */
+export const texturing = {
+  on: false, still: false, moving: false,
+  // How many triangles a moving frame may lay the picture on, largest
+  // quads first; the page sets it from how long they took to draw.
+  budget: 0,
+  // How many were drawn in the last frame, for the page to time.
+  drawn: 0,
+};
+
+/* Which quads a moving frame lays the picture on: the largest on screen
+ * first, until the budget is spent. The nearest ground is where the
+ * difference between a flat colour and the picture shows. */
+function chooseForMoving(items) {
+  const candidates = [];
+  for (const item of items) {
+    item.pictured = false;
+    if (item.kind !== "face" || !item.texture || !item.texture.slice) continue;
+    const size = longestSide(item.screen);
+    if (size >= MOVING_MIN_PX) candidates.push([size, item]);
+  }
+  candidates.sort((a, b) => b[0] - a[0]);
+  let left = texturing.budget;
+  for (const [, item] of candidates) {
+    if (left < 2) break;
+    item.pictured = true;
+    left -= 2;
+  }
+}
 
 export function paint(context, width, height, items) {
   context.clearRect(0, 0, width, height);
   items.sort((a, b) => b.depth - a.depth);
+  texturing.drawn = 0;
+  if (texturing.on && texturing.moving && !texturing.still) chooseForMoving(items);
   for (const item of items) {
     if (item.kind === "unit") {
       context.globalAlpha = 1;

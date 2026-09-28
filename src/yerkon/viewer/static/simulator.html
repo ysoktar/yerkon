@@ -394,6 +394,16 @@
   <span><i class="unit"></i><span data-say="legend.unit"></span></span>
 </div>
 
+<!--
+  Everything running behind the page, and what is waiting for what: the
+  browser's engine answers one question at a time, so a sweep asked for
+  during a simulation starts only when the simulation is done.
+-->
+<div id="activity" hidden role="status" aria-live="polite">
+  <h2 id="activity-head"></h2>
+  <ul id="activity-list"></ul>
+</div>
+
 <div id="status"></div>
 
 <script type="module" src="/app.js"></script>

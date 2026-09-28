@@ -715,6 +715,35 @@ i.prov.assumption { background: var(--warn); }
 #notice button { flex: 0 0 auto; padding: 4px 10px; font-size: 11px; }
 
 
+/* ---------- what is running in the background ---------- */
+
+#activity {
+  position: absolute;
+  right: 354px;
+  bottom: 12px;
+  z-index: 4;
+  min-width: 220px;
+  max-width: 340px;
+  padding: 8px 11px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(18, 24, 31, 0.16);
+  font-size: 11px;
+}
+#activity h2 { margin: 0 0 4px; font-size: 10px; }
+#activity ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+#activity li { display: grid; grid-template-columns: 10px 1fr auto; gap: 6px;
+  align-items: baseline; }
+#activity li .dot { width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); animation: pulse 1s ease-in-out infinite; }
+#activity li.waiting .dot { background: #b6c0ca; animation: none; }
+#activity li.waiting .what { color: #61707e; }
+#activity li .when { color: #8a97a3; font-variant-numeric: tabular-nums; }
+#activity li .why { grid-column: 2 / -1; color: #8a97a3; font-size: 10px; }
+@keyframes pulse { 50% { opacity: 0.3; } }
+
+
 /* ---------- the first-time path: a place, a layout, a run ---------- */
 
 #quick {
@@ -764,6 +793,8 @@ i.prov.assumption { background: var(--warn); }
   #legend-bands { gap: 1px; }
   #status { left: 8px; right: 8px; bottom: auto; top: calc(46dvh - 34px); }
   #notice { left: 8px; right: 8px; bottom: 8px; max-width: none; max-height: 34vh; }
+  #activity { right: 8px; bottom: auto; top: 8px; min-width: 0;
+    max-width: 50vw; font-size: 10px; padding: 5px 8px; }
   .sheet { width: calc(100vw - 24px); max-height: 86vh; padding: 16px; }
   .row { flex-wrap: wrap; }
   .map-bar { flex-wrap: wrap; }

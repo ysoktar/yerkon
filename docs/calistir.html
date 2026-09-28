@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YERKON</title>
-<link rel="stylesheet" href="style.css?v=abe541aa7d">
+<link rel="stylesheet" href="style.css?v=f9cc7d8530">
 </head>
 <body>
 
@@ -394,9 +394,19 @@
   <span><i class="unit"></i><span data-say="legend.unit"></span></span>
 </div>
 
+<!--
+  Everything running behind the page, and what is waiting for what: the
+  browser's engine answers one question at a time, so a sweep asked for
+  during a simulation starts only when the simulation is done.
+-->
+<div id="activity" hidden role="status" aria-live="polite">
+  <h2 id="activity-head"></h2>
+  <ul id="activity-list"></ul>
+</div>
+
 <div id="status"></div>
 
-<script src="local.js?v=abe541aa7d"></script>
-<script type="module" src="app.js?v=abe541aa7d"></script>
+<script src="local.js?v=f9cc7d8530"></script>
+<script type="module" src="app.js?v=f9cc7d8530"></script>
 </body>
 </html>

@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=abe541aa7d";
+import { decimal, say, speak, speaks } from "./words.js?v=f9cc7d8530";
 
 /* The choices whose names are this page's to give.
  *
@@ -76,11 +76,113 @@ async function ask(path, body) {
     ? { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body) }
     : {};
-  const response = await fetch(path, options);
-  const payload = await response.json();
-  if (!response.ok) throw new Error(payload.error || "engine refused");
-  return payload;
+  const done = doing(activityOf(path), path.split("?")[0]);
+  try {
+    const response = await fetch(path, options);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "engine refused");
+    return payload;
+  } finally {
+    done();
+  }
 }
+
+/* ---------- what is running in the background ----------
+ *
+ * Every question to the engine, every long task and every download of
+ * the photograph is listed while it runs, with how long it has taken.
+ * Only what lasts past `ACTIVITY_AFTER_MS` is shown, so a slider does not
+ * make the list blink. In the browser the engine answers one question at
+ * a time, and `local.js` says which is being answered; the rest are
+ * shown as waiting for it rather than as running side by side.
+ */
+const ACTIVITY_AFTER_MS = 400;
+const activity = new Map();
+let activityNext = 1;
+let activityTimer = null;
+//: The engine's queue as the browser's worker reports it, oldest first;
+//: null where the engine answers questions side by side.
+let engineQueue = null;
+
+/* Which phrase a question to the engine is shown under. The long tasks
+ * are listed by `watch` and `jobResult` for as long as they run, so the
+ * questions that start and poll them are not listed themselves. */
+function activityOf(path) {
+  const bare = path.split("?")[0];
+  const known = {
+    "/api/scene": "act.scene", "/api/apply": "act.apply",
+    "/api/propose": "act.propose", "/api/sweep": "act.sweep",
+    "/api/simulate": "act.simulate", "/api/simulate/pooled": "act.pooled",
+    "/api/ground": "act.ground", "/api/blocks": "act.blocks",
+    "/api/mode": "act.mode", "/api/figures": "act.figures",
+  };
+  if (bare === "/api/job" || bare === "/api/run") return null;
+  return known[bare] || "act.engine";
+}
+
+/* Start listing something; the function it returns takes it off. */
+function doing(key, path = "") {
+  if (!key) return () => {};
+  const id = activityNext++;
+  activity.set(id, { key, path, started: performance.now() });
+  setTimeout(drawActivity, ACTIVITY_AFTER_MS + 20);
+  return () => {
+    activity.delete(id);
+    drawActivity();
+  };
+}
+
+function drawActivity() {
+  const host = document.getElementById("activity");
+  const list = document.getElementById("activity-list");
+  if (!host || !list) return;
+  const now = performance.now();
+  const shown = [...activity.values()]
+    .filter(entry => now - entry.started >= ACTIVITY_AFTER_MS);
+  host.hidden = shown.length === 0;
+  clearInterval(activityTimer);
+  if (!shown.length) return;
+  // Once a second while anything is listed, for the seconds beside it.
+  activityTimer = setInterval(drawActivity, 1000);
+  // The one the engine is answering, where the engine answers in turn.
+  const answering = engineQueue && engineQueue.length
+    ? engineQueue[0].split("?")[0] : null;
+  // Named after what is listed for it: a long task is listed under its
+  // own name, not under the question that started it.
+  const answeringKey = answering
+    ? ((shown.find(entry => entry.path === answering) || {}).key
+       || activityOf(answering))
+    : null;
+  let running = 0;
+  list.innerHTML = "";
+  for (const entry of shown) {
+    const waiting = Boolean(engineQueue && entry.path.startsWith("/api/")
+      && answering && entry.path !== answering);
+    if (!waiting) running++;
+    const row = document.createElement("li");
+    row.className = waiting ? "waiting" : "";
+    row.innerHTML = '<i class="dot"></i><span class="what"></span>'
+      + '<span class="when"></span>';
+    row.querySelector(".what").textContent = say(entry.key);
+    row.querySelector(".when").textContent = say("act.seconds",
+      { n: Math.round((now - entry.started) / 1000) });
+    if (waiting && answeringKey) {
+      const why = document.createElement("span");
+      why.className = "why";
+      why.textContent = say("act.waits", { what: say(answeringKey) });
+      row.appendChild(why);
+    }
+    list.appendChild(row);
+  }
+  document.getElementById("activity-head").textContent = running > 1
+    ? say("act.together", { n: running }) : say("act.head");
+}
+
+// The browser's engine says what it is answering and what is waiting.
+window.addEventListener("yerkon-queue", event => {
+  engineQueue = event.detail || [];
+  drawActivity();
+});
 
 /* The line that tells you what just happened, and then stops.
  *
@@ -1569,8 +1671,8 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=abe541aa7d";
-import * as pick from "./map.js?v=abe541aa7d";
+import * as draw from "./draw.js?v=f9cc7d8530";
+import * as pick from "./map.js?v=f9cc7d8530";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1689,9 +1791,11 @@ function loadPhotograph() {
   const dropped = () => { if (stillWanted()) photograph = null; };
 
   if (aerial.tiles) {
+    const done = doing("act.photo");
     stitchTiles(aerial.tiles).then(sheet => {
+      done();
       if (stillWanted()) takePhotograph(sheet, aerial);
-    }, dropped);
+    }, () => { done(); dropped(); });
     return;
   }
 
@@ -1864,7 +1968,9 @@ function loadFinePhoto(box) {
                t.south_y].join(":");
   if ((finePhoto && finePhoto.key === key) || fineAsked === key) return;
   fineAsked = key;
+  const done = doing("act.fine");
   stitchTiles(t).then(sheet => {
+    done();
     if (fineAsked !== key) return;
     let pixels;
     try {
@@ -1880,7 +1986,7 @@ function loadFinePhoto(box) {
                                  chosen.extent, sheet),
     };
     render();
-  }, () => {});
+  }, done);
 }
 
 /* The streets over the ground being drawn, cut where it ends.
@@ -2036,6 +2142,42 @@ let framePending = false;
 let stillTimer = null;
 let stillFrame = false;
 
+/* How many triangles of the photograph a moving frame may draw.
+ *
+ * The photograph used to come off whenever anything moved, and every
+ * drag looked like it had failed. A moving frame now lays it on the
+ * largest quads on screen, as many as fit in a smooth frame. The number
+ * is set from what a still frame cost per triangle on this machine and
+ * then kept honest by every moving frame: slower than smooth and it
+ * shrinks, well inside it and it grows. A fast computer ends up drawing
+ * nearly every quad with the picture while moving; a slow phone draws
+ * the nearest ones. */
+const SMOOTH_MS = 20;
+const FEWEST_MOVING = 60;
+const MOST_MOVING = 20000;
+
+function timedPaint() {
+  const textured = draw.texturing.on && drawnPhotograph();
+  const started = performance.now();
+  paintScene();
+  const took = performance.now() - started;
+  if (!textured) return;
+  const drawn = draw.texturing.drawn;
+  if (draw.texturing.still) {
+    if (drawn > 0) {
+      const each = took / drawn;
+      draw.texturing.budget = Math.max(FEWEST_MOVING,
+        Math.min(MOST_MOVING, Math.floor(SMOOTH_MS * 0.8 / each)));
+    }
+  } else if (took > SMOOTH_MS * 1.3) {
+    draw.texturing.budget = Math.max(FEWEST_MOVING,
+      Math.floor(draw.texturing.budget * 0.7));
+  } else if (took < SMOOTH_MS * 0.6 && drawn >= draw.texturing.budget - 2) {
+    draw.texturing.budget = Math.min(MOST_MOVING,
+      Math.ceil(draw.texturing.budget * 1.25));
+  }
+}
+
 function render() {
   // Every path that redraws also reconsiders how fine the ground under
   // the camera should be. Cheap: it only resets a timer, and the window
@@ -2044,24 +2186,27 @@ function render() {
   scheduleStill();
   if (framePending) return;
   framePending = true;
-  requestAnimationFrame(() => { framePending = false; paintScene(); });
+  requestAnimationFrame(() => { framePending = false; timedPaint(); });
 }
 
-/* Flat colours while anything moves, the photograph once it stops.
+/* The picture on the large quads while moving, on every quad once still.
  *
- * Laying the picture across every quad is a clipped image draw apiece,
- * too slow to repeat on every step of a drag; a quarter of a second
- * after the last change the same frame is painted once more with it. */
+ * A quarter of a second after the last change the same frame is painted
+ * once more with the photograph laid across every quad, each cut as
+ * finely as its size on screen needs. */
 function scheduleStill() {
   if (stillFrame) return;
-  draw.texturing.on = false;
+  draw.texturing.on = true;
+  draw.texturing.moving = true;
+  draw.texturing.still = false;
   clearTimeout(stillTimer);
   stillTimer = setTimeout(() => {
     if (!drawnPhotograph()) return;
     stillFrame = true;
     draw.texturing.on = true;
-    paintScene();
-    draw.texturing.on = false;
+    draw.texturing.still = true;
+    timedPaint();
+    draw.texturing.still = false;
     stillFrame = false;
   }, 250);
 }
@@ -2722,6 +2867,15 @@ function logInto(host, job) {
 }
 
 async function watch(kind, body, host, render) {
+  const done = doing("act.run." + kind, "/api/run");
+  try {
+    return await watching(kind, body, host, render);
+  } finally {
+    done();
+  }
+}
+
+async function watching(kind, body, host, render) {
   const target = document.getElementById(host);
   target.innerHTML = '<p class="hint">Başlatılıyor…</p>';
   let job;
@@ -3447,6 +3601,15 @@ function wireQuick() {
 
 /* Run a long task and hand back what it returned, saying its last line. */
 async function jobResult(kind, body, onLine) {
+  const done = doing("act.run." + kind, "/api/run");
+  try {
+    return await jobOutcome(kind, body, onLine);
+  } finally {
+    done();
+  }
+}
+
+async function jobOutcome(kind, body, onLine) {
   let { job } = await ask("/api/run", Object.assign({ kind }, body));
   while (!job.done) {
     await new Promise(resume => setTimeout(resume, 1000));

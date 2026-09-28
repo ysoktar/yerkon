@@ -55,6 +55,12 @@
   };
   const waiting = new Map();
   let next = 1;
+  // What the worker is answering and what waits behind it, oldest first.
+  // It answers one question at a time, so the page can say which of its
+  // background work is running and which is queued behind it.
+  const queue = [];
+  const tell = () => window.dispatchEvent(
+    new CustomEvent("yerkon-queue", { detail: queue.map(entry => entry.path) }));
 
   // The cover stays until the page has its first real answer, not just
   // until Python is up: the first scene takes seconds of its own, and a
@@ -76,6 +82,8 @@
     }
     const settle = waiting.get(message.id);
     waiting.delete(message.id);
+    const at = queue.findIndex(entry => entry.id === message.id);
+    if (at >= 0) { queue.splice(at, 1); tell(); }
     if (settle) settle(message);
   };
 
@@ -83,6 +91,8 @@
     return new Promise(settle => {
       const id = next++;
       waiting.set(id, settle);
+      queue.push({ id, path });
+      tell();
       worker.postMessage({ id, method, path, body: body || "" });
     });
   }
