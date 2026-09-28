@@ -20,6 +20,7 @@ measurement this repository records, with the decision it came from.
 
 from __future__ import annotations
 
+import hashlib
 import html
 import pathlib
 import re
@@ -209,12 +210,12 @@ HOME = Page(
                 ),
                 _w(
                     "Bir yayın birimi 1000 adetlik üretimde, kutusu, "
-                    "baskılı devresi ve dizgisiyle 1382 ile 1680 lira "
-                    "arasında. Hedef, AUS "
+                    "baskılı devresi ve dizgisiyle yaklaşık 1400 ile 1700 "
+                    "lira arasında. Hedef, AUS "
                     "noktalarında zaten "
                     "duran elektrik ve haberleşme altyapısını yeniden "
                     "kullanmak; maliyeti aşağıda tutan da bu.",
-                    "A broadcast unit costs between 1382 and 1680 lira at "
+                    "A broadcast unit costs roughly 1400 to 1700 lira at "
                     "a thousand units, box, printed board and assembly "
                     "included. The aim is to reuse "
                     "the power and "
@@ -3389,17 +3390,40 @@ def browser_simulator() -> dict:
          '<script src="local.js"></script>\n'
          '<script type="module" src="app.js"></script>'),
     ))
+    # One tag from everything the page loads, put on every address it
+    # loads them by. GitHub Pages lets a browser keep a file ten minutes,
+    # so a fix went out and a visitor went on running the old drawing
+    # code beside the new page; a changed file now has a new address.
+    archive = package_zip()
+    digest = hashlib.sha256(archive)
+    for name in BROWSER_SCRIPTS:
+        digest.update((STATIC / name).read_bytes())
+    tag = "?v=" + digest.hexdigest()[:10]
+    page = _loose(page, (
+        ('href="style.css"', 'href="style.css{}"'.format(tag)),
+        ('<script src="local.js">', '<script src="local.js{}">'.format(tag)),
+        ('src="app.js"', 'src="app.js{}"'.format(tag)),
+    ))
     files = {BROWSER_SIMULATOR: page.encode("utf-8")}
     for name in BROWSER_SCRIPTS:
         body = (STATIC / name).read_bytes()
         if name == "app.js":
             body = _loose(body.decode("utf-8"), (
-                ('from "/words.js"', 'from "./words.js"'),
-                ('from "/draw.js"', 'from "./draw.js"'),
-                ('from "/map.js"', 'from "./map.js"'),
+                ('from "/words.js"', 'from "./words.js{}"'.format(tag)),
+                ('from "/draw.js"', 'from "./draw.js{}"'.format(tag)),
+                ('from "/map.js"', 'from "./map.js{}"'.format(tag)),
+            )).encode("utf-8")
+        elif name == "local.js":
+            body = _loose(body.decode("utf-8"), (
+                ('new Worker("sim-worker.js"',
+                 'new Worker("sim-worker.js{}"'.format(tag)),
+            )).encode("utf-8")
+        elif name == "sim-worker.js":
+            body = _loose(body.decode("utf-8"), (
+                ('fetch("yerkon.zip")', 'fetch("yerkon.zip{}")'.format(tag)),
             )).encode("utf-8")
         files[name] = body
-    files["yerkon.zip"] = package_zip()
+    files["yerkon.zip"] = archive
     return files
 
 

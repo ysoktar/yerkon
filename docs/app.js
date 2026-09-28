@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js";
+import { decimal, say, speak, speaks } from "./words.js?v=abe541aa7d";
 
 /* The choices whose names are this page's to give.
  *
@@ -1569,8 +1569,8 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js";
-import * as pick from "./map.js";
+import * as draw from "./draw.js?v=abe541aa7d";
+import * as pick from "./map.js?v=abe541aa7d";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1679,6 +1679,9 @@ function loadPhotograph() {
   if (aerial.url === photographUrl) return;
   photographUrl = aerial.url;
   photograph = null;
+  // The closer picture belonged to the ground before this one.
+  finePhoto = null;
+  fineAsked = "";
 
   // Another site's picture may have been asked for while this one was
   // in flight; the last one asked for is the one that belongs.
@@ -1773,9 +1776,111 @@ function stitchTiles(tiles) {
     (arrived.some(Boolean) ? sheet : Promise.reject(new Error("no tiles"))));
 }
 
-/* The photograph the painter should use this frame, if any. */
+/* The photograph the painter should use this frame, if any.
+ *
+ * With a finer picture of the ground under the camera in hand, one that
+ * hands each quad whichever of the two covers it: the finer one where it
+ * covers every corner, the site's own everywhere else. */
 function drawnPhotograph() {
-  return showPhotograph ? photograph : null;
+  if (!showPhotograph || !photograph) return null;
+  if (!finePhoto) return photograph;
+  const [west, south, east, north] = finePhoto.extent;
+  const covers = points => points.every(
+    ([x, y]) => x >= west && x <= east && y >= south && y <= north);
+  return Object.assign({}, photograph, {
+    pick: points => (covers(points) ? finePhoto.sampler : photograph),
+  });
+}
+
+/* ---------- a sharper photograph when the camera is close ----------
+ *
+ * The site's photograph is stitched once, at the zoom the fetch chose to
+ * keep it under two hundred tiles: about 0,9 m a pixel over a town and 7
+ * m over twenty kilometres of country. Close to the ground that is a
+ * blur. So when the camera is near enough that a finer mesh is asked for,
+ * the same provider is asked for finer tiles over the same window, at the
+ * finest zoom that fits `FINE_MOST_TILES`, and quads inside it take that
+ * picture instead.
+ */
+
+//: The most tiles a closer look asks for at once: 48 tiles is a sheet of
+//: about eight megabytes, and a few seconds on an ordinary connection.
+const FINE_MOST_TILES = 48;
+//: How many zooms past the site's own a closer look may go, and the
+//: finest the provider serves everywhere worth looking at.
+const FINE_STEPS = 3;
+const FINEST_ZOOM = 19;
+
+let finePhoto = null;
+let fineAsked = "";
+
+/* The tiles at `zoom` that cover `box`, and the ground they cover.
+ *
+ * Read off the site's own tiles: the sheet's edges are known in metres
+ * and in tile numbers, and over a few kilometres the mapping between the
+ * two is a straight line. */
+function tileWindow(aerial, box, zoom) {
+  const t = aerial.tiles;
+  const [w, s, e, n] = aerial.extent_m;
+  const scale = 2 ** (zoom - t.zoom);
+  const wide = (t.east_x - t.west_x + 1) * 256;
+  const high = (t.south_y - t.north_y + 1) * 256;
+  const pxX = x => (t.west_x * 256 + (x - w) / (e - w) * wide) * scale;
+  const pxY = y => (t.north_y * 256 + (n - y) / (n - s) * high) * scale;
+  const mX = px => w + (px / scale - t.west_x * 256) / wide * (e - w);
+  const mY = py => n - (py / scale - t.north_y * 256) / high * (n - s);
+  const west_x = Math.floor(pxX(box.west) / 256);
+  const east_x = Math.floor((pxX(box.east) - 1e-6) / 256);
+  const north_y = Math.floor(pxY(box.north) / 256);
+  const south_y = Math.floor((pxY(box.south) - 1e-6) / 256);
+  return {
+    tiles: { template: t.template, zoom, west_x, north_y, east_x, south_y },
+    extent: [mX(west_x * 256), mY((south_y + 1) * 256),
+             mX((east_x + 1) * 256), mY(north_y * 256)],
+    count: (east_x - west_x + 1) * (south_y - north_y + 1),
+  };
+}
+
+function loadFinePhoto(box) {
+  const aerial = aerialOf();
+  if (!box || !aerial || !aerial.tiles || !photograph) {
+    finePhoto = null;
+    fineAsked = "";
+    return;
+  }
+  let chosen = null;
+  const top = Math.min(FINEST_ZOOM, aerial.tiles.zoom + FINE_STEPS);
+  for (let zoom = top; zoom > aerial.tiles.zoom; zoom--) {
+    const window = tileWindow(aerial, box, zoom);
+    if (window.count <= FINE_MOST_TILES) { chosen = window; break; }
+  }
+  if (!chosen) {
+    finePhoto = null;
+    fineAsked = "";
+    return;
+  }
+  const t = chosen.tiles;
+  const key = [photographUrl, t.zoom, t.west_x, t.north_y, t.east_x,
+               t.south_y].join(":");
+  if ((finePhoto && finePhoto.key === key) || fineAsked === key) return;
+  fineAsked = key;
+  stitchTiles(t).then(sheet => {
+    if (fineAsked !== key) return;
+    let pixels;
+    try {
+      pixels = sheet.getContext("2d", { willReadFrequently: true })
+        .getImageData(0, 0, sheet.width, sheet.height).data;
+    } catch {
+      return;
+    }
+    finePhoto = {
+      key,
+      extent: chosen.extent,
+      sampler: draw.photoSampler(pixels, sheet.width, sheet.height,
+                                 chosen.extent, sheet),
+    };
+    render();
+  }, () => {});
 }
 
 /* The streets over the ground being drawn, cut where it ends.
@@ -2168,6 +2273,7 @@ function scheduleDetail() {
   clearTimeout(detailTimer);
   detailTimer = setTimeout(async () => {
     const box = visibleGround();
+    loadFinePhoto(box);
     if (!box) {
       // Pulled back far enough that the site's own mesh is the finer of
       // the two. Dropping it keeps one mesh on screen rather than a

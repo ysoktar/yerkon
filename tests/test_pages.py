@@ -998,8 +998,10 @@ def test_the_browser_simulator_asks_nothing_of_the_domain_root(tmp_path):
 
     files = browser_simulator()
     page = files["calistir.html"].decode("utf-8")
-    assert '<script src="local.js"></script>' in page
-    assert page.index("local.js") < page.index('src="app.js"'), (
+    # Each address carries the version tag (`?v=`), so a browser that
+    # kept yesterday's file asks for today's.
+    assert re.search(r'<script src="local\.js\?v=\w+"></script>', page)
+    assert page.index("local.js") < page.index('src="app.js'), (
         "the replacement fetch has to be in place before the page asks")
     for absolute in ('src="/', 'href="/style', 'href="/app'):
         assert absolute not in page, absolute
@@ -1060,13 +1062,14 @@ def test_the_socketless_answer_is_the_server_s_answer():
 
 
 def test_the_home_page_quotes_the_bill_s_own_unit_prices():
-    """The one price the home page writes out is the bill's, rounded."""
+    """The one price the home page writes out is the bill's, rounded to
+    the hundred, the way the deck and the form give it."""
     from yerkon.bom import read as bill
 
     boards = bill().boards
     page = render(page_at(""), "tr", read())
     for key in ("amplified-anchor", "tunnel-anchor"):
-        assert str(round(boards[key].thousand_tl)) in page, key
+        assert str(int(round(boards[key].thousand_tl, -2))) in page, key
 
 
 def test_a_cell_with_two_figures_draws_a_line_to_the_second():

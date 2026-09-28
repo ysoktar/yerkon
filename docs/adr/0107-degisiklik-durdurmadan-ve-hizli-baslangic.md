@@ -76,6 +76,22 @@ paneli, zemin seçimi, altıncı adımdaki yerleştirme araması ve en alttaki
   görmek için sahnedeki listeden «Yalnız zemin (uydu ve yollar)»
   seçilmesini söylüyor.
 
+- Fotoğraf, ekran ölçeği %125 ya da %150 olan ekranlarda karelere hiç
+  döşenmiyordu. Döşeme kodu, sayfanın ekran ölçeği için koyduğu dönüşümü
+  kendi dönüşümüyle değiştiriyordu; fotoğraf karenin dışına çiziliyor,
+  her kare tek renk kalıyordu. İki dönüşüm artık birleştiriliyor.
+- Kamera yaklaşınca aynı sağlayıcıdan, ekrandaki bölge için daha ince
+  karolar isteniyor: en fazla 48 karoya sığan en ince düzey, sahanın
+  kendi düzeyinin en çok üç üstü ve en fazla 19. Kızılay'da bu 0,9
+  m/pikselden yaklaşık 0,2 m/piksele iniyor.
+- Tarayıcının eski bir çizim dosyasını kullanmaması için simülatörün
+  dosyaları, içeriklerinden hesaplanan bir sürüm etiketiyle
+  isteniyor; bir dosya değişince adresi de değişiyor.
+- Sitedeki dört görsel PNG yerine WebP (1,5 MB yerine 216 KB); boyutları
+  sayfada yazılı ve aşağıdakiler gerektiğinde yükleniyor.
+- Ana sayfadaki fiyat, sunum ve formdaki gibi yuvarlak: 1000 adette
+  yaklaşık 1400-1700 lira (malzeme listesinde 1381,83 ve 1680,26).
+
 ## Sonuç
 
 Tablonun sayıları değişmiyor: hiçbir satırın modülü, yerleşimi ya da

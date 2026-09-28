@@ -234,7 +234,10 @@ export function groundFaces(view, terrain, light, photo) {
         sub(corners[1], corners[0]), sub(corners[3], corners[0]),
       ));
       const lit = 0.45 + 0.55 * Math.max(0, dot(normal, light));
-      const ink = (photo && photo.colourAt(
+      // The finer picture of the ground under the camera, where there is
+      // one and it covers the whole quad; the site's own picture otherwise.
+      const sheet = photo && photo.pick ? photo.pick(corners) : photo;
+      const ink = (sheet && sheet.colourAt(
         (xs[column] + xs[column + 1]) / 2, (ys[row] + ys[row + 1]) / 2,
       )) || BARE;
       const painted = face(
@@ -242,12 +245,12 @@ export function groundFaces(view, terrain, light, photo) {
         `rgb(${Math.round(ink[0] * lit)},${Math.round(ink[1] * lit)},${Math.round(ink[2] * lit)})`,
         1, 0.6,
       );
-      if (painted && photo && photo.image && painted.screen.length === 4) {
+      if (painted && sheet && sheet.image && painted.screen.length === 4) {
         // Where the quad's corners fall on the picture, so a still frame
         // can lay the photograph itself across it rather than one colour.
         painted.texture = {
-          image: photo.image,
-          source: corners.map(point => photo.pixelOf(point[0], point[1])),
+          image: sheet.image,
+          source: corners.map(point => sheet.pixelOf(point[0], point[1])),
           shade: 1 - lit,
         };
       }
@@ -299,17 +302,18 @@ export function blocks(view, list, light, photo, bias = 0) {
             [x + half, y + half], [x - half, y + half]];
     }
     const roof = at.map(([px, py]) => [px, py, top]);
-    const ink = (photo && photo.colourAt(x, y)) || WALL;
+    const sheet = photo && photo.pick ? photo.pick(roof) : photo;
+    const ink = (sheet && sheet.colourAt(x, y)) || WALL;
     const lit = 0.45 + 0.55 * Math.max(0, light[2]);
     const painted = face(
       view, roof,
       `rgb(${Math.round(ink[0] * lit)},${Math.round(ink[1] * lit)},${Math.round(ink[2] * lit)})`,
       1, 0.4, nearer,
     );
-    if (painted && photo && photo.image && painted.screen.length === roof.length) {
+    if (painted && sheet && sheet.image && painted.screen.length === roof.length) {
       painted.texture = {
-        image: photo.image,
-        source: roof.map(point => photo.pixelOf(point[0], point[1])),
+        image: sheet.image,
+        source: roof.map(point => sheet.pixelOf(point[0], point[1])),
         shade: 1 - lit,
       };
     }
