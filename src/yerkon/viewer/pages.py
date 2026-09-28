@@ -505,7 +505,7 @@ SYSTEM = Page(
                     "birimler arasında hassas bir ağ geneli zaman "
                     "senkronizasyonu ve bunu sağlayan ek altyapı "
                     "gerekebilir. Örneğin milyarda bir saniyenin altına "
-                    "inmek, birim başına yaklaşık 100 000 liralık atomik "
+                    "inmek, birim başına yaklaşık 100000 liralık atomik "
                     "saat ve IEEE 1588 PTP altyapısı demek. Çift yönlü "
                     "ölçümde bu ağ geneli senkronizasyona gerek yok: "
                     "sinyalin havada geçirdiği süre, birimle alıcı "
@@ -516,7 +516,7 @@ SYSTEM = Page(
                     "infrastructure to supply it, to reach the same "
                     "accuracy. Going below a billionth of a second, for "
                     "instance, means an atomic clock and IEEE 1588 PTP at "
-                    "roughly 100 000 lira a unit. Two way ranging needs no "
+                    "roughly 100000 lira a unit. Two way ranging needs no "
                     "network wide synchronisation: the time the signal "
                     "spends in the air comes out of one short "
                     "there-and-back between the unit and the receiver.",
@@ -2980,7 +2980,7 @@ WHEN_UNDER = _w(
     "gaps between them are closing.",
 )
 CLOCKS = (
-    ("~100 000 TL", _w("birim başına saat senkronizasyonu, TDoA",
+    ("~100000 TL", _w("birim başına saat senkronizasyonu, TDoA",
                        "clock synchronisation per unit, TDoA")),
     ("0 TL", _w("saat senkronizasyonu, YERKON (çift yönlü ölçüm)",
                 "clock synchronisation, YERKON (two way ranging)")),

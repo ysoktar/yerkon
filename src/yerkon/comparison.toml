@@ -686,9 +686,7 @@ bedeli, bir ekip gününün (sepetli araç, usta ve yardımcı, 17570 TL) o gün
 uğranan birim sayısına bölünmesiyle bulunuyor: şehirde 8 aydınlatma \
 direği, kırsalda 4 dağıtım direği, tünelde 4 birim. Merkezî sistem bir \
 yazılımcının haftada bir günü ve iki sunucudur, yılda 237000 TL, 1000 \
-birime yayılır. Kırsalda ve tünelde bakım kalemi arttı, çünkü bakım \
-ziyareti artık montajla aynı hızda (günde 4 birim) sayılıyor. Doğruluk ve \
-kullanılabilirlik değişmedi."""
+birime yayılır."""
 en = """YERKON CAPEX is the thousand unit bill of materials price of a \
 scenario's broadcast units plus what fitting each one costs (bracket, \
 labour and, where needed, a standalone supply), divided by the scenario's \
@@ -703,6 +701,4 @@ day (bucket truck, electrician and helper, 17570 TL) divided by the sites \
 the crew reaches on that structure in a day: 8 lighting columns in town, \
 4 distribution poles in open country, 4 units in a tunnel. The central \
 system is one day a week of a developer and two servers, 237000 TL a year \
-spread over 1000 units. In open country and the tunnel the maintenance line \
-rose, because a maintenance visit is now counted at the same pace as a \
-fitting (4 units a day). Accuracy and availability did not change."""
+spread over 1000 units."""
