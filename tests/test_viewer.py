@@ -772,13 +772,13 @@ def test_a_figure_edited_by_hand_is_still_an_assumption():
 def test_a_figure_given_a_source_stops_being_an_assumption():
     state = a_state().merged({
         "overrides": {
-            "mounting.tall_mast.site_cost_tl": {
-                "value": 5000.0, "source": "a quotation",
+            "mounting.tall_mast.height_m": {
+                "value": 20.0, "source": "a survey",
             }
         }
     })
     settings = state.settings()
-    assert not settings.entry("mounting.tall_mast.site_cost_tl").is_assumed
+    assert not settings.entry("mounting.tall_mast.height_m").is_assumed
     assert len(settings.assumed) == len(a_state().settings().assumed) - 1
 
 

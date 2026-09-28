@@ -178,7 +178,7 @@ def test_the_defaults_verb_lists_every_figure_nobody_supplied(capsys):
     assert defaults([]) == 0
     printed = capsys.readouterr().out
     assert "still assumptions" in printed
-    assert "mounting.tall_mast.site_cost_tl" in printed
+    assert "mounting.tall_mast.height_m" in printed
     assert "affects:" in printed
 
 
@@ -198,23 +198,24 @@ def test_the_defaults_verb_can_list_what_has_been_sourced(capsys, tmp_path):
     from yerkon.settings import DEFAULT_FILE
 
     text = pathlib.Path(DEFAULT_FILE).read_text(encoding="utf-8").replace(
-        '''[values."mounting.tall_mast.site_cost_tl"]
-value = 85000.0
-unit = "TL"
+        '''[values."mounting.tall_mast.height_m"]
+value = 25.0
+unit = "m"
 provenance = "ASSUMPTION"
 source = "bu proje"''',
-        '''[values."mounting.tall_mast.site_cost_tl"]
-value = 5000.0
-unit = "TL"
+        '''[values."mounting.tall_mast.height_m"]
+value = 20.0
+unit = "m"
 provenance = "MEASUREMENT"
-source = "a quotation"''',
+source = "a survey"''',
     )
+    assert "a survey" in text
     path = tmp_path / "sourced.toml"
     path.write_text(text, encoding="utf-8")
 
     assert defaults(["--file", str(path), "--sourced"]) == 0
     printed = capsys.readouterr().out
-    assert "mounting.tall_mast.site_cost_tl" in printed
+    assert "mounting.tall_mast.height_m" in printed
 
 
 def test_a_missing_defaults_file_is_refused_with_a_message(capsys):

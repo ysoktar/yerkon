@@ -292,6 +292,294 @@ volume.date = "25.09.2026"
 volume.note = "ILI9341, SPI, 240x320, kapasitif dokunmatik; 1000+ kademesi"
 # --- Products ---------------------------------------------------------------
 #
+# Kartın geri kalanı, parça parça (ADR-0103): raporun "diğer" satırının
+# yerine geçiyor. / The rest of the board, part by part (ADR-0103).
+
+[[part]]
+key = "hlk-5m12"
+name = "HI-LINK HLK-5M12"
+role.tr = "şebeke beslemesi, 230 V AC'den 12 V DC, 5 W"
+role.en = "mains supply, 230 V AC to 12 V DC, 5 W"
+usd = 2.8434
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C209908.html"
+volume.usd = 1.5877
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C209908.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "tps563200"
+name = "TI TPS563200DDCR"
+role.tr = "12 V'tan 3,3 V'a anahtarlamalı düşürücü, 3 A"
+role.en = "switching regulator, 12 V to 3,3 V, 3 A"
+usd = 1.026
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C97253.html"
+volume.usd = 0.6687
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C97253.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "smbj18a"
+name = "Littelfuse SMBJ18A"
+role.tr = "girişte aşırı gerilim koruması (TVS)"
+role.en = "input surge protection (TVS)"
+usd = 0.1492
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C151256.html"
+volume.usd = 0.103
+volume.tier = 500
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C151256.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "smbj33a"
+name = "Brightking SMBJ33A"
+role.tr = "araç girişinde aşırı gerilim koruması (TVS)"
+role.en = "surge protection on the vehicle input (TVS)"
+usd = 0.0719
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C78419.html"
+volume.usd = 0.0514
+volume.tier = 300
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C78419.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "mov-10d471k"
+name = "VDR-10D471K"
+role.tr = "şebeke tarafında varistör"
+role.en = "mains-side varistor"
+usd = 0.1185
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C316609.html"
+volume.usd = 0.0674
+volume.tier = 500
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C316609.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "ptc-0.5a"
+name = "PTTC SMD1206P050TF/15"
+role.tr = "kendini sıfırlayan sigorta, 500 mA"
+role.en = "resettable fuse, 500 mA"
+usd = 0.1006
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C106264.html"
+volume.usd = 0.0639
+volume.tier = 500
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C106264.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "ss34"
+name = "MDD SS34"
+role.tr = "ters kutup koruma diyodu"
+role.en = "reverse polarity diode"
+usd = 0.0352
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C8678.html"
+volume.usd = 0.0252
+volume.tier = 600
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C8678.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "kf301-2p"
+name = "Cixi Kefa KF301-5.0-2P"
+role.tr = "vidalı klemens, 2 uçlu (besleme ve servis)"
+role.en = "screw terminal, 2 way (supply and service)"
+usd = 0.1018
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C474881.html"
+volume.usd = 0.0629
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C474881.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "ipex-sma"
+name = "DreamLNK IPEX TO SMA"
+role.tr = "modülden kutu duvarındaki SMA'ya 20 cm anten kablosu"
+role.en = "20 cm cable from the module to the SMA on the box wall"
+usd = 1.0533
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C403729.html"
+volume.usd = 0.5431
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C403729.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "gainta-g203"
+name = "Gainta G203"
+role.tr = "dış ortam kutusu, 115x65x40 mm, IP65 (4,99 €)"
+role.en = "outdoor box, 115x65x40 mm, IP65 (4,99 €)"
+usd = 5.7994
+seller = "Gainta"
+url = "https://www.gainta.com/en/g203.html"
+
+[[part]]
+key = "gainta-g212"
+name = "Gainta G212"
+role.tr = "araç kutusu, 115x90x55 mm, IP65 (5,98 €)"
+role.en = "vehicle box, 115x90x55 mm, IP65 (5,98 €)"
+usd = 6.95
+seller = "Gainta"
+url = "https://www.gainta.com/en/g212.html"
+
+[[part]]
+key = "gainta-g517"
+name = "Gainta G517G(BC)-1"
+role.tr = "el tipi kutu, pil bölmeli, 92x66,5x21 mm (1,86 €)"
+role.en = "hand-held box with a battery bay, 92x66,5x21 mm (1,86 €)"
+usd = 2.1617
+seller = "Gainta"
+url = "https://www.gainta.com/en/g517gbc-1.html"
+
+[[part]]
+key = "passives"
+name = "Pasifler ve gösterge"
+role.tr = "10 x 100 nF, 10 x 10 kΩ, 3 x 10 µF, 2 x 22 µF, LED, düğme (LCSC C1525, C25744, C15850, C45783, C2286, C318884)"
+role.en = "10 x 100 nF, 10 x 10 kΩ, 3 x 10 µF, 2 x 22 µF, LED, button (LCSC C1525, C25744, C15850, C45783, C2286, C318884)"
+usd = 0.7908
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C1525.html"
+volume.usd = 0.4388
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C1525.html"
+volume.date = "28.09.2026"
+volume.note = "her parçanın 1000-2000 kademesi"
+
+[[part]]
+key = "pcb-2l"
+name = "JLCPCB iki katlı kart"
+role.tr = "baskılı devre kartı, iki kat, 100x100 mm'ye kadar"
+role.en = "printed circuit board, two layers, up to 100x100 mm"
+usd = 0.4
+seller = "JLCPCB"
+url = "https://jlcpcb.com/"
+
+[[part]]
+key = "smt"
+name = "JLCPCB dizgi"
+role.tr = "SMD dizgi: 150 lehim noktası x 0,0016 $, kurulum 8,18 $, şablon 1,53 $, 10 genişletilmiş parça x 3,07 $"
+role.en = "SMD assembly: 150 joints x 0,0016 $, setup 8,18 $, stencil 1,53 $, 10 extended parts x 3,07 $"
+usd = 8.322
+seller = "JLCPCB"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+volume.usd = 0.644
+volume.tier = 100
+volume.seller = "JLCPCB"
+volume.url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+volume.date = "28.09.2026"
+volume.note = "5 kartlık siparişte kurulum 5'e, 100 kartta 100'e bölünüyor"
+
+[[part]]
+key = "tp4056"
+name = "TOP POWER TP4056"
+role.tr = "LiPo şarj denetleyicisi"
+role.en = "LiPo charger"
+usd = 0.1867
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C16581.html"
+volume.usd = 0.0919
+volume.tier = 2500
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C16581.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "dw01a"
+name = "PUOLOP DW01A"
+role.tr = "pil koruma yongası"
+role.en = "battery protection IC"
+usd = 0.0249
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C351410.html"
+volume.usd = 0.0154
+volume.tier = 3000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C351410.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "fs8205"
+name = "Fortune FS8205"
+role.tr = "pil koruma MOSFET'leri"
+role.en = "battery protection MOSFETs"
+usd = 0.1825
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C32254.html"
+volume.usd = 0.0961
+volume.tier = 3000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C32254.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "usb-c"
+name = "Hroparts TYPE-C-31-M-12"
+role.tr = "USB-C şarj ve servis girişi"
+role.en = "USB-C charge and service port"
+usd = 0.1875
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C165948.html"
+volume.usd = 0.1044
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C165948.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "xc6206"
+name = "TOREX XC6206P332MR-G"
+role.tr = "3,3 V doğrusal düzenleyici"
+role.en = "3,3 V linear regulator"
+usd = 0.1439
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C5446.html"
+volume.usd = 0.094
+volume.tier = 500
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C5446.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "xl7015"
+name = "XLSEMI XL7015E1"
+role.tr = "araç beslemesinden (80 V'a kadar) 3,3 V'a düşürücü"
+role.en = "regulator from the vehicle supply (up to 80 V) to 3,3 V"
+usd = 0.5015
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C73013.html"
+volume.usd = 0.2328
+volume.tier = 1000
+volume.seller = "LCSC"
+volume.url = "https://www.lcsc.com/product-detail/C73013.html"
+volume.date = "28.09.2026"
+
+[[part]]
+key = "lipo-1000"
+name = "YDL 803040"
+role.tr = "LiPo pil, 3,7 V, 1000 mAh"
+role.en = "LiPo cell, 3,7 V, 1000 mAh"
+usd = 4.27
+seller = "YDL Battery"
+url = "https://ydlbattery.com/products/50pcs-3-7v-1000mah-803040-lithium-polymer-battery"
+
 # `report` is the line of page 14 the product is priced from, with its
 # two totals. `was` is what that line contains; `parts` is what goes in
 # now. The difference is priced at one unit and carried to 100 and 1000
@@ -311,6 +599,7 @@ was = ["lambda80-24s", "w24p-u", "stm32g0b1met6", "atecc608b"]
 # row of the table uses it now (ADR-0094); it stays for the simulator,
 # where a module can be chosen per run.
 parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
+other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "amplified-anchor"
@@ -326,6 +615,7 @@ was = ["e28-2g4m27s", "stm32g0b1met6", "atecc608b"]
 # rubber duck on the box's own connector (ADR-0094, ADR-0099). The town used the 12,5 dBm
 # module with a 12 dBi mast antenna on a cable (ADR-0091).
 parts = ["e28-2g4m20s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
+other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "tunnel-anchor"
@@ -337,6 +627,7 @@ report_one_tl = 2241.42
 report_hundred_tl = 1634.44
 was = ["dwm3000-digikey", "stm32g0b1met6", "atecc608b"]
 parts = ["dwm3000-lcsc", "stm32g031k8t6", "atecc608b"]
+other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "gainta-g203", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "pedestrian"
@@ -348,6 +639,7 @@ report_one_tl = 3913.16
 report_hundred_tl = 3117.74
 was = ["lambda80-24s", "dwm3000-digikey", "esp32-s3", "bno085", "atecc608b"]
 parts = ["e28-2g4m12s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b"]
+other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "gainta-g517", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "vehicle"
@@ -361,3 +653,5 @@ was = ["lambda80-24s", "dwm3000-digikey", "stm32g0b1met6", "bno085",
        "atecc608b", "tcan1051", "nhd-2.8"]
 parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
          "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151"]
+other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-sma", "gainta-g212", "passives", "pcb-2l", "smt"]
+

@@ -718,3 +718,73 @@ group = "project"
 label.tr = "Akakçe: 12 V 7 Ah kuru akü (en ucuz 524,40 TL), Eylül 2026"
 label.en = "Akakçe: 12 V 7 Ah sealed battery (cheapest 524,40 TL), September 2026"
 url = "https://www.akakce.com/kesintisiz-guc-kaynagi-akusu.html"
+
+[[source]]
+key = "tedas-led-yol"
+group = "rules"
+label.tr = "TEDAŞ: LED'li yol aydınlatma tasarımına ilişkin usul ve esaslar, Ağustos 2022 (Ek-1: yol sınıfına göre direk boyu 6-14 m)"
+label.en = "TEDAŞ: rules for LED road lighting design, August 2022 (annex 1: column height 6 to 14 m by road class)"
+url = "https://www.tedas.gov.tr/FileUpload/MediaFolder/c09a508b-c5f8-4b60-bb0c-e907e7438670.pdf"
+
+[[source]]
+key = "tedas-beton-direk"
+group = "rules"
+label.tr = "TEDAŞ-MLZ/99-34: santrifüj betonarme direk imalatı teknik şartnamesi, Eylül 2017 (boylar 9,3-25 m)"
+label.en = "TEDAŞ-MLZ/99-34: spun concrete pole specification, September 2017 (lengths 9,3 to 25 m)"
+url = "https://www.tedas.gov.tr/FileUpload/MediaFolder/8aef4429-1647-4a50-9a9e-a44250bc486f.pdf"
+
+[[source]]
+key = "ekaty"
+group = "rules"
+label.tr = "Elektrik Kuvvetli Akım Tesisleri Yönetmeliği (iletkenlerin haberleşme hatlarına en küçük düşey uzaklığı: alçak gerilimde 1 m, orta gerilimde 2,5 m)"
+label.en = "Regulation on Electrical Power Installations (least vertical distance to communication lines: 1 m at low voltage, 2,5 m at medium voltage)"
+url = "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=9949&MevzuatTur=7&MevzuatTertip=5"
+
+[[source]]
+key = "yaklasim-mesafeleri"
+group = "rules"
+label.tr = "Eltes Mühendislik: hava hattı yaklaşım mesafeleri çizelgesi (yönetmelik çizelgesinin aktarımı)"
+label.en = "Eltes Mühendislik: overhead line approach distances (the regulation's table reproduced)"
+url = "https://www.eltesmuhendislik.com.tr/icerik/teknik-bilgiler/havai-hat-yaklasim-mesafeleri.pdf"
+
+[[source]]
+key = "tarim-orman-2025"
+group = "rules"
+label.tr = "Tarım ve Orman Bakanlığı: 2025 baz istasyonu yıllık kira rayiç bedelleri (yer seçim ücreti 27503,44 TL; 3194 sayılı Kanun Ek 9/7 üst sınırı)"
+label.en = "Ministry of Agriculture and Forestry: 2025 base station rent rates (site selection fee 27503,44 TL; cap of Law 3194, Additional Article 9(7))"
+url = "https://www.tarimorman.gov.tr/DKMP/Belgeler/KORUNAN%20ALANLAR%20%C3%9CCRET%20TAR%C4%B0FES%C4%B0/2025/Ek-11%20Baz%20ve%20Radyo%20Verici%20%C4%B0stasyonlar%C4%B1%20Y%C4%B1ll%C4%B1k%20Kira%20Rayi%C3%A7%20Bedeli-2025-1.pdf"
+
+[[source]]
+key = "pana-direk"
+group = "project"
+label.tr = "Pana Bayrak Direği: TEDAŞ tipi galvaniz poligon direkler 6-15 m (6500-27500 TL), galvaniz direk 20 m 120000 TL, 30 m 475000 TL, Eylül 2026"
+label.en = "Pana Bayrak Direği: TEDAŞ-type galvanised polygonal columns 6 to 15 m (6500 to 27500 TL), galvanised pole 20 m 120000 TL, 30 m 475000 TL, September 2026"
+url = "https://www.panabayrakdiregi.com/urun/12-metre-tek-konsol-ad1-120-10-konsol-boyu-1-metre-yeni-tedas-galvaniz-poligon-sokak-aydinlatma-diregi/"
+
+[[source]]
+key = "palmiye-direk"
+group = "project"
+label.tr = "Palmiye Aydınlatma: 2026 aydınlatma direği fiyatları (galvaniz yol direği 8-10 m, 14000-28000 TL)"
+label.en = "Palmiye Aydınlatma: 2026 lighting column prices (galvanised road column 8 to 10 m, 14000 to 28000 TL)"
+url = "https://www.palmiyeaydinlatma.com.tr/aydinlatma-direk-fiyatlari/"
+
+[[source]]
+key = "gainta"
+group = "project"
+label.tr = "Gainta: IP65 kutular G203 (115x65x40 mm, 4,99 €), G212 (115x90x55 mm, 5,98 €), el tipi G517G(BC)-1 (1,86 €)"
+label.en = "Gainta: IP65 boxes G203 (115x65x40 mm, 4,99 €), G212 (115x90x55 mm, 5,98 €), hand-held G517G(BC)-1 (1,86 €)"
+url = "https://www.gainta.com/en/g203.html"
+
+[[source]]
+key = "jlcpcb-smt"
+group = "project"
+label.tr = "JLCPCB: dizgi fiyatları (lehim noktası 0,0016 $, kurulum 8,18 $, şablon 1,53 $, genişletilmiş parça 3,07 $), 9 Eylül 2026"
+label.en = "JLCPCB: assembly prices (0,0016 $ a joint, setup 8,18 $, stencil 1,53 $, extended part 3,07 $), 9 September 2026"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+
+[[source]]
+key = "ydl-lipo"
+group = "project"
+label.tr = "YDL Battery: 803040 LiPo, 3,7 V, 1000 mAh (4,27 $)"
+label.en = "YDL Battery: 803040 LiPo, 3,7 V, 1000 mAh (4,27 $)"
+url = "https://ydlbattery.com/products/50pcs-3-7v-1000mah-803040-lithium-polymer-battery"

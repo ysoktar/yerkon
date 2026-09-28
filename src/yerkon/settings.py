@@ -348,8 +348,10 @@ def _like(entry: Entry, given) -> "float | str":
 
 def _edited(entry: Entry, edit: Edit) -> Entry:
     was = entry.sourced
+    # A number typed without a source is somebody's guess, whatever the
+    # figure it replaced rested on.
     provenance = (
-        Provenance.MEASUREMENT if edit.source.strip() else was.provenance
+        Provenance.MEASUREMENT if edit.source.strip() else Provenance.ASSUMPTION
     )
     return Entry(
         key=entry.key,

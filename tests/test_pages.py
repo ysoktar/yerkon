@@ -892,7 +892,8 @@ def test_a_part_nobody_can_draw_is_an_error_rather_than_a_blank():
 
 
 def test_what_the_town_s_structures_save_is_what_the_model_prices():
-    """ADR-0077, ADR-0079. The one counterfactual the results page quotes.
+    """ADR-0077, ADR-0079, ADR-0103. The one counterfactual the cost page
+    quotes.
 
     A unit on a lighting column against the same unit on a mast raised
     for it. The record has no run of a town on masts, so the page cannot
@@ -911,10 +912,10 @@ def test_what_the_town_s_structures_save_is_what_the_model_prices():
                + float(DEFAULT_RATES.off_grid_supply_tl.value))
     assert ratio_on_masts() == round(on_mast / on_column)
 
-    page = render(page_at("sonuclar"), "tr")
+    page = render(page_at("maliyet"), "tr")
     for figure in (on_column, on_mast):
         assert decimal_comma(figure, 2) in page
-    assert "{} kat".format(ratio_on_masts()) in page
+    assert "{} katı".format(ratio_on_masts()) in page
 
 
 def test_every_cost_cell_is_the_last_line_of_its_breakdown():

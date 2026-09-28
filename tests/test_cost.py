@@ -377,13 +377,25 @@ def test_receivers_are_counted_apart_from_the_infrastructure():
 # --- Saying what it rests on ----------------------------------------------
 
 
+def an_assumed_inventory(count=13):
+    """Sites whose fitting cost nobody supplied: what the share counts."""
+    from dataclasses import replace
+
+    from yerkon.evidence import Sourced
+
+    guessed = replace(TALL_MAST, site_cost_tl=Sourced(
+        85000.0, "TL", Provenance.ASSUMPTION, "test", note="a guessed mast"))
+    return Inventory(anchors=tuple(site(guessed) for _ in range(count)),
+                     service_area_km2=57.2, route_km=24.0)
+
+
 def test_a_costing_says_how_much_of_itself_nobody_supplied():
-    costing = price(an_inventory())
+    costing = price(an_assumed_inventory())
     assert costing.assumed_share > 0.9
 
 
 def test_the_structures_line_carries_the_weakest_provenance_under_it():
-    costing = price(an_inventory())
+    costing = price(an_assumed_inventory())
     structures = next(
         item for item in costing.capital
         if item.label == "structures and installation"
@@ -394,7 +406,7 @@ def test_the_structures_line_carries_the_weakest_provenance_under_it():
 def test_the_description_warns_before_it_is_quoted():
     from yerkon.numbers import decimal_comma
 
-    costing = price(an_inventory())
+    costing = price(an_assumed_inventory())
     printed = costing.describe()
     assert "rests on figures nobody supplied" in printed
     assert "(assumed)" in printed

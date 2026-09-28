@@ -22,7 +22,7 @@ LINES = {
     "standalone power": ("Şebeke dışı besleme", "Standalone power"),
     "energy": ("Elektrik", "Electricity"),
     "connectivity": ("Veri hattı", "Data plans"),
-    "structure rent": ("Direk kirası", "Pole rent"),
+    "structure rent": ("Kira", "Rent"),
     "replacement": ("Yenileme", "Replacement"),
     "maintenance": ("Bakım", "Maintenance"),
     "central operation": ("Merkezî işletme payı", "Share of central operation"),
@@ -65,57 +65,86 @@ ROWS = (
     ("tunnel", ("Tünel", "Tunnel")),
 )
 
-#: Every figure a cost rests on, in the order a reader meets them.
-ASSUMED = (
-    ("operating.crew_day_tl",
-     ("Bir ekip günü", "One crew day")),
-    ("mounting.lighting_column.per_crew_day",
-     ("Aydınlatma direği, günde", "Lighting columns a day")),
-    ("mounting.distribution_pole.per_crew_day",
-     ("Kırsal dağıtım direği, günde", "Rural distribution poles a day")),
-    ("mounting.tunnel_bracket.per_crew_day",
-     ("Tünel, günde", "Tunnel units a day")),
-    ("mounting.rooftop.per_crew_day",
-     ("Çatı, günde", "Roofs a day")),
-    ("mounting.lighting_column.site_cost_tl",
-     ("Aydınlatma direğine montaj", "Fitting to a lighting column")),
-    ("mounting.tall_mast.site_cost_tl",
-     ("25 m direk dikmek", "Raising a 25 m mast")),
-    ("mounting.distribution_pole.height_m",
-     ("Dağıtım direğinde yükseklik", "Height on a distribution pole")),
-    ("mounting.distribution_pole.site_cost_tl",
-     ("Dağıtım direğine montaj", "Fitting to a distribution pole")),
-    ("mounting.distribution_pole.rent_tl_per_year",
-     ("Dağıtım direği kirası, yıllık", "Distribution pole rent, a year")),
-    ("mounting.tunnel_bracket.site_cost_tl",
-     ("Tünel askısı", "Tunnel bracket")),
-    ("operating.off_grid_supply_tl",
-     ("Güneş paneli ve akü", "Solar panel and battery")),
-    ("operating.electricity_tl_per_kwh",
-     ("Elektrik birim fiyatı", "Electricity tariff")),
-    ("operating.anchor_kwh_per_year",
-     ("Bir birimin yıllık tüketimi", "One unit's yearly consumption")),
-    ("operating.connectivity_tl_per_year",
-     ("Hücresel veri hattı, yıllık", "Cellular data line, a year")),
-    ("urban.junction_every",
-     ("Işıklı kavşak aralığı", "Signalised junction spacing")),
-    ("operating.service_life_years",
-     ("Birimin ömrü", "A unit's service life")),
-    ("operating.maintenance_visits_per_year",
-     ("Yıllık bakım ziyareti", "Maintenance visits a year")),
-    ("operating.extra_off_grid_visits_per_year",
-     ("Şebeke dışı ek ziyaret", "Extra off-grid visits")),
-    ("operating.crew_size",
-     ("Bakım ekibi", "Maintenance crew")),
-    ("operating.per_diem_tl",
-     ("Harcırah, kişi başı gündelik", "Per diem, a person a day")),
-    ("operating.per_diem_share",
-     ("Günübirlik görevde gündeliğin payı", "Share of it on a day trip")),
-    ("operating.central_operation_tl_per_year",
-     ("Merkezî sistem, yıllık", "Central system, a year")),
-    ("operating.anchors_sharing_central_operation",
-     ("Merkezî sistemi paylaşan birim", "Units sharing the centre")),
+#: Every figure a cost rests on, grouped, in the order a reader meets
+#: them: who does the work and what a day of it costs, how many sites
+#: that day covers, what fitting a unit costs, how high it stands, what
+#: it draws, how often it is visited, what is rented, and how long it
+#: lasts.
+GROUPS = (
+    (("Ekip ve ekip günü", "The crew and its day"), (
+        ("operating.crew_day_tl", ("Bir ekip günü", "One crew day")),
+        ("operating.crew_size", ("Bakım ekibi", "Maintenance crew")),
+        ("mounting.rooftop.crew_day_tl",
+         ("Çatıda bir ekip günü", "A crew day on roofs")),
+    )),
+    (("Ekibin bir günde uğradığı birim", "Sites a crew covers in a day"), (
+        ("mounting.lighting_column.per_crew_day",
+         ("Aydınlatma direği", "Lighting columns")),
+        ("mounting.distribution_pole.per_crew_day",
+         ("Kırsal dağıtım direği", "Rural distribution poles")),
+        ("mounting.tunnel_bracket.per_crew_day", ("Tünel", "Tunnel")),
+        ("mounting.rooftop.per_crew_day", ("Çatı", "Roofs")),
+        ("mounting.tall_mast.per_crew_day", ("Dikilen direk", "Raised masts")),
+    )),
+    (("Montaj", "Fitting"), (
+        ("mounting.lighting_column.site_cost_tl",
+         ("Aydınlatma direğine montaj", "Fitting to a lighting column")),
+        ("mounting.distribution_pole.site_cost_tl",
+         ("Dağıtım direğine montaj", "Fitting to a distribution pole")),
+        ("mounting.rooftop.site_cost_tl", ("Çatıya montaj", "Fitting to a roof")),
+        ("mounting.tunnel_bracket.site_cost_tl",
+         ("Tünel askısı", "Tunnel bracket")),
+        ("mounting.tall_mast.site_cost_tl",
+         ("Direk dikmek", "Raising a mast")),
+    )),
+    (("Birimin yüksekliği", "How high the unit stands"), (
+        ("mounting.lighting_column.height_m",
+         ("Aydınlatma direğinde", "On a lighting column")),
+        ("mounting.distribution_pole.height_m",
+         ("Dağıtım direğinde", "On a distribution pole")),
+        ("mounting.rooftop.height_m", ("Çatıda", "On a roof")),
+        ("mounting.tall_mast.height_m", ("Dikilen direkte", "On a raised mast")),
+    )),
+    (("Enerji", "Power"), (
+        ("operating.anchor_kwh_per_year",
+         ("Bir birimin yıllık tüketimi", "One unit's yearly consumption")),
+        ("operating.electricity_tl_per_kwh",
+         ("Elektrik birim fiyatı", "Electricity tariff")),
+        ("operating.off_grid_supply_tl",
+         ("Güneş paneli ve akü", "Solar panel and battery")),
+    )),
+    (("Bakım ve harcırah", "Maintenance and per diem"), (
+        ("operating.maintenance_visits_per_year",
+         ("Yıllık bakım ziyareti", "Maintenance visits a year")),
+        ("operating.extra_off_grid_visits_per_year",
+         ("Şebeke dışı ek ziyaret", "Extra off-grid visits")),
+        ("operating.per_diem_tl",
+         ("Harcırah, kişi başı gündelik", "Per diem, a person a day")),
+        ("operating.per_diem_share",
+         ("Günübirlik görevde gündeliğin payı", "Share of it on a day trip")),
+    )),
+    (("Kira ve veri hattı", "Rent and data"), (
+        ("mounting.distribution_pole.rent_tl_per_year",
+         ("Dağıtım direği kirası, yıllık", "Distribution pole rent, a year")),
+        ("mounting.rooftop.rent_tl_per_year",
+         ("Çatı kirası, yıllık", "Roof rent, a year")),
+        ("operating.connectivity_tl_per_year",
+         ("Hücresel veri hattı, yıllık", "Cellular data line, a year")),
+        ("urban.junction_every",
+         ("Işıklı kavşak aralığı", "Signalised junction spacing")),
+    )),
+    (("Ömür ve merkezî sistem", "Service life and the central system"), (
+        ("operating.service_life_years", ("Birimin ömrü", "A unit's service life")),
+        ("operating.battery_life_years", ("Akünün ömrü", "The battery's life")),
+        ("operating.central_operation_tl_per_year",
+         ("Merkezî sistem, yıllık", "Central system, a year")),
+        ("operating.anchors_sharing_central_operation",
+         ("Merkezî sistemi paylaşan birim", "Units sharing the centre")),
+    )),
 )
+
+#: The same figures as one flat list, for whatever counts them.
+ASSUMED = tuple(item for _, items in GROUPS for item in items)
 
 #: How much weight each kind of figure carries, said plainly.
 KINDS = {
@@ -218,40 +247,67 @@ def summary(language: str, table) -> str:
 
 
 def parts(language: str, table) -> str:
-    """Every part of every product, with who sells it and for how much."""
+    """Every part of every product, with who sells it and for how much,
+    at one unit and at a thousand, the rest of the board included."""
     from yerkon.bom import read
 
     bill = read()
     out = []
     for board in bill.boards.values():
         replaced = {came.key: gone for gone, came in board.swapped}
+        carried = board.hundred_over_one * board.thousand_over_hundred
         head = [_say(pair, language) for pair in (
             ("Parça", "Part"), ("Görevi", "What it does"),
             ("Satıcı", "Seller"), ("Rapordaki karşılığı", "In the report"),
-            ("1 adet", "One"),
+            ("1 adet", "One"), ("1000 adette", "At a thousand"),
         )]
-        body = []
-        for part in board.parts:
-            gone = replaced.get(part.key)
-            body.append([
-                html.escape(part.name), html.escape(part.role(language)),
+
+        def row(part, count, gone=None):
+            name = part.name if count == 1 else "{} x {}".format(count, part.name)
+            return [
+                html.escape(name), html.escape(part.role(language)),
                 '<a href="{}">{}</a>'.format(
                     html.escape(part.url, quote=True), html.escape(part.seller)),
                 html.escape("{}, {}, {} USD".format(
                     gone.name, gone.seller, decimal_comma(gone.usd, 2)))
                 if gone else "",
-                "{} USD".format(decimal_comma(part.usd, 2)),
+                "{} USD".format(decimal_comma(count * part.at(1, 1.0), 2)),
+                "{} USD".format(decimal_comma(count * part.at(1000, carried), 2)),
+            ]
+
+        body = [row(part, 1, replaced.get(part.key)) for part in board.parts]
+        body += [row(part, count) for part, count in board.others]
+        if board.others:
+            body.append([
+                html.escape(_say(("Raporun \"diğer\" kalanı", "The report's \"other\" remainder"),
+                                 language)),
+                html.escape(_say((
+                    "karşılaştırma için; toplama girmiyor",
+                    "for comparison; not added in"), language)),
+                html.escape(_say(("raporun toplamından", "from the report's total"),
+                                 language)),
+                "",
+                "{} USD".format(decimal_comma(board.other_usd, 2)),
+                "{} USD".format(decimal_comma(board.other_usd * carried, 2)),
+            ])
+        else:
+            body.append([
+                html.escape(_say(("Diğer", "Other"), language)),
+                html.escape(_say((
+                    "güç dönüşümü, koruma, bağlantı, kutu",
+                    "power conversion, protection, connectors, enclosure",
+                ), language)),
+                html.escape(_say(("raporun toplamından", "from the report's total"),
+                                 language)),
+                "",
+                "{} USD".format(decimal_comma(board.other_usd, 2)),
+                "{} USD".format(decimal_comma(board.other_usd * carried, 2)),
             ])
         body.append([
-            html.escape(_say(("Diğer", "Other"), language)),
-            html.escape(_say((
-                "güç dönüşümü, koruma, bağlantı, kutu",
-                "power conversion, protection, connectors, enclosure",
-            ), language)),
-            html.escape(_say(("raporun toplamından", "from the report's total"),
-                             language)),
-            "",
-            "{} USD".format(decimal_comma(board.other_usd, 2)),
+            "<b>{}</b>".format(html.escape(_say(("Toplam", "Total"), language))),
+            "", "", "",
+            "<b>{}</b>".format(_tl(board.one_tl)),
+            "<b>{}</b>".format(_tl(board.thousand_tl)),
         ])
         out.append("<h3>{}</h3>{}".format(
             html.escape(board.name(language)),
@@ -261,30 +317,37 @@ def parts(language: str, table) -> str:
 
 
 def assumptions(language: str, table) -> str:
-    """Every figure a cost rests on, what it is and where it came from."""
+    """Every figure a cost rests on, grouped and numbered, one by one:
+    what it is, its value, what kind of figure it is, how it was worked
+    out and where it came from."""
     from yerkon.settings import defaults_in
 
     settings = defaults_in(language)
-    head = [_say(pair, language) for pair in (
-        ("Varsayım", "Figure"), ("Değer", "Value"),
-        ("Dayanağı", "What it rests on"), ("Ne demek", "What it means"),
-    )]
-    body = []
-    for key, name in ASSUMED:
-        sourced = settings.sourced(key)
-        value = float(sourced.value)
-        shown = decimal_comma(value, 2 if value != int(value) else 0)
-        body.append([
-            html.escape(_say(name, language)),
-            html.escape("{} {}".format(
-                shown, _say(UNITS.get(sourced.unit, (sourced.unit, sourced.unit)),
-                            language))),
-            html.escape("{}: {}".format(
-                _say(KINDS[sourced.provenance], language), sourced.source)),
-            html.escape(sourced.note),
-        ])
-    return '<div class="scroll">{}</div>'.format(
-        table([head] + body, numeric_from=1))
+    out = []
+    number = 0
+    for title, items in GROUPS:
+        entries = []
+        start = number + 1
+        for key, name in items:
+            number += 1
+            sourced = settings.sourced(key)
+            value = float(sourced.value)
+            shown = decimal_comma(value, 2 if value != int(value) else 0)
+            unit = _say(UNITS.get(sourced.unit, (sourced.unit, sourced.unit)),
+                        language)
+            entries.append(
+                "<li><p><b>{name}: {value} {unit}</b> <span class=\"kind\">"
+                "({kind})</span></p><p>{note}</p><p class=\"source\">{said}: "
+                "{source}</p></li>".format(
+                    name=html.escape(_say(name, language)),
+                    value=html.escape(shown), unit=html.escape(unit),
+                    kind=html.escape(_say(KINDS[sourced.provenance], language)),
+                    note=html.escape(sourced.note),
+                    said=html.escape(_say(("Kaynak", "Source"), language)),
+                    source=html.escape(sourced.source)))
+        out.append("<h3>{}</h3><ol class=\"basis\" start=\"{}\">{}</ol>".format(
+            html.escape(_say(title, language)), start, "".join(entries)))
+    return "".join(out)
 
 
 def structures(language: str, table) -> str:
@@ -322,6 +385,122 @@ def structures(language: str, table) -> str:
     ), language).format(times)
     return '<div class="scroll">{}</div>{}'.format(
         table([head] + body, numeric_from=1), said)
+
+
+#: The structures a broadcast unit is shown on, in the order a reader
+#: meets them: town, open country, roof, tunnel, a mast raised for it.
+SHOWN_ON = ("lighting_column", "distribution_pole", "rooftop",
+            "tunnel_bracket", "tall_mast")
+
+
+def units(published, language: str, table) -> str:
+    """One broadcast unit on each structure, and why a row's km² differs.
+
+    Priced through `cost.price` one unit at a time, so every figure here
+    is the one the rows are built from.
+    """
+    from yerkon.cost import (AMPLIFIED_ANCHOR, TUNNEL_ANCHOR, AnchorSite,
+                             Inventory, price)
+    from yerkon.world import MOUNTINGS
+
+    columns = []
+    for key in SHOWN_ON:
+        mounting = MOUNTINGS[key]
+        product = TUNNEL_ANCHOR if key == "tunnel_bracket" else AMPLIFIED_ANCHOR
+        site = AnchorSite(
+            product=product, structure=mounting.kind,
+            site_cost_tl=mounting.site_cost_tl,
+            per_crew_day=float(mounting.per_crew_day.value),
+            crew_day_tl=mounting.crew_day_value,
+            has_power=mounting.has_power, has_backhaul=mounting.has_backhaul,
+            rent_tl_per_year=(float(mounting.rent_tl_per_year.value)
+                              if mounting.rent_tl_per_year is not None
+                              else 0.0))
+        costing = price(Inventory(anchors=(site,)))
+        lines = {i.label: i.tl for i in costing.capital + costing.operating}
+        columns.append((mounting, lines, costing))
+
+    head = [_say(("Bir birim", "One unit"), language)] + [
+        html.escape(_say(STRUCTURES[m.kind], language)).capitalize()
+        for m, _, _ in columns]
+    shown = (
+        ("anchor units", ("Yayın birimi (kart, 1000 adette)",
+                          "Broadcast unit (board, at a thousand)")),
+        ("structures and installation", ("Montaj", "Fitting")),
+        ("standalone power", ("Güneş paneli ve akü", "Solar panel and battery")),
+    )
+    body = []
+    for label, name in shown:
+        body.append([html.escape(_say(name, language))]
+                    + [_tl(lines[label]) for _, lines, _ in columns])
+    body.append(["<b>{}</b>".format(_say(("Kurulum", "To build"), language))]
+                + ["<b>{}</b>".format(_tl(c.capex_tl)) for _, _, c in columns])
+    for label in ("energy", "structure rent", "maintenance", "replacement",
+                  "central operation"):
+        body.append([html.escape(_say(LINES[label], language))]
+                    + [_tl(lines[label]) for _, lines, _ in columns])
+    body.append(["<b>{}</b>".format(_say(("Yıllık işletme", "To run, a year"),
+                                         language))]
+                + ["<b>{}</b>".format(_tl(c.opex_tl_per_year))
+                   for _, _, c in columns])
+
+    said = [_say((
+        "<p>Şehir içi ve kırsal satırlar aynı kartı kullanıyor: yükselteçli "
+        "SX1280 modülü E28-2G4M20S, dış ortam tipi 5 dBi çubuk anten, aynı "
+        "mikrodenetleyici ve güvenlik yongası. Tünelde kart DWM3000 UWB "
+        "modülünü taşıyor. Farkı kart değil, kartın takıldığı yapı "
+        "yaratıyor: şehirde elektriği olan aydınlatma direği, kırsalda "
+        "elektriği olmayan dağıtım direği ve güneş paneli, tünelde şerit "
+        "kapatmaya bağlı bir askı.</p>",
+        "<p>The town and open country rows use the same board: the "
+        "amplified SX1280 module E28-2G4M20S, an outdoor 5 dBi whip, the "
+        "same microcontroller and secure element. In the tunnel the board "
+        "carries the DWM3000 UWB module. What differs is not the board but "
+        "the structure it goes on: a lighting column with mains in town, a "
+        "distribution pole with no mains and a solar panel in open "
+        "country, a bracket that waits on a lane closure in the tunnel.</p>",
+    ), language)]
+    column = dict((m.kind, c) for m, _, c in columns)
+    said.append(_say((
+        "<p><b>Dikilen direkte kurulum, aydınlatma direğindekinin {} katı.</b> "
+        "Aynı birim, aynı zemin; tek fark neye takıldığı.</p>",
+        "<p><b>On a raised mast the build costs {} times what it does on a "
+        "lighting column.</b> The same unit on the same ground; the only "
+        "difference is what it is fitted to.</p>",
+    ), language).format(ratio_on_masts()))
+    dense = []
+    for key, name in ROWS:
+        if published is None or key not in published.keys:
+            continue
+        deployed = __import__("yerkon.scenarios", fromlist=["CHOICES"]).CHOICES[key]
+        if deployed.serves_a_corridor:
+            continue
+        count = len(deployed.scenario.deployment.anchors)
+        area = published.row(key).area_km2
+        dense.append((name, count, area))
+    if len(dense) == 2:
+        (n1, c1, a1), (n2, c2, a2) = dense
+        said.append(_say((
+            "<p>Bir birim şehirde en ucuza kuruluyor ve işletiliyor, ama "
+            "şehir içi satır kilometrekare başına en pahalısı. Sebep "
+            "yoğunluk: binalar sinyali kestiği için şehirde bir birim "
+            "{a1} km²'ye, kırsalda {a2} km²'ye hizmet ediyor. {c1} birim "
+            "{A1} km²'de kilometrekareye {d1} birim, {c2} birim {A2} km²'de "
+            "{d2} birim ediyor. Kilometrekare başına maliyet, birim başına "
+            "maliyetin bu yoğunlukla çarpımı.</p>",
+            "<p>A unit is cheapest to build and run in town, yet the town "
+            "row is the dearest per square kilometre. The reason is "
+            "density: buildings cut the signal, so a unit serves {a1} km² "
+            "in town and {a2} km² in open country. {c1} units over {A1} km² "
+            "are {d1} units a km²; {c2} units over {A2} km² are {d2}. The "
+            "cost per square kilometre is the cost per unit times that "
+            "density.</p>",
+        ), language).format(
+            a1=decimal_comma(a1 / c1, 2), a2=decimal_comma(a2 / c2, 2),
+            c1=c1, A1=decimal_comma(a1, 2), d1=decimal_comma(c1 / a1, 2),
+            c2=c2, A2=decimal_comma(a2, 2), d2=decimal_comma(c2 / a2, 2)))
+    return '<div class="scroll">{}</div>{}'.format(
+        table([head] + body, numeric_from=1), "".join(said))
 
 
 def ratio_on_masts() -> int:

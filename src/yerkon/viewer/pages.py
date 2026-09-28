@@ -200,13 +200,15 @@ HOME = Page(
                     "surveyed when it was installed.",
                 ),
                 _w(
-                    "Bir yayın biriminin ana parçaları 1000 adetlik "
-                    "üretimde 1365 ile 1691 lira arasında. Hedef, AUS "
+                    "Bir yayın birimi 1000 adetlik üretimde, kutusu, "
+                    "baskılı devresi ve dizgisiyle 1289 ile 1596 lira "
+                    "arasında. Hedef, AUS "
                     "noktalarında zaten "
                     "duran elektrik ve haberleşme altyapısını yeniden "
                     "kullanmak; maliyeti aşağıda tutan da bu.",
-                    "A broadcast unit's main parts cost between 1365 and "
-                    "1691 lira at a thousand units. The aim is to reuse "
+                    "A broadcast unit costs between 1289 and 1596 lira at "
+                    "a thousand units, box, printed board and assembly "
+                    "included. The aim is to reuse "
                     "the power and "
                     "communications already standing at intelligent "
                     "transport points, and that is what keeps the cost "
@@ -695,16 +697,19 @@ SYSTEM = Page(
                     "part, its seller and its price are on the Cost page.",
                 ),
                 _w(
-                    "Fiyatlar yalnızca ana parçaların maliyeti. Kartın "
-                    "basılması ve parçaların lehimlenmesi, direnç ve "
-                    "kondansatörler, kablolama, test, ayar, belgelendirme, "
-                    "vergi ve kargo bu rakamların dışında; sahadaki montaj "
-                    "ayrı bir kalem olarak tabloya giriyor.",
-                    "The prices are main component costs. Board "
-                    "manufacture and assembly, the passive components, "
-                    "cabling, test, calibration, certification, tax and "
-                    "shipping are outside them; installation goes into "
-                    "the table as a line of its own.",
+                    "Fiyatlar kartın bütün parçalarını kapsıyor: ana "
+                    "parçalar, besleme ve koruma, klemensler, anten "
+                    "kablosu, kutu, direnç ve kondansatörler, baskılı devre "
+                    "ve dizgi. Test, ayar, belgelendirme, vergi ve kargo "
+                    "bu rakamların dışında; sahadaki montaj ayrı bir kalem "
+                    "olarak tabloya giriyor.",
+                    "The prices cover every part of the board: the main "
+                    "parts, supply and protection, terminals, antenna "
+                    "cable, box, the passive components, the printed "
+                    "board and its assembly. Test, calibration, "
+                    "certification, tax and shipping are outside them; "
+                    "installation goes into the table as a line of its "
+                    "own.",
                 ),
                 _w(
                     "İki alıcı da hem SX1280 hem DWM3000 taşıyor. Bu "
@@ -1145,69 +1150,6 @@ RESULTS = Page(
         ),
         Part(kind="shows", shows="cost"),
         Part(
-            kind="text",
-            heading=_w("Şehir içi neden bu kadar ucuz",
-                       "Why the town row costs so little"),
-            lines=(
-                _w(
-                    "Bir şehirde yayın birimini taşıyacak yapı zaten "
-                    "duruyor: aydınlatma direkleri, levhalar, portallar, "
-                    "ışıklı kavşakların direkleri. Hepsinin ortak yanı "
-                    "elektrik şebekesine bağlı olması. Bir birim takmak "
-                    "kelepçe, işçilik ve direğin beslemesinden bir hat "
-                    "demek. Direk dikmek, temel atmak, güneş paneli ve akü "
-                    "almak demek değil. Aynı birimin iki yerdeki bedeli:",
-                    "In a town the structures that can carry a broadcast "
-                    "unit already stand: lighting columns, signs, "
-                    "gantries, the poles at signalised junctions. What "
-                    "they have in common is that they are already on the "
-                    "electricity network. Fitting a unit to one means a "
-                    "bracket, the labour and a tap into the column's "
-                    "supply. It does not mean raising a mast, pouring a "
-                    "foundation, or buying a solar panel and a battery. "
-                    "The same unit in the two places:",
-                ),
-            ),
-        ),
-        Part(kind="shows", shows="structures"),
-        Part(
-            kind="text",
-            lines=(
-                _w(
-                    "Elektrik, yapının verdiği iki şeyden yalnızca biri. "
-                    "Işıklı bir kavşakta sinyal dolabı durur: hem besleme "
-                    "hem de trafik yönetim merkezine giden bir hat. "
-                    "Belediyenin kameraları o hattı zaten kullanıyor. "
-                    "Birimlerin bir kısmı böyle bir kavşakta duruyor ve "
-                    "merkeze oradan bağlanıyor. Hiçbir birime SIM kartı "
-                    "konmuyor: geri kalanları, onlara karşı ölçüm yapan "
-                    "telefonlar ve araç alıcıları izliyor, cevap vermeyen "
-                    "birim böyle görünüyor. Kalem kalem döküm Maliyet "
-                    "sayfasında.",
-                    "Power is only one of the two things a structure "
-                    "gives. A signalised junction carries a controller "
-                    "cabinet: mains for the heads and a line to the "
-                    "traffic management centre. The municipality's cameras "
-                    "already use that line. Some of the units stand at "
-                    "such a junction and reach the centre through it. No unit carries a SIM card: the rest are watched "
-                    "by the phones and vehicle receivers that range "
-                    "against them, and a unit that stops answering shows "
-                    "up that way. The line by line breakdown is on the "
-                    "Cost page.",
-                ),
-                _w(
-                    "Direk eklemek kullanılabilirliği yükseltiyor ama "
-                    "bedava değil. Mevcut yapıların yaptığı şey bu "
-                    "alışverişi karşılanabilir kılmak: her ek birim bir "
-                    "kart ve bir montaj, bir saha değil.",
-                    "Adding anchors raises availability, but not for "
-                    "nothing. What the existing structures do is make that "
-                    "trade affordable, because each extra unit is a board "
-                    "and a fitting rather than a site.",
-                ),
-            ),
-        ),
-        Part(
             kind="table",
             heading=_w("Sütunlar ne demek", "What the columns mean"),
             rows=(
@@ -1253,9 +1195,10 @@ RESULTS = Page(
                     _w("CAPEX", "CAPEX"),
                     _w(
                         "Yayın birimlerinin donanım maliyeti, hizmet "
-                        "verilen alana bölündü. Yalnızca ana parçalar.",
-                        "Unit hardware cost divided by the service area. "
-                        "Main hardware only.",
+                        "verilen alana bölündü; kartın bütün parçaları ve "
+                        "montaj dahil.",
+                        "Unit hardware cost divided by the service area; "
+                        "every part of the board and the fitting included.",
                     ),
                 ),
                 (
@@ -1893,11 +1836,11 @@ COST = Page(
     title=_w("Ne kadara mal oluyor", "What it costs"),
     lead=_w(
         "Tablodaki her maliyet hücresinin kalem kalem dökümü: hangi parça, "
-        "kaça, kimden; hangi varsayım, neye dayanarak. Buradaki hiçbir "
+        "kaça, kimden; hangi sayı, neye dayanarak. Buradaki hiçbir "
         "sayı elle yazılmadı. Hepsi modelden, malzeme listesinden ve "
         "ayarlar dosyasından çiziliyor; biri değişince sayfa da değişiyor.",
         "Every cost cell in the table, line by line: which part, for how "
-        "much, from whom; which assumption, resting on what. No number "
+        "much, from whom; which figure, resting on what. No number "
         "here was typed. They are all drawn from the model, the bill of "
         "materials and the settings file, so when one changes the page "
         "does too.",
@@ -1929,8 +1872,77 @@ COST = Page(
             ),
         ),
         Part(
+            kind="shows", shows="units",
+            heading=_w("Yayın birimleri: bir birim nerede ne kadar",
+                       "Broadcast units: what one costs where"),
+        ),
+        Part(
+            kind="text",
+            lines=(
+                _w(
+                    "Elektrik, yapının verdiği iki şeyden yalnızca biri. "
+                    "Işıklı bir kavşakta sinyal dolabı durur: hem besleme "
+                    "hem de trafik yönetim merkezine giden bir hat. "
+                    "Belediyenin kameraları o hattı zaten kullanıyor. "
+                    "Birimlerin bir kısmı böyle bir kavşakta duruyor ve "
+                    "merkeze oradan bağlanıyor. Hiçbir birime SIM kartı "
+                    "konmuyor: geri kalanları, onlara karşı ölçüm yapan "
+                    "telefonlar ve araç alıcıları izliyor, cevap vermeyen "
+                    "birim böyle görünüyor.",
+                    "Power is only one of the two things a structure "
+                    "gives. A signalised junction carries a controller "
+                    "cabinet: mains for the heads and a line to the "
+                    "traffic management centre. The municipality's cameras "
+                    "already use that line. Some of the units stand at "
+                    "such a junction and reach the centre through it. No unit carries a SIM card: the rest are watched "
+                    "by the phones and vehicle receivers that range "
+                    "against them, and a unit that stops answering shows "
+                    "up that way.",
+                ),
+                _w(
+                    "Direk eklemek kullanılabilirliği yükseltiyor ama "
+                    "bedava değil. Mevcut yapıların yaptığı şey bu "
+                    "alışverişi karşılanabilir kılmak: her ek birim bir "
+                    "kart ve bir montaj, bir saha değil.",
+                    "Adding anchors raises availability, but not for "
+                    "nothing. What the existing structures do is make that "
+                    "trade affordable, because each extra unit is a board "
+                    "and a fitting rather than a site.",
+                ),
+            ),
+        ),
+        Part(
+            kind="table",
+            heading=_w("Direklerin boyu ve fiyatı", "Pole heights and prices"),
+            rows=(
+                (_w("Yapı", "Structure"), _w("Boy", "Height"), _w("Fiyat", "Price"), _w("Kaynak", "Source")),
+                (_w("Aydınlatma direği, TEDAŞ tipi galvaniz poligon", "Lighting column, TEDAŞ-type galvanised polygonal"), _w("6 / 8 / 10 / 12 / 14 / 15 m", "6 / 8 / 10 / 12 / 14 / 15 m"), _w("6500 / 9750 / 14750 / 18250 / 24750 / 27500 TL", "6500 / 9750 / 14750 / 18250 / 24750 / 27500 TL"), _w("Pana Bayrak Direği, Eylül 2026", "Pana Bayrak Direği, September 2026")),
+                (_w("Aydınlatma direği, galvaniz yol direği", "Lighting column, galvanised road column"), _w("8-10 m", "8-10 m"), _w("14000-28000 TL", "14000-28000 TL"), _w("Palmiye Aydınlatma, Ocak 2026", "Palmiye Aydınlatma, January 2026")),
+                (_w("Galvaniz direk", "Galvanised pole"), _w("20 / 30 m", "20 / 30 m"), _w("120000 / 475000 TL", "120000 / 475000 TL"), _w("Pana Bayrak Direği, Eylül 2026", "Pana Bayrak Direği, September 2026")),
+                (_w("Dağıtım direği, santrifüj betonarme", "Distribution pole, spun concrete"), _w("9,3-25 m", "9,3-25 m"), _w("yayımlanmamış", "not published"), _w("TEDAŞ-MLZ/99-34 şartnamesi", "TEDAŞ specification MLZ/99-34")),
+            ),
+        ),
+        Part(
+            kind="text",
+            lines=(
+                _w("YERKON var olan direği kullanıyor, direk satın almıyor; "
+                   "bu fiyatlar yeni bir direk dikmenin ne tuttuğunu ve "
+                   "25 m direğin bedelinin nereden geldiğini gösteriyor. "
+                   "Aydınlatma direği boyları TEDAŞ'ın yol sınıfı "
+                   "çizelgesinden (6-14 m), dağıtım direği boyları "
+                   "TEDAŞ-MLZ/99-34'ten; kaynakları Mevzuat sayfasında.",
+                   "YERKON uses the pole that stands and buys none; these "
+                   "prices show what raising a new one costs and where the "
+                   "25 m mast's figure comes from. The column heights come "
+                   "from TEDAŞ's road class table (6 to 14 m), the "
+                   "distribution pole lengths from TEDAŞ-MLZ/99-34; their "
+                   "sources are on the Regulation page."),
+            ),
+        ),
+        Part(
             kind="shows", shows="bill",
-            heading=_w("Kartların fiyatı", "What the boards cost"),
+            heading=_w("YERKON yayın birimleri fiyatları",
+                       "YERKON broadcast unit prices"),
         ),
         Part(
             kind="shows", shows="parts",
@@ -1943,20 +1955,21 @@ COST = Page(
                 _w(
                     "Rapor her ürün için yalnızca iki toplam veriyor, parça "
                     "fiyatı vermiyor. Burada her ana parça kendi satıcı "
-                    "fiyatıyla yazılı. Raporun toplamından o parçalar "
-                    "çıkarılınca kalan, \"diğer\" satırıdır: güç "
-                    "dönüşümü, koruma, bağlantı ve kutu. Üç yayın biriminde "
-                    "de bu kalan aynı çıkıyor, ki kart aynı kart olduğuna "
-                    "göre öyle olmalı; dökümün raporla tutarlı olduğunu "
-                    "söyleyen de bu.",
+                    "fiyatıyla yazılı. Kartın geri kalanı da parça parça "
+                    "yazılı: şebeke beslemesi, düşürücü, koruma, klemens, "
+                    "anten kablosu, kutu, pasifler, baskılı devre ve dizgi. "
+                    "Raporun toplamından ana parçalar çıkarılınca kalan "
+                    "\"diğer\" satırı karşılaştırma için yanında duruyor, "
+                    "toplama girmiyor.",
                     "The report gives only two totals per product and no "
                     "part prices. Here each main part carries its own "
-                    "distributor price. What is left of the report's total "
-                    "once those are taken out is the \"other\" line: power "
-                    "conversion, protection, connectors and the enclosure. "
-                    "It comes out the same for all three broadcast units, "
-                    "as it should for the same board, and that is what "
-                    "says the breakdown agrees with the report.",
+                    "distributor price, and so does the rest of the board: "
+                    "mains supply, regulator, protection, terminals, "
+                    "antenna cable, box, passives, the printed board and "
+                    "its assembly. What is left of the report's total once "
+                    "the main parts are taken out, its \"other\" line, "
+                    "stands beside them for comparison and is not added "
+                    "in.",
                 ),
                 _w(
                     "Satıcının kademe fiyatı doğrulanan bir parça, o "
@@ -1995,7 +2008,7 @@ COST = Page(
         ),
         Part(
             kind="shows", shows="assumptions",
-            heading=_w("Her varsayım", "Every assumption"),
+            heading=_w("Her sayının dayanağı", "What every figure rests on"),
         ),
     ),
 )
@@ -2334,6 +2347,94 @@ LAW = Page(
         ),
         Part(
             kind="points",
+            heading=_w("Direklerin boyu ve birimin yeri",
+                       "Pole heights and where the unit goes"),
+            lines=(
+                _w("Aydınlatma direği: TEDAŞ'ın LED'li Yol Aydınlatma "
+                   "Tasarımına İlişkin Usul ve Esasları (Ağustos 2022, Ek-1) "
+                   "direk boyunu yol sınıfına bağlıyor: M1 sınıfı yollarda "
+                   "12-14 m, M2 ve M3'te 10-12 m, M4'te 8-10 m, M5'te 8 m, "
+                   "yaya yollarında (P2, P3) 6-8 m. Direk boyları bu "
+                   "yüzden bir küme: 6, 8, 10, 12, 14 m.",
+                   "Lighting column: TEDAŞ's rules for LED road lighting "
+                   "design (August 2022, annex 1) tie the column height to "
+                   "the road class: 12 to 14 m on M1 roads, 10 to 12 m on "
+                   "M2 and M3, 8 to 10 m on M4, 8 m on M5, 6 to 8 m on "
+                   "footways (P2, P3). The heights are therefore a set: 6, "
+                   "8, 10, 12, 14 m."),
+                _w("Dağıtım direği: TEDAŞ-MLZ/99-34 santrifüj betonarme "
+                   "direk şartnamesi boyları 9,3 m'den 25 m'ye kadar "
+                   "sayıyor (9,3-10-11 m, 12-13-14 m, 15-16 m ve üstü). "
+                   "Direğin toprak altında kalan boyunu denetlemek için "
+                   "tabanından 4 m yukarıya bir çizgi çekiliyor.",
+                   "Distribution pole: TEDAŞ-MLZ/99-34, the specification "
+                   "for spun concrete poles, lists lengths from 9,3 m to "
+                   "25 m (9,3-10-11 m, 12-13-14 m, 15-16 m and up). A line "
+                   "4 m above the base marks where the buried length is "
+                   "checked."),
+                _w("Birimle iletkenler arasındaki mesafe: Elektrik Kuvvetli "
+                   "Akım Tesisleri Yönetmeliği'nin hava hattı iletkenlerinin "
+                   "en küçük düşey uzaklıkları çizelgesi, iletkenlerin "
+                   "haberleşme hatlarına en küçük "
+                   "düşey uzaklığını alçak gerilimde 1 m, 1-36 kV orta "
+                   "gerilimde 2,5 m veriyor. Birim bu yüzden orta gerilim "
+                   "iletkenlerinin en az 2,5 m altına takılıyor. Aynı "
+                   "çizelge orta gerilim iletkenlerinin köy ve şehir içi "
+                   "yollarda yerden en az 7 m, tarlada 6 m yüksekte "
+                   "olmasını istiyor.",
+                   "Distance from the conductors: the table of least "
+                   "vertical distances in the Regulation on Electrical "
+                   "Power Installations gives the least vertical distance "
+                   "from overhead "
+                   "conductors to communication lines as 1 m at low "
+                   "voltage and 2,5 m at 1 to 36 kV medium voltage. A unit "
+                   "therefore goes at least 2,5 m below medium-voltage "
+                   "conductors. The same table wants medium-voltage "
+                   "conductors at least 7 m above village and town roads "
+                   "and 6 m above fields."),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Kamu yapısında yer kullanımı",
+                       "Using space on public structures"),
+            lines=(
+                _w("3194 sayılı İmar Kanunu, Ek Madde 9/7: kamu kurumları "
+                   "elektronik haberleşme istasyonlarına yer "
+                   "kullandırırken alacakları yıllık bedel, büyükşehirde "
+                   "Ulaştırma ve Altyapı Bakanlığının yer seçim belgesi "
+                   "ücretinin beş katını, diğer yerlerde üç katını geçemez. "
+                   "2025 yer seçim ücreti 27503,44 TL; üst sınır "
+                   "büyükşehirde yılda 137517,20 TL, diğer yerlerde "
+                   "82510,32 TL (Tarım ve Orman Bakanlığı, 2025 rayiç "
+                   "bedelleri). İstanbul Büyükşehir Belediyesi'nin tarifesi "
+                   "bu kuralla kuruluyor. YERKON birimleri kamu protokolüyle "
+                   "konduğu için modelde dağıtım direği kirası sıfır.",
+                   "Zoning Law 3194, Additional Article 9(7): the yearly "
+                   "fee a public body charges an electronic communications "
+                   "station for space may not exceed five times the "
+                   "Ministry of Transport's site selection fee in a "
+                   "metropolitan municipality and three times elsewhere. "
+                   "The 2025 site selection fee is 27503,44 TL, so the cap "
+                   "is 137517,20 TL a year in a metropolitan municipality "
+                   "and 82510,32 TL elsewhere (Ministry of Agriculture and "
+                   "Forestry, 2025 rates). Istanbul's municipal tariff is "
+                   "built on this rule. YERKON units go up under a public "
+                   "agreement, so the model charges no pole rent."),
+                _w("Genel Aydınlatma Yönetmeliği: aydınlatma tesisinin "
+                   "bağlantı noktasından genel aydınlatma dışında bir "
+                   "amaca enerji verilmez; aydınlatma tesisleri TEDAŞ'ın "
+                   "mülkiyetinde. Birim bu yüzden ayrı sayaçlı bir abone "
+                   "sayılıyor ve ticarethane tarifesinden ödüyor.",
+                   "General Lighting Regulation: no energy may be taken "
+                   "from a public lighting connection for anything but "
+                   "public lighting, and the lighting installations belong "
+                   "to TEDAŞ. A unit is therefore a separately metered "
+                   "subscriber and pays the commercial tariff."),
+            ),
+        ),
+        Part(
+            kind="points",
             heading=_w("Harita ve uydu görüntüsü", "Maps and imagery"),
             lines=(
                 _w("Yer seçme haritası OpenStreetMap'in karolarını kullanıyor "
@@ -2377,6 +2478,20 @@ LAW = Page(
                      url="https://www.mevzuat.gov.tr/mevzuatmetin/1.4.193.pdf"),
                 Link(label=_w("SBB: 2026 H Cetveli", "SBB: 2026 Schedule H"),
                      url="https://www.sbb.gov.tr/wp-content/uploads/2025/12/8-H-Cetveli_2026Butcesi.pdf"),
+                Link(label=_w("Elektrik Kuvvetli Akım Tesisleri Yönetmeliği",
+                              "Regulation on Electrical Power Installations"),
+                     url="https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=9949&MevzuatTur=7&MevzuatTertip=5"),
+                Link(label=_w("TEDAŞ: LED'li yol aydınlatma tasarımına ilişkin usul ve esaslar (Ağustos 2022)",
+                              "TEDAŞ: rules for LED road lighting design (August 2022)"),
+                     url="https://www.tedas.gov.tr/FileUpload/MediaFolder/c09a508b-c5f8-4b60-bb0c-e907e7438670.pdf"),
+                Link(label=_w("TEDAŞ-MLZ/99-34: santrifüj betonarme direk teknik şartnamesi",
+                              "TEDAŞ-MLZ/99-34: spun concrete pole specification"),
+                     url="https://www.tedas.gov.tr/FileUpload/MediaFolder/8aef4429-1647-4a50-9a9e-a44250bc486f.pdf"),
+                Link(label=_w("Tarım ve Orman Bakanlığı: 2025 baz istasyonu yıllık kira rayiç bedelleri (3194 Ek 9/7)",
+                              "Ministry of Agriculture and Forestry: 2025 base station rent rates (Law 3194, Additional Article 9(7))"),
+                     url="https://www.tarimorman.gov.tr/DKMP/Belgeler/KORUNAN%20ALANLAR%20%C3%9CCRET%20TAR%C4%B0FES%C4%B0/2025/Ek-11%20Baz%20ve%20Radyo%20Verici%20%C4%B0stasyonlar%C4%B1%20Y%C4%B1ll%C4%B1k%20Kira%20Rayi%C3%A7%20Bedeli-2025-1.pdf"),
+                Link(label=_w("Genel Aydınlatma Yönetmeliği", "General Lighting Regulation"),
+                     url="https://www.mevzuat.gov.tr/File/GeneratePdf?mevzuatNo=18646&mevzuatTur=KurumVeKurulusYonetmeligi&mevzuatTertip=5"),
                 Link(label=_w("GİB: amortisman oranları tablosu",
                               "Revenue Administration: depreciation rates"),
                      url="https://cdn.gib.gov.tr/api/gibportal-file/file/getFileResources?objectKey=arsiv/yardim-kaynaklar/yararli-bilgiler/AmortismanOranlariTablosu.pdf"),
@@ -2649,6 +2764,8 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         drawn = _when(language)
     elif part.kind == "shows" and part.shows == "structures":
         drawn = costing.structures(language, _table)
+    elif part.kind == "shows" and part.shows == "units":
+        drawn = costing.units(published, language, _table)
     elif part.kind == "shows" and part.shows == "cost-rows":
         drawn = (costing.rows(published, language, _table)
                  if published is not None

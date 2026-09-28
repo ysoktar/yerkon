@@ -571,16 +571,16 @@ measurement."""
 
 [note.rural-run]
 sources = ["sx1280-range", "yerkon-github"]
-tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yollarında sürüyor; 50 \
-direk bir yerleşim aramasının seçtiği yerlerde (çoğu elektrik direği, \
-biri tepede, biri çatıda). Hata modeli kısa menzilde yayımlanmış SX1280 \
+tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yollarında sürüyor; 52 \
+birim bir yerleşim aramasının seçtiği yerlerde (46 elektrik dağıtım \
+direği, 4 aydınlatma direği, 2 çatı). Hata modeli kısa menzilde yayımlanmış SX1280 \
 ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
 saha ölçümü değil, model çıktısıdır. Dağıtım direği kirası sıfır alındı: \
 birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
 edilebilmeleri öngörülüyor."""
-en = """In the rural row the units drive Polatlı's real roads; the 50 \
-anchors stand where a placement search put them (mostly distribution \
-poles, one on a hilltop, one on a roof). Its error model is derived from \
+en = """In the rural row the units drive Polatlı's real roads; the 52 \
+anchors stand where a placement search put them (46 distribution poles, \
+4 lighting columns, 2 roofs). Its error model is derived from \
 published SX1280 measurements at short range. Its long range result is \
 therefore a model output rather than a direct field measurement. The \
 distribution pole rent is taken as nothing: the units go up under a \
@@ -646,8 +646,9 @@ sources = ["digikey", "lcsc", "mouser", "banque-de-france", "sepetli-ankara", "y
 tr = """YERKON CAPEX, senaryodaki yayın birimlerinin 1000 adetlik malzeme \
 listesi fiyatı ile her birimin yapıya takılma bedelinin (tutucu, işçilik, \
 gerekiyorsa şebeke dışı besleme) toplamının senaryo alanına bölünmesidir. \
-Birim fiyatı yalnız ana parçaları kapsar: kartın basılması ve dizgisi, \
-pasifler, test, kalibrasyon, belgelendirme, vergi ve kargo dahil değildir. \
+Birim fiyatı kartın bütün parçalarını, kutusunu, baskılı devresini ve \
+dizgisini kapsar; test, kalibrasyon, belgelendirme, vergi ve kargo dahil \
+değildir. \
 Konum, radyo mesafe ölçümlerini ve haritadan gelen yüksekliği birleştiren \
 bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
 kullanılmamıştır. YERKON OPEX, yıllık işletme bedelidir: elektrik \
@@ -663,8 +664,8 @@ kullanılabilirlik değişmedi."""
 en = """YERKON CAPEX is the thousand unit bill of materials price of a \
 scenario's broadcast units plus what fitting each one costs (bracket, \
 labour and, where needed, a standalone supply), divided by the scenario's \
-area. The unit price covers the main parts only: board manufacture and \
-assembly, the passives, test, calibration, certification, tax and shipping \
+area. The unit price covers every part of the board, its box, the printed \
+board and its assembly; test, calibration, certification, tax and shipping \
 are excluded. The position comes from a Kalman filter that combines radio \
 ranges with the height from a map; no inertial unit or odometry is used. \
 YERKON OPEX is the yearly running cost: electricity (the commercial tariff, \

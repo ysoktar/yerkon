@@ -74,9 +74,20 @@ class Board:
     parts: tuple[Part, ...]
     usd_try: float
     thousand_over_hundred: float
+    #: The rest of the board part by part, with how many of each. When
+    #: given, it replaces the report's remainder as the "other" line
+    #: (ADR-0103).
+    others: tuple[tuple[Part, int], ...] = ()
 
     def name(self, language: Optional[str] = None) -> str:
         return self.name_en if language == "en" else self.name_tr
+
+    def other_at(self, quantity: int, carried: float) -> float:
+        """The "other" line in USD at a quantity: itemised where the bill
+        lists it, else the report's remainder carried by its discount."""
+        if self.others:
+            return sum(n * part.at(quantity, carried) for part, n in self.others)
+        return self.other_usd * carried
 
     @property
     def hundred_over_one(self) -> float:
@@ -91,14 +102,15 @@ class Board:
 
     @property
     def one_tl(self) -> float:
-        return (self.other_usd + sum(p.at(1, 1.0) for p in self.parts)) * self.usd_try
+        return (self.other_at(1, 1.0)
+                + sum(p.at(1, 1.0) for p in self.parts)) * self.usd_try
 
     @property
     def hundred_tl(self) -> float:
         """A hundred units: the report's discount from one to a hundred,
         except where a part's verified tier price says otherwise."""
         carried = self.hundred_over_one
-        return (self.other_usd * carried + sum(
+        return (self.other_at(100, carried) + sum(
             p.at(100, carried) for p in self.parts)) * self.usd_try
 
     @property
@@ -112,7 +124,7 @@ class Board:
         where a distributor's tier says otherwise the tier wins.
         """
         carried = self.hundred_over_one * self.thousand_over_hundred
-        total = self.other_usd * carried + sum(
+        total = self.other_at(1000, carried) + sum(
             part.at(1000, carried) for part in self.parts)
         return total * self.usd_try
 
@@ -153,6 +165,15 @@ def _volume(table: Optional[dict]) -> dict:
     }
 
 
+def _counted(parts: dict, entry: str, board: str) -> tuple:
+    """A "key" or "key:count" entry of a board's other line."""
+    key, _, count = entry.partition(":")
+    if key not in parts:
+        raise ValueError("{} names a part the bill does not list: {}".format(
+            board, key))
+    return parts[key], int(count or 1)
+
+
 @lru_cache(maxsize=None)
 def read(path: pathlib.Path = FILE) -> Bill:
     raw = tomllib.loads(path.read_text(encoding="utf-8"))
@@ -184,6 +205,8 @@ def read(path: pathlib.Path = FILE) -> Bill:
             report_hundred_tl=float(b["report_hundred_tl"]),
             was=was, parts=now, usd_try=usd_try,
             thousand_over_hundred=ratio,
+            others=tuple(_counted(parts, entry, b["key"])
+                         for entry in b.get("other", ())),
         )
     tier = int(raw["used_tier"])
     if tier not in (1, 100, 1000):

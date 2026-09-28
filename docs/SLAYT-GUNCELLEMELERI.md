@@ -223,10 +223,10 @@ Son güncelleme: 25 Eylül 2026.
 
   | Ürün | 1 adet | 100 adet | 1000 adet |
   |---|---|---|---|
-  | Şehir içi ve kırsal yayın birimi (E28-2G4M20S, 5 dBi IP67 anten) | 1733,44 TL | 1417,55 TL | 1365,12 TL |
-  | Kritik bölge yayın birimi | 1952,38 TL | 1744,09 TL | 1691,48 TL |
-  | Yaya alıcısı | 3282,63 TL | 2910,70 TL | 2724,32 TL |
-  | Kara aracı alıcısı (E28-2G4M20S, 5 dBi IP67 anten) | 4671,84 TL | 3970,85 TL | 3611,14 TL |
+  | Şehir içi ve kırsal yayın birimi (E28-2G4M20S, 5 dBi IP67 anten) | 1992,69 TL | 1348,26 TL | 1288,87 TL |
+  | Kritik bölge yayın birimi | 2189,58 TL | 1654,29 TL | 1595,56 TL |
+  | Yaya alıcısı | 2967,70 TL | 2369,81 TL | 2232,52 TL |
+  | Kara aracı alıcısı (E28-2G4M20S, 5 dBi IP67 anten) | 4493,81 TL | 3554,98 TL | 3218,03 TL |
 
 - [ ] Kırsal birim satırı E28-2G4M20S'de; gerekçe frekans atlama
   belgesi (ADR-0094) ve 20 dBm'lik modülün aynı sınıra ulaşması
@@ -243,9 +243,9 @@ Son güncelleme: 25 Eylül 2026.
 
   | Satır | HPE P50 | HPE P95 | VPE P95 | Kullanılabilirlik | Alan | CAPEX | OPEX |
   |---|---|---|---|---|---|---|---|
-  | Şehir içi | 2,28 | 8,94 | 3,92 | %96,64 | 8,14 km² | 9022 TL/km² | 1936 TL/km²/yıl |
-  | Kırsal | 2,14 | 7,45 | 4,93 | %96,26 | 361,83 km² | 1287 TL/km² | 312 TL/km²/yıl |
-  | Tünel | 0,58 | 2,43 | 3,31 | %94,32 | güzergâh | 108485 TL/km | 22126 TL/km/yıl |
+  | Şehir içi | 2,28 | 8,94 | 3,92 | %96,64 | 8,14 km² | 8844 TL/km² | 1919 TL/km²/yıl |
+  | Kırsal | 2,16 | 8,02 | 4,95 | %94,85 | 354,83 km² | 1107 TL/km² | 329 TL/km²/yıl |
+  | Tünel | 0,58 | 2,43 | 3,31 | %94,32 | güzergâh | 106855 TL/km | 21963 TL/km/yıl |
 
   (27 Eylül koşusu: A seçeneği, doğruluğa bağlı kullanılabilirlik,
   alıcılar gerçek yollarda, şehir içi ve kırsalda direkler yerleşim

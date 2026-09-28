@@ -93,21 +93,21 @@ def test_the_clock_residual_is_the_one_that_has_been_measured():
 def test_sourcing_a_figure_stops_it_counting_as_an_assumption(tmp_path):
     """Three edits in one place: the value, the source, the provenance."""
     text = pathlib.Path(DEFAULT_FILE).read_text(encoding="utf-8").replace(
-        '''[values."mounting.tall_mast.site_cost_tl"]
-value = 85000.0
-unit = "TL"
+        '''[values."mounting.tall_mast.height_m"]
+value = 25.0
+unit = "m"
 provenance = "ASSUMPTION"
 source = "bu proje"''',
-        '''[values."mounting.tall_mast.site_cost_tl"]
-value = 5000.0
-unit = "TL"
+        '''[values."mounting.tall_mast.height_m"]
+value = 20.0
+unit = "m"
 provenance = "MEASUREMENT"
-source = "a quotation"''',
+source = "a survey"''',
     )
     settings = load(write(tmp_path, text))
 
-    assert settings.number("mounting.tall_mast.site_cost_tl") == 5000.0
-    assert not settings.entry("mounting.tall_mast.site_cost_tl").is_assumed
+    assert settings.number("mounting.tall_mast.height_m") == 20.0
+    assert not settings.entry("mounting.tall_mast.height_m").is_assumed
     assert len(settings.assumed) == len(DEFAULTS.assumed) - 1
     assert settings.assumed_share < DEFAULTS.assumed_share
 
@@ -175,7 +175,7 @@ def test_the_mounting_catalogue_is_built_from_the_file(tmp_path):
     from yerkon.world import mountings
 
     text = pathlib.Path(DEFAULT_FILE).read_text(encoding="utf-8").replace(
-        "value = 85000.0", "value = 1234.0"
+        "value = 191890.0", "value = 1234.0"
     )
     rebuilt = mountings(load(write(tmp_path, text)))
     assert float(rebuilt["tall_mast"].site_cost_tl.value) == 1234.0

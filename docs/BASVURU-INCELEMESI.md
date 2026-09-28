@@ -125,21 +125,21 @@ bağlantısı var. Bu ortamdan erişilemeyen siteler ayrıca belirtildi.
 | Şehir içi | VPE P95 | 31,47 m | 3,92 m |
 | Şehir içi | Kullanılabilirlik | yaklaşık %98,0 | %96,64 |
 | Şehir içi | Alan | 1,00 km² | 8,14 km² |
-| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 9022 TL/km² |
-| Şehir içi | OPEX | boş | 1936 TL/km²/yıl |
-| Kırsal | HPE P50 | 4,17 m | 2,14 m |
-| Kırsal | HPE P95 | 14,29 m | 7,45 m |
-| Kırsal | VPE P95 | 24,14 m | 4,93 m |
-| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %96,26 |
-| Kırsal | Alan | 1,01 km² | 361,83 km² |
-| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1287 TL/km² |
-| Kırsal | OPEX | boş | 312 TL/km²/yıl |
+| Şehir içi | CAPEX | yaklaşık 66937 TL/km² | 8844 TL/km² |
+| Şehir içi | OPEX | boş | 1919 TL/km²/yıl |
+| Kırsal | HPE P50 | 4,17 m | 2,16 m |
+| Kırsal | HPE P95 | 14,29 m | 8,02 m |
+| Kırsal | VPE P95 | 24,14 m | 4,95 m |
+| Kırsal | Kullanılabilirlik | yaklaşık %98,9 | %94,85 |
+| Kırsal | Alan | 1,01 km² | 354,83 km² |
+| Kırsal | CAPEX | yaklaşık 471524 TL/km² | 1107 TL/km² |
+| Kırsal | OPEX | boş | 329 TL/km²/yıl |
 | Tünel | HPE P50 | 0,25 m | 0,58 m |
 | Tünel | HPE P95 | 1,88 m | 2,43 m |
 | Tünel | VPE P95 | 5,53 m | 3,31 m |
 | Tünel | Kullanılabilirlik | yaklaşık %97,0 | %94,32 |
-| Tünel | CAPEX | yaklaşık 545903 TL/km² | 108485 TL/km (güzergâh) |
-| Tünel | OPEX | boş | 22126 TL/km/yıl |
+| Tünel | CAPEX | yaklaşık 545903 TL/km² | 106855 TL/km (güzergâh) |
+| Tünel | OPEX | boş | 21963 TL/km/yıl |
 
 Farkın nedenleri modelde değişenler: gerçek Ankara zemini ve binaları,
 ITU-R P.526 kırınımı, gölgelenme, sekiz çekiliş, sahanın çevresinden ve
@@ -159,10 +159,10 @@ gönderebilir.
 | Ürün | Sunum, 1 adet | Sunum, 100 adet | Şimdi, 1 adet | Şimdi, 100 adet | Şimdi, 1000 adet |
 |---|---|---|---|---|---|
 | Şehir içi yayın birimi (bugün belgesiz kart, kullanılmıyor) | 1983,71 | 1366,07 | 1644,42 | 1132,42 | 1275,13 |
-| Kırsal yayın birimi (bugün E28-2G4M20S; şehir içi ve kırsal) | 1549,67 | 1082,68 | 1733,44 | 1417,55 | 1365,12 |
-| Kritik bölge yayın birimi | 2241,42 | 1634,44 | 1952,38 | 1744,09 | 1691,48 |
-| Yaya alıcısı | 3913,16 | 3117,74 | 3282,63 | 2910,70 | 2724,32 |
-| Kara aracı alıcısı | 5202,69 | 4002,29 | 4671,84 | 3970,85 | 3611,14 |
+| Kırsal yayın birimi (bugün E28-2G4M20S; şehir içi ve kırsal) | 1549,67 | 1082,68 | 1992,69 | 1348,26 | 1288,87 |
+| Kritik bölge yayın birimi | 2241,42 | 1634,44 | 2189,58 | 1654,29 | 1595,56 |
+| Yaya alıcısı | 3913,16 | 3117,74 | 2967,70 | 2369,81 | 2232,52 |
+| Kara aracı alıcısı | 5202,69 | 4002,29 | 4493,81 | 3554,98 | 3218,03 |
 
 Değişenler (`bom.toml`, ADR-0079): LAMBDA80-24S yerine E28-2G4M12S
 (aynı SX1280), STM32G0B1 yerine yayın birimlerinde STM32G031. Şehir içi
@@ -181,8 +181,8 @@ Formdaki tutarsızlıklar:
 
 - "100 adet üretimde yayın birimlerinin referans ana bileşen maliyeti
   yaklaşık 1.100-1.650 TL" diyor; sunumun kendi tablosu 1082-1634 TL,
-  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 1418-1744 TL
-  (100 adet), 1365-1691 TL (1000 adet).
+  slayt 5 ise "1000-1600". Üçü aynı olmalı. Bugünkü değer 1348-1654 TL
+  (100 adet), 1289-1596 TL (1000 adet).
 - Kırsal birimi E28-2G4M27S ile anlatıyor. Frekans atlama belgesiyle 20
   dBm'e 20 dBm'lik E28-2G4M20S de ulaşıyor ve daha ucuz; proje ona geçti
   (ADR-0099). Form modülü, belgeyi ve şehir içi birimin de aynı kart
