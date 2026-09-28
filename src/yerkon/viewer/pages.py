@@ -1631,10 +1631,12 @@ SIMULATION = Page(
                     "it was not measured at 6,5 GHz.",
                 ),
                 _w(
-                    "Güvenlik katmanı da yok. İmza doğrulama ve anahtar "
-                    "yönetimi tasarımın parçası, simülasyonun değil.",
-                    "The security layer is absent too. Signature checking "
-                    "and key management belong to the design rather than "
+                    "Güvenlik katmanı da yok. İmza doğrulama, anahtar "
+                    "yönetimi ve birimlerin merkeze gönderdiği yaşam "
+                    "sinyalleri tasarımın parçası, simülasyonun değil.",
+                    "The security layer is absent too. Signature checking, "
+                    "key management and the \"still working\" messages the "
+                    "units send the centre belong to the design rather than "
                     "to the simulation.",
                 ),
             ),
@@ -1943,26 +1945,37 @@ COST = Page(
                     "hat. Işıklı bir kavşakta sinyal dolabı durur; hem "
                     "besleme hem de trafik yönetim merkezine giden hat "
                     "oradadır ve belediyenin kameraları o hattı zaten "
-                    "kullanıyor. Birimler merkeze takıldıkları yapının "
-                    "hattından bağlanıyor; hiçbir birime SIM kartı "
-                    "konmuyor. Her birim bu hattan merkeze düzenli "
-                    "aralıklarla kısa bir \"çalışıyorum\" mesajı (yaşam "
-                    "sinyali) gönderiyor; mesajı gelmeyen birim arızalı "
-                    "sayılıyor ve ekip gönderiliyor. Alıcılar GPS karıştırması ya da aldatması "
-                    "gördüğünde bunu yakındaki yayın birimine iletiyor, "
-                    "birim de bu hattan merkeze ulaştırıyor.",
+                    "kullanıyor. Hattı olan yapıdaki birim merkeze o "
+                    "hattan bağlanıyor: şehirde ışıklı kavşak, tünelde "
+                    "tünelin haberleşme omurgası, kırsalda yol üzerindeki "
+                    "AUS noktası. Hattı olmayan birim, örneğin kırsalda "
+                    "AUS'tan uzak bir dağıtım direğindeki, güneş paneliyle "
+                    "çalışmaya devam ediyor ve mesajlarını kendi telsiziyle "
+                    "hattı olan en yakın birime iletiyor; hiçbir birime SIM "
+                    "kartı konmuyor. Her birim merkeze düzenli aralıklarla "
+                    "kısa bir \"çalışıyorum\" mesajı (yaşam sinyali) "
+                    "gönderiyor; mesajı gelmeyen birim arızalı sayılıyor ve "
+                    "ekip gönderiliyor. Alıcılar GPS karıştırması ya da "
+                    "aldatması gördüğünde bunu yakındaki yayın birimine "
+                    "iletiyor, uyarı da aynı yoldan merkeze ulaşıyor.",
                     "A structure gives two things: power and a line to the "
                     "centre. A signalised junction carries a controller "
                     "cabinet with both the mains and a line to the traffic "
                     "management centre, which the municipality's cameras "
-                    "already use. The units reach the centre over the line "
-                    "of the structure they are fitted to; no unit carries a "
-                    "SIM card. Each unit sends the centre a short \"still "
-                    "working\" message over that line at regular intervals, "
-                    "and a unit whose message stops coming is taken as "
-                    "failed and a crew is sent. When a receiver sees GPS jamming or spoofing "
-                    "it passes that to a nearby broadcast unit, and the "
-                    "unit carries it to the centre over that line.",
+                    "already use. A unit on a structure with a line reaches "
+                    "the centre over it: a signalised junction in town, "
+                    "the tunnel's communications spine in a tunnel, an ITS "
+                    "point on the road in open country. A unit with no "
+                    "line, such as one on a distribution pole far from an "
+                    "ITS point, keeps running on its solar panel and passes "
+                    "its messages by its own radio to the nearest unit that "
+                    "has a line; no unit carries a SIM card. Each unit "
+                    "sends the centre a short \"still working\" message at "
+                    "regular intervals, and a unit whose message stops "
+                    "coming is taken as failed and a crew is sent. When a "
+                    "receiver sees GPS jamming or spoofing it passes that "
+                    "to a nearby broadcast unit, and the warning reaches "
+                    "the centre the same way.",
                 ),
                 _w(
                     "Direk eklemek kullanılabilirliği yükseltiyor ama "

@@ -115,3 +115,4 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0103](0103-kartin-geri-kalani-ve-direk-boylari.md) | Kartın geri kalanı parça parça; direk boyları ve fiyatları kaynaklı | Fiyat yöntemi yerini aldı: ADR-0105 |
 | [0104](0104-catilar-aramada-yok.md) | Çatılar aramada yok; yükseklikler 12 m ve 10 m | Geçerli |
 | [0105](0105-satici-kademeleri-rapor-yok.md) | Fiyatlar satıcı kademelerinden; raporun fiyatları kullanılmıyor | Geçerli |
+| [0106](0106-yasam-sinyali-ve-telsizle-aktarma.md) | Yaşam sinyali; hattı olmayan birim telsizle aktarıyor | Geçerli |

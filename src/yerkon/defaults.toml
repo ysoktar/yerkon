@@ -420,22 +420,24 @@ provenance = "DESIGN"
 source = "bu proje, bir tasarım kararı olarak"
 source_en = "this project, as a design choice"
 note = """Kendi hattı olmayan bir birimin yıllık veri bedeli: sıfır, çünkü \
-birimlere SIM kartı konmuyor. Merkeze bağ, birimin takıldığı yapının \
-hattından geçiyor: tünelde tünelin haberleşme omurgası, şehirde ışıklı \
-kavşağın sinyal dolabı. Her birim bu hattan merkeze düzenli aralıklarla \
-kısa bir "çalışıyorum" mesajı (yaşam sinyali) gönderiyor; mesajı gelmeyen \
-birim arızalı sayılıyor. Alıcılar GPS karıştırması ya da aldatması \
-gördüğünde bunu yakındaki yayın birimine iletiyor, birim de bu hattan \
-merkeze ulaştırıyor."""
+birimlere SIM kartı konmuyor. Hattı olan yapıdaki birim merkeze o hattan \
+bağlanıyor: tünelde tünelin haberleşme omurgası, şehirde ışıklı kavşağın \
+sinyal dolabı, kırsalda yol üzerindeki AUS noktası. Hattı olmayan birim \
+mesajlarını kendi telsiziyle hattı olan en yakın birime iletiyor. Her \
+birim merkeze düzenli aralıklarla kısa bir "çalışıyorum" mesajı (yaşam \
+sinyali) gönderiyor; mesajı gelmeyen birim arızalı sayılıyor. Alıcılar \
+GPS karıştırması ya da aldatması gördüğünde bunu yakındaki yayın birimine \
+iletiyor, uyarı da aynı yoldan merkeze ulaşıyor."""
 note_en = """What a year of data costs an anchor with no line of its own: \
-nothing, because no unit carries a SIM card. The tie to the centre runs \
-over the line of the structure the unit is fitted to: the tunnel's own \
-communications spine in a tunnel, a signalised junction's cabinet in \
-town. Each unit sends the centre a short "still working" message over \
-that line at regular intervals, and a unit whose message stops coming is \
-taken as failed. When a receiver sees GPS jamming or spoofing it passes \
-that to a nearby broadcast unit, and the unit carries it to the centre over that \
-line."""
+nothing, because no unit carries a SIM card. A unit on a structure with a \
+line reaches the centre over it: the tunnel's communications spine in a \
+tunnel, a signalised junction's cabinet in town, an ITS point on the road \
+in open country. A unit with no line passes its messages by its own radio \
+to the nearest unit that has one. Each unit sends the centre a short \
+"still working" message at regular intervals, and a unit whose message \
+stops coming is taken as failed. When a receiver sees GPS jamming or \
+spoofing it passes that to a nearby broadcast unit, and the warning \
+reaches the centre the same way."""
 affects = "kendi hattı olmayan direklerin OPEX'ini"
 affects_en = "OPEX of anchors with no line of their own"
 
