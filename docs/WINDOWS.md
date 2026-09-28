@@ -14,6 +14,8 @@ olduğunu `$PSVersionTable.PSVersion` söyler.
 
 ## Kurulum
 
+Aşağıdaki `C:\projeler\yerkon` deponun senin makinendeki klasörü.
+
 Bir yer getirmek dahil her şey `pip install -e ".[dev]"` ile çalışır
 (ADR-0087). Aşağıdaki `rasterio` yalnızca Copernicus zeminini ve
 Overture binalarını isteyen için; gerekmiyorsa atla.
@@ -23,7 +25,7 @@ conda kuruluysa ayrı bir ortam en temizi. base'i kirletmez ve
 kurmaktan daha güvenilir.
 
 ```powershell
-cd C:\Users\yavuz\git\yerkon
+cd C:\projeler\yerkon
 git pull
 
 conda create -n yerkon python=3.11 -y
@@ -36,7 +38,7 @@ conda kullanmak istemiyorsan venv de olur, ama `rasterio` Windows'ta
 pip'ten kurulurken derleyici isteyebilir:
 
 ```powershell
-cd C:\Users\yavuz\git\yerkon
+cd C:\projeler\yerkon
 git pull
 
 python -m venv .venv
@@ -97,7 +99,7 @@ Zaten indirilmiş bir rasterin varsa onu öne koyabilirsin. Ağ hiç
 gerekmez:
 
 ```powershell
-yerkon fetch --centre 39.9250,32.8370 --size 12 --into ankara-o20 --geotiff C:\Users\yavuz\Downloads\N39E032.tif
+yerkon fetch --centre 39.9250,32.8370 --size 12 --into ankara-o20 --geotiff C:\indirilenler\N39E032.tif
 ```
 
 Karo önbelleğini başka yere koymak istersen `--tile-cache`, Copernicus'u
@@ -112,5 +114,5 @@ reddeder.
 PowerShell'de değil. PowerShell'den çalıştırmak istersen:
 
 ```powershell
-matlab -batch "cd('C:\Users\yavuz\git\yerkon\matlab'); yerkon_ranging_sim"
+matlab -batch "cd('C:\projeler\yerkon\matlab'); yerkon_clock_residual"
 ```

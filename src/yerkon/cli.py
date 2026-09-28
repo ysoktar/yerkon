@@ -4,15 +4,16 @@
 and everything else reads that cache and runs offline. ADR-0008 is why
 they are separate.
 
-``table`` runs the three scenarios and prints the four rows of the
+``table`` runs the three scenarios and prints the three YERKON rows of the
 report's comparison table.
 
 ``view`` starts a local site: what YERKON is, what this project
 measured and what it left out, the published table, and behind them the
 same engine drawn in three dimensions with every setting live.
 
-``pages`` writes that site out as a folder of files, without the
-simulator, for anywhere that serves files and runs nothing.
+``pages`` writes that site out as a folder of files, the simulator
+included: it runs in the visitor's browser, so anywhere that serves files
+will do (ADR-0080).
 
 ``defaults`` lists every figure the model needs that nobody supplied,
 what it affects, and what replacing it would move.
@@ -521,7 +522,7 @@ def table(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon table",
         description=(
-            "Run the three scenarios and print the four YERKON rows of the "
+            "Run the three scenarios and print the three YERKON rows of the "
             "comparison table, with what they rest on."
         ),
     )
@@ -558,7 +559,7 @@ def table(argv: list[str] | None = None) -> int:
         help=(
             "write what this run produced into the published record the "
             "site and the README read, instead of leaving it in the "
-            "terminal for somebody to retype. Wants all four rows and "
+            "terminal for somebody to retype. Wants all three rows and "
             "refuses a coarse read."
         ),
     )
@@ -581,7 +582,7 @@ def table(argv: list[str] | None = None) -> int:
     chosen = tuple(available[name] for name in keys)
 
     # A saved arrangement replaces the row it belongs to rather than
-    # adding one: the table has four rows and always did, and a preset
+    # adding one: the table has three rows, and a preset
     # is a different answer to the same row's question.
     try:
         chosen, arrangements = _with_presets(keys, chosen, args)
@@ -1256,7 +1257,7 @@ def deliver(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="yerkon deliver",
         description=(
-            "Write the study out as Markdown: the four rows, the error "
+            "Write the study out as Markdown: the three rows, the error "
             "budget behind them, every figure and what it rests on, and "
             "the deployments that could be built instead. Everything "
             "this project knows, as files somebody can hand over."

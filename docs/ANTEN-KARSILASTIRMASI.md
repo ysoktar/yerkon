@@ -1,5 +1,7 @@
 # Anten ve belgelendirme seçenekleri: fiyat ve performans
 
+> **Arşiv.** Bu karşılaştırma bir karar için yapıldı ve karar verildi (ADR-0094). Sayılar o günün modeline ve fiyatlarına ait; güncel değerler sitede ve `src/yerkon/published.toml` dosyasında.
+
 25 Eylül 2026. **Proje sahibi O6'yı seçti; tablo artık O6 ile
 yayımlanıyor (ADR-0094).** Hepsi tam çözünürlükte (sekiz gölge çekilişi, 10 m
 profil), SX1280'in resmî duyarlılığıyla (-118 dBm, ADR-0091), A

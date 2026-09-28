@@ -300,23 +300,25 @@ affects = "bu yapıdaki birimlerin montaj ve bakım bedelini"
 affects_en = "the fitting and maintenance cost of units on this structure"
 
 [values."mounting.rooftop.rent_tl_per_year"]
-value = 1200.0
+value = 24500.0
 unit = "TL/year"
-provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
-note = """Bina sahibine çatı için ödenen yıllık bedel. Yayımlanmış bir \
-sayı bulunamadı; ayda 100 TL varsayıldı, dağıtım direği için protokol \
-olmazsa karşılaştırmada kullanılan tutar. Baz istasyonu çatı kiraları \
-bunun çok üstünde, ama onlar kilovatlar çeken dolaplar için; bu birim avuç \
-içi kadar. Çatılar kiralık olduğu için yerleşim aramasına girmiyor; bu \
-değer tablodaki hiçbir satırı etkilemiyor."""
+provenance = "DATASHEET"
+source = "İBB Elektronik Sistemler Şube Müdürlüğü, 2025 ücret tarifesi: belediye mülküne konan bir repeater ya da small cell için yıllık 24500 TL"
+source_en = "Istanbul Metropolitan Municipality, electronic systems, 2025 tariff: 24500 TL a year for a repeater or small cell on its property"
+note = """Bina sahibine çatı için ödenen yıllık bedel. Özel bir binanın \
+çatısı için yayımlanmış bir tarife bulunamadı; bulunan en yakın yayımlanmış \
+bedel, İstanbul Büyükşehir Belediyesi'nin küçük bir telsiz cihazı için \
+aldığı yıllık 24500 TL. Kamu yapılarında üst sınır 3194 sayılı Kanun Ek \
+9/7'den: büyükşehirde yılda 137517,20 TL, diğer yerlerde 82510,32 TL. \
+Çatılar kiralık olduğu için yerleşim aramasına girmiyor; bu değer tablodaki \
+hiçbir satırı etkilemiyor."""
 note_en = """What the building's owner is paid a year for the roof. No \
-published figure was found; 100 TL a month is assumed, the sum used for a \
-distribution pole as a comparison should there be no protocol. Base \
-station roof rents are far above this, but those are for cabinets drawing \
-kilowatts; this unit fits in a palm. Roofs are rented, so the placement \
-search does not offer them; this figure touches no row of the table."""
+published tariff for a private roof was found; the nearest published fee is \
+the 24500 TL a year Istanbul Metropolitan Municipality charges for a small \
+radio device. On public buildings the ceiling comes from Law 3194, \
+additional article 9/7: 137517,20 TL a year in a metropolitan province, \
+82510,32 TL elsewhere. Roofs are rented, so the placement search does not \
+offer them; this figure touches no row of the table."""
 affects = "çatıdaki birimlerin OPEX'ini"
 affects_en = "OPEX of units on roofs"
 

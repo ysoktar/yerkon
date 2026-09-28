@@ -1,6 +1,6 @@
 # MATLAB ölçümleri
 
-`src/yerkon/defaults.toml` içindeki iki figür tahmin edilmek yerine
+`src/yerkon/defaults.toml` içindeki iki değer tahmin edilmek yerine
 ölçülebilir. Bunlardan biri burada.
 
 ## Çalıştırmak
@@ -37,11 +37,11 @@ cıvıltıyı cıvıltısızlaştırmak `offset + mu*tau` verir. Bunların
 **toplamı**, zamanlaması sönmüş hâlde frekans kaymasının iki katıdır.
 Tepe alınmadan önce izgeler önsöz boyunca biriktirilir, çünkü göz
 kestirimleri döngüseldir ve onları aritmetik olarak ortalamak yanlıştır;
-sonra bir parabolik aradeğerleme 1587 Hz'lik gözün altına iner — ki o göz
+sonra bir parabolik aradeğerleme 1587 Hz'lik gözün altına iner; o göz
 tek başına 0,65 ppm'dir ve olmasa cevabı boğardı.
 
-Sinyal–gürültü oranını **ilinti sonrasında** +5'ten +40 dB'ye tarar,
-çünkü link bütçesi orada yaşar: SX1280'in −20 dB'lik bant içi eşiğindeki
+Sinyal-gürültü oranını **ilinti sonrasında** +5'ten +40 dB'ye tarar,
+çünkü link bütçesi orada yaşar: SX1280'in -20 dB'lik bant içi eşiğindeki
 bir bağlantı, 30,1 dB'lik yayma kazancından sonra +10 dB'de oturur
 (ADR-0017).
 

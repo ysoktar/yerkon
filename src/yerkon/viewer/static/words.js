@@ -118,7 +118,7 @@ export const SAY = {
   "preset.replaces": {
     tr: "{name} yüklenecek. Bu sekmedeki her şeyin yerine geçer: zemin, "
         + "sahanın boyu ve eni, bütün direk dizileri ve alıcılar, elle "
-        + "taşınmış ve silinmiş direkler, ve elle değiştirilmiş bütün "
+        + "taşınmış ve silinmiş direkler ve elle değiştirilmiş bütün "
         + "değerler. Diğer sekmelere dokunulmaz.",
     en: "{name} will be loaded. It replaces everything in this tab: the "
         + "ground, the site's length and width, every anchor run and "

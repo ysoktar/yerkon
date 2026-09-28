@@ -232,10 +232,11 @@ CATALOGUE: dict[str, dict[str, str]] = {
     "site.no_imagery_url": {
         "tr": "Hava görüntüsü için bir karo adresi verilmedi. Sağlayıcıyı "
               "sen seçiyorsun: her birinin kendi koşulları var ve çoğu "
-              "anahtar istiyor. Örnekler docs/TRY-IT.md içinde.",
+              "anahtar istiyor. Bir örnek README.md'de, \"Yeni bir saha "
+              "getirmek\" başlığında.",
         "en": "No tile URL given for the imagery. You choose the provider: "
-              "each has its own terms and most want a key. Examples are in "
-              "docs/TRY-IT.md.",
+              "each has its own terms and most want a key. There is an "
+              "example in README.md, under \"Yeni bir saha getirmek\".",
     },
     "site.too_many_tiles": {
         "tr": "{tiles} karo, {zoom} yakınlıkta; sınır {most}. Daha düşük "

@@ -2101,7 +2101,7 @@ def test_the_panel_has_a_third_state_for_a_number_it_is_working_out():
 
     Read off the file rather than run, because `app.js` is the page
     itself — it reaches for `document` as it loads. The behaviour is
-    walked in a browser instead, and `docs/TRY-IT.md` says how.
+    walked in a browser instead.
     """
     page = (STATIC / "app.js").read_text(encoding="utf-8")
     assert 'const WORKING = "…";' in page
@@ -2201,7 +2201,7 @@ def test_the_size_knob_stands_down_while_a_map_box_is_in_force():
     # The exact branch, so that disabling it is a failing test rather
     # than a passing one: `app.js` is the page itself and reaches for
     # `document` as it loads, so these read the file. The behaviour is
-    # walked in a browser, and `docs/TRY-IT.md` says how.
+    # walked in a browser.
     assert "if (pickedBox && pickedSpan) {" in knob
     assert "size.disabled = true;" in knob
     assert "size.disabled = false;" in knob

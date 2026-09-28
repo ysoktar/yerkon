@@ -1,6 +1,7 @@
 """What a deployment costs to build and to run. See ADR-0006."""
 
 import math
+import pathlib
 
 import pytest
 
@@ -40,74 +41,48 @@ def an_inventory(count=13, mounting=TALL_MAST, **kwargs):
 # --- The bill of materials ------------------------------------------------
 
 
-def test_the_bill_starts_from_the_report_s_own_totals():
-    """ADR-0079. With the report's parts in, the report's number comes out.
+def test_a_part_costs_what_its_seller_asks_for_that_many():
+    """ADR-0105. The last tier at or below the pieces bought; below the
+    seller's least order, the first tier."""
+    from yerkon.bom import Part
 
-    The report prints a total per product and no part prices. The bill
-    takes the named parts out at their distributor prices and calls what
-    is left "other"; put the same parts back and the total is the
-    report's to the lira, at one unit and at a hundred.
-    """
+    part = Part(key="k", name="n", role_tr="", role_en="", seller="s",
+                url="u", ladder=((5, 0.15), (500, 0.10), (3000, 0.09)))
+    assert part.at(1) == 0.15
+    assert part.at(499) == 0.15
+    assert part.at(500) == 0.10
+    assert part.at(2000) == 0.10
+    assert part.at(3000) == 0.09
+
+
+def test_a_part_used_twice_is_priced_at_the_pieces_it_needs():
+    """Two terminals a board: a hundred boards buy two hundred."""
     from yerkon.bom import read
 
-    for board in read().boards.values():
-        back = (board.other_usd + sum(p.usd for p in board.was)) * board.usd_try
-        assert back == pytest.approx(board.report_one_tl)
-        assert back * board.hundred_over_one == pytest.approx(
-            board.report_hundred_tl)
+    board = read().boards["amplified-anchor"]
+    terminals = dict((p.key, (p, n)) for p, n in board.lines)["kf301-2p"]
+    part, n = terminals
+    assert n == 2
+    assert board.usd(100) == pytest.approx(sum(
+        k * q.at(k * 100) for q, k in board.lines))
+    assert part.at(n * 100) < part.at(n)
 
 
-def test_what_is_left_of_each_anchor_is_the_same_board():
-    """The check that says the breakdown agrees with the report.
-
-    Taking each anchor's named parts out of the report's total leaves
-    power conversion, protection, connectors and an enclosure, which are
-    the same whatever radio sits on the board. If the three remainders
-    disagreed by much, a part price here would be wrong. They agree to
-    within a dollar.
-    """
+def test_no_tier_means_no_discount():
+    """A part with one known price costs that at every tier."""
     from yerkon.bom import read
 
-    left = [read().boards[k].other_usd
-            for k in ("sx1280-anchor", "amplified-anchor", "tunnel-anchor")]
-    assert max(left) - min(left) < 1.0
-    assert all(13.0 < usd < 22.0 for usd in left)
+    box = read().parts["gainta-g203"]
+    assert box.at(1) == box.at(100) == box.at(1000)
 
 
-#: Parts bought for range and for the weather rather than for price
-#: (ADR-0091, ADR-0094): antennas with gain, and the cable to a mast
-#: antenna. The printed antenna on the report's board is neither.
-FOR_RANGE = {"tl-ant2412d", "hgv-2409u", "lmr200-pigtail", "gw-22-5151"}
-
-
-def test_no_part_is_swapped_for_a_dearer_one():
-    """Except the parts bought for range, which are named above. Without
-    them every board still costs no more than the report said."""
-    from yerkon.bom import read
-
-    for board in read().boards.values():
-        for gone, came in board.swapped:
-            if came.key in FOR_RANGE:
-                continue
-            assert came.usd < gone.usd, (board.key, gone.name, came.name)
-        for_range_tl = sum(
-            p.usd for p in board.parts if p.key in FOR_RANGE) * board.usd_try
-        assert board.one_tl - for_range_tl <= board.report_one_tl, board.key
-
-
-def test_each_part_sits_beside_the_one_it_replaced():
-    """The cost page pairs `was` and `parts` in order. The antenna the
-    report never named once came between the module and the
-    microcontroller, and the page put the old microcontroller beside
-    the antenna."""
-    from yerkon.bom import read
-
-    pairs = {(gone.key, came.key)
-             for board in read().boards.values()
-             for gone, came in board.swapped}
-    assert ("stm32g0b1met6", "stm32g031k8t6") in pairs
-    assert not any(came == "gw-22-5151" and gone.startswith("stm32")
-                   for gone, came in pairs)
+def test_the_bill_leans_on_no_report_figure():
+    """The report's prices were wrong; nothing in the bill reads them."""
+    text = (pathlib.Path(__file__).resolve().parents[1]
+            / "src/yerkon/bom.toml").read_text(encoding="utf-8")
+    for gone in ("report_one_tl", "report_hundred_tl", "was =",
+                 "thousand_over_hundred"):
+        assert gone not in text
 
 
 def test_the_table_prices_hardware_for_the_network_it_runs():

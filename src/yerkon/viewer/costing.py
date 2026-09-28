@@ -234,18 +234,16 @@ def rows(published, language: str, table) -> str:
 
 
 def summary(language: str, table) -> str:
-    """Each product at one, a hundred and a thousand, beside the report."""
+    """Each product at one, a hundred and a thousand."""
     from yerkon.bom import read
 
     bill = read()
     head = [_say(pair, language) for pair in (
-        ("Ürün", "Product"), ("Rapor, 1", "Report, 1"),
-        ("Rapor, 100", "Report, 100"), ("Döküm, 1", "Itemised, 1"),
-        ("Döküm, 100", "Itemised, 100"), ("Döküm, 1000", "Itemised, 1000"),
+        ("Ürün", "Product"), ("1 adet", "One"),
+        ("100 adette", "At a hundred"), ("1000 adette", "At a thousand"),
     )]
     body = [
-        [html.escape(board.name(language)), _tl(board.report_one_tl),
-         _tl(board.report_hundred_tl), _tl(board.one_tl),
+        [html.escape(board.name(language)), _tl(board.one_tl),
          _tl(board.hundred_tl), "<b>{}</b>".format(_tl(board.thousand_tl))]
         for board in bill.boards.values()
     ]
@@ -254,72 +252,43 @@ def summary(language: str, table) -> str:
 
 
 def parts(language: str, table) -> str:
-    """Every part of every product, with who sells it and for how much,
-    at one unit and at a thousand, the rest of the board included."""
+    """Every part of every product, with who sells it and for how much
+    at one, a hundred and a thousand boards."""
     from yerkon.bom import read
 
     bill = read()
     out = []
     for board in bill.boards.values():
-        replaced = {came.key: gone for gone, came in board.swapped}
-        carried = board.hundred_over_one * board.thousand_over_hundred
         head = [_say(pair, language) for pair in (
             ("Parça", "Part"), ("Görevi", "What it does"),
-            ("Satıcı", "Seller"), ("Rapordaki karşılığı", "In the report"),
-            ("1 adet", "One"), ("1000 adette", "At a thousand"),
+            ("Satıcı", "Seller"), ("1 adet", "One"),
+            ("100 adette", "At a hundred"), ("1000 adette", "At a thousand"),
         )]
-
-        def row(part, count, gone=None):
+        body = []
+        for part, count in board.lines:
             name = part.name if count == 1 else "{} x {}".format(count, part.name)
-            return [
-                html.escape(name), html.escape(part.role(language)),
+            role = part.role(language)
+            if part.note and language != "en":
+                role = "{} ({})".format(role, part.note)
+            body.append([
+                html.escape(name), html.escape(role),
                 '<a href="{}">{}</a>'.format(
                     html.escape(part.url, quote=True), html.escape(part.seller)),
-                html.escape("{}, {}, {} USD".format(
-                    gone.name, gone.seller, decimal_comma(gone.usd, 2)))
-                if gone else "",
-                "{} USD".format(decimal_comma(count * part.at(1, 1.0), 2)),
-                "{} USD".format(decimal_comma(count * part.at(1000, carried), 2)),
-            ]
-
-        body = [row(part, 1, replaced.get(part.key)) for part in board.parts]
-        body += [row(part, count) for part, count in board.others]
-        if board.others:
-            body.append([
-                html.escape(_say(("Raporun \"diğer\" kalanı", "The report's \"other\" remainder"),
-                                 language)),
-                html.escape(_say((
-                    "karşılaştırma için; toplama girmiyor",
-                    "for comparison; not added in"), language)),
-                html.escape(_say(("raporun toplamından", "from the report's total"),
-                                 language)),
-                "",
-                "{} USD".format(decimal_comma(board.other_usd, 2)),
-                "{} USD".format(decimal_comma(board.other_usd * carried, 2)),
-            ])
-        else:
-            body.append([
-                html.escape(_say(("Diğer", "Other"), language)),
-                html.escape(_say((
-                    "güç dönüşümü, koruma, bağlantı, kutu",
-                    "power conversion, protection, connectors, enclosure",
-                ), language)),
-                html.escape(_say(("raporun toplamından", "from the report's total"),
-                                 language)),
-                "",
-                "{} USD".format(decimal_comma(board.other_usd, 2)),
-                "{} USD".format(decimal_comma(board.other_usd * carried, 2)),
+            ] + [
+                "{} USD".format(decimal_comma(count * part.at(count * tier), 2))
+                for tier in (1, 100, 1000)
             ])
         body.append([
             "<b>{}</b>".format(html.escape(_say(("Toplam", "Total"), language))),
-            "", "", "",
+            "", "",
             "<b>{}</b>".format(_tl(board.one_tl)),
+            "<b>{}</b>".format(_tl(board.hundred_tl)),
             "<b>{}</b>".format(_tl(board.thousand_tl)),
         ])
         out.append("<h3>{}</h3>{}".format(
             html.escape(board.name(language)),
             '<div class="scroll">{}</div>'.format(
-                table([head] + body, numeric_from=4))))
+                table([head] + body, numeric_from=3))))
     return "".join(out)
 
 
@@ -492,14 +461,16 @@ def units(published, language: str, table) -> str:
     if len(dense) == 2:
         (n1, c1, a1), (n2, c2, a2) = dense
         said.append(_say((
-            "<p>Bir birim şehirde en ucuza kuruluyor ve işletiliyor, ama "
+            "<p>Tablonun kullandığı yapılar içinde bir birim şehirdeki "
+            "aydınlatma direğinde en ucuza kuruluyor ve işletiliyor, ama "
             "şehir içi satır kilometrekare başına en pahalısı. Sebep "
             "yoğunluk: binalar sinyali kestiği için şehirde bir birim "
             "{a1} km²'ye, kırsalda {a2} km²'ye hizmet ediyor. {c1} birim "
             "{A1} km²'de kilometrekareye {d1} birim, {c2} birim {A2} km²'de "
             "{d2} birim ediyor. Kilometrekare başına maliyet, birim başına "
             "maliyetin bu yoğunlukla çarpımı.</p>",
-            "<p>A unit is cheapest to build and run in town, yet the town "
+            "<p>Of the structures the table uses, a unit is cheapest to "
+            "build and run on a town lighting column, yet the town "
             "row is the dearest per square kilometre. The reason is "
             "density: buildings cut the signal, so a unit serves {a1} km² "
             "in town and {a2} km² in open country. {c1} units over {A1} km² "

@@ -171,7 +171,7 @@ HOME = Page(
             lines=(_w(
                 "Rapordan. Yayın birimleri yol kenarında zaten duran "
                 "noktalara takılıyor. Alıcı hem uyduyu hem yerdeki "
-                "birimleri görüyor, ve uydu kesilince yerdekilerle devam "
+                "birimleri görüyor ve uydu kesilince yerdekilerle devam "
                 "ediyor.",
                 "From the report. The broadcast units go onto points "
                 "already standing by the road. A receiver sees both the "
@@ -209,12 +209,12 @@ HOME = Page(
                 ),
                 _w(
                     "Bir yayın birimi 1000 adetlik üretimde, kutusu, "
-                    "baskılı devresi ve dizgisiyle 1289 ile 1596 lira "
+                    "baskılı devresi ve dizgisiyle 1382 ile 1680 lira "
                     "arasında. Hedef, AUS "
                     "noktalarında zaten "
                     "duran elektrik ve haberleşme altyapısını yeniden "
                     "kullanmak; maliyeti aşağıda tutan da bu.",
-                    "A broadcast unit costs between 1289 and 1596 lira at "
+                    "A broadcast unit costs between 1382 and 1680 lira at "
                     "a thousand units, box, printed board and assembly "
                     "included. The aim is to reuse "
                     "the power and "
@@ -224,7 +224,7 @@ HOME = Page(
                 ),
                 _w(
                     "YERKON uydunun yerine geçmeyi hedeflemiyor. Uydu "
-                    "çalışırken iki konum yan yana duruyor, ve ikisini "
+                    "çalışırken iki konum yan yana duruyor ve ikisini "
                     "karşılaştırmak bir aldatma saldırısını tespit etmeye "
                     "yarayabilir.",
                     "YERKON does not aim to replace the satellites. While "
@@ -259,7 +259,7 @@ WHY = Page(
             kind="picture",
             picture="gnss.png",
             lines=(_w(
-                "Dördü de yabancı devletlerin elinde, ve dördünün de "
+                "Dördü de yabancı devletlerin elinde ve dördünün de "
                 "aynı zayıf noktası var: uydudan gelen sinyal yere "
                 "vardığında çok cılızdır.",
                 "All four are in the hands of foreign states, and all "
@@ -278,7 +278,7 @@ WHY = Page(
                     "tall buildings.",
                 ),
                 _w(
-                    "Sinyal zayıf olduğu için bastırmak kolay, ve "
+                    "Sinyal zayıf olduğu için bastırmak kolay ve "
                     "bastırma cihazları gitgide yaygınlaşıyor.",
                     "The signal is weak, so it is easy to drown out, and "
                     "the equipment for doing it keeps spreading.",
@@ -386,8 +386,8 @@ WHY = Page(
             heading=_w("YERKON'un cevabı", "What YERKON answers"),
             lines=(
                 _w(
-                    "Kırsal yayın biriminde 8-10 km bir haberleşme ve "
-                    "kapsama hedefi; o mesafedeki mesafe ölçüm doğruluğu "
+                    "Kırsal yayın birimi için 8-10 km'lik bir haberleşme ve "
+                    "kapsama hedefi var; o uzaklıktaki ölçüm doğruluğu "
                     "saha deneyleriyle ayrıca doğrulanacak. Tutarsa "
                     "alçaktan uçan bir uçak da birimi duyabilir. "
                     "Havalimanı çevresine kurulan birimler ise uydular "
@@ -426,7 +426,7 @@ SYSTEM = Page(
     title=_w("Mimari", "The architecture"),
     lead=_w(
         "Üç parça: ölçülmüş konumlarda duran yayın birimleri, konumunu "
-        "kendi hesaplayan alıcılar, ve kimlikleri güncel tutan merkezi "
+        "kendi hesaplayan alıcılar ve kimlikleri güncel tutan merkezi "
         "yönetim sistemi.",
         "Three parts: broadcast units standing at surveyed positions, "
         "receivers that work out their own position, and a management "
@@ -455,7 +455,7 @@ SYSTEM = Page(
                     "kenarı ünitesine, haberleşme tesisine ya da tünelin "
                     "içine takılan verici. Alıcı sorduğunda üç şey "
                     "yayınlar: kim olduğunu, kurulumda ölçülen sabit "
-                    "konumunu, ve bunların sahte olmadığını gösteren "
+                    "konumunu ve bunların sahte olmadığını gösteren "
                     "imzayı.",
                     "**The broadcast unit.** A transmitter fixed to one "
                     "point: a mast, a roadside unit, a communications "
@@ -522,13 +522,13 @@ SYSTEM = Page(
                     "there-and-back between the unit and the receiver.",
                 ),
                 _w(
-                    "Simülasyon bu farkı ölçtü. Düzeltilmemiş 10 ppm'lik bir "
+                    "Simülasyon bu farkı hesapladı. Düzeltilmemiş 10 ppm'lik bir "
                     "saat kayması tek yönlü ölçümde 24,1 m hata bırakır, "
                     "çift yönlüde 0,3 mm. Alıcı kaymayı kestirip "
                     "düzeltince geriye en kötü 0,0793 ppm kalıyor; bu "
                     "değer kestiricinin MATLAB koşusundan, donanımdan "
                     "değil.",
-                    "The simulation measured that difference. An "
+                    "The simulation worked out that difference. An "
                     "uncorrected 10 ppm clock offset leaves 24,1 m of "
                     "error one way and 0,3 mm two ways. Once the receiver "
                     "estimates and removes the offset, at worst 0,0793 ppm "
@@ -561,7 +561,7 @@ SYSTEM = Page(
                     "veriyor. Bu bir birim ile alıcı arasındaki tek "
                     "mesafenin doğruluğu; nihai konum hatası değil. Konum "
                     "hatası birimlerin geometrisine, çok yollu yayılıma ve "
-                    "engellere de bağlı, ve ayrıca HPE P50 ile HPE P95 "
+                    "engellere de bağlı ve ayrıca HPE P50 ile HPE P95 "
                     "üzerinden değerlendirilecek.",
                     "**Urban.** Many short range units: base station "
                     "sites, traffic signs and lights, advertising boards, "
@@ -588,9 +588,9 @@ SYSTEM = Page(
                     "(E28-2G4M20S) ve dış ortam tipi 5 dBi çubuk anten. "
                     "Menzilin geri "
                     "kalanını direğin yüksekliği ve açık görüş sağlıyor. "
-                    "YERKON'da 8-10 km bir "
-                    "haberleşme ve kapsama hedefi olarak alınıyor ve o "
-                    "mesafedeki ölçüm doğruluğu saha deneyleriyle "
+                    "YERKON'da 8-10 km'lik bir "
+                    "menzil haberleşme ve kapsama hedefi olarak alınıyor; o "
+                    "uzaklıktaki ölçüm doğruluğu saha deneyleriyle "
                     "doğrulanacak. Simülasyondaki Polatlı arazisi "
                     "seyrek yapılı bir bozkır olduğu için, 486 m'lik iniş "
                     "çıkışına rağmen kırsal satır şehir içinden biraz daha "
@@ -629,7 +629,7 @@ SYSTEM = Page(
                     "mesafe ölçüm hassasiyeti hedefleyen uygulamalarda "
                     "kullanılabiliyor. Nihai konum hatası buna eşit değil: "
                     "geometriye, kalibrasyona, çok yollu yayılıma ve "
-                    "engellere bağlı, ve saha testlerinde HPE P50 ile HPE "
+                    "engellere bağlı ve saha testlerinde HPE P50 ile HPE "
                     "P95 üzerinden ayrıca ölçülecek.",
                     "**Critical areas.** Tunnels, metro and station areas, "
                     "ports and airports, disaster logistics areas. A 6,5 "
@@ -707,23 +707,21 @@ SYSTEM = Page(
             kind="points",
             lines=(
                 _w(
-                    "\"Rapor\" sütunları başvuru raporunun 1 ve 100 adet "
-                    "fiyatları. \"Döküm\" sütunları kartın parça parça "
-                    "satıcı fiyatları: telsiz modülü, mikrodenetleyici, "
-                    "anten, besleme, koruma, kutu, pasifler, baskılı devre "
-                    "ve dizgi. Tablo 1000 "
-                    "adetlik fiyatla hesaplanıyor, çünkü işletme modeli "
-                    "bin birimlik bir ağ varsayıyor. Her parça, satıcısı "
-                    "ve fiyatı Maliyet sayfasında.",
-                    "The \"report\" columns are the application report's "
-                    "prices at one and a hundred. The \"itemised\" "
-                    "columns price the board part by part from its "
-                    "sellers: radio module, microcontroller, antenna, "
+                    "Her ürünün 1, 100 ve 1000 adetteki fiyatı, kartın "
+                    "parçalarının satıcılarının kendi kademe fiyatlarıyla "
+                    "toplanıyor: telsiz modülü, mikrodenetleyici, anten, "
+                    "besleme, koruma, kutu, pasifler, baskılı devre ve "
+                    "dizgi. Tablo 1000 adetlik fiyatla hesaplanıyor, çünkü "
+                    "işletme modeli bin birimlik bir ağ varsayıyor. Her "
+                    "parça, satıcısı ve fiyatı Maliyet sayfasında.",
+                    "Each product's price at one, a hundred and a thousand "
+                    "is the sum of its parts at their sellers' own tier "
+                    "prices: radio module, microcontroller, antenna, "
                     "supply, protection, box, passives, printed board and "
-                    "assembly. The "
-                    "table prices at a thousand, because the operating "
-                    "model assumes a network of a thousand units. Every "
-                    "part, its seller and its price are on the Cost page.",
+                    "assembly. The table prices at a thousand, because the "
+                    "operating model assumes a network of a thousand "
+                    "units. Every part, its seller and its price are on "
+                    "the Cost page.",
                 ),
                 _w(
                     "Fiyatlar kartın bütün parçalarını kapsıyor: ana "
@@ -760,7 +758,7 @@ RESEARCH = Page(
     nav=_w("AR-GE", "Research"),
     title=_w("Araştırma soruları", "The research questions"),
     lead=_w(
-        "Proje dört soruya cevap arıyor. Hiçbiri kapanmış değil, ve her "
+        "Proje dört soruya cevap arıyor. Hiçbiri kapanmış değil ve her "
         "birinin altında ne yapılacağı yazılı.",
         "The project is looking for answers to four questions. None of "
         "them is closed, and under each one is what will be done.",
@@ -802,7 +800,7 @@ RESEARCH = Page(
                 ),
                 _w(
                     "**Çift yönlü ölçümün iki eksisi giderilebilir mi?** "
-                    "Bu eksiler şunlar: havada daha çok mesaj dolaşıyor, "
+                    "Bu eksiler şunlar: havada daha çok mesaj dolaşıyor "
                     "ve alıcı sayısı arttıkça sıra beklemek gerekiyor. "
                     "Tek yönlü yayın yapan sistemler alıcıdan cevap "
                     "beklemediği için bu yükü taşımıyor. TWR CDMA "
@@ -824,7 +822,7 @@ RESEARCH = Page(
                 _w(
                     "**Konum hizmeti veren bir altyapının güvenliği ne "
                     "ister?** İki tehdide karşı çözüm denenecek: birinin "
-                    "sahte bir yayın birimi kurması, ve izinsiz alıcıların "
+                    "sahte bir yayın birimi kurması ve izinsiz alıcıların "
                     "sistemi doldurması. Her modüle şifreleme işini "
                     "üstlenen ayrı bir yonga (ATECC608B) konacak; her "
                     "mesajın kimden geldiği ve yolda değiştirilmediği "
@@ -853,7 +851,7 @@ RESEARCH = Page(
                     "ortancası (P50), yüzde 95'i (P95) ve en kötüsü, "
                     "konumun kesintisiz gelip gelmediği, sinyal koptuktan "
                     "sonra yeniden yakınsama süresi, boşuna verilen alarm "
-                    "oranı, ve aldatma ile karıştırmanın yakalanma "
+                    "oranı ve aldatma ile karıştırmanın yakalanma "
                     "oranı.",
                     "Under a spoofing attack the receiver gives a "
                     "position and speed that look flawless from outside "
@@ -1020,20 +1018,20 @@ VALUE = Page(
                        "Institutional and academic"),
             lines=(
                 _w("Hangi hizmetin uyduya ne kadar bağlı olduğu "
-                   "çıkarılır, ve olaylar ülke haritasına işlenir.",
+                   "çıkarılır ve olaylar ülke haritasına işlenir.",
                    "It comes out which service depends on the satellites "
                    "how much, and the events go onto a national map."),
                 _w("Kurumlar aynı olay verisine bakar; hizmetin ne kadar "
                    "iyi olması gerektiği bu veriyle tanımlanabilir.",
                    "Institutions look at the same event data, and how good "
                    "the service has to be can be defined from it."),
-                _w("Geriye bir veri kümesi kalır: birden çok sensörden "
-                   "toplanmış, uydunun kesildiği ve kandırıldığı durumları "
-                   "içeren.",
+                _w("Geriye birden çok sensörden toplanmış, uydunun "
+                   "kesildiği ve kandırıldığı durumları da içeren bir veri "
+                   "kümesi kalır.",
                    "What is left is a dataset gathered from several "
                    "sensors, covering satellites cut off and satellites "
                    "fooled."),
-                _w("Konum hesaplayan yöntemler burada yazılır, ve "
+                _w("Konum hesaplayan yöntemler burada yazılır ve "
                    "üniversite, kamu ve sanayi aynı işin üzerinde çalışır.",
                    "The methods that work out position get written here, "
                    "with universities, the state and industry on the same "
@@ -1042,7 +1040,7 @@ VALUE = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Nasıl kendini döndürür",
+            heading=_w("Kendini nasıl döndürür",
                        "How it pays for itself"),
             lines=(
                 _w(
@@ -1078,7 +1076,7 @@ VALUE = Page(
                     "yazılacak, ilk yayın ve alıcı kartları tasarlanacak. "
                     "Orta vadede yerli gömülü sistem ve telsiz "
                     "firmalarıyla ortaklık, savunma ve haberleşme "
-                    "ekosistemiyle birlikte donanım geliştirme, ve kritik "
+                    "ekosistemiyle birlikte donanım geliştirme ve kritik "
                     "parçaların iki ayrı yerden tedariki.",
                     "In the short term the pilot is proved on hardware "
                     "bought off the shelf, while the domestic software and "
@@ -1122,7 +1120,7 @@ VALUE = Page(
                 _w(
                     "**Altyapı.** Şehir içi ve kırsal yayın birimi (aynı "
                     "kart; kırsalda güneş paneli ve aküyle), kritik bölge "
-                    "yayın birimi, ve güvenli anahtar ile yayın birimi "
+                    "yayın birimi ve güvenli anahtar ile yayın birimi "
                     "yönetim sistemi.",
                     "**Infrastructure.** The urban and rural broadcast "
                     "unit (one board; in open country with a solar panel "
@@ -1131,7 +1129,7 @@ VALUE = Page(
                 ),
                 _w(
                     "**Kullanıcı.** Kara aracı alıcısı, yaya alıcısı "
-                    "(taşınabilir saha alıcısı), ve nesnelerin interneti "
+                    "(taşınabilir saha alıcısı) ve nesnelerin interneti "
                     "alıcısı. "
                     "Sonraki ürünler: insansız hava aracı entegrasyon "
                     "modülü, demiryolu ve denizcilik alıcısı.",
@@ -1144,7 +1142,7 @@ VALUE = Page(
                 _w(
                     "**Yazılım.** Merkezi yönetim paneli, GNSS bütünlük ve "
                     "olay haritası, filolar ve kritik altyapı için "
-                    "arayüzler, analiz ve raporlama yazılımı, ve "
+                    "arayüzler, analiz ve raporlama yazılımı ve "
                     "çevrimdışı yayın birimi konum haritası.",
                     "**Software.** The management panel, the GNSS "
                     "integrity and event map, interfaces for fleets and "
@@ -1299,7 +1297,7 @@ RESULTS = Page(
                 _w(
                     "Simülasyondaki **Hızlı dene** düğmesi ve komut "
                     "satırındaki `--fast` aynı iki ayarı kabalaştırır: "
-                    "gölgeleme sekiz kez yerine bir kez çekilir, ve zemin "
+                    "gölgeleme sekiz kez yerine bir kez çekilir ve zemin "
                     "10 m'de bir yerine sabit 64 noktada okunur. Koşu on "
                     "beş dakikadan bir dakikaya iner.",
                     "The **fast** button in the simulation and `--fast` on "
@@ -1349,7 +1347,7 @@ SIMULATION = Page(
             lines=(_w(
                 "Şehir içi satırı, koşusu bitmiş hâlde: Kızılay'ın "
                 "gerçek arazisi, aydınlatma direklerine takılmış yayın "
-                "birimleri, ve zemine boyanmış kapsama haritası. Renkler o "
+                "birimleri ve zemine boyanmış kapsama haritası. Renkler o "
                 "noktada kaç birimin duyulduğunu gösteriyor; konum hesabı "
                 "için en az dört gerekiyor. Sağdaki panel o sekmenin "
                 "kendi koşusu, sekiz gölge çekilişi havuzlanmış.",
@@ -1412,7 +1410,7 @@ SIMULATION = Page(
                     "Kodun hiçbir yerinde \"azami menzil şu kadardır\" "
                     "diye bir sayı yok. Menzil, sinyalin yolda ne kadar "
                     "zayıfladığı hesaplanarak çıkıyor. Aynı hesap iki "
-                    "şeye birden karar veriyor: bağlantı kuruluyor mu, ve "
+                    "şeye birden karar veriyor: bağlantı kuruluyor mu ve "
                     "kurulduysa ne kadar hassas ölçüyor.",
                     "Nowhere in the code is there a number saying \"the "
                     "maximum range is this\". Range comes out of working "
@@ -1422,7 +1420,7 @@ SIMULATION = Page(
                     "does.",
                 ),
                 _w(
-                    "Sinyal alıcıya iki yoldan gelir: doğrudan, ve "
+                    "Sinyal alıcıya iki yoldan gelir: doğrudan ve "
                     "zeminden sekerek. Belli bir mesafeden sonra bu ikisi "
                     "ters düşüp birbirini zayıflatır. O mesafe anten "
                     "yüksekliğiyle birlikte arttığı için, birimi alçağa "
@@ -1514,7 +1512,7 @@ SIMULATION = Page(
                     "Konumu hesaplayan kod, aracın gerçekte nerede "
                     "olduğunu hiç görmez. Yalnızca şunları görür: ölçülen "
                     "mesafe, birimin kurulumda ölçülmüş konumu, ölçümün "
-                    "saati, ve o ölçüme ne kadar güvenildiği.",
+                    "saati ve o ölçüme ne kadar güvenildiği.",
                     "The code that works out the position never sees "
                     "where the vehicle really is. It sees only these: the "
                     "measured distance, the unit's position as surveyed at "
@@ -1524,14 +1522,14 @@ SIMULATION = Page(
                 _w(
                     "Yol kenarına dizilmiş birimler hep aynı yükseklikte "
                     "olduğu için yüksekliği mesafelerle ölçmek zor. Filtre "
-                    "bu yüzden birimin haritasındaki yol yüksekliğini bir "
+                    "bu yüzden alıcının haritasındaki yol yüksekliğini bir "
                     "ölçüm olarak alıyor, 2,43 m'lik bir harita hatasıyla; "
                     "hata yol boyunca parça parça çekiliyor. Tablodaki VPE "
                     "sütunu bu hesabın sonucu.",
                     "Units strung along a roadside are all at much the "
                     "same height, which leaves the vertical hard to "
                     "measure from ranges. The filter therefore takes the "
-                    "road's height from the unit's map as a measurement, "
+                    "road's height from the receiver's map as a measurement, "
                     "with a map error of 2,43 m drawn in patches along the "
                     "road. The VPE column is the result.",
                 ),
@@ -1545,7 +1543,7 @@ SIMULATION = Page(
             lines=(
                 _w(
                     "**Önü kapalı bir bağlantı olduğundan uzun ölçer.** "
-                    "Sinyal engelin üzerinden dolaşıyor, ve ölçüm bu uzun "
+                    "Sinyal engelin üzerinden dolaşıyor ve ölçüm bu uzun "
                     "yolu sayıyor. Hata hep aynı yöne, artı yöne gidiyor; "
                     "bu yüzden çok ölçüp ortalamak onu götürmüyor.",
                     "**A blocked link measures longer than it is.** The "
@@ -1560,16 +1558,14 @@ SIMULATION = Page(
                     "çekiliyor ve sonuna kadar taşınıyor. Tünelde "
                     "hataların ortancası, birimler kusursuz ölçülmüş "
                     "olsaydı 0,12 m çıkıyor; 15 cm'lik bir ölçüm hatasıyla "
-                    "bunun yaklaşık beş katı. Birimleri ölçtüğünüzden "
-                    "daha iyi konum "
-                    "veremiyorsunuz.",
+                    "bunun yaklaşık beş katı. Konum, birimlerin yerinin "
+                    "ölçüldüğünden daha iyi olamaz.",
                     "**If a unit's position is surveyed wrong at "
                     "installation, it stays wrong.** It is drawn once per "
                     "unit and carried to the end. In the tunnel the median "
                     "error is 0,12 m with a perfect survey and about five "
-                    "times that with 15 cm of survey error: you "
-                    "cannot position better "
-                    "than you surveyed.",
+                    "times that with 15 cm of survey error. A position "
+                    "cannot be better than the survey of the units.",
                 ),
                 _w(
                     "**Kaybolan mesaj ölçüm vermez.** Kullanılan 2,4 GHz "
@@ -1766,19 +1762,17 @@ SOURCES = Page(
                    "OpenStreetMap and Overture: buildings, and the masts, "
                    "signs and boards along the road."),
                 _w("Semtech SX1280, EBYTE E28-2G4M20S ve E28-2G4M12S, Qorvo "
-                   "DWM3000 veri sayfaları, ve SX1280 uzun menzil testi.",
+                   "DWM3000 veri sayfaları ve SX1280 uzun menzil testi.",
                    "Semtech SX1280, EBYTE E28-2G4M20S and E28-2G4M12S, "
                    "Qorvo DWM3000 datasheets, and the SX1280 long range "
                    "test."),
                 _w("DigiKey, LCSC, JLCPCB, Mouser, Gainta ve diğer "
-                   "satıcıların liste fiyatları, 23-28 Eylül 2026; "
-                   "başvuru raporunun fiyatları 6 Eylül 2026. Kur 4 Eylül "
-                   "2026, 48,44 TL/USD ve 1,1622 USD/EUR.",
-                   "List prices from DigiKey, LCSC, JLCPCB, Mouser, Gainta "
-                   "and other sellers, 23 to 28 September 2026; the "
-                   "application report's prices from 6 September 2026. "
-                   "Exchange rates of 4 September 2026, 48,44 TL a dollar "
-                   "and 1,1622 dollars a euro."),
+                   "satıcıların kademe fiyatları, 25-28 Eylül 2026. Kur 4 "
+                   "Eylül 2026, 48,44 TL/USD ve 1,1622 USD/EUR.",
+                   "Tier prices from DigiKey, LCSC, JLCPCB, Mouser, Gainta "
+                   "and other sellers, 25 to 28 September 2026. Exchange "
+                   "rates of 4 September 2026, 48,44 TL a dollar and "
+                   "1,1622 dollars a euro."),
                 _w("Karşılaştırma tablosunun bizim olmayan satırları "
                    "aşağıdaki kaynakçadan gelir. Tablonun altındaki her "
                    "dipnot, dayandığı girdiye bağlıdır.",
@@ -1793,7 +1787,7 @@ SOURCES = Page(
             lines=(
                 _w(
                     "Raporun kaynakça bağlantılarının tamamı, raporda "
-                    "yazıldığı hâliyle, ve sitenin maliyet ve mevzuat "
+                    "yazıldığı hâliyle ve sitenin maliyet ve mevzuat "
                     "hesapları için eklediği kaynaklar. Bir girdiyi hiçbir "
                     "dipnot anmıyorsa da listede kalır.",
                     "Every hyperlink in the report's bibliography, as the "
@@ -1889,7 +1883,7 @@ COST = Page(
         "Tablodaki her maliyet hücresinin kalem kalem dökümü: hangi parça, "
         "kaça, kimden; hangi sayı, neye dayanarak. Satırların, kartların "
         "ve dayanakların sayıları modelden, malzeme listesinden ve ayarlar "
-        "dosyasından çiziliyor; biri değişince sayfa da değişiyor. Yalnız "
+        "dosyasından okunuyor; biri değişince sayfa da değişiyor. Yalnız "
         "direk fiyatları tablosu kaynaklarından aktarıldı.",
         "Every cost cell in the table, line by line: which part, for how "
         "much, from whom; which figure, resting on what. The rows', the "
@@ -1915,11 +1909,11 @@ COST = Page(
                     "the table are the last lines of this breakdown.",
                 ),
                 _w(
-                    "Alıcılar bu dökümde yok. Kimin alacağı rapor "
-                    "tarafından karara bağlanmadı, o yüzden kilometrekare "
-                    "başına rakamlara hiç girmiyorlar.",
-                    "Receivers are not in this breakdown. The report does "
-                    "not settle who buys them, so they never enter the "
+                    "Alıcılar bu dökümde yok. Onları kimin alacağı "
+                    "başvuruda belirlenmedi, o yüzden kilometrekare başına "
+                    "rakamlara girmiyorlar.",
+                    "Receivers are not in this breakdown. The application "
+                    "does not settle who buys them, so they never enter the "
                     "per square kilometre figures.",
                 ),
             ),
@@ -1954,9 +1948,9 @@ COST = Page(
                 ),
                 _w(
                     "Direk eklemek kullanılabilirliği yükseltiyor ama "
-                    "bedava değil. Mevcut yapıların yaptığı şey bu "
-                    "alışverişi karşılanabilir kılmak: her ek birim bir "
-                    "kart ve bir montaj, bir saha değil.",
+                    "bedava değil. Mevcut yapılar bunu karşılanabilir "
+                    "kılıyor: her ek birim yeni bir saha değil, bir kart ve "
+                    "bir montaj.",
                     "Adding anchors raises availability, but not for "
                     "nothing. What the existing structures do is make that "
                     "trade affordable, because each extra unit is a board "
@@ -2006,59 +2000,46 @@ COST = Page(
             heading=_w("Fiyatlar nereden geldi", "Where the prices came from"),
             lines=(
                 _w(
-                    "Rapor her ürün için yalnızca iki toplam veriyor, parça "
-                    "fiyatı vermiyor. Burada her ana parça kendi satıcı "
-                    "fiyatıyla yazılı. Kartın geri kalanı da parça parça "
-                    "yazılı: şebeke beslemesi, düşürücü, koruma, klemens, "
-                    "anten kablosu, kutu, pasifler, baskılı devre ve dizgi. "
-                    "Raporun toplamından ana parçalar çıkarılınca kalan "
-                    "\"diğer\" satırı karşılaştırma için yanında duruyor, "
-                    "toplama girmiyor.",
-                    "The report gives only two totals per product and no "
-                    "part prices. Here each main part carries its own "
-                    "distributor price, and so does the rest of the board: "
+                    "Her parça satıcısının kendi kademe tablosuyla yazılı: "
+                    "ana parçalar ve kartın geri kalanı, yani şebeke "
+                    "beslemesi, düşürücü, koruma, klemens, anten kablosu, "
+                    "kutu, pasifler, baskılı devre ve dizgi. Bir parça bir "
+                    "kartta birden çok varsa (klemens, pasifler) kademe o "
+                    "kadar kart için alınan adete göre seçiliyor.",
+                    "Every part carries its seller's own price ladder: the "
+                    "main parts and the rest of the board, that is the "
                     "mains supply, regulator, protection, terminals, "
                     "antenna cable, box, passives, the printed board and "
-                    "its assembly. What is left of the report's total once "
-                    "the main parts are taken out, its \"other\" line, "
-                    "stands beside them for comparison and is not added "
-                    "in.",
+                    "its assembly. Where a board holds more than one of a "
+                    "part (terminals, passives), the tier is the one the "
+                    "pieces for that many boards reach.",
                 ),
                 _w(
-                    "Satıcının kademe fiyatı doğrulanan bir parça, o "
-                    "kademeden büyük her adette o fiyatla giriyor. Daha "
-                    "küçük adette o fiyat bir taban: bir parça az "
-                    "alındığında çok alındığından ucuz olamaz. Kademesi "
-                    "doğrulanmayan parçalar ve \"diğer\" satırı 100 "
-                    "adette raporun kendi 1'den 100'e indirimiyle, 1000 "
-                    "adette 100 adetlik fiyatın %90'ıyla hesaplanıyor. "
-                    "Böylece her üründe 1 adet, 100 adetten, 100 adet de "
-                    "1000 adetten pahalı. İndirim her ürünün kendi rapor "
-                    "satırından geldiği için, kademesi doğrulanmayan aynı "
-                    "parça (kutu, baskılı devre) ürüne göre biraz farklı "
-                    "bir 1000 adet fiyatı alıyor. Maliyet tablosu 1000 "
-                    "adeti kullanıyor.",
-                    "A part whose distributor tier was verified enters at "
-                    "that price at every quantity from its tier up. Below "
-                    "it, that price is a floor: fewer of a part never cost "
-                    "less than more of it. Parts with no verified tier and "
-                    "the \"other\" line use the report's own discount "
-                    "from one to a hundred, and 90 % of the hundred price "
-                    "at a thousand. So for every product one unit costs "
-                    "more than a hundred, and a hundred more than a "
-                    "thousand. Because the discount comes from each "
-                    "product's own report line, the same part with no "
-                    "verified tier (the box, the printed board) takes a "
-                    "slightly different thousand price in each product. "
-                    "The cost table uses the thousand.",
+                    "Satıcı bir adette kademe yayımlamamışsa indirim "
+                    "varsayılmıyor, bilinen son kademe kullanılıyor. "
+                    "Kutuların 100 adet üstü fiyatı teklifle veriliyor; "
+                    "baskılı devrenin ve pilin büyük adet fiyatı okunamadı; "
+                    "bunlar her adette tek adet fiyatıyla giriyor. Dizginin "
+                    "kurulum, şablon ve parça yükleme bedeli siparişe bir "
+                    "kez ödendiği için karta düşen payı adet büyüdükçe "
+                    "küçülüyor. Maliyet tablosu 1000 adeti kullanıyor.",
+                    "Where a seller published no tier for a quantity, no "
+                    "discount is assumed and the last known tier holds. "
+                    "The boxes are priced on request above a hundred, and "
+                    "no volume price could be read for the printed board "
+                    "or the battery; those enter at their one-unit price "
+                    "at every quantity. Assembly setup, stencil and part "
+                    "loading fees are paid once an order, so each board's "
+                    "share shrinks as the order grows. The cost table uses "
+                    "the thousand.",
                 ),
                 _w(
-                    "Parça fiyatları satıcıların 23-28 Eylül 2026 liste "
+                    "Parça fiyatları satıcıların 25-28 Eylül 2026 liste "
                     "fiyatları; bağlantılar yukarıda. Sipariş öncesinde "
                     "teklifle doğrulanmalı. Bir fiyat değişirse bom.toml "
                     "dosyasındaki tek satır değişir, bu sayfa da tablo da "
                     "onu izler.",
-                    "The part prices are the sellers' list prices of 23 "
+                    "The part prices are the sellers' list prices of 25 "
                     "to 28 September 2026; the links are above. They are "
                     "to be confirmed by quotation before ordering. If a "
                     "price changes, one line in bom.toml changes and this "
@@ -2250,10 +2231,12 @@ LAW = Page(
                    "There is no limit on receiving: a stronger antenna "
                    "hears a weak signal better. Every range goes both ways, "
                    "so the gain is needed at both ends."),
-                _w("Model sınırı antenin en güçlü yönünde tutuyor; alıcıya "
-                   "doğru ne düşüyorsa o.",
+                _w("Model sınırı antenin en güçlü yönüne uyguluyor; "
+                   "alıcıya, antenin alıcı yönündeki kazancıyla düşen güç "
+                   "ulaşıyor.",
                    "The model meets the limit where the antenna is "
-                   "strongest; toward the receiver it gives what it gives."),
+                   "strongest; the receiver gets the power the antenna's "
+                   "gain in its direction leaves."),
             ),
         ),
         Part(
@@ -2630,7 +2613,7 @@ FOOTER = _w(
 
 WEIGHTING = _w(
     "Simülasyonun doldurduğu üç satır. Her biri, hataların yüzde "
-    "95'inin altında kaldığı yatay sapmayı gösteriyor, ve her biri "
+    "95'inin altında kaldığı yatay sapmayı gösteriyor ve her biri "
     "Ankara'nın gerçek arazisi üzerinde koşuldu.",
     "The three rows the simulation filled. Each shows the horizontal "
     "error that 95 per cent of the measurements stayed under, and each was "
@@ -2910,7 +2893,7 @@ WHEN = (
 WHEN_TITLE = _w("Dört olay, dokuz yıl", "Four events, nine years")
 WHEN_UNDER = _w(
     "Yukarıdaki dört olay zaman içinde. Hiçbiri tarihi bir merak değil: "
-    "en eskisi 2017, en yenisi bu yıl, ve aradaki boşluklar kapanıyor.",
+    "en eskisi 2017, en yenisi bu yıl ve aradaki boşluklar kapanıyor.",
     "The four events above, in time. None of them is a historical "
     "curiosity: the oldest is 2017, the newest is this year, and the "
     "gaps between them are closing.",
@@ -2922,14 +2905,14 @@ CLOCKS = (
                   "two way ranging, the same clock")),
 )
 CLOCKS_UNDER = _w(
-    "Aynı 10 ppm'lik saat kaymasının iki ölçüm yöntemine maliyeti. "
-    "Aradaki fark seksen bin kat, ve bu yüzden çift yönlü ölçüm her "
+    "Aynı 10 ppm'lik saat kaymasının iki ölçüm yönteminde bıraktığı "
+    "hata. Aradaki fark seksen bin kat; bu yüzden çift yönlü ölçüm her "
     "direğe atomik saat koymadan çalışabiliyor. İkisi de simülasyonun "
-    "ölçtüğü değer.",
-    "What the same 10 ppm clock offset costs each way of measuring. The "
-    "gap is eighty thousand fold, and it is why two way ranging works "
-    "without an atomic clock on every mast. Both figures are the "
-    "simulation's own measurement.",
+    "hesapladığı değer.",
+    "What the same 10 ppm clock offset leaves behind in each way of "
+    "measuring. The gap is eighty thousand fold, and it is why two way "
+    "ranging works without an atomic clock on every mast. Both figures "
+    "are worked out by the simulation.",
 )
 SPREAD = _w("Üç satırın hatası: ortancadan en kötü %5'e",
             "Each row's error, median to ninety fifth")

@@ -1,62 +1,34 @@
 # Malzeme listesi, parça parça. / The bill of materials, part by part.
 #
-# Raporun 14. sayfası her ürün için iki toplam veriyor: 1 adet ve 100
-# adette birim fiyat. Parça fiyatlarını vermiyor. Burada her ana parça
-# kendi satıcı fiyatıyla yazılı; raporun toplamından bu parçalar
-# çıkarılınca kalan "diğer" kalemi (güç dönüşümü, koruma, bağlantı,
-# kutu) ayrıca yazılı. Üç yayın biriminde de bu kalan 1 adette 15 USD
-# civarında çıkıyor, yani döküm raporla tutarlı.
+# Her parça satıcısının kendi kademe tablosuyla yazılı: `ladder` her
+# satırda bir en küçük adet ve o adetten başlayan birim fiyat (USD). Bir
+# ürünün 1, 100 ve 1000 adetlik fiyatı, her parçanın o kadar kart için
+# alınan adetteki kademesinden toplanıyor. Kademesi yayımlanmamış bir
+# adette indirim varsayılmıyor: bilinen son kademe kullanılıyor.
 #
-# The report gives two totals per product and no part prices. Here each
-# main part carries its own distributor price, and what is left of the
-# report's total once they are taken out is written down as "other".
-# It comes to about 15 USD at one unit for all three broadcast units,
-# which is what says the breakdown agrees with the report (ADR-0079).
-#
-# Fiyatlar 23 Eylül 2026'da web aramasının döndürdüğü satıcı
-# fiyatlarıdır. Bu oturumun ağ politikası satıcı sitelerini açmaya izin
-# vermediği için sayfalar tek tek açılıp kademe kademe doğrulanamadı.
-# The prices are the distributor prices a web search returned on 23
-# September 2026. The session's network policy did not allow opening
-# the distributor pages, so no price tier was read off a page directly.
+# Every part carries its seller's own price ladder: each `ladder` row is
+# a least quantity and the unit price (USD) from it. A product's price at
+# 1, 100 and 1000 is the sum of each part at the tier that many boards
+# buy. Where no tier is published, no discount is assumed: the last known
+# tier holds (ADR-0105).
 
-#: TL per USD on 4 September 2026, the date the report converted at. The
-#: report did not print its rate; this is the free market rate that
-#: morning, which the central bank's reference sits within a few kuruş
-#: of.
+#: TL per USD on 4 September 2026, the free market rate that morning,
+#: which the central bank's reference sits within a few kuruş of.
 usd_try = 48.44
 usd_try_source = "USD/TRY 4 Eylül 2026, serbest piyasa 09:30 satış 48,4445 (BloombergHT)"
 
-#: The 1000 unit price over the 100 unit price, for whatever has no
-#: verified volume price: the "other" line and parts whose distributor
-#: tier could not be read. A part with a `volume` table is priced at the
-#: thousand from that table instead (ADR-0093). The report's own 100
-#: over 1 is 0,69 to 0,80 per line.
-thousand_over_hundred = 0.90
-
 #: Which tier the table prices a deployment at. A thousand, because the
 #: operating model already shares the central system across a thousand
-#: anchors (`operating.anchors_sharing_central_operation`); pricing the
-#: hardware at a hundred while running it as one of a thousand was two
-#: network sizes in one row.
+#: anchors (`operating.anchors_sharing_central_operation`).
 used_tier = 1000
 
 # --- Parts ------------------------------------------------------------------
 
-[[part]]
-key = "lambda80-24s"
-name = "RF Solutions LAMBDA80-24S"
-role.tr = "SX1280 telsiz modülü, 12,5 dBm"
-role.en = "SX1280 radio module, 12,5 dBm"
-usd = 16.49
-seller = "DigiKey"
-url = "https://www.digikey.co.uk/en/products/detail/rf-solutions/LAMBDA80-24S/9749701"
-
 # The SX1281 has no ranging engine (Semtech SX1280/SX1281 Data Sheet Rev
 # 3.2, table 1-1, p. 15). EBYTE's own pages name the chip in the E28
 # modules both SX1280 and SX1281: the E28-2G4M12S and E28-2G4M20S user
-# manuals say SX1280, the E28-2G4M27S manual v1.3 (2024) and the product
-# pages of all three say SX1281, while listing ranging among the features. Order against the chip, not the module name: the
+# manuals say SX1280, the product pages say SX1281 while listing ranging
+# among the features. Order against the chip, not the module name: the
 # package reads 1280 or 1281 (datasheet figure 17-2), and a module that
 # cannot range is no use here.
 [[part]]
@@ -64,542 +36,376 @@ key = "e28-2g4m12s"
 name = "EBYTE E28-2G4M12S"
 role.tr = "SX1280 telsiz modülü, 12,5 dBm"
 role.en = "SX1280 radio module, 12,5 dBm"
-usd = 4.3869
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C411310.html"
-volume.usd = 4.2582
-volume.tier = 100
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C411310.html"
-volume.date = "25.09.2026"
-volume.note = "LCSC'nin tablosu 100+ kademesinde bitiyor; 1000'lik makara ambalaj miktarı, kademe değil"
-[[part]]
-key = "e28-2g4m27s"
-name = "EBYTE E28-2G4M27S"
-role.tr = "SX1280 telsiz modülü, yükselteçli, 27 dBm"
-role.en = "SX1280 radio module with an amplifier, 27 dBm"
-usd = 8.7416
-seller = "LCSC"
-url = "https://www.lcsc.com/product-detail/C411312.html"
-volume.usd = 8.4593
-volume.tier = 100
-volume.seller = "LCSC"
-volume.url = "https://lcsc.com/product-detail/Wireless-Modules_Chengdu-Ebyte-Elec-Tech-E28-2G4M27S_C411312.html"
-volume.date = "25.09.2026"
-volume.note = "LCSC'nin tablosu 100+ kademesinde bitiyor"
+ladder = [[1, 4.3869], [100, 4.2582]]
+date = "25.09.2026"
+note = "LCSC'nin tablosu 100+ kademesinde bitiyor"
+
 [[part]]
 key = "e28-2g4m20s"
 name = "EBYTE E28-2G4M20S"
 role.tr = "SX1280 telsiz modülü, yükselteçli, 20 dBm"
 role.en = "SX1280 radio module with an amplifier, 20 dBm"
-usd = 5.9566
 seller = "JLCPCB"
 url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M20S/C411311"
-volume.usd = 5.8105
-volume.tier = 10
-volume.seller = "JLCPCB"
-volume.url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M20S/C411311"
-volume.date = "27.09.2026"
-volume.note = "JLCPCB'nin tablosu 10+ kademesinde bitiyor; LCSC'nin sayfası kaldırılmış. 1000 adet için bu fiyat kullanılıyor"
-
-[[part]]
-key = "tl-ant2412d"
-name = "TP-Link TL-ANT2412D"
-role.tr = "direk anteni, 2,4 GHz, 12 dBi, dış ortam, çok yönlü"
-role.en = "pole antenna, 2,4 GHz, 12 dBi, outdoor omni"
-usd = 50.66
-seller = "Amazon"
-url = "https://www.amazon.com/TP-Link-Outdoor-Omni-directional-Antenna-TL-ANT2412D/dp/B003CFATO2"
-
-[[part]]
-key = "hgv-2409u"
-name = "L-com HGV-2409U"
-role.tr = "araç çatı anteni, 2,4 GHz, 8 dBi, çok yönlü"
-role.en = "vehicle roof antenna, 2,4 GHz, 8 dBi, omni"
-usd = 58.95
-seller = "Microcom"
-url = "https://www.microcom.us/hgv2409u.html"
+ladder = [[1, 5.9566], [10, 5.8105]]
+date = "28.09.2026"
+note = "JLCPCB'nin tablosu 10+ kademesinde bitiyor"
 
 [[part]]
 key = "gw-22-5151"
 name = "Taoglas GW.22.5151"
 role.tr = "direk ve araç anteni, 2,4 GHz, 5 dBi, IP67, dış ortam"
 role.en = "pole and vehicle antenna, 2,4 GHz, 5 dBi, IP67, outdoor"
-usd = 11.51
-seller = "Westward Sales"
+seller = "Westward Sales; Mouser (1000+)"
 url = "https://westwardsales.com/taoglas-gw.22.5151-rp-sma-antenna"
-volume.usd = 10.07
-volume.tier = 1000
-volume.seller = "Mouser"
-volume.url = "https://www.mouser.com/en/ProductDetail/Taoglas/GW.22.5151?qs=vLWxofP3U2zcF%2FANv9lyVA%3D%3D"
-volume.date = "25.09.2026"
-volume.note = "tam 1000 kademesi"
+volume_url = "https://www.mouser.com/en/ProductDetail/Taoglas/GW.22.5151?qs=vLWxofP3U2zcF%2FANv9lyVA%3D%3D"
+ladder = [[1, 11.51], [1000, 10.07]]
+date = "25.09.2026"
+note = "100 adet kademesi okunamadı; 1000'e kadar tek adet fiyatı"
 
-[[part]]
-key = "lmr200-pigtail"
-name = "LMR-200 anten kablosu"
-role.tr = "karttan antene kısa kablo (LMR-200)"
-role.en = "short cable from board to antenna (LMR-200)"
-usd = 9.50
-seller = "Amazon"
-url = "https://www.amazon.com/LMR200-Double-Shielded-LMR-200-Pigtail/dp/B0DQ61NXP9"
-
-[[part]]
-key = "w24p-u"
-name = "Inventek W24P-U"
-role.tr = "2,4 GHz anten"
-role.en = "2,4 GHz antenna"
-usd = 1.48
-seller = "DigiKey"
-url = "https://www.digikey.com/en/products/detail/inventek-systems/W24P-U/4488778"
-volume.usd = 1.4375
-volume.tier = 500
-volume.seller = "DigiKey"
-volume.url = "https://www.digikey.com/en/products/detail/inventek-systems/W24P-U/4488778"
-volume.date = "25.09.2026"
-volume.note = "1000 kademesi yok; yayımlanmış en yakın kademe 500+"
 [[part]]
 key = "stm32g0b1met6"
 name = "STM32G0B1MET6"
 role.tr = "mikrodenetleyici, 512 KB"
 role.en = "microcontroller, 512 KB"
-# DigiKey at one unit, the seller and tier the report's one-unit column
-# used. It was 3,61 here, which was Arrow's price at ten.
-usd = 6.86
 seller = "DigiKey"
 url = "https://www.digikey.com/en/products/detail/stmicroelectronics/STM32G0B1MET6/13693657"
-volume.usd = 3.83132
-volume.tier = 500
-volume.seller = "DigiKey"
-volume.url = "https://www.digikey.com/en/products/detail/stmicroelectronics/STM32G0B1MET6/18085464"
-volume.date = "25.09.2026"
-volume.note = "1000 kademesi yok; yayımlanmış en yakın kademe 500+"
+volume_url = "https://www.digikey.com/en/products/detail/stmicroelectronics/STM32G0B1MET6/18085464"
+ladder = [[1, 6.86], [500, 3.8313]]
+date = "25.09.2026"
+note = "100 adet kademesi okunamadı; 500+ en yakın kademe"
+
 [[part]]
 key = "stm32g031k8t6"
 name = "STM32G031K8T6"
 role.tr = "mikrodenetleyici, 64 KB"
 role.en = "microcontroller, 64 KB"
-usd = 1.9287
 seller = "LCSC"
 url = "https://lcsc.com/product-detail/ST-Microelectronics_STMicroelectronics_C432203.html"
-volume.usd = 1.7424
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-image/C432203.html"
-volume.date = "25.09.2026"
-volume.note = "tam 1000 kademesi"
+volume_url = "https://www.lcsc.com/product-image/C432203.html"
+ladder = [[1, 3.107], [10, 2.6275], [30, 2.327], [250, 1.9411], [500, 1.8015], [1000, 1.7424]]
+date = "28.09.2026"
+
 [[part]]
 key = "atecc608b"
 name = "Microchip ATECC608B"
 role.tr = "kimlik ve anahtar yongası"
 role.en = "identity and key chip"
-usd = 0.90
-seller = "DigiKey"
+seller = "DigiKey; Mouser (1000+)"
 url = "https://www.digikey.com/en/products/detail/microchip-technology/ATECC608B-MAHDA-S/13415130"
-volume.usd = 0.819
-volume.tier = 1000
-volume.seller = "Mouser"
-volume.url = "https://www.mouser.com/en/ProductDetail/Microchip-Technology/ATECC608B-MAHDA-S?qs=sPbYRqrBIVnKfPKcuUlUgg%3D%3D"
-volume.date = "25.09.2026"
-volume.note = "tam 1000 kademesi"
-[[part]]
-key = "dwm3000-digikey"
-name = "Qorvo DWM3000TR13"
-role.tr = "UWB telsiz modülü"
-role.en = "UWB radio module"
-usd = 23.62
-seller = "DigiKey"
-url = "https://www.digikey.com/en/products/detail/qorvo/DWM3000TR13/24367320"
+volume_url = "https://www.mouser.com/en/ProductDetail/Microchip-Technology/ATECC608B-MAHDA-S?qs=sPbYRqrBIVnKfPKcuUlUgg%3D%3D"
+ladder = [[1, 0.9], [1000, 0.819]]
+date = "25.09.2026"
+note = "100 adet kademesi okunamadı"
 
 [[part]]
 key = "dwm3000-lcsc"
 name = "Qorvo DWM3000TR13"
 role.tr = "UWB telsiz modülü"
 role.en = "UWB radio module"
-usd = 16.6039
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C5299931.html"
-volume.usd = 22.5844
-volume.tier = 10
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-image/C5299931.html?whichImg=0"
-volume.date = "25.09.2026"
-volume.note = "LCSC yalnız 1+ ve 10+ yayımlıyor; 1000'lik makara bir ambalaj miktarı, kademe değil"
+volume_url = "https://www.lcsc.com/product-image/C5299931.html?whichImg=0"
+ladder = [[1, 23.1998], [10, 22.5844]]
+date = "28.09.2026"
+note = "LCSC'nin tablosu 10+ kademesinde bitiyor"
+
 [[part]]
 key = "esp32-s3"
 name = "Espressif ESP32-S3-WROOM-1-N8"
 role.tr = "telefon bağlantısı (BLE)"
 role.en = "phone link (BLE)"
-usd = 3.0323
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C2913198.html"
-volume.usd = 3.1542
-volume.tier = 1300
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/wifi-modules_espressif-esp32-s3-wroom-1-n8_C2913198.html"
-volume.date = "25.09.2026"
-volume.note = "1000 yok; en yakın kademe 1300+ (650+ 3,2391)"
+volume_url = "https://www.lcsc.com/product-detail/wifi-modules_espressif-esp32-s3-wroom-1-n8_C2913198.html"
+ladder = [[1, 4.91], [10, 4.2345], [30, 3.833], [100, 3.4251], [650, 3.2391], [1300, 3.1542]]
+date = "28.09.2026"
+note = "1000 yerine en yakın kademe 650+"
+
 [[part]]
 key = "bno085"
 name = "CEVA BNO085"
 role.tr = "hareket sensörü"
 role.en = "motion sensor"
-usd = 13.57
-seller = "DigiKey"
+seller = "DigiKey; Mouser (1000+)"
 url = "https://www.digikey.com/en/products/detail/ceva-technologies-inc/BNO085/9445940"
-volume.usd = 8.81
-volume.tier = 1000
-volume.seller = "Mouser"
-volume.url = "https://www.mouser.com/en/ProductDetail/CEVA/BNO085?qs=ulEaXIWI0c9BFVeZDQCmmQ%3D%3D"
-volume.date = "25.09.2026"
-volume.note = "tam 1000 kademesi"
+volume_url = "https://www.mouser.com/en/ProductDetail/CEVA/BNO085?qs=ulEaXIWI0c9BFVeZDQCmmQ%3D%3D"
+ladder = [[1, 13.57], [1000, 8.81]]
+date = "25.09.2026"
+note = "100 adet kademesi okunamadı"
+
 [[part]]
 key = "tcan1051"
 name = "TI TCAN1051HGVDRQ1"
 role.tr = "CAN hattı sürücüsü"
 role.en = "CAN transceiver"
-usd = 1.8732
-seller = "LCSC"
+seller = "LCSC; Mouser (1000+)"
 url = "https://lcsc.com/product-detail/Others_TI_TCAN1051HGVDRQ1_TCAN1051HGVDRQ1_C190987.html"
-volume.usd = 1.19
-volume.tier = 1000
-volume.seller = "Mouser"
-volume.url = "https://www.mouser.com/en/ProductDetail/Texas-Instruments/TCAN1051HGVDRQ1?qs=dSktwyqbRaUv%252Bzz8wwNi2g%3D%3D"
-volume.date = "25.09.2026"
-volume.note = "tam 1000 kademesi"
-[[part]]
-key = "nhd-2.8"
-name = "Newhaven NHD-2.8-240320DA-CTXN-T"
-role.tr = "2,8 inç ekran"
-role.en = "2,8 inch display"
-usd = 21.80
-seller = "Newhaven"
-url = "https://newhavendisplay.com/2-8-inch-standard-tn-lcd-tft/"
+volume_url = "https://www.mouser.com/en/ProductDetail/Texas-Instruments/TCAN1051HGVDRQ1?qs=dSktwyqbRaUv%252Bzz8wwNi2g%3D%3D"
+ladder = [[1, 1.9762], [10, 1.9316], [30, 1.9024], [100, 1.8732], [1000, 1.19]]
+date = "28.09.2026"
 
 [[part]]
 key = "ili9341-2.8"
 name = "2,8 inç ILI9341 SPI TFT modülü"
 role.tr = "2,8 inç ekran"
 role.en = "2,8 inch display"
-usd = 10.90
-seller = "Elecrow"
+seller = "Elecrow; Alibaba (1000+)"
 url = "https://www.elecrow.com/2-8-inch-320x240-spi-serial-tft-lcd-module-display-with-driver-ic-ili9341.html"
-volume.usd = 6.0
-volume.tier = 1000
-volume.seller = "Alibaba"
-volume.url = "https://www.alibaba.com/product-introduction/capacitive-touch-240x320-spi-2-8_60844805677.html"
-volume.date = "25.09.2026"
-volume.note = "ILI9341, SPI, 240x320, kapasitif dokunmatik; 1000+ kademesi"
-# --- Products ---------------------------------------------------------------
-#
-# Kartın geri kalanı, parça parça (ADR-0103): raporun "diğer" satırının
-# yerine geçiyor. / The rest of the board, part by part (ADR-0103).
+volume_url = "https://www.alibaba.com/product-introduction/capacitive-touch-240x320-spi-2-8_60844805677.html"
+ladder = [[1, 10.9], [1000, 6.0]]
+date = "25.09.2026"
+note = "100 adet kademesi okunamadı"
 
 [[part]]
 key = "hlk-5m12"
 name = "HI-LINK HLK-5M12"
 role.tr = "şebeke beslemesi, 230 V AC'den 12 V DC, 5 W"
 role.en = "mains supply, 230 V AC to 12 V DC, 5 W"
-usd = 2.8434
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C209908.html"
-volume.usd = 1.5877
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C209908.html"
-volume.date = "28.09.2026"
+ladder = [[1, 2.8434], [10, 2.3914], [30, 2.1087], [100, 1.7751], [500, 1.6453], [1000, 1.5877]]
+date = "28.09.2026"
 
 [[part]]
 key = "tps563200"
 name = "TI TPS563200DDCR"
 role.tr = "12 V'tan 3,3 V'a anahtarlamalı düşürücü, 3 A"
 role.en = "switching regulator, 12 V to 3,3 V, 3 A"
-usd = 1.026
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C97253.html"
-volume.usd = 0.6687
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C97253.html"
-volume.date = "28.09.2026"
+ladder = [[1, 1.026], [10, 0.9097], [30, 0.8015], [100, 0.7195], [500, 0.6851], [1000, 0.6687]]
+date = "28.09.2026"
 
 [[part]]
 key = "smbj18a"
 name = "Littelfuse SMBJ18A"
 role.tr = "girişte aşırı gerilim koruması (TVS)"
 role.en = "input surge protection (TVS)"
-usd = 0.1492
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C151256.html"
-volume.usd = 0.103
-volume.tier = 500
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C151256.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1492], [50, 0.1245], [150, 0.1122], [500, 0.103], [3000, 0.0956], [6000, 0.0919]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "smbj33a"
 name = "Brightking SMBJ33A"
 role.tr = "araç girişinde aşırı gerilim koruması (TVS)"
 role.en = "surge protection on the vehicle input (TVS)"
-usd = 0.0719
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C78419.html"
-volume.usd = 0.0514
-volume.tier = 300
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C78419.html"
-volume.date = "28.09.2026"
+ladder = [[10, 0.0719], [100, 0.0583], [300, 0.0514], [3000, 0.0454], [6000, 0.0413], [9000, 0.0393]]
+date = "28.09.2026"
+note = "en küçük sipariş 10 adet"
 
 [[part]]
 key = "mov-10d471k"
 name = "VDR-10D471K"
 role.tr = "şebeke tarafında varistör"
 role.en = "mains-side varistor"
-usd = 0.1185
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C316609.html"
-volume.usd = 0.0674
-volume.tier = 500
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C316609.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1185], [50, 0.0954], [150, 0.0839], [500, 0.0674], [2500, 0.0605], [5000, 0.0571]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "ptc-0.5a"
 name = "PTTC SMD1206P050TF/15"
 role.tr = "kendini sıfırlayan sigorta, 500 mA"
 role.en = "resettable fuse, 500 mA"
-usd = 0.1006
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C106264.html"
-volume.usd = 0.0639
-volume.tier = 500
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C106264.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1006], [50, 0.081], [150, 0.0713], [500, 0.0639], [2500, 0.0559], [4000, 0.053]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "ss34"
 name = "MDD SS34"
 role.tr = "ters kutup koruma diyodu"
 role.en = "reverse polarity diode"
-usd = 0.0352
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C8678.html"
-volume.usd = 0.0252
-volume.tier = 600
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C8678.html"
-volume.date = "28.09.2026"
+ladder = [[20, 0.0351], [200, 0.0282], [600, 0.0251], [5000, 0.0171], [10000, 0.0162], [20000, 0.0156]]
+date = "28.09.2026"
+note = "en küçük sipariş 20 adet"
 
 [[part]]
 key = "kf301-2p"
 name = "Cixi Kefa KF301-5.0-2P"
 role.tr = "vidalı klemens, 2 uçlu (besleme ve servis)"
 role.en = "screw terminal, 2 way (supply and service)"
-usd = 0.1018
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C474881.html"
-volume.usd = 0.0629
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C474881.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1019], [50, 0.084], [150, 0.0748], [1000, 0.0629], [2000, 0.0603], [5000, 0.0585]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "ipex-sma"
 name = "DreamLNK IPEX TO SMA"
 role.tr = "modülden kutu duvarındaki SMA'ya 20 cm anten kablosu"
 role.en = "20 cm cable from the module to the SMA on the box wall"
-usd = 1.0533
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C403729.html"
-volume.usd = 0.5431
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C403729.html"
-volume.date = "28.09.2026"
+ladder = [[1, 1.0533], [10, 0.8449], [30, 0.7399], [100, 0.6366], [500, 0.5742], [1000, 0.5431]]
+date = "28.09.2026"
 
 [[part]]
 key = "gainta-g203"
 name = "Gainta G203"
 role.tr = "dış ortam kutusu, 115x65x40 mm, IP65 (4,99 €)"
 role.en = "outdoor box, 115x65x40 mm, IP65 (4,99 €)"
-usd = 5.7994
 seller = "Gainta"
 url = "https://www.gainta.com/en/g203.html"
+ladder = [[1, 5.7994]]
+date = "25.09.2026"
+note = "100+ fiyatı teklifle; indirim varsayılmadı"
 
 [[part]]
 key = "gainta-g212"
 name = "Gainta G212"
 role.tr = "araç kutusu, 115x90x55 mm, IP65 (5,98 €)"
 role.en = "vehicle box, 115x90x55 mm, IP65 (5,98 €)"
-usd = 6.95
 seller = "Gainta"
 url = "https://www.gainta.com/en/g212.html"
+ladder = [[1, 6.95]]
+date = "25.09.2026"
+note = "100+ fiyatı teklifle; indirim varsayılmadı"
 
 [[part]]
 key = "gainta-g517"
 name = "Gainta G517G(BC)-1"
 role.tr = "el tipi kutu, pil bölmeli, 92x66,5x21 mm (1,86 €)"
 role.en = "hand-held box with a battery bay, 92x66,5x21 mm (1,86 €)"
-usd = 2.1617
 seller = "Gainta"
 url = "https://www.gainta.com/en/g517gbc-1.html"
+ladder = [[1, 2.1617]]
+date = "25.09.2026"
+note = "100+ fiyatı teklifle; indirim varsayılmadı"
 
 [[part]]
 key = "passives"
 name = "Pasifler ve gösterge"
 role.tr = "10 x 100 nF, 10 x 10 kΩ, 3 x 10 µF, 2 x 22 µF, LED, düğme (LCSC C1525, C25744, C15850, C45783, C2286, C318884)"
 role.en = "10 x 100 nF, 10 x 10 kΩ, 3 x 10 µF, 2 x 22 µF, LED, button (LCSC C1525, C25744, C15850, C45783, C2286, C318884)"
-usd = 0.7908
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C1525.html"
-volume.usd = 0.4388
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C1525.html"
-volume.date = "28.09.2026"
-volume.note = "her parçanın 1000-2000 kademesi"
+ladder = [[1, 0.7911], [100, 0.605], [1000, 0.4255]]
+date = "28.09.2026"
+note = "her parça kendi kademesinden, bir kartın adediyle çarpılarak"
 
 [[part]]
 key = "pcb-2l"
 name = "JLCPCB iki katlı kart"
 role.tr = "baskılı devre kartı, iki kat, 100x100 mm'ye kadar"
 role.en = "printed circuit board, two layers, up to 100x100 mm"
-usd = 0.4
 seller = "JLCPCB"
 url = "https://jlcpcb.com/"
+ladder = [[1, 0.4]]
+date = "25.09.2026"
+note = "5 kart 2 $; büyük adet fiyatı okunamadı, indirim varsayılmadı"
 
 [[part]]
 key = "smt"
 name = "JLCPCB dizgi"
 role.tr = "SMD dizgi: 150 lehim noktası x 0,0016 $, kurulum 8,18 $, şablon 1,53 $, 10 genişletilmiş parça x 3,07 $"
 role.en = "SMD assembly: 150 joints x 0,0016 $, setup 8,18 $, stencil 1,53 $, 10 extended parts x 3,07 $"
-usd = 8.322
 seller = "JLCPCB"
 url = "https://jlcpcb.com/help/article/pcb-assembly-price"
-volume.usd = 0.644
-volume.tier = 100
-volume.seller = "JLCPCB"
-volume.url = "https://jlcpcb.com/help/article/pcb-assembly-price"
-volume.date = "28.09.2026"
-volume.note = "5 kartlık siparişte kurulum 5'e, 100 kartta 100'e bölünüyor"
+ladder = [[1, 8.322], [100, 0.6441], [1000, 0.2804]]
+date = "25.09.2026"
+note = "kurulum 8,18 $, şablon 1,53 $ ve 10 genişletilmiş parça x 3,07 $ siparişe bir kez; 150 lehim noktası x 0,0016 $ her karta. 5 kartlık en küçük siparişte 8,32 $, 100 kartta 0,64 $, 1000 kartta 0,28 $"
 
 [[part]]
 key = "tp4056"
 name = "TOP POWER TP4056"
 role.tr = "LiPo şarj denetleyicisi"
 role.en = "LiPo charger"
-usd = 0.1867
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C16581.html"
-volume.usd = 0.0919
-volume.tier = 2500
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C16581.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1862], [50, 0.1474], [150, 0.1285], [500, 0.1116], [2500, 0.0917], [4000, 0.0889]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "dw01a"
 name = "PUOLOP DW01A"
 role.tr = "pil koruma yongası"
 role.en = "battery protection IC"
-usd = 0.0249
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C351410.html"
-volume.usd = 0.0154
-volume.tier = 3000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C351410.html"
-volume.date = "28.09.2026"
+ladder = [[20, 0.0249], [200, 0.0196], [600, 0.0172], [3000, 0.0154], [9000, 0.0147], [21000, 0.0142]]
+date = "28.09.2026"
+note = "en küçük sipariş 20 adet"
 
 [[part]]
 key = "fs8205"
 name = "Fortune FS8205"
 role.tr = "pil koruma MOSFET'leri"
 role.en = "battery protection MOSFETs"
-usd = 0.1825
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C32254.html"
-volume.usd = 0.0961
-volume.tier = 3000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C32254.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1825], [50, 0.1444], [150, 0.1281], [500, 0.1077], [3000, 0.0961], [6000, 0.0907]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "usb-c"
 name = "Hroparts TYPE-C-31-M-12"
 role.tr = "USB-C şarj ve servis girişi"
 role.en = "USB-C charge and service port"
-usd = 0.1875
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C165948.html"
-volume.usd = 0.1044
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C165948.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1875], [50, 0.148], [150, 0.1287], [1000, 0.1044], [2000, 0.0997], [5000, 0.0969]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "xc6206"
 name = "TOREX XC6206P332MR-G"
 role.tr = "3,3 V doğrusal düzenleyici"
 role.en = "3,3 V linear regulator"
-usd = 0.1439
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C5446.html"
-volume.usd = 0.094
-volume.tier = 500
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C5446.html"
-volume.date = "28.09.2026"
+ladder = [[5, 0.1439], [50, 0.1182], [150, 0.1049], [500, 0.094], [3000, 0.0902], [6000, 0.0876]]
+date = "28.09.2026"
+note = "en küçük sipariş 5 adet"
 
 [[part]]
 key = "xl7015"
 name = "XLSEMI XL7015E1"
 role.tr = "araç beslemesinden (80 V'a kadar) 3,3 V'a düşürücü"
 role.en = "regulator from the vehicle supply (up to 80 V) to 3,3 V"
-usd = 0.5015
 seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C73013.html"
-volume.usd = 0.2328
-volume.tier = 1000
-volume.seller = "LCSC"
-volume.url = "https://www.lcsc.com/product-detail/C73013.html"
-volume.date = "28.09.2026"
+ladder = [[1, 0.5015], [10, 0.3983], [30, 0.3475], [100, 0.3032], [500, 0.241], [1000, 0.2328]]
+date = "28.09.2026"
 
 [[part]]
 key = "lipo-1000"
 name = "YDL 803040"
 role.tr = "LiPo pil, 3,7 V, 1000 mAh"
 role.en = "LiPo cell, 3,7 V, 1000 mAh"
-usd = 4.27
 seller = "YDL Battery"
 url = "https://ydlbattery.com/products/50pcs-3-7v-1000mah-803040-lithium-polymer-battery"
+ladder = [[1, 4.27]]
+date = "25.09.2026"
+note = "büyük adet fiyatı yayımlanmamış, indirim varsayılmadı"
 
-# `report` is the line of page 14 the product is priced from, with its
-# two totals. `was` is what that line contains; `parts` is what goes in
-# now, a replacement in the same place as what it replaced, because the
-# cost page pairs the two in order (`Board.swapped`); a part the report
-# did not name goes after them. The difference is priced at one unit and carried to 100 and 1000
-# by the report's own ratio between its two columns.
+# --- Products ---------------------------------------------------------------
 
+# Certified as adaptive frequency hopping, the unit may radiate 20 dBm at
+# any bandwidth: the 20 dBm module reaches it through a sealed 5 dBi rod
+# antenna on the box's own connector (ADR-0094, ADR-0099).
 [[product]]
 key = "amplified-anchor"
 name.tr = "Şehir içi ve kırsal yayın birimi"
 name.en = "Urban and rural broadcast unit"
-report.tr = "Kırsal yayın birimi"
-report.en = "Rural broadcast unit"
-report_one_tl = 1549.67
-report_hundred_tl = 1082.68
-was = ["e28-2g4m27s", "stm32g0b1met6", "atecc608b"]
-# Certified as adaptive frequency hopping, the unit may radiate 20 dBm
-# at any bandwidth: the 20 dBm module reaches it through a sealed 5 dBi
-# rubber duck on the box's own connector (ADR-0094, ADR-0099). The town used the 12,5 dBm
-# module with a 12 dBi mast antenna on a cable (ADR-0091).
 parts = ["e28-2g4m20s", "stm32g031k8t6", "atecc608b", "gw-22-5151"]
 other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]
 
@@ -607,11 +413,6 @@ other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", 
 key = "tunnel-anchor"
 name.tr = "Kritik bölge yayın birimi"
 name.en = "Critical area broadcast unit"
-report.tr = "Kritik bölge yayın birimi"
-report.en = "Critical area broadcast unit"
-report_one_tl = 2241.42
-report_hundred_tl = 1634.44
-was = ["dwm3000-digikey", "stm32g0b1met6", "atecc608b"]
 parts = ["dwm3000-lcsc", "stm32g031k8t6", "atecc608b"]
 other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "gainta-g203", "passives", "pcb-2l", "smt"]
 
@@ -619,11 +420,6 @@ other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", 
 key = "pedestrian"
 name.tr = "Yaya alıcısı"
 name.en = "Pedestrian receiver"
-report.tr = "Yaya alıcısı"
-report.en = "Pedestrian receiver"
-report_one_tl = 3913.16
-report_hundred_tl = 3117.74
-was = ["lambda80-24s", "dwm3000-digikey", "esp32-s3", "bno085", "atecc608b"]
 parts = ["e28-2g4m12s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b"]
 other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "gainta-g517", "passives", "pcb-2l", "smt"]
 
@@ -631,28 +427,16 @@ other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "gainta-g5
 key = "vehicle"
 name.tr = "Kara aracı alıcısı"
 name.en = "Vehicle receiver"
-report.tr = "Kara aracı alıcısı"
-report.en = "Vehicle receiver"
-report_one_tl = 5202.69
-report_hundred_tl = 4002.29
-was = ["lambda80-24s", "dwm3000-digikey", "stm32g0b1met6", "bno085",
-       "atecc608b", "tcan1051", "nhd-2.8"]
-parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085",
-         "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151"]
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085", "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151"]
 other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-sma", "gainta-g212", "passives", "pcb-2l", "smt"]
 
+# The unit as it would be without the frequency hopping certificate: the
+# density limit holds it to 12,1 dBm, which the plain module reaches. No
+# row of the table uses it (ADR-0094); it stays for the simulator, where a
+# module can be chosen per run.
 [[product]]
 key = "sx1280-anchor"
 name.tr = "Frekans atlama belgesi olmayan yayın birimi (yalnız simülatörde)"
 name.en = "Broadcast unit without the hopping certificate (simulator only)"
-report.tr = "Şehir içi yayın birimi"
-report.en = "Urban broadcast unit"
-report_one_tl = 1983.71
-report_hundred_tl = 1366.07
-was = ["lambda80-24s", "w24p-u", "stm32g0b1met6", "atecc608b"]
-# The unit as it would be without the frequency hopping certificate: the
-# density limit holds it to 12,1 dBm, which the plain module reaches. No
-# row of the table uses it now (ADR-0094); it stays for the simulator,
-# where a module can be chosen per run.
 parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
 other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]

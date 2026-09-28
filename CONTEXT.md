@@ -1,9 +1,9 @@
 # YERKON simülasyonunun bağlamı
 
 Bu depo, YERKON donanımından kurulan karasal bir konumlandırma ağının
-gerçekte ne vereceğini ve neye mal olacağını kestirir. Tek çıktısı, YERKON
-raporunun 15. sayfasındaki karşılaştırma tablosunun YERKON bloğudur: dört
-satır, on sütun; her sayı ya bir veri sayfasına, ya yayımlanmış bir ölçüme
+gerçekte ne vereceğini ve neye mal olacağını kestirir. Tek çıktısı,
+başvurudaki karşılaştırma tablosunun YERKON bloğudur: üç satır, on sütun;
+her sayı ya bir veri sayfasına, ya yayımlanmış bir ölçüme, ya bir standarda
 ya da açıkça söylenmiş bir varsayıma kadar izlenebilir.
 
 ## Sözlük
@@ -68,7 +68,7 @@ erişilebilir olduğu* zemindir; bir koridor şeridi olarak çizilmez, gerçek
 arazi üzerinde taranır. Karşılaştırma tablosunun GNSS satırlarındaki km²
 paydasının anlamına uymasını sağlayan budur.
 
-Yalnızca *ulaşılan* zemin — en az bir direğin eriştiği — bambaşka ve çok
+Yalnızca *ulaşılan* zemin (en az bir direğin eriştiği) bambaşka ve çok
 daha büyük bir sayıdır; ikisinin asla karıştırılmaması için yan yana
 bildirilir: 25 m direklerde her 4 km'de bir direkle, bir direk 392,5 km²'ye,
 dört direk 15,2 km²'ye erişir. ADR-0012'ye bak. Koridor yerleşimleri için
@@ -81,8 +81,9 @@ geçer: `place(plan, ground)`. ADR-0040'a bak.
 
 **Placement search** (yöneylem yerleşimi): `placement.py`. Direkleri
 ızgara yerine zaten duran ya da zaten yüksek yerlere koyan arama: sokak
-donanımı, yüksekliği ölçülmüş çatılar, tepeler, yol kenarı ve ızgaranın
-kendi noktaları. Kapsamayı bağlantı bütçesiyle deniyor; bir hücre dört
+donanımı, yol boyundaki direkler (şehirde aydınlatma, kırsalda elektrik
+dağıtım direği), tepelere dikilecek direkler ve ızgaranın kendi noktaları.
+Çatılar kiralık olduğu için aday sayılmıyor (ADR-0104). Kapsamayı bağlantı bütçesiyle deniyor; bir hücre dört
 direk ona ulaşıp çevresindeki dört çeyreğin en az üçünde durduğunda
 sayılıyor. Seçim lira başına açgözlü, sonra bırakma ve değiş tokuş.
 Simülatörde "Yerleştir", komut satırında `yerkon place`. Cevap `placed`
@@ -108,22 +109,22 @@ kendisi simülasyonun içinde çalışmaz; kayıtları çalışır. ADR-0083.
 
 **Measured reach** (zeminde ölçülen menzil): bir aramanın adaylarını
 puanladığı disk, üzerinde durduğu zeminde ölçülerek. `reach_of` düz arazi
-rakamıdır ve kendi belgesi "bir iddia değil" der — bir halka için doğru,
+rakamıdır ve kendi belgesi "bir iddia değil" der: bir halka için doğru,
 bir karar için yanlış. Kızılay'da halka 3825 m, ölçülen 478 m. Kafesler
 diski okumaz, yalnızca aramalar (`layout.SEARCHES`). ADR-0047'ye bak.
 
 **Dilution** (seyreltme, HDOP): direk geometrisinin menzil hatasını ne
-kadar büyüttüğü. İki bilinmeyen için — x ve y — çünkü iki yollu menzil
+kadar büyüttüğü. İki bilinmeyen için (x ve y), çünkü iki yollu menzil
 ölçümü mesafeyi doğrudan ölçer, saat kayması durumda yoktur (ADR-0010)
 ve düşey yoldan gözlenebilir değildir (ADR-0011). Bir sıra hâlindeki
 direkler enine yönde seyreltmeyi sonsuza götürür; bu, kapsamanın
 göremediği şeydir.
 
 **Aerial** (hava görüntüsü): sahanın uydu fotoğrafı, zemine giydirilir.
-Benzetimin hiçbir yerinde okunmaz — link bütçesi bir tarlanın ne renk
-olduğunu umursamaz — yani çizilir ve o kadar. Hazır bir karo adresi yok:
-hangi servisi kullanacağına ve koşullarına kullanan karar verir.
-ADR-0041'e bak.
+Simülasyonun hiçbir yerinde okunmaz (link bütçesi bir tarlanın ne renk
+olduğunu umursamaz), yalnız çizilir. Yayımlanmış site Esri World Imagery
+kullanıyor; komut satırında karo adresini kullanan verir. ADR-0041 ve
+ADR-0086'ya bak.
 
 **Place picker** (yer seçici): getirilecek zemini haritada çizme.
 Merkez artı boyut yalnızca kare tarif eder; kutunun dört köşesi
@@ -135,19 +136,19 @@ düşürür. ADR-0042'ye bak.
 Zemin, sahanın boyu ve eni, bütün diziler ve alıcılar, elle taşınmış ve
 silinmiş direkler, elle değiştirilmiş değerler. Her satır için
 *varsayılan* ve *boş* hazır gelir; gerisi `presets/` klasörüne yazılır.
-`yerkon table --preset` ile yayımlanan bir satırı da sürebilir — o zaman
+`yerkon table --preset` ile yayımlanan bir satırı da sürebilir; o zaman
 künye düzenlemenin adını, yolunu ve içerik hash'ini yazar, çünkü
 `konya` iki koşu arasında değişebilir. ADR-0043'e bak.
 
-**Coverage layers** (örtü katmanları): aynı taramanın dört okuması —
+**Coverage layers** (örtü katmanları): aynı taramanın dört okuması:
 kaç direk erişiyor, sinyal marjı (dB), geometri (HDOP), ve beklenen konum
 hatası (menzil sigması × geometri). Link bütçesi zaten koşuyordu; bunlar
 atılanı tutuyor, %3'e. Hata bir kestirimdir: saat kayması, paket kaybı ve
-gerçekten oradan geçen bir alıcı yoktur — yayımlanan sayı koşudan gelir.
+gerçekten oradan geçen bir alıcı yoktur; yayımlanan sayı koşudan gelir.
 ADR-0044'e bak.
 
 **Furniture** (yol kenarı donanımı): direğin cıvatalanabileceği, zaten
-duran yapılar — trafik ışığı, otobüs durağı, aydınlatma direği, yol
+duran yapılar: trafik ışığı, otobüs durağı, aydınlatma direği, yol
 levhası. Overture'ın altyapı temasından geliyor ve iki türe indirgenerek
 saklanıyor: *column* (trafik ışığı ve aydınlatma direği) ile *sign*
 (durak ve yol levhası). Kızılay 232 taşıyor: 77 column, 155 sign. İkiye
@@ -184,37 +185,39 @@ kaynaklarının yayımladığı değerlerdir ve `comparison.toml`'da durur.
 Oradaki hiçbir sayı hesaplanmaz; her birinin yanında ona ne yapıldığını
 söyleyen bir not vardır. ADR-0069'a bak.
 
-**Bibliography** (kaynakça): raporun kaynakça slaytındaki 48 bağlantı,
-`sources.toml`'da altı grup altında. Notlar bunları anahtarla anar
+**Bibliography** (kaynakça): raporun kaynakça slaytındaki 48 bağlantı ve
+sitenin maliyet ve mevzuat hesapları için eklediği kaynaklar,
+`sources.toml`'da gruplar altında. Notlar bunları anahtarla anar
 (`sources = ["gps-gov"]`), yani bir adres tek yerde değişir. Hiçbir
 notun anmadığı girdi de listede kalır: liste raporun kaynakçasıdır,
 sitenin kullandıklarının listesi değil. ADR-0070'e bak.
 
 ## Ürünler
 
-**Bill** (malzeme listesi): `bom.toml` ve `bom.py`. Raporun 14. sayfası her
-ürün için yalnızca iki toplam veriyor (1 adet ve 100 adette). Malzeme
-listesi her ana parçayı satıcı fiyatıyla yazıyor; raporun toplamından
-bunlar çıkınca kalan "diğer" satırıdır (güç dönüşümü, koruma, bağlantı,
-kutu). Tablo 1000 adetlik fiyatı kullanıyor. ADR-0079'a bak.
+**Bill** (malzeme listesi): `bom.toml` ve `bom.py`. Her parça satıcısının
+kademe tablosuyla yazılı (`ladder`: en küçük adet ve o adetten başlayan
+birim fiyat). Bir ürünün fiyatı, parçaların o kadar kart için alınan
+adetteki fiyatlarının toplamı; yayımlanmamış bir kademede indirim
+varsayılmaz. Tablo 1000 adetlik fiyatı kullanıyor. ADR-0105'e bak.
 
-| Ürün | Ana parçalar | Raporda, 100 adet | Şimdi, 1000 adet |
-|---|---|---|---|
-| Şehir içi ve kırsal yayın birimi | E28-2G4M12S (SX1280), W24P-U, STM32G031, ATECC608B | 1366,07 / 1082,68 | 718,05 |
-| Kritik bölge yayın birimi | DWM3000, STM32G031, ATECC608B | 1634,44 | 1091,19 |
-| Yaya alıcısı | E28-2G4M12S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3117,74 | 2141,87 |
-| Kara aracı alıcısı | E28-2G4M12S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran | 4002,29 | 2595,30 |
+| Ürün | Ana parçalar | 1 adet | 100 adet | 1000 adet |
+|---|---|---|---|---|
+| Şehir içi ve kırsal yayın birimi | E28-2G4M20S (SX1280), GW.22.5151, STM32G031, ATECC608B | 2049,79 | 1531,32 | 1381,83 |
+| Kritik bölge yayın birimi | DWM3000, STM32G031, ATECC608B | 2276,48 | 1755,47 | 1680,26 |
+| Yaya alıcısı | E28-2G4M12S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3082,55 | 2586,76 | 2309,77 |
+| Kara aracı alıcısı | E28-2G4M20S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran, GW.22.5151 | 4528,63 | 4069,88 | 3309,05 |
 
-Şehir içi ve kırsal yayın birimi aynı kart: 20 dBm yükselteçli E28-2G4M20S ve
-dış ortam tipi 5 dBi çubuk anten (Taoglas GW.22.5151, IP67). Cihaz uyarlamalı frekans atlamalı (FHSS) olarak
+Fiyatlar TL, kartın bütün parçalarıyla (besleme, koruma, kutu, pasifler,
+baskılı devre, dizgi). Şehir içi ve kırsal yayın birimi aynı kart: 20 dBm
+yükselteçli E28-2G4M20S ve dış ortam tipi 5 dBi çubuk anten (Taoglas
+GW.22.5151, IP67). Cihaz uyarlamalı frekans atlamalı (FHSS) olarak
 belgelendiriliyor; bu belgeyle yoğunluk sınırı kalkıyor ve 20 dBm e.i.r.p.
-sınırı kalıyor (ADR-0092, ADR-0094, ADR-0099). Kara aracı alıcısı da aynı modülü ve
-aynı anteni taşıyor. Yaya alıcısı E28-2G4M12S'de ve baskılı antende
-(Inventek W24P-U) kalıyor.
+sınırı kalıyor (ADR-0092, ADR-0094, ADR-0099). Kara aracı alıcısı da aynı
+modülü ve aynı anteni taşıyor. Yaya alıcısı E28-2G4M12S'nin kendi
+anteniyle çalışıyor.
 
-LAMBDA80-24S, E28-2G4M12S, E28-2G4M20S ve E28-2G4M27S anten değil, SX1280 modülüdür.
-Link bütçesi her antenin yayımlanmış kazancını ve hüzme genişliğini
-kullanır.
+E28-2G4M12S ve E28-2G4M20S anten değil, SX1280 modülüdür. Link bütçesi her
+antenin yayımlanmış kazancını ve hüzme genişliğini kullanır.
 
 ## Tablo sütunları ne demek
 
@@ -240,8 +243,9 @@ kaynağı, masaüstünde Copernicus'un yedeği (ADR-0086).
 
 **Alan**: yukarıda tanımlandığı gibi hizmet alanı.
 
-**CAPEX**: direk donanım maliyetinin hizmet alanına bölümü. Yalnızca
-donanım. Raporun kendi kapsam notu neyin dışarıda bırakıldığını listeler.
+**CAPEX**: yayın birimlerinin 1000 adetlik fiyatı, montajı ve gerekiyorsa
+güneş paneli ile akünün toplamı, hizmet alanına bölünmüş (tünelde güzergâh
+kilometresine). Test, belgelendirme, vergi ve kargo dahil değil.
 
 **OPEX**: km² başına yıllık işletme maliyeti. Rapor bunu boş bırakır. Bu kod
 tabanı onu, yinelenen kalemlerden oluşan açıkça belirtilmiş bir envanterden

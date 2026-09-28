@@ -1,12 +1,10 @@
 """The bill of materials, part by part, at one, a hundred and a thousand.
 
-The report prints two totals per product and no part prices. This reads
-`bom.toml`, where every main part carries the distributor price it was
-found at, and works out three things for each product: what is left of
-the report's total once its named parts are taken out (the "other"
-line: power conversion, protection, connectors, enclosure), what the
-product costs with the cheaper parts in, and that cost at the three
-tiers.
+`bom.toml` gives every part its seller's own price ladder: the least
+quantity each price starts at. A product at a tier is the sum of its
+parts, each at the price the pieces that many boards need buy. Where a
+seller published no tier for that quantity, no discount is assumed and
+the last known tier holds (ADR-0105).
 
 Nothing here knows about radios or deployments. It prices boards.
 """
@@ -21,6 +19,9 @@ from typing import Optional
 
 FILE = pathlib.Path(__file__).resolve().parent / "bom.toml"
 
+#: The tiers the pages show and the table can be priced at.
+TIERS = (1, 100, 1000)
+
 
 @dataclass(frozen=True)
 class Part:
@@ -28,124 +29,76 @@ class Part:
     name: str
     role_tr: str
     role_en: str
-    usd: float
     seller: str
     url: str
-    #: A distributor's published price at volume, where one was read:
-    #: the tier it applies from, and where and when (ADR-0093).
-    volume_usd: Optional[float] = None
-    volume_tier: Optional[int] = None
-    volume_seller: str = ""
+    #: (least quantity, USD a piece from it), in rising quantity.
+    ladder: tuple[tuple[int, float], ...]
+    date: str = ""
+    note: str = ""
     volume_url: str = ""
-    volume_date: str = ""
-    volume_note: str = ""
 
     def role(self, language: Optional[str] = None) -> str:
         return self.role_en if language == "en" else self.role_tr
 
-    def at(self, quantity: int, carried: float) -> float:
-        """This part's price in USD when `quantity` are bought.
+    def at(self, pieces: int) -> float:
+        """USD a piece when `pieces` are bought.
 
-        A verified tier price applies from its tier up. Below its tier
-        it is a floor: nobody sells fewer of a part for less than more
-        of it. Otherwise the part is carried from one unit by `carried`,
-        the report's own discount (ADR-0102).
+        The last tier at or below `pieces`. Fewer than the seller's least
+        order still pays the first tier: that is what one board costs.
         """
-        estimate = self.usd * carried
-        if self.volume_usd is None:
-            return estimate
-        if self.volume_tier is not None and self.volume_tier <= quantity:
-            return self.volume_usd
-        return max(estimate, self.volume_usd)
+        price = self.ladder[0][1]
+        for least, usd in self.ladder:
+            if least <= pieces:
+                price = usd
+        return price
 
 
 @dataclass(frozen=True)
 class Board:
-    """One product: what the report priced, and what it costs now."""
+    """One product and what it costs at each tier."""
 
     key: str
     name_tr: str
     name_en: str
-    report_tr: str
-    report_en: str
-    report_one_tl: float
-    report_hundred_tl: float
-    was: tuple[Part, ...]
+    #: The main parts, one of each.
     parts: tuple[Part, ...]
     usd_try: float
-    thousand_over_hundred: float
-    #: The rest of the board part by part, with how many of each. When
-    #: given, it replaces the report's remainder as the "other" line
-    #: (ADR-0103).
+    #: The rest of the board, with how many of each.
     others: tuple[tuple[Part, int], ...] = ()
 
     def name(self, language: Optional[str] = None) -> str:
         return self.name_en if language == "en" else self.name_tr
 
-    def other_at(self, quantity: int, carried: float) -> float:
-        """The "other" line in USD at a quantity: itemised where the bill
-        lists it, else the report's remainder carried by its discount."""
-        if self.others:
-            return sum(n * part.at(quantity, carried) for part, n in self.others)
-        return self.other_usd * carried
-
     @property
-    def hundred_over_one(self) -> float:
-        """The report's own discount from one unit to a hundred."""
-        return self.report_hundred_tl / self.report_one_tl
+    def lines(self) -> tuple[tuple[Part, int], ...]:
+        """Every part on the board with its count."""
+        return tuple((part, 1) for part in self.parts) + self.others
 
-    @property
-    def other_usd(self) -> float:
-        """What the report's one unit total holds beyond its named parts."""
-        named = sum(part.usd for part in self.was)
-        return self.report_one_tl / self.usd_try - named
+    def usd(self, boards: int) -> float:
+        """One board's parts in USD when `boards` are made."""
+        return sum(n * part.at(n * boards) for part, n in self.lines)
+
+    def at(self, tier: int) -> float:
+        """One board in TL when `tier` of them are made."""
+        return self.usd(tier) * self.usd_try
 
     @property
     def one_tl(self) -> float:
-        return (self.other_at(1, 1.0)
-                + sum(p.at(1, 1.0) for p in self.parts)) * self.usd_try
+        return self.at(1)
 
     @property
     def hundred_tl(self) -> float:
-        """A hundred units: the report's discount from one to a hundred,
-        except where a part's verified tier price says otherwise."""
-        carried = self.hundred_over_one
-        return (self.other_at(100, carried) + sum(
-            p.at(100, carried) for p in self.parts)) * self.usd_try
+        return self.at(100)
 
     @property
     def thousand_tl(self) -> float:
-        """A thousand units: each part at its published volume price
-        where one was read, and the rest, the "other" line included,
-        carried from one unit by the report's own discount (ADR-0093).
-
-        A published volume price is often dearer than that discount
-        would make it: the report's ratio was a guess about volume, and
-        where a distributor's tier says otherwise the tier wins.
-        """
-        carried = self.hundred_over_one * self.thousand_over_hundred
-        total = self.other_at(1000, carried) + sum(
-            part.at(1000, carried) for part in self.parts)
-        return total * self.usd_try
-
-    def at(self, tier: int) -> float:
-        return {1: self.one_tl, 100: self.hundred_tl,
-                1000: self.thousand_tl}[tier]
-
-    @property
-    def swapped(self) -> tuple[tuple[Part, Part], ...]:
-        """Each part that changed, beside what it replaced."""
-        kept = {p.key for p in self.was}
-        new = [p for p in self.parts if p.key not in kept]
-        gone = [p for p in self.was if p.key not in {q.key for q in self.parts}]
-        return tuple(zip(gone, new))
+        return self.at(1000)
 
 
 @dataclass(frozen=True)
 class Bill:
     usd_try: float
     usd_try_source: str
-    thousand_over_hundred: float
     used_tier: int
     parts: dict
     boards: dict
@@ -153,16 +106,6 @@ class Bill:
     def price(self, key: str) -> float:
         """What the table charges for one of these, in TL."""
         return self.boards[key].at(self.used_tier)
-
-
-def _volume(table: Optional[dict]) -> dict:
-    if not table:
-        return {}
-    return {
-        "volume_usd": float(table["usd"]), "volume_tier": int(table["tier"]),
-        "volume_seller": table.get("seller", ""), "volume_url": table.get("url", ""),
-        "volume_date": table.get("date", ""), "volume_note": table.get("note", ""),
-    }
 
 
 def _counted(parts: dict, entry: str, board: str) -> tuple:
@@ -174,43 +117,37 @@ def _counted(parts: dict, entry: str, board: str) -> tuple:
     return parts[key], int(count or 1)
 
 
+def _ladder(key: str, rows) -> tuple:
+    ladder = tuple((int(q), float(u)) for q, u in rows)
+    if not ladder or [q for q, _ in ladder] != sorted({q for q, _ in ladder}):
+        raise ValueError("{}: a ladder climbs in quantity, once each".format(key))
+    return ladder
+
+
 @lru_cache(maxsize=None)
 def read(path: pathlib.Path = FILE) -> Bill:
     raw = tomllib.loads(path.read_text(encoding="utf-8"))
     parts = {
         p["key"]: Part(
             key=p["key"], name=p["name"], role_tr=p["role"]["tr"],
-            role_en=p["role"]["en"], usd=float(p["usd"]),
-            seller=p["seller"], url=p["url"],
-            **_volume(p.get("volume")),
+            role_en=p["role"]["en"], seller=p["seller"], url=p["url"],
+            ladder=_ladder(p["key"], p["ladder"]), date=p.get("date", ""),
+            note=p.get("note", ""), volume_url=p.get("volume_url", ""),
         )
         for p in raw["part"]
     }
     usd_try = float(raw["usd_try"])
-    ratio = float(raw["thousand_over_hundred"])
     boards = {}
     for b in raw["product"]:
-        try:
-            was = tuple(parts[k] for k in b["was"])
-            now = tuple(parts[k] for k in b["parts"])
-        except KeyError as missing:
-            raise ValueError(
-                "{} names a part the bill does not list: {}".format(
-                    b["key"], missing)
-            ) from None
         boards[b["key"]] = Board(
             key=b["key"], name_tr=b["name"]["tr"], name_en=b["name"]["en"],
-            report_tr=b["report"]["tr"], report_en=b["report"]["en"],
-            report_one_tl=float(b["report_one_tl"]),
-            report_hundred_tl=float(b["report_hundred_tl"]),
-            was=was, parts=now, usd_try=usd_try,
-            thousand_over_hundred=ratio,
+            parts=tuple(_counted(parts, k, b["key"])[0] for k in b["parts"]),
+            usd_try=usd_try,
             others=tuple(_counted(parts, entry, b["key"])
                          for entry in b.get("other", ())),
         )
     tier = int(raw["used_tier"])
-    if tier not in (1, 100, 1000):
+    if tier not in TIERS:
         raise ValueError("a tier is 1, 100 or 1000, not {}".format(tier))
     return Bill(usd_try=usd_try, usd_try_source=raw["usd_try_source"],
-                thousand_over_hundred=ratio, used_tier=tier,
-                parts=parts, boards=boards)
+                used_tier=tier, parts=parts, boards=boards)

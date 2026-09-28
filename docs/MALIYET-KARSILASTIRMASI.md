@@ -1,5 +1,7 @@
 # Maliyet karşılaştırması: görüş dışı seçenekleri ve direk aralığı
 
+> **Arşiv.** Bu karşılaştırma bir karar için yapıldı ve karar verildi (ADR-0084, ADR-0104, ADR-0105). Sayılar o günün modeline ve fiyatlarına ait; güncel değerler sitede ve `src/yerkon/published.toml` dosyasında.
+
 25 Eylül 2026. Amaç: km² ve km başına maliyeti düşürmek, doğruluğu ve
 kullanılabilirliği kaybetmeden.
 

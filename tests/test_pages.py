@@ -1057,3 +1057,13 @@ def test_the_socketless_answer_is_the_server_s_answer():
         answer("POST", "/api/mode", json.dumps({"mode": "tunnel"})))
     assert status == 200 and json.loads(text)["showing"] == "tunnel"
     answer("POST", "/api/mode", json.dumps({"mode": "urban"}))
+
+
+def test_the_home_page_quotes_the_bill_s_own_unit_prices():
+    """The one price the home page writes out is the bill's, rounded."""
+    from yerkon.bom import read as bill
+
+    boards = bill().boards
+    page = render(page_at(""), "tr", read())
+    for key in ("amplified-anchor", "tunnel-anchor"):
+        assert str(round(boards[key].thousand_tl)) in page, key

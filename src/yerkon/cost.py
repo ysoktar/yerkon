@@ -37,11 +37,10 @@ class Product:
 
 
 def _bom(key: str, name: str) -> Product:
-    """A product priced from the itemised bill (`bom.py`, ADR-0079).
+    """A product priced from the itemised bill (`bom.py`, ADR-0105).
 
-    Derived rather than read off a datasheet: every part carries its own
-    distributor price, but the tier the table uses is carried from the
-    report's two columns and, at a thousand, by one assumed ratio.
+    Derived rather than read off a datasheet: the sum of every part at
+    its seller's own price for that many boards.
     """
     from yerkon.bom import read
 
@@ -51,7 +50,7 @@ def _bom(key: str, name: str) -> Product:
         name=name,
         unit_price_tl=Sourced(
             round(bill.price(key), 2), "TL", Provenance.DERIVED,
-            "bom.toml, itemised from the YERKON report's page 14",
+            "bom.toml, every part at its seller's price ladder",
             note=(
                 "{} units, priced part by part from the sellers."
                 .format(bill.used_tier)

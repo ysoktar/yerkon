@@ -1634,7 +1634,7 @@ class TileImagery:
     fact about their network — this project has no business picking one
     on their behalf, and a hardcoded default would be a provider's terms
     accepted by whoever ran the command rather than by whoever wrote it.
-    `docs/TRY-IT.md` lists the usual templates; the person chooses.
+    README.md gives one template; the person chooses.
 
     Tiles are cached on disk beside the Copernicus ones, so a second site
     in the same place costs nothing, and fetched a few at a time because
