@@ -117,3 +117,4 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0105](0105-satici-kademeleri-rapor-yok.md) | Fiyatlar satıcı kademelerinden; raporun fiyatları kullanılmıyor | Geçerli |
 | [0106](0106-yasam-sinyali-ve-telsizle-aktarma.md) | Yaşam sinyali; hattı olmayan birim telsizle aktarıyor | Geçerli |
 | [0107](0107-degisiklik-durdurmadan-ve-hizli-baslangic.md) | Değişiklik kullanıcıyı durdurmadan uygulanır; haritadan hızlı başlangıç | Geçerli |
+| [0108](0108-site-bolumlerinin-yeri.md) | Sitenin bölümleri yerinde toplanır, tekrarlar kalkar | Geçerli |

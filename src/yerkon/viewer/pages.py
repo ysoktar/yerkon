@@ -80,6 +80,11 @@ class Part:
     #: on one line. Nothing does by default.
     numbers_from: int = 99
     shows: str = ""
+    #: Closed until opened: a long table most readers do not need, kept
+    #: on the page for the ones who do.
+    folded: bool = False
+    #: A section inside the one before it, so its heading is a level down.
+    sub: bool = False
 
 
 @dataclass(frozen=True)
@@ -711,12 +716,18 @@ SYSTEM = Page(
             ),
         ),
         Part(
-            kind="shows", shows="bill",
-            heading=_w("Donanım ve fiyatı", "The hardware and its price"),
-        ),
-        Part(
             kind="points",
+            heading=_w("Donanım ve fiyatı", "The hardware and its price"),
             lines=(
+                _w(
+                    "1000 adette bir yayın birimi yaklaşık 1400-1700 lira, "
+                    "bir alıcı yaklaşık 2300-3300 lira. Her ürünün 1, 100 "
+                    "ve 1000 adetlik fiyat tablosu Maliyet sayfasında.",
+                    "At a thousand units a broadcast unit is roughly 1400 "
+                    "to 1700 lira and a receiver roughly 2300 to 3300 "
+                    "lira. Every product's price at one, a hundred and a "
+                    "thousand is tabled on the Cost page.",
+                ),
                 _w(
                     "Her ürünün 1, 100 ve 1000 adetteki fiyatı, kartın "
                     "parçalarının satıcılarının kendi kademe fiyatlarıyla "
@@ -950,10 +961,10 @@ VALUE = Page(
     lead=_w(
         "Konumun hayati olduğu, ama uydu sinyalinin kesildiği, "
         "zayıfladığı ya da artık güvenilmediği yerlerde ulaşımın ve "
-        "haberleşmenin durmaması için.",
+        "haberleşmenin durmaması için; sayfanın sonunda ticarileşmesi.",
         "So that transport and communications do not stop where position "
         "is vital and the satellite signal is cut, weakened or no longer "
-        "trusted.",
+        "trusted; how it is commercialised closes the page.",
     ),
     parts=(
         Part(
@@ -1053,6 +1064,20 @@ VALUE = Page(
         ),
         Part(
             kind="text",
+            heading=_w("Ticarileşme", "Commercialisation"),
+            lines=(
+                _w("YERKON'un amacı kamu değeri üretmek. Aşağıdakiler, "
+                   "işletme maliyetini karşılayacak gelirin nereden "
+                   "geleceği, ilk ticari adımlar ve satılacak ürünler.",
+                   "YERKON's aim is public value. What follows is where "
+                   "the income to meet the running cost can come from, "
+                   "the first commercial steps and the products to be "
+                   "sold."),
+            ),
+        ),
+        Part(
+            kind="text",
+            sub=True,
             heading=_w("Kendini nasıl döndürür",
                        "How it pays for itself"),
             lines=(
@@ -1104,6 +1129,7 @@ VALUE = Page(
         ),
         Part(
             kind="points",
+            sub=True,
             heading=_w("Uzun vadede", "In the long term"),
             lines=(
                 _w("Komşu ve gelişmekte olan ülkelere karasal "
@@ -1128,6 +1154,7 @@ VALUE = Page(
         ),
         Part(
             kind="points",
+            sub=True,
             heading=_w("Ürünler", "The products"),
             lines=(
                 _w(
@@ -1300,41 +1327,6 @@ RESULTS = Page(
                     "publish come from different tests, over different "
                     "durations, against different thresholds. They should "
                     "not be read side by side as one measurement.",
-                ),
-            ),
-        ),
-        Part(
-            kind="text",
-            heading=_w("Hızlı okuma", "The fast reading"),
-            lines=(
-                _w(
-                    "Simülasyondaki **Hızlı dene** düğmesi ve komut "
-                    "satırındaki `--fast` iki şeyi kabalaştırır: yoldaki "
-                    "engellerin rastgele etkisi sekiz yerine bir kez "
-                    "denenir ve arazi 10 m'de bir yerine her bağlantıda "
-                    "sabit 64 noktada okunur. Hesap on beş dakikadan bir "
-                    "dakikaya iner.",
-                    "The **fast** button in the simulation and `--fast` on "
-                    "the command line coarsen the same two figures: the "
-                    "shadows are drawn once instead of pooled over eight, "
-                    "and the ground profile is read at a fixed 64 samples "
-                    "instead of every 10 m. A run drops from fifteen "
-                    "minutes to about one.",
-                ),
-                _w(
-                    "Arazi seyrek okununca tepelerin arkasındaki zayıflama "
-                    "eksik hesaplanıyor, bu da hızlı sonucu çoğunlukla "
-                    "olduğundan iyi gösteriyor. Engellerin etkisini bir kez "
-                    "denemek ise iki yöne de saptırabiliyor: aynı "
-                    "yerleşimde bir satır hızlıda iyi, başka biri kötü "
-                    "çıkabiliyor. Hızlı hesap yalnız denemek için; bu sayfa "
-                    "yalnızca yavaş ve tam hesabı gösterir.",
-                    "The coarse ground reads diffraction loss low, which "
-                    "mostly makes a fast answer flatter the deployment. "
-                    "The single shadow draw can err either way: on the same "
-                    "placement one row can come out better fast and "
-                    "another worse. A fast run is for trying things; this "
-                    "page shows the slow, full run only.",
                 ),
             ),
         ),
@@ -1740,6 +1732,43 @@ SIMULATION = Page(
             ),
         ),
         Part(
+            kind="text",
+            heading=_w("Hızlı okuma", "The fast reading"),
+            lines=(
+                _w(
+                    "Simülatördeki **Hızlı dene** düğmesi ve komut "
+                    "satırındaki `--fast` iki şeyi kabalaştırır: yoldaki "
+                    "engellerin rastgele etkisi sekiz yerine bir kez "
+                    "denenir ve arazi 10 m'de bir yerine her bağlantıda "
+                    "sabit 64 noktada okunur. Hesap on beş dakikadan bir "
+                    "dakikaya iner.",
+                    "The **Try it fast** button in the simulator and `--fast` on "
+                    "the command line coarsen the same two figures: the "
+                    "shadows are drawn once instead of pooled over eight, "
+                    "and the ground profile is read at a fixed 64 samples "
+                    "instead of every 10 m. A run drops from fifteen "
+                    "minutes to about one.",
+                ),
+                _w(
+                    "Arazi seyrek okununca tepelerin arkasındaki zayıflama "
+                    "eksik hesaplanıyor, bu da hızlı sonucu çoğunlukla "
+                    "olduğundan iyi gösteriyor. Engellerin etkisini bir kez "
+                    "denemek ise iki yöne de saptırabiliyor: aynı "
+                    "yerleşimde bir satır hızlıda iyi, başka biri kötü "
+                    "çıkabiliyor. Hızlı hesap yalnız denemek için; Sonuçlar "
+                    "sayfasındaki tablo yalnızca yavaş ve tam hesaptan "
+                    "gelir.",
+                    "The coarse ground reads diffraction loss low, which "
+                    "mostly makes a fast answer flatter the deployment. "
+                    "The single shadow draw can err either way: on the same "
+                    "placement one row can come out better fast and "
+                    "another worse. A fast run is for trying things; the "
+                    "table on the Results page comes from the slow, full "
+                    "run only.",
+                ),
+            ),
+        ),
+        Part(
             kind="code",
             code=_w(
                 "git clone https://github.com/ysoktar/yerkon\n"
@@ -2033,7 +2062,7 @@ COST = Page(
                        "YERKON broadcast unit prices"),
         ),
         Part(
-            kind="shows", shows="parts",
+            kind="shows", shows="parts", folded=True,
             heading=_w("Her kartın parçaları", "Every board's parts"),
         ),
         Part(
@@ -2089,6 +2118,7 @@ COST = Page(
             ),
         ),
         Part(
+            folded=True,
             kind="shows", shows="assumptions",
             heading=_w("Her sayının dayanağı", "What every figure rests on"),
         ),
@@ -2388,7 +2418,22 @@ LAW = Page(
             ),
         ),
         Part(
-            kind="points",
+            kind="text",
+            heading=_w("Kurulumun ve maliyetin dayandığı mevzuat",
+                       "The rules installation and cost rest on"),
+            lines=(
+                _w("Buraya kadarki kurallar telsizin kendisi ve piyasaya "
+                   "çıkışı içindi. Aşağıdakiler birimin nereye ve nasıl "
+                   "takıldığı ile kurulum ve bakım maliyetinin hangi "
+                   "kurallara dayandığı.",
+                   "The rules so far were for the radio itself and for "
+                   "putting it on the market. Those below are about where "
+                   "and how a unit is fitted, and which rules the cost of "
+                   "fitting and maintaining it rests on."),
+            ),
+        ),
+        Part(
+            kind="points", sub=True,
             heading=_w("Harcırah", "Per diem"),
             lines=(
                 _w("Harcırah, görev yeri dışına geçici bir görevle "
@@ -2462,6 +2507,7 @@ LAW = Page(
         ),
         Part(
             kind="points",
+            sub=True,
             heading=_w("Bakım maliyetinde mevzuat",
                        "Regulation in the maintenance cost"),
             lines=(
@@ -2478,21 +2524,23 @@ LAW = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Direklerin boyu ve birimin yeri",
-                       "Pole heights and where the unit goes"),
+            sub=True,
+            heading=_w("Direk boyunu ve birimin yerini belirleyen kurallar",
+                       "The rules that set pole heights and where the "
+                       "unit goes"),
             lines=(
                 _w("Aydınlatma direği: TEDAŞ'ın LED'li Yol Aydınlatma "
                    "Tasarımına İlişkin Usul ve Esasları (Ağustos 2022, Ek-1) "
                    "direk boyunu yol sınıfına bağlıyor: M1 sınıfı yollarda "
                    "12-14 m, M2 ve M3'te 10-12 m, M4'te 8-10 m, M5'te 8 m, "
-                   "yaya yollarında (P2, P3) 6-8 m. Direk boyları bu "
-                   "yüzden bir küme: 6, 8, 10, 12, 14 m.",
+                   "yaya yollarında (P2, P3) 6-8 m. Bu boyların "
+                   "fiyatları Maliyet sayfasında.",
                    "Lighting column: TEDAŞ's rules for LED road lighting "
                    "design (August 2022, annex 1) tie the column height to "
                    "the road class: 12 to 14 m on M1 roads, 10 to 12 m on "
                    "M2 and M3, 8 to 10 m on M4, 8 m on M5, 6 to 8 m on "
-                   "footways (P2, P3). The heights are therefore a set: 6, "
-                   "8, 10, 12, 14 m."),
+                   "footways (P2, P3). What these heights cost is on the "
+                   "Cost page."),
                 _w("Dağıtım direği: TEDAŞ-MLZ/99-34 santrifüj betonarme "
                    "direk şartnamesi boyları 9,3 m'den 25 m'ye kadar "
                    "sayıyor (9,3-10-11 m, 12-13-14 m, 15-16 m ve üstü). "
@@ -2527,6 +2575,7 @@ LAW = Page(
         ),
         Part(
             kind="points",
+            sub=True,
             heading=_w("Kamu yapısında yer kullanımı",
                        "Using space on public structures"),
             lines=(
@@ -2566,6 +2615,7 @@ LAW = Page(
         ),
         Part(
             kind="points",
+            sub=True,
             heading=_w("Harita ve uydu görüntüsü", "Maps and imagery"),
             lines=(
                 _w("Yer seçme haritası OpenStreetMap'in karolarını kullanıyor "
@@ -2809,8 +2859,10 @@ def _footer(language: str) -> str:
 
 
 def _part(part: Part, language: str, published, where: Optional[Where] = None) -> str:
+    level = 'h3 class="sub"' if part.sub else "h2"
     heading = (
-        "<h2>{}</h2>".format(_said(part.heading, language))
+        "<{0}>{1}</{2}>".format(level, _said(part.heading, language),
+                                level.split()[0])
         if part.heading else ""
     )
     if part.kind == "text":
@@ -2911,6 +2963,9 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         drawn = costing.assumptions(language, _table)
     else:
         raise ValueError("no way to draw a {} part".format(part.kind))
+    if part.folded and heading:
+        return '<section><details class="fold"><summary>{}</summary>{}' \
+            "</details></section>".format(heading, drawn)
     return "<section>{}{}</section>".format(heading, drawn)
 
 

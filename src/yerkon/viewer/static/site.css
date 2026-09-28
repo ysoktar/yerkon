@@ -231,3 +231,24 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
   .figures, .cards { grid-template-columns: 1fr 1fr; }
   .wide, figure { width: calc(100vw - 32px); }
 }
+
+/* A section closed until it is opened: the long tables on the cost page
+   that most readers do not need and the ones who do can open. The arrow
+   says it opens; it turns when it has. */
+details.fold > summary { cursor: pointer; list-style: none; }
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary > h2, details.fold > summary > h3 { display: inline; }
+details.fold > summary::before {
+  content: "▸"; display: inline-block; width: 1.1em; color: var(--quiet);
+  transition: transform 0.15s;
+}
+details.fold[open] > summary::before { transform: rotate(90deg); }
+details.fold > summary:hover h2, details.fold > summary:hover h3 { text-decoration: underline; }
+
+/* A section inside the one before it: its heading is in plain case and
+   the body's colour, so the capitals above read as the group's name. The
+   small type under a third-level heading is the bibliography's. */
+h3.sub { margin-top: 26px; font-size: 16px; text-transform: none;
+  letter-spacing: 0; color: var(--dim); font-weight: 650; }
+h3.sub + ul, h3.sub + p { font-size: inherit; }
+h3.sub + ul li { margin-bottom: 9px; overflow-wrap: normal; }
