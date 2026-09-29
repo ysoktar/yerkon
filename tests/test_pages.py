@@ -943,11 +943,14 @@ def test_every_cost_cell_is_the_last_line_of_its_breakdown():
 
 def test_the_cost_page_shows_every_part_and_every_assumption():
     from yerkon.bom import read as bill
-    from yerkon.viewer.costing import ASSUMED
+    from yerkon.viewer.costing import ASSUMED, UNSHOWN
 
     page = render(page_at("maliyet"), "tr", read())
     for part in bill().parts.values():
-        used = any(part in board.parts for board in bill().boards.values())
+        # A board the table does not use is off the page, and so is a
+        # part only it carries: the 12S since the pedestrian took the 20S.
+        used = any(part in board.parts for board in bill().boards.values()
+                   if board.key not in UNSHOWN)
         if used:
             assert html.escape(part.name) in page, part.name
     for key, name in ASSUMED:

@@ -599,9 +599,11 @@ SYSTEM = Page(
                     "bunlar seyrek olduğu için simülasyonda birimlerin "
                     "çoğu yol boyundaki elektrik dağıtım direklerinde, "
                     "güneş paneli ve aküyle. "
-                    "Cihaz uyarlamalı frekans atlamalı olarak "
-                    "belgelendiriliyor; bu belgeyle 2,4 GHz'de yoğunluk "
-                    "sınırı kalkıyor ve 20 dBm yayılan güç kalıyor. Kırsal "
+                    "Cihaz Frekans Atlamalı Spektrum Yayılımı (FHSS) ve "
+                    "Göndermeden Önce Dinle (LBT) ile TS EN 300 328'e göre "
+                    "belgelendiriliyor; FHSS'te yoğunluk sınırı 100 mW/100 "
+                    "kHz olduğu için 1,625 MHz'lik sinyalde bağlamıyor ve "
+                    "100 mW (20 dBm) e.i.r.p. kalıyor. Kırsal "
                     "birim şehir içindekiyle aynı kart: yükselteçli modül "
                     "(E28-2G4M20S) ve dış ortam tipi 5 dBi çubuk anten. "
                     "Şehirdeki birimden farkı kartta değil yerinde: "
@@ -624,9 +626,12 @@ SYSTEM = Page(
                     "are sparse, so in the simulation most units are on "
                     "the electricity distribution poles along the road, "
                     "with a solar panel and a battery. The "
-                    "equipment is certified as adaptive frequency hopping, "
-                    "which lifts the 2,4 GHz density limit and leaves "
-                    "20 dBm of radiated power. The rural unit is the same "
+                    "equipment is certified to TS EN 300 328 with "
+                    "frequency hopping spread spectrum (FHSS) and listen "
+                    "before talk (LBT); under FHSS the density limit is "
+                    "100 mW/100 kHz, which a 1,625 MHz signal does not "
+                    "reach, so 100 mW (20 dBm) e.i.r.p. holds. The rural "
+                    "unit is the same "
                     "board as the urban one: the amplified module "
                     "(E28-2G4M20S) and an outdoor 5 dBi rod antenna. Its "
                     "difference from the town unit is not the board but "
@@ -670,16 +675,20 @@ SYSTEM = Page(
             lines=(
                 _w(
                     "**Yaya.** Az pil harcasın ve cepte taşınsın diye "
-                    "tasarlandı. Şehirde ve kırsalda EBYTE E28-2G4M12S "
-                    "modülünü (SX1280 yongalı), tünelde ve kapalı alanda "
-                    "Qorvo DWM3000'i kullanır. ESP32-S3 ile telefona "
+                    "tasarlandı. Şehirde ve kırsalda direkler ve araçla "
+                    "aynı yükselteçli EBYTE E28-2G4M20S modülünü (SX1280 "
+                    "yongalı) kullanır; gücü yazılımla ayarlanır, kısa "
+                    "bağlantıda daha az yayın yapar. Tünelde ve kapalı "
+                    "alanda Qorvo DWM3000'i kullanır. ESP32-S3 ile telefona "
                     "bağlanır; sinyal kesilirse BNO085 hareket sensörüyle "
                     "son konumdan devam eder. UWB için seramik anten, "
                     "2,4 GHz için kart üzerinde çip anten.",
                     "**Pedestrian.** Designed to draw little power and "
-                    "fit in a pocket. It uses the EBYTE E28-2G4M12S "
-                    "module (an SX1280 chip) in town and in open country "
-                    "and the Qorvo DWM3000 in tunnels and indoors. An "
+                    "fit in a pocket. In town and in open country it uses "
+                    "the same amplified EBYTE E28-2G4M20S module (an "
+                    "SX1280 chip) as the poles and the vehicle; its power "
+                    "is set in software and turned down on a short link. "
+                    "It uses the Qorvo DWM3000 in tunnels and indoors. An "
                     "ESP32-S3 connects it to a phone; if the signal drops, "
                     "a BNO085 motion sensor carries on from the last "
                     "position. A ceramic antenna for UWB, a chip antenna "
@@ -1510,12 +1519,14 @@ SIMULATION = Page(
                 _w(
                     "Mesafe hesapla çıkarılmaz, ölçülür. İki telsiz "
                     "karşılıklı mesaj gönderir; SX1280'de bir ölçüm "
-                    "alışverişi, frekans atlamanın istediği %5 sessizlikle "
+                    "alışverişi, Göndermeden Önce Dinle (LBT) kuralının "
+                    "istediği %5 sessizlikle "
                     "birlikte 33,4 milisaniye sürüyor.",
                     "A distance is measured rather than calculated. Two "
                     "radios send messages back and forth; on the SX1280 "
                     "one ranging exchange takes 33,4 milliseconds, "
-                    "including the 5 % rest frequency hopping asks for.",
+                    "including the 5 % rest listen before talk (LBT) "
+                    "asks for.",
                 ),
                 _w(
                     "On iki birimle sırayla ölçüşmek 401 milisaniye "
@@ -2133,6 +2144,14 @@ COST = Page(
     ),
 )
 
+#: The BTK's criteria for licence-exempt radio equipment; a page is linked
+#: with #page=N.
+BTK_EXEMPT = ("https://www.btk.gov.tr/uploads/pages/"
+              "frekans-tahsisinden-muaf-telsiz-cihaz-sistemleri-olcutler-"
+              "633d4ca68c0b1.pdf")
+EN_300_328 = ("https://www.etsi.org/deliver/etsi_en/300300_300399/300328/"
+              "02.02.02_60/en_300328v020202p.pdf")
+
 LAW = Page(
     slug="mevzuat",
     nav=_w("Mevzuat", "Regulation"),
@@ -2150,58 +2169,111 @@ LAW = Page(
     ),
     parts=(
         Part(
-            kind="table",
+            kind="text",
             heading=_w("2,4 GHz'de ne kadar güç", "How much power at 2,4 GHz"),
+            lines=(
+                _w("Şehir içi ve kırsal birimler 2400-2483,5 MHz bandında "
+                   "genişband veri iletim sistemi olarak çalışıyor: [BTK, "
+                   "Frekans Tahsisinden Muaf Telsiz Cihaz ve Sistemlerine "
+                   "İlişkin Teknik Ölçütler, Madde 5, Tablo 3, satır 3]("
+                   + BTK_EXEMPT + "#page=11). En çok 100 mW e.i.r.p. "
+                   "(20 dBm); yeterli spektrum paylaşım mekanizması "
+                   "gerekli (örneğin LBT, DAA); referans standart "
+                   "[TS EN 300 328](" + EN_300_328 + "). Frekans Atlamalı "
+                   "Spektrum Yayılımı (FHSS) kullanıldığında e.i.r.p. "
+                   "yoğunluğu en çok 100 mW/100 kHz, FHSS dışındaki "
+                   "genişband modülasyonlarda en çok 10 mW/MHz.",
+                   "The town and open country units work in the "
+                   "2400-2483,5 MHz band as a wideband data transmission "
+                   "system: [BTK, Technical Criteria for Radio Equipment "
+                   "and Systems Exempt from Frequency Assignment, Article "
+                   "5, Table 3, row 3](" + BTK_EXEMPT + "#page=11). At most "
+                   "100 mW e.i.r.p. (20 dBm); an adequate spectrum sharing "
+                   "mechanism is required (for example LBT, DAA); the "
+                   "reference standard is [TS EN 300 328](" + EN_300_328
+                   + "). With frequency hopping spread spectrum (FHSS) the "
+                   "e.i.r.p. density is at most 100 mW/100 kHz; with other "
+                   "wideband modulations at most 10 mW/MHz."),
+                _w("Tablodaki güç sınırları yönetmelikten; kanal "
+                   "kontrolü, süreler ve eşikler TS EN 300 328'den (ETSI "
+                   "EN 300 328 V2.2.2, 4.3.1). Yönetmelik, referans "
+                   "standarttaki tekniklere en az eş değer spektrum erişim "
+                   "ve girişimi azaltma tekniklerini şart koşuyor ([Madde "
+                   "2](" + BTK_EXEMPT + "#page=6)).",
+                   "The power limits in the table are the regulation's; "
+                   "the channel check, the durations and the thresholds "
+                   "are TS EN 300 328's (ETSI EN 300 328 V2.2.2, 4.3.1). "
+                   "The regulation requires spectrum access and "
+                   "interference mitigation techniques at least equivalent "
+                   "to those of the reference standard ([Article 2]("
+                   + BTK_EXEMPT + "#page=6))."),
+            ),
+        ),
+        Part(
+            kind="table",
             rows=(
                 (_w("Kip", "Mode"), _w("Sınır", "Limit"),
                  _w("YERKON için ne demek", "What it means for YERKON")),
                 (
-                    _w("Frekans atlamasız", "Not hopping"),
-                    _w("20 dBm e.i.r.p. ve 10 dBm/MHz",
-                       "20 dBm e.i.r.p. and 10 dBm/MHz"),
-                    _w("Sinyal 1,6 MHz genişliğinde. MHz başına 10 dBm "
-                       "sınırı yüzünden toplam yayın gücü 12,1 dBm'yi "
-                       "geçemiyor; 20 dBm'lik genel sınıra hiç "
+                    _w("FHSS olmadan (FHSS dışındaki genişband "
+                       "modülasyon)",
+                       "Without FHSS (other wideband modulation)"),
+                    _w("100 mW e.i.r.p. ve en çok 10 mW/MHz",
+                       "100 mW e.i.r.p. and at most 10 mW/MHz"),
+                    _w("Sinyal 1,625 MHz genişliğinde. MHz başına 10 mW "
+                       "sınırı yüzünden toplam yayın gücü 16,25 mW'ı "
+                       "(12,1 dBm) geçemiyor; 100 mW'lık sınıra hiç "
                        "ulaşılamıyor.",
-                       "The signal is 1,6 MHz wide. The 10 dBm a MHz "
-                       "limit holds the total to 12,1 dBm, so the general "
-                       "20 dBm limit is never reached."),
+                       "The signal is 1,625 MHz wide. The 10 mW a MHz "
+                       "limit holds the total to 16,25 mW (12,1 dBm), so "
+                       "the 100 mW limit is never reached."),
                 ),
                 (
-                    _w("Uyarlamasız frekans atlama", "Non-adaptive hopping"),
-                    _w("20 dBm; yayın dizisi en çok 5 ms, ara en az 5 ms; "
-                       "bir frekansta 15 ms × N içinde en çok 15 ms; havayı "
-                       "meşgul etme payı en çok %10",
-                       "20 dBm; transmissions at most 5 ms with gaps of at "
-                       "least 5 ms; at most 15 ms on one frequency in "
-                       "15 ms × N; medium utilisation at most 10 %"),
+                    _w("FHSS, LBT ya da DAA olmadan (TS EN 300 328'de "
+                       "uyarlamasız cihaz)",
+                       "FHSS without LBT or DAA (non-adaptive equipment in "
+                       "TS EN 300 328)"),
+                    _w("100 mW e.i.r.p.; yayın dizisi en çok 5 ms, ara en "
+                       "az 5 ms; bir frekansta 15 ms × N içinde en çok "
+                       "15 ms; ortamı meşgul etme payı en çok %10",
+                       "100 mW e.i.r.p.; transmissions at most 5 ms with "
+                       "gaps of at least 5 ms; at most 15 ms on one "
+                       "frequency in 15 ms × N; medium utilisation at most "
+                       "10 %"),
                     _w("Uymuyor: bir ölçüm paketi SF10'da yaklaşık 15 ms "
                        "sürüyor ve araç sürekli soruyor.",
                        "Does not fit: one ranging frame lasts about 15 ms "
                        "at SF10 and a vehicle polls continuously."),
                 ),
                 (
-                    _w("Uyarlamalı frekans atlama (dinle, sonra konuş)",
-                       "Adaptive hopping (listen before talk)"),
-                    _w("20 dBm; her beklemeden önce kanal kontrolü, eşik "
+                    _w("FHSS ve Göndermeden Önce Dinle (LBT) (TS EN 300 "
+                       "328'de uyarlamalı cihaz)",
+                       "FHSS with listen before talk (LBT) (adaptive "
+                       "equipment in TS EN 300 328)"),
+                    _w("100 mW e.i.r.p. ve en çok 100 mW/100 kHz; her "
+                       "kanal kullanımından önce kanal kontrolü, eşik "
                        "-70 dBm/MHz; kanal kullanımı 60 ms'den kısa, "
                        "ardından onun en az %5'i kadar sessizlik; bandın en "
                        "az %70'inde çalışabilmeli",
-                       "20 dBm; a channel check before each dwell, threshold "
-                       "-70 dBm/MHz; channel occupancy under 60 ms, then "
-                       "silence of at least 5 % of it; able to use at least "
-                       "70 % of the band"),
+                       "100 mW e.i.r.p. and at most 100 mW/100 kHz; a "
+                       "channel check before each use of a channel, "
+                       "threshold -70 dBm/MHz; channel occupancy under "
+                       "60 ms, then silence of at least 5 % of it; able to "
+                       "use at least 70 % of the band"),
                     _w("YERKON'un seçtiği kip, şehir içi ve kırsalda: tek "
-                       "açık yol. Bir ölçüm alışverişi 31,8 ms, 60 ms'ye "
-                       "sığıyor. Cevap veren direk de kendi yayınından önce "
-                       "kanalı kontrol ediyor; bu, alışverişe 0,1 ms'den az "
-                       "ekliyor. Laboratuvar testiyle belgelendirilmeli.",
+                       "açık yol. 1,625 MHz'lik sinyalde yoğunluk sınırı "
+                       "bağlamıyor, 100 mW (20 dBm) kalıyor. Bir ölçüm "
+                       "alışverişi 31,8 ms, 60 ms'ye sığıyor. Cevap veren "
+                       "direk de kendi yayınından önce kanalı kontrol "
+                       "ediyor; bu, alışverişe 0,1 ms'den az ekliyor. "
+                       "Laboratuvar testiyle belgelendirilmeli.",
                        "The mode YERKON uses in town and open country, and "
-                       "the one open road. A ranging exchange is 31,8 ms "
-                       "and fits in 60 ms. The replying pole checks the "
-                       "channel before its own transmission too, which "
-                       "adds under 0,1 ms. It must be certified by a test "
-                       "laboratory."),
+                       "the one open road. On a 1,625 MHz signal the "
+                       "density limit does not bind and 100 mW (20 dBm) "
+                       "holds. A ranging exchange is 31,8 ms and fits in "
+                       "60 ms. The replying pole checks the channel before "
+                       "its own transmission too, which adds under 0,1 ms. "
+                       "It must be certified by a test laboratory."),
                 ),
             ),
         ),
@@ -2214,8 +2286,10 @@ LAW = Page(
                  _w("Sınır (e.i.r.p.)", "Limit (e.i.r.p.)"),
                  _w("YERKON için ne demek", "What it means for YERKON")),
                 (
-                    _w("Genel amaçlı UWB (Madde 18(1), Tablo 16)",
-                       "General purpose UWB (Article 18(1), Table 16)"),
+                    _w("Genel amaçlı UWB ([Madde 18(1), Tablo 16]("
+                       + BTK_EXEMPT + "#page=28))",
+                       "General purpose UWB ([Article 18(1), Table 16]("
+                       + BTK_EXEMPT + "#page=28))"),
                     _w("Ortalama -41,3 dBm/MHz, tepe 0 dBm/50 MHz",
                        "Mean -41,3 dBm/MHz, peak 0 dBm/50 MHz"),
                     _w("Açık alanda sabit kullanılan ya da sabit bir dış "
@@ -2227,9 +2301,10 @@ LAW = Page(
                        "row."),
                 ),
                 (
-                    _w("Konum izleme tip 1, LT1 (Madde 18(4), Tablo 19)",
-                       "Location tracking type 1, LT1 (Article 18(4), "
-                       "Table 19)"),
+                    _w("Konum izleme tip 1, LT1 ([Madde 18(4), Tablo 19]("
+                       + BTK_EXEMPT + "#page=31))",
+                       "Location tracking type 1, LT1 ([Article 18(4), "
+                       "Table 19](" + BTK_EXEMPT + "#page=31))"),
                     _w("Ortalama -41,3 dBm/MHz, tepe 0 dBm; TS EN 302 065-2",
                        "Mean -41,3 dBm/MHz, peak 0 dBm; TS EN 302 065-2"),
                     _w("İnsanların ve nesnelerin konumunu izleyen sistemler "
@@ -2242,9 +2317,10 @@ LAW = Page(
                        "the model uses."),
                 ),
                 (
-                    _w("Karayolu ve demiryolu taşıtları (Madde 18(2), "
-                       "Tablo 17)",
-                       "Road and rail vehicles (Article 18(2), Table 17)"),
+                    _w("Karayolu ve demiryolu taşıtları ([Madde 18(2), "
+                       "Tablo 17](" + BTK_EXEMPT + "#page=29))",
+                       "Road and rail vehicles ([Article 18(2), Table 17]("
+                       + BTK_EXEMPT + "#page=29))"),
                     _w("Ortalama -53,3 dBm/MHz, tepe -13,3 dBm/50 MHz. "
                        "LDC ya da TPC ile ortalama -41,3 dBm/MHz, tepe "
                        "0 dBm/50 MHz; 0°'den büyük yükselme açılarında "
@@ -2277,8 +2353,34 @@ LAW = Page(
         ),
         Part(
             kind="points",
-            heading=_w("UWB tanımları", "UWB definitions"),
+            heading=_w("Yönetmelikteki tanımlar", "Definitions in the regulation"),
             lines=(
+                _w("Frekans Atlamalı Spektrum Yayılımı (FHSS): alıcı ve "
+                   "vericinin eş zamanlı olarak bir frekanstan diğerine "
+                   "atlayabilmesi.",
+                   "Frequency hopping spread spectrum (FHSS): the receiver "
+                   "and transmitter hopping together from one frequency to "
+                   "another."),
+                _w("Göndermeden Önce Dinle (LBT): cihazın, kullandığı "
+                   "banttaki doluluğu algılayıp bant boşalana ya da boş "
+                   "bir banda geçene kadar beklemesi.",
+                   "Listen before talk (LBT): the device senses whether its "
+                   "band is busy and waits until it is free or it has moved "
+                   "to a free one."),
+                _w("Algıla ve Kaçın (DAA): cihazın göndermeden önce "
+                   "kanalları kontrol etmesi, başka sistemlerin "
+                   "kullandıklarından kaçınması ve boş bulduğu kanaldan "
+                   "göndermesi.",
+                   "Detect and avoid (DAA): the device checks the channels "
+                   "before sending, avoids those other systems are using "
+                   "and sends on one it finds free."),
+                _w("e.i.r.p. (etkin izotropik yayılım gücü): antene "
+                   "verilen güç ile antenin o yöndeki, izotropik antene "
+                   "göre kazancının çarpımı. 100 mW 20 dBm, 10 mW 10 dBm.",
+                   "e.i.r.p. (effective isotropic radiated power): the "
+                   "power fed to the antenna times the antenna's gain in "
+                   "that direction over an isotropic antenna. 100 mW is "
+                   "20 dBm, 10 mW is 10 dBm."),
                 _w("Düşük görev çevrimi (LDC): gönderilen bütün sinyallerin "
                    "toplamı her saniyenin %5'inden ve her saatin %0,5'inden "
                    "az, tek bir sinyal en çok 5 ms.",
@@ -2290,12 +2392,12 @@ LAW = Page(
                    "Transmit power control (TPC): the device's ability to "
                    "control its output power to reduce interference with "
                    "other systems."),
-                _w("Kaynak: BTK, Frekans Tahsisinden Muaf Telsiz Cihaz ve "
-                   "Sistemlerine İlişkin Teknik Ölçütler, Madde 1 ve "
-                   "Madde 18.",
-                   "Source: BTK, Technical Criteria for Radio Equipment "
-                   "and Systems Exempt from Frequency Assignment, "
-                   "Articles 1 and 18."),
+                _w("Kaynak: [BTK, Frekans Tahsisinden Muaf Telsiz Cihaz ve "
+                   "Sistemlerine İlişkin Teknik Ölçütler, Madde 1]("
+                   + BTK_EXEMPT + "#page=1).",
+                   "Source: [BTK, Technical Criteria for Radio Equipment "
+                   "and Systems Exempt from Frequency Assignment, Article "
+                   "1](" + BTK_EXEMPT + "#page=1)."),
             ),
         ),
         Part(
@@ -2340,7 +2442,8 @@ LAW = Page(
                    "declaration of conformity and the essential "
                    "requirements; the box carries the short or the full "
                    "declaration."),
-                _w("Gereken testler: EN 300 328 (telsiz), EN 301 489-1 ve "
+                _w("Gereken testler: [EN 300 328](" + EN_300_328 + ") "
+                   "(telsiz; FHSS ve LBT burada sınanıyor), EN 301 489-1 ve "
                    "-17 (elektromanyetik uyumluluk), EN 62368-1 (güvenlik) "
                    "ve EN 62311 (insanın elektromanyetik alana maruziyeti). "
                    "Laboratuvarlar teklifle çalışıyor. Yayımlanmış piyasa "
@@ -2365,7 +2468,8 @@ LAW = Page(
                    "(https://www.tse.org.tr/deney-kalibrasyon-lak-yt-onaylanmis-laboratuvar-hizmetleri/); "
                    "hiçbiri fiyat yayımlamıyor, bedel teklifle belli "
                    "olacak.",
-                   "Tests needed: EN 300 328 (radio), EN 301 489-1 and -17 "
+                   "Tests needed: [EN 300 328](" + EN_300_328 + ") "
+                   "(radio; FHSS and LBT are tested here), EN 301 489-1 and -17 "
                    "(electromagnetic compatibility), EN 62368-1 (safety) "
                    "and EN 62311 (human exposure to electromagnetic "
                    "fields). Laboratories work by quotation. A published "

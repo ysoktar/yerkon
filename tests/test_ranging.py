@@ -432,3 +432,45 @@ def test_a_range_needs_the_reply_to_close_as_well():
             closes_both = x
             break
     assert closes_both is not None
+
+
+def test_a_reply_too_weak_to_reach_the_anchor_fails_the_exchange():
+    """An exchange is a question and an answer. A loud anchor heard by a
+    quiet receiver used to count, although the receiver's reply never
+    arrived (ADR-0110)."""
+    from yerkon.hardware import E28_2G4M20S, GW_22_5151
+    from yerkon.regulatory import REGIONS
+
+    # Under the hopping certificate the anchor radiates 20 dBm and the
+    # 12,5 dBm module behind a printed antenna about 15,7.
+    rule = REGIONS["TR-FHSS"]
+    rng = np.random.default_rng(3)
+    loud = Terminal(E28_2G4M20S, GW_22_5151, (0.0, 0.0, 10.0))
+    for metres in np.linspace(1000.0, 12000.0, 45):
+        quiet = Terminal(SX1280, W24P_U, (float(metres), 0.0, 1.5))
+        down = evaluate_link(loud, quiet, region=rule)
+        up = evaluate_link(quiet, loud, region=rule)
+        if down.closes and not up.closes:
+            assert measure(loud, quiet, 0.0, rng, region=rule) is None
+            return
+    pytest.fail("no distance where the anchor reaches the receiver and not back")
+
+
+def test_the_reply_crosses_the_same_ground_from_the_other_end():
+    from yerkon.rf import Obstruction
+
+    ground = Obstruction(
+        peak_terrain_m=40.0, peak_at_fraction=0.2, reflection_at_fraction=0.9,
+        reflection_tilt_rad=0.03, profile=((0.1, 30.0), (0.2, 40.0), (0.7, 5.0)),
+        shadow_db=4.0, clutter_loss_db=2.0)
+    back = ground.reversed()
+    assert back.peak_at_fraction == pytest.approx(0.8)
+    assert back.reflection_at_fraction == pytest.approx(0.1)
+    assert back.reflection_tilt_rad == pytest.approx(-0.03)
+    assert [f for f, _ in back.profile] == pytest.approx([0.3, 0.8, 0.9])
+    assert [h for _, h in back.profile] == [5.0, 40.0, 30.0]
+    # What belongs to the path rather than to its direction stays.
+    assert (back.shadow_db, back.clutter_loss_db) == (4.0, 2.0)
+    again = back.reversed()
+    assert again.peak_at_fraction == pytest.approx(ground.peak_at_fraction)
+    assert [f for f, _ in again.profile] == pytest.approx([f for f, _ in ground.profile])

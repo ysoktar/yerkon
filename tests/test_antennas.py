@@ -67,12 +67,10 @@ def test_the_town_and_the_open_country_are_certified_as_adaptive_hopping():
         assert deployment.duty_cycle == pytest.approx(1.0 / 1.05)
         assert all(a.radio.part == E28_2G4M20S.part
                    for a in deployment.anchors)
+        # Every unit carries the 20 dBm module, the pedestrian too
+        # (ADR-0110).
         for unit in deployment.receivers:
-            wide_area = unit.radios[0].part
-            if unit.product == "vehicle":
-                assert wide_area == E28_2G4M20S.part, (row, unit.identifier)
-            else:
-                assert wide_area == SX1280.part, (row, unit.identifier)
+            assert unit.radios[0].part == E28_2G4M20S.part, (row, unit.identifier)
     tunnel = CHOICES["tunnel"].scenario.deployment
     assert tunnel.region is TURKEY
     assert tunnel.duty_cycle == 1.0

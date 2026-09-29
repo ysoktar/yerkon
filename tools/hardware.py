@@ -2,7 +2,6 @@
 
     python tools/hardware.py                      every setup, city and country
     python tools/hardware.py --setup o4 --setup e28-20s --row urban
-    python tools/hardware.py --forward-only       as the published table runs
     python tools/hardware.py --search cheaper     place the poles for each setup
     python tools/hardware.py --tl-ant2412d-usd 97.32
     python tools/hardware.py --set urban.anchors_per_round=6 --row urban
@@ -17,18 +16,8 @@ This is a local tool and stays out of the package on purpose: the site
 and the simulator that runs in a visitor's browser are built from
 `src/yerkon`, and nothing here reaches them.
 
-Two things are done here that the model does not do yet:
-
-- **Both ways.** The model checks an exchange only from the pole to the
-  receiver, except for a vehicle's UWB reply. By default every exchange
-  here must close both ways, and the weaker way sets the timing. The
-  reply leg's ground is measured from the end that transmits; its shadow
-  is the forward leg's, because a shadow belongs to the path and not to
-  its direction. `--forward-only` runs the model as it is, which is how
-  the published rows were made.
-- **A board per setup.** The model prices a pole by its module's part
-  name, so two setups on the same module would cost the same. Each run
-  here prices the pole with its own setup's board.
+Every exchange closes both ways, as the model runs it (ADR-0110), and
+each run prices the pole with its own setup's board.
 """
 
 from __future__ import annotations
@@ -101,11 +90,14 @@ class Setup:
     #: Keys in `hardware.radios()`, plus "e28-27s".
     pole: str
     vehicle: str = "e28"
-    pedestrian: str = "sx1280"
+    pedestrian: str = "e28"
     #: "rod" is the 5 dBi Taoglas GW.22.5151 the table uses; "mast" and
     #: "roof" are the O4 antennas; the pedestrian keeps its printed one.
     pole_antenna: str = "rod"
     vehicle_antenna: str = "rod"
+    #: "printed" is the pedestrian's chip antenna; "uwb" is the DWM3000's
+    #: own, which the tunnel row uses at every end.
+    pedestrian_antenna: str = "printed"
     #: A key in `regulatory.REGIONS`.
     rule: str = "TR-FHSS"
     #: The pole board: a board in `bom.toml`, and the parts swapped on it.
@@ -116,15 +108,14 @@ class Setup:
     vehicle_add: tuple = ()
     pedestrian_remove: tuple = ()
     pedestrian_add: tuple = ()
+    #: Settings this setup changes, as (key, value) pairs; --set wins.
+    values: tuple = ()
 
 
 def setups(tl_usd: float = TL_ANT2412D_USD) -> dict:
     mast = tl_ant2412d(tl_usd)
     return {s.key: s for s in (
-        Setup("e28-20s", "E28-2G4M20S on the pole (published)", pole="e28"),
-        Setup("e28-20s-everywhere", "E28-2G4M20S on the pole, vehicle and pedestrian",
-              pole="e28", pedestrian="e28",
-              pedestrian_remove=("e28-2g4m12s",), pedestrian_add=("e28-2g4m20s",)),
+        Setup("e28-20s", "E28-2G4M20S on every unit (published)", pole="e28"),
         Setup("e28-12s", "E28-2G4M12S on the pole, hopping certificate",
               pole="sx1280", board="sx1280-anchor"),
         Setup("e28-27s", "E28-2G4M27S on the pole, hopping certificate",
@@ -136,7 +127,19 @@ def setups(tl_usd: float = TL_ANT2412D_USD) -> dict:
               vehicle_antenna="roof", rule="TR", board="sx1280-anchor",
               remove=("gw-22-5151",), add=(mast, LMR200),
               vehicle_remove=("e28-2g4m20s", "gw-22-5151"),
-              vehicle_add=("e28-2g4m12s", HGV_2409U, LMR200)),
+              vehicle_add=("e28-2g4m12s", HGV_2409U, LMR200),
+              pedestrian="sx1280", pedestrian_remove=("e28-2g4m20s",),
+              pedestrian_add=("e28-2g4m12s",)),
+        # The tunnel row: UWB as published, and the 2,4 GHz module in its
+        # place. Run with --row tunnel.
+        Setup("tunnel-dwm3000", "Tunnel: DWM3000 (published)", pole="dwm3000",
+              pole_antenna="uwb", vehicle_antenna="uwb", pedestrian_antenna="uwb",
+              rule="TR", board="tunnel-anchor"),
+        # The tunnel's 2 m gate is set for UWB's decimetre ranging and
+        # turns every LoRa range away; the 20S gets the city's 15 m gate.
+        Setup("tunnel-e28-20s", "Tunnel: E28-2G4M20S on every unit, hopping certificate, 15 m gate",
+              pole="e28", board="amplified-anchor",
+              values=(("tunnel.accept_sigma_m", 15.0),)),
     )}
 
 
@@ -172,7 +175,7 @@ def prices(setup: Setup, bill=None) -> dict:
 
 # --- One run ----------------------------------------------------------------
 
-def run_one(setup: Setup, row: str, both_ways: bool, aim: str,
+def run_one(setup: Setup, row: str, aim: str,
             values: dict = None, fix_rate: float = 1.0) -> dict:
     """One row with one setup, in this process. Patches the model's module
     tables, so each run gets a process of its own (see `main`)."""
@@ -185,6 +188,7 @@ def run_one(setup: Setup, row: str, both_ways: bool, aim: str,
 
     bill = bom.read()
     priced = prices(setup, bill)
+    values = {**dict(setup.values), **(values or {})}
     settings = DEFAULTS.with_values(values) if values else DEFAULTS
 
     original = scenarios.radios
@@ -198,10 +202,12 @@ def run_one(setup: Setup, row: str, both_ways: bool, aim: str,
 
     scenarios.radios = radios
     antennas = {"rod": hardware.GW_22_5151, "mast": hardware.TL_ANT2412D,
-                "roof": hardware.HGV_2409U}
+                "roof": hardware.HGV_2409U, "printed": hardware.W24P_U,
+                "uwb": hardware.DWM3000_ANTENNA}
     scenarios.ROW_REGIONS[row] = setup.rule
     scenarios.ROW_ANTENNAS[row] = (antennas[setup.pole_antenna],
-                                   {"vehicle": antennas[setup.vehicle_antenna]})
+                                   {"vehicle": antennas[setup.vehicle_antenna],
+                                    "pedestrian": antennas[setup.pedestrian_antenna]})
     scenarios.ROW_RADIOS[row] = (setup.pole, {
         "vehicle": (setup.vehicle, "dwm3000"),
         "pedestrian": (setup.pedestrian, "dwm3000"),
@@ -215,29 +221,6 @@ def run_one(setup: Setup, row: str, both_ways: bool, aim: str,
     module_part = radios()[setup.pole].part
     cost.ANCHOR_PRODUCT_BY_PART[module_part] = product
 
-    terrain = {"ground": None}
-    if both_ways:
-        measure, link = evaluate.measure, ranging.evaluate_link
-        calls = {"n": 0}
-
-        def both(*args, reply_ceiling_dbm=None, **kwargs):
-            calls["n"] = 0
-            return measure(*args, reply_ceiling_dbm=(
-                1000.0 if reply_ceiling_dbm is None else reply_ceiling_dbm),
-                **kwargs)
-
-        def oriented(transmitter, receiver, *args, obstruction=None, **kwargs):
-            calls["n"] += 1
-            if calls["n"] == 2 and terrain["ground"] is not None:
-                obstruction = dataclasses.replace(
-                    terrain["ground"].obstruction_between(
-                        transmitter.position_m, receiver.position_m),
-                    shadow_db=obstruction.shadow_db)
-            return link(transmitter, receiver, *args,
-                        obstruction=obstruction, **kwargs)
-
-        evaluate.measure = both
-        ranging.evaluate_link = oriented
 
     start = time.time()
     extra = {}
@@ -257,7 +240,6 @@ def run_one(setup: Setup, row: str, both_ways: bool, aim: str,
         deployed = scenarios.catalogue(settings)[row]
         rates = None
     deployed = dataclasses.replace(deployed, product=product)
-    terrain["ground"] = deployed.scenario.terrain
     _, rows = build((deployed,), rates=rates)
     record = dataclasses.asdict(rows[0])
     from yerkon.ranging import exchange_duration_s
@@ -272,9 +254,12 @@ def run_one(setup: Setup, row: str, both_ways: bool, aim: str,
         # medium, one exchange at a time.
         one_channel=per_second / (per_fix * fix_rate),
         # The ceiling: every pole answering at once.
-        busy_per_km2=len(dep.anchors) / rows[0].area_km2 * per_second / (per_fix * fix_rate),
+        # Per route km where the row is costed by its length.
+        busy_per_km2=len(dep.anchors) / (
+            rows[0].area_km2 if rows[0].costed_by == "area" else deployed.route_km)
+        * per_second / (per_fix * fix_rate),
         values=values or {})
-    record.update(setup=setup.key, row=row, both_ways=both_ways, aim=aim,
+    record.update(setup=setup.key, row=row, aim=aim,
                   anchors=len(deployed.scenario.deployment.anchors),
                   prices=priced, seconds=round(time.time() - start), **extra)
     return record
@@ -288,7 +273,8 @@ def c(x, n=2):
 
 def table(records, chosen) -> str:
     out = []
-    for row, title in (("urban", "City (Kızılay)"), ("rural", "Country (Polatlı)")):
+    for row, title in (("urban", "City (Kızılay)"), ("rural", "Country (Polatlı)"),
+                       ("tunnel", "Tunnel (per route km; area in km² of the bore)")):
         mine = [r for r in records if r["row"] == row]
         if not mine:
             continue
@@ -339,10 +325,8 @@ def main(argv=None) -> int:
         description="Compare radio hardware setups on the city and country rows.")
     parser.add_argument("--setup", action="append",
                         help="a setup to run; repeat for several (default: all)")
-    parser.add_argument("--row", action="append", choices=("urban", "rural"),
+    parser.add_argument("--row", action="append", choices=("urban", "rural", "tunnel"),
                         help="a row to run; repeat for both (default: both)")
-    parser.add_argument("--forward-only", action="store_true",
-                        help="check exchanges from the pole only, as the model does")
     parser.add_argument("--search", choices=("cheaper", "better"),
                         help="search each setup's own poles before running it")
     parser.add_argument("--tl-ant2412d-usd", type=float, default=TL_ANT2412D_USD,
@@ -364,7 +348,7 @@ def main(argv=None) -> int:
         return 0
     if args.one:
         record = run_one(known[args.one[0]], args.one[1],
-                         not args.forward_only, args.search or "",
+                         args.search or "",
                          values=_values(args.set), fix_rate=args.fix_rate)
         print(json.dumps(record, ensure_ascii=False))
         return 0
@@ -377,11 +361,12 @@ def main(argv=None) -> int:
     records = []
     for key in chosen:
         for row in args.row or ("urban", "rural"):
+            # A tunnel setup is for the tunnel row and no other.
+            if key.startswith("tunnel-") != (row == "tunnel"):
+                continue
             print("running {} on {}".format(key, row), file=sys.stderr)
             command = [sys.executable, os.path.abspath(__file__), "--one", key, row,
                        "--tl-ant2412d-usd", str(args.tl_ant2412d_usd)]
-            if args.forward_only:
-                command.append("--forward-only")
             if args.search:
                 command += ["--search", args.search]
             for pair in args.set:

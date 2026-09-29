@@ -274,10 +274,12 @@ def unit_antenna(row: str, product: str):
 #: Each row's modules, by their key in `hardware.radios`: the pole's,
 #: and a unit's by what it is.
 #:
-#: Under the hopping certificate the pole and the vehicle carry the
-#: 20 dBm module, which reaches the 20 dBm ceiling through any of the
-#: antennas above (ADR-0099). A pedestrian keeps the 12,5 dBm one: it is a battery
-#: device, and its link is short (ADR-0094).
+#: Under the hopping certificate every 2,4 GHz unit carries the 20 dBm
+#: module, which reaches the 20 dBm ceiling through any of the antennas
+#: above (ADR-0099). The pedestrian carried the 12,5 dBm one until every
+#: exchange had to close both ways: its reply was the weaker leg, and one
+#: module on every unit is also one part to buy and one to certify
+#: (ADR-0110).
 ROW_RADIOS = {
     "urban": ("e28", {"vehicle": ("e28", "dwm3000")}),
     "rural": ("e28", {"vehicle": ("e28", "dwm3000")}),
@@ -285,7 +287,7 @@ ROW_RADIOS = {
 }
 
 #: What a unit carries where its row names nothing for it.
-UNIT_RADIOS = ("sx1280", "dwm3000")
+UNIT_RADIOS = ("e28", "dwm3000")
 
 
 def unit_radios(row: str, product: str) -> tuple:

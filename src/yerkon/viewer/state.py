@@ -519,8 +519,7 @@ class UnitPlan:
     start_m: float = 0.0
     antenna_height_m: float = 1.5
     #: Which modules it carries. Both, for either receiver in the bill;
-    #: the 20 dBm one by default, as the table's vehicle carries. A
-    #: pedestrian's 12,5 dBm module is named where the row names it.
+    #: the 20 dBm one, as every unit of the table carries (ADR-0110).
     radios: tuple = ("e28", "dwm3000")
     #: Which route it drives, by name (`yerkon.routes`).
     #:

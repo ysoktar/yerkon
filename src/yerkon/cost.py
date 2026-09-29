@@ -61,7 +61,7 @@ def _bom(key: str, name: str) -> Product:
 
 #: The plain module's unit, without the frequency hopping certificate.
 #: No row of the table uses it now; the simulator can (ADR-0094).
-SX1280_ANCHOR = _bom("sx1280-anchor", "Frekans atlama belgesi olmayan yayın birimi")
+SX1280_ANCHOR = _bom("sx1280-anchor", "FHSS ve LBT belgesi olmayan yayın birimi")
 #: The broadcast unit the town and the open country both use.
 #:
 #: They were two lines of the report because they carried two radio
@@ -205,7 +205,7 @@ def anchor_product(part: str, antenna: str = "") -> Product:
 #: antenna each carries as built.
 _RECEIVER_BOARD = {
     "vehicle": ("vehicle", "e28-2g4m20s", "gw-22-5151"),
-    "pedestrian": ("pedestrian", "e28-2g4m12s", None),
+    "pedestrian": ("pedestrian", "e28-2g4m20s", None),
 }
 _MODULE_KEY = {
     "EBYTE E28-2G4M12S": "e28-2g4m12s",

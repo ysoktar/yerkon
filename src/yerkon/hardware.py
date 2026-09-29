@@ -386,8 +386,9 @@ SX1280 = _sx1280_family(
     12.5,
     "EBYTE E28-2G4M12S user manual, maximum output power",
 )
-"""The pedestrian's wide-area radio, and the anchors' where no hopping
-certificate lifts the density limit.
+"""The plain 12,5 dBm module: the anchors' where no hopping certificate
+lifts the density limit, and the pedestrian's until every unit moved to
+the 20 dBm one (ADR-0110).
 
 It was an RF Solutions LAMBDA80-24S at 16,49 USD. The EBYTE module
 carries the same Semtech chip at the same 12,5 dBm for 4,39 USD, so

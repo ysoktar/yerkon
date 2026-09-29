@@ -419,15 +419,14 @@ def unit_ranges(state: ViewState, deployment) -> list:
 
 #: Ways of equipping a tab's 2,4 GHz anchors and units, all at once: the
 #: pole's module, the vehicle's and the pedestrian's, the pole and
-#: vehicle antennas, and the spectrum rule. The same six the local
+#: vehicle antennas, and the spectrum rule. The same five the local
 #: hardware comparison runs (`tools/hardware.py`). An empty antenna is
 #: the row's own, the 5 dBi rod.
 HARDWARE_SETUPS = (
-    ("e28-20s", "e28", "e28", "sx1280", "", "", "TR-FHSS"),
-    ("e28-20s-everywhere", "e28", "e28", "e28", "", "", "TR-FHSS"),
-    ("e28-12s", "sx1280", "e28", "sx1280", "", "", "TR-FHSS"),
-    ("e28-27s", "e28-27s", "e28", "sx1280", "", "", "TR-FHSS"),
-    ("e28-12s-uncertified", "sx1280", "e28", "sx1280", "", "", "TR"),
+    ("e28-20s", "e28", "e28", "e28", "", "", "TR-FHSS"),
+    ("e28-12s", "sx1280", "e28", "e28", "", "", "TR-FHSS"),
+    ("e28-27s", "e28-27s", "e28", "e28", "", "", "TR-FHSS"),
+    ("e28-12s-uncertified", "sx1280", "e28", "e28", "", "", "TR"),
     ("o4", "sx1280", "sx1280", "sx1280", "mast", "roof", "TR"),
 )
 

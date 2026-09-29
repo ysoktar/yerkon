@@ -95,11 +95,13 @@ TURKEY = SpectrumRule(
     region="Türkiye",
     max_eirp_dbm=Sourced(
         20.0, "dBm", Provenance.STANDARD,
-        "TS EN 300 328, as adopted by the BTK short-range device regulation",
+        "BTK licence-exempt criteria, Article 5, Table 3, row 3: 100 mW "
+        "e.i.r.p.; reference standard TS EN 300 328",
     ),
     max_eirp_density_dbm_per_mhz=Sourced(
         10.0, "dBm/MHz", Provenance.STANDARD,
-        "TS EN 300 328, modulation other than frequency hopping",
+        "BTK licence-exempt criteria, Article 5, Table 3, row 3: 10 mW/MHz "
+        "for wideband modulation other than FHSS",
     ),
     note=(
         "Turkey follows the CEPT position and cites the harmonised "
@@ -110,10 +112,11 @@ TURKEY = SpectrumRule(
 )
 
 TURKEY_FREQUENCY_HOPPING = SpectrumRule(
-    region="Türkiye, uyarlamalı frekans atlamalı (belgelendirilmiş)",
+    region="Türkiye, FHSS ve LBT ile belgeli (TS EN 300 328)",
     max_eirp_dbm=Sourced(
         20.0, "dBm", Provenance.STANDARD,
-        "TS EN 300 328, as adopted by the BTK short-range device regulation",
+        "BTK licence-exempt criteria, Article 5, Table 3, row 3: 100 mW "
+        "e.i.r.p.; reference standard TS EN 300 328",
     ),
     # Adaptive, because the non-adaptive mode allows 5 ms on a channel
     # and a ranging frame is about 15 ms: after each occupancy at least

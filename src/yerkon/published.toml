@@ -4,7 +4,7 @@
 # the tests that keep the README from drifting away from it.
 # Edit the model and run it again rather than editing this.
 
-run_on = "2026-09-28"
+run_on = "2026-09-29"
 source = "defaults.toml"
 shadow_draws = 8
 profile_spacing_m = 10
@@ -14,10 +14,10 @@ key = "urban"
 system = "YERKON (Şehir içi)"
 technology = "Karasal konumlandırma (SX1280/LoRa TWR)"
 environment = "Dış"
-hpe_p50_m = 2.2802
-hpe_p95_m = 8.9351
-vpe_p95_m = 3.921
-availability = 0.9664
+hpe_p50_m = 2.2871
+hpe_p95_m = 9.1859
+vpe_p95_m = 3.9973
+availability = 0.9665
 area_km2 = 8.14
 capex_tl_per_unit = 9060.7826
 opex_tl_per_unit_year = 1940.3645
@@ -30,10 +30,10 @@ key = "rural"
 system = "YERKON (Kırsal)"
 technology = "Karasal konumlandırma (E28-SX1280 TWR)"
 environment = "Dış"
-hpe_p50_m = 2.1626
-hpe_p95_m = 8.1635
-vpe_p95_m = 4.9564
-availability = 0.9452
+hpe_p50_m = 2.163
+hpe_p95_m = 8.1519
+vpe_p95_m = 4.9602
+availability = 0.9458
 area_km2 = 354
 capex_tl_per_unit = 1138.4609
 opex_tl_per_unit_year = 329.5388

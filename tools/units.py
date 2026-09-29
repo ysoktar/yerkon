@@ -104,6 +104,8 @@ def open_ground_ranges():
     radios, antennas = _models()
     lines = []
     for setup in tool.setups().values():
+        if setup.key.startswith("tunnel-"):
+            continue
         region = REGIONS[setup.rule]
         for row in ("urban", "rural"):
             pole_radio = radios[setup.pole]

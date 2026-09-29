@@ -204,17 +204,21 @@ varsayılmaz. Tablo 1000 adetlik fiyatı kullanıyor. ADR-0105'e bak.
 |---|---|---|---|---|
 | Şehir içi ve kırsal yayın birimi | E28-2G4M20S (SX1280), GW.22.5151, STM32G031, ATECC608B | 2049,79 | 1531,32 | 1381,83 |
 | Kritik bölge yayın birimi | DWM3000, STM32G031, ATECC608B | 2276,48 | 1755,47 | 1680,26 |
-| Yaya alıcısı | E28-2G4M12S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3082,55 | 2586,76 | 2309,77 |
+| Yaya alıcısı | E28-2G4M20S, DWM3000, ESP32-S3, BNO085, ATECC608B | 3158,59 | 2661,96 | 2384,97 |
 | Kara aracı alıcısı | E28-2G4M20S, DWM3000, STM32G0B1, BNO085, ATECC608B, CAN, ekran, GW.22.5151 | 4528,63 | 4069,88 | 3309,05 |
 
 Fiyatlar TL, kartın bütün parçalarıyla (besleme, koruma, kutu, pasifler,
 baskılı devre, dizgi). Şehir içi ve kırsal yayın birimi aynı kart: 20 dBm
 yükselteçli E28-2G4M20S ve dış ortam tipi 5 dBi çubuk anten (Taoglas
-GW.22.5151, IP67). Cihaz uyarlamalı frekans atlamalı (FHSS) olarak
-belgelendiriliyor; bu belgeyle yoğunluk sınırı kalkıyor ve 20 dBm e.i.r.p.
-sınırı kalıyor (ADR-0092, ADR-0094, ADR-0099). Kara aracı alıcısı da aynı
-modülü ve aynı anteni taşıyor. Yaya alıcısı E28-2G4M12S'nin kendi
-anteniyle çalışıyor.
+GW.22.5151, IP67). Cihaz Frekans Atlamalı Spektrum Yayılımı (FHSS) ve
+Göndermeden Önce Dinle (LBT) ile TS EN 300 328'e göre belgelendiriliyor.
+BTK Madde 5, Tablo 3: 100 mW e.i.r.p. (20 dBm); FHSS'te yoğunluk en çok
+100 mW/100 kHz, 1,625 MHz'lik sinyalde bağlamıyor; FHSS olmadan 10 mW/MHz
+toplamı 16,25 mW'a (12,1 dBm) indiriyor (ADR-0092, ADR-0094, ADR-0099,
+ADR-0111). Kara aracı alıcısı da aynı
+modülü ve aynı anteni taşıyor. Yaya alıcısı da E28-2G4M20S taşıyor, kendi
+anteniyle ve gücü yazılımla ayarlanarak: yanıtın direğe ulaşması gerekir ve
+her birimde tek modül kalır (ADR-0110).
 
 E28-2G4M12S ve E28-2G4M20S anten değil, SX1280 modülüdür. Link bütçesi her
 antenin yayımlanmış kazancını ve hüzme genişliğini kullanır.

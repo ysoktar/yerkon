@@ -234,7 +234,7 @@ def rows(published, language: str, table) -> str:
 
 
 #: Products the model keeps but no row of the table uses: the plain
-#: module without the hopping certificate stays so a simulator run can
+#: module without the FHSS and LBT certificate stays so a simulator run can
 #: choose it, and is left off the price tables (ADR-0094).
 UNSHOWN = {"sx1280-anchor"}
 

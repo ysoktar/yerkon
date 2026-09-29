@@ -164,6 +164,32 @@ class Obstruction:
     #: space and the floor reflection. Nothing in the open.
     guide: Optional[GuidedLoss] = None
 
+    def reversed(self) -> "Obstruction":
+        """The same ground seen from the other end.
+
+        What an exchange's reply crosses. Everything placed along the path
+        is measured from the end that transmits, so it is mirrored: the
+        peak and the reflection sit at one minus their fraction, the
+        profile runs the other way and a patch tilting up the path tilts
+        down it. The shadow, the clutter, whether the line is cut and a
+        tunnel's guiding belong to the path rather than to its direction,
+        so they stay as they are.
+        """
+        from dataclasses import replace
+
+        array = None
+        if self.profile_array is not None:
+            array = self.profile_array[::-1].copy()
+            array[:, 0] = 1.0 - array[:, 0]
+        return replace(
+            self,
+            peak_at_fraction=1.0 - self.peak_at_fraction,
+            reflection_at_fraction=1.0 - self.reflection_at_fraction,
+            reflection_tilt_rad=-self.reflection_tilt_rad,
+            profile=tuple((1.0 - f, h) for f, h in reversed(self.profile)),
+            profile_array=array,
+        )
+
     def __post_init__(self) -> None:
         if not 0.0 < self.peak_at_fraction < 1.0:
             raise ValueError("peak_at_fraction must lie strictly inside the path")

@@ -470,7 +470,7 @@ other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", 
 key = "pedestrian"
 name.tr = "Yaya alıcısı"
 name.en = "Pedestrian receiver"
-parts = ["e28-2g4m12s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b"]
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b"]
 other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "gainta-g517", "passives", "pcb-2l", "smt"]
 
 [[product]]
@@ -486,7 +486,7 @@ other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-s
 # module can be chosen per run.
 [[product]]
 key = "sx1280-anchor"
-name.tr = "Frekans atlama belgesi olmayan yayın birimi"
-name.en = "Broadcast unit without the hopping certificate"
+name.tr = "FHSS ve LBT belgesi olmayan yayın birimi"
+name.en = "Broadcast unit without the FHSS and LBT certificate"
 parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
 other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]

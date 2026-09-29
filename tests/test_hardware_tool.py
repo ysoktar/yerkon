@@ -67,3 +67,10 @@ def test_capacity_is_the_air_time_shared_out():
     assert one_channel == pytest.approx(per_second / dep.max_anchors_per_round)
     # Every pole busy carries more than one channel, never less.
     assert rows["urban"][9] * rows["urban"][5] >= one_channel
+
+
+def test_the_tunnel_20s_gets_the_city_gate_and_uwb_keeps_its_own(tool):
+    # The tunnel's 2 m gate turns every LoRa range away (ADR-0110).
+    setups = tool.setups()
+    assert dict(setups["tunnel-e28-20s"].values) == {"tunnel.accept_sigma_m": 15.0}
+    assert setups["tunnel-dwm3000"].values == ()

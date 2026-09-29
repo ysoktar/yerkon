@@ -470,14 +470,15 @@ def test_a_receiver_is_priced_with_what_it_carries():
     as_built = receiver_product("vehicle", ("EBYTE E28-2G4M20S", "Qorvo DWM3000"),
                                 "Taoglas GW.22.5151")
     assert as_built is VEHICLE_RECEIVER
-    assert receiver_product("pedestrian", ("EBYTE E28-2G4M12S", "Qorvo DWM3000"),
+    # The pedestrian is built with the 20 dBm module (ADR-0110).
+    assert receiver_product("pedestrian", ("EBYTE E28-2G4M20S", "Qorvo DWM3000"),
                             "Inventek W24P-U") is PEDESTRIAN_RECEIVER
     o4 = receiver_product("vehicle", ("EBYTE E28-2G4M12S", "Qorvo DWM3000"),
                           "L-com HGV-2409U")
     assert float(o4.unit_price_tl.value) > float(VEHICLE_RECEIVER.unit_price_tl.value)
-    louder = receiver_product("pedestrian", ("EBYTE E28-2G4M20S", "Qorvo DWM3000"),
-                              "Inventek W24P-U")
-    assert float(louder.unit_price_tl.value) > float(PEDESTRIAN_RECEIVER.unit_price_tl.value)
+    quieter = receiver_product("pedestrian", ("EBYTE E28-2G4M12S", "Qorvo DWM3000"),
+                               "Inventek W24P-U")
+    assert float(quieter.unit_price_tl.value) < float(PEDESTRIAN_RECEIVER.unit_price_tl.value)
 
 
 def test_a_module_the_report_does_not_name_is_refused_with_the_list():

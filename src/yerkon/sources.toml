@@ -575,14 +575,14 @@ url = "https://www.semtech.com/uploads/technology/LoRa/cad-ensuring-lora-packets
 [[source]]
 key = "etsi-en-300-328"
 group = "rules"
-label.tr = "ETSI EN 300 328 V2.2.2 (2019-07): 2,4 GHz geniş bantlı iletim; uyarlamalı frekans atlamada dinle, sonra konuş (4.3.1.7.2.2)"
-label.en = "ETSI EN 300 328 V2.2.2 (2019-07): 2,4 GHz wideband transmission; listen before talk for adaptive frequency hopping (4.3.1.7.2.2)"
+label.tr = "ETSI EN 300 328 V2.2.2 (2019-07): 2,4 GHz genişband veri iletimi; Frekans Atlamalı Spektrum Yayılımında (FHSS) Göndermeden Önce Dinle (LBT) (4.3.1.7.2.2)"
+label.en = "ETSI EN 300 328 V2.2.2 (2019-07): 2,4 GHz wideband data transmission; listen before talk (LBT) with frequency hopping spread spectrum (FHSS) (4.3.1.7.2.2)"
 url = "https://www.etsi.org/deliver/etsi_en/300300_300399/300328/02.02.02_60/en_300328v020202p.pdf"
 
 [[source]]
 key = "expresslrs-lbt"
 group = "radio"
-label.tr = "ExpressLRS, çekme isteği 1243: SX1280 ile dinle, sonra konuş (anlık RSSI ile), yazılımda"
+label.tr = "ExpressLRS, çekme isteği 1243: SX1280 ile Göndermeden Önce Dinle (LBT), anlık RSSI ile, yazılımda"
 label.en = "ExpressLRS, pull request 1243: listen before talk on the SX1280 (instantaneous RSSI), in firmware"
 url = "https://github.com/ExpressLRS/ExpressLRS/pull/1243"
 

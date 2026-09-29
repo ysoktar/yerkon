@@ -357,19 +357,21 @@ def measure(
     )
     if not budget.closes:
         return None
-    if reply_ceiling_dbm is not None:
-        # The receiver transmits too, and a rule may hold it lower than
-        # the anchor: a vehicle's UWB radio may send upward only at the
-        # exterior limit. The exchange needs both ways to close, and the
-        # weaker way sets how well it times.
-        back = evaluate_link(
-            receiver, anchor, frequency_hz, obstruction=obstruction,
-            region=region, eirp_ceiling_dbm=reply_ceiling_dbm,
-        )
-        if not back.closes:
-            return None
-        if back.snr_db < budget.snr_db:
-            budget = back
+    # The receiver answers, so the exchange needs both ways to close and
+    # the weaker way sets how well it times. The reply was checked only
+    # where a rule capped it (a vehicle's UWB radio sends upward only at
+    # the exterior limit), which let a pedestrian's weaker 2,4 GHz reply
+    # pass unexamined; and it was checked against the ground as seen from
+    # the anchor's end (ADR-0110).
+    back = evaluate_link(
+        receiver, anchor, frequency_hz,
+        obstruction=obstruction.reversed() if obstruction is not None else None,
+        region=region, eirp_ceiling_dbm=reply_ceiling_dbm,
+    )
+    if not back.closes:
+        return None
+    if back.snr_db < budget.snr_db:
+        budget = back
 
     # Everything the link budget does not model: interference from the
     # rest of a shared band, a collision with traffic this study does not

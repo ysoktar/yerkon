@@ -40,8 +40,8 @@ yerkon table --publish  # koşuyu src/yerkon/published.toml'a yazar
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,28 | 8,94 | 3,92 | %96,64 | 8,14 | 9061 | 1940 |
-| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,16 | 8,16 | 4,96 | %94,52 | 354,00 | 1138 | 330 |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,29 | 9,19 | 4,00 | %96,65 | 8,14 | 9061 | 1940 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,16 | 8,15 | 4,96 | %94,58 | 354,00 | 1138 | 330 |
 | YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,58 | 2,43 | 3,31 | %94,32 | 0,02 | 108294 /km | 22107 /km |
 
 Tünel satırının maliyeti km² değil güzergâh km'si başına ("/km").
@@ -120,7 +120,7 @@ tablonun şehir içi ve kırsal satırları onu kullanır (ADR-0096).
 | `yerkon deliver --into KLASÖR` | Tabloyu, hata bütçesini, değerleri ve seçenekleri Markdown olarak yazar |
 | `yerkon calibrate KAYIT` | SDR kaydından paket kaybını ya da MATLAB çıktısından saat kaymasını okur |
 | `yerkon design` | Bir ayar değişikliğinin başka neleri değiştirdiğini gösterir ve bir kez sorar |
-| `python tools/hardware.py` | Telsiz donanımı seçeneklerini (EBYTE 12S, 20S, 27S, belgesiz 12S ve eski O4 kurulumu) şehir içi ve kırsal satırda, bütün sütunlarla ve iki yönü de sınayarak karşılaştırır. Yalnız yerel; site ve tarayıcıdaki simülatör bunu görmez. `--list` seçenekleri sayar |
+| `python tools/hardware.py` | Telsiz donanımı seçeneklerini (EBYTE 12S, 20S, 27S, belgesiz 12S ve eski O4 kurulumu) şehir içi ve kırsal satırda, tünelde DWM3000 ile E28-2G4M20S'yi (`--row tunnel`), bütün sütunlarla karşılaştırır; her ölçüm iki yönde kapanmalı (ADR-0110). Yalnız yerel; site bunu görmez, tarayıcıdaki simülatörün Çalıştır sekmesinde aynı kurulumlar seçilebilir. `--list` seçenekleri sayar |
 | `python tools/units.py` | Her direk ve alıcı eşleşmesinin iki yönlü menzili (tünelde kendi borusu boyunca), alıcıların parçaları ve fiyatları, ve km² başına en çok kaç alıcı taşınabildiği. Yalnız yerel |
 
 ## Yeni bir saha getirmek
