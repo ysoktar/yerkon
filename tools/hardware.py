@@ -420,6 +420,8 @@ def run_one(setup: Setup, row: str, aim: str,
                               "bom.toml with this setup's parts"))
     module_part = radios()[own or setup.pole].part
     cost.ANCHOR_PRODUCT_BY_PART[module_part] = product
+    # A module the bill does not name is priced by this setup's own board.
+    cost._ANCHOR_BOARD.setdefault(module_part, (setup.board, (), ()))
 
 
     start = time.time()
