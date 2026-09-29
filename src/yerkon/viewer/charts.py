@@ -667,3 +667,85 @@ def timeline(events: Sequence[tuple[float, str, str]], *, title: str,
                          fill="var(--ink)", weight="600"))
         out.append(_text(x, base + 15, what, size=11, anchor=anchor))
     return _frame(width, height, "".join(out), title)
+
+
+def glyph(kind: str) -> str:
+    """One symbol the drawings use, small, for the legend under them.
+
+    Drawn with the same strokes and tokens as the marks, so the legend
+    and the chart can never disagree about what a symbol looks like.
+    """
+    mark, context = "var(--chart-mark)", "var(--chart-context)"
+    shapes = {
+        "ours": '<circle cx="14" cy="8" r="5.5" fill="{}"/>'.format(mark),
+        "others": '<circle cx="14" cy="8" r="5" fill="{}"/>'.format(context),
+        "at_most": (
+            '<circle cx="18" cy="8" r="5" fill="{0}"/><path d="M9 2 l-6 6 '
+            'l6 6" fill="none" stroke="{0}" stroke-width="2" '
+            'stroke-linecap="round" stroke-linejoin="round"/>'.format(context)),
+        "at_least": (
+            '<circle cx="10" cy="8" r="5" fill="{0}"/><path d="M19 2 l6 6 '
+            'l-6 6" fill="none" stroke="{0}" stroke-width="2" '
+            'stroke-linecap="round" stroke-linejoin="round"/>'.format(context)),
+        "below": (
+            '<line x1="14" y1="4" x2="14" y2="14" stroke="{0}" '
+            'stroke-width="2" stroke-linecap="round"/><path d="M10 11 l4 4 '
+            'l4 -4" fill="none" stroke="{0}" stroke-width="2" '
+            'stroke-linecap="round" stroke-linejoin="round"/>'
+            '<circle cx="14" cy="4" r="3.5" fill="{0}"/>'.format(context)),
+        "pair": (
+            '<line x1="6" y1="8" x2="23" y2="8" stroke="{0}" stroke-width="2" '
+            'stroke-opacity="0.55" stroke-linecap="round"/><line x1="23" '
+            'y1="3" x2="23" y2="13" stroke="{0}" stroke-width="2" '
+            'stroke-linecap="round"/><circle cx="6" cy="8" r="4.5" '
+            'fill="{0}"/>'.format(context)),
+        "median": ('<circle cx="14" cy="8" r="5" fill="var(--paper)" '
+                   'stroke="{}" stroke-width="2"/>'.format(mark)),
+        "worst": ('<circle cx="14" cy="8" r="5" fill="{0}" stroke="{0}" '
+                  'stroke-width="2"/>'.format(mark)),
+        "spread": ('<line x1="4" y1="8" x2="24" y2="8" stroke="{}" '
+                   'stroke-width="3" stroke-linecap="round"/>'.format(mark)),
+        "vertical": ('<path d="M14 2 l6 6 l-6 6 l-6 -6 Z" fill="none" '
+                     'stroke="{}" stroke-width="2" stroke-linejoin="round"/>'
+                     .format(context)),
+        "event": ('<line x1="2" y1="8" x2="26" y2="8" stroke="var(--line)" '
+                  'stroke-width="2"/><circle cx="14" cy="8" r="5" '
+                  'fill="{}"/>'.format(mark)),
+    }
+    return ('<svg class="glyph" viewBox="0 0 28 16" width="28" height="16" '
+            'aria-hidden="true">{}</svg>'.format(shapes[kind]))
+
+
+def legend(items: Sequence[tuple[str, str]]) -> str:
+    """What each symbol in a drawing stands for: (symbol, words) pairs."""
+    if not items:
+        return ""
+    return '<ul class="legend">{}</ul>'.format("".join(
+        "<li>{}<span>{}</span></li>".format(glyph(kind),
+                                            html.escape(words, quote=False))
+        for kind, words in items))
+
+
+def symbols_in(marks: Sequence[Mark], upright: bool = False) -> list[str]:
+    """The symbols a set of marks will be drawn with, in legend order.
+
+    ``upright`` is the scatter, where a bound trails down the page
+    rather than along it.
+    """
+    kinds = [mark.figure.kind for mark in marks if mark.figure is not None]
+    found = []
+    if any(mark.ours for mark in marks):
+        found.append("ours")
+    if any(not mark.ours for mark in marks):
+        found.append("others")
+    if upright:
+        if any(kind in ("at_most", "under") for kind in kinds):
+            found.append("below")
+    else:
+        if any(kind in ("at_most", "under") for kind in kinds):
+            found.append("at_most")
+        if any(kind in ("at_least", "over") for kind in kinds):
+            found.append("at_least")
+        if any(mark.second is not None for mark in marks):
+            found.append("pair")
+    return found

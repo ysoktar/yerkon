@@ -3222,9 +3222,7 @@ LANDSCAPE_UNDER = _w(
     "YERKON'unki satırın kendi alanı. YERKON'un kırsal satırı uydu "
     "sistemlerinden ucuz, şehir içi satırı pahalı: şehirde binalar "
     "sinyali kestiği için kilometrekareye daha çok birim gerekiyor. İkisi "
-    "de uydularla aynı doğruluk kuşağında. Oklu işaret, kaynağın \"en "
-    "fazla şu kadar\" dediği bir değer; gerçek değer okun gösterdiği "
-    "yönde. Tünel satırı burada yok: o "
+    "de uydularla aynı doğruluk kuşağında. Tünel satırı burada yok: o "
     "kilometreye bölünüyor, yani aynı eksene konamaz. Hem maliyetini "
     "hem doğruluğunu yayımlamayan sistem de çizilemedi.",
     "Capital per square kilometre across, horizontal error up, both "
@@ -3233,9 +3231,7 @@ LANDSCAPE_UNDER = _w(
     "each row's own area. YERKON's rural row costs less than the "
     "satellite systems and its town row more: in town buildings cut the "
     "signal, so a square kilometre needs more units. Both sit in the "
-    "satellites' band of accuracy. A mark with an "
-    "arrow is a value the source gave as \"at most this\"; the true "
-    "value lies the way the arrow points. The tunnel row is absent: "
+    "satellites' band of accuracy. The tunnel row is absent: "
     "it is divided by route kilometre and does not belong on this axis. "
     "A system that publishes only one of the two cannot be drawn "
     "either.",
@@ -3280,15 +3276,11 @@ CLOCKS_UNDER = _w(
 SPREAD = _w("Üç satırın hatası: ortancadan en kötü %5'e",
             "Each row's error, median to ninety fifth")
 SPREAD_UNDER = _w(
-    "Dolu nokta hataların yüzde 95'inin altında kaldığı değer, boş nokta "
-    "ortancası; aradaki çizgi ne kadar dağıldıklarını gösteriyor. "
-    "Baklava, aynı konumun düşey hatası. Yol kenarına dizilmiş "
+    "Yol kenarına dizilmiş "
     "birimlerin hepsi aşağı yukarı aynı yükseklikte, o yüzden yüksekliği "
     "mesafelerden ölçecek geometri yok; düşeyi haritadan gelen yükseklik "
     "taşıyor.",
-    "The filled dot is the value 95 % of the errors stay under, the "
-    "hollow one the median; the line between them is how far they "
-    "spread. The diamond is the same position's vertical error. Units strung "
+    "Units strung "
     "along a roadside are all at much the same height, so there is no "
     "geometry to measure height from ranges; the height from the map "
     "carries the vertical.",
@@ -3311,20 +3303,52 @@ COST_UNDER = _w(
 ACCURACY = _w("Yatay hata, en kötü %5 hariç (HPE P95)",
               "Horizontal error, worst 5 % excluded (HPE P95)")
 ACCURACY_UNDER = _w(
-    "Sola doğru daha iyi. Oklu işaret, kaynağın \"en fazla şu kadar\" "
-    "dediği bir değer; gerçek değer okun gösterdiği yönde. İki değer "
-    "verilmişse (ortalama ve en kötü konum) nokta ortalamada duruyor, "
-    "ince çizgi en kötü konuma kadar uzanıyor. Eksen logaritmik, çünkü "
+    "Sola doğru daha iyi. Eksen logaritmik, çünkü "
     "değerler santimetreden on beş metreye uzanıyor. Hücresi boş olan "
     "sistem çizilmedi.",
-    "Further left is better. A mark with an arrow is a value the source "
-    "gave as \"at most this\"; the true value lies the way the arrow "
-    "points. Where two figures are given, an average and a worst "
-    "place, the dot sits on the average and a thin line runs to the "
-    "worst. The axis is logarithmic because the figures run from "
+    "Further left is better. The axis is logarithmic because the "
+    "figures run from "
     "centimetres to fifteen metres. A system with an empty cell is not "
     "drawn.",
 )
+
+
+#: What each symbol in the drawings means, for the legend under them.
+SYMBOLS = {
+    "ours": _w("YERKON: bu simülasyonun sonucu",
+               "YERKON: what this simulation found"),
+    "others": _w("Diğer sistemler: kendi kaynaklarının yayımladığı değer",
+                 "Other systems: the figure their own sources publish"),
+    "at_most": _w("Üst sınır: kaynak \"en fazla bu kadar\" diyor, gerçek "
+                  "değer okun gösterdiği yönde",
+                  "A ceiling: the source says \"at most this\", the true "
+                  "value lies the way the arrow points"),
+    "at_least": _w("Alt sınır: kaynak \"en az bu kadar\" diyor, gerçek "
+                   "değer okun gösterdiği yönde",
+                   "A floor: the source says \"at least this\", the true "
+                   "value lies the way the arrow points"),
+    "below": _w("Üst sınır: gerçek değer işaretin altında",
+                "A ceiling: the true value lies below the mark"),
+    "pair": _w("İki değer: nokta ortalamada, çizginin ucu en kötü konumda",
+               "Two figures: the dot on the average, the end of the line "
+               "on the worst place"),
+    "median": _w("Yatay hatanın ortancası (HPE P50)",
+                 "Median horizontal error (HPE P50)"),
+    "worst": _w("Yatay hata, en kötü %5 hariç (HPE P95)",
+                "Horizontal error, worst 5 % excluded (HPE P95)"),
+    "spread": _w("Hataların ortancadan P95'e dağılımı",
+                 "How the errors spread, median to P95"),
+    "vertical": _w("Düşey hata, en kötü %5 hariç (VPE P95)",
+                   "Vertical error, worst 5 % excluded (VPE P95)"),
+    "event": _w("Olayın tarihi", "When it happened"),
+}
+
+
+def _legend(kinds, language: str) -> str:
+    from yerkon.viewer import charts
+
+    return charts.legend([(kind, SYMBOLS[kind].said(language))
+                          for kind in kinds])
 
 
 def _marks(published, language: str, at: int):
@@ -3360,7 +3384,8 @@ def _marks(published, language: str, at: int):
     return out
 
 
-def _figure(drawn: str, under, language: str, narrow: str = "") -> str:
+def _figure(drawn: str, under, language: str, narrow: str = "",
+            legend: str = "") -> str:
     """One drawing and what it says, with a phone sized twin.
 
     A chart drawn for a laptop and then scrolled on a phone opens on
@@ -3375,8 +3400,8 @@ def _figure(drawn: str, under, language: str, narrow: str = "") -> str:
         '<div class="only-wide">{}</div><div class="only-narrow">{}</div>'
         .format(drawn, narrow)
     )
-    return '<figure class="chart">{}<figcaption>{}</figcaption></figure>' \
-        .format(body, _said(under, language))
+    return ('<figure class="chart">{}{}<figcaption>{}</figcaption>'
+            "</figure>").format(body, legend, _said(under, language))
 
 
 def _accuracy(published, language: str) -> str:
@@ -3391,6 +3416,7 @@ def _accuracy(published, language: str) -> str:
         ACCURACY_UNDER, language,
         narrow=charts.bars(marks, title=ACCURACY.said(language), unit="m",
                            width=344.0, label_width=96.0, narrow=True),
+        legend=_legend(charts.symbols_in(marks), language),
     )
 
 
@@ -3417,6 +3443,8 @@ def _landscape(published, language: str) -> str:
             across_title="TL/km²", up_title="HPE P95 [m]",
             width=344.0, height=430.0, narrow=True, logarithmic=False,
         ),
+        legend=_legend(charts.symbols_in([mark for mark, _ in points],
+                                         upright=True), language),
     )
 
 
@@ -3430,7 +3458,7 @@ def _when(language: str) -> str:
              for year, where, what in WHEN],
             title=WHEN_TITLE.said(language),
         ),
-        WHEN_UNDER, language,
+        WHEN_UNDER, language, legend=_legend(("event",), language),
     )
 
 
@@ -3467,6 +3495,9 @@ def _spread(published, language: str) -> str:
         SPREAD_UNDER, language,
         narrow=charts.spread(rows, title=SPREAD.said(language), unit="m",
                              width=344.0, label_width=76.0, narrow=True),
+        legend=_legend(("median", "worst", "spread") + (
+            ("vertical",) if any(row[3] is not None for row in rows) else ()),
+            language),
     )
 
 
@@ -3484,6 +3515,7 @@ def _cost(published, language: str) -> str:
         narrow=charts.bars(marks, title=COST.said(language), unit="TL/km²",
                            width=344.0, label_width=96.0, narrow=True,
                            logarithmic=False),
+        legend=_legend(charts.symbols_in(marks), language),
     )
 
 

@@ -267,6 +267,12 @@ svg.chart { display: block; margin: 0 auto; }
 figure.chart { width: min(100vw - 32px, 900px); text-align: left;
   margin: 24px 0 24px 50%; }
 figure.chart figcaption { margin: 8px auto 0; max-width: 860px; }
+/* The symbols a drawing uses and what each means. */
+ul.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; max-width: 860px;
+  margin: 10px auto 0; padding: 0; list-style: none; text-align: left;
+  font-size: 12px; color: var(--dim); }
+ul.legend li { display: flex; align-items: center; gap: 6px; }
+ul.legend svg.glyph { flex: none; }
 .only-narrow { display: none; }
 @media (max-width: 760px) {
   .only-wide { display: none; }
