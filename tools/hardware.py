@@ -79,6 +79,169 @@ LMR200 = _part(
     "before 28.09.2026", "no volume price published")
 
 
+# --- The module experiment (29 September 2026) --------------------------------
+#
+# JLCPCB's parts API, 29 September 2026, every ladder as listed. Semtech's
+# own board is the SX1280 datasheet's reference design (Rev 1.1, table
+# 14-1), part for part.
+
+JLC = "JLCPCB, 29.09.2026"
+
+
+def _jlc(key, name, code, ladder, note=""):
+    return _part(key, name, ladder, "JLCPCB",
+                 "https://jlcpcb.com/partdetail/{}".format(code), "29.09.2026", note)
+
+
+E28_12S_JLC = _jlc("x-e28-12s", "EBYTE E28-2G4M12S", "C411310",
+                   [(1, 6.9639), (10, 5.9844), (30, 5.3866), (100, 4.8863)])
+E28_20S_JLC = _jlc("x-e28-20s", "EBYTE E28-2G4M20S", "C411311",
+                   [(1, 5.9584), (10, 5.8122)])
+E28_12SX_JLC = _jlc("x-e28-12sx", "EBYTE E28-2G4M12SX", "C17916848",
+                    [(1, 6.9899), (10, 6.0071), (30, 5.4077), (100, 4.9042)])
+E28_20SX_JLC = _jlc("x-e28-20sx", "EBYTE E28-2G4M20SX", "C42377415",
+                    [(1, 6.038), (10, 5.8853)])
+SX1280_CHIP = _jlc("x-sx1280", "Semtech SX1280IMLTRT", "C125969",
+                   [(1, 3.2716), (10, 3.1092), (30, 3.0117), (100, 2.9143),
+                    (500, 2.8688), (1000, 2.8477)])
+SX1281_CHIP = _jlc("x-sx1281", "Semtech SX1281IMLTRT", "C2151551",
+                   [(1, 3.4828), (10, 2.9792), (30, 2.5683), (100, 2.2661),
+                    (500, 2.1264), (1000, 2.0647)], "out of stock on 29.09.2026")
+#: Semtech's reference design, less the chip: (part, count).
+REFERENCE_RF = (
+    (_jlc("x-nx2016sa", "NDK NX2016SA 52 MHz", "C6249276",
+          [(1, 1.1615), (200, 0.4646), (500, 0.4484), (1000, 0.4403)],
+          "out of stock on 29.09.2026"), 1),
+    (_jlc("x-mlz2012", "TDK MLZ2012M150WT000 15 uH", "C383402",
+          [(1, 0.0738), (100, 0.0626), (300, 0.0571), (2000, 0.0512)]), 1),
+    (_jlc("x-lqw3n0", "Murata LQW15AN3N0B80D", "C2041661",
+          [(1, 0.2512), (50, 0.2021), (150, 0.1812), (500, 0.1549), (2500, 0.1432)]), 1),
+    (_jlc("x-lqw2n5", "Murata LQW15AN2N5C00D", "C703121",
+          [(1, 0.0684), (100, 0.0564), (300, 0.0502), (1000, 0.0459)]), 1),
+    (_jlc("x-c0p8", "Murata GRM1555C1HR80BA01D", "C76988",
+          [(1, 0.0129), (500, 0.0107), (1500, 0.0095)]), 1),
+    (_jlc("x-c1p2", "Murata GRM1555C1H1R2BA01D", "C76954",
+          [(1, 0.0081), (1000, 0.0065)], "out of stock on 29.09.2026"), 2),
+    (_jlc("x-c100p", "Murata GRM1555C1H101JA01D", "C77177",
+          [(1, 0.0108), (500, 0.0086), (1500, 0.0073)]), 1),
+    (_jlc("x-c0p5", "Murata GRM1555C1HR50WA01D", "C88941",
+          [(1, 0.0156), (500, 0.0125), (1500, 0.0108)], "out of stock on 29.09.2026"), 1),
+    (_jlc("x-c10n", "Murata GRM155R71E103KA01D", "C77013",
+          [(1, 0.0101), (500, 0.008), (1500, 0.0069)]), 2),
+    (_jlc("x-c100n", "Murata GRM155R71C104KA88D", "C71629",
+          [(1, 0.0051), (1000, 0.0047), (3000, 0.0044)]), 2),
+    (_jlc("x-c470n", "Murata GRM155R61A474KE15D", "C77003",
+          [(1, 0.0169), (500, 0.0138), (1500, 0.0122)]), 1),
+    (_jlc("x-r0", "Vishay CRCW04020000Z0ED", "C190119",
+          [(1, 0.0031), (1000, 0.0025), (3000, 0.0021)]), 1),
+)
+UFL = _jlc("x-ufl", "Hirose U.FL-R-SMT-1(10)", "C88373",
+           [(1, 0.2218), (50, 0.1776), (150, 0.1588), (500, 0.135), (2500, 0.1246)])
+#: For the pedestrian when the module has an IPEX socket and no antenna.
+FLEX = _jlc("x-flex", "Molex 1461530050 2,4 GHz flex antenna", "C916292",
+            [(1, 2.474), (10, 2.0939), (30, 1.8568), (100, 1.5367), (500, 1.4263),
+             (1000, 1.3792)])
+
+
+def _assembly(extended: int, joints: int):
+    """JLCPCB's assembly for the parts a board gains: 3,07 $ an extended
+    part type an order, 0,0016 $ a joint a board (the rate `smt` uses)."""
+    at = lambda boards: round(joints * 0.0016 + extended * 3.07 / boards, 4)
+    return _part("x-smt-{}-{}".format(extended, joints),
+                 "JLCPCB dizgi, eklenen parçalar", [(1, at(1)), (100, at(100)),
+                                                     (1000, at(1000))],
+                 "JLCPCB", "https://jlcpcb.com/help/article/pcb-assembly-price",
+                 "29.09.2026", "{} extended part types, {} joints".format(
+                     extended, joints))
+
+
+#: The module's own antenna. EBYTE gives no gain; 0 dBi as ADR-0100.
+def _on_board():
+    from yerkon.evidence import Provenance, Sourced
+    from yerkon.hardware import Antenna
+
+    return Antenna(
+        part="on-board antenna",
+        peak_gain_dbi=Sourced(0.0, "dBi", Provenance.ASSUMPTION,
+                              "EBYTE, module datasheets",
+                              note="EBYTE gives no gain for its PCB antenna; "
+                                   "0 dBi, as ADR-0100"),
+        efficiency=Sourced(1.0, "fraction", Provenance.ASSUMPTION,
+                           "EBYTE, module datasheets",
+                           note="folded into the 0 dBi"),
+        centre_frequency_hz=2442e6, bandwidth_hz=100e6)
+
+
+ON_BOARD = _on_board()
+
+SX1280_RADIO = ("Semtech SX1280 (own board)", 12.5,
+                "Semtech SX1280 datasheet: +12,5 dBm",
+                -132.0, "Semtech SX1280 datasheet: -132 dBm, SF12 203 kHz, typical")
+EXPERIMENT_RADIOS = {
+    "12s": ("EBYTE E28-2G4M12S (x)", 12.5,
+            "EBYTE E28-2G4M12S datasheet: 12 / 12,5 / 14 dBm, typical",
+            -129.0, "EBYTE E28-2G4M12S datasheet: -128 / -129 / -130 dBm, typical"),
+    "12sx": ("EBYTE E28-2G4M12SX (x)", 13.0,
+             "EBYTE E28-2G4M12SX: 12-14 dBm, no typical given; the middle",
+             -129.0, "EBYTE E28-2G4M12SX: -128 to -130 dBm, no typical; the middle"),
+    "20s": ("EBYTE E28-2G4M20S (x)", 20.0,
+            "EBYTE E28-2G4M20S datasheet: 19 / 20 / 21 dBm, typical",
+            -131.0, "EBYTE E28-2G4M20S datasheet: -130 / -131 / -132 dBm, typical"),
+    "20sx": ("EBYTE E28-2G4M20SX (x)", 20.0,
+             "EBYTE E28-2G4M20SX page: 19 / 20 / 21 dBm, typical",
+             -131.0, "EBYTE E28-2G4M20SX page: -130 / -131 / -132 dBm, typical"),
+}
+EXPERIMENT_PARTS = {"12s": E28_12S_JLC, "12sx": E28_12SX_JLC,
+                    "20s": E28_20S_JLC, "20sx": E28_20SX_JLC}
+#: Only an IPEX socket: no antenna of their own.
+IPEX_ONLY = {"12sx", "20sx"}
+
+
+def experiment_setups() -> list:
+    """Every module on every unit, with the 5 dBi rod on pole and vehicle
+    and without it (the module's own antenna)."""
+    out = []
+    module = ("e28-2g4m20s",)
+    for name, radio in EXPERIMENT_RADIOS.items():
+        part = EXPERIMENT_PARTS[name]
+        walk = (FLEX,) if name in IPEX_ONLY else ()
+        for antenna in ("rod", "board"):
+            if antenna == "board" and name in IPEX_ONLY:
+                continue
+            out.append(Setup(
+                "x-{}-{}".format(name, antenna),
+                "{} on every unit, {}".format(
+                    radio[0], "5 dBi rod" if antenna == "rod" else "own antenna"),
+                pole="e28", pole_antenna=antenna, vehicle_antenna=antenna,
+                radio=radio, remove=module, add=(part,),
+                vehicle_remove=module, vehicle_add=(part,),
+                pedestrian_remove=module, pedestrian_add=(part,) + walk,
+                strip=() if antenna == "rod" else ("gw-22-5151", "ipex-sma")))
+    for chip, radio_part in (("sx1280", SX1280_CHIP), ("sx1281", SX1281_CHIP)):
+        radio = SX1280_RADIO if chip == "sx1280" else (
+            ("Semtech SX1281 (own board)",) + SX1280_RADIO[1:])
+        for antenna in ("rod", "board"):
+            ufl = (UFL,) if antenna == "rod" else ()
+            # Joints: VQFN24 25, crystal 4, 13 two-pad parts, U.FL 3, less
+            # the module's 16. Extended types: 13, and U.FL, less the module.
+            joints = 25 + 4 + 13 * 2 + (3 if antenna == "rod" else 0) - 16
+            extended = 13 + (1 if antenna == "rod" else 0) - 1
+            rf = (radio_part,) + tuple((p, n) for p, n in REFERENCE_RF) + (
+                (_assembly(extended, joints), 1),)
+            out.append(Setup(
+                "x-{}-{}".format(chip, antenna),
+                "{} on every unit, {}".format(
+                    radio[0], "5 dBi rod" if antenna == "rod" else "trace antenna"),
+                pole="e28", pole_antenna=antenna, vehicle_antenna=antenna,
+                radio=radio, remove=module, add=rf + ufl,
+                vehicle_remove=module, vehicle_add=rf + ufl,
+                pedestrian_remove=module, pedestrian_add=rf,
+                strip=() if antenna == "rod" else ("gw-22-5151", "ipex-sma"),
+                cannot=("Semtech: the SX1281 has no ranging engine"
+                        if chip == "sx1281" else "")))
+    return out
+
+
 # --- Setups -------------------------------------------------------------------
 
 @dataclass(frozen=True)
@@ -110,6 +273,18 @@ class Setup:
     pedestrian_add: tuple = ()
     #: Settings this setup changes, as (key, value) pairs; --set wins.
     values: tuple = ()
+    #: A module the model does not name, as (part, output dBm, where the
+    #: output is from, typical sensitivity dBm, where that is from). Every
+    #: unit of the setup carries it. The model's SX1280 closes a link from
+    #: a 6 dB noise figure and Semtech's -132 dBm; a module its maker
+    #: rates less sensitive gets the difference added to the noise figure.
+    radio: tuple = ()
+    #: Parts put on every board of the setup, as (part, count), and keys
+    #: taken off every board, from the main parts or the rest.
+    extra: tuple = ()
+    strip: tuple = ()
+    #: Shown instead of results, for a setup that cannot range.
+    cannot: str = ""
 
 
 def setups(tl_usd: float = TL_ANT2412D_USD) -> dict:
@@ -140,7 +315,7 @@ def setups(tl_usd: float = TL_ANT2412D_USD) -> dict:
         Setup("tunnel-e28-20s", "Tunnel: E28-2G4M20S on every unit, hopping certificate, 15 m gate",
               pole="e28", board="amplified-anchor",
               values=(("tunnel.accept_sigma_m", 15.0),)),
-    )}
+    ) + tuple(experiment_setups())}
 
 
 def board(bill, key: str, remove=(), add=()):
@@ -150,24 +325,34 @@ def board(bill, key: str, remove=(), add=()):
     """
     base = bill.boards[key]
     parts = list(base.parts)
+    others = list(base.others)
     for gone in remove:
         match = [p for p in parts if p.key == gone]
+        if match:
+            parts.remove(match[0])
+            continue
+        match = [o for o in others if o[0].key == gone]
         if not match:
             raise KeyError("{} has no {}".format(key, gone))
-        parts.remove(match[0])
+        others.remove(match[0])
     for extra in add:
-        parts.append(bill.parts[extra] if isinstance(extra, str) else extra)
-    return dataclasses.replace(base, parts=tuple(parts))
+        if isinstance(extra, tuple):
+            others.append(extra)
+        else:
+            parts.append(bill.parts[extra] if isinstance(extra, str) else extra)
+    return dataclasses.replace(base, parts=tuple(parts), others=tuple(others))
 
 
 def prices(setup: Setup, bill=None) -> dict:
     """The pole, vehicle and pedestrian boards at 1, 100 and 1000, in TL."""
     bill = bill or bom.read()
     boards = {
-        "pole": board(bill, setup.board, setup.remove, setup.add),
-        "vehicle": board(bill, "vehicle", setup.vehicle_remove, setup.vehicle_add),
+        "pole": board(bill, setup.board, setup.remove + setup.strip,
+                      setup.add + setup.extra),
+        "vehicle": board(bill, "vehicle", setup.vehicle_remove + setup.strip,
+                         setup.vehicle_add + setup.extra),
         "pedestrian": board(bill, "pedestrian", setup.pedestrian_remove,
-                            setup.pedestrian_add),
+                            setup.pedestrian_add + setup.extra),
     }
     return {name: {tier: round(b.at(tier), 2) for tier in bom.TIERS}
             for name, b in boards.items()}
@@ -198,19 +383,34 @@ def run_one(setup: Setup, row: str, aim: str,
         found["e28-27s"] = hardware._sx1280_family(
             "EBYTE E28-2G4M27S", 27.0,
             "EBYTE E28-2G4M27S product page, rated output power", settings)
+        if setup.radio:
+            part, output, output_source, sensitivity, sensitivity_source = setup.radio
+            base = found["e28"]
+            found[setup.key] = dataclasses.replace(
+                base, part=part,
+                max_output_dbm=Sourced(output, "dBm", Provenance.DATASHEET,
+                                       output_source),
+                sensitivity_dbm=Sourced(sensitivity, "dBm", Provenance.DATASHEET,
+                                        sensitivity_source),
+                noise_figure_db=Sourced(
+                    float(base.noise_figure_db.value) + (sensitivity + 132.0),
+                    "dB", Provenance.DERIVED,
+                    "the model's noise figure plus the datasheet's "
+                    "sensitivity short of Semtech's -132 dBm"))
         return found
 
     scenarios.radios = radios
     antennas = {"rod": hardware.GW_22_5151, "mast": hardware.TL_ANT2412D,
                 "roof": hardware.HGV_2409U, "printed": hardware.W24P_U,
-                "uwb": hardware.DWM3000_ANTENNA}
+                "uwb": hardware.DWM3000_ANTENNA, "board": ON_BOARD}
     scenarios.ROW_REGIONS[row] = setup.rule
     scenarios.ROW_ANTENNAS[row] = (antennas[setup.pole_antenna],
                                    {"vehicle": antennas[setup.vehicle_antenna],
                                     "pedestrian": antennas[setup.pedestrian_antenna]})
-    scenarios.ROW_RADIOS[row] = (setup.pole, {
-        "vehicle": (setup.vehicle, "dwm3000"),
-        "pedestrian": (setup.pedestrian, "dwm3000"),
+    own = setup.key if setup.radio else None
+    scenarios.ROW_RADIOS[row] = (own or setup.pole, {
+        "vehicle": (own or setup.vehicle, "dwm3000"),
+        "pedestrian": (own or setup.pedestrian, "dwm3000"),
     })
 
     product = cost.Product(
@@ -218,7 +418,7 @@ def run_one(setup: Setup, row: str, aim: str,
         unit_price_tl=Sourced(priced["pole"][bill.used_tier], "TL",
                               Provenance.DERIVED,
                               "bom.toml with this setup's parts"))
-    module_part = radios()[setup.pole].part
+    module_part = radios()[own or setup.pole].part
     cost.ANCHOR_PRODUCT_BY_PART[module_part] = product
 
 
