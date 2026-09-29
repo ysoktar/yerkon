@@ -77,6 +77,57 @@
     document.body.appendChild(box);
   });
 
+  /* The button at the end of a table row opens that row's notes over
+     the page: a copy of the panel drawn hidden under the table. */
+  document.addEventListener("click", function (event) {
+    var opener = event.target.closest && event.target.closest("button.rowinfo");
+    if (!opener) return;
+    var drawn = document.querySelector(
+      '.rowpanels section[data-row="' + opener.dataset.row + '"]');
+    if (!drawn) return;
+    var box = document.createElement("div");
+    box.className = "panel";
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    var section = drawn.cloneNode(true);
+    var shut = document.createElement("button");
+    shut.type = "button";
+    shut.className = "shut";
+    shut.title = said.close;
+    shut.setAttribute("aria-label", said.close);
+    shut.textContent = "×";
+    section.insertBefore(shut, section.firstChild);
+    box.appendChild(section);
+    function close() {
+      box.remove();
+      document.removeEventListener("keydown", onKey);
+      opener.focus();
+    }
+    function onKey(key) { if (key.key === "Escape") close(); }
+    box.addEventListener("click", function (inside) {
+      if (inside.target === box || inside.target === shut) close();
+    });
+    document.addEventListener("keydown", onKey);
+    document.body.appendChild(box);
+    shut.focus();
+  });
+
+  /* A note number in the table opens the folded notes before the page
+     moves to the note. */
+  function unfold(name) {
+    var at = name && document.getElementById(name);
+    var fold = at && at.closest && at.closest("details");
+    if (fold && !fold.open) {
+      fold.open = true;
+      at.scrollIntoView();
+    }
+  }
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest && event.target.closest('a[href^="#"]');
+    if (link) unfold(link.getAttribute("href").slice(1));
+  });
+  unfold(location.hash.slice(1));
+
   if (!button) return;
   button.hidden = false;
   button.setAttribute("role", "switch");

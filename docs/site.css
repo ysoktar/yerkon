@@ -228,6 +228,34 @@ ol.basis li p { margin: 4px 0; }
 ol.basis .kind, ol.basis .source { color: var(--quiet); }
 ol.basis .source { font-size: 0.92em; }
 a.back { text-decoration: none; }
+details.notes { margin-top: 26px; }
+details.notes > summary > h2 { font-size: 16px; }
+
+/* The button at the end of each row of the comparison table, and the
+   panel it opens over the page. */
+.hide { position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; }
+td.info, th.info { width: 1%; padding-left: 4px; padding-right: 4px;
+  text-align: center; }
+button.rowinfo { display: inline-flex; padding: 3px; border: 0;
+  background: none; color: var(--accent); cursor: pointer; }
+button.rowinfo svg { width: 16px; height: 16px; }
+button.rowinfo:hover { color: var(--ink); }
+.panel { position: fixed; inset: 0; z-index: 50; display: flex;
+  align-items: center; justify-content: center; padding: 16px;
+  background: rgba(8, 12, 16, 0.6); }
+.panel > section { position: relative; max-width: 680px; width: 100%;
+  max-height: 85vh; overflow: auto; padding: 22px 24px 12px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
+.panel h2 { margin: 0 32px 14px 0; font-size: 18px;
+  text-transform: none; letter-spacing: 0; }
+.panel ol { padding-left: 26px; font-size: 13px; }
+.panel li { margin-bottom: 12px; }
+.panel button.shut { position: absolute; top: 10px; right: 10px;
+  width: 28px; height: 28px; border: 1px solid var(--line);
+  border-radius: 50%; background: var(--shade); color: var(--ink);
+  font-size: 16px; line-height: 1; cursor: pointer; }
 
 /* A drawing of the table. Kept at its drawn size and scrolled in a
  * narrow window, the same way the table itself is: scaling the box
@@ -286,6 +314,11 @@ details.fold > summary::before {
 }
 details.fold[open] > summary::before { transform: rotate(90deg); }
 details.fold > summary:hover h2, details.fold > summary:hover h3 { text-decoration: underline; }
+/* A topic inside an opened section: one line each until opened. */
+details.fold.sub { margin: 4px 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
+details.fold.sub > summary > h3 { margin: 0; font-size: 14px; text-transform: none;
+  letter-spacing: 0; color: var(--ink); }
+details.fold.sub[open] > summary { margin-bottom: 10px; }
 
 /* A section inside the one before it: its heading is in plain case and
    the body's colour, so the capitals above read as the group's name. The

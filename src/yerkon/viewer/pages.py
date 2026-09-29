@@ -173,11 +173,11 @@ HOME = Page(
     lead=_w(
         "YERKON, karayolunda konumun yabancı uydulara bağımlılığını "
         "azaltmak için bir öneri. Yol kenarında zaten duran direklere ve "
-        "kabinlere ucuz birer yayın kartı takılıyor; araçtaki alıcı da "
+        "kabinlere ucuz birer yayın birimi takılıyor; araçtaki alıcı da "
         "çevresindeki birimlere olan mesafesini ölçerek nerede olduğunu "
         "kendi buluyor.",
         "YERKON is a proposal for road transport to depend less on "
-        "foreign satellites for position. A cheap broadcast board goes "
+        "foreign satellites for position. A cheap broadcast unit goes "
         "onto masts and cabinets already standing by the road, and the "
         "receiver in a vehicle finds where it is by measuring its distance "
         "to the units around it.",
@@ -207,7 +207,7 @@ HOME = Page(
                     "ulaşım sistemi kabinleri, yol kenarı üniteleri, "
                     "trafik ışıkları, tünel aydınlatması ve ücretli yol "
                     "gişeleri. YERKON bu noktalara düşük maliyetli bir "
-                    "radyo yayın kartı ekler. Kart, kimliğini ve "
+                    "radyo yayın birimi ekler. Birim, kimliğini ve "
                     "kurulumda ölçülmüş konumunu yayınlar. Bu noktaların "
                     "seyrek kaldığı yerde yol boyundaki diğer direkler "
                     "kullanılıyor: simülasyonda şehirde aydınlatma "
@@ -217,8 +217,8 @@ HOME = Page(
                     "has points on the power and communications network: "
                     "intelligent transport cabinets, roadside units, "
                     "traffic lights, tunnel lighting and toll gates. "
-                    "YERKON adds a low cost radio board to those points. "
-                    "The board broadcasts its identity and the position "
+                    "YERKON adds a low cost radio broadcast unit to those "
+                    "points. The unit broadcasts its identity and the position "
                     "surveyed when it was installed. Where those points "
                     "are sparse, the other poles along the road are used: "
                     "in the simulation, lighting columns in town and "
@@ -616,9 +616,9 @@ SYSTEM = Page(
                     "belgelendiriliyor; FHSS'te yoğunluk sınırı 100 mW/100 "
                     "kHz olduğu için 1,625 MHz'lik sinyalde bağlamıyor ve "
                     "100 mW (20 dBm) e.i.r.p. kalıyor. Kırsal "
-                    "birim şehir içindekiyle aynı kart: yükselteçli modül "
+                    "birim şehir içindekiyle aynı yayın birimi: yükselteçli modül "
                     "(E28-2G4M20S) ve dış ortam tipi 5 dBi çubuk anten. "
-                    "Şehirdeki birimden farkı kartta değil yerinde: "
+                    "Şehirdeki birimden farkı donanımında değil yerinde: "
                     "kırsalda arada bina olmadığı için sinyal çok daha "
                     "uzağa ulaşıyor, elektriği olmayan direklerde de güneş "
                     "paneli ve akü var. "
@@ -644,9 +644,9 @@ SYSTEM = Page(
                     "100 mW/100 kHz, which a 1,625 MHz signal does not "
                     "reach, so 100 mW (20 dBm) e.i.r.p. holds. The rural "
                     "unit is the same "
-                    "board as the urban one: the amplified module "
+                    "broadcast unit as the urban one: the amplified module "
                     "(E28-2G4M20S) and an outdoor 5 dBi rod antenna. Its "
-                    "difference from the town unit is not the board but "
+                    "difference from the town unit is not the hardware but "
                     "where it stands: with no buildings in the way the "
                     "signal reaches much further, and poles with no mains "
                     "carry a solar panel and a battery. YERKON takes 8 to 10 km as a communications and "
@@ -758,7 +758,7 @@ SYSTEM = Page(
                     "thousand is tabled on the Cost page.",
                 ),
                 _w(
-                    "Her ürünün 1, 100 ve 1000 adetteki fiyatı, kartın "
+                    "Her ürünün 1, 100 ve 1000 adetteki fiyatı, birimin "
                     "parçalarının satıcılarının kendi kademe fiyatlarıyla "
                     "toplanıyor: telsiz modülü, mikrodenetleyici, anten, "
                     "besleme, koruma, kutu, pasifler, baskılı devre ve "
@@ -775,13 +775,13 @@ SYSTEM = Page(
                     "the Cost page.",
                 ),
                 _w(
-                    "Fiyatlar kartın bütün parçalarını kapsıyor: ana "
+                    "Fiyatlar birimin bütün parçalarını kapsıyor: ana "
                     "parçalar, besleme ve koruma, klemensler, anten "
                     "kablosu, kutu, direnç ve kondansatörler, baskılı devre "
                     "ve dizgi. Test, ayar, belgelendirme, vergi ve kargo "
                     "bu rakamların dışında; sahadaki montaj ayrı bir kalem "
                     "olarak tabloya giriyor.",
-                    "The prices cover every part of the board: the main "
+                    "The prices cover every part of the unit: the main "
                     "parts, supply and protection, terminals, antenna "
                     "cable, box, the passive components, the printed "
                     "board and its assembly. Test, calibration, "
@@ -1188,11 +1188,11 @@ VALUE = Page(
             lines=(
                 _w(
                     "**Altyapı.** Şehir içi ve kırsal yayın birimi (aynı "
-                    "kart; kırsalda güneş paneli ve aküyle), kritik bölge "
+                    "donanım; kırsalda güneş paneli ve aküyle), kritik bölge "
                     "yayın birimi ve güvenli anahtar ile yayın birimi "
                     "yönetim sistemi.",
                     "**Infrastructure.** The urban and rural broadcast "
-                    "unit (one board; in open country with a solar panel "
+                    "unit (one set of hardware; in open country with a solar panel "
                     "and a battery), the critical area broadcast unit, and "
                     "the system that manages the units and their keys.",
                 ),
@@ -1231,18 +1231,19 @@ RESULTS = Page(
     lead=_w(
         "On üç sistem, aynı sütunlarla yan yana. Koyu zeminli üç satırı "
         "simülasyon doldurdu; geri kalan on satır, o sistemlerin kendi "
-        "kaynaklarının yayımladığı değerler. Bir sayıya ne yapıldığı "
-        "altındaki dipnotta yazıyor. Boş hücre, o kaynağın bu sütuna "
-        "uyan bir şey yayımlamadığı anlamına geliyor.",
+        "kaynaklarının yayımladığı değerler. Bir sayıya ne yapıldığı, "
+        "satırın sonundaki düğmeyle açılan kutuda ve sayfanın sonundaki "
+        "dipnotlarda yazıyor. Boş hücre, o kaynağın bu sütuna uyan bir "
+        "şey yayımlamadığı anlamına geliyor.",
         "Thirteen systems side by side under the same columns. The three "
         "shaded rows are the YERKON rows the simulation filled; the rest "
         "are what their own sources publish. What was done to a cell is "
-        "in the note under it, and an empty cell means the source "
-        "publishes nothing that fits that column.",
+        "in the box the button at the end of its row opens and in the "
+        "notes at the foot of the page, and an empty cell means the "
+        "source publishes nothing that fits that column.",
     ),
     parts=(
         Part(kind="shows", shows="landscape"),
-        Part(kind="shows", shows="published"),
         Part(
             kind="shows", shows="accuracy",
             heading=_w("Doğruluk yan yana", "Accuracy side by side"),
@@ -1294,10 +1295,10 @@ RESULTS = Page(
                     _w("CAPEX", "CAPEX"),
                     _w(
                         "Yayın birimlerinin donanım maliyeti, hizmet "
-                        "verilen alana bölündü; kartın bütün parçaları ve "
+                        "verilen alana bölündü; birimin bütün parçaları ve "
                         "montaj dahil.",
                         "Unit hardware cost divided by the service area; "
-                        "every part of the board and the fitting included.",
+                        "every part of the unit and the fitting included.",
                     ),
                 ),
                 (
@@ -1359,6 +1360,7 @@ RESULTS = Page(
                 ),
             ),
         ),
+        Part(kind="shows", shows="published"),
     ),
 )
 
@@ -2019,11 +2021,11 @@ COST = Page(
                 _w(
                     "Direk eklemek kullanılabilirliği yükseltiyor ama "
                     "bedava değil. Mevcut yapılar bunu karşılanabilir "
-                    "kılıyor: her ek birim yeni bir saha değil, bir kart ve "
+                    "kılıyor: her ek birim yeni bir saha değil, bir yayın birimi ve "
                     "bir montaj.",
                     "Adding anchors raises availability, but not for "
                     "nothing. What the existing structures do is make that "
-                    "trade affordable, because each extra unit is a board "
+                    "trade affordable, because each extra unit is a device "
                     "and a fitting rather than a site.",
                 ),
             ),
@@ -2063,7 +2065,8 @@ COST = Page(
         ),
         Part(
             kind="shows", shows="parts", folded=True,
-            heading=_w("Her kartın parçaları", "Every board's parts"),
+            heading=_w("Yayın ve alıcı birimlerinin parçaları",
+                       "The parts of every broadcast unit and receiver"),
         ),
         Part(
             kind="points",
@@ -2071,18 +2074,18 @@ COST = Page(
             lines=(
                 _w(
                     "Her parça satıcısının kendi kademe tablosuyla yazılı: "
-                    "ana parçalar ve kartın geri kalanı, yani şebeke "
+                    "ana parçalar ve birimin geri kalanı, yani şebeke "
                     "beslemesi, düşürücü, koruma, klemens, anten kablosu, "
                     "kutu, pasifler, baskılı devre ve dizgi. Bir parça bir "
-                    "kartta birden çok varsa (klemens, pasifler) kademe o "
-                    "kadar kart için alınan adete göre seçiliyor.",
+                    "birimde birden çok varsa (klemens, pasifler) kademe o "
+                    "kadar birim için alınan adete göre seçiliyor.",
                     "Every part carries its seller's own price ladder: the "
-                    "main parts and the rest of the board, that is the "
+                    "main parts and the rest of the unit, that is the "
                     "mains supply, regulator, protection, terminals, "
                     "antenna cable, box, passives, the printed board and "
-                    "its assembly. Where a board holds more than one of a "
+                    "its assembly. Where a unit holds more than one of a "
                     "part (terminals, passives), the tier is the one the "
-                    "pieces for that many boards reach.",
+                    "pieces for that many units reach.",
                 ),
                 _w(
                     "Satıcı bir adette kademe yayımlamamışsa indirim "
@@ -2091,7 +2094,7 @@ COST = Page(
                     "baskılı devrenin ve pilin büyük adet fiyatı okunamadı; "
                     "bunlar her adette tek adet fiyatıyla giriyor. Dizginin "
                     "kurulum, şablon ve parça yükleme bedeli siparişe bir "
-                    "kez ödendiği için karta düşen payı adet büyüdükçe "
+                    "kez ödendiği için birime düşen payı adet büyüdükçe "
                     "küçülüyor. Maliyet tablosu 1000 adeti kullanıyor.",
                     "Where a seller published no tier for a quantity, no "
                     "discount is assumed and the last known tier holds. "
@@ -2099,7 +2102,7 @@ COST = Page(
                     "no volume price could be read for the printed board "
                     "or the battery; those enter at their one-unit price "
                     "at every quantity. Assembly setup, stencil and part "
-                    "loading fees are paid once an order, so each board's "
+                    "loading fees are paid once an order, so each unit's "
                     "share shrinks as the order grows. The cost table uses "
                     "the thousand.",
                 ),
@@ -2933,6 +2936,19 @@ RUN_NOTE = _w(
     "are not translated.",
 )
 
+ROW_BASIS = _w("Bu satırın kaynakları ve açıklamaları",
+               "This row's sources and notes")
+
+NOTES_HEADING = _w("Dipnotlar ({count})", "Notes ({count})")
+
+#: The round "i" at the end of each row of the comparison table.
+INFO_ICON = (
+    '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" '
+    'r="7" fill="none" stroke="currentColor" stroke-width="1.4"/>'
+    '<circle cx="8" cy="4.8" r="1" fill="currentColor"/><path d="M8 7v5" '
+    'stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+)
+
 #: The typeface: Inter, for the Turkish letters and the equal-width
 #: figures the tables line up on.
 FONT = ("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700"
@@ -3488,10 +3504,15 @@ def _published(published, language: str, table=None) -> str:
         table = comparison.read()
 
     numbered: dict = {}
+    # The notes each row points at, in the order it points at them, for
+    # the panel its button opens.
+    per_row: list = []
 
     def mark(key: str) -> str:
         if key not in numbered:
             numbered[key] = len(numbered) + 1
+        if per_row and key not in per_row[-1][1]:
+            per_row[-1][1].append(key)
         at = numbered[key]
         return (
             '<sup class="note"><a id="back{0}" href="#note{0}">{0}</a>'
@@ -3510,6 +3531,7 @@ def _published(published, language: str, table=None) -> str:
 
     body = []
     for row in table.rows:
+        per_row.append((row.system, []))
         body.append(
             [html.escape(row.system), html.escape(row.technology),
              html.escape(row.environment)] + [cell(one) for one in row.cells]
@@ -3517,6 +3539,7 @@ def _published(published, language: str, table=None) -> str:
     ours = len(body)
     for key, row in zip(published.keys, published.rows):
         cells = list(row.cells())
+        per_row.append((cells[0], []))
         marked = [html.escape(one) for one in cells[:3]]
         marked[0] += mark(table.yerkon[key])
         rest = [html.escape(one) for one in cells[3:]]
@@ -3541,20 +3564,45 @@ def _published(published, language: str, table=None) -> str:
         spacing=decimal_comma(published.profile_spacing_m, 0),
     )
     bibliography = sources.read()
+
+    def explained(key: str) -> str:
+        return _marked(table.said(key, language)) + _cited(
+            table.notes[key].get("sources", ()), bibliography, language)
+
     listed = "".join(
-        '<li id="note{0}">{1}{2} <a class="back" href="#back{0}">↑</a></li>'
-        .format(at, _marked(table.said(key, language)),
-                _cited(table.notes[key].get("sources", ()), bibliography,
-                       language))
+        '<li id="note{0}">{1} <a class="back" href="#back{0}">↑</a></li>'
+        .format(at, explained(key))
         for key, at in sorted(numbered.items(), key=lambda pair: pair[1])
     )
+    # A button at the end of each row opens every note the row points
+    # at, with its sources, over the page. The panels are drawn here and
+    # kept hidden; the script only moves one into view.
+    head.append('<span class="hide">{}</span>'.format(
+        _said(ROW_BASIS, language)))
+    panels = []
+    for line, (system, keys) in enumerate(per_row):
+        body[line].append(
+            '<button class="rowinfo" type="button" data-row="{0}" '
+            'title="{1}" aria-label="{1}: {2}">{3}</button>'.format(
+                line, _said(ROW_BASIS, language), html.escape(system),
+                INFO_ICON))
+        panels.append(
+            '<section data-row="{}"><h2>{}</h2><ol>{}</ol></section>'.format(
+                line, html.escape(system), "".join(
+                    '<li value="{}">{}</li>'.format(numbered[key],
+                                                    explained(key))
+                    for key in keys)))
     return (
         '<div class="wide"><div class="scroll">{table}</div>'
         '<p class="under">{note}</p></div>'
-        '<ol class="notes">{notes}</ol>'
+        '<div class="rowpanels" hidden>{panels}</div>'
+        '<details class="fold notes"><summary><h2>{heading}</h2></summary>'
+        '<ol class="notes">{notes}</ol></details>'
     ).format(
-        table=_table([head] + body, numeric_from=3, ours_from=ours),
-        note=note, notes=listed,
+        table=_table([head] + body, numeric_from=3, ours_from=ours,
+                     last="info"),
+        note=note, notes=listed, panels="".join(panels),
+        heading=_said(NOTES_HEADING, language).format(count=len(numbered)),
     )
 
 
@@ -3575,22 +3623,26 @@ def _table(
     rows: Sequence[Sequence[str]],
     numeric_from: int = 99,
     ours_from: Optional[int] = None,
+    last: str = "",
 ) -> str:
-    """One table. ``ours_from`` marks where this project's rows start."""
+    """One table. ``ours_from`` marks where this project's rows start;
+    ``last`` names a class for the final column when it is not data."""
     head, body = rows[0], rows[1:]
+
+    def kind(at: int, width: int) -> str:
+        if last and at == width - 1:
+            return ' class="{}"'.format(last)
+        return ' class="num"' if at >= numeric_from else ""
+
     out = ["<table><thead><tr>"]
     for at, cell in enumerate(head):
-        out.append('<th{}>{}</th>'.format(
-            ' class="num"' if at >= numeric_from else "", cell
-        ))
+        out.append('<th{}>{}</th>'.format(kind(at, len(head)), cell))
     out.append("</tr></thead><tbody>")
     for line, row in enumerate(body):
         ours = ours_from is not None and line >= ours_from
         out.append('<tr class="ours">' if ours else "<tr>")
         for at, cell in enumerate(row):
-            out.append('<td{}>{}</td>'.format(
-                ' class="num"' if at >= numeric_from else "", cell
-            ))
+            out.append('<td{}>{}</td>'.format(kind(at, len(row)), cell))
         out.append("</tr>")
     out.append("</tbody></table>")
     return "".join(out)

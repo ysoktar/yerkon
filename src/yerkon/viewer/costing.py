@@ -293,11 +293,18 @@ def parts(language: str, table) -> str:
             "<b>{}</b>".format(_tl(board.hundred_tl)),
             "<b>{}</b>".format(_tl(board.thousand_tl)),
         ])
-        out.append("<h3>{}</h3>{}".format(
-            html.escape(board.name(language)),
+        out.append(_folded(
+            board.name(language),
             '<div class="scroll">{}</div>'.format(
                 table([head] + body, numeric_from=3))))
     return "".join(out)
+
+
+def _folded(title: str, inside: str) -> str:
+    """A sub-heading that opens to what is under it, so a long list reads
+    as its topics first."""
+    return ('<details class="fold sub"><summary><h3>{}</h3></summary>{}'
+            "</details>".format(html.escape(title), inside))
 
 
 #: The bibliography entries behind each figure on the list, so a source
@@ -386,8 +393,10 @@ def assumptions(language: str, table) -> str:
                     note=html.escape(sourced.note),
                     said=html.escape(_say(("Kaynak", "Source"), language)),
                     source=html.escape(sourced.source)))
-        out.append("<h3>{}</h3><ol class=\"basis\" start=\"{}\">{}</ol>".format(
-            html.escape(_say(title, language)), start, "".join(entries)))
+        out.append(_folded(
+            _say(title, language),
+            '<ol class="basis" start="{}">{}</ol>'.format(
+                start, "".join(entries))))
     return "".join(out)
 
 
@@ -465,8 +474,8 @@ def units(published, language: str, table) -> str:
         html.escape(_say(STRUCTURES[m.kind], language)).capitalize()
         for m, _, _ in columns]
     shown = (
-        ("anchor units", ("Yayın birimi (kart, 1000 adette)",
-                          "Broadcast unit (board, at a thousand)")),
+        ("anchor units", ("Yayın birimi (1000 adette)",
+                          "Broadcast unit (at a thousand)")),
         ("structures and installation", ("Montaj", "Fitting")),
         ("standalone power", ("Güneş paneli ve akü", "Solar panel and battery")),
     )
@@ -486,17 +495,17 @@ def units(published, language: str, table) -> str:
                    for _, _, c in columns])
 
     said = [_say((
-        "<p>Şehir içi ve kırsal satırlar aynı kartı kullanıyor: yükselteçli "
+        "<p>Şehir içi ve kırsal satırlar aynı yayın birimini kullanıyor: yükselteçli "
         "SX1280 modülü E28-2G4M20S, dış ortam tipi 5 dBi çubuk anten, aynı "
-        "mikrodenetleyici ve güvenlik yongası. Tünelde kart DWM3000 UWB "
-        "modülünü taşıyor. Farkı kart değil, kartın takıldığı yapı "
+        "mikrodenetleyici ve güvenlik yongası. Tünelde yayın birimi DWM3000 "
+        "UWB modülünü taşıyor. Farkı birim değil, birimin takıldığı yapı "
         "yaratıyor: şehirde elektriği olan aydınlatma direği, kırsalda "
         "elektriği olmayan dağıtım direği ve güneş paneli, tünelde şerit "
         "kapatmaya bağlı bir askı.</p>",
-        "<p>The town and open country rows use the same board: the "
+        "<p>The town and open country rows use the same broadcast unit: the "
         "amplified SX1280 module E28-2G4M20S, an outdoor 5 dBi whip, the "
-        "same microcontroller and secure element. In the tunnel the board "
-        "carries the DWM3000 UWB module. What differs is not the board but "
+        "same microcontroller and secure element. In the tunnel the unit "
+        "carries the DWM3000 UWB module. What differs is not the unit but "
         "the structure it goes on: a lighting column with mains in town, a "
         "distribution pole with no mains and a solar panel in open "
         "country, a bracket that waits on a lane closure in the tunnel.</p>",
