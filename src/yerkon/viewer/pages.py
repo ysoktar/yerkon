@@ -87,7 +87,8 @@ class Part:
     #: A section inside the one before it, so its heading is a level down.
     sub: bool = False
     #: Parts shown one card each in a strip that slides: (key in
-    #: bom.toml, photo file under photos/ or "" while there is none).
+    #: bom.toml or PILOT_ITEMS, photo file under photos/ or "" while
+    #: there is none).
     slides: tuple[tuple[str, str], ...] = ()
 
 
@@ -453,9 +454,30 @@ FINAL_PARTS = (
     ("gainta-g212", ""), ("gainta-g517", ""),
 )
 
-#: The parts already in hand for the pilot. Empty until the list is in;
-#: a strip with nothing in it is not drawn.
-PILOT_PARTS: tuple = ()
+#: The hardware the team already has for the pilot, as the proposal's
+#: "Pilot Doğrulama" slide lists it. None of it is bought for the
+#: project, so it is not in bom.toml: its name and what it is live here.
+PILOT_ITEMS = {
+    "rak-r1": (_w("RAKwireless R1 Meshtastic", "RAKwireless R1 Meshtastic"),
+               _w("Meshtastic cihazı", "Meshtastic device")),
+    "rak-wisblock": (_w("RAK WisBlock", "RAK WisBlock"),
+                     _w("geliştirme kiti", "development kit")),
+    "t1000-e": (_w("Seeed Studio SenseCAP Card Tracker T1000-E",
+                   "Seeed Studio SenseCAP Card Tracker T1000-E"),
+                _w("kart tipi izleyici", "card tracker")),
+    "atgm336h": (_w("ATGM336H", "ATGM336H"),
+                 _w("GNSS modülü", "GNSS module")),
+    "whip": (_w("Whip anten", "Whip antenna"),
+             _w("harici anten", "external antenna")),
+    "sdr": (_w("SDR geliştirme altyapısı", "SDR development setup"),
+            _w("TWR mesajlaşmasını, kanal erişimini ve ölçeklenmeyi "
+               "kartlara aktarmadan önce denemek için",
+               "to try TWR messaging, channel access and scaling before "
+               "they go onto the boards")),
+}
+
+#: The pilot's strip, in the slide's order.
+PILOT_PARTS = tuple((key, "") for key in PILOT_ITEMS)
 
 SYSTEM = Page(
     slug="sistem",
@@ -835,10 +857,6 @@ SYSTEM = Page(
             kind="slides", slides=FINAL_PARTS,
             heading=_w("Son ürünün parçaları", "The final product's parts"),
         ),
-        Part(
-            kind="slides", slides=PILOT_PARTS,
-            heading=_w("Pilot denemenin parçaları", "The pilot's parts"),
-        ),
     ),
 )
 
@@ -1014,7 +1032,27 @@ RESEARCH = Page(
                     "under control, recorded signals will be played back, "
                     "and attacks will be imitated in a laboratory.",
                 ),
+                _w(
+                    "Özel YERKON kartları yapılmadan önce haberleşme "
+                    "mimarisi ve temel bileşenler, ekibin elindeki hazır "
+                    "donanımla hızlı ve ucuz biçimde denenecek: yayın "
+                    "birimiyle alıcının haberleşmesi, paket ve protokol "
+                    "yapısı, saha kapsaması, hareket eden alıcının "
+                    "davranışı, uydu konumuyla karasal konumun "
+                    "karşılaştırılması ve radyo ortamı.",
+                    "Before the YERKON boards are made, the communication "
+                    "design and the basic parts will be tried quickly and "
+                    "cheaply on hardware the team already has: how the "
+                    "unit and the receiver talk, the packet and protocol "
+                    "layout, coverage in the field, how a moving receiver "
+                    "behaves, the satellite position against the "
+                    "terrestrial one, and the radio environment.",
+                ),
             ),
+        ),
+        Part(
+            kind="slides", slides=PILOT_PARTS,
+            heading=_w("Pilot doğrulamanın parçaları", "The pilot's parts"),
         ),
     ),
 )
@@ -3212,17 +3250,22 @@ def _slides(slides, language: str, where: Optional["Where"]) -> str:
     parts = read().parts
     cards = []
     for key, photo in slides:
-        part = parts[key]
+        if key in parts:
+            name = parts[key].name
+            role = parts[key].role(language)
+        else:
+            name = _said(PILOT_ITEMS[key][0], language)
+            role = _said(PILOT_ITEMS[key][1], language)
         if photo:
             src = where.asset("photos/" + photo) if where else "photos/" + photo
             shown = '<img src="{}" alt="{}" loading="lazy">'.format(
-                html.escape(src, quote=True), html.escape(part.name, quote=True))
+                html.escape(src, quote=True), html.escape(name, quote=True))
         else:
             shown = '<span class="nophoto">{}</span>'.format(NO_PHOTO)
         cards.append(
             '<figure class="slide"><div class="photo">{}</div><figcaption>'
             "<b>{}</b><span>{}</span></figcaption></figure>".format(
-                shown, html.escape(part.name), html.escape(part.role(language))))
+                shown, html.escape(name), html.escape(role)))
     return (
         '<div class="slider"><button class="slide-back" type="button" '
         'hidden aria-label="{back}">‹</button><div class="slides">{cards}'

@@ -1159,13 +1159,32 @@ def test_every_sourced_figure_on_the_cost_page_links_its_source():
     assert known["dicle-surici"].url in html.unescape(page)
 
 
-def test_the_system_page_shows_the_final_parts_and_hides_an_empty_strip():
-    """A strip of slides with nothing in it is left off the page."""
+def test_the_system_page_shows_the_final_parts():
+    """Every part of the final product has its card on the System page."""
     from yerkon.bom import read as read_bill
-    from yerkon.viewer.pages import FINAL_PARTS, PILOT_PARTS
+    from yerkon.viewer.pages import FINAL_PARTS
 
     drawn = render(page_at("/sistem"), "tr", a_record())
     parts = read_bill().parts
     for key, _ in FINAL_PARTS:
         assert html.escape(parts[key].name) in drawn, key
-    assert ("Pilot denemenin parçaları" in drawn) == bool(PILOT_PARTS)
+
+
+def test_the_research_page_ends_with_the_pilot_hardware():
+    """The pilot's hardware is not bought, so its names come from the
+    page rather than the bill, and it closes the research page."""
+    from yerkon.viewer.pages import PILOT_ITEMS
+
+    drawn = render(page_at("/arge"), "tr", a_record())
+    assert "Pilot doğrulamanın parçaları" in drawn
+    for name, _ in PILOT_ITEMS.values():
+        assert html.escape(name.tr) in drawn
+    assert drawn.rindex('class="slider"') > drawn.index("Pilot doğrulama")
+
+
+def test_a_strip_with_nothing_in_it_is_left_off():
+    """A strip of slides with nothing in it is left off the page."""
+    from yerkon.viewer.pages import Part, Words, _part
+
+    empty = Part(kind="slides", slides=(), heading=Words(tr="Boş", en="Empty"))
+    assert _part(empty, "tr", None) == ""
