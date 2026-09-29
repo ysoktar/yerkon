@@ -3779,8 +3779,8 @@ BROWSER_SIMULATOR_PAGE = "calistir/index.html"
 #: domain, and the folder is pushed afresh each time, so it is drawn with
 #: the pages rather than set once by hand (ADR-0112).
 DOMAIN = "yerkon.com"
-BROWSER_SCRIPTS = ("app.js", "draw.js", "words.js", "map.js", "style.css",
-                   "local.js", "sim-worker.js")
+BROWSER_SCRIPTS = ("app.js", "draw.js", "bore.js", "words.js", "map.js",
+                   "style.css", "local.js", "sim-worker.js")
 #: What of the package the browser does not need: caches, the fetch
 #: cache of raw elevation tiles, and the files the server sends.
 LEFT_OUT = ("__pycache__", "_tiles", "static")
@@ -3840,6 +3840,11 @@ def browser_simulator() -> dict:
                 ('from "/words.js"', 'from "./words.js{}"'.format(tag)),
                 ('from "/draw.js"', 'from "./draw.js{}"'.format(tag)),
                 ('from "/map.js"', 'from "./map.js{}"'.format(tag)),
+                ('from "/bore.js"', 'from "./bore.js{}"'.format(tag)),
+            )).encode("utf-8")
+        elif name == "bore.js":
+            body = _loose(body.decode("utf-8"), (
+                ('from "/draw.js"', 'from "./draw.js{}"'.format(tag)),
             )).encode("utf-8")
         elif name == "local.js":
             body = _loose(body.decode("utf-8"), (

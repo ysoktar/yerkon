@@ -644,6 +644,31 @@ export const SAY = {
                     en: "fit the whole scene on screen" },
   "scene.frame": { tr: "Sahneyi sığdır", en: "Fit the scene" },
   "roads.forward": { tr: "Yolları öne çıkar", en: "Bring the roads forward" },
+  "scene.motion": { tr: "Telefonu çevirerek bak", en: "Look by turning the phone" },
+  "scene.motion.denied": {
+    tr: "Telefon hareket bilgisini vermedi; ayarlardan izin verilebilir.",
+    en: "The phone did not give its motion; it can be allowed in its settings.",
+  },
+  // -- the tunnel, drawn flat ------------------------------------------
+  "bore.plan": { tr: "Tünel, üstten", en: "The tunnel from above" },
+  "bore.plan.note": {
+    tr: "Tünel {width} m genişliğinde; iki duvar ayırt edilsin diye genişlik "
+        + "uzunluğa göre büyütülerek çizildi.",
+    en: "The bore is {width} m wide; the width is stretched against the "
+        + "length so the two walls can be told apart.",
+  },
+  "bore.portal.in": { tr: "Giriş ağzı", en: "Entry portal" },
+  "bore.portal.out": { tr: "Çıkış ağzı", en: "Exit portal" },
+  "bore.section": { tr: "Boy kesit", en: "Long section" },
+  "bore.section.note": {
+    tr: "Yolun yüksekliği ve birimler; iki ağız arasında {rise} m fark var.",
+    en: "The road's height and the units; the portals are {rise} m apart "
+        + "in height.",
+  },
+  "scene.along": { tr: "tünel boyunca kaydır", en: "slide along the tunnel" },
+  "scene.closer": { tr: "yaklaş ya da uzaklaş", en: "zoom in or out" },
+  "scene.fits": { tr: "bütün tüneli sığdır", en: "fit the whole tunnel" },
+  "scene.arrows": { tr: "Oklar", en: "Arrows" },
   // -- what the ground overlay reads (ADR-0044) ------------------------
   "layer.anchors": { tr: "Kaç direk erişiyor", en: "Anchors in reach" },
   "layer.margin_db": { tr: "Sinyal marjı", en: "Signal margin" },

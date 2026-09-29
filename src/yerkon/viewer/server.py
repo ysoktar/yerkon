@@ -364,7 +364,7 @@ class Handler(BaseHTTPRequestHandler):
         # for a slider on the noise figure (ADR-0064).
         if path in (SIMULATOR, SIMULATOR + "/"):
             return self._file("simulator.html", "text/html; charset=utf-8")
-        if path in ("/app.js", "/draw.js", "/words.js", "/map.js",
+        if path in ("/app.js", "/draw.js", "/bore.js", "/words.js", "/map.js",
                     "/theme.js"):
             return self._file(path.lstrip("/"), "text/javascript; charset=utf-8")
         if path == "/favicon.ico":

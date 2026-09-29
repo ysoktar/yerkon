@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=fbf30ed5b1";
+import { decimal, say, speak, speaks } from "./words.js?v=d72bfc4e40";
 
 /* The choices whose names are this page's to give.
  *
@@ -549,21 +549,39 @@ function drawWords() {
   drawLegend();
   document.documentElement.lang = speaks();
 
-  // The gestures, as one line. Built rather than written into the markup
-  // because each is a key and a word, and the order of the two is not
-  // the same in both languages.
+  drawGestures();
+}
+
+/* The gestures, as one line. Built rather than written into the markup
+ * because each is a key and a word, and the order of the two is not the
+ * same in both languages. The flat tunnel has fewer: it only slides and
+ * zooms. */
+function drawGestures() {
   const gestures = document.getElementById("gestures");
-  if (gestures) {
-    gestures.innerHTML = [
-      [say("scene.drag"), say("scene.turns")],
-      [say("scene.slide_keys"), say("scene.slides")],
-      [say("scene.wheel"), say("scene.zooms")],
-      ["WASD", say("scene.walks")],
-      ["Q/E", say("scene.turns")],
-      ["R/F", say("scene.tilts")],
-      ["G", say("scene.frames")],
-    ].map(([key, what]) => `<b>${key}</b>: ${what}`).join(" · ");
+  if (!gestures) return;
+  const lines = flatTunnel() ? [
+    [say("scene.drag"), say("scene.along")],
+    [say("scene.wheel"), say("scene.closer")],
+    [say("scene.arrows"), say("scene.along")],
+    ["G", say("scene.fits")],
+  ] : [
+    [say("scene.drag"), say("scene.turns")],
+    [say("scene.slide_keys"), say("scene.slides")],
+    [say("scene.wheel"), say("scene.zooms")],
+    ["WASD", say("scene.walks")],
+    ["Q/E", say("scene.turns")],
+    ["R/F", say("scene.tilts")],
+    ["G", say("scene.frames")],
+  ];
+  gestures.innerHTML = lines.map(([key, what]) => `<b>${key}</b>: ${what}`)
+    .join(" · ");
+  // What only the three dimensional scene has.
+  for (const id of ["relief-pick", "roads-forward"]) {
+    const control = document.getElementById(id);
+    if (control) control.hidden = flatTunnel();
   }
+  const turning = document.getElementById("motion");
+  if (turning && turning.dataset.can) turning.hidden = flatTunnel();
 }
 
 function drawLanguages() {
@@ -1699,8 +1717,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=fbf30ed5b1";
-import * as pick from "./map.js?v=fbf30ed5b1";
+import * as draw from "./draw.js?v=d72bfc4e40";
+import * as flat from "./bore.js?v=d72bfc4e40";
+import * as pick from "./map.js?v=d72bfc4e40";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -2263,6 +2282,16 @@ function paintScene() {
   });
   const colourOf = id => colourIndex[id] || "#3a4652";
 
+  // The tunnel is drawn flat, and nothing outside it.
+  if (flatTunnel()) {
+    draw.shade.dim = 0;
+    flat.paintBore(context, width, height, latest, {
+      sweep: sweepData, layer: shownLayer, say, colourOf, dark: false,
+    });
+    markers = [];
+    return;
+  }
+
   // How far something drawn on the ground has to be pulled towards the
   // camera to sort in front of the quad it lies on: one mesh cell, which
   // is how much a quad's own depth varies across itself.
@@ -2359,6 +2388,26 @@ function paintScene() {
 let dragging = null;
 let spinning = null;
 let panning = null;
+/* A drag along the flat tunnel: where it started and what was on screen. */
+let sliding = null;
+
+/* The tunnel tab is drawn flat rather than in three dimensions. */
+function flatTunnel() {
+  return Boolean(state && state.scenario === "tunnel" && latest
+                 && (latest.road || []).length > 1);
+}
+
+/* Zoom the flat tunnel by `times` about a point `px` pixels across. */
+function zoomBore(times, px) {
+  const { left, plotW } = flat.layout(container.clientWidth, container.clientHeight);
+  const share = Math.max(0, Math.min(1, (px - left) / plotW));
+  const at = flat.bore.start + share * flat.bore.span;
+  flat.bore.span *= times;
+  flat.clamp();
+  flat.bore.start = at - share * flat.bore.span;
+  flat.clamp();
+  render();
+}
 const pinch = new Map();
 let pinchSpan = null;
 
@@ -2497,7 +2546,12 @@ function scheduleDetail() {
 canvas.addEventListener("pointerdown", event => {
   if (event.pointerType === "touch") {
     pinch.set(event.pointerId, [event.clientX, event.clientY]);
-    if (pinch.size === 2) { spinning = panning = null; return; }
+    if (pinch.size === 2) { spinning = panning = sliding = null; return; }
+  }
+  if (flatTunnel()) {
+    canvas.setPointerCapture(event.pointerId);
+    sliding = { x: event.clientX, start: flat.bore.start };
+    return;
   }
   const [px, py] = pixel(event);
   const hit = markerAt(px, py);
@@ -2545,6 +2599,15 @@ canvas.addEventListener("pointermove", event => {
   if (event.pointerType === "touch" && pinch.has(event.pointerId)) {
     pinch.set(event.pointerId, [event.clientX, event.clientY]);
     if (pinch.size === 2) return twoFingers();
+  }
+
+  if (sliding) {
+    const { plotW } = flat.layout(container.clientWidth, container.clientHeight);
+    flat.bore.start = sliding.start
+      - (event.clientX - sliding.x) / plotW * flat.bore.span;
+    flat.clamp();
+    render();
+    return;
   }
 
   if (dragging) {
@@ -2603,7 +2666,10 @@ canvas.addEventListener("pointermove", event => {
 function twoFingers() {
   const [a, b] = [...pinch.values()];
   const span = Math.hypot(a[0] - b[0], a[1] - b[1]);
-  if (pinchSpan && span > 1) {
+  if (pinchSpan && span > 1 && flatTunnel()) {
+    const middle = (a[0] + b[0]) / 2 - canvas.getBoundingClientRect().left;
+    zoomBore(pinchSpan / span, middle);
+  } else if (pinchSpan && span > 1) {
     orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M,
       orbit.distance * (pinchSpan / span)));
     render();
@@ -2627,7 +2693,7 @@ function letGo(event) {
     }
     dragging = null;
   }
-  spinning = panning = null;
+  spinning = panning = sliding = null;
 }
 
 canvas.addEventListener("pointerup", letGo);
@@ -2640,6 +2706,7 @@ canvas.addEventListener("wheel", event => {
   // deltas creep and a mouse notch steps. The old fixed twelve percent
   // per event made a trackpad unusable and a mouse imprecise.
   const notches = Math.max(-4, Math.min(4, event.deltaY / 100));
+  if (flatTunnel()) return zoomBore(Math.exp(notches * 0.18), pixel(event)[0]);
   const was = orbit.distance;
   orbit.distance = Math.min(FURTHEST_M, Math.max(NEAREST_M,
     orbit.distance * Math.exp(notches * 0.18)));
@@ -2669,6 +2736,21 @@ window.addEventListener("keydown", event => {
   const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(
     (document.activeElement || {}).tagName || "");
   if (typing || event.altKey || event.ctrlKey || event.metaKey) return;
+
+  if (flatTunnel()) {
+    const along = { ArrowLeft: -1, a: -1, ArrowRight: 1, d: 1 }[event.key];
+    if (along) {
+      event.preventDefault();
+      flat.bore.start += along * flat.bore.span * (event.shiftKey ? 0.5 : 0.15);
+      flat.clamp();
+      return render();
+    }
+    if (event.key === "+" || event.key === "=" || event.key === "-") {
+      return zoomBore(event.key === "-" ? 1.25 : 0.8, container.clientWidth / 2);
+    }
+    if (event.key === "g" || event.key === "0") return frameEverything();
+    return;
+  }
 
   const nudge = NUDGE[event.key];
   if (nudge) {
@@ -2709,6 +2791,66 @@ window.addEventListener("keydown", event => {
   }
 });
 
+/* ---------- turning the phone turns the view ----------
+ *
+ * Where the phone reports how it is held, turning it about its upright
+ * axis turns the camera and tipping it forward or back tilts it, from
+ * wherever the camera was when the button was pressed. A finger still
+ * slides and zooms. The flat tunnel has nothing to turn.
+ */
+const motion = { on: false, from: null, frame: 0 };
+
+function onMotion(event) {
+  if (!motion.on || flatTunnel()) return;
+  if (event.alpha === null || event.beta === null) return;
+  if (!motion.from) {
+    motion.from = { alpha: event.alpha, beta: event.beta,
+                    yaw: orbit.yaw, pitch: orbit.pitch };
+    return;
+  }
+  // The compass heading wraps at 360: take the short way round.
+  let turn = event.alpha - motion.from.alpha;
+  if (turn > 180) turn -= 360;
+  if (turn < -180) turn += 360;
+  const tip = event.beta - motion.from.beta;
+  orbit.yaw = motion.from.yaw - turn * Math.PI / 180;
+  orbit.pitch = Math.min(HIGHEST_PITCH, Math.max(LOWEST_PITCH,
+    motion.from.pitch + tip * Math.PI / 180 * 0.8));
+  if (!motion.frame) {
+    motion.frame = requestAnimationFrame(() => { motion.frame = 0; render(); });
+  }
+}
+
+function wireMotion() {
+  const button = document.getElementById("motion");
+  const can = typeof window.DeviceOrientationEvent !== "undefined"
+    && window.matchMedia("(pointer: coarse)").matches;
+  if (!button || !can) return;
+  button.dataset.can = "yes";
+  button.hidden = flatTunnel();
+  button.onclick = async () => {
+    if (!motion.on) {
+      // Some phones ask the person first, and only from a tap.
+      const ask = window.DeviceOrientationEvent.requestPermission;
+      if (typeof ask === "function") {
+        try {
+          if (await ask() !== "granted") return flash(say("scene.motion.denied"), true);
+        } catch (error) {
+          return flash(say("scene.motion.denied"), true);
+        }
+      }
+      window.addEventListener("deviceorientation", onMotion);
+    } else {
+      window.removeEventListener("deviceorientation", onMotion);
+    }
+    motion.on = !motion.on;
+    motion.from = null;
+    button.setAttribute("aria-pressed", motion.on ? "true" : "false");
+    button.classList.toggle("on", motion.on);
+  };
+}
+wireMotion();
+
 /* Put the whole deployment back on screen. The one gesture a person
  * needs after getting lost, and getting lost is the price of being able
  * to go anywhere.
@@ -2721,6 +2863,10 @@ window.addEventListener("keydown", event => {
  * ground.
  */
 function frameEverything() {
+  if (flatTunnel()) {
+    flat.fit(flat.along(latest.road).length);
+    return render();
+  }
   if (!latest || !latest.anchors.length) return;
   // The route counts. A corridor longer than its anchor run drives off
   // past the last mast, and framing on the masts alone left the far half
@@ -4071,6 +4217,7 @@ async function refreshScene() {
     clearTimeout(slow);
   }
   takeLists();
+  drawGestures();
   // The session's language, not the markup's. Reloading a page that was
   // switched to English used to come back with English figures under
   // Turkish headings, because the page took its language from the `lang`

@@ -823,3 +823,4 @@ i.prov.assumption { background: var(--warn); }
   font-size: 11px; }
 #roads-forward.on { background: var(--accent); color: #fff;
   border-color: var(--accent); }
+#motion.on { background: var(--accent); color: #fff; border-color: var(--accent); }
