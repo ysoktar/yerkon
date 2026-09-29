@@ -123,6 +123,11 @@ def sweep_margin_m(state: ViewState) -> float:
     route, and a road outside the anchors is ground with no coverage on
     it rather than coverage with no ground under it.
     """
+    # A bore is swept across its own width and no further: nobody stands
+    # in the rock, and four kilometres of it either side made the tunnel's
+    # sweep a hundred times the work at a tenth of the detail.
+    if getattr(state, "bore", False):
+        return state.settings().number("tunnel.width_m") / 2.0
     widest = max((run.spacing_m for run in state.runs), default=2000.0)
     return max(widest * 3.0, 4000.0)
 

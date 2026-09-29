@@ -81,7 +81,7 @@ def test_the_list_separates_what_is_measured_from_what_is_guessed():
         assert entry.sourced.provenance is Provenance.ASSUMPTION
     for entry in DEFAULTS.sourced_entries:
         assert entry.sourced.provenance is not Provenance.ASSUMPTION
-        assert entry.sourced.source != "bu proje"
+        assert entry.sourced.source != "YERKON tasarım tercihi"
 
 
 def test_the_clock_residual_is_the_one_that_has_been_measured():
@@ -97,7 +97,7 @@ def test_sourcing_a_figure_stops_it_counting_as_an_assumption(tmp_path):
 value = 25.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"''',
+source = "YERKON varsayımı"''',
         '''[values."mounting.tall_mast.height_m"]
 value = 20.0
 unit = "m"

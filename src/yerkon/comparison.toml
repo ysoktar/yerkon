@@ -557,7 +557,8 @@ the accuracy was measured."""
 
 [note.urban-run]
 sources = ["sx1280-datasheet", "sx1280-range", "yerkon-github"]
-tr = """Şehir içi satır, Kızılay'ın gerçek zemini üzerinde koşuldu; alıcılar \
+tr = """Şehir içi satırın simülasyonu Kızılay'ın gerçek zemini üzerinde \
+çalıştırıldı; alıcılar \
 gerçek sokaklarda sürüyor. Birimlerin yeri için var olan aydınlatma \
 direkleri, trafik ışıkları, levhalar ve duraklar ile tepelere dikilecek \
 direkler denendi; arama bunlar arasından 19 aydınlatma direğini seçti. \
@@ -617,8 +618,10 @@ GHz'de, 50-500 m arasında ölçtüğü modelle (Denklem 2) hesaplanıyor; 6,5 \
 GHz'e taşınmış bir ölçüm, 6,5 GHz'de ölçülmemiş. Araçtaki UWB cihazı \
 kendi yüksekliğinin üstüne daha az güç yayabiliyor (-53,3 dBm/MHz, ETSI \
 EN 302 065-3, 4.3.4.2); birimler araç anteninin altında, yoldan 1,2 m \
-yüksekte durunca bu sınıra takılmıyor. Sonuç bir Monte Carlo \
-benzetimidir; saha ölçümü değildir."""
+yüksekte durunca bu sınıra takılmıyor. Birimler 40 m arayla, iki duvara \
+sırayla takılıyor. Kaybın ortalama modelden sapması aynı ölçümün 2,7 \
+dB'si (Denklem 3). Sonuç bir Monte Carlo benzetimidir; saha ölçümü \
+değildir."""
 en = """The tunnel row is worked out with the DWM3000 on channel 5 (6489,6 \
 MHz): the BTK location tracking limit (-41,3 dBm/MHz), Qorvo's channel 5 \
 sensitivity (-100 dBm) and the module's own antenna (0 dBi, as no gain is \
@@ -627,8 +630,10 @@ colleagues measured in a road tunnel at 2,8 to 5 GHz between 50 and 500 m \
 (equation 2), carried to 6,5 GHz rather than measured there. The vehicle's \
 UWB device may send less power above its own height (-53,3 dBm/MHz, ETSI \
 EN 302 065-3, 4.3.4.2); units below the vehicle's antenna, 1,2 m above \
-the road, stay clear of that limit. The result is a Monte \
-Carlo simulation rather than a field measurement."""
+the road, stay clear of that limit. The units stand 40 m apart, on the \
+two walls in turn. The loss strays from the mean model by the same \
+measurement's 2,7 dB (equation 3). The result is a Monte Carlo simulation \
+rather than a field measurement."""
 
 [note.yerkon-availability]
 sources = ["yerkon-github"]

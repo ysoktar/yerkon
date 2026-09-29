@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=d72bfc4e40";
+import { decimal, say, speak, speaks } from "./words.js?v=256dba068f";
 
 /* The choices whose names are this page's to give.
  *
@@ -159,9 +159,22 @@ function drawActivity() {
     ? ((shown.find(entry => entry.path === answering) || {}).key
        || activityOf(answering))
     : null;
+  // The same task asked for several times is one line with a count:
+  // sliding over the ground asks for its detail again and again, and a
+  // list of ten identical lines says less than one line saying ten.
+  const grouped = new Map();
+  for (const entry of shown) {
+    const had = grouped.get(entry.key);
+    if (!had) grouped.set(entry.key, Object.assign({ count: 1 }, entry));
+    else {
+      had.count += 1;
+      had.started = Math.min(had.started, entry.started);
+      if (entry.path === answering) had.path = entry.path;
+    }
+  }
   let running = 0;
   list.innerHTML = "";
-  for (const entry of shown) {
+  for (const entry of grouped.values()) {
     const waiting = Boolean(engineQueue && entry.path.startsWith("/api/")
       && answering && entry.path !== answering);
     if (!waiting) running++;
@@ -169,7 +182,8 @@ function drawActivity() {
     row.className = waiting ? "waiting" : "";
     row.innerHTML = '<i class="dot"></i><span class="what"></span>'
       + '<span class="when"></span>';
-    row.querySelector(".what").textContent = say(entry.key);
+    row.querySelector(".what").textContent = say(entry.key)
+      + (entry.count > 1 ? ` (${entry.count})` : "");
     row.querySelector(".when").textContent = say("act.seconds",
       { n: Math.round((now - entry.started) / 1000) });
     if (waiting && answeringKey) {
@@ -546,6 +560,8 @@ function drawWords() {
   // goes wrong with two languages is translating nine tenths of
   // something and nobody noticing the tenth (ADR-0035).
   wireLayers();
+  wireQuality();
+  wireSweepPick();
   drawLegend();
   document.documentElement.lang = speaks();
 
@@ -1371,6 +1387,7 @@ function fillControls() {
   drawRuns();
   drawUnits();
   drawSummary();
+  wireSweepPick();
   // However the figures got there: the button, a hand edit, a preset,
   // or clearing the overrides.
   drawHurry();
@@ -1645,6 +1662,7 @@ function wireControls() {
   wireMap();
   wirePresets();
   wireLayers();
+  wireQuality();
   drawLegend();
 
   document.getElementById("show-photo").onchange = event => {
@@ -1717,9 +1735,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=d72bfc4e40";
-import * as flat from "./bore.js?v=d72bfc4e40";
-import * as pick from "./map.js?v=d72bfc4e40";
+import * as draw from "./draw.js?v=256dba068f";
+import * as flat from "./bore.js?v=256dba068f";
+import * as pick from "./map.js?v=256dba068f";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1775,13 +1793,102 @@ const ROADS = {
   forward: { colour: "#ffd84a", width: 2.2, dim: 0.5 },
 };
 /* Whether the fetched buildings stand on the ground. */
-let showBuildings = false;
+let showBuildings = true;
 /* The buildings of the site on screen, asked for once per site. */
 let blockSet = { site: "", blocks: [] };
 
 /* How many buildings one frame draws at most, largest first. Kızılay's
  * five thousand fit; zoomed in, every one on the drawn ground does. */
-const MOST_BLOCKS = 6000;
+/* ---------- how much this device is asked to draw ----------
+ *
+ * One page runs on a phone and on a workstation. Each level says how
+ * sharp the canvas is against the screen's own pixels, how many
+ * buildings and photograph tiles are laid, how far past the screen the
+ * finer ground is fetched, and whether a moving frame keeps the exact
+ * picture or takes the quick one. "Automatic" reads the device: its
+ * processors, its memory, and whether it is held in the hand.
+ */
+const QUALITIES = {
+  low: { ratio: 1, blocks: 2500, tiles: 24, reach: 1.0, exact: false },
+  medium: { ratio: 1.5, blocks: 6000, tiles: 48, reach: 1.3, exact: false },
+  high: { ratio: 2, blocks: 15000, tiles: 96, reach: 1.8, exact: true },
+};
+const QUALITY_KEY = "yerkon-quality";
+let qualityChosen = "auto";
+try {
+  const kept = localStorage.getItem(QUALITY_KEY);
+  if (kept && (kept === "auto" || QUALITIES[kept])) qualityChosen = kept;
+} catch (error) { /* storage blocked: automatic, for this visit */ }
+
+function guessedQuality() {
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = navigator.deviceMemory || 4;
+  const hand = window.matchMedia("(pointer: coarse)").matches;
+  if (!hand && cores >= 8 && memory >= 8) return "high";
+  if (hand && (cores <= 4 || memory <= 3)) return "low";
+  return "medium";
+}
+
+function qualityName() {
+  return qualityChosen === "auto" ? guessedQuality() : qualityChosen;
+}
+
+function quality() {
+  return QUALITIES[qualityName()];
+}
+
+/* The size of a coverage cell, from the scene's key as well as from the
+ * step it belongs to: finer is slower, and the choice is whoever is
+ * looking at the map's to make. */
+/* The answer folds away, and starts folded: the scene is what a visitor
+ * comes for first, and the numbers are one tap away. */
+function wireReadout() {
+  const box = document.getElementById("readout");
+  const head = document.getElementById("readout-head");
+  if (!box || !head) return;
+  head.onclick = () => {
+    const open = !box.classList.contains("open");
+    box.classList.toggle("open", open);
+    head.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+}
+wireReadout();
+
+const SWEEP_CELLS = [10, 25, 50, 100, 250, 500];
+
+function wireSweepPick() {
+  const pick = document.getElementById("sweep-pick");
+  if (!pick || !state) return;
+  const now = Number(state.sweep_m);
+  const cells = SWEEP_CELLS.includes(now) ? SWEEP_CELLS
+    : SWEEP_CELLS.concat([now]).sort((a, b) => a - b);
+  pick.innerHTML = options(
+    cells.map(m => [String(m), say("sweep.cell", { metres: m })]), String(now));
+  pick.title = say("sweep.note");
+  pick.onchange = () => apply({ sweep_m: Number(pick.value) })
+    .catch(e => flash(e.message, true));
+}
+
+function wireQuality() {
+  const pick = document.getElementById("quality-pick");
+  if (!pick) return;
+  pick.innerHTML = options([
+    ["auto", say("quality.auto", { level: say("quality.level." + guessedQuality()) })],
+    ["low", say("quality.low")], ["medium", say("quality.medium")],
+    ["high", say("quality.high")],
+  ], qualityChosen);
+  pick.title = say("quality.note");
+  pick.onchange = () => {
+    qualityChosen = pick.value;
+    try { localStorage.setItem(QUALITY_KEY, qualityChosen); } catch (error) { /* this visit only */ }
+    draw.texturing.exact = quality().exact;
+    detailAsked = null;
+    loadBlocks();
+    resize();
+    scheduleDetail();
+  };
+  draw.texturing.exact = quality().exact;
+}
 
 /* Ask for the site's buildings when the ground becomes another site. */
 async function loadBlocks() {
@@ -1801,7 +1908,7 @@ async function loadBlocks() {
   }
 }
 
-/* The buildings over the ground being drawn, at most `MOST_BLOCKS`. */
+/* The buildings over the ground being drawn, at most the quality's own count. */
 function blocksOnDrawnGround() {
   const ground = drawnTerrain();
   if (!ground || !ground.xs) return [];
@@ -1812,7 +1919,7 @@ function blocksOnDrawnGround() {
     const [x, y] = block;
     if (x < west || x > east || y < south || y > north) continue;
     out.push(block);
-    if (out.length >= MOST_BLOCKS) break;
+    if (out.length >= quality().blocks) break;
   }
   return out;
 }
@@ -1960,13 +2067,12 @@ function drawnPhotograph() {
  * m over twenty kilometres of country. Close to the ground that is a
  * blur. So when the camera is near enough that a finer mesh is asked for,
  * the same provider is asked for finer tiles over the same window, at the
- * finest zoom that fits `FINE_MOST_TILES`, and quads inside it take that
+ * finest zoom that fits the quality's tile count, and quads inside it take that
  * picture instead.
  */
 
 //: The most tiles a closer look asks for at once: 48 tiles is a sheet of
 //: about eight megabytes, and a few seconds on an ordinary connection.
-const FINE_MOST_TILES = 48;
 //: How many zooms past the site's own a closer look may go, and the
 //: finest the provider serves everywhere worth looking at.
 const FINE_STEPS = 3;
@@ -2013,7 +2119,7 @@ function loadFinePhoto(box) {
   const top = Math.min(FINEST_ZOOM, aerial.tiles.zoom + FINE_STEPS);
   for (let zoom = top; zoom > aerial.tiles.zoom; zoom--) {
     const window = tileWindow(aerial, box, zoom);
-    if (window.count <= FINE_MOST_TILES) { chosen = window; break; }
+    if (window.count <= quality().tiles) { chosen = window; break; }
   }
   if (!chosen) {
     finePhoto = null;
@@ -2174,7 +2280,7 @@ function meshCell() {
 }
 
 function resize() {
-  const ratio = window.devicePixelRatio || 1;
+  const ratio = Math.min(window.devicePixelRatio || 1, quality().ratio);
   canvas.width = container.clientWidth * ratio;
   canvas.height = container.clientHeight * ratio;
   canvas.style.width = container.clientWidth + "px";
@@ -2300,7 +2406,7 @@ function paintScene() {
   // The coarse, photographed ground a moving frame can fall back on when
   // there are more quads than it can lay the picture on one by one.
   draw.texturing.patches = draw.texturing.on && draw.texturing.moving
-      && !draw.texturing.still
+      && !draw.texturing.still && !draw.texturing.exact
     ? draw.groundPatches(view, drawnTerrain(), drawnPhotograph())
     : null;
 
@@ -2500,7 +2606,9 @@ let detailAsked = null;
 function visibleGround() {
   if (!terrainData) return null;
   const { xs, ys } = terrainData;
-  const reach = orbit.distance;
+  // Wider than what is on screen, by the quality setting's reach, so a
+  // short slide stays inside the ground already fetched.
+  const reach = orbit.distance * quality().reach;
   const west = Math.max(xs[0], orbit.target[0] - reach);
   const east = Math.min(xs[xs.length - 1], orbit.target[0] + reach);
   const south = Math.max(ys[0], orbit.target[1] - reach);
@@ -2512,31 +2620,70 @@ function visibleGround() {
   return enough ? { west, east, south, north } : null;
 }
 
+/* Whether the scene is being moved by hand right now. */
+function moving() {
+  return Boolean(spinning || panning || sliding || dragging || pinch.size);
+}
+
+/* Whether a box of ground is inside the one already fetched. */
+function inside(box, held) {
+  return held && box.west >= held.west && box.east <= held.east
+    && box.south >= held.south && box.north <= held.north;
+}
+
+let detailBox = null;
+let detailBusy = false;
+
 function scheduleDetail() {
   clearTimeout(detailTimer);
   detailTimer = setTimeout(async () => {
+    // Never while the scene is in the hand: a finer mesh arriving half
+    // way through a drag changes the heights under the camera, and the
+    // picture jumps. Asked for once it is let go.
+    if (moving() || detailBusy) return scheduleDetail();
     const box = visibleGround();
     loadFinePhoto(box);
     if (!box) {
       // Pulled back far enough that the site's own mesh is the finer of
       // the two. Dropping it keeps one mesh on screen rather than a
       // sharp patch left behind in the middle of a coarse one.
-      if (detail) { detail = null; detailAsked = null; paintScene(); scheduleStill(); }
+      if (detail) {
+        detail = null; detailAsked = null; detailBox = null;
+        paintScene(); scheduleStill();
+      }
       return;
     }
-    const key = [box.west, box.east, box.south, box.north]
+    // Still inside the ground in hand, and not so much smaller that the
+    // mesh would be worth refining: nothing to ask.
+    const span = Math.max(box.east - box.west, box.north - box.south);
+    const heldSpan = detailBox ? Math.max(detailBox.east - detailBox.west,
+      detailBox.north - detailBox.south) : 0;
+    if (detail && inside(box, detailBox) && span > heldSpan * 0.4) return;
+    // Half as wide again as what is wanted, so the next slide is covered.
+    const pad = span * 0.25;
+    const wanted = {
+      west: box.west - pad, east: box.east + pad,
+      south: box.south - pad, north: box.north + pad,
+    };
+    const key = [wanted.west, wanted.east, wanted.south, wanted.north]
       .map(edge => Math.round(edge / 25)).join(",");
     if (key === detailAsked) return;
     detailAsked = key;
+    detailBusy = true;
     try {
       const query = new URLSearchParams(
-        Object.entries(box).map(([edge, at]) => [edge, String(at)]));
-      detail = await ask("/api/ground?" + query.toString());
+        Object.entries(wanted).map(([edge, at]) => [edge, String(at)]));
+      const fetched = await ask("/api/ground?" + query.toString());
+      detail = fetched;
+      detailBox = wanted;
       paintScene();
       scheduleStill();
     } catch (error) {
       detail = null;
+      detailBox = null;
       detailAsked = null;
+    } finally {
+      detailBusy = false;
     }
   }, 220);
 }
@@ -4248,6 +4395,7 @@ async function refreshScene() {
   // middle of the new one.
   detail = null;
   detailAsked = null;
+  detailBox = null;
   if (!framed) {
     // Frame everything the first time, then leave the camera exactly
     // where the person put it. Re-centring on every refresh is what made

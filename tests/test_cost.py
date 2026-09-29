@@ -422,7 +422,7 @@ def test_a_rate_looks_sourced_only_when_it_names_its_source():
             Provenance.DATASHEET, Provenance.DERIVED, Provenance.DESIGN,
             Provenance.STANDARD), name
         if rate.provenance is not Provenance.DESIGN:
-            assert not rate.source.startswith("bu proje"), name
+            assert not rate.source.startswith("YERKON tasarım tercihi"), name
 
 
 # --- Pricing a mixed corridor ---------------------------------------------

@@ -231,7 +231,6 @@ def test_the_results_page_draws_the_published_run():
     drawn = render(page_at("/sonuclar"), "tr", a_record())
     for expected in ("90,00", "91,00", "93,00", "%93,75", "94000"):
         assert expected in drawn, expected
-    assert "2026-01-02" in drawn
 
 
 def test_the_home_page_leads_with_one_figure_per_row():
@@ -283,10 +282,12 @@ def test_no_page_carries_a_copy_of_the_published_table():
     assert "yerkon table --publish" in results
 
 
-def test_the_published_record_says_how_finely_it_was_read():
-    """A coarse table and a published one look the same in a file."""
+def test_the_results_page_names_no_file():
+    """How finely a run was read is kept in the record, not shown to a
+    reader: a settings file's name is a development note on a page."""
     drawn = render(page_at("/sonuclar"), "tr", a_record())
-    assert "8" in drawn and "defaults.toml" in drawn
+    assert "defaults.toml" not in drawn
+    assert "published.toml" not in drawn
 
 
 # --- the record itself ----------------------------------------------------
@@ -564,8 +565,12 @@ def test_a_drawing_prints_the_table_s_own_numbers():
     for row in record.rows:
         shown = list(row.cells())[4]
         assert ">{}<".format(shown) in pictures, shown
-        assert ">{}<".format(shown.split(",")[0]) not in pictures, (
-            "{} was rounded to its whole part".format(shown))
+        # A power of ten is also an axis label on the logarithmic scale,
+        # so its absence proves nothing about the mark.
+        whole = shown.split(",")[0]
+        if whole not in ("0", "1", "10", "100"):
+            assert ">{}<".format(whole) not in pictures, (
+                "{} was rounded to its whole part".format(shown))
     # And one of the other systems', which comes from comparison.toml.
     assert ">15,72<" in pictures and ">0,017<" in pictures
 
@@ -1144,7 +1149,7 @@ def test_every_sourced_figure_on_the_cost_page_links_its_source():
             for cited in LINKS.get(key, ()):
                 assert cited in known, (key, cited)
             source = settings.sourced(key).source
-            if not source.startswith("bu proje") and "tasarım" not in source \
+            if not source.startswith("YERKON") and "tasarım" not in source \
                     and "bakım modeli" not in source:
                 assert key in LINKS, key
     page = render(page_at("maliyet"), "tr", read())

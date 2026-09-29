@@ -42,7 +42,7 @@ yerkon table --publish  # koşuyu src/yerkon/published.toml'a yazar
 |---|---|---|---|---|---|---|---|---|---|
 | YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,29 | 9,19 | 4,00 | %96,65 | 8,14 | 9061 | 1940 |
 | YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,16 | 8,15 | 4,96 | %94,58 | 354,00 | 1138 | 330 |
-| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,58 | 2,43 | 3,31 | %94,32 | 0,02 | 108294 /km | 22107 /km |
+| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,37 | 1,08 | 2,57 | %99,55 | 0,02 | 162442 /km | 33160 /km |
 
 Tünel satırının maliyeti km² değil güzergâh km'si başına ("/km").
 
@@ -52,7 +52,8 @@ Tünel satırının maliyeti km² değil güzergâh km'si başına ("/km").
   yol boyundaki elektrik dağıtım direklerinde, 10 m'de, güneş paneli ve
   aküyle.
 - **Tünel:** Kızılcahamam'da 2 km'lik bir güzergâh, UWB (DWM3000), birimler
-  yoldan 1,2 m yüksekte. Maliyeti km² değil güzergâh km'si başına.
+  40 m arayla iki duvara sırayla, yoldan 1,2 m yüksekte. Maliyeti km² değil
+  güzergâh km'si başına.
 
 Zemin Copernicus 30 m yükseklik verisinden, binalar ve yollar Overture ve
 OpenStreetMap'ten bir kez getirilip paketin içine kondu; bir klon tabloyu

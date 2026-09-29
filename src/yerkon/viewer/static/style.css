@@ -486,11 +486,15 @@ i.prov.assumption { background: var(--warn); }
  * out what is in it.
  */
 
-#languages { display: flex; gap: 2px; flex: 0 0 auto; }
+#languages { display: flex; gap: 0; flex: 0 0 auto; }
 
+/* One square switch, the same as the site's: the language in use is the
+   filled half. */
 #languages button {
   flex: 0 0 auto;
-  padding: 4px 7px;
+  width: 32px;
+  padding: 4px 0;
+  border-radius: 0;
   font-size: 10px;
   letter-spacing: 0.06em;
   border-color: var(--line);
@@ -498,6 +502,8 @@ i.prov.assumption { background: var(--warn); }
   color: #8a97a3;
 }
 
+#languages button:first-child { border-radius: 4px 0 0 4px; }
+#languages button + button { border-left: 0; border-radius: 0 4px 4px 0; }
 #languages button.on {
   background: var(--accent);
   border-color: var(--accent);
@@ -824,3 +830,15 @@ i.prov.assumption { background: var(--warn); }
 #roads-forward.on { background: var(--accent); color: #fff;
   border-color: var(--accent); }
 #motion.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* The answer, folded until opened. */
+#readout h2 { margin: 8px 0 6px; }
+#readout-head { display: flex; align-items: center; gap: 6px; width: 100%;
+  padding: 2px 0; border: 0; background: none; color: inherit; font: inherit;
+  letter-spacing: inherit; text-transform: inherit; text-align: left;
+  cursor: pointer; }
+#readout-head::before { content: "▸"; display: inline-block;
+  transition: transform 0.15s; }
+#readout.open #readout-head::before { transform: rotate(90deg); }
+#readout:not(.open) #numbers { display: none; }
+#sweep-pick, #quality-pick { margin-bottom: 4px; }

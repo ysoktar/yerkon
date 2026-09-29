@@ -202,7 +202,7 @@ def test_the_defaults_verb_can_list_what_has_been_sourced(capsys, tmp_path):
 value = 25.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"''',
+source = "YERKON varsayımı"''',
         '''[values."mounting.tall_mast.height_m"]
 value = 20.0
 unit = "m"

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
-<link rel="stylesheet" href="style.css?v=d72bfc4e40">
+<link rel="stylesheet" href="style.css?v=256dba068f">
 </head>
 <body>
 
@@ -154,7 +154,7 @@
       <input type="checkbox" id="show-roads" checked>
       <span data-say="ground.roads"></span></label>
     <label class="tick" id="buildings-tick" data-find="bina yapı blok buildings blocks">
-      <input type="checkbox" id="show-buildings">
+      <input type="checkbox" id="show-buildings" checked>
       <span data-say="ground.buildings"></span></label>
 
     <label class="knob" data-find="tepe yükseklik rölyef relief modellenmiş">
@@ -248,8 +248,8 @@
       <input type="number" id="journey_s-num" class="num" step="30"></label>
     <label class="knob" data-find="tarama hücre çözünürlük kapsama grid">
       <span data-say="knob.sweep"></span><output id="sweep-out"></output>
-      <input type="range" id="sweep_m" min="50" max="1000" step="50">
-      <input type="number" id="sweep_m-num" class="num" step="50"></label>
+      <input type="range" id="sweep_m" min="10" max="1000" step="5">
+      <input type="number" id="sweep_m-num" class="num" step="5"></label>
   </details>
 
   <details class="step" id="step-basis">
@@ -333,7 +333,9 @@
   </details>
 
   <section id="readout">
-    <h2 data-say="result.head"></h2>
+    <h2><button id="readout-head" type="button" class="fold"
+        aria-expanded="false" aria-controls="numbers"><span
+        data-say="result.head"></span></button></h2>
     <dl id="numbers"></dl>
     <div class="row">
       <button id="run" data-say="result.run"></button>
@@ -412,6 +414,9 @@
   -->
   <button id="roads-forward" class="quiet" type="button" aria-pressed="false"
           data-say="roads.forward"></button>
+  <!-- How finely coverage is worked out, and how much this device draws. -->
+  <select id="sweep-pick" data-find="kapsama hücre çözünürlük tarama coverage resolution"></select>
+  <select id="quality-pick" data-find="görüntü kalite hız çizim quality performance"></select>
   <div id="legend-bands"></div>
   <span><i class="reach"></i><span data-say="legend.reach"></span></span>
   <span><i class="unit"></i><span data-say="legend.unit"></span></span>
@@ -429,7 +434,7 @@
 
 <div id="status"></div>
 
-<script src="local.js?v=d72bfc4e40"></script>
-<script type="module" src="app.js?v=d72bfc4e40"></script>
+<script src="local.js?v=256dba068f"></script>
+<script type="module" src="app.js?v=256dba068f"></script>
 </body>
 </html>

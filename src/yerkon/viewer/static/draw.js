@@ -322,6 +322,7 @@ export function groundPatches(view, terrain, photo, across = 16) {
  */
 const SLICE_PX = 64;
 const MOST_SLICES = 8;
+const MOVING_SLICES = 4;
 
 function slices(view, corners, sheet, most = MOST_SLICES) {
   const onScreen = corners.map(view.project);
@@ -717,8 +718,11 @@ function textured(context, item) {
   // A moving frame lays each quad with one draw rather than two
   // triangles: the seam that leaves is not visible while the ground is
   // moving, and the same frame time covers twice the quads.
-  const triangles = !moving && item.texture.slice
-    ? item.texture.slice(MOST_SLICES) : null;
+  // Where the device can afford it, a moving frame keeps the exact
+  // picture too, cut a little less finely: the one-draw quad bends the
+  // photograph at its fourth corner, and that bend is what flickers.
+  const triangles = (!moving || texturing.exact) && item.texture.slice
+    ? item.texture.slice(moving ? MOVING_SLICES : MOST_SLICES) : null;
   if (triangles) {
     context.beginPath();
     context.moveTo(item.screen[0][0], item.screen[0][1]);
@@ -807,6 +811,9 @@ function textured(context, item) {
  * enough. With neither, every quad is its flat colour. */
 export const texturing = {
   on: false, still: false, moving: false,
+  // Whether a moving frame draws the picture exactly (a capable device)
+  // or quickly; the page sets it from its quality setting.
+  exact: false,
   // How many triangles a moving frame may lay the picture on, largest
   // quads first; the page sets it from how long they took to draw.
   budget: 0,
@@ -829,6 +836,12 @@ function chooseForMoving(items) {
   }
   // More quads than the budget: the coarse ground covers all of it in a
   // few hundred draws, where the quads would leave most of it flat.
+  // A device that draws exactly lays the picture on every quad and
+  // never falls back on the coarse ground.
+  if (texturing.exact) {
+    for (const [, item] of candidates) item.pictured = true;
+    return null;
+  }
   const patches = texturing.patches;
   if (patches && candidates.length > texturing.budget
       && patches.triangles.length <= Math.max(texturing.budget, 600)) {

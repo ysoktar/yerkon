@@ -552,7 +552,12 @@ def varying(terrain: Terrain, settings: Settings, row: str) -> Terrain:
     # want the same one.
     terrain = replace(terrain, profile_spacing_m=settings.number(
         "site.profile_spacing_m"), shadowing=Shadowing(
-        sigma_db=settings.number("site.shadow_sigma_db"),
+        # A row with a spread of its own measured takes it: a bore guides
+        # the signal and scatters it less than open ground does.
+        sigma_db=settings.number(
+            "{}.shadow_sigma_db".format(row)
+            if "{}.shadow_sigma_db".format(row) in settings.entries
+            else "site.shadow_sigma_db"),
         correlation_m=settings.number("site.shadow_correlation_m"),
         seed=int(settings.number("site.shadow_seed")),
         sigma_obstructed_db=settings.number(

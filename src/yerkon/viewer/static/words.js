@@ -644,6 +644,27 @@ export const SAY = {
                     en: "fit the whole scene on screen" },
   "scene.frame": { tr: "Sahneyi sığdır", en: "Fit the scene" },
   "roads.forward": { tr: "Yolları öne çıkar", en: "Bring the roads forward" },
+  "sweep.cell": { tr: "Kapsama hücresi: {metres} m", en: "Coverage cell: {metres} m" },
+  "sweep.note": {
+    tr: "Kapsamanın kaç metrede bir hesaplandığı. Küçük hücre daha ayrıntılı ama daha yavaş.",
+    en: "How often coverage is worked out, in metres. A smaller cell is finer and slower.",
+  },
+  "quality.auto": { tr: "Görüntü: otomatik ({level})", en: "Picture: automatic ({level})" },
+  "quality.level.low": { tr: "düşük", en: "low" },
+  "quality.level.medium": { tr: "orta", en: "medium" },
+  "quality.level.high": { tr: "yüksek", en: "high" },
+  "quality.low": { tr: "Görüntü: düşük", en: "Picture: low" },
+  "quality.medium": { tr: "Görüntü: orta", en: "Picture: medium" },
+  "quality.high": { tr: "Görüntü: yüksek", en: "Picture: high" },
+  "quality.note": {
+    tr: "Bu cihazın ne kadar çizeceği: ekran keskinliği, bina ve uydu karesi sayısı, "
+        + "yakın zeminin ne kadar geniş getirildiği, hareket sırasında resmin tam çizilip "
+        + "çizilmediği. Otomatik, cihazın işlemcisine ve belleğine bakar.",
+    en: "How much this device draws: sharpness against the screen, how many buildings "
+        + "and photo tiles, how wide the near ground is fetched, and whether a moving "
+        + "frame keeps the exact picture. Automatic reads the device's processors and "
+        + "memory.",
+  },
   "scene.motion": { tr: "Telefonu çevirerek bak", en: "Look by turning the phone" },
   "scene.motion.denied": {
     tr: "Telefon hareket bilgisini vermedi; ayarlardan izin verilebilir.",

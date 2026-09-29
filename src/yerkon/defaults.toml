@@ -34,8 +34,8 @@
 value = 3.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Banket üzerine monte edilmiş bir yol levhasının tipik montaj yüksekliği."""
 note_en = "Typical mounting height of a verge-mounted road sign."
 affects = "levhadan kullanılabilir menzili: 5 m toleransta 1,66 km"
@@ -45,8 +45,8 @@ affects_en = "usable range from a sign: 1,66 km at a 5 m tolerance"
 value = 2500.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Zaten duran bir levhaya bir birim takmanın kelepçesi, muhafazası ve \
 işçiliği. Levhalar hakkında bir olgu değil."""
 note_en = """Bracket, enclosure and the labour to fit a unit to a sign that already \
@@ -72,8 +72,8 @@ affects_en = "the fitting and maintenance cost of units on this structure"
 value = 6.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = "Karayolu levha portalının taşıt yolu üzerindeki geçiş yüksekliği."
 note_en = "Clearance height of a highway sign portal over the carriageway."
 affects = "portaldan kullanılabilir menzili"
@@ -83,8 +83,8 @@ affects_en = "usable range from a gantry"
 value = 4000.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Levha gibi, artı trafiğe açık şeritler üzerindeki bir portalın \
 gerektirdiği trafik yönetimi."""
 note_en = """As a sign, plus the traffic management a gantry over live lanes needs."""
@@ -106,8 +106,8 @@ affects_en = "the fitting and maintenance cost of units on this structure"
 value = 10.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = "Yol kenarındaki reklam panosunun üstü."
 note_en = "Top of a roadside advertising hoarding."
 affects = "panodan kullanılabilir menzili"
@@ -117,8 +117,8 @@ affects_en = "usable range from a billboard"
 value = 3500.0
 unit = "TL"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = "Levha gibi, artı erişim ekipmanı ve sahibinin izni."
 note_en = "As a sign, plus access equipment and the owner's consent."
 affects = "panodaki her direğin CAPEX'ini"
@@ -173,8 +173,8 @@ affects_en = "the fitting and maintenance cost of units on this structure"
 value = 25.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Amaca özel yapılmış direk. 25 m, düz zemin üzerinde 2 m'lik bir araç \
 anteni karşısında 10 km'lik bir bağlantının gerektirdiği yüksekliktir."""
 note_en = """Purpose-built mast. 25 m is the height a 10 km link needs against a 2 m \
@@ -232,8 +232,8 @@ unit = "sites/day"
 provenance = "DERIVED"
 source = """Dicle Elektrik, Diyarbakır Suriçi, 25 Haziran 2026: 11 ekip ve 11 sepetli araç bir hafta sonunda 207 direkteki 414 armatürü değiştirdi"""
 source_en = """Dicle Elektrik, Diyarbakır Suriçi, 25 June 2026: 11 crews with 11 bucket trucks replaced 414 luminaires on 207 poles over one weekend"""
-note = """Kırsalda bir ekibin günde uğradığı dağıtım direği sayısı. Şehirde direk başına bir saat iş sayılıyor (aydınlatma direğinde günde uğranan birim, Dicle Elektrik örneği). Kırsalda buna yol ekleniyor: sekiz saatlik günün ikisi merkeze gidiş dönüş, sahalar arası her geçiş yarım saat (bu projenin yol tahmini). (8 - 2) / (1 + 0,5) = 4."""
-note_en = """How many distribution poles a crew reaches in a day in open country. Town counts an hour of work a column (columns a crew reaches in a day, the Dicle Elektrik example). Open country adds the road: two hours of the eight-hour day to and from the base, half an hour between sites (this project's estimate of the road). (8 - 2) / (1 + 0,5) = 4."""
+note = """Kırsalda bir ekibin günde uğradığı dağıtım direği sayısı. Şehirde direk başına bir saat iş sayılıyor (aydınlatma direğinde günde uğranan birim, Dicle Elektrik örneği). Kırsalda buna yol ekleniyor: sekiz saatlik günün ikisi merkeze gidiş dönüş, sahalar arası her geçiş yarım saat (YERKON'un yol tahmini). (8 - 2) / (1 + 0,5) = 4."""
+note_en = """How many distribution poles a crew reaches in a day in open country. Town counts an hour of work a column (columns a crew reaches in a day, the Dicle Elektrik example). Open country adds the road: two hours of the eight-hour day to and from the base, half an hour between sites (YERKON's estimate of the road). (8 - 2) / (1 + 0,5) = 4."""
 affects = "bu yapıdaki birimlerin montaj ve bakım bedelini"
 affects_en = "the fitting and maintenance cost of units on this structure"
 
@@ -241,8 +241,8 @@ affects_en = "the fitting and maintenance cost of units on this structure"
 value = 0.0
 unit = "TL/year"
 provenance = "DESIGN"
-source = "bu proje, bir işletme kararı olarak: kamu protokolü"
-source_en = "this project, as an operating choice: a public-sector agreement"
+source = "YERKON tasarım tercihi: kamu protokolü"
+source_en = "YERKON design choice: a public-sector agreement"
 note = """Dağıtım şirketinin direğine birim taşıtmanın yıllık bedeli: sıfır. Birimler kamu protokolüyle konuyor; AUS kabinleri, yol kenarı üniteleri ve dağıtım direkleri gibi hazır kamu yapılarına dahil edilebilmeleri öngörülüyor. Dağıtım şirketlerinin direğe cihaz için yayımladığı bir bedel de yok: Ulaştırma Bakanlığı'nın geçiş hakkı usul ve esasları, Türk Telekom'un bağlantı ve nakil ücretleri ve Genel Aydınlatma Yönetmeliği direk başına bir bedel yazmıyor. Ticari kullanıcılara uygulanan bedeller karşılaştırma için: dağıtım şirketleri 2015'ten beri EPDK izniyle direklerde reklam alanı kiralıyor, en küçük afiş ayda 4700 TL (Tr724, 11 Mayıs 2019); İstanbul Büyükşehir Belediyesi 2025 tarifesi belediye mülküne konan bir repeater ya da small cell için yıllık 24500 TL, BEDAŞ ve AYEDAŞ aydınlatma direğindeki bir kabinet için yer seçim belgesi ücretinin iki katını alıyor. Protokol olmazsa direk başına yıllık 1200 TL kırsal OPEX'i yaklaşık yarı yarıya artırır."""
 note_en = """What the distribution company charges a year to carry a unit on its pole: nothing. The units go up under a public-sector agreement, with the prospect of being included in public structures that already stand, such as ITS cabinets, roadside units and distribution poles. Nor has any distribution company published a fee for equipment on its poles: the transport ministry's rights-of-way rules, Türk Telekom's connection fees and the General Lighting Regulation name no per-pole fee. Fees charged to commercial users, for comparison: distribution companies have rented advertising space on their poles since 2015 with the regulator's leave, the smallest poster 4700 TL a month (Tr724, 11 May 2019); Istanbul Metropolitan Municipality's 2025 tariff charges 24500 TL a year for a repeater or small cell on its property, and twice the site selection fee for a cabinet on a BEDAŞ or AYEDAŞ lighting column. Without the agreement, 1200 TL a pole a year would raise rural OPEX by about half."""
 affects = "dağıtım direğindeki direklerin OPEX'ini"
@@ -254,8 +254,8 @@ sensitivity_en = "1200 TL a pole a year raises rural OPEX by about 47 %"
 value = 2.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Çatıdaki tutucunun çatının üstüne çıkardığı yükseklik. Birimin \
 yerden yüksekliği binanın kendi yüksekliği artı bu; bina yüksekliği \
 getirilen bina izlerinden, bina bina okunuyor."""
@@ -326,10 +326,10 @@ affects_en = "OPEX of units on roofs"
 value = 1.2
 unit = "m"
 provenance = "DESIGN"
-source = """bu proje; ETSI EN 302 065-3 V2.1.1, 4.3.4.2 ve Tablo 4; BTK \
+source = """YERKON tasarım tercihi; ETSI EN 302 065-3 V2.1.1, 4.3.4.2 ve Tablo 4; BTK \
 Kısa Mesafeli Telsiz Cihazları için Muafiyet Kriterleri, Madde 18(2), \
 Tablo 17"""
-source_en = """this project; ETSI EN 302 065-3 V2.1.1, 4.3.4.2 and table 4; \
+source_en = """YERKON design choice; ETSI EN 302 065-3 V2.1.1, 4.3.4.2 and table 4; \
 BTK exemption criteria for short range devices, Article 18(2), table 17"""
 note = """Bir birimin tünelde, yol yüzeyinin üstünde askıya alındığı \
 yükseklik. Araçtaki UWB, anteninin montaj düzleminin üstüne -53,3 \
@@ -394,8 +394,8 @@ sensitivity_en = "at 3 kWh a year, 16,86 TL a unit a year; even twice the tariff
 value = 3.0
 unit = "kWh/year"
 provenance = "DERIVED"
-source = "SX1280 ve STM32G0 veri sayfaları, bu projenin hesabı"
-source_en = "SX1280 and STM32G0 datasheets, this project's arithmetic"
+source = "SX1280 ve STM32G0 veri sayfaları, YERKON hesabı"
+source_en = "SX1280 and STM32G0 datasheets, YERKON's arithmetic"
 note = """Bir yayın biriminin yıllık tüketimi. Birim zamanının neredeyse \
 tamamında dinliyor: SX1280 dinlerken birkaç mA, mikrodenetleyici bir iki \
 mA çeker, 3,3 V'ta ikisi 30 mW'ı bulmaz. Şebeke dönüştürücüsünün boştaki \
@@ -417,8 +417,8 @@ sensitivity_en = "the energy line is under 2 % of OPEX in every row"
 value = 0.0
 unit = "TL/year"
 provenance = "DESIGN"
-source = "bu proje, bir tasarım kararı olarak"
-source_en = "this project, as a design choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Kendi hattı olmayan bir birimin yıllık veri bedeli: sıfır, çünkü \
 birimlere SIM kartı konmuyor. Hattı olan yapıdaki birim merkeze o hattan \
 bağlanıyor: tünelde tünelin haberleşme omurgası, şehirde ışıklı kavşağın \
@@ -478,8 +478,8 @@ sensitivity_en = "5 years (the positioning line) doubles the replacement line"
 value = 0.2
 unit = "visits/year"
 provenance = "DESIGN"
-source = "bu proje, bir işletme kararı olarak"
-source_en = "this project, as an operating choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir direğe yılda kaç kez gidildiği. Merkezî sistem her birimin \
 durumunu görüyor (her birim düzenli bir yaşam sinyali gönderiyor), bu \
 yüzden ekip takvimle değil arıza olduğunda gider. Kutusu kapalı, hareketli \
@@ -620,8 +620,8 @@ unit = "TL/year"
 provenance = "DERIVED"
 source = """yazılımcı medyan maaşı, Türkiye'deki şirketler, net aylık 95000 TL (Yazılımcı Maaşları 2026 anketi, Şubat 2026, 1223 katılımcı); 6 vCPU, 8 GB sanal sunucu aylık 374,90 TL (Karekod, en ucuz VDS fiyatları, 25 Eylül 2026)"""
 source_en = """median developer salary, companies in Türkiye, net 95000 TL a month (Yazılımcı Maaşları 2026 survey, February 2026, 1223 respondents); a 6 vCPU, 8 GB virtual server 374,90 TL a month (Karekod, cheapest VDS prices, 25 September 2026)"""
-note = """Merkezî yönetim sistemini bir yıl işletmek: birimlerin kayıtlarını izleyen, arızayı ekibe bildiren yazılım ve onu yürüten kişi. Bir yazılımcının haftada bir günü: 95000 x 12 x 0,2 = 228000 TL; birbirinin yedeği iki sunucu: 2 x 374,90 x 12 = 8998 TL. Toplam 236998, yuvarlanarak 237000 TL. Haftada bir gün, bu projenin işletme kararı."""
-note_en = """Running the central management system for a year: the software that watches the units' records and tells the crew of a failure, and the person who runs it. One day a week of a developer: 95000 x 12 x 0,2 = 228000 TL; two servers backing each other up: 2 x 374,90 x 12 = 8998 TL. 236998, rounded to 237000 TL. One day a week is this project's operating choice."""
+note = """Merkezî yönetim sistemini bir yıl işletmek: birimlerin kayıtlarını izleyen, arızayı ekibe bildiren yazılım ve onu yürüten kişi. Bir yazılımcının haftada bir günü: 95000 x 12 x 0,2 = 228000 TL; birbirinin yedeği iki sunucu: 2 x 374,90 x 12 = 8998 TL. Toplam 236998, yuvarlanarak 237000 TL. Haftada bir gün, YERKON'un işletme tercihi."""
+note_en = """Running the central management system for a year: the software that watches the units' records and tells the crew of a failure, and the person who runs it. One day a week of a developer: 95000 x 12 x 0,2 = 228000 TL; two servers backing each other up: 2 x 374,90 x 12 = 8998 TL. 236998, rounded to 237000 TL. One day a week is YERKON's operating choice."""
 affects = "OPEX'i; her birime 237 TL/yıl"
 affects_en = "OPEX; 237 TL a year a unit"
 sensitivity = "iki katına çıkarmak her birime yılda 237 TL ekler"
@@ -631,8 +631,8 @@ sensitivity_en = "doubling it adds 237 TL a year a unit"
 value = 1000.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "bu proje, bir işletme kararı olarak"
-source_en = "this project, as an operating choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Merkezî sistemin kaç birime yayıldığı. Haftada bir günlük bir kişi ve iki sunucu bin birimin kayıtlarını izleyebilir; ülke çapında bir ağ bunu daha da geniş yayar. Bu yüzden her yerleşime eklenen sabit bir sayı değil, birim başına bir oran: 237000 / 1000 = 237 TL/yıl."""
 note_en = """How many units the central system is spread over. One person one day a week and two servers can watch the records of a thousand units; a national network spreads it wider still. That is why this is a rate a unit and not a constant added to every deployment: 237000 / 1000 = 237 TL a year."""
 affects = "OPEX'i; her birime 237 TL/yıl"
@@ -648,8 +648,8 @@ sensitivity_en = "halving it adds 237 TL a year a unit"
 value = 6.0
 unit = "dB"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Semtech SX1280 için gürültü katsayısı yayımlamıyor. 6 dB, tümleşik bir \
 2,4 GHz ön uç için iyimser uçtur; bütçenin kazara kötümser bir menzil \
 üretmemesi için seçildi."""
@@ -685,8 +685,8 @@ affects_en = "the reach of every SX1280 link; everything in the urban and rural 
 value = 0.0
 unit = "dBi"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Qorvo DWM3000 Data Sheet Rev B, §5, Tablo 10 ve 11: anten dikey \
 kutuplu ve XZ düzleminde yaklaşık her yöne eşit; örüntü veriliyor, dBi \
 verilmiyor. Ölçülene kadar 0 dBi, izotropik anten; verim bu kazancın \
@@ -702,8 +702,8 @@ affects_en = "the gain at both ends of a tunnel link; the tunnel row's reach"
 value = 6.0
 unit = "dB"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = "Qorvo gürültü katsayısı yayımlamıyor; SX1280 değerine eşitlendi."
 note_en = "Qorvo publishes no noise figure; matched to the SX1280 figure."
 affects = "tünel satırının menzilini ve kullanılabilirliğini"
@@ -739,8 +739,8 @@ affects_en = "where the tunnel link stops closing"
 value = 10.0
 unit = "ppm"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """İki modül de kristal toleransı yayımlamıyor. Sıcaklık ve yaşlanma \
 sayıldığında, bu boyutta telafisiz bir kristal için olağan sınıf \
 milyonda on parçadır."""
@@ -791,8 +791,8 @@ to rise fifteen-fold before it mattered."""
 value = 2.0
 unit = "ppm"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Yaygın bir sıcaklık telafili sınıf; \"alsak ne alırdık\" sorusu için."""
 note_en = """A common temperature-compensated grade, for asking what one would buy."""
 affects = "bir senaryo onu seçmedikçe hiçbir şeyi"
@@ -802,8 +802,8 @@ affects_en = "nothing unless a scenario chooses it"
 value = 0.1
 unit = "ppm"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = "Zaten güç sürüklenen bir parça üzerinde düzeltme."
 note_en = "Correction over a part that barely drifts."
 affects = "bir senaryo onu seçmedikçe hiçbir şeyi"
@@ -817,8 +817,8 @@ affects_en = "nothing unless a scenario chooses it"
 value = 0.0003
 unit = "s"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Bir telsizin bir çerçeveyi aldıktan sonra yanıtlamak için gereksindiği \
 süre: alıcı-verici dönüşü artı ana birimin yaptığı her ne ise. Bir SF10 \
 çerçevesinin yanında kısa, bir UWB çerçevesinin yanında değil."""
@@ -832,8 +832,8 @@ affects_en = "single-sided clock error and the round duration"
 value = 16.0
 unit = "bytes"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Adresler, bir sıra numarası ve çift yönlü bir alışverişin son \
 çerçevesinde taşıdığı zaman damgaları. Her hâlükârda önsöz baskındır."""
 note_en = """Addresses, a sequence number, and the timestamps a double-sided exchange \
@@ -919,8 +919,8 @@ sensitivity_en = """it covers 98 % of the urban row's links and none of the tunn
 value = 10.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Bir bağlantının zemin profilinin kaç metrede bir okunduğu. \
 Sıfır, sabit 64 örnek demek, yani aralık bağlantının boyuna göre \
 değişiyor: 1 km'lik bir şehir bağlantısında 15 m, 6,9 km'lik bir kırsal \
@@ -955,8 +955,8 @@ sensitivity_en = """decisive in the rural row: P95 15,75 m at a fixed 64 samples
 value = 50.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje, Gudmundson'ın ölçümlerinin mertebesinde"
-source_en = "this project, the order of Gudmundson's measurements"
+source = "YERKON varsayımı, Gudmundson'ın ölçümlerinin mertebesinde"
+source_en = "YERKON assumption, the order of Gudmundson's measurements"
 note = """Bir alıcının, gölgesi başka bir şey olana kadar ne kadar yol \
 gitmesi gerektiği. Sıfır olsaydı her adım bağımsız bir çekiliş olurdu ve \
 bir tur boyunca ortalamaya giderdi; oysa gölge bir yer hakkında bir \
@@ -978,8 +978,8 @@ it stays"""
 value = 8.0
 unit = "draws"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir satırın kaç gölge dizilişi üzerinden koşturulacağı. Tek bir \
 çekiliş kırsal satırın 95. yüzdeliğini 14,6 m ile 279,6 m arasında \
 herhangi bir yere koyabiliyor, çünkü o kullanılabilirlikte hayatta kalan \
@@ -1007,8 +1007,8 @@ eight"""
 value = 1.0
 unit = "seed"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Hangi gölge dizilişi olduğu. Bir koşu bir çekiliştir ve tek bir \
 çekilişten okunan sayı güvenilir değildir. Ölçüm tohumundan ayrı \
 tutuluyor, böylece bir koşu gölgeleri sabit tutup gürültüyü, ya da tersini \
@@ -1028,8 +1028,8 @@ this shows it"""
 value = 30.0
 unit = "dB/km"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Yüksekliğin aşamadığı binalar, bitki örtüsü ve trafiğin \
 soğurması. Otuz, 2,4 GHz'de yoğun yapılı alanlar için yayımlanmış aralığın \
 ortasıdır. Yalnızca binasız zeminde işlenir: bir zemin kendi taban \
@@ -1049,8 +1049,8 @@ Ankara sites carry them, so it goes unread in the published rows"""
 value = 5.78
 unit = "m"
 provenance = "DERIVED"
-source = "bu proje, HPE P95 < 10 m hedefinden"
-source_en = "this project, from the HPE P95 < 10 m target"
+source = "YERKON tasarım tercihi, HPE P95 < 10 m hedefinden"
+source_en = "YERKON design choice, from the HPE P95 < 10 m target"
 note = """Bir konumun "var" sayılması için filtrenin kendi yatay \
 belirsizliğinin (kovaryansın izinin karekökü, bir sigma) en fazla bu \
 olması gerekir. Sunumun hedefi yatay hatada P95 < 10 m. İki boyutlu, eşit \
@@ -1090,8 +1090,8 @@ affects_en = "the vertical error (VPE), and through it the horizontal error and 
 value = 500.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Harita yükseklik hatasının yol boyunca ne kadar benzer kaldığı. \
 Yükseklik modelleri parça parça yanılır; bir araç 500 m'yi yarım dakikada \
 geçer, filtrenin düşey belleği bundan kısa, yani hata filtre için bir \
@@ -1107,8 +1107,8 @@ affects_en = "how much of the vertical error averages away"
 value = 0.0
 unit = "sigma"
 provenance = "DESIGN"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Filtrenin beklediğinden bu kadar sigmadan uzak düşen bir mesafe \
 ölçümü atılır (yenilik testi). 0 kapalı demek. Görüş dışı yanlılık \
 açıldığında 3 ile birlikte açılır."""
@@ -1122,8 +1122,8 @@ affects_en = "which ranges the filter accepts"
 value = 0.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Doğrudan ışını bir engel kestiğinde SX1280'in ölçtüğü mesafeye \
 eklenen pozitif yanlılığın ortalaması; üstel dağılımla çekilir. 0 kapalı \
 demek. Yayımlanmış bir SX1280 görüş dışı ölçümü bulunamadı; pilotta \
@@ -1139,8 +1139,8 @@ affects_en = "urban accuracy; the range of every blocked link"
 value = 0.0
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Aynısı, DWM3000 için. Geniş bantlı bir darbe radyosu yansımaları \
 çok daha ince ayırır."""
 note_en = """The same, for the DWM3000. An impulse radio of this bandwidth \
@@ -1152,8 +1152,8 @@ affects_en = "tunnel accuracy"
 value = 0.15
 unit = "m"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Bir direğin kendi konumunun ne kadar iyi bilindiği. Kestiriciye ölçülmüş \
 konum verilir ve onu kesin sayar; dolayısıyla o konumdaki hata, o \
 direğin katkıda bulunduğu her konuma doğrudan geçer. Ölçüm başına \
@@ -1173,8 +1173,8 @@ affects_en = "a floor under HPE that no amount of ranging removes: set to zero, 
 value = 0.05
 unit = "fraction"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Link bütçesinin modellemediği sebeplerle başarısız olan alışverişlerin \
 payı: paylaşımlı bandın geri kalanından gelen girişim, bu çalışmanın \
 benzetmediği trafikle çakışmalar ve iki ışınlı modelin ortalamaladığı \
@@ -1194,8 +1194,8 @@ affects_en = "availability, and the number of ranges a fix is built from"
 value = 0.15
 unit = "fraction"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Aynısı, bandın tıkalı olduğu şehir içinde. Bunu hiçbir şey ölçmüyor ve \
 bu, kırsal gibi okunan bir şehir içi kullanılabilirlik ile şehir gibi \
 okunan bir kullanılabilirlik arasındaki farktır."""
@@ -1209,8 +1209,8 @@ affects_en = "the urban row's availability"
 value = 1.5
 unit = "m/s^2"
 provenance = "ASSUMPTION"
-source = "bu proje"
-source_en = "this project"
+source = "YERKON varsayımı"
+source_en = "YERKON assumption"
 note = """Süzgecin ölçümler arasında beklediği, modellenmemiş ivme. Sert fren \
 yapan bir araç yaklaşık 6; sıradan sürüş 1'in epey altında. Çok küçükse \
 süzgeç yeni ölçümlere inanmayı bırakır; çok büyükse yumuşatmayı bırakır."""
@@ -1342,8 +1342,8 @@ which no tunnel is built to"""
 value = 3000.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Şehrin bir kenarda ne kadar sürdüğü. Ankara merkezinden üç kilometre; \
 getirilen Kızılay ızgarasının kapsadığı da bu."""
 note_en = """How far the town runs, on a side. Three kilometres of Ankara centre, \
@@ -1357,8 +1357,8 @@ square kilometre"""
 value = 600.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Direk taşıyan aydınlatma direklerinin birbirinden ne kadar \
 uzakta durduğu. 250 ile 800 m arasındaki taramada 600 m, 500 m'ye göre 36 \
 yerine 25 direk veriyor: km² başına CAPEX ve OPEX yaklaşık %23 düşük, HPE \
@@ -1378,8 +1378,8 @@ sensitivity_en = "halving it quadruples the anchors and therefore the capital"
 value = 300.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Ardışık sıraların boyuna ne kadar kaydığı. Kusursuz bir ızgara, bir \
 alıcının görebildiği her direği içinden geçen iki çizgiden birine koyar; \
 bu da kimsenin yapmadığı, daha kötü bir düzendir."""
@@ -1393,8 +1393,8 @@ affects_en = "the urban row's horizontal geometry"
 value = 2.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Izgaranın kaçta kaçı ışıklı bir kavşakta duruyor: her ikinci sıranın her ikinci noktası, yani dörtte biri. Bir şehrin ana caddeleri ışıklıdır ve ışıklı bir kavşakta sinyal dolabı zaten durur: hem şebeke beslemesi hem de trafik yönetim merkezine giden bir hat. Oradaki direk, belediyenin kameralarının ve dedektörlerinin yaptığının aynısını yapar, hattını o dolaptan alır ve kendine bir veri paketi satın almaz. Yapı, yükseklik ve montaj bedeli aynı aydınlatma direğidir; dolayısıyla geometride hiçbir şey kımıldamaz. Dörtte bir, ihtiyatlı okuma: Ankara merkezinde ana cadde kavşaklarının yarısı da savunulabilir ve iki katı tasarruf eder."""
 note_en = """How much of the grid stands at a signalised junction: every second spot of every second row, so a quarter. A town's main streets are signalised, and a signalised junction already carries a controller cabinet: mains for the heads and a line to the traffic management centre. An anchor there does what the municipality's cameras and detectors already do, takes its link from that cabinet, and buys no data plan of its own. The structure, the height and the fitting cost are the same lighting column, so nothing about the geometry moves. A quarter is the conservative reading: half of the main-street junctions in Ankara's centre is defensible too, and saves twice as much."""
 affects = "yalnız ızgara yerleşiminde şehir içi satırın bağlantı kalemini; tablodaki satır arama yerleşimini kullanıyor ve kavşaktaki birimi o yerleşim kendisi işaretliyor"
@@ -1406,8 +1406,8 @@ sensitivity_en = """setting it to 1 connects every anchor and zeroes the connect
 value = 0.0
 unit = "yes/no"
 provenance = "DESIGN"
-source = "bu proje, bakım ekibi Ankara merkezde"
-source_en = "this project, the maintenance crew is based in central Ankara"
+source = "YERKON tasarım tercihi, bakım ekibi Ankara merkezde"
+source_en = "YERKON design choice, the maintenance crew is based in central Ankara"
 note = """Hayır. Harcırah Kanunu Madde 3(g): büyükşehirde görev yeri, \
 çalışanın bağlı olduğu ilçenin belediye sınırı ve onun devamı olan \
 yerleşim yerleridir. Kızılay'a Çankaya'daki bir ekip gidiyor; görev yeri \
@@ -1423,8 +1423,8 @@ affects_en = "this row's per diem line"
 value = 12.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak (proje sahibi, 27 Eylül 2026)"
-source_en = "this project, as a deployment choice (the owner, 27 September 2026)"
+source = "YERKON tasarım tercihi (27 Eylül 2026)"
+source_en = "YERKON design choice (27 September 2026)"
 note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Gerçek \
 yollarda, aramanın 19 direğiyle, tam çözünürlükte: 8 direkle HPE P50 2,03, \
 P95 9,80 m, %96,37; 12 direkle 2,28, 8,94 m, %96,64. On iki P95'i 0,86 m \
@@ -1442,8 +1442,8 @@ affects_en = "the urban row's update rate and availability"
 value = 15.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir bağlantının sahip olabileceği ve yine de kullanılabileceği ölçüm \
 hatası. Ötesinde bir ölçüm konumu iyileştirmek yerine sürükler; gerçek \
 alıcıların sinyal kalitesine de kapı koymasının sebebi budur."""
@@ -1457,8 +1457,8 @@ affects_en = "which urban links reach the estimator"
 value = 20000.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Açık arazinin bir kenarda ne kadar sürdüğü. Polatlı ovasından yirmi \
 kilometre; getirilen ızgaranın kapsadığı da bu."""
 note_en = """How far the open country runs, on a side. Twenty kilometres of the \
@@ -1470,8 +1470,8 @@ affects_en = "the rural row's service area and cost per square kilometre"
 value = 3000.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Direklerin birbirinden ne kadar uzakta durduğu. Elektrik dağıtım \
 hattının 10 m'deki direklerinde 3000 m en ucuzu: kaba okumada 3500 m'de \
 alan 126 km²'ye düşüyor ve kilometrekare başına maliyet artıyor, 2500 m \
@@ -1488,8 +1488,8 @@ affects_en = "the rural row's pole count, availability and capital"
 value = 1500.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Aralığın yarısı; böylece ardışık sıralar hizalanmak yerine geçmeli \
 durur."""
 note_en = """Half a spacing, so alternate rows interleave rather than lining up."""
@@ -1520,8 +1520,8 @@ affects_en = "this row's per diem line"
 value = 12.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak (proje sahibi, 27 Eylül 2026)"
-source_en = "this project, as a deployment choice (the owner, 27 September 2026)"
+source = "YERKON tasarım tercihi (27 Eylül 2026)"
+source_en = "YERKON design choice (27 September 2026)"
 note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Gerçek \
 yollarda, aramanın 50 direğiyle, tam çözünürlükte: 8 direkle HPE P50 1,97, \
 P95 8,58 m, %94,21; 12 direkle 2,14, 7,45 m, %96,26. On iki P95'i 1,13 m \
@@ -1541,8 +1541,8 @@ sensitivity_en = """flat between six and eight, falling with every step above ei
 value = 30.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir bağlantının sahip olabileceği ve yine de kullanılabileceği ölçüm \
 hatası. Bu satırda hiç bağlayıcı olmadığı ölçüldü: 60 m'ye çıkarmak \
 hiçbir değeri iki ondalık basamağa kadar değiştirmiyor, çünkü kapanan \
@@ -1557,8 +1557,8 @@ affects_en = "which rural links reach the estimator"
 value = 2000.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Tünelin ne kadar uzun olduğu. İki kilometre; getirilen Kızılcahamam \
 dağının içinden bulunan güzergâhla uyumlu."""
 note_en = """How long the bore is. Two kilometres, matching the alignment found \
@@ -1568,25 +1568,29 @@ maliyetini"""
 affects_en = "the tunnel row's served area and cost per route kilometre"
 
 [values."tunnel.anchor_spacing_m"]
-value = 60.0
+value = 40.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. \
-Kanal 5, 1,2 m yükseklik, tam çözünürlük: 40 m'de %99,66 ve km başına \
-196133 TL; 50 m'de %92,04; 55 m'de %91,90; 60 m'de %94,32, HPE P95 2,43 m \
-ve 130755 TL; 65 m'de %89,50; 70 m'de %83,46; 75 m'de %86,87; 90 m'de \
-%70,03. 50-65 m arası bir düzlük, 70 m'den sonra kullanılabilirlik \
-düşüyor. 60 m düzlüğün en ucuz noktası: 40 m'den km başına %33 ucuz, \
-bedeli 5 puan kullanılabilirlik."""
-note_en = """How far apart the brackets stand along the bore. Channel 5, \
-1,2 m high, full resolution: at 40 m 99,66 % and 196133 TL per km; at 50 \
-m 92,04 %; at 55 m 91,90 %; at 60 m 94,32 %, HPE P95 2,43 m and 130755 \
-TL; at 65 m 89,50 %; at 70 m 83,46 %; at 75 m 86,87 %; at 90 m 70,03 %. \
-50 to 65 m is a plateau, and past 70 m availability falls. 60 m is the \
-cheapest point on the plateau: 33 % cheaper per km than 40 m, at a cost of \
-5 points of availability."""
+Tünelde kayıp 50 m'den sonra mesafeyle çok yavaş artıyor, o yüzden bir \
+birim menzilinin sınırına konursa komşularının hepsi sınırın hemen altında \
+kalıyor. 29 Eylül 2026, tünelin ölçülmüş 2,7 dB gölgeleme payıyla, tam \
+çözünürlük: 40 m'de HPE P95 1,08 m, %99,55, km başına 162442 TL; 45 m'de \
+1,13 m ve %91,04, 143331 TL; 50 m'de 1,28 m ve %88,82, 130590 TL; 60 m'de \
+1,93 m ve %84,07, 108294 TL. 60 m, en yakın komşuda payı tam 0,0 dB \
+bırakıyor. 40 m, km başına %50 daha pahalı ama tünelin her yerinde konum \
+veriyor."""
+note_en = """How far apart the brackets stand along the bore. In a tunnel \
+the loss grows very slowly with distance past 50 m, so a unit placed at the \
+edge of its reach leaves every neighbour just below the bar. 29 September \
+2026, with the tunnel's measured 2,7 dB shadow spread, full resolution: at \
+40 m HPE P95 1,08 m, 99,55 %, 162442 TL per km; at 45 m 1,13 m and 91,04 %, \
+143331 TL; at 50 m 1,28 m and 88,82 %, 130590 TL; at 60 m 1,93 m and \
+84,07 %, 108294 TL. 60 m leaves the nearest neighbour exactly 0,0 dB of \
+margin. 40 m costs 50 % more per km but gives a position everywhere in the \
+bore."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \
 başına en büyük sermaye"""
 affects_en = """the tunnel row's anchor count and its capital, which is the largest per \
@@ -1596,8 +1600,8 @@ square kilometre in the table"""
 value = 4.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Askıların eksenden ne kadar uzakta durduğu. Tünel 12 m genişliğinde, \
 yani bu kabaca duvara dayalı demektir."""
 note_en = """How far off the centreline the brackets sit. The bore is 12 m wide, so \
@@ -1699,12 +1703,39 @@ nothing below 50 m. Closer in, the loss is worked out as in the open."""
 affects = "tünelde yakın bağlantıların kaybını"
 affects_en = "the loss of short tunnel links"
 
+[values."tunnel.shadow_sigma_db"]
+value = 2.7
+unit = "dB"
+provenance = "MEASUREMENT"
+source = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, makale 560571, \
+§3.1, Denklem (3)"""
+source_en = """Molina-Garcia-Pardo, Lienard, Degauque, "Propagation in \
+Tunnels: Experimental Investigations and Channel Modeling in a Wide \
+Frequency Band for MIMO Applications", EURASIP JWCN 2009, article 560571, \
+section 3.1, equation (3)"""
+note = """Tünelde bir bağlantının kaybının ortalama modelden ne kadar \
+saptığı. Tünelin ortalama kaybını veren ölçümün kendisi, aynı tünelde \
+ölçülen kaybın modelden farkını 2,7 dB standart sapmayla veriyor. Açık \
+havadaki 4 dB (site.shadow_sigma_db) tünel için fazla: tünel sinyali \
+yönlendiriyor ve yol boyunca engel yok. Tünelin bütün bağlantıları görüş \
+hattında olduğu için kapalı yol payı burada kullanılmıyor."""
+note_en = """How far a tunnel link's loss strays from the mean model. The \
+measurement that gives the tunnel's mean loss gives the difference between \
+measured and modelled loss in the same tunnel a standard deviation of \
+2,7 dB. The open air's 4 dB (site.shadow_sigma_db) is too much for a \
+tunnel: the bore guides the signal and nothing stands along the way. Every \
+tunnel link has line of sight, so the blocked-path spread is not used here."""
+affects = "tünelde her bağlantının kapanıp kapanmadığını, dolayısıyla tünel satırının kullanılabilirliğini"
+affects_en = "whether each tunnel link closes, and so the tunnel row's availability"
+
 [values."tunnel.width_m"]
 value = 12.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Taşıt yolunun ne kadar geniş olduğu. Tünel bir düzlem değildir; \
 dolayısıyla hizmet verdiği alan uzunluğu çarpı budur, başka bir şey değil."""
 note_en = """How wide the carriageway is. A tunnel is not a plane, so its \
@@ -1734,8 +1765,8 @@ affects_en = "this row's per diem line"
 value = 8.0
 unit = "anchors"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Burada sekiz doğru: \
 korunaklı bir tünelde 150 m aralıkta yoklananın neredeyse hepsi cevap \
 verir."""
@@ -1748,8 +1779,8 @@ affects_en = "the tunnel row's update rate, which is the fastest in the table"
 value = 2.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir bağlantının sahip olabileceği ve yine de kullanılabileceği ölçüm \
 hatası. Sıkı, çünkü modül metrenin onda birine kadar ölçer ve burada iki \
 metrelik bir ölçüm bir şeylerin ters gittiği anlamına gelir."""
@@ -1771,8 +1802,8 @@ affects_en = "which tunnel links reach the estimator"
 value = 200.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Bir şehir \
 örtüsünü her bir iki blokta değiştirir: asfalt, kaldırım, bir park, bir \
 otopark. İki yüz metre kabaca budur. İnce katmanlar bunun altıya \
@@ -1789,8 +1820,8 @@ affects_en = """how quickly the reflecting surface changes along a link in the u
 value = 0.7
 unit = "fraction"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik \
 değerin katları cinsinden bir log-normalin genişliği olarak. Ortalamaya \
 değil karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü \
@@ -1815,8 +1846,8 @@ and none"""
 value = 2.0
 unit = "scales"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Zeminin kaç ölçekte değiştiği. İki, örtü ve dokudur; üç, daha ince bir \
 tane ekler. Aynı toplam değişintiyi paylaşırlar, yani üçüncü katman \
 zemini pürüzlendirmez, pürüzü daha ince böler."""
@@ -1830,8 +1861,8 @@ affects_en = "how finely the reflecting surface varies in the urban row"
 value = 1101.0
 unit = "seed"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bu zeminin hangisi olduğu. Ölçüm tohumundan bilerek ayrı: bunu \
 sabitleyip onu değiştirmek, gürültünün tek bir arazide ne yaptığını \
 sorar; tersi ise tek bir yerleşimin birçok arazide ne yaptığını. Tek \
@@ -1847,8 +1878,8 @@ affects_en = "which patches are rough and which are smooth in the urban row"
 value = 600.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Açık \
 arazi tarla sınırlarında değişir (anız, sürülmüş toprak, mera, çalılık); \
 Anadolu platosunda bu birkaç yüz metredir. İnce katmanlar bunun altıya \
@@ -1865,8 +1896,8 @@ affects_en = """how quickly the reflecting surface changes along a link in the r
 value = 0.6
 unit = "fraction"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik \
 değerin katları cinsinden bir log-normalin genişliği olarak. Ortalamaya \
 değil karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü \
@@ -1891,8 +1922,8 @@ and none"""
 value = 2.0
 unit = "scales"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Zeminin kaç ölçekte değiştiği. İki, örtü ve dokudur; üç, daha ince bir \
 tane ekler. Aynı toplam değişintiyi paylaşırlar, yani üçüncü katman \
 zemini pürüzlendirmez, pürüzü daha ince böler."""
@@ -1906,8 +1937,8 @@ affects_en = "how finely the reflecting surface varies in the rural row"
 value = 2202.0
 unit = "seed"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bu zeminin hangisi olduğu. Ölçüm tohumundan bilerek ayrı: bunu \
 sabitleyip onu değiştirmek, gürültünün tek bir arazide ne yaptığını \
 sorar; tersi ise tek bir yerleşimin birçok arazide ne yaptığını. Tek \
@@ -1923,8 +1954,8 @@ affects_en = "which patches are rough and which are smooth in the rural row"
 value = 50.0
 unit = "m"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Zemin başka bir şeye dönüşene kadar kaç metre gidildiği. Tünel bu \
 çalışmadaki en tekdüze yüzeydir ve yine de tekdüze değildir: genleşme \
 derzleri, drenaj kanalları, ıslak kesimler. Elli metre kabaca bunların \
@@ -1944,8 +1975,8 @@ row"""
 value = 0.4
 unit = "fraction"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bir yamanın diğerinden ne kadar pürüzlü ya da düz olduğu; tipik \
 değerin katları cinsinden bir log-normalin genişliği olarak. Ortalamaya \
 değil karesel ortalamaya oturtulmuştur, böylece sahanın ölçülmüş pürüzü \
@@ -1970,8 +2001,8 @@ and none"""
 value = 2.0
 unit = "scales"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Zeminin kaç ölçekte değiştiği. İki, örtü ve dokudur; üç, daha ince bir \
 tane ekler. Aynı toplam değişintiyi paylaşırlar, yani üçüncü katman \
 zemini pürüzlendirmez, pürüzü daha ince böler."""
@@ -1985,8 +2016,8 @@ affects_en = "how finely the reflecting surface varies in the tunnel row"
 value = 3303.0
 unit = "seed"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bu zeminin hangisi olduğu. Ölçüm tohumundan bilerek ayrı: bunu \
 sabitleyip onu değiştirmek, gürültünün tek bir arazide ne yaptığını \
 sorar; tersi ise tek bir yerleşimin birçok arazide ne yaptığını. Tek \
@@ -2004,8 +2035,8 @@ affects_en = "which patches are rough and which are smooth in the tunnel row"
 value = "placed"
 unit = "choice"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Direklerin nereye konduğu: \"placed\", yerleşim aramasının seçtiği ve \
 `src/yerkon/placements/urban.toml`'a yazdığı yerler (mevcut direk ve \
 levhalar, yol kenarı, ölçülmüş çatılar, tepeler); \"grid\", kaydırmalı ızgara. \
@@ -2023,8 +2054,8 @@ affects_en = "the urban row's anchor count, cost and geometry"
 value = "road"
 unit = "choice"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Alıcıların sürdüğü güzergâh: \"road\", tur köşelerini getirilmiş yol ağı \
 üstünde en kısa yollarla birleştiren gerçek sokaklar; \"circuit\", alanın \
 çevresinden ve köşegeninden geçen düz çizgiler."""
@@ -2038,8 +2069,8 @@ affects_en = "the urban row's accuracy and availability"
 value = "kizilay"
 unit = "fetched site"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bu satırın üzerinde durduğu, getirilmiş zemin; \
 `src/yerkon/site/places/` altındaki klasör adıyla. Ankara'nın merkezi, bir \
 kenarı üç kilometre, üzerinde doksan bir metre iniş çıkışla. Boş \
@@ -2062,8 +2093,8 @@ sensitivity_en = """the same rural deployment gives 89,5 % availability on Polat
 value = "placed"
 unit = "choice"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Direklerin nereye konduğu, şehir içindekiyle aynı anlamda; yer \
 `src/yerkon/placements/rural.toml`. Kırsalda arama \"daha iyi\" hedefiyle \
 koşuldu: ızgaranın maliyetiyle en çok kapsama."""
@@ -2077,8 +2108,8 @@ affects_en = "the rural row's anchor count, cost and geometry"
 value = "road"
 unit = "choice"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Alıcıların sürdüğü güzergâh, şehir içindekiyle aynı anlamda."""
 note_en = """The route the units drive, as for the urban row."""
 affects = "kırsal satırın doğruluğunu ve kullanılabilirliğini"
@@ -2088,8 +2119,8 @@ affects_en = "the rural row's accuracy and availability"
 value = "polatli"
 unit = "fetched site"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bu satırın üzerinde durduğu, getirilmiş zemin; \
 `src/yerkon/site/places/` altındaki klasör adıyla. Ankara'nın batısındaki, \
 şehirlerarası yolların geçtiği Polatlı ovası. Bunu `golbasi` yaparsan aynı \
@@ -2115,8 +2146,8 @@ sensitivity_en = """the same rural deployment gives 89,5 % availability on Polat
 value = "kizilcahamam"
 unit = "fetched site"
 provenance = "DESIGN"
-source = "bu proje, bir yerleşim kararı olarak"
-source_en = "this project, as a deployment choice"
+source = "YERKON tasarım tercihi"
+source_en = "YERKON design choice"
 note = """Bu satırın üzerinde durduğu, getirilmiş zemin; \
 `src/yerkon/site/places/` altındaki klasör adıyla. Tünelin içinden geçtiği \
 dağ. Yalnızca iki portal yüksekliği kullanılır, çünkü bir tünel tepenin \

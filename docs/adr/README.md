@@ -104,7 +104,7 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0092](0092-frekans-atlamali-belge-secenegi.md) | Frekans atlamalı belgelendirme bir seçenek olarak | Uygulandı: ADR-0094 |
 | [0093](0093-dogrulanmis-toplu-fiyatlar.md) | 1000 adet fiyatı, doğrulandığı yerde dağıtıcının kademesinden | Yerini aldı: ADR-0105 |
 | [0094](0094-o6-uyarlamali-frekans-atlama-ve-cubuk-anten.md) | Şehir içi ve kırsal O6 ile: uyarlamalı frekans atlama belgesi, 27 dBm modül ve 5 dBi çubuk anten | Geçerli |
-| [0095](0095-tunel-uwb-kanal-5-ve-60-m.md) | Tünelde UWB kanal 5, yoldan 1,2 m yükseklik ve 60 m aralık | Geçerli |
+| [0095](0095-tunel-uwb-kanal-5-ve-60-m.md) | Tünelde UWB kanal 5, yoldan 1,2 m yükseklik ve 60 m aralık | Aralık kısmı 0113 ile değişti |
 | [0096](0096-gercek-yollar-ve-yerlesim-aramasi.md) | Şehir içi ve kırsalda alıcılar gerçek yollarda, direkler yerleşim aramasının yerlerinde | Geçerli |
 | [0097](0097-baglanti-butcesinde-gercek-ayak-izleri.md) | Bağlantı bütçesinde binalar gerçek ayak izleriyle | Geçerli |
 | [0098](0098-izgara-noktalari-sokakta-ve-tur-boyu.md) | Bina içine düşen ızgara noktaları en yakın sokakta; turda 8 ve 12 direk | Kısmen yerini aldı: ADR-0099 |
@@ -122,3 +122,4 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0110](0110-iki-yonlu-olcum-ve-her-birimde-20s.md) | Her ölçüm iki yönde kapanır; her birimde E28-2G4M20S | Geçerli |
 | [0111](0111-yonetmeligin-terimleri.md) | 2,4 GHz kuralı yönetmeliğin terimleriyle: FHSS, LBT, mW; BTK sayfa bağlantıları | Geçerli |
 | [0112](0112-adreslerde-html-yok.md) | Adreslerde .html yok; her dil ve sayfa kendi klasöründe, eski adresler yönlendiriyor | Geçerli |
+| [0113](0113-tunelde-olculmus-golgeleme-ve-40-m.md) | Tünelde ölçülmüş 2,7 dB gölgeleme payı ve 40 m aralık | Geçerli |

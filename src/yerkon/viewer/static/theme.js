@@ -55,6 +55,17 @@
   var chosen = kept();
   if (chosen === "dark" || chosen === "light") root.dataset.theme = chosen;
 
+  /* A link in the text opens in a new tab, so the page it was read on
+     stays where it was. The menu, the buttons and the note numbers stay
+     in this tab. */
+  Array.prototype.forEach.call(document.querySelectorAll("main a[href]"),
+    function (link) {
+      var to = link.getAttribute("href");
+      if (!to || to.charAt(0) === "#" || link.classList.contains("card")) return;
+      link.target = "_blank";
+      link.rel = "noopener";
+    });
+
   /* Any picture in a figure opens to the whole screen. */
   document.addEventListener("click", function (event) {
     var picture = event.target.closest && event.target.closest("figure img");

@@ -84,12 +84,18 @@ nav.pages { display: flex; flex-wrap: wrap; gap: 14px; margin-left: auto; }
 nav.pages a { font-size: 13px; color: var(--quiet); text-decoration: none; }
 nav.pages a:hover { color: var(--ink); }
 nav.pages a.here { color: var(--ink); font-weight: 600; }
-nav.tongues { display: flex; gap: 6px; }
+/* The two languages as one square switch: the one in use is the filled
+   square, the other the empty half of the same box. */
+nav.tongues { display: flex; align-items: center; gap: 6px; }
 nav.tongues a {
-  padding: 2px 7px; border: 1px solid var(--line); border-radius: 4px;
-  background: none; font: inherit; font-size: 11px; color: var(--quiet);
-  text-decoration: none; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 24px; border: 1px solid var(--line);
+  background: var(--shade); font: inherit; font-size: 11px; font-weight: 600;
+  color: var(--quiet); text-decoration: none; cursor: pointer;
 }
+nav.tongues a:first-child { border-radius: 4px 0 0 4px; }
+nav.tongues a + a { margin-left: -6px; border-left: 0; border-radius: 0 4px 4px 0; }
+nav.tongues a:hover { color: var(--ink); }
 /* Light and dark as a two-way switch: the sun and the moon sit in the
    track, the knob covers the one that is not in use. */
 button.theme { position: relative; display: inline-flex;
@@ -102,8 +108,8 @@ button.theme .knob { position: absolute; top: 2px; left: 2px; width: 18px;
   height: 18px; border-radius: 50%; background: var(--paper);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); transition: left 0.18s ease; }
 button.theme[aria-checked="true"] .knob { left: 28px; }
-nav.tongues a.here { background: var(--ink); border-color: var(--ink);
-  color: var(--paper); }
+nav.tongues a.here { background: var(--accent); border-color: var(--accent);
+  color: #fff; }
 button.theme:hover { color: var(--ink); border-color: var(--accent); }
 a.run {
   padding: 7px 14px; border-radius: 4px; background: var(--accent);
@@ -140,7 +146,7 @@ pre { margin: 0; padding: 14px 16px; overflow-x: auto;
 pre code { padding: 0; background: none; }
 .under { margin-top: 10px; color: var(--quiet); font-size: 12px; }
 .warn { color: var(--warn); }
-a { color: var(--accent); }
+a, a:visited { color: var(--accent); }
 
 /* --- figures and tables ------------------------------------------------- */
 
@@ -188,7 +194,7 @@ img { margin-left: auto; margin-right: auto; }
   background: rgba(8, 12, 16, 0.9); cursor: zoom-out; }
 .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain;
   background: var(--plate); border-radius: 8px; }
-figcaption { max-width: 720px; margin: 10px auto 0; color: var(--quiet);
+figcaption { max-width: 672px; margin: 10px auto 0; color: var(--quiet);
   font-size: 12px; text-align: left; }
 
 /* The four rows are ten columns wide and the reading column is 720px,
@@ -257,18 +263,18 @@ button.rowinfo:hover { color: var(--ink); }
   border-radius: 50%; background: var(--shade); color: var(--ink);
   font-size: 16px; line-height: 1; cursor: pointer; }
 
-/* A drawing of the table. Kept at its drawn size and scrolled in a
- * narrow window, the same way the table itself is: scaling the box
- * would scale the type with it and leave the labels unreadable. */
-svg.chart { display: block; margin: 0 auto; }
+/* A drawing of the table. Shrunk to fit between a phone and a wide
+ * window, where it loses at most a sixth of its size and the labels still
+ * read; a phone gets its own narrow drawing instead of a shrunk one. */
+svg.chart { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 /* A chart breaks out of the 672px reading column the way the table
    does, because twelve labelled points need the room. It keeps the
    picture rule's centring and takes its own width. */
 figure.chart { width: min(100vw - 32px, 900px); text-align: left;
   margin: 24px 0 24px 50%; }
-figure.chart figcaption { margin: 8px auto 0; max-width: 860px; }
+figure.chart figcaption { margin: 8px auto 0; max-width: 672px; }
 /* The symbols a drawing uses and what each means. */
-ul.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; max-width: 860px;
+ul.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; max-width: 672px;
   margin: 10px auto 0; padding: 0; list-style: none; text-align: left;
   font-size: 12px; color: var(--dim); }
 ul.legend li { display: flex; align-items: center; gap: 6px; }
@@ -368,3 +374,6 @@ figure.slide figcaption span { font-size: 12px; color: var(--quiet); }
   .slider > button.slide-back { left: -6px; }
   .slider > button.slide-on { right: -6px; }
 }
+
+/* A heading set in the middle, over the strip of pages. */
+h2.centred { text-align: center; }

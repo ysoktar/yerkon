@@ -1326,7 +1326,7 @@ def _template(name: str) -> ViewState:
             clutter_db_per_km=0.0, roughness_m=0.05, tolerance_m=1.0,
             # Single-sided, as the table runs it (ADR-0010). The tab
             # carried double-sided after the table moved (ADR-0084).
-            sweep_m=100.0, journey_s=_journey_s("tunnel"), scheme="single",
+            sweep_m=10.0, journey_s=_journey_s("tunnel"), scheme="single",
             runs=(AnchorRun("T", _radio("tunnel"), "tunnel", 0.0, 2000.0,
                             _grid("tunnel", stagger=False)[0], 4.0),),
             units=_units("tunnel"),

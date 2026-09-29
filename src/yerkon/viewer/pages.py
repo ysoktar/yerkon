@@ -190,11 +190,11 @@ HOME = Page(
             kind="picture",
             picture="road.webp",
             lines=(_w(
-                "Rapordan. Yayın birimleri yol kenarında zaten duran "
+                "Yayın birimleri yol kenarında zaten duran "
                 "noktalara takılıyor. Alıcı hem uyduyu hem yerdeki "
                 "birimleri görüyor ve uydu kesilince yerdekilerle devam "
                 "ediyor.",
-                "From the report. The broadcast units go onto points "
+                "The broadcast units go onto points "
                 "already standing by the road. A receiver sees both the "
                 "satellites and the units on the ground, and carries on "
                 "with the ground ones when the satellites go.",
@@ -473,10 +473,10 @@ SYSTEM = Page(
             kind="picture",
             picture="architecture.webp",
             lines=(_w(
-                "Rapordan. Alıcı mesafeyi karşılıklı mesajlaşarak "
+                "Alıcı mesafeyi karşılıklı mesajlaşarak "
                 "ölçüyor. Merkezi yönetim sistemiyle birimler arasındaki "
                 "hat ise mesafe değil, kimlik ve anahtar taşıyor.",
-                "From the report, with Turkish labels. The receiver "
+                "The labels are in Turkish. The receiver "
                 "measures distance by sending messages back and forth. "
                 "The line between the management system and the units "
                 "carries identity and keys rather than distance.",
@@ -1414,12 +1414,13 @@ SIMULATION = Page(
             kind="picture",
             picture="simulator.webp",
             lines=(_w(
-                "Şehir içi satırı, koşusu bitmiş hâlde: Kızılay'ın "
+                "Şehir içi satırı, simülasyon bitmiş hâlde: Kızılay'ın "
                 "gerçek arazisi, aydınlatma direklerine takılmış yayın "
                 "birimleri ve zemine boyanmış kapsama haritası. Renkler o "
                 "noktada kaç birimin duyulduğunu gösteriyor; konum hesabı "
                 "için en az dört gerekiyor. Sağdaki panel o sekmenin "
-                "kendi koşusu, sekiz gölge çekilişi havuzlanmış.",
+                "kendi sonucu; sekiz farklı gölgeleme dağılımının ortak "
+                "sonucu.",
                 "The urban row with its run finished: the real terrain "
                 "at Kızılay, the broadcast units on lighting columns, and "
                 "the coverage painted onto the ground. The colours show "
@@ -1434,8 +1435,8 @@ SIMULATION = Page(
             heading=_w("Arazi gerçek", "The ground is real"),
             lines=(
                 _w(
-                    "Üç satır da Ankara'nın gerçek arazisi üzerinde "
-                    "koşuldu. Yükseklik verisi Copernicus'un 30 metrelik "
+                    "Üç satırın simülasyonu da Ankara'nın gerçek arazisi "
+                    "üzerinde çalıştırıldı. Yükseklik verisi Copernicus'un 30 metrelik "
                     "haritasından bir kez indirilip paketin içine kondu, "
                     "yani depoyu indiren biri tabloyu internete hiç "
                     "çıkmadan yeniden üretebiliyor.",
@@ -1658,12 +1659,12 @@ SIMULATION = Page(
                 _w(
                     "Aracın hareket sensörü ve tekerlek turu hesaba "
                     "katılmadı. Filtre yalnız telsiz ölçümlerini ve "
-                    "haritadan gelen yüksekliği birleştiriyor. Rapordaki "
-                    "tasarımda ikisi de var; buradaki sayılar bu yüzden "
+                    "haritadan gelen yüksekliği birleştiriyor. Ürünün "
+                    "tasarımında ikisi de var; buradaki sayılar bu yüzden "
                     "gerçek bir araçtan daha kötü.",
                     "The vehicle's motion sensor and wheel turns are left "
                     "out. The filter combines only the radio measurements "
-                    "and the height from the map. The report's design has "
+                    "and the height from the map. The product's design has "
                     "both, so these numbers are worse than a real "
                     "vehicle's.",
                 ),
@@ -1710,7 +1711,7 @@ SIMULATION = Page(
                     "değil, bir yerleşim aramasının seçtiği yerlerde "
                     "durur; simülatördeki **En iyi yerleşimi bul** bölümü "
                     "ve **Hızlı başla** kutusu aynı aramayı haritadan "
-                    "seçilen başka bir yer için koşar. Aday yerler "
+                    "seçilen başka bir yer için çalıştırır. Aday yerler "
                     "var olan "
                     "aydınlatma direkleri ve tabelalar, yol kenarındaki "
                     "direkler (şehirde aydınlatma, kırsalda elektrik "
@@ -1766,10 +1767,10 @@ SIMULATION = Page(
                     "**Simülasyonu çalıştır** düğmesi simülatörü bu "
                     "tarayıcıda açar. Hiçbir sunucu hesap yapmaz: Python, "
                     "numpy ve bu projenin kendi paketi sayfaya iner ve her "
-                    "şey bu bilgisayarda koşar. İlk açılış yaklaşık 20 MB "
+                    "şey bu bilgisayarda çalışır. İlk açılış yaklaşık 20 MB "
                     "indirir ve bir dakika kadar sürebilir; sonra tarayıcı "
                     "saklar. Tarayıcıda tek işlemci kullanıldığı için bir "
-                    "koşu yerel kurulumdakinden yavaştır; **Hızlı deneme** "
+                    "simülasyon kendi bilgisayarına kurulandan yavaştır; **Hızlı deneme** "
                     "bunu kısaltır.",
                     "The **Run the simulation** button opens the simulator "
                     "in this browser. No server computes anything: Python, "
@@ -1781,12 +1782,13 @@ SIMULATION = Page(
                     "a local install; **Quick trial** shortens it.",
                 ),
                 _w(
-                    "Tabloyu yeniden yayımlamak, başka bir şehrin zeminini "
+                    "Tabloyu yeniden üretmek, başka bir şehrin zeminini "
                     "indirmek ya da üç satırı birden tam çözünürlükte "
-                    "koşturmak için yerel kurulum gerekir. Dört komut:",
-                    "Republishing the table, fetching another city's "
-                    "ground, or running all three rows at full resolution "
-                    "needs a local install. Four commands:",
+                    "çalıştırmak için kod ve talimatlar "
+                    "[GitHub'da](https://github.com/ysoktar/yerkon).",
+                    "The code and the instructions for reproducing the "
+                    "table, fetching another city's ground, or running all "
+                    "three rows at full resolution are [on GitHub](https://github.com/ysoktar/yerkon).",
                 ),
             ),
         ),
@@ -1795,14 +1797,14 @@ SIMULATION = Page(
             heading=_w("Hızlı deneme", "The quick trial"),
             lines=(
                 _w(
-                    "Simülatördeki **Hızlı deneme** düğmesi ve komut "
-                    "satırındaki `--fast` iki şeyi kabalaştırır: yoldaki "
+                    "Simülatördeki **Hızlı deneme** düğmesi iki şeyi "
+                    "kabalaştırır: yoldaki "
                     "engellerin rastgele etkisi sekiz yerine bir kez "
                     "denenir ve arazi 10 m'de bir yerine her bağlantıda "
                     "sabit 64 noktada okunur. Hesap on beş dakikadan bir "
                     "dakikaya iner.",
-                    "The **Quick trial** button in the simulator and `--fast` on "
-                    "the command line coarsen the same two figures: the "
+                    "The **Quick trial** button in the simulator coarsens "
+                    "two figures: the "
                     "shadows are drawn once instead of pooled over eight, "
                     "and the ground profile is read at a fixed 64 samples "
                     "instead of every 10 m. A run drops from fifteen "
@@ -1825,19 +1827,6 @@ SIMULATION = Page(
                     "table on the Results page comes from the slow, full "
                     "run only.",
                 ),
-            ),
-        ),
-        Part(
-            kind="code",
-            code=_w(
-                "git clone https://github.com/ysoktar/yerkon\n"
-                "cd yerkon\n"
-                "pip install -e \".[dev]\"\n"
-                "yerkon view",
-                "git clone https://github.com/ysoktar/yerkon\n"
-                "cd yerkon\n"
-                "pip install -e \".[dev]\"\n"
-                "yerkon view",
             ),
         ),
     ),
@@ -1899,48 +1888,23 @@ SOURCES = Page(
             heading=_w("Kaynakça", "Bibliography"),
             lines=(
                 _w(
-                    "Raporun kaynakça bağlantılarının tamamı, raporda "
-                    "yazıldığı hâliyle ve sitenin maliyet ve mevzuat "
-                    "hesapları için eklediği kaynaklar. Bir girdiyi hiçbir "
-                    "dipnot anmıyorsa da listede kalır.",
-                    "Every hyperlink in the report's bibliography, as the "
-                    "report wrote it, and the sources the site added for "
-                    "its cost and regulation figures. An entry no note "
-                    "cites is still listed.",
+                    "Başvurunun kaynakçasındaki bütün bağlantılar ve "
+                    "maliyet ile mevzuat hesapları için eklenen kaynaklar. "
+                    "Hiçbir dipnotun anmadığı kaynaklar da listede.",
+                    "Every link in the application's bibliography, and "
+                    "the sources added for the cost and regulation "
+                    "figures. A source no note cites is still listed.",
                 ),
             ),
         ),
         Part(kind="shows", shows="bibliography"),
         Part(
-            kind="code",
-            heading=_w("Tabloyu yeniden üretmek", "Reproducing the table"),
-            code=_w(
-                "pip install -e \".[dev]\"\n"
-                "yerkon table          # yayımlanan sayılar, ~15 dk\n"
-                "yerkon table --fast   # denemek için, ~1 dk, yayımlanmaz\n"
-                "yerkon view           # bu site ve simülasyon",
-                "pip install -e \".[dev]\"\n"
-                "yerkon table          # the published numbers, ~15 min\n"
-                "yerkon table --fast   # for trying things, ~1 min\n"
-                "yerkon view           # this site and the simulation",
-            ),
-        ),
-        Part(
-            kind="points",
+            kind="text",
             lines=(
-                _w(
-                    "Arazi verisi paketin içinde geliyor, yani tablo "
-                    "internete hiç çıkmadan yeniden üretiliyor. Rastgele "
-                    "sayıların başlangıcı sabit, o yüzden her koşu aynı "
-                    "sonucu veriyor.",
-                    "The terrain data ships inside the package, so the "
-                    "table reproduces with no network at all. The random "
-                    "seed is fixed, so every run gives the same answer.",
-                ),
-                _w("`CONTEXT.md` sözlüktür: her terimin kodda kullanılan "
-                   "adı ve raporda kullanılan karşılığı.",
-                   "`CONTEXT.md` is the glossary: the name the code uses "
-                   "for each term beside the one the report uses."),
+                _w("Sonuçları yeniden üretmek için kod ve talimatlar "
+                   "GitHub'da.",
+                   "The code and the instructions for reproducing the "
+                   "results are on GitHub."),
             ),
         ),
         Part(
@@ -2135,14 +2099,13 @@ COST = Page(
                 _w(
                     "Parça fiyatları satıcıların 25-28 Eylül 2026 liste "
                     "fiyatları; bağlantılar yukarıda. Sipariş öncesinde "
-                    "teklifle doğrulanmalı. Bir fiyat değişirse bom.toml "
-                    "dosyasındaki tek satır değişir, bu sayfa da tablo da "
-                    "onu izler.",
+                    "teklifle doğrulanmalı. Bir fiyat değişirse bu sayfa da "
+                    "tablo da kendiliğinden güncellenir.",
                     "The part prices are the sellers' list prices of 25 "
                     "to 28 September 2026; the links are above. They are "
                     "to be confirmed by quotation before ordering. If a "
-                    "price changes, one line in bom.toml changes and this "
-                    "page and the table follow.",
+                    "price changes, this page and the table follow on "
+                    "their own.",
                 ),
             ),
         ),
@@ -2326,9 +2289,10 @@ LAW = Page(
                  _w("7,4 dBm (5,5 mW)", "7,4 dBm (5,5 mW)")),
                 (_w("Yaya alıcısı", "Pedestrian receiver"),
                  _w("19 / 20 / 21 dBm", "19 / 20 / 21 dBm"),
-                 _w("kart üstü, 3,2 dBi (modelin değeri; EBYTE vermiyor)",
-                    "on-board, 3,2 dBi (the model's figure; EBYTE gives "
-                    "none)"),
+                 _w("kart üstü, 3,2 dBi (hesapta kullanılan değer; üretici "
+                    "kazancı vermiyor)",
+                    "on-board, 3,2 dBi (the figure used in the calculation; "
+                    "the maker gives none)"),
                  _w("166-263 mW, sınırı aşıyor",
                     "166-263 mW, over the limit"),
                  _w("16,8 dBm (48 mW)", "16,8 dBm (48 mW)"),
@@ -2637,7 +2601,8 @@ LAW = Page(
                    "Turkey; only narrow sub-bands such as 917,4-919,4 MHz "
                    "are, under conditions."),
                 _w("863-870 MHz alt bantlarının çoğunda 25 mW e.r.p. ve "
-                   "%0,1 ile %1 görev döngüsü; 869,4-869,65 MHz'de 500 mW ve "
+                   "%0,1 ile %1 görev çevrimi (vericinin açık kaldığı zaman oranı); "
+                   "869,4-869,65 MHz'de 500 mW ve "
                    "%10. Prototipler bu koşullara göre ayarlanmalı.",
                    "Most 863-870 MHz sub-bands allow 25 mW e.r.p. at a "
                    "0,1 to 1 % duty cycle; 869,4-869,65 MHz allows 500 mW "
@@ -2922,12 +2887,6 @@ PAGES = (HOME, WHY, SYSTEM, RESEARCH, VALUE, RESULTS, COST, LAW,
 SIMULATOR = "/calistir"
 SIMULATOR_LABEL = _w("Simülasyonu çalıştır", "Run the simulation")
 
-#: The one line under the wordmark, on every page.
-STANDFIRST = _w(
-    "Karasal konumlandırma yedek katmanı",
-    "A terrestrial positioning backup layer",
-)
-
 BACK_TO_SITE = _w("Siteye dön", "Back to the site")
 
 LANGUAGES = (("tr", "TR"), ("en", "EN"))
@@ -2950,16 +2909,6 @@ COLUMNS = (
     _w("Alan [km²]", "Area [km²]"),
     _w("CAPEX [TL/km²]", "CAPEX [TL/km²]"),
     _w("OPEX [TL/km²/yıl]", "OPEX [TL/km²/yr]"),
-)
-
-RUN_NOTE = _w(
-    "{run_on} tarihinde {source} okunarak koşuldu. Gölgeleme {draws} kez "
-    "çekildi, arazi {spacing} metrede bir okundu. İlk üç sütun rapora "
-    "giren adlardır, o yüzden çevrilmiyor.",
-    "Run on {run_on} against {source}. The shadows were drawn {draws} "
-    "times and the ground profile was read every {spacing} m. The first "
-    "three columns are the names that go into the Turkish report, so they "
-    "are not translated.",
 )
 
 ROW_BASIS = _w("Bu satırın kaynakları ve açıklamaları",
@@ -2988,7 +2937,7 @@ FOOTER = _w(
 WEIGHTING = _w(
     "Simülasyonun doldurduğu üç satır. Her biri, hataların yüzde "
     "95'inin altında kaldığı yatay sapmayı gösteriyor ve her biri "
-    "Ankara'nın gerçek arazisi üzerinde koşuldu.",
+    "Ankara'nın gerçek arazisi üzerinde çalıştırıldı.",
     "The three rows the simulation filled. Each shows the horizontal "
     "error that 95 per cent of the measurements stayed under, and each was "
     "run over real ground near Ankara.",
@@ -3081,8 +3030,7 @@ def _header(page: Page, language: str, where: Where) -> str:
     )
     return (
         "<header>\n"
-        '<a class="brand" href="{home}"><b>YERKON</b> '
-        "<span>{standfirst}</span></a>\n"
+        '<a class="brand" href="{home}"><b>YERKON</b></a>\n'
         '<nav class="pages">{links}</nav>\n'
         '<nav class="tongues">{tongues}'
         '<button class="theme" id="theme" type="button" hidden></button>'
@@ -3091,7 +3039,6 @@ def _header(page: Page, language: str, where: Where) -> str:
         "</header>"
     ).format(
         home=where.page(HOME),
-        standfirst=_said(STANDFIRST, language),
         links="".join(links),
         tongues=tongues,
         simulator=where.simulator(),
@@ -3149,6 +3096,7 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
             for other in PAGES if other.slug
         )
         drawn = '<div class="cards">{}</div>'.format(drawn)
+        heading = heading.replace("<h2>", '<h2 class="centred">', 1)
     elif part.kind == "picture":
         where = where or Where(language=language)
         # The size is given so the page does not jump when the picture
@@ -3661,12 +3609,6 @@ def _published(published, language: str, table=None) -> str:
     # The template is escaped once, by `_said`. What comes out of the
     # record is escaped here, and escaping the result again would put
     # `&amp;#x27;` on the page where an apostrophe belongs.
-    note = _said(RUN_NOTE, language).format(
-        run_on=html.escape(published.run_on),
-        source=html.escape(published.source),
-        draws=published.shadow_draws,
-        spacing=decimal_comma(published.profile_spacing_m, 0),
-    )
     bibliography = sources.read()
 
     def explained(key: str) -> str:
@@ -3697,15 +3639,14 @@ def _published(published, language: str, table=None) -> str:
                                                     explained(key))
                     for key in keys)))
     return (
-        '<div class="wide"><div class="scroll">{table}</div>'
-        '<p class="under">{note}</p></div>'
+        '<div class="wide"><div class="scroll">{table}</div></div>'
         '<div class="rowpanels" hidden>{panels}</div>'
         '<details class="fold notes"><summary><h2>{heading}</h2></summary>'
         '<ol class="notes">{notes}</ol></details>'
     ).format(
         table=_table([head] + body, numeric_from=3, ours_from=ours,
                      last="info"),
-        note=note, notes=listed, panels="".join(panels),
+        notes=listed, panels="".join(panels),
         heading=_said(NOTES_HEADING, language).format(count=len(numbered)),
     )
 
