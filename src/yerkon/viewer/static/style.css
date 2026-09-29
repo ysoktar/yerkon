@@ -19,11 +19,16 @@ html, body { margin: 0; height: 100%; overflow: hidden;
 #panel { position: absolute; top: 0; right: 0; bottom: 0; width: 340px;
   overflow-y: auto; padding: 16px 18px 40px; background: var(--paper);
   border-left: 1px solid var(--line); }
-/* Above the wordmark rather than beside it: it belongs to the site
- * this page sits in, not to the panel's own controls. */
-#back { display: block; margin-bottom: 10px; color: var(--accent);
-  font-size: 12px; text-decoration: none; }
-#back:hover { text-decoration: underline; }
+/* The page's name and the way home, in the pinned top of the panel. */
+#top .masthead { display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px; }
+#top h1 { margin: 0; font-size: 15px; letter-spacing: 0.08em; }
+#top h1 span { letter-spacing: 0; font-weight: 500; color: #61707e; }
+a.home { display: inline-flex; align-items: center; justify-content: center;
+  margin-left: auto; width: 32px; height: 32px; border: 1px solid var(--line);
+  border-radius: 6px; color: var(--ink); background: var(--paper); }
+a.home svg { width: 18px; height: 18px; }
+a.home:hover { border-color: var(--accent); color: var(--accent); }
 h1 { font-size: 18px; letter-spacing: 0.14em; margin: 0; }
 .sub { margin: 2px 0 16px; color: #61707e; font-size: 12px; }
 h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em;
@@ -44,7 +49,8 @@ button.quiet { background: #fff; color: var(--ink); border-color: var(--line); }
    and the button is the only thing on screen that undoes that. */
 button.quiet.on { background: var(--warn); color: #fff; border-color: var(--warn); }
 button:disabled { opacity: 0.5; cursor: progress; }
-dl { display: grid; grid-template-columns: 1fr auto; gap: 3px 10px; margin: 0; }
+dl { display: grid; grid-template-columns: minmax(96px, 42%) minmax(0, 1fr);
+  gap: 3px 10px; margin: 0; }
 dt { color: #61707e; font-size: 12px; }
 dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 dd.warn { color: var(--warn); }
@@ -468,6 +474,10 @@ i.prov.assumption { background: var(--warn); }
 }
 
 #readout h2 { margin-top: 10px; }
+/* However long the answer grows (a parts list per unit), it scrolls in
+   its own box: pinned to the bottom and taller than the panel, its top
+   went under the pinned tabs where no scrolling could reach it. */
+#numbers { max-height: 42vh; overflow-y: auto; overscroll-behavior: contain; }
 
 
 /* ---------- two languages, both on screen ----------
@@ -807,3 +817,9 @@ i.prov.assumption { background: var(--warn); }
   .card select, #presets select { font-size: 14px; }
   #tabs button { padding: 9px 4px; font-size: 13px; }
 }
+
+/* The roads button in the scene's key: pressed, it reads as on. */
+#roads-forward { flex: none; margin: 2px 0 6px; padding: 4px 8px;
+  font-size: 11px; }
+#roads-forward.on { background: var(--accent); color: #fff;
+  border-color: var(--accent); }

@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <base href="../">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>YERKON</title>
+<title>YERKON simülasyonu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
-<link rel="stylesheet" href="style.css?v=9c82aa2287">
+<link rel="stylesheet" href="style.css?v=fbf30ed5b1">
 </head>
 <body>
 
@@ -23,19 +23,20 @@
 -->
 <aside id="panel">
   <!--
-    The way back. The simulator is one page of a site (ADR-0064), and a
-    page somebody arrived at through a link has to say how to leave it.
-  -->
-  <a id="back" href="tr/" data-say="back.site"></a>
-  <h1>YERKON</h1>
-  <p class="sub" id="terrain-note">-</p>
-
-  <!--
-    Which row, what to search for, and which language belong to the whole
-    panel rather than to the step that happens to be open, so they stay
-    pinned while the steps scroll under them.
+    The name of the page and the way home, pinned with the rows and the
+    language so both are in reach on every tab and every step. The
+    simulator is one page of a site (ADR-0064), and a page somebody
+    arrived at through a link has to say how to leave it.
   -->
   <div id="top">
+    <div class="masthead">
+      <h1>YERKON <span data-say="title.sim"></span></h1>
+      <a id="back" href="tr/" class="home" data-say-title="back.site"
+         data-say-label="back.site"><svg viewBox="0 0 24 24"
+         aria-hidden="true" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path
+         d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h5v-5.5h3V20h5V9.5"/></svg></a>
+    </div>
     <nav id="tabs"></nav>
 
     <div class="find">
@@ -50,6 +51,7 @@
     </div>
   </div>
   <p class="hint no-hits" id="find-empty" data-say="find.empty" hidden></p>
+  <p class="sub" id="terrain-note">-</p>
 
   <!--
     The way in for somebody who has never seen this page: a place on a
@@ -152,7 +154,7 @@
       <input type="checkbox" id="show-roads" checked>
       <span data-say="ground.roads"></span></label>
     <label class="tick" id="buildings-tick" data-find="bina yapı blok buildings blocks">
-      <input type="checkbox" id="show-buildings" checked>
+      <input type="checkbox" id="show-buildings">
       <span data-say="ground.buildings"></span></label>
 
     <label class="knob" data-find="tepe yükseklik rölyef relief modellenmiş">
@@ -400,6 +402,13 @@
     <option value="2" data-say="relief.two"></option>
     <option value="5" data-say="relief.five"></option>
   </select>
+  <!--
+    The streets are context, drawn light so the coverage reads over them.
+    This brings them forward for whoever is looking at the roads: thick,
+    bright, and everything under them darkened.
+  -->
+  <button id="roads-forward" class="quiet" type="button" aria-pressed="false"
+          data-say="roads.forward"></button>
   <div id="legend-bands"></div>
   <span><i class="reach"></i><span data-say="legend.reach"></span></span>
   <span><i class="unit"></i><span data-say="legend.unit"></span></span>
@@ -417,7 +426,7 @@
 
 <div id="status"></div>
 
-<script src="local.js?v=9c82aa2287"></script>
-<script type="module" src="app.js?v=9c82aa2287"></script>
+<script src="local.js?v=fbf30ed5b1"></script>
+<script type="module" src="app.js?v=fbf30ed5b1"></script>
 </body>
 </html>

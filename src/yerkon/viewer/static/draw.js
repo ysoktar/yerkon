@@ -844,6 +844,21 @@ function chooseForMoving(items) {
   return null;
 }
 
+/* How much everything but the lines is darkened, 0 to 1: the page turns
+ * it up when the roads are brought forward, so the roads are what reads. */
+export const shade = { dim: 0 };
+
+function dimmed(context, screen) {
+  if (!shade.dim || !screen) return;
+  context.globalAlpha = shade.dim;
+  context.fillStyle = "#0b1016";
+  context.beginPath();
+  context.moveTo(screen[0][0], screen[0][1]);
+  for (const point of screen.slice(1)) context.lineTo(point[0], point[1]);
+  context.closePath();
+  context.fill();
+}
+
 export function paint(context, width, height, items) {
   context.clearRect(0, 0, width, height);
   items.sort((a, b) => b.depth - a.depth);
@@ -855,6 +870,11 @@ export function paint(context, width, height, items) {
     context.globalAlpha = 1;
     for (const piece of coarse.triangles) triangle(context, piece.image, piece.corners);
     texturing.drawn += coarse.triangles.length;
+    if (shade.dim) {
+      context.globalAlpha = shade.dim;
+      context.fillStyle = "#0b1016";
+      context.fillRect(0, 0, width, height);
+    }
   }
   for (const item of items) {
     if (coarse && item.ground && coarse.covered.has(
@@ -891,7 +911,10 @@ export function paint(context, width, height, items) {
     }
     if (item.kind === "face" && item.texture && texturing.on) {
       context.globalAlpha = 1;
-      if (textured(context, item)) continue;
+      if (textured(context, item)) {
+        dimmed(context, item.screen);
+        continue;
+      }
     }
     if (item.kind === "face") {
       context.globalAlpha = item.alpha;
@@ -903,6 +926,7 @@ export function paint(context, width, height, items) {
       }
       context.closePath();
       context.fill();
+      dimmed(context, item.screen);
     } else if (item.kind === "line") {
       context.globalAlpha = 1;
       context.strokeStyle = item.colour;

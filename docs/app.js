@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=9c82aa2287";
+import { decimal, say, speak, speaks } from "./words.js?v=fbf30ed5b1";
 
 /* The choices whose names are this page's to give.
  *
@@ -99,6 +99,10 @@ async function ask(path, body) {
  * shown as waiting for it rather than as running side by side.
  */
 const ACTIVITY_AFTER_MS = 400;
+
+/* The most receivers per km² with every anchor busy is worked out on
+ * every draw and not shown. */
+const SHOW_BUSY = false;
 const activity = new Map();
 let activityNext = 1;
 let activityTimer = null;
@@ -522,6 +526,16 @@ function drawWords() {
   for (const element of document.querySelectorAll("[data-say-title]")) {
     element.title = say(element.dataset.sayTitle);
   }
+  for (const element of document.querySelectorAll("[data-say-label]")) {
+    element.setAttribute("aria-label", say(element.dataset.sayLabel));
+  }
+  // Home is the front page in the language the page now speaks, where
+  // the site has one per language (the published folder, not `yerkon
+  // view`, whose home is "/").
+  const home = document.getElementById("back");
+  if (home && /^(tr|en)\/$/.test(home.getAttribute("href") || "")) {
+    home.setAttribute("href", speaks() === "en" ? "en/" : "tr/");
+  }
   for (const element of document.querySelectorAll("[data-say-placeholder]")) {
     element.placeholder = say(element.dataset.sayPlaceholder);
   }
@@ -548,7 +562,7 @@ function drawWords() {
       ["Q/E", say("scene.turns")],
       ["R/F", say("scene.tilts")],
       ["G", say("scene.frames")],
-    ].map(([key, what]) => `<b>${key}</b> ${what}`).join(" · ");
+    ].map(([key, what]) => `<b>${key}</b>: ${what}`).join(" · ");
   }
 }
 
@@ -581,12 +595,11 @@ async function switchTo(code) {
     state = moved;
     drawWords();
     drawLanguages();
-    await refreshScene();
+    await refreshWords();
     fillControls();
     await loadFigures();
     await loadOptions();
     wireTasks();
-    scheduleSweep();
   } catch (error) { flash(error.message, true); }
 }
 
@@ -1631,6 +1644,19 @@ function wireControls() {
     render();
   };
 
+  const forward = document.getElementById("roads-forward");
+  if (forward) forward.onclick = () => {
+    roadsForward = !roadsForward;
+    forward.setAttribute("aria-pressed", roadsForward ? "true" : "false");
+    forward.classList.toggle("on", roadsForward);
+    if (roadsForward && !showRoads) {
+      showRoads = true;
+      const box = document.getElementById("show-roads");
+      if (box) box.checked = true;
+    }
+    render();
+  };
+
   const relief = document.getElementById("relief-pick");
   if (relief) {
     relief.value = String(draw.VERTICAL);
@@ -1673,8 +1699,8 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=9c82aa2287";
-import * as pick from "./map.js?v=9c82aa2287";
+import * as draw from "./draw.js?v=fbf30ed5b1";
+import * as pick from "./map.js?v=fbf30ed5b1";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1719,8 +1745,18 @@ let photographUrl = "";
 let showPhotograph = true;
 /* Whether the fetched streets are drawn beside the route. */
 let showRoads = true;
+
+/* Whether the streets are brought forward: drawn thick and bright over a
+ * darkened ground. */
+let roadsForward = false;
+
+/* How the streets are drawn, at rest and brought forward. */
+const ROADS = {
+  rest: { colour: "rgba(238,242,246,0.9)", width: 1.6, dim: 0 },
+  forward: { colour: "#ffd84a", width: 2.2, dim: 0.5 },
+};
 /* Whether the fetched buildings stand on the ground. */
-let showBuildings = true;
+let showBuildings = false;
 /* The buildings of the site on screen, asked for once per site. */
 let blockSet = { site: "", blocks: [] };
 
@@ -2239,18 +2275,21 @@ function paintScene() {
     ? draw.groundPatches(view, drawnTerrain(), drawnPhotograph())
     : null;
 
+  const roadStyle = roadsForward && showRoads ? ROADS.forward : ROADS.rest;
+  draw.shade.dim = roadStyle.dim;
   const items = [
     ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
     ...(showBuildings ? draw.blocks(
       view, blocksOnDrawnGround(), light, drawnPhotograph(), bias) : []),
     ...(shownLayer === "ground" ? []
       : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer)),
-    // The streets under the route, thin and pale: context, not a result.
+    // The streets under the route, light: context, not a result, unless
+    // they have been brought forward.
     ...(showRoads ? onDrawnGround(latest.terrain.roads || []).flatMap(
       street => draw.polyline(
         view,
         street.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 4]),
-        "#9aa4ae", 1, bias,
+        roadStyle.colour, roadStyle.width, bias,
       )) : []),
     ...draw.masts(view, latest.anchors, colourOf),
     ...onDrawnGround([latest.road.map(p => [p.x, p.y, p.z])]).flatMap(
@@ -2767,9 +2806,14 @@ function showNumbers(drawn, result, pending) {
   const extent = corridor
     ? (drawn.state ? drawn.state.corridor_m / 1000 : null)
     : (sweepData ? sweepData.served_km2 : null);
-  rows.push([say(corridor ? "result.capacity.busy_km" : "result.capacity.busy_km2"),
-             oneChannel && extent ? tr(anchorCount * oneChannel / extent, 1)
-               : (oneChannel && !corridor && !sweepData ? WORKING : NOTHING)]);
+  // Worked out and kept, not shown: a ceiling per km² reads as a promise
+  // about traffic the model does not make. SHOW_BUSY puts it back.
+  const busy = oneChannel && extent ? tr(anchorCount * oneChannel / extent, 1)
+    : (oneChannel && !corridor && !sweepData ? WORKING : NOTHING);
+  if (SHOW_BUSY) {
+    rows.push([say(corridor ? "result.capacity.busy_km"
+                            : "result.capacity.busy_km2"), busy]);
+  }
 
   // Both rows are always here, because a row that comes and goes moves
   // everything under it and reads as a change in the answer.
@@ -3292,10 +3336,10 @@ function wireTasks() {
 /* ---------- what the ground overlay reads ---------- */
 
 /* Which of the sweep's four readings is painted. */
-let shownLayer = "anchors";
+let shownLayer = "ground";
 
 /* "ground" draws no cells, so the photograph and the streets show. */
-const LAYERS = ["anchors", "margin_db", "dilution", "error_m", "ground"];
+const LAYERS = ["ground", "anchors", "margin_db", "dilution", "error_m"];
 
 /* How each band's range is written, in the layer's own units. */
 const BAND_UNITS = {
@@ -3964,20 +4008,9 @@ function drawSetups(setups) {
   };
 }
 
-async function refreshScene() {
-  // Only if it actually takes a moment: most scenes are milliseconds,
-  // and a panel that blinks on every drag is harder to read than one
-  // that does not. A search over a real town is nine seconds, and for
-  // all nine the panel used to show the arrangement before the edit.
-  const slow = setTimeout(() => {
-    if (latest) showNumbers(latest, simulated, true);
-    flash(say("busy.working"));
-  }, PATIENCE_MS);
-  try {
-    latest = await ask("/api/scene");
-  } finally {
-    clearTimeout(slow);
-  }
+/* What the scene says besides its geometry: the lists the panel draws
+ * from, each named in the session's language. */
+function takeLists() {
   state = latest.state;
   drawSetups(latest.setups || []);
   // The server finds what ground has been fetched; the page never keeps
@@ -3998,6 +4031,46 @@ async function refreshScene() {
     LANGUAGES = latest.choices.languages || [];
     for (const [name, label] of TABS) MODE_LABEL[name] = label;
   }
+}
+
+/* The same arrangement said in another language.
+ *
+ * Only the words change, so only the words are taken: the ground, its
+ * photograph and buildings, the finer mesh, the camera, the last
+ * simulation and the swept coverage all stay as they are. Going through
+ * `refreshScene` threw every one of those away and swept the ground
+ * again, seconds of work for a change of vocabulary.
+ */
+async function refreshWords() {
+  latest = await ask("/api/scene");
+  takeLists();
+  drawTabs();
+  drawPresets();
+  drawLanguages();
+  drawSites();
+  document.getElementById("terrain-note").textContent = say("terrain.note", {
+    ground: latest.terrain.description, anchors: latest.anchors.length,
+  });
+  drawLegend();
+  render();
+  showNumbers(latest, simulated);
+}
+
+async function refreshScene() {
+  // Only if it actually takes a moment: most scenes are milliseconds,
+  // and a panel that blinks on every drag is harder to read than one
+  // that does not. A search over a real town is nine seconds, and for
+  // all nine the panel used to show the arrangement before the edit.
+  const slow = setTimeout(() => {
+    if (latest) showNumbers(latest, simulated, true);
+    flash(say("busy.working"));
+  }, PATIENCE_MS);
+  try {
+    latest = await ask("/api/scene");
+  } finally {
+    clearTimeout(slow);
+  }
+  takeLists();
   // The session's language, not the markup's. Reloading a page that was
   // switched to English used to come back with English figures under
   // Turkish headings, because the page took its language from the `lang`

@@ -97,8 +97,10 @@ def test_the_way_back_from_the_simulator_is_in_both_languages():
     assert '"back.site"' in words
     line = words[words.index('"back.site"'):][:120]
     assert "tr:" in line and "en:" in line
-    assert 'data-say="back.site"' in (
-        STATIC / "simulator.html").read_text(encoding="utf-8")
+    page = (STATIC / "simulator.html").read_text(encoding="utf-8")
+    # An icon, so its name is its title and what a screen reader says.
+    assert 'data-say-title="back.site"' in page
+    assert 'data-say-label="back.site"' in page
 
 
 def test_a_page_is_drawn_in_the_language_it_was_asked_for():
