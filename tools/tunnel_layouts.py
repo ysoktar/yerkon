@@ -8,6 +8,7 @@ along the bore. Run from the repository root:
 
     python tools/tunnel_layouts.py            # every layout
     python tools/tunnel_layouts.py --fast     # quicker, not publishable
+    python tools/tunnel_layouts.py --only single-40-wall   # one layout
 """
 
 from __future__ import annotations
@@ -43,6 +44,12 @@ LAYOUTS = (
      "both walls at the same point, every 80 m"),
     ("paired-60", "paired", 60.0, 4.0, 1.2,
      "both walls at the same point, every 60 m"),
+    ("paired-80-wall", "paired", 80.0, 5.5, 1.2,
+     "both walls at the same point, every 80 m, on the wall itself"),
+    ("paired-60-wall", "paired", 60.0, 5.5, 1.2,
+     "both walls at the same point, every 60 m, on the wall itself"),
+    ("single-40-wall", "single", 40.0, 5.5, 1.2,
+     "one wall only, 40 m, on the wall itself"),
     ("centre-40", "staggered", 40.0, 0.0, 1.2,
      "on the centre line, 40 m"),
     ("roof-40", "staggered", 40.0, 0.0, 5.0,
@@ -58,8 +65,12 @@ def laid(pattern: str):
               radio=scenarios.SX1280, prefix="N"):
         out = []
         for station, x in enumerate(np.arange(0.0, length_m + 1.0, spacing_m)):
-            sides = ((offset_m, -offset_m) if pattern == "paired"
-                     else ((offset_m if station % 2 == 0 else -offset_m),))
+            if pattern == "paired":
+                sides = (offset_m, -offset_m)
+            elif pattern == "single":
+                sides = (offset_m,)
+            else:
+                sides = ((offset_m if station % 2 == 0 else -offset_m),)
             for side in sides:
                 out.append(Anchor("{}{}".format(prefix, len(out)),
                                   (float(x), side), mounting, terrain,
@@ -87,12 +98,16 @@ def settings_file(spacing: float, offset: float, height: float) -> pathlib.Path:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--fast", action="store_true")
+    parser.add_argument("--only", action="append", default=[],
+                        help="run only this layout; may be repeated")
     args = parser.parse_args()
     original = scenarios._anchors_along
     print("| Yerleşim | Birim | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] "
           "| Kullanılabilirlik | CAPEX [TL/km] | OPEX [TL/km/yıl] |")
     print("|---|---|---|---|---|---|---|---|")
     for name, pattern, spacing, offset, height, said in LAYOUTS:
+        if args.only and name not in args.only:
+            continue
         scenarios._anchors_along = laid(pattern)
         path = settings_file(spacing, offset, height)
         argv = ["table", "--only", "tunnel", "--no-notes", "--defaults",
