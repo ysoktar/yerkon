@@ -112,6 +112,29 @@
     shut.focus();
   });
 
+  /* A strip of slides gets its arrows: each moves it by what is in
+     view, and an arrow with nowhere to go is greyed out. */
+  Array.prototype.forEach.call(document.querySelectorAll(".slider"),
+    function (slider) {
+      var strip = slider.querySelector(".slides");
+      var back = slider.querySelector(".slide-back");
+      var on = slider.querySelector(".slide-on");
+      function mark() {
+        back.disabled = strip.scrollLeft <= 2;
+        on.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
+      }
+      back.hidden = on.hidden = false;
+      back.addEventListener("click", function () {
+        strip.scrollBy({ left: -strip.clientWidth, behavior: "smooth" });
+      });
+      on.addEventListener("click", function () {
+        strip.scrollBy({ left: strip.clientWidth, behavior: "smooth" });
+      });
+      strip.addEventListener("scroll", mark, { passive: true });
+      window.addEventListener("resize", mark);
+      mark();
+    });
+
   /* A note number in the table opens the folded notes before the page
      moves to the note. */
   function unfold(name) {

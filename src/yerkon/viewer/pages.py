@@ -86,6 +86,9 @@ class Part:
     folded: bool = False
     #: A section inside the one before it, so its heading is a level down.
     sub: bool = False
+    #: Parts shown one card each in a strip that slides: (key in
+    #: bom.toml, photo file under photos/ or "" while there is none).
+    slides: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -437,6 +440,21 @@ WHY = Page(
         ),
     ),
 )
+
+#: The final product's main parts, in the order a unit is built up:
+#: radios, what drives them, the antenna, power, and the boxes. Names and
+#: roles come from bom.toml, so they never differ from the cost page.
+FINAL_PARTS = (
+    ("e28-2g4m20s", ""), ("dwm3000-lcsc", ""), ("stm32g031k8t6", ""),
+    ("stm32g0b1met6", ""), ("atecc608b", ""), ("esp32-s3", ""),
+    ("bno085", ""), ("gw-22-5151", ""), ("hlk-5m12", ""),
+    ("lipo-1000", ""), ("ili9341-2.8", ""), ("gainta-g203", ""),
+    ("gainta-g212", ""), ("gainta-g517", ""),
+)
+
+#: The parts already in hand for the pilot. Empty until the list is in;
+#: a strip with nothing in it is not drawn.
+PILOT_PARTS: tuple = ()
 
 SYSTEM = Page(
     slug="sistem",
@@ -802,6 +820,14 @@ SYSTEM = Page(
                     "nothing switched over.",
                 ),
             ),
+        ),
+        Part(
+            kind="slides", slides=FINAL_PARTS,
+            heading=_w("Son ürünün parçaları", "The final product's parts"),
+        ),
+        Part(
+            kind="slides", slides=PILOT_PARTS,
+            heading=_w("Pilot denemenin parçaları", "The pilot's parts"),
         ),
     ),
 )
@@ -3150,6 +3176,10 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
             )
             for group in sources.read().groups
         )
+    elif part.kind == "slides":
+        if not part.slides:
+            return ""
+        drawn = _slides(part.slides, language, where)
     elif part.kind == "shows" and part.shows == "headline":
         drawn = _headline(published, language)
     elif part.kind == "shows" and part.shows == "published":
@@ -3186,6 +3216,48 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         return '<section><details class="fold"><summary>{}</summary>{}' \
             "</details></section>".format(heading, drawn)
     return "<section>{}{}</section>".format(heading, drawn)
+
+
+#: The arrows either side of a strip of slides.
+SLIDE_BACK = _w("Önceki", "Previous")
+SLIDE_ON = _w("Sonraki", "Next")
+#: What stands in a card before its photo: a plain drawing of a part.
+NO_PHOTO = (
+    '<svg viewBox="0 0 48 48" aria-hidden="true" fill="none" '
+    'stroke="currentColor" stroke-width="2"><rect x="12" y="12" width="24" '
+    'height="24" rx="3"/><path d="M18 12V6M24 12V6M30 12V6M18 42v-6M24 '
+    '42v-6M30 42v-6M12 18H6M12 24H6M12 30H6M42 18h-6M42 24h-6M42 30h-6"/>'
+    '</svg>'
+)
+
+
+def _slides(slides, language: str, where: Optional["Where"]) -> str:
+    """Parts one card each, with the photo when there is one, in a strip
+    that slides; the arrows are shown by the script, and without it the
+    strip still scrolls."""
+    from yerkon.bom import read
+
+    parts = read().parts
+    cards = []
+    for key, photo in slides:
+        part = parts[key]
+        if photo:
+            src = where.asset("photos/" + photo) if where else "photos/" + photo
+            shown = '<img src="{}" alt="{}" loading="lazy">'.format(
+                html.escape(src, quote=True), html.escape(part.name, quote=True))
+        else:
+            shown = '<span class="nophoto">{}</span>'.format(NO_PHOTO)
+        cards.append(
+            '<figure class="slide"><div class="photo">{}</div><figcaption>'
+            "<b>{}</b><span>{}</span></figcaption></figure>".format(
+                shown, html.escape(part.name), html.escape(part.role(language))))
+    return (
+        '<div class="slider"><button class="slide-back" type="button" '
+        'hidden aria-label="{back}">‹</button><div class="slides">{cards}'
+        '</div><button class="slide-on" type="button" hidden '
+        'aria-label="{on}">›</button></div>'
+    ).format(back=_said(SLIDE_BACK, language), on=_said(SLIDE_ON, language),
+             cards="".join(cards))
 
 
 def _headline(published, language: str) -> str:
@@ -3837,6 +3909,10 @@ def write_pages(into, published=None) -> tuple:
                 render(page, code, published, where).encode("utf-8"))
     for name in CARRIED:
         put(name, (STATIC / name).read_bytes())
+    # The parts' photos, whatever is in the folder (Part.slides).
+    for photo in sorted((STATIC / "photos").iterdir()):
+        if photo.suffix.lower() in (".webp", ".jpg", ".jpeg", ".png"):
+            put("photos/" + photo.name, photo.read_bytes())
     # The simulator itself, running in the visitor's browser (ADR-0080).
     for name, body in browser_simulator().items():
         put(name, body)

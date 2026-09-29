@@ -299,7 +299,9 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
 }
 
 @media (max-width: 760px) {
-  header { padding: 10px 16px; }
+  header { position: static; padding: 10px 16px; }
+  nav.pages { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+  nav.pages a { flex: none; }
   nav.pages { margin-left: 0; order: 4; width: 100%; }
   main { padding: 28px 16px 0; }
   h1 { font-size: 24px; }
@@ -333,3 +335,36 @@ h3.sub { margin-top: 26px; font-size: 16px; text-transform: none;
   letter-spacing: 0; color: var(--dim); font-weight: 650; }
 h3.sub + ul, h3.sub + p { font-size: inherit; }
 h3.sub + ul li { margin-bottom: 9px; overflow-wrap: normal; }
+
+/* Parts, one card each, in a strip that slides: three in view on a wide
+   window, two on a phone. The arrows appear with the script. */
+.slider { position: relative; }
+.slides { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
+  scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+figure.slide { flex: 0 0 calc((100% - 24px) / 3); width: auto; margin: 0;
+  transform: none;
+  scroll-snap-align: start; border: 1px solid var(--line); border-radius: 6px;
+  overflow: hidden; background: var(--paper); }
+figure.slide .photo { display: flex; align-items: center;
+  justify-content: center; aspect-ratio: 4 / 3; background: var(--shade); }
+figure.slide .photo img { width: 100%; height: 100%; object-fit: cover;
+  border-radius: 0; }
+figure.slide .nophoto svg { width: 44px; height: 44px; color: var(--line); }
+figure.slide figcaption { margin: 0; padding: 10px 12px 12px; max-width: none;
+  text-align: left; }
+figure.slide figcaption b { display: block; margin-bottom: 3px;
+  font-size: 13px; color: var(--ink); }
+figure.slide figcaption span { font-size: 12px; color: var(--quiet); }
+.slider > button { position: absolute; top: calc(50% - 36px); z-index: 2;
+  width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%;
+  background: var(--paper); color: var(--ink); font-size: 20px; line-height: 1;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+.slider > button.slide-back { left: -14px; }
+.slider > button.slide-on { right: -14px; }
+.slider > button:hover { border-color: var(--accent); }
+.slider > button:disabled { opacity: 0; pointer-events: none; }
+@media (max-width: 760px) {
+  figure.slide { flex-basis: calc((100% - 12px) / 2); width: auto; }
+  .slider > button.slide-back { left: -6px; }
+  .slider > button.slide-on { right: -6px; }
+}

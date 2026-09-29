@@ -1147,3 +1147,15 @@ def test_every_sourced_figure_on_the_cost_page_links_its_source():
                 assert key in LINKS, key
     page = render(page_at("maliyet"), "tr", read())
     assert known["dicle-surici"].url in html.unescape(page)
+
+
+def test_the_system_page_shows_the_final_parts_and_hides_an_empty_strip():
+    """A strip of slides with nothing in it is left off the page."""
+    from yerkon.bom import read as read_bill
+    from yerkon.viewer.pages import FINAL_PARTS, PILOT_PARTS
+
+    drawn = render(page_at("/sistem"), "tr", a_record())
+    parts = read_bill().parts
+    for key, _ in FINAL_PARTS:
+        assert html.escape(parts[key].name) in drawn, key
+    assert ("Pilot denemenin parçaları" in drawn) == bool(PILOT_PARTS)
