@@ -2146,9 +2146,9 @@ COST = Page(
 
 #: The BTK's criteria for licence-exempt radio equipment; a page is linked
 #: with #page=N.
-BTK_EXEMPT = ("https://www.btk.gov.tr/uploads/pages/"
-              "frekans-tahsisinden-muaf-telsiz-cihaz-sistemleri-olcutler-"
-              "633d4ca68c0b1.pdf")
+BTK_EXEMPT = ("https://www.btk.gov.tr/s3/web-btk-site/"
+              "7708c26c-5161-4919-8b3d-daa31d4ac8fb/2026/07/"
+              "b02b513d-09b2-4035-bc04-64f59d02f707.pdf")
 EN_300_328 = ("https://www.etsi.org/deliver/etsi_en/300300_300399/300328/"
               "02.02.02_60/en_300328v020202p.pdf")
 
@@ -2176,7 +2176,10 @@ LAW = Page(
                    "genişband veri iletim sistemi olarak çalışıyor: [BTK, "
                    "Frekans Tahsisinden Muaf Telsiz Cihaz ve Sistemlerine "
                    "İlişkin Teknik Ölçütler, Madde 5, Tablo 3, satır 3]("
-                   + BTK_EXEMPT + "#page=11). En çok 100 mW e.i.r.p. "
+                   + BTK_EXEMPT + "#page=11) (Kurul Kararı 23.09.2022, "
+                   "2022/İK-SYD/245; [BTK'nın sayfası]"
+                   "(https://www.btk.gov.tr/frekans-tahsisinden-muaf-telsiz-"
+                   "cihaz-ve-sistemleri)). En çok 100 mW e.i.r.p. "
                    "(20 dBm); yeterli spektrum paylaşım mekanizması "
                    "gerekli (örneğin LBT, DAA); referans standart "
                    "[TS EN 300 328](" + EN_300_328 + "). Frekans Atlamalı "
@@ -2187,7 +2190,10 @@ LAW = Page(
                    "2400-2483,5 MHz band as a wideband data transmission "
                    "system: [BTK, Technical Criteria for Radio Equipment "
                    "and Systems Exempt from Frequency Assignment, Article "
-                   "5, Table 3, row 3](" + BTK_EXEMPT + "#page=11). At most "
+                   "5, Table 3, row 3](" + BTK_EXEMPT + "#page=11) (Board "
+                   "decision 23.09.2022, 2022/İK-SYD/245; [the BTK's page]"
+                   "(https://www.btk.gov.tr/frekans-tahsisinden-muaf-telsiz-"
+                   "cihaz-ve-sistemleri)). At most "
                    "100 mW e.i.r.p. (20 dBm); an adequate spectrum sharing "
                    "mechanism is required (for example LBT, DAA); the "
                    "reference standard is [TS EN 300 328](" + EN_300_328
@@ -2275,6 +2281,91 @@ LAW = Page(
                        "its own transmission too, which adds under 0,1 ms. "
                        "It must be certified by a test laboratory."),
                 ),
+            ),
+        ),
+        Part(
+            kind="table",
+            heading=_w("Birim birim yasal güç, 2,4 GHz",
+                       "Legal power unit by unit, 2,4 GHz"),
+            rows=(
+                (_w("Birim", "Unit"),
+                 _w("E28-2G4M20S çıkışı, en az / tipik / en çok",
+                    "E28-2G4M20S output, min / typ / max"),
+                 _w("Anten, net kazanç", "Antenna, net gain"),
+                 _w("Tam güçte e.i.r.p.", "E.i.r.p. at full power"),
+                 _w("FHSS ve LBT ile en yüksek ayar",
+                    "Highest setting with FHSS and LBT"),
+                 _w("FHSS olmadan en yüksek ayar",
+                    "Highest setting without FHSS")),
+                (_w("Yayın birimi, şehir içi ve kırsal",
+                    "Broadcast unit, town and open country"),
+                 _w("19 / 20 / 21 dBm", "19 / 20 / 21 dBm"),
+                 _w("Taoglas GW.22.5151, 4,7 dBi",
+                    "Taoglas GW.22.5151, 4,7 dBi"),
+                 _w("234-372 mW, sınırı aşıyor",
+                    "234-372 mW, over the limit"),
+                 _w("15,3 dBm (34 mW)", "15,3 dBm (34 mW)"),
+                 _w("7,4 dBm (5,5 mW)", "7,4 dBm (5,5 mW)")),
+                (_w("Kara aracı alıcısı", "Vehicle receiver"),
+                 _w("19 / 20 / 21 dBm", "19 / 20 / 21 dBm"),
+                 _w("Taoglas GW.22.5151, 4,7 dBi",
+                    "Taoglas GW.22.5151, 4,7 dBi"),
+                 _w("234-372 mW, sınırı aşıyor",
+                    "234-372 mW, over the limit"),
+                 _w("15,3 dBm (34 mW)", "15,3 dBm (34 mW)"),
+                 _w("7,4 dBm (5,5 mW)", "7,4 dBm (5,5 mW)")),
+                (_w("Yaya alıcısı", "Pedestrian receiver"),
+                 _w("19 / 20 / 21 dBm", "19 / 20 / 21 dBm"),
+                 _w("kart üstü, 3,2 dBi (modelin değeri; EBYTE vermiyor)",
+                    "on-board, 3,2 dBi (the model's figure; EBYTE gives "
+                    "none)"),
+                 _w("166-263 mW, sınırı aşıyor",
+                    "166-263 mW, over the limit"),
+                 _w("16,8 dBm (48 mW)", "16,8 dBm (48 mW)"),
+                 _w("8,9 dBm (7,8 mW)", "8,9 dBm (7,8 mW)")),
+            ),
+        ),
+        Part(
+            kind="text",
+            lines=(
+                _w("Modülün gücü [EBYTE'nin E28-2G4M20S veri sayfasından]("
+                   "https://www.ebyte.com/downpdf/304.html): 100 mW, en az "
+                   "19, tipik 20, en çok 21 dBm; bu antene giden güç. "
+                   "Sınır antenden çıkan güç için: FHSS ve LBT ile 100 mW "
+                   "e.i.r.p. (20 dBm), FHSS olmadan 1,625 MHz'lik sinyalde "
+                   "16,25 mW (12,1 dBm). En yüksek ayar, modülün en çok "
+                   "çıkışıyla bile sınırın aşılmadığı iletilen güç: sınır "
+                   "eksi antenin net kazancı. Tipik çıkış bundan 1 dB "
+                   "aşağıda kalır. Anten takmak serbest, ama TS EN 300 328 "
+                   "cihazın o antenle test edilmesini ve yazılımın izin "
+                   "verdiği hiçbir güç ayarının sınırı aşmamasını istiyor "
+                   "(4.2.4 ve 4.3.1.2). Model her birimin gücünü antenin "
+                   "en güçlü yönünde sınıra kısıyor; sonuçlar bu güçle.",
+                   "The module's power is from [EBYTE's E28-2G4M20S "
+                   "datasheet](https://www.ebyte.com/downpdf/304.html): "
+                   "100 mW, at least 19, typically 20, at most 21 dBm; that "
+                   "is the power fed to the antenna. The limit is on the "
+                   "power leaving the antenna: 100 mW e.i.r.p. (20 dBm) "
+                   "with FHSS and LBT, 16,25 mW (12,1 dBm) without FHSS on "
+                   "a 1,625 MHz signal. The highest setting is the "
+                   "conducted power at which even the module's highest "
+                   "output stays within the limit: the limit less the "
+                   "antenna's net gain. The typical output stays 1 dB "
+                   "below it. An antenna may be fitted, but TS EN 300 328 "
+                   "has the equipment tested with that antenna and no "
+                   "power setting the software allows may exceed the limit "
+                   "(4.2.4 and 4.3.1.2). The model holds every unit to the "
+                   "limit in its antenna's strongest direction; the "
+                   "results use that power."),
+                _w("UWB birimleri (DWM3000) kendi antenleriyle -41,3 "
+                   "dBm/MHz'te; tünel ve yaya birimi aşağıdaki tabloya "
+                   "olduğu gibi uyuyor, araç alıcısı gücünü denetlemek "
+                   "(TPC) ve yukarıya harici sınırı uygulamak zorunda.",
+                   "The UWB units (DWM3000) run at -41,3 dBm/MHz on their "
+                   "own antennas; the tunnel and pedestrian units fit the "
+                   "table below as they are, the vehicle receiver has to "
+                   "control its power (TPC) and keep to the exterior limit "
+                   "upward."),
             ),
         ),
         Part(
@@ -2416,6 +2507,20 @@ LAW = Page(
                    "There is no limit on receiving: a stronger antenna "
                    "hears a weak signal better. Every range goes both ways, "
                    "so the gain is needed at both ends."),
+                _w("E28-2G4M20S zaten 20 dBm verdiği için 5 dBi anten "
+                   "yayında bir şey kazandırmıyor: modül 15,3 dBm'ye "
+                   "kısılıyor ve antenden yine 100 mW çıkıyor. Kazanç alışta: "
+                   "her uç karşıyı 4,7 dB daha iyi duyuyor. Modülün kart "
+                   "üstü anteni kutunun içinde kalıyor ve EBYTE kazancını "
+                   "vermiyor; kart üstü antenle kapsanan alan küçülüyor, "
+                   "km² başına maliyet artıyor (ADR-0100).",
+                   "The E28-2G4M20S already gives 20 dBm, so the 5 dBi "
+                   "antenna adds nothing on transmit: the module is turned "
+                   "down to 15,3 dBm and 100 mW still leaves the antenna. "
+                   "The gain is on receive: each end hears the other 4,7 dB "
+                   "better. The module's on-board antenna stays inside the "
+                   "box and EBYTE gives no gain for it; with it the covered "
+                   "area shrinks and the cost per km² rises (ADR-0100)."),
                 _w("Güç sınırı antenin en güçlü yayın yaptığı yöne göre "
                    "uygulanıyor; başka yönlerde alıcıya daha az güç "
                    "ulaşıyor.",

@@ -316,9 +316,9 @@ url = "https://www.etsi.org/deliver/etsi_en/302000_302099/30206503/02.01.01_60/e
 [[source]]
 key = "btk-exempt-criteria"
 group = "rules"
-label.tr = "BTK: Frekans Tahsisinden Muaf Telsiz Cihaz ve Sistemlerine İlişkin Teknik Ölçütler"
-label.en = "BTK: technical criteria for radio equipment exempt from frequency assignment"
-url = "https://www.btk.gov.tr/uploads/pages/frekans-tahsisinden-muaf-telsiz-cihaz-sistemleri-olcutler-633d4ca68c0b1.pdf"
+label.tr = "BTK: Frekans Tahsisinden Muaf Telsiz Cihaz ve Sistemlerine İlişkin Teknik Ölçütler (Kurul Kararı 23.09.2022, 2022/İK-SYD/245)"
+label.en = "BTK: technical criteria for radio equipment exempt from frequency assignment (Board decision 23.09.2022, 2022/İK-SYD/245)"
+url = "https://www.btk.gov.tr/s3/web-btk-site/7708c26c-5161-4919-8b3d-daa31d4ac8fb/2026/07/b02b513d-09b2-4035-bc04-64f59d02f707.pdf"
 
 [[source]]
 key = "dwm3000-datasheet"
@@ -844,3 +844,10 @@ group = "project"
 label.tr = "YDL Battery: 803040 LiPo, 3,7 V, 1000 mAh (4,27 $)"
 label.en = "YDL Battery: 803040 LiPo, 3,7 V, 1000 mAh (4,27 $)"
 url = "https://ydlbattery.com/products/50pcs-3-7v-1000mah-803040-lithium-polymer-battery"
+
+[[source]]
+key = "ebyte-e28-20s-datasheet-cn"
+group = "radio"
+label.tr = "EBYTE E28-2G4M20S veri sayfası (Çince, ebyte.com): 100 mW, çıkış en az 19, tipik 20, en çok 21 dBm"
+label.en = "EBYTE E28-2G4M20S datasheet (Chinese, ebyte.com): 100 mW, output at least 19, typically 20, at most 21 dBm"
+url = "https://www.ebyte.com/downpdf/304.html"

@@ -32,3 +32,18 @@ terimlerini tanımlıyor.
 Model değişmedi: sınırlar zaten bunlardı (20 dBm = 100 mW, 10 dBm/MHz =
 10 mW/MHz). Simülatördeki bölge ve kurulum adları, Sistem sayfası, sunum
 ve başvuru formu aynı terimlere geçti.
+
+## Ek: birim birim yasal güç (29 Eylül 2026)
+
+- Mevzuat sayfasına 2,4 GHz birimlerinin yasal güç tablosu eklendi:
+  E28-2G4M20S'nin çıkışı EBYTE'nin veri sayfasından (19 / 20 / 21 dBm),
+  her birimin anteni, tam güçteki e.i.r.p. ve sınırı aşmayan en yüksek
+  ayar (FHSS ve LBT ile 20 dBm, FHSS olmadan 12,1 dBm e.i.r.p.).
+- Anten takmak yasal: TS EN 300 328 cihazın o antenle test edilmesini ve
+  hiçbir güç ayarının sınırı aşmamasını istiyor (4.2.4, 4.3.1.2). 20S
+  5 dBi antenle en çok 15,3 dBm'ye kısılıyor; anten yayında değil alışta
+  kazandırıyor (ADR-0100).
+- BTK bağlantısı BTK'nın sayfasındaki güncel dosyaya geçti (Kurul Kararı
+  23.09.2022, 2022/İK-SYD/245); metni önceki dosyayla aynı.
+- Seçenek modüller (12S, 27S, O4) sitede değil, yalnız tarayıcıdaki
+  simülatörde; onların yasal gücü yerel rapordadır.
