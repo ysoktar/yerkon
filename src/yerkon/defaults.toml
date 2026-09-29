@@ -1071,15 +1071,17 @@ unit = "m"
 provenance = "DERIVED"
 source = "Copernicus DEM ürün el kitabı: mutlak düşey doğruluk < 4 m (LE90)"
 source_en = "Copernicus DEM product handbook: absolute vertical accuracy < 4 m (LE90)"
-note = """Birimin haritasının yolun yüksekliğini ne kadar iyi bildiği, bir \
-sigma. Her turda filtre, kendini bulduğu yerdeki harita yüksekliğine anten \
-yüksekliğini ekleyip bir ölçüm olarak alıyor (harita kısıtı). LE90 4 m, \
+note = """Alıcıdaki sayısal yükseklik modelinin (Copernicus DEM) yolun \
+yüksekliğini ne kadar iyi bildiği, bir sigma. Her turda filtre, kendini \
+bulduğu yerdeki model yüksekliğine anten yüksekliğini ekleyip bir ölçüm \
+olarak alıyor (yükseklik kısıtı). LE90 4 m, \
 normal dağılımda 4 / 1,645 = 2,43 m. Hata yol boyunca parça parça: her 500 \
 m'de bir çekiliyor. 0 kısıtı kapatır ve yüksekliği yalnız mesafelere \
 bırakır."""
-note_en = """How well the unit's map knows the road's height, one sigma. \
-Each round the filter takes the map's height where it thinks it is, plus \
-the antenna height, as a measurement (a map constraint). LE90 4 m is 4 / \
+note_en = """How well the receiver's elevation model (Copernicus DEM) knows \
+the road's height, one sigma. Each round the filter takes the model's \
+height where it thinks it is, plus the antenna height, as a measurement \
+(a height constraint). LE90 4 m is 4 / \
 1,645 = 2,43 m for a normal error. The error comes in patches along the \
 road, drawn every 500 m. 0 switches the aid off and leaves the height to \
 the ranges."""
@@ -1092,11 +1094,12 @@ unit = "m"
 provenance = "ASSUMPTION"
 source = "YERKON varsayımı"
 source_en = "YERKON assumption"
-note = """Harita yükseklik hatasının yol boyunca ne kadar benzer kaldığı. \
+note = """Sayısal yükseklik modelinin hatasının yol boyunca ne kadar benzer \
+kaldığı. \
 Yükseklik modelleri parça parça yanılır; bir araç 500 m'yi yarım dakikada \
 geçer, filtrenin düşey belleği bundan kısa, yani hata filtre için bir \
 sapma gibi davranır ve ortalamayla silinmez."""
-note_en = """How far along a road the map's height error stays alike. \
+note_en = """How far along a road the elevation model's error stays alike. \
 Height models are wrong in patches; a vehicle covers 500 m in half a \
 minute, longer than the filter's vertical memory, so to the filter the \
 error behaves like a bias and does not average away."""

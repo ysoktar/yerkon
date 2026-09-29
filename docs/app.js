@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=7de794b371";
+import { decimal, say, speak, speaks } from "./words.js?v=d5ab8c4c15";
 
 /* The choices whose names are this page's to give.
  *
@@ -1192,8 +1192,8 @@ const TERMS = {
   extent_m: "uzunluk",
   fix_horizontal_sigma_m: "konumun kabul sınırı, yatay belirsizlik",
   gate_sigmas: "filtrenin ölçüm eleme sınırı",
-  height_aid_sigma_m: "harita yükseklik hatası",
-  height_aid_correlation_m: "harita hatasının değiştiği uzaklık",
+  height_aid_sigma_m: "yükseklik modelinin hatası",
+  height_aid_correlation_m: "yükseklik modeli hatasının değiştiği uzaklık",
   extra_off_grid_visits_per_year: "şebeke dışı ek ziyaret",
   ground_levels: "zemin pürüz katmanı",
   ground_patch_m: "zemin parçası boyu",
@@ -1734,9 +1734,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=7de794b371";
-import * as flat from "./bore.js?v=7de794b371";
-import * as pick from "./map.js?v=7de794b371";
+import * as draw from "./draw.js?v=d5ab8c4c15";
+import * as flat from "./bore.js?v=d5ab8c4c15";
+import * as pick from "./map.js?v=d5ab8c4c15";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");

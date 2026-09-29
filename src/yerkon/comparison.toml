@@ -688,8 +688,8 @@ gerekiyorsa şebeke dışı besleme) toplamının senaryo alanına bölünmesidi
 Birim fiyatı kartın bütün parçalarını, kutusunu, baskılı devresini ve \
 dizgisini kapsar; test, kalibrasyon, belgelendirme, vergi ve kargo dahil \
 değildir. \
-Konum, radyo mesafe ölçümlerini ve haritadan gelen yüksekliği birleştiren \
-bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
+Konum, radyo mesafe ölçümlerini ve sayısal yükseklik modelinden okunan \
+yol yüksekliğini birleştiren bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
 kullanılmamıştır. YERKON OPEX, yıllık işletme bedelidir: elektrik \
 (ticarethane tarifesi, Nisan 2026 zammıyla 5,62 TL/kWh), yenileme (vergi \
 amortisman ömürleri), bakım ve merkezî sistem. Bir bakım ziyaretinin \
@@ -704,7 +704,7 @@ labour and, where needed, a standalone supply), divided by the scenario's \
 area. The unit price covers every part of the board, its box, the printed \
 board and its assembly; test, calibration, certification, tax and shipping \
 are excluded. The position comes from a Kalman filter that combines radio \
-ranges with the height from a map; no inertial unit or odometry is used. \
+ranges with the road height from an elevation model; no inertial unit or odometry is used. \
 YERKON OPEX is the yearly running cost: electricity (the commercial tariff, \
 5,62 TL/kWh after the April 2026 increase), replacement (tax depreciation \
 lives), maintenance and the central system. A maintenance visit is a crew \
