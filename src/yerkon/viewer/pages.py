@@ -2587,8 +2587,13 @@ LAW = Page(
                    "göstergesine göre dördü birlikte vergi hariç 2500-8000 "
                    "€, bir kerelik ([LCAS v1.0, Multicert, Haziran 2026]"
                    "(https://lcas.info/)). Birim merkeze bağlandığı için "
-                   "RED Madde 3(3) siber güvenlik şartı (EN 18031) da "
-                   "kapsama girebilir; o kanıtın bedeli bu aralığın dışında. "
+                   "[Telsiz Ekipmanları Yönetmeliği (2014/53/AB)]"
+                   "(https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) Madde 5(3)'teki ağa zarar "
+                   "vermeme, kişisel verilerin korunması ve sahtekârlığa "
+                   "karşı korunma gerekleri (EN 18031) de kapsama "
+                   "girebilir; Madde 5(4)'e göre bunları BTK kendi "
+                   "düzenlemesiyle uygulamaya alıyor. O kanıtın bedeli bu "
+                   "aralığın dışında. "
                    "UWB (Qorvo DWM3000) taşıyan tünel birimi, yaya ve araç "
                    "alıcısına EN 302 065 de gerekiyor: yaya alıcısına genel "
                    "amaçlı UWB için [-1]"
@@ -2613,9 +2618,13 @@ LAW = Page(
                    "market indication puts the four together at 2500-8000 "
                    "€ before tax, once ([LCAS v1.0, Multicert, June 2026]"
                    "(https://lcas.info/)). The unit is connected to the "
-                   "centre, so the RED Article 3(3) cybersecurity "
-                   "requirement (EN 18031) may apply as well; that "
-                   "evidence costs extra. The tunnel unit and the "
+                   "centre, so the requirements of Article 5(3) of "
+                   "Türkiye's [Radio Equipment Regulation (2014/53/AB)]"
+                   "(https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) on harm to the network, "
+                   "personal data and fraud (EN 18031) may apply as "
+                   "well; under Article 5(4) the BTK brings them into "
+                   "force by its own rules. That evidence costs extra. "
+                   "The tunnel unit and the "
                    "pedestrian and vehicle receivers carry UWB (Qorvo "
                    "DWM3000) and also need EN 302 065: [-1]"
                    "(https://www.etsi.org/deliver/etsi_en/302000_302099/30206501/02.01.01_60/en_30206501v020101p.pdf) "
@@ -2632,14 +2641,16 @@ LAW = Page(
                    "none publishes a price, so the cost will come from a "
                    "quotation."),
                 _w("Uyumlaştırılmış standartlar uygulanırsa Onaylanmış "
-                   "Kuruluşa gitme zorunluluğu yok: RED 2014/53/AB Madde "
-                   "17(3), Ek II'deki iç üretim kontrolüne izin veriyor. "
+                   "Kuruluşa gitme zorunluluğu yok: [Telsiz Ekipmanları "
+                   "Yönetmeliği (2014/53/AB)](https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) Madde 20(3), "
+                   "Ek–2'deki iç üretim kontrolüne izin veriyor. "
                    "Bu, uygunluğun bedelsiz olduğu anlamına gelmiyor; "
                    "üretici uygunluğu teknik dosya ve ölçüm sonuçlarıyla "
                    "göstermek zorunda.",
                    "Where the harmonised standards are applied, a notified "
-                   "body is not required: Article 17(3) of RED 2014/53/EU "
-                   "allows internal production control under Annex II. "
+                   "body is not required: Article 20(3) of Türkiye's "
+                   "[Radio Equipment Regulation (2014/53/AB)](https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) "
+                   "allows internal production control under Annex 2. "
                    "That does not make conformity free; the manufacturer "
                    "still has to show it with a technical file and "
                    "measurement results."),
@@ -2892,8 +2903,13 @@ LAW = Page(
                 Link(label=_w("ETSI EN 302 065-3 V2.1.1 (2016-11), taşıtlarda UWB",
                               "ETSI EN 302 065-3 V2.1.1 (2016-11), UWB in vehicles"),
                      url="https://www.etsi.org/deliver/etsi_en/302000_302099/30206503/02.01.01_60/en_30206503v020101p.pdf"),
-                Link(label=_w("RED 2014/53/AB (EUR-Lex)",
-                              "RED 2014/53/EU (EUR-Lex)"),
+                Link(label=_w("Telsiz Ekipmanları Yönetmeliği (2014/53/AB), "
+                              "Resmî Gazete, 5 Kasım 2020, sayı 31295",
+                              "Radio Equipment Regulation (2014/53/AB), "
+                              "Resmî Gazete, 5 November 2020, issue 31295"),
+                     url="https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm"),
+                Link(label=_w("Yönetmeliğin dayandığı AB direktifi 2014/53/AB (EUR-Lex)",
+                              "The EU directive it transposes, 2014/53/EU (EUR-Lex)"),
                      url="https://eur-lex.europa.eu/eli/dir/2014/53/oj"),
                 Link(label=_w("BTK: piyasa gözetimi, sıkça sorulan sorular",
                               "BTK: market surveillance, frequently asked questions"),
