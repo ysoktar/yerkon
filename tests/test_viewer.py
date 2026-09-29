@@ -222,7 +222,7 @@ def test_an_arrangement_with_nothing_in_it_draws_but_will_not_run():
         state.scenario_object,
         state.deployed,
     ):
-        with pytest.raises(ValueError, match="Direk yok|No anchors"):
+        with pytest.raises(ValueError, match="Yayın birimi yok|No anchors"):
             produces_a_number()
 
 
