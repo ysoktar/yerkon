@@ -565,7 +565,9 @@ direkler denendi; arama bunlar arasından 19 aydınlatma direğini seçti. \
 Simülasyondaki yerleşim maliyet yapılabilirliğini göstermek için: birim \
 sayısı ve yeri değiştirilerek istenilen yerde istenilen doğruluğa \
 ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
-türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir."""
+türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir. \
+Ağaçlar simülasyona eklenmedi; ağacın arkasında kalan bir bağlantı \
+gerçekte daha zayıf olabilir."""
 en = """The urban row was run over the real ground at Kızılay; the units \
 drive the real streets. Standing lighting columns, traffic lights, signs \
 and stops, and masts to be put up on hilltops, were all tried as places \
@@ -574,7 +576,8 @@ placement in the simulation is there to show cost feasibility: with more \
 units, or units elsewhere, the accuracy wanted can be had where it is \
 wanted. Its range error model is derived from published SX1280 \
 measurements, so the result is a model output rather than a field \
-measurement."""
+measurement. Trees are not in the simulation; a link behind a tree may \
+be weaker in reality."""
 
 [note.rural-run]
 sources = ["sx1280-range", "yerkon-github"]
@@ -586,7 +589,9 @@ denendi; çatılar kiralık olduğu için aramaya sokulmuyor. Simülasyondaki \
 yerleşim maliyet yapılabilirliğini göstermek için: birim sayısı ve yeri \
 değiştirilerek istenilen yerde istenilen doğruluğa ulaşılabilir. Hata modeli kısa menzilde yayımlanmış SX1280 \
 ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
-saha ölçümü değil, model çıktısıdır. Dağıtım direği kirası sıfır alındı: \
+saha ölçümü değil, model çıktısıdır. Ağaçlar simülasyona eklenmedi; \
+ağacın arkasında kalan bir bağlantı gerçekte daha zayıf olabilir. \
+Dağıtım direği kirası sıfır alındı: \
 birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
 edilebilmeleri öngörülüyor. Yol üzerinde AUS noktası varsa birim ona \
 takılıyor; yoksa güneş paneliyle çalışıyor ve merkeze giden mesajlarını \
@@ -600,8 +605,9 @@ placement in the simulation is there to show cost feasibility: with more \
 units, or units elsewhere, the accuracy wanted can be had where it is \
 wanted. Its error model is derived from \
 published SX1280 measurements at short range. Its long range result is \
-therefore a model output rather than a direct field measurement. The \
-distribution pole rent is taken as nothing: the units go up under a \
+therefore a model output rather than a direct field measurement. Trees \
+are not in the simulation; a link behind a tree may be weaker in \
+reality. The distribution pole rent is taken as nothing: the units go up under a \
 public-sector agreement, with the prospect of being included in public \
 structures that already stand, such as ITS cabinets. Where the road has \
 an ITS point the unit is fitted to it; elsewhere it runs on its solar \

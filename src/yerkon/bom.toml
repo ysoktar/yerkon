@@ -447,6 +447,31 @@ ladder = [[1, 4.27]]
 date = "25.09.2026"
 note = "büyük adet fiyatı yayımlanmamış, indirim varsayılmadı"
 
+# The receivers also carry satellite positioning: the product is meant to
+# use the satellites while they are there and the roadside units when they
+# are not. L76KB-A58 tracks GPS, GLONASS, BeiDou and QZSS (no Galileo);
+# the patch covers both 1575 and 1602 MHz, so GPS and GLONASS both reach
+# it. The price ladders are JLCPCB's, read on 29 September 2026.
+[[part]]
+key = "l76kb"
+name = "Quectel L76KB-A58"
+role.tr = "uydu konum modülü (GPS, GLONASS, BeiDou, QZSS)"
+role.en = "satellite positioning module (GPS, GLONASS, BeiDou, QZSS)"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/partdetail/Quectel-L76KBA58/C2916234"
+ladder = [[1, 4.5468], [10, 3.8288], [30, 3.4016], [100, 2.9695], [500, 2.7713], [1000, 2.6803]]
+date = "29.09.2026"
+
+[[part]]
+key = "pro-ob-430"
+name = "Abracon PRO-OB-430"
+role.tr = "uydu konum anteni, kart üstü, 1575 ve 1602 MHz"
+role.en = "satellite positioning antenna, on the board, 1575 and 1602 MHz"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/partdetail/AbraconLLC-PRO_OB_430/C3284500"
+ladder = [[1, 1.0852], [10, 0.8854], [30, 0.7846], [100, 0.6856], [500, 0.6255], [1000, 0.5946]]
+date = "29.09.2026"
+
 # --- Products ---------------------------------------------------------------
 
 # Certified as adaptive frequency hopping, the unit may radiate 20 dBm at
@@ -470,14 +495,14 @@ other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", 
 key = "pedestrian"
 name.tr = "Yaya alıcısı"
 name.en = "Pedestrian receiver"
-parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b"]
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b", "l76kb", "pro-ob-430"]
 other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "gainta-g517", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "vehicle"
 name.tr = "Kara aracı alıcısı"
 name.en = "Vehicle receiver"
-parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085", "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151"]
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085", "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151", "l76kb", "pro-ob-430"]
 other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-sma", "gainta-g212", "passives", "pcb-2l", "smt"]
 
 # The unit as it would be without the frequency hopping certificate: the

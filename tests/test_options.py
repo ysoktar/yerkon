@@ -240,7 +240,7 @@ def test_a_search_that_meets_nothing_returns_nothing():
         tried=(an_outcome(availability=0.5), an_outcome(availability=0.6)),
     )
     assert found.best is None
-    with pytest.raises(ValueError, match="hiçbir düzen karşılamadı"):
+    with pytest.raises(ValueError, match="hiçbir yerleşim karşılamadı"):
         found.as_option("hopeless")
 
 
@@ -276,26 +276,28 @@ def test_every_searchable_figure_is_one_the_settings_file_holds():
 def test_a_search_finds_a_real_arrangement_and_writes_it_back(tmp_path):
     """End to end: search, meet, save, and run against what was saved.
 
-    Deliberately on the tunnel, which is the quickest row, and against a
-    target the default does not meet, so the search has to actually find
-    something rather than shrug.
+    Deliberately on the tunnel, which is the quickest row, and starting
+    from the old 60 m spacing, which misses the target, so the search has
+    to actually find something rather than shrug.
     """
+    sparse = DEFAULTS.with_values({"tunnel.anchor_spacing_m": 60.0})
     found = search(
         "tunnel",
         Target(availability=0.99, hpe_p50_m=1.0),
         over={"tunnel.anchor_spacing_m": (60.0, 40.0)},
+        settings=sparse,
     )
     assert found.best is not None
     assert found.best.values["tunnel.anchor_spacing_m"] == 40.0
 
-    write(found.as_option("found", DEFAULTS), where=tmp_path)
+    write(found.as_option("found", sparse), where=tmp_path)
     saved = read("found", where=tmp_path)
     assert saved.origin == "yerkon solve"
 
-    tighter = saved.applied_to(DEFAULTS)
+    tighter = saved.applied_to(sparse)
     assert (
         len(catalogue(tighter)["tunnel"].scenario.deployment.anchors)
-        > len(catalogue(DEFAULTS)["tunnel"].scenario.deployment.anchors)
+        > len(catalogue(sparse)["tunnel"].scenario.deployment.anchors)
     )
 
 

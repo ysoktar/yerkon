@@ -55,13 +55,14 @@
   var chosen = kept();
   if (chosen === "dark" || chosen === "light") root.dataset.theme = chosen;
 
-  /* A link in the text opens in a new tab, so the page it was read on
-     stays where it was. The menu, the buttons and the note numbers stay
-     in this tab. */
-  Array.prototype.forEach.call(document.querySelectorAll("main a[href]"),
+  /* A link to another site opens in a new tab, so the page it was read
+     on stays where it was. Links within this site (the menu, the pages
+     on the home page, one page quoting another) and the note numbers
+     stay in this tab. */
+  Array.prototype.forEach.call(document.querySelectorAll("a[href]"),
     function (link) {
-      var to = link.getAttribute("href");
-      if (!to || to.charAt(0) === "#" || link.classList.contains("card")) return;
+      if (!/^https?:/i.test(link.getAttribute("href") || "")) return;
+      if (link.host === location.host) return;
       link.target = "_blank";
       link.rel = "noopener";
     });

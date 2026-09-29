@@ -135,6 +135,13 @@ h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.09em;
   color: var(--quiet); margin: 0 0 10px; }
 section { margin-top: 34px; }
 p { margin: 0 0 12px; }
+/* Both edges straight, so the column reads as one block in the middle of
+   the page; words are broken the language's own way. A phone's column
+   is too narrow for that: the gaps between words grow wider than the
+   words, so there the right edge stays ragged. */
+@media (min-width: 700px) {
+  main p, main li, figcaption { text-align: justify; hyphens: auto; }
+}
 ul { margin: 0; padding-left: 20px; }
 li { margin-bottom: 9px; }
 strong { font-weight: 650; }
@@ -146,7 +153,7 @@ pre { margin: 0; padding: 14px 16px; overflow-x: auto;
 pre code { padding: 0; background: none; }
 .under { margin-top: 10px; color: var(--quiet); font-size: 12px; }
 .warn { color: var(--warn); }
-a, a:visited { color: var(--accent); }
+a { color: var(--accent); }
 
 /* --- figures and tables ------------------------------------------------- */
 
@@ -177,7 +184,9 @@ a, a:visited { color: var(--accent); }
 /* A picture is centred on the page and allowed past the reading column,
    because every one of them is a diagram that stops working when it is
    shrunk to the width of a paragraph. */
-figure { width: min(100vw - 32px, 900px); margin: 0 0 0 50%;
+/* A picture takes the text's own width, so its edges line up with the
+   lines above and below it; a click opens it to the whole screen. */
+figure { width: min(100vw - 32px, 672px); margin: 0 0 0 50%;
   transform: translateX(-50%); text-align: center; }
 figure img { display: block; width: 100%; height: auto; margin: 0 auto;
   padding: 14px; background: var(--plate); border: 1px solid var(--line);

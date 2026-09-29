@@ -447,7 +447,8 @@ WHY = Page(
 FINAL_PARTS = (
     ("e28-2g4m20s", ""), ("dwm3000-lcsc", ""), ("stm32g031k8t6", ""),
     ("stm32g0b1met6", ""), ("atecc608b", ""), ("esp32-s3", ""),
-    ("bno085", ""), ("gw-22-5151", ""), ("hlk-5m12", ""),
+    ("bno085", ""), ("l76kb", ""), ("pro-ob-430", ""),
+    ("gw-22-5151", ""), ("hlk-5m12", ""),
     ("lipo-1000", ""), ("ili9341-2.8", ""), ("gainta-g203", ""),
     ("gainta-g212", ""), ("gainta-g517", ""),
 )
@@ -711,8 +712,11 @@ SYSTEM = Page(
                     "bağlantıda daha az yayın yapar. Tünelde ve kapalı "
                     "alanda Qorvo DWM3000'i kullanır. ESP32-S3 ile telefona "
                     "bağlanır; sinyal kesilirse BNO085 hareket sensörüyle "
-                    "son konumdan devam eder. UWB için seramik anten, "
-                    "2,4 GHz için kart üzerinde çip anten.",
+                    "son konumdan devam eder. Uydu varken konumu Quectel "
+                    "L76KB-A58 uydu konum modülünden de alır (GPS, GLONASS, "
+                    "BeiDou, QZSS). UWB için seramik anten, 2,4 GHz için "
+                    "kart üzerinde çip anten, uydu için kart üzerinde "
+                    "Abracon PRO-OB-430 yama anten.",
                     "**Pedestrian.** Designed to draw little power and "
                     "fit in a pocket. In town and in open country it uses "
                     "the same amplified EBYTE E28-2G4M20S module (an "
@@ -721,8 +725,12 @@ SYSTEM = Page(
                     "It uses the Qorvo DWM3000 in tunnels and indoors. An "
                     "ESP32-S3 connects it to a phone; if the signal drops, "
                     "a BNO085 motion sensor carries on from the last "
-                    "position. A ceramic antenna for UWB, a chip antenna "
-                    "on the board for 2,4 GHz.",
+                    "position. While the satellites are there it also "
+                    "takes a position from a Quectel L76KB-A58 satellite "
+                    "positioning module (GPS, GLONASS, BeiDou, QZSS). A "
+                    "ceramic antenna for UWB, a chip antenna on the board "
+                    "for 2,4 GHz, and an Abracon PRO-OB-430 patch on the "
+                    "board for the satellites.",
                 ),
                 _w(
                     "**Kara aracı.** STM32 üzerine kurulu, LCD harita "
@@ -733,7 +741,8 @@ SYSTEM = Page(
                     "modülü (SX1280 yongalı), kritik bölge için Qorvo "
                     "DWM3000. DWM3000 kendi dahili antenini kullanır; "
                     "E28-2G4M20S araç tavanındaki dış ortam tipi 5 dBi "
-                    "çubuk antenle çalışır.",
+                    "çubuk antenle çalışır. Yaya alıcısındaki uydu konum "
+                    "modülü ve anteni bunda da var.",
                     "**Road vehicle.** Built on an STM32 with an LCD map "
                     "screen. It connects to the CAN bus of vehicles that "
                     "support one and takes live data from the wheel speed "
@@ -743,7 +752,8 @@ SYSTEM = Page(
                     "and the Qorvo DWM3000 for critical ones. The DWM3000 "
                     "uses its own on-board antenna; the E28-2G4M20S works "
                     "with an outdoor 5 dBi rod antenna on the vehicle's "
-                    "roof.",
+                    "roof. It has the pedestrian receiver's satellite "
+                    "positioning module and antenna too.",
                 ),
                 _w(
                     "**Nesnelerin interneti alıcısı.** Kapalı ve yarı açık "
@@ -768,10 +778,10 @@ SYSTEM = Page(
             lines=(
                 _w(
                     "1000 adette bir yayın birimi yaklaşık 1400-1700 lira, "
-                    "bir alıcı yaklaşık 2300-3300 lira. Her ürünün 1, 100 "
+                    "bir alıcı yaklaşık 2500-3500 lira. Her ürünün 1, 100 "
                     "ve 1000 adetlik fiyat tablosu Maliyet sayfasında.",
                     "At a thousand units a broadcast unit is roughly 1400 "
-                    "to 1700 lira and a receiver roughly 2300 to 3300 "
+                    "to 1700 lira and a receiver roughly 2500 to 3500 "
                     "lira. Every product's price at one, a hundred and a "
                     "thousand is tabled on the Cost page.",
                 ),
@@ -1681,6 +1691,16 @@ SIMULATION = Page(
                     "long reading of a blocked link. The radio's own noise "
                     "and the clock drifting during the exchange are in the "
                     "model.",
+                ),
+                _w(
+                    "Ağaçlar simülasyona eklenmedi. Zemin ve binalar "
+                    "gerçek veriden geliyor, ama ağaçlar için ayrı bir "
+                    "kayıp hesaplanmadı. Ağacın arkasında kalan bir "
+                    "bağlantı gerçekte daha zayıf olabilir.",
+                    "Trees are not in the simulation. The ground and the "
+                    "buildings come from real data, but no separate loss "
+                    "is worked out for trees. A link behind a tree may be "
+                    "weaker in reality.",
                 ),
                 _w(
                     "Tünel kaybı gerçek bir karayolu tünelinde 2,8-5 GHz'de "

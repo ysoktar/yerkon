@@ -330,26 +330,25 @@ const WORDS = {
     mounting: ["Montaj", ""],
     receiver_height_m: ["Alıcı anten yüksekliği", ""],
     surface_roughness_m: ["Yüzey pürüzü", ""],
-    target_ranging_sigma_m: ["Menzil toleransı", ""],
+    target_ranging_sigma_m: ["Mesafe ölçme toleransı", ""],
     eirp_dbm: ["Yasal yayın gücü",
                "gücü bölgenin tavanı ve antenin kazancı belirliyor"],
-    anchor_height_m: ["Direk yüksekliği",
-                      "montaj yapısı direğin ne kadar yükseldiğini belirliyor"],
+    anchor_height_m: ["Yayın biriminin yüksekliği",
+                      "birimin ne kadar yükseğe takılacağını montaj yapısı belirliyor"],
     corridor_m: ["Sahanın boyu", ""],
     width_m: ["Sahanın eni", ""],
     site: ["Zemin", ""],
     from_m: ["Grubun başlangıcı",
-             "sahanın dışında kalan direk hiçbir şeyin modellemediği "
-             + "zeminde durur"],
+             "sahanın dışında kalan birim, modelde olmayan ve hiçbir "
+             + "alıcının geçmediği bir zeminde durur"],
     to_m: ["Grubun bitişi",
-           "sahanın dışında kalan direk hiçbir şeyin modellemediği "
-           + "zeminde durur"],
+           "sahanın dışında kalan birim, modelde olmayan ve hiçbir "
+           + "alıcının geçmediği bir zeminde durur"],
     usable_range_m: ["Kullanılabilir menzil",
-                     "menzil, hedeflenen hassasiyette link bütçesinin izin "
+                     "menzil, istenen hassasiyette bağlantı bütçesinin izin "
                      + "verdiği kadar"],
     closure_range_m: ["Bağlantının koptuğu mesafe",
-                      "aynı bütçe bağlantının nerede çözülemez olduğunu "
-                      + "belirliyor"],
+                      "bağlantının nerede koptuğunu aynı bütçe belirliyor"],
   },
   // In English the engine's own label and reason are already English, so
   // this only names the two the page adds.
@@ -374,7 +373,7 @@ const VALUE_WORDS = {
   "sign gantry": "portal (6 m)",
   "billboard": "pano (10 m)",
   "lighting column": "aydınlatma direği (12 m)",
-  "tall mast": "direk (25 m)",
+  "tall mast": "dikilecek direk (25 m)",
   "tunnel bracket": "tünel askısı (1,2 m)",
 };
 
@@ -852,7 +851,7 @@ function drawRuns() {
   state.runs.forEach((run, index) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.dataset.find = `direk grup anchor group ${run.identifier} `
+    card.dataset.find = `yayın birimi direk grup anchor group ${run.identifier} `
       + `modül montaj aralık yoldan kaydırma başlangıç bitiş `
       + `module mounting spacing stagger start end `
       + `${run.radio} ${run.mounting}`;
@@ -1169,11 +1168,11 @@ const TERMS = {
   per_diem_share: "günübirlik görevde gündeliğin payı",
   anchor_kwh_per_year: "yıllık elektrik",
   anchor_offset_m: "yoldan uzaklık",
-  anchor_spacing_m: "direk aralığı",
-  anchor_stagger_m: "sıra kaydırması",
-  anchor_survey_sigma_m: "direk ölçüm hatası",
-  anchors_per_round: "turdaki direk sayısı",
-  anchors_sharing_central_operation: "merkezi işletmeyi paylaşan direk",
+  anchor_spacing_m: "birimler arası uzaklık",
+  anchor_stagger_m: "iki yan arasındaki kaydırma",
+  anchor_survey_sigma_m: "birim konumunun ölçüm hatası",
+  anchors_per_round: "bir turda ölçülen birim sayısı",
+  anchors_sharing_central_operation: "merkezi işletmeyi paylaşan birim sayısı",
   billboard: "pano",
   central_operation_tl_per_year: "merkezi işletme, yıllık",
   clock: "saat",
@@ -1181,25 +1180,25 @@ const TERMS = {
   crew_day_tl: "ekip günü",
   crystal: "kristal",
   distribution_pole: "elektrik dağıtım direği",
-  demodulation_threshold_db: "çözme eşiği",
+  demodulation_threshold_db: "sinyal çözme eşiği",
   electricity_tl_per_kwh: "elektrik birim fiyatı",
-  estimator: "kestirici",
-  profile_spacing_m: "profil örnek aralığı",
-  shadow_correlation_m: "gölge boyu",
-  shadow_draws: "gölge çekilişi",
-  shadow_seed: "gölge tohumu",
+  estimator: "konum kestirici",
+  profile_spacing_m: "arazi kesiti okuma aralığı",
+  shadow_correlation_m: "gölgelemenin değiştiği uzaklık",
+  shadow_draws: "rastgele gölgeleme tekrarı",
+  shadow_seed: "gölgeleme için rastgele sayı tohumu",
   shadow_sigma_db: "gölgeleme, yol açıkken",
   shadow_sigma_obstructed_db: "gölgeleme, yol kapalıyken",
   extent_m: "uzunluk",
-  fix_horizontal_sigma_m: "konum çıtası, yatay belirsizlik",
-  gate_sigmas: "filtre kapısı",
+  fix_horizontal_sigma_m: "konumun kabul sınırı, yatay belirsizlik",
+  gate_sigmas: "filtrenin ölçüm eleme sınırı",
   height_aid_sigma_m: "harita yükseklik hatası",
-  height_aid_correlation_m: "harita hatasının boyu",
+  height_aid_correlation_m: "harita hatasının değiştiği uzaklık",
   extra_off_grid_visits_per_year: "şebeke dışı ek ziyaret",
   ground_levels: "zemin pürüz katmanı",
-  ground_patch_m: "zemin yaması",
-  ground_roughness_spread: "pürüz saçılımı",
-  ground_seed: "zemin tohumu",
+  ground_patch_m: "zemin parçası boyu",
+  ground_roughness_spread: "pürüzün yayılımı",
+  ground_seed: "zemin için rastgele sayı tohumu",
   height_m: "yükseklik",
   junction_every: "ışıklı kavşak aralığı",
   length_m: "uzunluk",
@@ -1217,14 +1216,14 @@ const TERMS = {
   guided_from_m: "tünel kayıp modelinin başladığı uzaklık",
   off_grid_supply_tl: "şebeke dışı besleme",
   operating: "işletme",
-  nlos_bias_mean_m: "görüş dışı yanlılık, ortalama",
+  nlos_bias_mean_m: "görüş hattı kapalıyken ortalama fazla ölçme",
   packet_loss: "paket kaybı",
   payload_bytes: "paket yükü",
   per_crew_day: "ekibin günde uğradığı birim",
   rent_tl_per_year: "yıllık kira",
   rooftop: "çatı",
   radio: "modül",
-  ranging: "ölçüm",
+  ranging: "mesafe ölçme",
   residual_ppm: "düzeltme sonrası kalan sapma",
   roadside_sign: "yol levhası",
   rural: "kırsal",
@@ -1234,8 +1233,8 @@ const TERMS = {
   sign_gantry: "portal",
   site: "saha",
   site_cost_tl: "saha maliyeti",
-  tall_mast: "direk",
-  tolerance_ppm: "toleransı",
+  tall_mast: "dikilecek direk",
+  tolerance_ppm: "sapma toleransı",
   tunnel: "tünel",
   tunnel_bracket: "tünel askısı",
   tunnel_grade: "tünel eğimi",
@@ -3184,8 +3183,7 @@ function drawOptions() {
   if (!host || !optionsData) return;
   host.innerHTML = "";
   if (!optionsData.options.length) {
-    host.innerHTML =
-      '<p class="hint">Hazır seçenek yok. Çözücü ile bir tane kaydet.</p>';
+    host.innerHTML = `<p class="hint">${say("options.none")}</p>`;
     return;
   }
   for (const option of optionsData.options) {
@@ -3261,7 +3259,7 @@ async function watch(kind, body, host, render) {
 
 async function watching(kind, body, host, render) {
   const target = document.getElementById(host);
-  target.innerHTML = '<p class="hint">Başlatılıyor…</p>';
+  target.innerHTML = `<p class="hint">${say("busy.starting")}</p>`;
   let job;
   try {
     ({ job } = await ask("/api/run", Object.assign({ kind }, body)));
@@ -3331,8 +3329,8 @@ function drawBudget(result, host) {
     const note = document.createElement("p");
     note.className = "hint";
     note.textContent = scenario.dominant
-      ? `Önce harcanacak yer: ${
-          scenario.sources.find(s => s.source === scenario.dominant).remedy}.`
+      ? say("budget.first", { remedy:
+          scenario.sources.find(s => s.source === scenario.dominant).remedy })
       : say("budget.no_dominant");
     host.appendChild(note);
   }

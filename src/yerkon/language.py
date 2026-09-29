@@ -159,8 +159,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
     "route.line": { "tr": "Düz çizgi", "en": "A straight line" },
     "route.out-and-back": { "tr": "Gidiş-dönüş", "en": "Out and back" },
     "route.circuit": { "tr": "Çevre turu", "en": "A circuit" },
-    "route.figure-eight": { "tr": "Sekiz çizme", "en": "A figure of eight" },
-    "route.lawnmower": { "tr": "Tarama (biçerdöver)", "en": "Lawnmower passes" },
+    "route.figure-eight": { "tr": "Sekiz çizerek", "en": "A figure of eight" },
+    "route.lawnmower": { "tr": "Şerit şerit tarama", "en": "Lawnmower passes" },
     "route.waypoints": { "tr": "Rastgele duraklar", "en": "Random waypoints" },
     "route.road": { "tr": "Gerçek yol", "en": "The real road" },
     "route.no_road": {
@@ -170,10 +170,10 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "cannot be drawn. A fetch has to bring roads too.",
     },
     "deployment.no_anchors": {
-        "tr": "Direk yok: ya her dizi hiç yerleştirmiyor ya da hepsi "
-              "silinmiş. `manual` yerleşimi bilerek hiç koymaz: elle "
-              "direk sürükle ya da başka bir yöntem seç. (Boş bir düzenleme "
-              "çizilebilir; koşturulamaz.)",
+        "tr": "Yayın birimi yok: ya hiçbir grup birim yerleştirmiyor ya da "
+              "hepsi silinmiş. Elle yerleşim bilerek boş başlar: birimleri "
+              "sürükleyerek koy ya da başka bir yöntem seç. (Boş bir "
+              "düzenleme çizilebilir ama çalıştırılamaz.)",
         "en": "No anchors: every run either places none or has had them all "
               "removed. The `manual` layout places none on purpose: drag "
               "anchors in, or choose another method. (An empty arrangement "
@@ -201,7 +201,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "{source} is not an arrangement; it is missing: {missing}",
     },
     "preset.from": {
-        "tr": "{mode} satırı {name!r} düzenlemesinden koştu "
+        "tr": "{mode} satırı {name!r} düzenlemesiyle çalıştırıldı "
               "({source}, içerik {digest})",
         "en": "the {mode} row ran from the arrangement {name!r} "
               "({source}, contents {digest})",
@@ -217,11 +217,11 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "{name} found no road to drive in this box",
     },
     "site.furniture": {
-        "tr": "{name} kaynağından direğe uygun {count} yapı ({kinds})",
+        "tr": "{name} kaynağından birim takılabilecek {count} yapı ({kinds})",
         "en": "{count} mountable structures from {name} ({kinds})",
     },
     "site.no_furniture": {
-        "tr": "{name} bu kutuda direğe uygun yapı bulamadı",
+        "tr": "{name} bu kutuda birim takılabilecek yapı bulamadı",
         "en": "{name} found no mountable structure in this box",
     },
     "site.needs_pillow": {
@@ -296,7 +296,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
     "target.hpe_p50": {"tr": "HPE P50 ≤ {value} m", "en": "HPE P50 ≤ {value} m"},
     "target.hpe_p95": {"tr": "HPE P95 ≤ {value} m", "en": "HPE P95 ≤ {value} m"},
     "target.fixes": {
-        "tr": "saniyede {value} sabitleme",
+        "tr": "saniyede {value} konum",
         "en": "{value} fixes a second",
     },
     "target.nothing": {
@@ -304,27 +304,27 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "nothing in particular",
     },
     "solve.none_met": {
-        "tr": "{target} koşulunu hiçbir düzen karşılamadı; kaydedilecek bir "
+        "tr": "{target} koşulunu hiçbir yerleşim karşılamadı; kaydedilecek bir "
               "seçenek yok",
         "en": "nothing met {target}; there is no option to save",
     },
     "solve.already_met": {
         "tr": "ayarlar {target} koşulunu zaten karşılıyor; onu karşılayan en "
-              "ucuz düzen elindeki düzenin kendisi, yani kaydedilecek bir "
+              "ucuz yerleşim şimdiki yerleşimin kendisi, yani kaydedilecek bir "
               "şey yok",
         "en": "the settings already meet {target}; the cheapest arrangement "
               "that meets it is the one you have, so there is nothing to "
               "save",
     },
     "solve.title": {
-        "tr": "{scenario}: {target}, {anchors} direk, {capex} TL",
+        "tr": "{scenario}: {target}, {anchors} yayın birimi, {capex} TL",
         "en": "{scenario}: {target}, {anchors} anchors, {capex} TL",
     },
     "solve.note": {
-        "tr": "{scenario} satırının {tried} düzeni, üzerinde durduğu gerçek "
+        "tr": "{scenario} satırının {tried} yerleşimi, üzerinde durduğu gerçek "
               "zemine karşı denenerek bulundu; {target} koşulunu "
               "karşılayanların en ucuzu tutuldu.\n\n"
-              "{anchors} direkle, %{availability} kullanılabilirlik, "
+              "{anchors} yayın birimiyle, %{availability} kullanılabilirlik, "
               "ellinci yüzdelikte {hpe_p50} m ve doksan beşinci yüzdelikte "
               "{hpe_p95} m, saniyede {fixes} sabitleme veriyor.\n\n"
               "Her aday, uydurulmuş bir model değil tam bir benzetimdi; "
@@ -374,7 +374,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Automatic: four units over every point",
     },
     "layout.placed": {
-        "tr": "En iyi yerleşim: var olan direk ve yapılar (tablonun kullandığı)",
+        "tr": "En iyi yerleşim: var olan direkler ve yapılar (tablonun kullandığı)",
         "en": "Best layout: existing poles and structures (what the table uses)",
     },
     "layout.manual": {
@@ -396,8 +396,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     # -- why the confirmation panel says a figure has to move ------------
     "panel.past_the_site": {
-        "tr": "sahanın ucunu geçen bir direk, hiçbir şeyin modellemediği "
-              "zeminde durur ve hiçbir birim oradan geçmez",
+        "tr": "sahanın ucunu geçen bir yayın birimi, modelde olmayan bir "
+              "zeminde durur ve hiçbir alıcı oradan geçmez",
         "en": "an anchor past the end of the site stands on ground nothing "
               "models and nothing drives past",
     },
@@ -427,20 +427,20 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Running {rows} row{s} on {workers} processes.",
     },
     "task.budget.running": {
-        "tr": "{runs} benzetim çalışıyor: {rows} senaryo, {sources} hata "
+        "tr": "{runs} simülasyon çalışıyor: {rows} satır, {sources} hata "
               "kaynağına karşı, {workers} süreçte.",
         "en": "Running {runs} simulations: {rows} scenario{s} against "
               "{sources} sources, on {workers} processes.",
     },
     "task.done": {"tr": "Bitti.", "en": "Done."},
     "task.solve.searching": {
-        "tr": "{scenario} için {candidates} düzen, {target} hedefine karşı, "
+        "tr": "{scenario} için {candidates} yerleşim, {target} hedefine karşı, "
               "{workers} süreçte aranıyor.",
         "en": "Searching {candidates} arrangements of {scenario} for "
               "{target}, on {workers} processes.",
     },
     "task.solve.candidate": {
-        "tr": "[{seen}/{candidates}] {anchors} direk · {availability} "
+        "tr": "[{seen}/{candidates}] {anchors} yayın birimi · {availability} "
               "kullanılabilirlik · HPE50 {hpe_p50} m · {capex} TL{meets}",
         "en": "[{seen}/{candidates}] {anchors} anchors · {availability} "
               "availability · HPE50 {hpe_p50} m · {capex} TL{meets}",
@@ -451,7 +451,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Nothing met it.",
     },
     "task.solve.met": {
-        "tr": "{tried} düzenin {met} tanesi karşıladı.",
+        "tr": "{tried} yerleşimin {met} tanesi karşıladı.",
         "en": "{met} of {tried} met it.",
     },
     "task.solve.saved": {
@@ -470,9 +470,9 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Candidates tried: {share} %",
     },
     "task.place.chose": {
-        "tr": "{anchors} direk seçildi ({kinds}). Hizmet verilen hücre "
-              "%{share} (şimdiki düzen %{grid_share}); ömür boyu maliyet {cost} "
-              "TL (şimdiki düzen {grid_cost} TL).",
+        "tr": "{anchors} yayın birimi yeri seçildi ({kinds}). Hizmet verilen "
+              "hücre %{share} (şimdiki yerleşim %{grid_share}); ömür boyu "
+              "maliyet {cost} TL (şimdiki yerleşim {grid_cost} TL).",
         "en": "Chose {anchors} anchors ({kinds}). Cells served {share} % "
               "(current layout {grid_share} %); lifecycle cost {cost} TL "
               "(current layout {grid_cost} TL).",
@@ -485,8 +485,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     # The anchors the row already had, whatever laid them out: the
     # search keeps them as candidates so it can never do worse.
-    "place.origin.grid": {"tr": "şimdiki düzenden", "en": "from the current layout"},
-    "place.origin.furniture": {"tr": "var olan direk ve tabela",
+    "place.origin.grid": {"tr": "şimdiki yerleşimden", "en": "from the current layout"},
+    "place.origin.furniture": {"tr": "var olan direkler ve tabelalar",
                                "en": "existing columns and signs"},
     "place.origin.rooftop": {"tr": "çatı", "en": "rooftop"},
     "place.origin.hilltop": {"tr": "tepe", "en": "hilltop"},
