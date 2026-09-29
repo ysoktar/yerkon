@@ -448,7 +448,7 @@ WHY = Page(
 FINAL_PARTS = (
     ("e28-2g4m20s", ""), ("dwm3000-lcsc", ""), ("stm32g031k8t6", ""),
     ("stm32g0b1met6", ""), ("atecc608b", ""), ("esp32-s3", ""),
-    ("bno085", ""), ("l76kb", ""), ("pro-ob-430", ""),
+    ("bno085", ""), ("atgm336h-5nr32", ""), ("pro-ob-430", ""),
     ("gw-22-5151", ""), ("hlk-5m12", ""),
     ("lipo-1000", ""), ("ili9341-2.8", ""), ("gainta-g203", ""),
     ("gainta-g212", ""), ("gainta-g517", ""),
@@ -734,8 +734,8 @@ SYSTEM = Page(
                     "bağlantıda daha az yayın yapar. Tünelde ve kapalı "
                     "alanda Qorvo DWM3000'i kullanır. ESP32-S3 ile telefona "
                     "bağlanır; sinyal kesilirse BNO085 hareket sensörüyle "
-                    "son konumdan devam eder. Uydu varken konumu Quectel "
-                    "L76KB-A58 uydu konum modülünden de alır (GPS, GLONASS, "
+                    "son konumdan devam eder. Uydu varken konumu "
+                    "ATGM336H-5NR32 uydu konum modülünden de alır (GPS, GLONASS, "
                     "BeiDou, QZSS). UWB için seramik anten, 2,4 GHz için "
                     "kart üzerinde çip anten, uydu için kart üzerinde "
                     "Abracon PRO-OB-430 yama anten.",
@@ -748,7 +748,7 @@ SYSTEM = Page(
                     "ESP32-S3 connects it to a phone; if the signal drops, "
                     "a BNO085 motion sensor carries on from the last "
                     "position. While the satellites are there it also "
-                    "takes a position from a Quectel L76KB-A58 satellite "
+                    "takes a position from an ATGM336H-5NR32 satellite "
                     "positioning module (GPS, GLONASS, BeiDou, QZSS). A "
                     "ceramic antenna for UWB, a chip antenna on the board "
                     "for 2,4 GHz, and an Abracon PRO-OB-430 patch on the "
@@ -800,10 +800,10 @@ SYSTEM = Page(
             lines=(
                 _w(
                     "1000 adette bir yayın birimi yaklaşık 1400-1700 lira, "
-                    "bir alıcı yaklaşık 2500-3500 lira. Her ürünün 1, 100 "
+                    "bir alıcı yaklaşık 2500-3400 lira. Her ürünün 1, 100 "
                     "ve 1000 adetlik fiyat tablosu Maliyet sayfasında.",
                     "At a thousand units a broadcast unit is roughly 1400 "
-                    "to 1700 lira and a receiver roughly 2500 to 3500 "
+                    "to 1700 lira and a receiver roughly 2500 to 3400 "
                     "lira. Every product's price at one, a hundred and a "
                     "thousand is tabled on the Cost page.",
                 ),

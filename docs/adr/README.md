@@ -123,4 +123,4 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0111](0111-yonetmeligin-terimleri.md) | 2,4 GHz kuralı yönetmeliğin terimleriyle: FHSS, LBT, mW; BTK sayfa bağlantıları | Geçerli |
 | [0112](0112-adreslerde-html-yok.md) | Adreslerde .html yok; her dil ve sayfa kendi klasöründe, eski adresler yönlendiriyor | Geçerli |
 | [0113](0113-tunelde-olculmus-golgeleme-ve-40-m.md) | Tünelde ölçülmüş 2,7 dB gölgeleme payı ve 40 m aralık | Geçerli |
-| [0114](0114-alicilarda-uydu-konum-modulu.md) | Alıcılarda uydu konum modülü (Quectel L76KB-A58) | Geçerli |
+| [0114](0114-alicilarda-uydu-konum-modulu.md) | Alıcılarda uydu konum modülü (ATGM336H-5NR32) | Geçerli |
