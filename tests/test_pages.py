@@ -774,40 +774,62 @@ def test_the_sources_are_shipped_with_the_package():
 
 
 def test_the_folder_carries_both_languages_and_every_page(tmp_path):
+    """Each language in its folder, each page in a folder of its own, so
+    no address ends in ".html" (ADR-0112)."""
     from yerkon.viewer.pages import CARRIED, browser_simulator, write_pages
 
     written = write_pages(tmp_path, a_record())
     names = {str(path.relative_to(tmp_path)) for path in written}
-    assert "index.html" in names and "en/index.html" in names
-    assert "simulasyon.html" in names and "en/simulasyon.html" in names
+    assert "tr/index.html" in names and "en/index.html" in names
+    assert "tr/simulasyon/index.html" in names
+    assert "en/simulasyon/index.html" in names
     assert "site.css" in names and ".nojekyll" in names
+    assert (tmp_path / "CNAME").read_text() == "yerkon.com\n"
     # The simulator itself, run by the visitor's browser (ADR-0080).
-    assert {"calistir.html", "yerkon.zip", "sim-worker.js"} <= names
-    assert len(written) == (2 * len(PAGES) + len(CARRIED) + 1
-                            + len(browser_simulator()))
+    assert {"calistir/index.html", "yerkon.zip", "sim-worker.js"} <= names
+    # The root and every old address send the visitor on: one per page
+    # in each language but the English front page, which is itself.
+    onward = 1 + 2 * (len(PAGES) - 1) + 1
+    assert len(written) == (2 * len(PAGES) + len(CARRIED) + 2
+                            + len(browser_simulator()) + onward)
+
+
+def test_an_old_address_sends_the_visitor_to_the_new_one(tmp_path):
+    written = write_pages_of(tmp_path)
+    assert 'url=tr/"' in (tmp_path / "index.html").read_text()
+    assert 'url=tr/sistem/"' in (tmp_path / "sistem.html").read_text()
+    assert 'url=sistem/"' in (tmp_path / "en" / "sistem.html").read_text()
+    # The simulator keeps its language in the address it is sent on with.
+    old = (tmp_path / "calistir.html").read_text()
+    assert 'url=calistir/"' in old and "location.search" in old
+    assert written
 
 
 def test_a_page_in_the_folder_points_at_files_that_are_there(tmp_path):
-    """Served, the links are addresses. Loose, they are file names, and
-    a folder served under /yerkon/ has no root to point at."""
+    """Served, the links are addresses. Loose, they are relative paths, so
+    the folder works at a domain's root and under a path of its own."""
     written = write_pages_of(tmp_path)
     for path in written:
         if path.suffix != ".html":
             continue
         drawn = path.read_text(encoding="utf-8")
+        base = path.parent
+        declared = re.search(r'<base href="([^"]+)"', drawn)
+        if declared:
+            base = (path.parent / declared.group(1)).resolve()
         for reference in re.findall(r'(?:href|src)="([^"]+)"', drawn):
             if reference.startswith("http") or reference.startswith("#"):
                 continue
             # The simulator is asked for its language in the address.
             reference = reference.split("?")[0]
             # Answered by the engine in the browser rather than by a file.
-            if reference.startswith("api/"):
+            if reference.startswith("api/") or declared and reference == declared.group(1):
                 continue
             assert not reference.startswith("/"), "{}: {}".format(
                 path.name, reference
             )
-            assert (path.parent / reference).resolve().exists(), "{}: {}".format(
-                path.name, reference
+            assert (base / reference).resolve().exists(), "{}: {}".format(
+                path.relative_to(tmp_path), reference
             )
 
 
@@ -841,11 +863,13 @@ def test_the_folder_in_the_repository_is_what_the_pages_draw_now(tmp_path):
     # And nothing the pages no longer draw. A page that was renamed
     # leaves its file behind, and the address keeps serving it.
     drawn = {path.relative_to(tmp_path) for path in written}
-    for folder in ("", "en"):
-        for found in (docs / folder).glob("*.html"):
-            assert found.relative_to(docs) in drawn, (
-                "{} is not a page any more; run `yerkon pages`".format(found)
-            )
+    found_pages = list(docs.glob("*.html"))
+    for folder in ("tr", "en", "calistir"):
+        found_pages += list((docs / folder).rglob("*.html"))
+    for found in found_pages:
+        assert found.relative_to(docs) in drawn, (
+            "{} is not a page any more; run `yerkon pages`".format(found)
+        )
 
 
 def test_the_site_as_files_refuses_to_draw_a_table_that_is_not_there(tmp_path):
@@ -985,8 +1009,11 @@ def test_the_published_site_opens_the_simulator_rather_than_a_page_about_it():
     """"Simülasyonu çalıştır" runs it; it no longer sends people elsewhere."""
     from yerkon.viewer.pages import BROWSER_SIMULATOR, Where
 
-    assert Where(language="tr", loose=True).simulator() == BROWSER_SIMULATOR
-    assert Where(language="en", loose=True).simulator() == (
+    from yerkon.viewer.pages import HOME
+
+    home = dict(loose=True, at=HOME)
+    assert Where(language="tr", **home).simulator() == "../" + BROWSER_SIMULATOR
+    assert Where(language="en", **home).simulator() == (
         "../" + BROWSER_SIMULATOR + "?dil=en")
     assert Where().simulator() == SIMULATOR
 
@@ -999,8 +1026,10 @@ def test_the_browser_simulator_asks_nothing_of_the_domain_root(tmp_path):
     """
     from yerkon.viewer.pages import browser_simulator
 
+    from yerkon.viewer.pages import BROWSER_SIMULATOR_PAGE
+
     files = browser_simulator()
-    page = files["calistir.html"].decode("utf-8")
+    page = files[BROWSER_SIMULATOR_PAGE].decode("utf-8")
     # Each address carries the version tag (`?v=`), so a browser that
     # kept yesterday's file asks for today's.
     assert re.search(r'<script src="local\.js\?v=\w+"></script>', page)

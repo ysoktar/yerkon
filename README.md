@@ -3,7 +3,7 @@
 YERKON yayın birimlerinden kurulan karasal bir konumlandırma ağının ne
 kadar doğru konum verdiğini ve kurmanın ile işletmenin neye mal olduğunu
 kestirir. Çıktısı, başvurudaki karşılaştırma tablosunun üç YERKON
-satırıdır. Site: **<https://ysoktar.github.io/yerkon/>**
+satırıdır. Site: **<https://yerkon.com/tr/>**
 
 Sayılar bir modelden gelir, sahada yapılmış bir ölçümden değil. Her sayı
 bir veri sayfasına, yayımlanmış bir ölçüme, bir standarda ya da açıkça

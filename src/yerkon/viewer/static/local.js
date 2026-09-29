@@ -125,7 +125,7 @@
   addEventListener("DOMContentLoaded", () => {
     // The way back is to the site's front page in the reader's language.
     const back = document.getElementById("back");
-    if (back) back.setAttribute("href", english ? "en/index.html" : "index.html");
+    if (back) back.setAttribute("href", english ? "en/" : "tr/");
 
     // The figures file is a link rather than a fetch, so it would go to
     // the network and find nothing. It is made here and handed over.

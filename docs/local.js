@@ -47,7 +47,7 @@
   const show = () => document.body.append(cover);
   if (document.body) show(); else addEventListener("DOMContentLoaded", show);
 
-  const worker = new Worker("sim-worker.js?v=ad06a4694f", { type: "module" });
+  const worker = new Worker("sim-worker.js?v=5b5cde11e9", { type: "module" });
   // A worker that dies while loading says nothing on its own, and the
   // cover would promise a load that is never coming.
   worker.onerror = event => {
@@ -125,7 +125,7 @@
   addEventListener("DOMContentLoaded", () => {
     // The way back is to the site's front page in the reader's language.
     const back = document.getElementById("back");
-    if (back) back.setAttribute("href", english ? "en/index.html" : "index.html");
+    if (back) back.setAttribute("href", english ? "en/" : "tr/");
 
     // The figures file is a link rather than a fetch, so it would go to
     // the network and find nothing. It is made here and handed over.

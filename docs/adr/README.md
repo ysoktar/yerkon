@@ -121,3 +121,4 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0109](0109-atomik-saat-fiyati.md) | TDoA saat bedeli kaynaklı: atomik saatin tek adet fiyatı | Geçerli |
 | [0110](0110-iki-yonlu-olcum-ve-her-birimde-20s.md) | Her ölçüm iki yönde kapanır; her birimde E28-2G4M20S | Geçerli |
 | [0111](0111-yonetmeligin-terimleri.md) | 2,4 GHz kuralı yönetmeliğin terimleriyle: FHSS, LBT, mW; BTK sayfa bağlantıları | Geçerli |
+| [0112](0112-adreslerde-html-yok.md) | Adreslerde .html yok; her dil ve sayfa kendi klasöründe, eski adresler yönlendiriyor | Geçerli |

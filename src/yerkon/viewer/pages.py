@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import hashlib
 import html
+import json
 import pathlib
 import re
 from dataclasses import dataclass
@@ -109,47 +110,58 @@ class Where:
     """How one page names another.
 
     A server answers `/sorun` and a folder of files answers
-    `sorun.html`, and that is the only thing the two disagree about.
+    `tr/sorun/`, and that is the only thing the two disagree about.
     Keeping it in one object means the pages are written once and the
     static export is not a second copy of them (ADR-0065).
+
+    In the folder each language has its own folder and each page a
+    folder of its own inside it, so an address never ends in ".html":
+    `tr/` is the Turkish front page, `tr/sistem/` a page, `en/sistem/`
+    its English (ADR-0112). Links are relative, so the folder works at
+    the domain's root and under a path of its own alike.
     """
 
-    #: The language of the page doing the naming. Only the static export
-    #: needs it, because there each language is its own folder.
+    #: The language of the page doing the naming.
     language: str = "tr"
     #: A folder of files rather than a running server.
     loose: bool = False
+    #: The page doing the naming: how deep it sits decides the way up.
+    at: Optional["Page"] = None
+
+    def _up(self) -> str:
+        # `tr/` is one folder below the root, `tr/sistem/` two.
+        return "../" if self.at is None or not self.at.slug else "../../"
 
     def page(self, page: "Page") -> str:
         if not self.loose:
             return "/" + page.slug
-        return self.file(page)
+        return self._up() + self.folder(page, self.language)
 
     def tongue(self, page: "Page", code: str) -> str:
         if not self.loose:
             return "/{}?dil={}".format(page.slug, code)
-        if code == self.language:
-            return self.file(page)
-        return ("en/" if code == "en" else "../") + self.file(page)
+        return self._up() + self.folder(page, code)
 
     def asset(self, name: str) -> str:
         if not self.loose:
             return "/" + name
-        return ("../" if self.language == "en" else "") + name
+        return self._up() + name
 
     def simulator(self) -> str:
         # Served, this is the running simulator. Loose, it is the same
-        # simulator running in the visitor's browser, one folder up from
-        # the English pages (ADR-0080).
+        # simulator running in the visitor's browser (ADR-0080).
         if not self.loose:
             return SIMULATOR
-        if self.language == "en":
-            return "../" + BROWSER_SIMULATOR + "?dil=en"
-        return BROWSER_SIMULATOR
+        return self._up() + BROWSER_SIMULATOR + (
+            "?dil=en" if self.language == "en" else "")
 
     @staticmethod
-    def file(page: "Page") -> str:
-        return "index.html" if not page.slug else page.slug + ".html"
+    def folder(page: "Page", code: str) -> str:
+        return code + "/" + (page.slug + "/" if page.slug else "")
+
+    @staticmethod
+    def file(page: "Page", code: str) -> str:
+        return Where.folder(page, code) + "index.html"
 
 
 # --- what the site says ---------------------------------------------------
@@ -3630,7 +3642,13 @@ STATIC = pathlib.Path(__file__).parent / "static"
 
 
 #: The simulator's page on the published site, and what it needs beside it.
-BROWSER_SIMULATOR = "calistir.html"
+BROWSER_SIMULATOR = "calistir/"
+#: Its page, in a folder of its own so the address needs no ".html".
+BROWSER_SIMULATOR_PAGE = "calistir/index.html"
+#: Where the site lives. GitHub Pages reads this file to serve the
+#: domain, and the folder is pushed afresh each time, so it is drawn with
+#: the pages rather than set once by hand (ADR-0112).
+DOMAIN = "yerkon.com"
 BROWSER_SCRIPTS = ("app.js", "draw.js", "words.js", "map.js", "style.css",
                    "local.js", "sim-worker.js")
 #: What of the package the browser does not need: caches, the fetch
@@ -3659,8 +3677,12 @@ def _loose(text: str, swaps) -> str:
 def browser_simulator() -> dict:
     """The simulator's files for a folder served by nothing, by name."""
     page = _loose((STATIC / "simulator.html").read_text(encoding="utf-8"), (
+        # The page sits in calistir/ and everything it loads at the root:
+        # one base puts every relative address, the worker's included,
+        # where the files are.
+        ('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="../">'),
         ('href="/style.css"', 'href="style.css"'),
-        ('<a id="back" href="/"', '<a id="back" href="index.html"'),
+        ('<a id="back" href="/"', '<a id="back" href="tr/"'),
         ('href="/api/figures.toml"', 'href="api/figures.toml"'),
         ('<script type="module" src="/app.js"></script>',
          '<script src="local.js"></script>\n'
@@ -3680,7 +3702,7 @@ def browser_simulator() -> dict:
         ('<script src="local.js">', '<script src="local.js{}">'.format(tag)),
         ('src="app.js"', 'src="app.js{}"'.format(tag)),
     ))
-    files = {BROWSER_SIMULATOR: page.encode("utf-8")}
+    files = {BROWSER_SIMULATOR_PAGE: page.encode("utf-8")}
     for name in BROWSER_SCRIPTS:
         body = (STATIC / name).read_bytes()
         if name == "app.js":
@@ -3742,40 +3764,64 @@ def write_pages(into, published=None) -> tuple:
     should get the one the project is written in.
     """
     into = pathlib.Path(into)
-    (into / "en").mkdir(parents=True, exist_ok=True)
     written = []
-    for code, _ in LANGUAGES:
-        folder = into if code == "tr" else into / code
-        where = Where(language=code, loose=True)
-        for page in PAGES:
-            path = folder / Where.file(page)
-            path.write_text(
-                render(page, code, published, where), encoding="utf-8"
-            )
-            written.append(path)
-    for name in CARRIED:
+
+    def put(name: str, body: bytes) -> None:
         path = into / name
-        path.write_bytes((STATIC / name).read_bytes())
-        written.append(path)
-    # The simulator itself, running in the visitor's browser (ADR-0080).
-    for name, body in browser_simulator().items():
-        path = into / name
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(body)
         written.append(path)
+
+    for code, _ in LANGUAGES:
+        for page in PAGES:
+            where = Where(language=code, loose=True, at=page)
+            put(Where.file(page, code),
+                render(page, code, published, where).encode("utf-8"))
+    for name in CARRIED:
+        put(name, (STATIC / name).read_bytes())
+    # The simulator itself, running in the visitor's browser (ADR-0080).
+    for name, body in browser_simulator().items():
+        put(name, body)
+    # The domain's root and every address the site had before its pages
+    # moved into folders: each sends the visitor on, so a link somebody
+    # kept still arrives (ADR-0112).
+    put("index.html", _onward("tr/"))
+    for page in PAGES:
+        # The front pages are tr/ and en/ themselves: en/index.html is the
+        # English front page, not a way to it.
+        if page.slug:
+            put(page.slug + ".html", _onward(Where.folder(page, "tr")))
+            put("en/" + page.slug + ".html", _onward(page.slug + "/"))
+    put("calistir.html", _onward(BROWSER_SIMULATOR, keep_query=True))
+    put("CNAME", (DOMAIN + "\n").encode("utf-8"))
     # Without this the pages are handed to Jekyll, which is a static site
     # generator this site is not written for.
-    marker = into / ".nojekyll"
-    marker.write_text("", encoding="utf-8")
-    written.append(marker)
+    put(".nojekyll", b"")
     # A page that has been renamed or dropped leaves its file behind,
     # and a stale page nothing links to is still a page the address
     # serves. Only the pages are swept: the folder holds other things.
     kept = set(written)
-    for folder in (into, into / "en"):
-        for stale in folder.glob("*.html"):
-            if stale not in kept:
-                stale.unlink()
+    swept = list(into.glob("*.html"))
+    for folder in ("tr", "en", "calistir"):
+        swept += list((into / folder).rglob("*.html"))
+    for stale in swept:
+        if stale not in kept:
+            stale.unlink()
     return tuple(written)
+
+
+def _onward(to: str, keep_query: bool = False) -> bytes:
+    """A page that only sends the visitor to `to`."""
+    target = html.escape(to, quote=True)
+    carry = "+location.search+location.hash" if keep_query else "+location.hash"
+    return (
+        "<!doctype html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n"
+        '<meta http-equiv="refresh" content="0; url={0}">\n'
+        '<link rel="canonical" href="{0}">\n'
+        "<title>YERKON</title>\n"
+        "<script>location.replace({1}{2})</script>\n"
+        "</head>\n<body><a href=\"{0}\">YERKON</a></body>\n</html>\n"
+    ).format(target, json.dumps(to), carry).encode("utf-8")
 
 
 def _said(words: Words, language: str) -> str:
