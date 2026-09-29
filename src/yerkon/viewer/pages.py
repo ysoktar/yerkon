@@ -530,8 +530,8 @@ SYSTEM = Page(
                     "birimi, tekerleğin kaç tur döndüğü ve harita. "
                     "Böylece uydu hiç görünmese de konum vermeye devam "
                     "eder. Tablodaki simülasyonda atalet birimi ve "
-                    "tekerlek kullanılmadı; yalnız mesafeler ve sayısal "
-                    "yükseklik modelinden okunan yol yüksekliği.",
+                    "tekerlek kullanılmadı; yalnız mesafeler ve haritadan "
+                    "gelen yükseklik.",
                     "**The receiver.** It goes in a vehicle or in a "
                     "pocket. It combines the distances it measures to the "
                     "units with the vehicle's own sensors: an inertial "
@@ -1643,17 +1643,15 @@ SIMULATION = Page(
                 _w(
                     "Yol kenarına dizilmiş birimler hep aynı yükseklikte "
                     "olduğu için yüksekliği mesafelerle ölçmek zor. Filtre "
-                    "bu yüzden alıcıdaki sayısal yükseklik modelinden okunan "
-                    "yol yüksekliğini bir ölçüm olarak alıyor, modelin 2,43 "
-                    "m'lik hatasıyla; "
+                    "bu yüzden alıcının haritasındaki yol yüksekliğini bir "
+                    "ölçüm olarak alıyor, 2,43 m'lik bir harita hatasıyla; "
                     "hata yol boyunca parça parça çekiliyor. Tablodaki VPE "
                     "sütunu bu hesabın sonucu.",
                     "Units strung along a roadside are all at much the "
                     "same height, which leaves the vertical hard to "
                     "measure from ranges. The filter therefore takes the "
-                    "road's height from the receiver's elevation model as a "
-                    "measurement, with the model's error of 2,43 m drawn in "
-                    "patches along the "
+                    "road's height from the receiver's map as a measurement, "
+                    "with a map error of 2,43 m drawn in patches along the "
                     "road. The VPE column is the result.",
                 ),
             ),
@@ -1709,14 +1707,12 @@ SIMULATION = Page(
                 _w(
                     "Aracın hareket sensörü ve tekerlek turu hesaba "
                     "katılmadı. Filtre yalnız telsiz ölçümlerini ve "
-                    "sayısal yükseklik modelinden okunan yol yüksekliğini "
-                    "birleştiriyor. Ürünün "
+                    "haritadan gelen yüksekliği birleştiriyor. Ürünün "
                     "tasarımında ikisi de var; buradaki sayılar bu yüzden "
                     "gerçek bir araçtan daha kötü.",
                     "The vehicle's motion sensor and wheel turns are left "
                     "out. The filter combines only the radio measurements "
-                    "and the road height read from the elevation model. The "
-                    "product's design has "
+                    "and the height from the map. The product's design has "
                     "both, so these numbers are worse than a real "
                     "vehicle's.",
                 ),
@@ -3369,12 +3365,12 @@ SPREAD = _w("Üç satırın hatası: ortancadan en kötü %5'e",
 SPREAD_UNDER = _w(
     "Yol kenarına dizilmiş "
     "birimlerin hepsi aşağı yukarı aynı yükseklikte, o yüzden yüksekliği "
-    "mesafelerden ölçecek geometri yok; düşeyi sayısal yükseklik "
-    "modelinden okunan yol yüksekliği taşıyor.",
+    "mesafelerden ölçecek geometri yok; düşeyi haritadan gelen yükseklik "
+    "taşıyor.",
     "Units strung "
     "along a roadside are all at much the same height, so there is no "
-    "geometry to measure height from ranges; the road height read from "
-    "the elevation model carries the vertical.",
+    "geometry to measure height from ranges; the height from the map "
+    "carries the vertical.",
 )
 COST = _w("Kilometrekare başına kurulum maliyeti",
           "Capital per square kilometre")
