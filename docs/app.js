@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=256dba068f";
+import { decimal, say, speak, speaks } from "./words.js?v=59b2b01e66";
 
 /* The choices whose names are this page's to give.
  *
@@ -1735,9 +1735,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=256dba068f";
-import * as flat from "./bore.js?v=256dba068f";
-import * as pick from "./map.js?v=256dba068f";
+import * as draw from "./draw.js?v=59b2b01e66";
+import * as flat from "./bore.js?v=59b2b01e66";
+import * as pick from "./map.js?v=59b2b01e66";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -3034,8 +3034,7 @@ function frameEverything() {
 
 /* ---------- numbers ---------- */
 
-const tr = (value, places = 2) =>
-  Number(value).toFixed(places).replace(".", ",");
+const tr = (value, places = 2) => decimal(value, places);
 
 function showNumbers(drawn, result, pending) {
   const list = document.getElementById("numbers");

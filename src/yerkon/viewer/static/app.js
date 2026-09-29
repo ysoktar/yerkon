@@ -3034,8 +3034,7 @@ function frameEverything() {
 
 /* ---------- numbers ---------- */
 
-const tr = (value, places = 2) =>
-  Number(value).toFixed(places).replace(".", ",");
+const tr = (value, places = 2) => decimal(value, places);
 
 function showNumbers(drawn, result, pending) {
   const list = document.getElementById("numbers");

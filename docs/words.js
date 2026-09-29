@@ -42,8 +42,8 @@ export const SAY = {
   "ground.buildings.note": {
     tr: "Bu zemin kendi binalarını getiriyor, dolayısıyla engel arazinin "
         + "içinde. Kilometre başına bir kayıp, arazinin gösteremediği "
-        + "engelin yerine geçer; ikisini birden saymak aynı binaları iki "
-        + "kez saymaktır.",
+        + "engelin yerine geçer; ikisinin birden sayılması aynı binaların iki "
+        + "kez sayılması olur.",
     en: "This ground brings its own buildings, so the obstruction is in "
         + "the terrain. A loss per kilometre stands in for obstruction the "
         + "terrain cannot show; charging both counts the same buildings "
@@ -234,7 +234,7 @@ export const SAY = {
   // -- step 2, the site ---------------------------------------------------
   "step.site": { tr: "Saha", en: "Site" },
   "site.rows": {
-    tr: "Üç satırın üçü de hazır durur. Sekmeler arasında geçmek yaptığın "
+    tr: "Üç satırın üçü de hazır durur. Sekmeler arasında geçiş yaptığın "
         + "düzenlemeyi silmez; her sekme kendi yerleşimini tutar.",
     en: "All three rows are held at once. Switching tabs does not discard "
         + "your edits; each tab keeps its own arrangement.",
@@ -867,8 +867,14 @@ export function speaks() { return speaking; }
  * `.toFixed(n).replace(".", ",")` written out by hand, which is three
  * more places for one of them to be forgotten.
  */
+/* A figure as Turkish writes it: a comma for the decimal mark and a dot
+ * between thousands (1.400; 6.489,6). */
 export function decimal(value, places = 1) {
-  return Number(value).toFixed(places).replace(".", ",");
+  const [whole, part] = Number(value).toFixed(places).split(".");
+  const sign = whole.startsWith("-") ? "-" : "";
+  const digits = sign ? whole.slice(1) : whole;
+  const marked = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return sign + marked + (part !== undefined ? "," + part : "");
 }
 
 /* One phrase, with what it was given put where that language puts it.

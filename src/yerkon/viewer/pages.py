@@ -233,8 +233,8 @@ HOME = Page(
                     "baskılı devresi ve dizgisiyle yaklaşık 1400 ile 1700 "
                     "lira arasında. Hedef, AUS "
                     "noktalarında zaten "
-                    "duran elektrik ve haberleşme altyapısını yeniden "
-                    "kullanmak; maliyeti aşağıda tutan da bu.",
+                    "duran elektrik ve haberleşme altyapısının yeniden "
+                    "kullanılması; maliyeti aşağıda tutan da bu.",
                     "A broadcast unit costs roughly 1400 to 1700 lira at "
                     "a thousand units, box, printed board and assembly "
                     "included. The aim is to reuse "
@@ -867,7 +867,7 @@ RESEARCH = Page(
                     "Ulaştırma ve Haberleşme Şurası akıllı ulaşım "
                     "altyapısının geliştirilmesini hedef koydu. Yol "
                     "kenarındaki ünitelerin ve trafik kontrol noktalarının "
-                    "elektriğini ve hattını kullanmak, montajı ucuza "
+                    "elektriğinin ve hattının kullanılması, montajı ucuza "
                     "getirmenin yolu.",
                     "**Can a system be built by touching the existing "
                     "infrastructure as little as possible, and grown "
@@ -919,7 +919,7 @@ RESEARCH = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Sahte sinyali erken görmek", "Seeing spoofing early"),
+            heading=_w("Sahte sinyali erken görme", "Seeing spoofing early"),
             lines=(
                 _w(
                     "Sahte sinyal altında alıcı, dışarıdan bakınca "
@@ -1347,8 +1347,8 @@ RESULTS = Page(
                     "**Tünel satırının maliyeti kilometre başına, "
                     "diğerleri kilometrekare başına.** 12 m genişliğinde "
                     "2 km'lik bir tünel bir km²'nin ellide biri kadar yer "
-                    "kaplar; alana bölmek sayıyı tünel pahalı olduğu için "
-                    "değil payda küçük olduğu için büyütür. Tünel bir "
+                    "kaplar; alana bölünce sayı, tünel pahalı olduğu için "
+                    "değil payda küçük olduğu için büyür. Tünel bir "
                     "alana değil bir hatta hizmet ediyor, o yüzden o iki "
                     "hücre güzergâh kilometresine bölündü ve \"/km\" ile "
                     "işaretli. Aynı ölçü olmadığı için diğer satırlarla "
@@ -1493,8 +1493,8 @@ SIMULATION = Page(
                     "Sinyal alıcıya iki yoldan gelir: doğrudan ve "
                     "zeminden sekerek. Belli bir mesafeden sonra bu ikisi "
                     "ters düşüp birbirini zayıflatır. O mesafe anten "
-                    "yüksekliğiyle birlikte arttığı için, birimi alçağa "
-                    "koymak menzilden götürür.",
+                    "yüksekliğiyle birlikte arttığı için, birimin alçağa "
+                    "konması menzilden götürür.",
                     "The signal reaches the receiver two ways: directly, "
                     "and bouncing off the ground. Past a certain distance "
                     "those two fall out of step and weaken each other. "
@@ -1529,8 +1529,8 @@ SIMULATION = Page(
                 _w(
                     "Bir bağlantıda bu iki kayıptan büyük olan hesaba "
                     "giriyor, ikisi toplanmıyor. İkisi de aynı arazinin aynı bağlantıya "
-                    "yaptığını anlatıyor; toplamak aynı tepeyi iki kez "
-                    "saymak olurdu.",
+                    "yaptığını anlatıyor; toplanırsa aynı tepe iki kez "
+                    "sayılmış olur.",
                     "A link counts the larger of those two losses, not "
                     "their sum. Both describe what the same terrain does "
                     "to the same link, and adding them would count the "
@@ -1570,7 +1570,7 @@ SIMULATION = Page(
                     "asks for.",
                 ),
                 _w(
-                    "On iki birimle sırayla ölçüşmek 401 milisaniye "
+                    "On iki birimle sırayla ölçüşme 401 milisaniye "
                     "sürüyor. Bu sürede 100 km/sa giden araç 11,1 metre yol "
                     "alıyor, yani bir turdaki ölçümler aynı ana ait değil. "
                     "Hesap da onları aynı anda alınmış gibi kabul "
@@ -1618,7 +1618,7 @@ SIMULATION = Page(
                     "**Önü kapalı bir bağlantı olduğundan uzun ölçer.** "
                     "Sinyal engelin üzerinden dolaşıyor ve ölçüm bu uzun "
                     "yolu sayıyor. Hata hep aynı yöne, artı yöne gidiyor; "
-                    "bu yüzden çok ölçüp ortalamak onu götürmüyor.",
+                    "bu yüzden çok ölçüp ortalama alma onu gidermiyor.",
                     "**A blocked link measures longer than it is.** The "
                     "signal goes around the obstacle and the measurement "
                     "counts that longer way. The error always goes the "
@@ -1813,8 +1813,8 @@ SIMULATION = Page(
                 _w(
                     "Arazi seyrek okununca tepelerin arkasındaki zayıflama "
                     "eksik hesaplanıyor, bu da hızlı sonucu çoğunlukla "
-                    "olduğundan iyi gösteriyor. Engellerin etkisini bir kez "
-                    "denemek ise iki yöne de saptırabiliyor: aynı "
+                    "olduğundan iyi gösteriyor. Engellerin etkisinin bir kez "
+                    "denenmesi ise iki yöne de saptırabiliyor: aynı "
                     "yerleşimde bir satır hızlıda iyi, başka biri kötü "
                     "çıkabiliyor. Hızlı hesap yalnız denemek için; Sonuçlar "
                     "sayfasındaki tablo yalnızca yavaş ve tam hesaptan "
@@ -2009,7 +2009,7 @@ COST = Page(
                     "the centre the same way.",
                 ),
                 _w(
-                    "Direk eklemek kullanılabilirliği yükseltiyor ama "
+                    "Direk ekleme kullanılabilirliği yükseltiyor ama "
                     "bedava değil. Mevcut yapılar bunu karşılanabilir "
                     "kılıyor: her ek birim yeni bir saha değil, bir yayın birimi ve "
                     "bir montaj.",
@@ -2310,7 +2310,7 @@ LAW = Page(
                    "16,25 mW (12,1 dBm). En yüksek ayar, modülün en çok "
                    "çıkışıyla bile sınırın aşılmadığı iletilen güç: sınır "
                    "eksi antenin net kazancı. Tipik çıkış bundan 1 dB "
-                   "aşağıda kalır. Anten takmak serbest, ama TS EN 300 328 "
+                   "aşağıda kalır. Anten takılması serbest, ama TS EN 300 328 "
                    "cihazın o antenle test edilmesini ve yazılımın izin "
                    "verdiği hiçbir güç ayarının sınırı aşmamasını istiyor "
                    "(4.2.4 ve 4.3.1.2). Model her birimin gücünü antenin "
@@ -2333,8 +2333,8 @@ LAW = Page(
                    "results use that power."),
                 _w("UWB birimleri (DWM3000) kendi antenleriyle -41,3 "
                    "dBm/MHz'te; tünel ve yaya birimi aşağıdaki tabloya "
-                   "olduğu gibi uyuyor, araç alıcısı gücünü denetlemek "
-                   "(TPC) ve yukarıya harici sınırı uygulamak zorunda.",
+                   "olduğu gibi uyuyor; araç alıcısının gücünü denetlemesi "
+                   "(TPC) ve yukarıya doğru harici sınırı uygulaması gerekiyor.",
                    "The UWB units (DWM3000) run at -41,3 dBm/MHz on their "
                    "own antennas; the tunnel and pedestrian units fit the "
                    "table below as they are, the vehicle receiver has to "
@@ -2574,7 +2574,7 @@ LAW = Page(
                    "none publishes a price, so the cost will come from a "
                    "quotation."),
                 _w("Uyumlaştırılmış standartlar uygulanırsa Onaylanmış "
-                   "Kuruluşa gitmek zorunlu değil: RED 2014/53/AB Madde "
+                   "Kuruluşa gitme zorunluluğu yok: RED 2014/53/AB Madde "
                    "17(3), Ek II'deki iç üretim kontrolüne izin veriyor. "
                    "Bu, uygunluğun bedelsiz olduğu anlamına gelmiyor; "
                    "üretici uygunluğu teknik dosya ve ölçüm sonuçlarıyla "
@@ -2984,13 +2984,17 @@ def render(
     # The home page is called YERKON, and "YERKON · YERKON" is not a
     # title.
     named = page.title.said(language)
-    return _document(
+    from yerkon.numbers import grouped_html
+
+    # Every quantity on the page with its thousands marked, whichever
+    # file it was written in (the page, the table's notes, the settings).
+    return grouped_html(_document(
         title=named if named == "YERKON" else "{} · YERKON".format(named),
         language=language,
         stylesheet=where.asset("site.css"),
         script=where.asset("theme.js"),
         body="\n".join(body),
-    )
+    ))
 
 
 def _document(title: str, language: str, stylesheet: str, script: str,
@@ -3284,7 +3288,7 @@ CLOCKS = (
                 "clock synchronisation, YERKON (two way ranging)")),
 )
 CLOCKS_UNDER = _w(
-    "TDoA'da birimlerin saatlerini birbirine eşitlemek, birim başına "
+    "TDoA'da birimlerin saatlerinin birbirine eşitlenmesi, birim başına "
     "atomik saat ve IEEE 1588 PTP gibi pahalı bir altyapı istiyor. "
     "YERKON mesafeyi çift yönlü ölçtüğü için bu senkronizasyona hiç "
     "gerek duymuyor.",

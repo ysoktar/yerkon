@@ -40,9 +40,9 @@ yerkon table --publish  # koşuyu src/yerkon/published.toml'a yazar
 
 | Sistem | Teknoloji | Ortam | HPE P50 [m] | HPE P95 [m] | VPE P95 [m] | Kullanılabilirlik | Alan [km²] | CAPEX [TL/km²] | OPEX [TL/km²/yıl] |
 |---|---|---|---|---|---|---|---|---|---|
-| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,29 | 9,19 | 4,00 | %96,65 | 8,14 | 9061 | 1940 |
-| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,16 | 8,15 | 4,96 | %94,58 | 354,00 | 1138 | 330 |
-| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,37 | 1,08 | 2,57 | %99,55 | 0,02 | 162442 /km | 33160 /km |
+| YERKON (Şehir içi) | Karasal konumlandırma (SX1280/LoRa TWR) | Dış | 2,29 | 9,19 | 4,00 | %96,65 | 8,14 | 9.061 | 1.940 |
+| YERKON (Kırsal) | Karasal konumlandırma (E28-SX1280 TWR) | Dış | 2,16 | 8,15 | 4,96 | %94,58 | 354,00 | 1.138 | 330 |
+| YERKON (Tünel) | Karasal konumlandırma (UWB/DWM3000 TWR) | İç + dış | 0,37 | 1,08 | 2,57 | %99,55 | 0,02 | 162.442 /km | 33.160 /km |
 
 Tünel satırının maliyeti km² değil güzergâh km'si başına ("/km").
 

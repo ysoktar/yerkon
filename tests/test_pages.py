@@ -16,6 +16,8 @@ import re
 
 import pytest
 
+from yerkon.numbers import grouped
+
 from yerkon.published import EVERY_ROW, Published, read, write
 from yerkon.report import Row
 from yerkon.viewer.pages import (
@@ -229,7 +231,7 @@ def a_record(**changes) -> Published:
 
 def test_the_results_page_draws_the_published_run():
     drawn = render(page_at("/sonuclar"), "tr", a_record())
-    for expected in ("90,00", "91,00", "93,00", "%93,75", "94000"):
+    for expected in ("90,00", "91,00", "93,00", "%93,75", "94.000"):
         assert expected in drawn, expected
 
 
@@ -359,7 +361,8 @@ def test_the_record_is_the_table_the_readme_quotes():
     assert len(rows) == len(record.rows), rows
     for line, row in zip(rows, record.rows):
         quoted = [cell.strip() for cell in line.strip("|").split("|")]
-        assert quoted == list(row.cells()), line
+        # Thousands marked, as on the site.
+        assert quoted == [grouped(cell) for cell in row.cells()], line
 
 
 def test_the_shipped_record_is_a_whole_table_read_finely():
@@ -946,7 +949,7 @@ def test_what_the_town_s_structures_save_is_what_the_model_prices():
 
     page = render(page_at("maliyet"), "tr")
     for figure in (on_column, on_mast):
-        assert decimal_comma(figure, 2) in page
+        assert grouped(decimal_comma(figure, 2)) in page
     assert "{} katı".format(ratio_on_masts()) in page
 
 
@@ -1110,7 +1113,7 @@ def test_the_home_page_quotes_the_bill_s_own_unit_prices():
     boards = bill().boards
     page = render(page_at(""), "tr", read())
     for key in ("amplified-anchor", "tunnel-anchor"):
-        assert str(int(round(boards[key].thousand_tl, -2))) in page, key
+        assert grouped(str(int(round(boards[key].thousand_tl, -2)))) in page, key
 
 
 def test_a_cell_with_two_figures_draws_a_line_to_the_second():
