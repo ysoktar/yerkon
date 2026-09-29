@@ -13,7 +13,8 @@
  * search looked broken while doing exactly what it was told. */
 [hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; overflow: hidden;
-  font: 13px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  font: 13px/1.5 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
 #scene { position: absolute; inset: 0; right: 340px; background: #dfe7ee; }
 #panel { position: absolute; top: 0; right: 0; bottom: 0; width: 340px;
   overflow-y: auto; padding: 16px 18px 40px; background: var(--paper);

@@ -62,8 +62,11 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
-  font: 15px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif;
+  font: 15px/1.65 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
+/* Selected text in the line blue, the colour the charts draw with, see
+   through enough that what is selected stays readable. */
+::selection { background: color-mix(in srgb, var(--chart-mark) 30%, transparent); }
 
 /* --- the chrome --------------------------------------------------------- */
 
@@ -82,14 +85,26 @@ nav.pages a { font-size: 13px; color: var(--quiet); text-decoration: none; }
 nav.pages a:hover { color: var(--ink); }
 nav.pages a.here { color: var(--ink); font-weight: 600; }
 nav.tongues { display: flex; gap: 6px; }
-nav.tongues a, button.theme {
+nav.tongues a {
   padding: 2px 7px; border: 1px solid var(--line); border-radius: 4px;
   background: none; font: inherit; font-size: 11px; color: var(--quiet);
   text-decoration: none; cursor: pointer;
 }
+/* Light and dark as a two-way switch: the sun and the moon sit in the
+   track, the knob covers the one that is not in use. */
+button.theme { position: relative; display: inline-flex;
+  align-items: center; justify-content: space-between; width: 50px;
+  height: 24px; padding: 0 5px; border: 1px solid var(--line);
+  border-radius: 12px; background: var(--shade); color: var(--quiet);
+  cursor: pointer; }
+button.theme svg { width: 13px; height: 13px; }
+button.theme .knob { position: absolute; top: 2px; left: 2px; width: 18px;
+  height: 18px; border-radius: 50%; background: var(--paper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); transition: left 0.18s ease; }
+button.theme[aria-checked="true"] .knob { left: 28px; }
 nav.tongues a.here { background: var(--ink); border-color: var(--ink);
   color: var(--paper); }
-button.theme:hover { color: var(--ink); }
+button.theme:hover { color: var(--ink); border-color: var(--accent); }
 a.run {
   padding: 7px 14px; border-radius: 4px; background: var(--accent);
   color: var(--accent-ink); font-size: 13px; font-weight: 600;
@@ -136,13 +151,18 @@ a { color: var(--accent); }
   grid-auto-columns: 1fr; gap: 1px;
   background: var(--line); border: 1px solid var(--line); border-radius: 6px;
   overflow: hidden; }
-.figure { padding: 14px 16px; background: var(--paper); }
+/* A tile that holds a number holds it in the middle. */
+.figure { padding: 14px 16px; background: var(--paper); text-align: center; }
 .figure b { display: block; font-size: 22px;
   font-variant-numeric: tabular-nums; }
 .figure span { font-size: 11px; color: var(--quiet); }
 
-.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.card { display: block; padding: 14px 16px; border: 1px solid var(--line);
+/* The pages, side by side in a strip that scrolls: three in view on a
+   wide window, two on a phone. */
+.cards { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
+  scroll-snap-type: x mandatory; }
+.card { display: block; flex: 0 0 calc((100% - 24px) / 3);
+  scroll-snap-align: start; padding: 14px 16px; border: 1px solid var(--line);
   border-radius: 6px; color: inherit; text-decoration: none; }
 .card:hover { border-color: var(--accent); }
 .card b { display: block; margin-bottom: 4px; }
@@ -155,7 +175,19 @@ figure { width: min(100vw - 32px, 900px); margin: 0 0 0 50%;
   transform: translateX(-50%); text-align: center; }
 figure img { display: block; width: 100%; height: auto; margin: 0 auto;
   padding: 14px; background: var(--plate); border: 1px solid var(--line);
-  border-radius: 8px; }
+  border-radius: 8px; cursor: zoom-in;
+  transition: transform 0.25s ease, box-shadow 0.25s ease; }
+img { margin-left: auto; margin-right: auto; }
+@media (hover: hover) {
+  figure img:hover { transform: scale(1.015);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14); }
+}
+/* A picture opened to the whole screen; a click or Escape closes it. */
+.lightbox { position: fixed; inset: 0; z-index: 50; display: flex;
+  align-items: center; justify-content: center; padding: 16px;
+  background: rgba(8, 12, 16, 0.9); cursor: zoom-out; }
+.lightbox img { max-width: 100%; max-height: 100%; object-fit: contain;
+  background: var(--plate); border-radius: 8px; }
 figcaption { max-width: 720px; margin: 10px auto 0; color: var(--quiet);
   font-size: 12px; text-align: left; }
 
@@ -213,8 +245,7 @@ figure.chart figcaption { margin: 8px auto 0; max-width: 860px; }
   .only-narrow { display: block; }
 }
 /* The bibliography entries a note rests on, beside the note itself. */
-.cited a { color: var(--quiet); }
-.cited a:hover { color: var(--ink); }
+.cited a { color: var(--accent); }
 
 /* The bibliography, grouped the way the report groups it. */
 h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
@@ -223,12 +254,23 @@ section h3:first-child { margin-top: 0; }
 h3 + ul { font-size: 13px; }
 h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
 
+/* The header holds one line while it can: the brand's subtitle goes first,
+   then the page links move to a line of their own. */
+@media (max-width: 1360px) {
+  .brand span { display: none; }
+}
+@media (max-width: 1080px) {
+  .brand { margin-right: auto; }
+  nav.pages { margin-left: 0; order: 4; width: 100%; }
+}
+
 @media (max-width: 760px) {
   header { padding: 10px 16px; }
   nav.pages { margin-left: 0; order: 4; width: 100%; }
   main { padding: 28px 16px 0; }
   h1 { font-size: 24px; }
-  .figures, .cards { grid-template-columns: 1fr 1fr; }
+  .figures { grid-template-columns: 1fr 1fr; }
+  .card { flex-basis: calc((100% - 12px) / 2); }
   .wide, figure { width: calc(100vw - 32px); }
 }
 

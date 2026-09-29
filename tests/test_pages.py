@@ -609,7 +609,7 @@ def test_every_drawing_takes_its_colours_from_the_palette_tokens():
     # query, and the dark override the button sets.
     css = (STATIC / "site.css").read_text(encoding="utf-8")
     for token in ("--chart-mark", "--chart-context"):
-        assert css.count(token) == 3, token
+        assert css.count(token + ":") == 3, token
 
 
 def test_a_chart_is_drawn_again_at_a_phone_s_width():

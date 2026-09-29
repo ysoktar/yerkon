@@ -510,11 +510,11 @@ export const SAY = {
   "result.reset": { tr: "Sıfırla", en: "Reset" },
   // The fidelity toggle. Not a deployment choice, so it sits beside Run
   // rather than among the ready-made options (ADR-0063).
-  "result.hurry": { tr: "Hızlı dene", en: "Try it fast" },
-  "result.hurry.on": { tr: "Hızlı: açık", en: "Fast: on" },
+  "result.hurry": { tr: "Hızlı deneme", en: "Quick trial" },
+  "result.hurry.on": { tr: "Hızlı deneme: açık", en: "Quick trial: on" },
   "result.hurried": {
-    tr: "Bu sayılar hızlı okundu, yayımlanacak olanlar değil",
-    en: "read fast, and not the published figures",
+    tr: "Bu sayılar hızlı denemeden, yayımlanacak olanlar değil",
+    en: "from a quick trial, not the published figures",
   },
   "result.hurried.draws": {
     tr: "gölgeler sekiz yerine bir kez çekiliyor",
@@ -615,10 +615,10 @@ export const SAY = {
   "quick.run": { tr: "Hızlı simülasyon koşuluyor",
                  en: "Running a quick simulation" },
   "quick.done": {
-    tr: "Bitti. Sonuç aşağıda. Yayımlanacak doğrulukta sayı için «Hızlı: "
-        + "açık» düğmesini kapatıp «Simülasyonu çalıştır»a bas.",
+    tr: "Bitti. Sonuç aşağıda. Yayımlanacak doğrulukta sayı için «Hızlı "
+        + "deneme: açık» düğmesini kapatıp «Simülasyonu çalıştır»a bas.",
     en: "Done. The result is below. For publication-grade figures, turn "
-        + "“Fast: on” off and press “Run the simulation”.",
+        + "“Quick trial: on” off and press “Run the simulation”.",
   },
   "quick.failed": { tr: "Durdu: {why}", en: "Stopped: {why}" },
   "quick.big": {

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The comparison table · YERKON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
 <link rel="stylesheet" href="../../site.css">
 <script src="../../theme.js" defer></script>
 </head>
@@ -12,7 +15,7 @@
 <a class="brand" href="../../en/"><b>YERKON</b> <span>A terrestrial positioning backup layer</span></a>
 <nav class="pages"><a href="../../en/">Home</a><a href="../../en/sorun/">The problem</a><a href="../../en/sistem/">The system</a><a href="../../en/arge/">Research</a><a href="../../en/fayda/">What it is for</a><a href="../../en/sonuclar/" class="here">Results</a><a href="../../en/maliyet/">Cost</a><a href="../../en/mevzuat/">Regulation</a><a href="../../en/simulasyon/">The simulation</a><a href="../../en/kaynaklar/">Sources</a></nav>
 <nav class="tongues"><a href="../../tr/sonuclar/">TR</a><a href="../../en/sonuclar/" class="here">EN</a><button class="theme" id="theme" type="button" hidden></button></nav>
-<a class="run" href="../../calistir/?dil=en">Run the simulation →</a>
+<a class="run" href="../../calistir/?dil=en">Run the simulation</a>
 </header>
 <main>
 <h1>The comparison table</h1>
@@ -24,6 +27,6 @@
 <section><h2>What the columns mean</h2><div class="scroll"><table><thead><tr><th>Column</th><th>Meaning</th></tr></thead><tbody><tr><td>HPE, VPE</td><td>How far the position is out, horizontally and vertically, in metres. P50 is the value half the errors stay under, P95 the one 95 per cent of them stay under.</td></tr><tr><td>Availability</td><td>What share of the attempts to work out a position gave a valid one. It counts only the failures in the model, and is not a promise about a service.</td></tr><tr><td>Area</td><td>The ground where enough units can be heard to work out a position, found by sweeping the real terrain. Not the same as the ground the signal reaches.</td></tr><tr><td>CAPEX</td><td>Unit hardware cost divided by the service area; every part of the board and the fitting included.</td></tr><tr><td>OPEX</td><td>What a year of running one km² costs, from an itemised list of what recurs.</td></tr></tbody></table></div></section>
 <section><h2>Three warnings for reading the table</h2><ul><li><strong>The tunnel row is priced per kilometre, the other two per square kilometre.</strong> Twelve metres wide over two kilometres is a fiftieth of a square kilometre, so dividing by area makes the number large because the denominator is small rather than because a tunnel is dear. A tunnel serves a line, so those two cells are divided by route kilometre and marked &quot;/km&quot;. They are not the same measure as the other rows and should not be read beside them.</li><li><strong>The service area is where a position can be had</strong>, not where the signal arrives. The ground the signal reaches is wider: hearing one unit is not enough, a position needs four at once.</li><li><strong>The percentages do not measure the same thing.</strong> The availability figures the satellite systems publish come from different tests, over different durations, against different thresholds. They should not be read side by side as one measurement.</li></ul></section>
 </main>
-<footer><p>YERKON is a project submitted to the UDHAM idea competition of the Ministry of Transport and Infrastructure. The accuracy wanted, where it is wanted.</p></footer>
+<footer><p>Made with love by the YERKON team.</p></footer>
 </body>
 </html>

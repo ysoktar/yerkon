@@ -1741,7 +1741,7 @@ SIMULATION = Page(
                     "şey bu bilgisayarda koşar. İlk açılış yaklaşık 20 MB "
                     "indirir ve bir dakika kadar sürebilir; sonra tarayıcı "
                     "saklar. Tarayıcıda tek işlemci kullanıldığı için bir "
-                    "koşu yerel kurulumdakinden yavaştır; **Hızlı dene** "
+                    "koşu yerel kurulumdakinden yavaştır; **Hızlı deneme** "
                     "bunu kısaltır.",
                     "The **Run the simulation** button opens the simulator "
                     "in this browser. No server computes anything: Python, "
@@ -1750,7 +1750,7 @@ SIMULATION = Page(
                     "first load fetches about 20 MB and can take a minute; "
                     "after that the browser keeps it. In a browser one "
                     "processor does the work, so a run is slower than in "
-                    "a local install; **Try it fast** shortens it.",
+                    "a local install; **Quick trial** shortens it.",
                 ),
                 _w(
                     "Tabloyu yeniden yayımlamak, başka bir şehrin zeminini "
@@ -1764,16 +1764,16 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Hızlı okuma", "The fast reading"),
+            heading=_w("Hızlı deneme", "The quick trial"),
             lines=(
                 _w(
-                    "Simülatördeki **Hızlı dene** düğmesi ve komut "
+                    "Simülatördeki **Hızlı deneme** düğmesi ve komut "
                     "satırındaki `--fast` iki şeyi kabalaştırır: yoldaki "
                     "engellerin rastgele etkisi sekiz yerine bir kez "
                     "denenir ve arazi 10 m'de bir yerine her bağlantıda "
                     "sabit 64 noktada okunur. Hesap on beş dakikadan bir "
                     "dakikaya iner.",
-                    "The **Try it fast** button in the simulator and `--fast` on "
+                    "The **Quick trial** button in the simulator and `--fast` on "
                     "the command line coarsen the same two figures: the "
                     "shadows are drawn once instead of pooled over eight, "
                     "and the ground profile is read at a fixed 64 samples "
@@ -1913,37 +1913,6 @@ SOURCES = Page(
                    "adı ve raporda kullanılan karşılığı.",
                    "`CONTEXT.md` is the glossary: the name the code uses "
                    "for each term beside the one the report uses."),
-            ),
-        ),
-        Part(
-            kind="points",
-            heading=_w("Proje", "The project"),
-            lines=(
-                _w(
-                    "YERKON, Ulaştırma ve Altyapı Bakanlığı UDHAM'ın "
-                    "“Ulaşan ve Erişen Türkiye 2053” üniversiteler "
-                    "arası fikir yarışmasına sunulan bir fikirdir, Temmuz "
-                    "2026.",
-                    "YERKON is an idea submitted to UDHAM's “Ulaşan ve "
-                    "Erişen Türkiye 2053” inter-university competition, "
-                    "run by the Ministry of Transport and Infrastructure, "
-                    "July 2026.",
-                ),
-                _w(
-                    "Proje ekibi, TOBB Ekonomi ve Teknoloji Üniversitesi: "
-                    "Mustafa Göktürk Binay, Mehmet Gönül, Yavuz Selim Oktar "
-                    "(grup temsilcisi).",
-                    "The team, at TOBB University of Economics and "
-                    "Technology: Mustafa Göktürk Binay, Mehmet Gönül, Yavuz "
-                    "Selim Oktar (group representative).",
-                ),
-                _w(
-                    "Bu depo raporun kendisi değil, raporun karşılaştırma "
-                    "tablosundaki üç YERKON satırını üreten simülasyondur.",
-                    "This repository is not the report. It is the "
-                    "simulation that produces the three YERKON rows of its "
-                    "comparison table.",
-                ),
             ),
         ),
         Part(
@@ -2964,12 +2933,14 @@ RUN_NOTE = _w(
     "are not translated.",
 )
 
+#: The typeface: Inter, for the Turkish letters and the equal-width
+#: figures the tables line up on.
+FONT = ("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700"
+        "&amp;display=swap")
+
 FOOTER = _w(
-    "YERKON, Ulaştırma ve Altyapı Bakanlığı UDHAM fikir yarışmasına "
-    "sunulan bir proje. İstenilen yerde istenilen doğruluk.",
-    "YERKON is a project submitted to the UDHAM idea competition of the "
-    "Ministry of Transport and Infrastructure. The accuracy wanted, where "
-    "it is wanted.",
+    "YERKON takımı tarafından sevgiyle hazırlanmıştır.",
+    "Made with love by the YERKON team.",
 )
 
 WEIGHTING = _w(
@@ -3040,11 +3011,14 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         "<title>{title}</title>\n"
+        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
+        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
+        '<link rel="stylesheet" href="{font}">\n'
         '<link rel="stylesheet" href="{stylesheet}">\n'
         '<script src="{script}" defer></script>\n'
         "</head>\n"
         "<body>\n{body}\n</body>\n</html>\n"
-    ).format(language=language, title=html.escape(title),
+    ).format(language=language, title=html.escape(title), font=FONT,
              stylesheet=html.escape(stylesheet, quote=True),
              script=html.escape(script, quote=True), body=body)
 
@@ -3071,7 +3045,7 @@ def _header(page: Page, language: str, where: Where) -> str:
         '<nav class="tongues">{tongues}'
         '<button class="theme" id="theme" type="button" hidden></button>'
         "</nav>\n"
-        '<a class="run" href="{simulator}">{label} →</a>\n'
+        '<a class="run" href="{simulator}">{label}</a>\n'
         "</header>"
     ).format(
         home=where.page(HOME),

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The architecture · YERKON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
 <link rel="stylesheet" href="../../site.css">
 <script src="../../theme.js" defer></script>
 </head>
@@ -12,7 +15,7 @@
 <a class="brand" href="../../en/"><b>YERKON</b> <span>A terrestrial positioning backup layer</span></a>
 <nav class="pages"><a href="../../en/">Home</a><a href="../../en/sorun/">The problem</a><a href="../../en/sistem/" class="here">The system</a><a href="../../en/arge/">Research</a><a href="../../en/fayda/">What it is for</a><a href="../../en/sonuclar/">Results</a><a href="../../en/maliyet/">Cost</a><a href="../../en/mevzuat/">Regulation</a><a href="../../en/simulasyon/">The simulation</a><a href="../../en/kaynaklar/">Sources</a></nav>
 <nav class="tongues"><a href="../../tr/sistem/">TR</a><a href="../../en/sistem/" class="here">EN</a><button class="theme" id="theme" type="button" hidden></button></nav>
-<a class="run" href="../../calistir/?dil=en">Run the simulation →</a>
+<a class="run" href="../../calistir/?dil=en">Run the simulation</a>
 </header>
 <main>
 <h1>The architecture</h1>
@@ -25,6 +28,6 @@
 <section><h2>Receiver modules</h2><ul><li><strong>Pedestrian.</strong> Designed to draw little power and fit in a pocket. In town and in open country it uses the same amplified EBYTE E28-2G4M20S module (an SX1280 chip) as the poles and the vehicle; its power is set in software and turned down on a short link. It uses the Qorvo DWM3000 in tunnels and indoors. An ESP32-S3 connects it to a phone; if the signal drops, a BNO085 motion sensor carries on from the last position. A ceramic antenna for UWB, a chip antenna on the board for 2,4 GHz.</li><li><strong>Road vehicle.</strong> Built on an STM32 with an LCD map screen. It connects to the CAN bus of vehicles that support one and takes live data from the wheel speed sensors and the steering angle. Like the pedestrian module it carries both radios: the amplified EBYTE E28-2G4M20S module (an SX1280 chip) for wide areas and the Qorvo DWM3000 for critical ones. The DWM3000 uses its own on-board antenna; the E28-2G4M20S works with an outdoor 5 dBi rod antenna on the vehicle&#x27;s roof.</li><li><strong>Internet of things.</strong> For robot fleets indoors and in half open areas. It talks directly to the common robot operating systems and keeps correcting its position from how far the wheels have turned and its own motion sensor. A DWM3000 is enough for most warehouse and factory work.</li></ul></section>
 <section><h2>The hardware and its price</h2><ul><li>At a thousand units a broadcast unit is roughly 1400 to 1700 lira and a receiver roughly 2300 to 3300 lira. Every product&#x27;s price at one, a hundred and a thousand is tabled on the Cost page.</li><li>Each product&#x27;s price at one, a hundred and a thousand is the sum of its parts at their sellers&#x27; own tier prices: radio module, microcontroller, antenna, supply, protection, box, passives, printed board and assembly. The table prices at a thousand, because the operating model assumes a network of a thousand units. Every part, its seller and its price are on the Cost page.</li><li>The prices cover every part of the board: the main parts, supply and protection, terminals, antenna cable, box, the passive components, the printed board and its assembly. Test, calibration, certification, tax and shipping are outside them; installation goes into the table as a line of its own.</li><li>Both receivers carry an EBYTE module with an SX1280 chip and a DWM3000. That is what lets one unit range against urban units on the road and against tunnel units inside the bore, with nothing switched over.</li></ul></section>
 </main>
-<footer><p>YERKON is a project submitted to the UDHAM idea competition of the Ministry of Transport and Infrastructure. The accuracy wanted, where it is wanted.</p></footer>
+<footer><p>Made with love by the YERKON team.</p></footer>
 </body>
 </html>

@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mimari · YERKON</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
 <link rel="stylesheet" href="../../site.css">
 <script src="../../theme.js" defer></script>
 </head>
@@ -12,7 +15,7 @@
 <a class="brand" href="../../tr/"><b>YERKON</b> <span>Karasal konumlandırma yedek katmanı</span></a>
 <nav class="pages"><a href="../../tr/">Anasayfa</a><a href="../../tr/sorun/">Sorun</a><a href="../../tr/sistem/" class="here">Sistem</a><a href="../../tr/arge/">AR-GE</a><a href="../../tr/fayda/">Fayda</a><a href="../../tr/sonuclar/">Sonuçlar</a><a href="../../tr/maliyet/">Maliyet</a><a href="../../tr/mevzuat/">Mevzuat</a><a href="../../tr/simulasyon/">Simülasyon</a><a href="../../tr/kaynaklar/">Kaynaklar</a></nav>
 <nav class="tongues"><a href="../../tr/sistem/" class="here">TR</a><a href="../../en/sistem/">EN</a><button class="theme" id="theme" type="button" hidden></button></nav>
-<a class="run" href="../../calistir/">Simülasyonu çalıştır →</a>
+<a class="run" href="../../calistir/">Simülasyonu çalıştır</a>
 </header>
 <main>
 <h1>Mimari</h1>
@@ -25,6 +28,6 @@
 <section><h2>Alıcı modülleri</h2><ul><li><strong>Yaya.</strong> Az pil harcasın ve cepte taşınsın diye tasarlandı. Şehirde ve kırsalda direkler ve araçla aynı yükselteçli EBYTE E28-2G4M20S modülünü (SX1280 yongalı) kullanır; gücü yazılımla ayarlanır, kısa bağlantıda daha az yayın yapar. Tünelde ve kapalı alanda Qorvo DWM3000&#x27;i kullanır. ESP32-S3 ile telefona bağlanır; sinyal kesilirse BNO085 hareket sensörüyle son konumdan devam eder. UWB için seramik anten, 2,4 GHz için kart üzerinde çip anten.</li><li><strong>Kara aracı.</strong> STM32 üzerine kurulu, LCD harita ekranı var. Uyumlu araçların CAN hattına bağlanıp tekerlek hız sensörlerinden ve direksiyon açısından anlık veri alır. Yaya modülü gibi iki telsizi birden taşır: geniş alan için yükselteçli EBYTE E28-2G4M20S modülü (SX1280 yongalı), kritik bölge için Qorvo DWM3000. DWM3000 kendi dahili antenini kullanır; E28-2G4M20S araç tavanındaki dış ortam tipi 5 dBi çubuk antenle çalışır.</li><li><strong>Nesnelerin interneti alıcısı.</strong> Kapalı ve yarı açık alanda çalışan robot filoları için. Yaygın robot işletim sistemleriyle doğrudan konuşur; tekerleğin kaç tur döndüğüne ve kendi hareket sensörüne bakarak konumunu sürekli düzeltir. Çoğu depo ve fabrikada DWM3000 yeter.</li></ul></section>
 <section><h2>Donanım ve fiyatı</h2><ul><li>1000 adette bir yayın birimi yaklaşık 1400-1700 lira, bir alıcı yaklaşık 2300-3300 lira. Her ürünün 1, 100 ve 1000 adetlik fiyat tablosu Maliyet sayfasında.</li><li>Her ürünün 1, 100 ve 1000 adetteki fiyatı, kartın parçalarının satıcılarının kendi kademe fiyatlarıyla toplanıyor: telsiz modülü, mikrodenetleyici, anten, besleme, koruma, kutu, pasifler, baskılı devre ve dizgi. Tablo 1000 adetlik fiyatla hesaplanıyor, çünkü işletme modeli bin birimlik bir ağ varsayıyor. Her parça, satıcısı ve fiyatı Maliyet sayfasında.</li><li>Fiyatlar kartın bütün parçalarını kapsıyor: ana parçalar, besleme ve koruma, klemensler, anten kablosu, kutu, direnç ve kondansatörler, baskılı devre ve dizgi. Test, ayar, belgelendirme, vergi ve kargo bu rakamların dışında; sahadaki montaj ayrı bir kalem olarak tabloya giriyor.</li><li>İki alıcı da hem SX1280 yongalı EBYTE modülünü hem DWM3000&#x27;i taşıyor. Bu sayede aynı cihaz yolda şehir birimleriyle, tünele girince tünel birimleriyle ölçüyor; kullanıcı hiçbir şeyi değiştirmiyor.</li></ul></section>
 </main>
-<footer><p>YERKON, Ulaştırma ve Altyapı Bakanlığı UDHAM fikir yarışmasına sunulan bir proje. İstenilen yerde istenilen doğruluk.</p></footer>
+<footer><p>YERKON takımı tarafından sevgiyle hazırlanmıştır.</p></footer>
 </body>
 </html>
