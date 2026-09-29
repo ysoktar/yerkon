@@ -1188,3 +1188,23 @@ def test_a_strip_with_nothing_in_it_is_left_off():
 
     empty = Part(kind="slides", slides=(), heading=Words(tr="Boş", en="Empty"))
     assert _part(empty, "tr", None) == ""
+
+
+def test_the_english_table_has_no_turkish_words():
+    """Every name, technology and environment of the comparison table has
+    an English form, and the English page uses it."""
+    from yerkon.comparison import read as read_table
+    from yerkon.published import read as read_published
+    from yerkon.viewer.pages import IN_ENGLISH
+
+    table = read_table()
+    for row in table.rows:
+        assert row.technology in IN_ENGLISH, row.technology
+        assert row.environment in IN_ENGLISH, row.environment
+    for row in read_published().rows:
+        name, technology, environment = list(row.cells())[:3]
+        for said in (name, technology, environment):
+            assert said in IN_ENGLISH, said
+    drawn = render(page_at("/sonuclar"), "en", read_published())
+    for turkish in ("Şehir içi", "Kırsal)", "Dış<", "Karasal konumlandırma"):
+        assert turkish not in drawn, turkish

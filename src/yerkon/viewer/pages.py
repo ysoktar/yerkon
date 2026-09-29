@@ -3464,9 +3464,9 @@ def _marks(published, language: str, at: int):
         figure = figure_in(cells[at + 3])
         if figure is not None:
             out.append(Mark(
-                label=cells[0], figure=figure, ours=True,
+                label=_in(cells[0], language), figure=figure, ours=True,
                 shown=cells[at + 3].strip(),
-                short=cells[0].replace("YERKON ", "").strip("()"),
+                short=_in(cells[0], language).replace("YERKON ", "").strip("()"),
             ))
     return out
 
@@ -3572,7 +3572,7 @@ def _spread(published, language: str) -> str:
     for row in published.rows:
         cells = list(row.cells())
         rows.append((
-            cells[0].replace("YERKON ", "").strip("()"),
+            _in(cells[0], language).replace("YERKON ", "").strip("()"),
             charts.figure_in(cells[3]),
             charts.figure_in(cells[4]),
             charts.figure_in(cells[5]),
@@ -3604,6 +3604,37 @@ def _cost(published, language: str) -> str:
                            logarithmic=False),
         legend=_legend(charts.symbols_in(marks), language),
     )
+
+
+#: The comparison table's YERKON row names, technology and environment
+#: columns, in English.
+#: They are written once, in Turkish, in comparison.toml and in the
+#: scenarios; a new one without an entry here fails a test rather than
+#: showing Turkish on the English page.
+IN_ENGLISH = {
+    "YERKON (Şehir içi)": "YERKON (Urban)",
+    "YERKON (Kırsal)": "YERKON (Rural)",
+    "YERKON (Tünel)": "YERKON (Tunnel)",
+    "Dış": "Outdoor",
+    "İç + dış": "Indoor and outdoor",
+    "GNSS": "GNSS",
+    "Bölgesel GNSS düzeltme servisi": "Regional GNSS augmentation service",
+    "Bölgesel GNSS": "Regional GNSS",
+    "Karasal konumlandırma, UHF": "Terrestrial positioning, UHF",
+    "Karasal pseudolite konumlandırma": "Terrestrial pseudolite positioning",
+    "UWB RTLS": "UWB RTLS",
+    "Karasal düşük frekanslı konumlandırma":
+        "Terrestrial low frequency positioning",
+    "Karasal konumlandırma (E28-2G4M20S, LoRa TWR)":
+        "Terrestrial positioning (E28-2G4M20S, LoRa TWR)",
+    "Karasal konumlandırma (DWM3000, UWB TWR)":
+        "Terrestrial positioning (DWM3000, UWB TWR)",
+}
+
+
+def _in(text: str, language: str) -> str:
+    """A row name, technology or environment in the page's language."""
+    return text if language == "tr" else IN_ENGLISH.get(text, text)
 
 
 def _published(published, language: str, table=None) -> str:
@@ -3638,6 +3669,12 @@ def _published(published, language: str, table=None) -> str:
             "</sup>".format(at)
         )
 
+    def said_in(text: str) -> str:
+        return _in(text, language)
+
+    def words(text: str) -> str:
+        return html.escape(said_in(text))
+
     def cell(text: str) -> str:
         from yerkon.comparison import keys_of, without_markers
 
@@ -3652,14 +3689,14 @@ def _published(published, language: str, table=None) -> str:
     for row in table.rows:
         per_row.append((row.system, []))
         body.append(
-            [html.escape(row.system), html.escape(row.technology),
-             html.escape(row.environment)] + [cell(one) for one in row.cells]
+            [html.escape(row.system), words(row.technology),
+             words(row.environment)] + [cell(one) for one in row.cells]
         )
     ours = len(body)
     for key, row in zip(published.keys, published.rows):
         cells = list(row.cells())
-        per_row.append((cells[0], []))
-        marked = [html.escape(one) for one in cells[:3]]
+        per_row.append((said_in(cells[0]), []))
+        marked = [words(cells[0]), words(cells[1]), words(cells[2])]
         marked[0] += mark(table.yerkon[key])
         rest = [html.escape(one) for one in cells[3:]]
         rest[3] += mark(table.yerkon["availability"])

@@ -200,7 +200,9 @@ def test_a_bore_turns_its_ranging_advantage_into_no_advantage_at_all():
     def amplification(result):
         return result.row().hpe_p50_m / result.samples.median_range_sigma_m
 
-    assert amplification(tunnel) > 5.0
+    # 3,2 with units every 40 m on alternate walls (ADR-0113); above 5
+    # when they stood every 60 m. Still well above the town's.
+    assert amplification(tunnel) > 2.0
     assert amplification(urban) < 1.0
 
 

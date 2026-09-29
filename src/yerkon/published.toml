@@ -12,7 +12,7 @@ profile_spacing_m = 10
 [[row]]
 key = "urban"
 system = "YERKON (Şehir içi)"
-technology = "Karasal konumlandırma (SX1280/LoRa TWR)"
+technology = "Karasal konumlandırma (E28-2G4M20S, LoRa TWR)"
 environment = "Dış"
 hpe_p50_m = 2.2871
 hpe_p95_m = 9.1859
@@ -28,7 +28,7 @@ assumed_share = 0
 [[row]]
 key = "rural"
 system = "YERKON (Kırsal)"
-technology = "Karasal konumlandırma (E28-SX1280 TWR)"
+technology = "Karasal konumlandırma (E28-2G4M20S, LoRa TWR)"
 environment = "Dış"
 hpe_p50_m = 2.163
 hpe_p95_m = 8.1519
@@ -44,7 +44,7 @@ assumed_share = 0
 [[row]]
 key = "tunnel"
 system = "YERKON (Tünel)"
-technology = "Karasal konumlandırma (UWB/DWM3000 TWR)"
+technology = "Karasal konumlandırma (DWM3000, UWB TWR)"
 environment = "İç + dış"
 hpe_p50_m = 0.3693
 hpe_p95_m = 1.0816
