@@ -101,6 +101,10 @@ E28_12SX_JLC = _jlc("x-e28-12sx", "EBYTE E28-2G4M12SX", "C17916848",
                     [(1, 6.9899), (10, 6.0071), (30, 5.4077), (100, 4.9042)])
 E28_20SX_JLC = _jlc("x-e28-20sx", "EBYTE E28-2G4M20SX", "C42377415",
                     [(1, 6.038), (10, 5.8853)])
+E28_27S_JLC = _jlc("x-e28-27s", "EBYTE E28-2G4M27S", "C411312",
+                   [(1, 6.9412), (10, 6.7722)])
+E28_27SX_JLC = _jlc("x-e28-27sx", "EBYTE E28-2G4M27SX", "C5333988",
+                    [(1, 6.9493), (10, 6.4457)])
 SX1280_CHIP = _jlc("x-sx1280", "Semtech SX1280IMLTRT", "C125969",
                    [(1, 3.2716), (10, 3.1092), (30, 3.0117), (100, 2.9143),
                     (500, 2.8688), (1000, 2.8477)])
@@ -190,9 +194,16 @@ EXPERIMENT_RADIOS = {
     "20sx": ("EBYTE E28-2G4M20SX (x)", 20.0,
              "EBYTE E28-2G4M20SX page: 19 / 20 / 21 dBm, typical",
              -131.0, "EBYTE E28-2G4M20SX page: -130 / -131 / -132 dBm, typical"),
+    "27s": ("EBYTE E28-2G4M27S (x)", 26.5,
+            "EBYTE E28-2G4M27S datasheet: 26 / 26,5 / 27 dBm, typical",
+            -131.0, "EBYTE E28-2G4M27S datasheet: -130 / -131 / -132 dBm, typical"),
+    "27sx": ("EBYTE E28-2G4M27SX (x)", 26.5,
+             "EBYTE E28-2G4M27SX user manual (2021): 26 / 26,5 / 27 dBm, typical",
+             -131.0, "EBYTE E28-2G4M27SX user manual (2021): -130 / -131 / -132 dBm, typical"),
 }
 EXPERIMENT_PARTS = {"12s": E28_12S_JLC, "12sx": E28_12SX_JLC,
-                    "20s": E28_20S_JLC, "20sx": E28_20SX_JLC}
+                    "20s": E28_20S_JLC, "20sx": E28_20SX_JLC,
+                    "27s": E28_27S_JLC, "27sx": E28_27SX_JLC}
 #: Only an IPEX socket: no antenna of their own.
 IPEX_ONLY = {"12sx", "20sx"}
 
