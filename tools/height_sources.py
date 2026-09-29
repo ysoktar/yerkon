@@ -8,10 +8,12 @@ Local only; the site does not read this.
   in patches (ADR-0088).
 - ``none``: no height aid; the height is left to the ranges.
 - ``units``: every broadcast unit's card carries, from its installation
-  survey, the height of the road beneath it. The receiver interpolates
-  those heights along its road, between the units within ``--reach`` of
-  it. The filter is told this source's own error: the survey error and
-  the interpolation's root mean square along that road.
+  survey, the height of the ground beneath it. Where units line the
+  receiver's road (at least one per kilometre within ``--reach``), the
+  receiver interpolates them along the road; elsewhere it reads a
+  triangulated surface through all of them. The filter is told this
+  source's own error: the survey error and the interpolation's root mean
+  square along that road.
 
 Run from the repository root:
 
@@ -91,6 +93,29 @@ class UnitHeights:
         return float(np.sqrt(np.mean(np.square(errors))))
 
 
+class SurfaceHeights(UnitHeights):
+    """Where a road has too few units beside it: a triangulated surface
+    through the ground heights every unit's card carries, read where the
+    receiver is; outside the units' hull, the nearest unit's height."""
+
+    def __init__(self, road, anchors, seed, index):
+        from scipy.interpolate import LinearNDInterpolator, NearestNDInterpolator
+        stream = np.random.default_rng([int(seed), 90, int(index)])
+        points = np.array([a.ground_position_m for a in anchors])
+        heights = np.array([a.terrain.height_at(*a.ground_position_m)
+                            + stream.normal(0.0, SURVEY_SIGMA_M)
+                            for a in anchors])
+        self.road = road
+        self.alongs = heights          # only its length is read
+        self.linear = LinearNDInterpolator(points, heights)
+        self.nearest = NearestNDInterpolator(points, heights)
+
+    def estimate(self, along_m: float) -> float:
+        x, y, _ = self.road.point_at(along_m)
+        value = float(self.linear(x, y))
+        return value if not math.isnan(value) else float(self.nearest(x, y))
+
+
 def patch_units(reach_m: float) -> None:
     """Swap the map's error for the unit-based one, per receiver."""
     original = evaluate.run_scenario
@@ -102,17 +127,17 @@ def patch_units(reach_m: float) -> None:
             road = unit.journey.road
             stored = stored_heights(road, scenario.deployment.anchors,
                                     reach_m, scenario.seed, index)
-            per_unit.append(UnitHeights(road, stored))
-        usable = [u for u in per_unit if len(u.alongs) >= 2]
-        if len(usable) < len(per_unit):
-            raise SystemExit("a receiver's road has fewer than two units "
-                             "within {} m".format(reach_m))
+            # Along the road where units line it (the tunnel); otherwise
+            # a surface through every unit's stored ground height.
+            if len(stored) >= max(2, road.length_m / 1000.0):
+                per_unit.append(UnitHeights(road, stored))
+            else:
+                per_unit.append(SurfaceHeights(
+                    road, scenario.deployment.anchors, scenario.seed, index))
         sigma = max(math.sqrt(u.rms_m() ** 2 + SURVEY_SIGMA_M ** 2)
                     for u in per_unit)
-        print("# {}: {} units per road on average, filter told {:.2f} m, "
-              "worst road rms {:.2f} m".format(
-                  scenario.name,
-                  sum(len(u.alongs) for u in per_unit) / len(per_unit),
+        print("# {}: {}, filter told {:.2f} m, worst road rms {:.2f} m".format(
+                  scenario.name, type(per_unit[0]).__name__,
                   sigma, max(u.rms_m() for u in per_unit)),
               file=sys.stderr)
         by_index = dict(enumerate(per_unit))
