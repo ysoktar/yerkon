@@ -4334,9 +4334,12 @@ def _marked(text: str) -> str:
     # The whole text went through html.escape above, so the address the
     # regex hands back is already safe to sit in an attribute. Escaping
     # it again would turn & into &amp;amp; and break the address.
-    out = re.sub(
-        r"\[([^\]]+)\]\((https?://[^)\s]+)\)",
-        r'<a href="\2">\1</a>',
-        out,
-    )
+    # A PDF opens in a tab of its own, so the page stays where it was.
+    def link(found) -> str:
+        words, address = found.group(1), found.group(2)
+        away = (' target="_blank" rel="noopener"'
+                if address.lower().endswith(".pdf") else "")
+        return '<a href="{}"{}>{}</a>'.format(address, away, words)
+
+    out = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", link, out)
     return out
