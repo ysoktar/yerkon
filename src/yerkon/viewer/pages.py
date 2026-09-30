@@ -447,8 +447,9 @@ WHY = Page(
 #: roles come from bom.toml, so they never differ from the cost page.
 FINAL_PARTS = (
     ("e28-2g4m20s", ""), ("dwm3000-lcsc", ""), ("stm32g031k8t6", ""),
-    ("stm32g0b1met6", ""), ("atecc608b", ""), ("esp32-s3", ""),
+    ("at32f403argt7", ""), ("atecc608b", ""), ("esp32-s3", ""),
     ("bno085", ""), ("atgm336h-5nr32", ""), ("pro-ob-430", ""),
+    ("zdemmc04ga", ""),
     ("gw-22-5151", ""), ("hlk-5m12", ""),
     ("lipo-1000", ""), ("ili9341-2.8", ""), ("gainta-g203", ""),
     ("gainta-g212", ""), ("gainta-g517", ""),
@@ -738,7 +739,9 @@ SYSTEM = Page(
                     "ATGM336H-5NR32 uydu konum modülünden de alır (GPS, GLONASS, "
                     "BeiDou, QZSS). UWB için seramik anten, 2,4 GHz için "
                     "kart üzerinde çip anten, uydu için kart üzerinde "
-                    "Abracon PRO-OB-430 yama anten.",
+                    "Abracon PRO-OB-430 yama anten. Türkiye'nin yükseklik "
+                    "haritası kart üzerindeki 4 GB'lık Zetta eMMC bellekte "
+                    "durur.",
                     "**Pedestrian.** Designed to draw little power and "
                     "fit in a pocket. In town and in open country it uses "
                     "the same amplified EBYTE E28-2G4M20S module (an "
@@ -752,10 +755,11 @@ SYSTEM = Page(
                     "positioning module (GPS, GLONASS, BeiDou, QZSS). A "
                     "ceramic antenna for UWB, a chip antenna on the board "
                     "for 2,4 GHz, and an Abracon PRO-OB-430 patch on the "
-                    "board for the satellites.",
+                    "board for the satellites. Türkiye's elevation model "
+                    "is kept on the board, in 4 GB of Zetta eMMC storage.",
                 ),
                 _w(
-                    "**Kara aracı.** STM32 üzerine kurulu, LCD harita "
+                    "**Kara aracı.** Artery AT32F403A üzerine kurulu, LCD harita "
                     "ekranı var. Uyumlu araçların CAN hattına bağlanıp "
                     "tekerlek hız sensörlerinden ve direksiyon açısından "
                     "anlık veri alır. Yaya modülü gibi iki telsizi birden "
@@ -764,8 +768,8 @@ SYSTEM = Page(
                     "DWM3000. DWM3000 kendi dahili antenini kullanır; "
                     "E28-2G4M20S araç tavanındaki dış ortam tipi 5 dBi "
                     "çubuk antenle çalışır. Yaya alıcısındaki uydu konum "
-                    "modülü ve anteni bunda da var.",
-                    "**Road vehicle.** Built on an STM32 with an LCD map "
+                    "modülü, anteni ve 4 GB bellek bunda da var.",
+                    "**Road vehicle.** Built on an Artery AT32F403A with an LCD map "
                     "screen. It connects to the CAN bus of vehicles that "
                     "support one and takes live data from the wheel speed "
                     "sensors and the steering angle. Like the pedestrian "
@@ -775,7 +779,8 @@ SYSTEM = Page(
                     "uses its own on-board antenna; the E28-2G4M20S works "
                     "with an outdoor 5 dBi rod antenna on the vehicle's "
                     "roof. It has the pedestrian receiver's satellite "
-                    "positioning module and antenna too.",
+                    "positioning module, its antenna and the 4 GB of "
+                    "storage too.",
                 ),
                 _w(
                     "**Nesnelerin interneti alıcısı.** Kapalı ve yarı açık "
@@ -800,10 +805,10 @@ SYSTEM = Page(
             lines=(
                 _w(
                     "1000 adette bir yayın birimi yaklaşık 1400-1700 lira, "
-                    "bir alıcı yaklaşık 2500-3400 lira. Her ürünün 1, 100 "
+                    "bir alıcı yaklaşık 2600-3400 lira. Her ürünün 1, 100 "
                     "ve 1000 adetlik fiyat tablosu Maliyet sayfasında.",
                     "At a thousand units a broadcast unit is roughly 1400 "
-                    "to 1700 lira and a receiver roughly 2500 to 3400 "
+                    "to 1700 lira and a receiver roughly 2600 to 3400 "
                     "lira. Every product's price at one, a hundred and a "
                     "thousand is tabled on the Cost page.",
                 ),

@@ -115,6 +115,33 @@ ladder = [[1, 9.50]]
 date = "24.09.2026"
 note = "toplu fiyat yayımlanmamış"
 
+# The vehicle receiver's controller since 30 September 2026. It has two
+# SD/MMC hosts (MultiMediaCard 4.2, 1, 4 or 8 bits) and two CAN 2.0A/B
+# controllers (AT32F403A data sheet); the STM32G0B1 before it had no
+# SD/MMC host, and an eMMC has no SPI mode to fall back on.
+[[part]]
+key = "at32f403argt7"
+name = "Artery AT32F403ARGT7"
+role.tr = "mikrodenetleyici, 1 MB, SD/MMC ve CAN"
+role.en = "microcontroller, 1 MB, SD/MMC and CAN"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/partdetail/ARTERY-AT32F403ARGT7/C528440"
+ladder = [[1, 2.3538], [10, 1.9623], [30, 1.7171], [160, 1.4653], [480, 1.3516], [960, 1.3028]]
+date = "30.09.2026"
+
+# Both receivers keep the country's elevation model on board: the
+# Copernicus 30 m tiles over Türkiye are about 4 GB as published and
+# about half that at two bytes a height (docs/adr/0115).
+[[part]]
+key = "zdemmc04ga"
+name = "Zetta ZDEMMC04GA"
+role.tr = "kalıcı bellek, 4 GB eMMC"
+role.en = "storage, 4 GB eMMC"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/partdetail/Zetta-ZDEMMC04GA/C3010207"
+ladder = [[1, 4.3161], [10, 3.707], [30, 3.3447], [152, 2.8152], [456, 2.6462], [1064, 2.5699]]
+date = "30.09.2026"
+
 [[part]]
 key = "stm32g0b1met6"
 name = "STM32G0B1MET6"
@@ -498,14 +525,14 @@ other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", 
 key = "pedestrian"
 name.tr = "Yaya alıcısı"
 name.en = "Pedestrian receiver"
-parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b", "atgm336h-5nr32", "pro-ob-430"]
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b", "atgm336h-5nr32", "pro-ob-430", "zdemmc04ga"]
 other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "gainta-g517", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "vehicle"
 name.tr = "Kara aracı alıcısı"
 name.en = "Vehicle receiver"
-parts = ["e28-2g4m20s", "dwm3000-lcsc", "stm32g0b1met6", "bno085", "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151", "atgm336h-5nr32", "pro-ob-430"]
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "at32f403argt7", "bno085", "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151", "atgm336h-5nr32", "pro-ob-430", "zdemmc04ga"]
 other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-sma", "gainta-g212", "passives", "pcb-2l", "smt"]
 
 # The unit as it would be without the frequency hopping certificate: the

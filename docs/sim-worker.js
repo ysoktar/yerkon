@@ -28,7 +28,7 @@ const ready = (async () => {
   // nothing about the network.
   if (!pyodide.loadedPackages.numpy) throw new Error("numpy could not be loaded");
   stage("package");
-  const response = await fetch("yerkon.zip?v=b2cb7f50bc");
+  const response = await fetch("yerkon.zip?v=8478c1f80a");
   if (!response.ok) throw new Error("yerkon.zip: " + response.status);
   pyodide.unpackArchive(await response.arrayBuffer(), "zip",
                         { extractDir: "/home/pyodide/lib" });
