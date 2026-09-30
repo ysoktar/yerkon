@@ -373,6 +373,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._file("favicon.svg", "image/svg+xml")
         if path in ("/apple-touch-icon.png", "/icon-192.png", "/icon-512.png"):
             return self._file(path.lstrip("/"), "image/png")
+        if path.startswith("/photos/") and path.endswith(".webp"):
+            name = path[len("/photos/"):]
+            if "/" in name or name.startswith("."):
+                return self.send_error(404)
+            return self._file("photos/" + name, "image/webp")
         if path == "/yerkon-rapor.pdf":
             return self._file("yerkon-rapor.pdf", "application/pdf")
         if path in ("/style.css", "/site.css"):

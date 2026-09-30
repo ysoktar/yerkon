@@ -151,6 +151,9 @@ def test_the_site_links_to_nothing_the_server_does_not_serve():
             # On disk, and routed: a picture the server does not serve is
             # a broken image on a page that otherwise looks finished.
             assert (STATIC / address.lstrip("/")).exists(), reference
+            if address.startswith("/photos/"):
+                assert '"/photos/"' in routing, reference
+                continue
             assert '"{}"'.format(address) in routing, reference
         else:
             assert page_at(address) is not None, reference
@@ -807,8 +810,10 @@ def test_the_folder_carries_both_languages_and_every_page(tmp_path):
     onward = 1 + 2 * (len(PAGES) - 1) + 1
     # An English page renamed in English keeps its Turkish folder too.
     onward += sum(1 for page in PAGES if page.slug_in("en") != page.slug)
+    photos = sum(1 for path in (STATIC / "photos").iterdir()
+                 if path.suffix == ".webp")
     assert len(written) == (2 * len(PAGES) + len(CARRIED) + 2
-                            + len(browser_simulator()) + onward)
+                            + len(browser_simulator()) + onward + photos)
 
 
 def test_an_old_address_sends_the_visitor_to_the_new_one(tmp_path):

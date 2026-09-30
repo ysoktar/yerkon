@@ -521,14 +521,46 @@ WHY = Page(
 #: radios, what drives them, the antenna, power, and the boxes. Names and
 #: roles come from bom.toml, so they never differ from the cost page.
 FINAL_PARTS = (
-    ("e28-2g4m20s", ""), ("dwm3000-lcsc", ""), ("stm32g031k8t6", ""),
-    ("at32f403argt7", ""), ("atecc608b", ""), ("esp32-s3", ""),
-    ("bno085", ""), ("atgm336h-5nr32", ""), ("pro-ob-430", ""),
-    ("zdemmc04ga", ""),
-    ("gw-22-5151", ""), ("hlk-5m12", ""),
-    ("lipo-1000", ""), ("ili9341-2.8", ""), ("gainta-g203", ""),
-    ("gainta-g212", ""), ("gainta-g517", ""),
+    ("e28-2g4m20s", "e28-2g4m20s.webp"),
+    ("dwm3000-lcsc", "dwm3000-lcsc.webp"),
+    ("stm32g031k8t6", "stm32g031k8t6.webp"),
+    ("at32f403argt7", "at32f403argt7.webp"),
+    ("atecc608b", "atecc608b.webp"), ("esp32-s3", "esp32-s3.webp"),
+    ("bno085", "bno085.webp"), ("atgm336h-5nr32", "atgm336h-5nr32.webp"),
+    ("pro-ob-430", "pro-ob-430.webp"), ("zdemmc04ga", "zdemmc04ga.webp"),
+    ("gw-22-5151", "gw-22-5151.webp"), ("hlk-5m12", "hlk-5m12.webp"),
+    ("lipo-1000", "lipo-1000.webp"),
+    ("seeed-solar-0.5w", "seeed-solar-0.5w.webp"),
+    ("ili9341-2.8", "ili9341-2.8.webp"),
+    ("gdey0154d67", "gdey0154d67.webp"),
+    ("gainta-g203", "gainta-g203.webp"), ("gainta-g212", "gainta-g212.webp"),
+    ("gainta-g517", "gainta-g517.webp"),
 )
+
+#: Where each photo was taken from: the maker's or the seller's own
+#: picture of the part, named under it on the card.
+PHOTO_SOURCES = {
+    "e28-2g4m20s.webp": ("EBYTE", "https://www.cdebyte.com/products/E28-2G4M20S"),
+    "dwm3000-lcsc.webp": ("LCSC", "https://www.lcsc.com/product-detail/C5299931.html"),
+    "stm32g031k8t6.webp": ("LCSC", "https://www.lcsc.com/product-detail/C432203.html"),
+    "at32f403argt7.webp": ("LCSC", "https://www.lcsc.com/product-detail/C528440.html"),
+    "atecc608b.webp": ("LCSC", "https://www.lcsc.com/product-detail/C1518773.html"),
+    "esp32-s3.webp": ("LCSC", "https://www.lcsc.com/product-detail/C2913198.html"),
+    "bno085.webp": ("LCSC", "https://www.lcsc.com/product-detail/C5189642.html"),
+    "atgm336h-5nr32.webp": ("LCSC", "https://www.lcsc.com/product-detail/C5117921.html"),
+    "pro-ob-430.webp": ("LCSC", "https://www.lcsc.com/product-detail/C3284500.html"),
+    "zdemmc04ga.webp": ("LCSC", "https://www.lcsc.com/product-detail/C3010207.html"),
+    "gw-22-5151.webp": ("Westward Sales", "https://westwardsales.com/taoglas-gw.22.5151-rp-sma-antenna"),
+    "hlk-5m12.webp": ("LCSC", "https://www.lcsc.com/product-detail/C209908.html"),
+    "lipo-1000.webp": ("YDL Battery", "https://ydlbattery.com/products/50pcs-3-7v-1000mah-803040-lithium-polymer-battery"),
+    "seeed-solar-0.5w.webp": ("Seeed Studio", "https://www.seeedstudio.com/0-5W-Solar-Panel-55x70.html"),
+    "ili9341-2.8.webp": ("Elecrow", "https://www.elecrow.com/2-8-inch-320x240-spi-serial-tft-lcd-module-display-with-driver-ic-ili9341.html"),
+    "gdey0154d67.webp": ("buy-lcd.com", "https://www.buy-lcd.com/products/154-inch-electronic-paper-display-200x200-partial-refresh-digital-price-tags-sreen-gdey0154d67"),
+    "gainta-g203.webp": ("Gainta", "https://www.gainta.com/en/g203.html"),
+    "gainta-g212.webp": ("Gainta", "https://www.gainta.com/en/g212.html"),
+    "gainta-g517.webp": ("Gainta", "https://www.gainta.com/en/g517gbc-1.html"),
+    "t1000-e.webp": ("Seeed Studio", "https://www.seeedstudio.com/SenseCAP-Card-Tracker-T1000-E-for-Meshtastic-p-5913.html"),
+}
 
 #: The hardware the team already has for the pilot, as the proposal's
 #: "Pilot Doğrulama" slide lists it. None of it is bought for the
@@ -553,7 +585,8 @@ PILOT_ITEMS = {
 }
 
 #: The pilot's strip, in the slide's order.
-PILOT_PARTS = tuple((key, "") for key in PILOT_ITEMS)
+PILOT_PARTS = tuple(
+    (key, "t1000-e.webp" if key == "t1000-e" else "") for key in PILOT_ITEMS)
 
 SYSTEM = Page(
     slug="sistem",
@@ -3230,8 +3263,8 @@ def render(
     return grouped_html(_document(
         title=named if named == "YERKON" else "{} · YERKON".format(named),
         language=language,
-        stylesheet=where.asset("site.css"),
-        script=where.asset("theme.js"),
+        stylesheet=where.asset(_tagged("site.css")),
+        script=where.asset(_tagged("theme.js")),
         body="\n".join(body),
         description=_described(_said(page.lead, language)),
         icon=where.asset(""),
@@ -3447,6 +3480,7 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
 SLIDE_BACK = _w("Önceki", "Previous")
 SLIDE_ON = _w("Sonraki", "Next")
 #: What stands in a card before its photo: a plain drawing of a part.
+PHOTO_CREDIT = _w("Görsel", "Photo")
 NO_PHOTO = (
     '<svg viewBox="0 0 48 48" aria-hidden="true" fill="none" '
     'stroke="currentColor" stroke-width="2"><rect x="12" y="12" width="24" '
@@ -3477,10 +3511,17 @@ def _slides(slides, language: str, where: Optional["Where"]) -> str:
                 html.escape(src, quote=True), html.escape(name, quote=True))
         else:
             shown = '<span class="nophoto">{}</span>'.format(NO_PHOTO)
+        credit = ""
+        if photo in PHOTO_SOURCES:
+            label, url = PHOTO_SOURCES[photo]
+            credit = ('<small>{}: <a href="{}" rel="noopener">{}</a></small>'
+                      .format(_said(PHOTO_CREDIT, language),
+                              html.escape(url, quote=True),
+                              html.escape(label)))
         cards.append(
             '<figure class="slide"><div class="photo">{}</div><figcaption>'
-            "<b>{}</b><span>{}</span></figcaption></figure>".format(
-                shown, html.escape(name), html.escape(role)))
+            "<b>{}</b><span>{}</span>{}</figcaption></figure>".format(
+                shown, html.escape(name), html.escape(role), credit))
     return (
         '<div class="slider"><button class="slide-back" type="button" '
         'hidden aria-label="{back}">‹</button><div class="slides">{cards}'
@@ -4263,6 +4304,17 @@ def write_pages(into, published=None) -> tuple:
         if stale not in kept:
             stale.unlink()
     return tuple(written)
+
+
+def _tagged(name: str) -> str:
+    """A file's address with a tag drawn from its contents.
+
+    GitHub Pages lets a browser keep a file ten minutes, so a changed
+    header went out beside the old stylesheet and the bar broke in two;
+    a changed file now has a new address, as the simulator's do.
+    """
+    digest = hashlib.sha256((STATIC / name).read_bytes()).hexdigest()
+    return "{}?v={}".format(name, digest[:10])
 
 
 def _onward(to: str, keep_query: bool = False) -> bytes:
