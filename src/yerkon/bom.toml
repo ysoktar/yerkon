@@ -389,16 +389,87 @@ ladder = [[1, 0.4]]
 date = "25.09.2026"
 note = "5 kart 2 $; büyük adet fiyatı okunamadı, indirim varsayılmadı"
 
+# Assembly is counted board by board: every pad of every part on the
+# board, from its package (a QFN's exposed pad counts, the eMMC's 153
+# balls count), and the passives line's 25 two-pad parts, LED and button
+# as 56. Through-hole parts and leads are soldered by hand at JLCPCB's
+# manual rate. Fitting the board into its box is labour and not here.
 [[part]]
-key = "smt"
-name = "JLCPCB dizgi"
-role.tr = "SMD dizgi: 150 lehim noktası x 0,0016 $, kurulum 8,18 $, şablon 1,53 $, 10 genişletilmiş parça x 3,07 $"
-role.en = "SMD assembly: 150 joints x 0,0016 $, setup 8,18 $, stencil 1,53 $, 10 extended parts x 3,07 $"
+key = "smt-anchor"
+name = "JLCPCB SMD dizgi, 125 nokta"
+role.tr = "SMD dizgi, 125 lehim noktası: E28 16, STM32G031 32, ATECC608B 9, TPS563200 6, SMBJ 2, sigorta 2, SS34 2, pasifler 56"
+role.en = "SMD assembly, 125 joints: E28 16, STM32G031 32, ATECC608B 9, TPS563200 6, SMBJ 2, fuse 2, SS34 2, passives 56"
 seller = "JLCPCB"
 url = "https://jlcpcb.com/help/article/pcb-assembly-price"
-ladder = [[1, 8.322], [100, 0.6441], [1000, 0.2804]]
-date = "25.09.2026"
-note = "kurulum 8,18 $, şablon 1,53 $ ve 10 genişletilmiş parça x 3,07 $ siparişe bir kez; 150 lehim noktası x 0,0016 $ her karta. 5 kartlık en küçük siparişte 8,32 $, 100 kartta 0,64 $, 1000 kartta 0,28 $"
+ladder = [[1, 8.282], [100, 0.6041], [1000, 0.2404]]
+date = "30.09.2026"
+note = "kurulum 8,18 $, şablon 1,53 $ ve 10 genişletilmiş parça x 3,07 $ siparişe bir kez; 125 nokta x 0,0016 $ her karta; en küçük sipariş 5 kart"
+
+[[part]]
+key = "smt-tunnel"
+name = "JLCPCB SMD dizgi, 133 nokta"
+role.tr = "SMD dizgi, 133 lehim noktası: DWM3000 24, STM32G031 32, ATECC608B 9, TPS563200 6, SMBJ 2, sigorta 2, SS34 2, pasifler 56"
+role.en = "SMD assembly, 133 joints: DWM3000 24, STM32G031 32, ATECC608B 9, TPS563200 6, SMBJ 2, fuse 2, SS34 2, passives 56"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+ladder = [[1, 8.2948], [100, 0.6169], [1000, 0.2532]]
+date = "30.09.2026"
+note = "kurulum 8,18 $, şablon 1,53 $ ve 10 genişletilmiş parça x 3,07 $ siparişe bir kez; 133 nokta x 0,0016 $ her karta; en küçük sipariş 5 kart"
+
+[[part]]
+key = "smt-pedestrian"
+name = "JLCPCB SMD dizgi, 428 nokta"
+role.tr = "SMD dizgi, 428 lehim noktası: E28 16, DWM3000 24, ESP32-S3 41, BNO085 28, ATECC608B 9, ATGM336H 18, uydu anteni 2, eMMC 153, ekran bağlantısı 26, TP4056 9, DW01A 6, FS8205 8, USB-C 16, XC6206 3, AO3400A 3, bobin 2, 4 diyot 8, pasifler 56"
+role.en = "SMD assembly, 428 joints: E28 16, DWM3000 24, ESP32-S3 41, BNO085 28, ATECC608B 9, ATGM336H 18, satellite antenna 2, eMMC 153, screen connector 26, TP4056 9, DW01A 6, FS8205 8, USB-C 16, XC6206 3, AO3400A 3, inductor 2, 4 diodes 8, passives 56"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+ladder = [[1, 8.7668], [100, 1.0889], [1000, 0.7252]]
+date = "30.09.2026"
+note = "kurulum 8,18 $, şablon 1,53 $ ve 10 genişletilmiş parça x 3,07 $ siparişe bir kez; 428 nokta x 0,0016 $ her karta; en küçük sipariş 5 kart"
+
+[[part]]
+key = "smt-vehicle"
+name = "JLCPCB SMD dizgi, 409 nokta"
+role.tr = "SMD dizgi, 409 lehim noktası: E28 16, DWM3000 24, AT32F403A 64, BNO085 28, ATECC608B 9, TCAN1051 8, ATGM336H 18, uydu anteni 2, eMMC 153, XL7015 9, SMBJ 2, sigorta 2, SS34 2, USB-C 16, pasifler 56"
+role.en = "SMD assembly, 409 joints: E28 16, DWM3000 24, AT32F403A 64, BNO085 28, ATECC608B 9, TCAN1051 8, ATGM336H 18, satellite antenna 2, eMMC 153, XL7015 9, SMBJ 2, fuse 2, SS34 2, USB-C 16, passives 56"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+ladder = [[1, 8.7364], [100, 1.0585], [1000, 0.6948]]
+date = "30.09.2026"
+note = "kurulum 8,18 $, şablon 1,53 $ ve 10 genişletilmiş parça x 3,07 $ siparişe bir kez; 409 nokta x 0,0016 $ her karta; en küçük sipariş 5 kart"
+
+[[part]]
+key = "hand-anchor"
+name = "JLCPCB elle lehim, 10 nokta"
+role.tr = "delikli parça ve kablo lehimi, 10 nokta: HLK-5M12 4, varistör 2, iki klemens 4"
+role.en = "through-hole and lead soldering, 10 joints: HLK-5M12 4, varistor 2, two terminal blocks 4"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+ladder = [[1, 0.164], [100, 0.164], [1000, 0.164]]
+date = "30.09.2026"
+note = "elle dizgi nokta başına 0,0164 $ (siparişte 10.000 noktaya kadar), 0,015 $ (10.001-30.000)"
+
+[[part]]
+key = "hand-pedestrian"
+name = "JLCPCB elle lehim, 4 nokta"
+role.tr = "delikli parça ve kablo lehimi, 4 nokta: pil ve güneş paneli kabloları 4"
+role.en = "through-hole and lead soldering, 4 joints: battery and solar panel leads 4"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+ladder = [[1, 0.0656], [100, 0.0656], [1000, 0.0656]]
+date = "30.09.2026"
+note = "elle dizgi nokta başına 0,0164 $ (siparişte 10.000 noktaya kadar), 0,015 $ (10.001-30.000)"
+
+[[part]]
+key = "hand-vehicle"
+name = "JLCPCB elle lehim, 18 nokta"
+role.tr = "delikli parça ve kablo lehimi, 18 nokta: ekran modülünün 14 uçlu başlığı 14, iki klemens 4"
+role.en = "through-hole and lead soldering, 18 joints: the screen module's 14-pin header 14, two terminal blocks 4"
+seller = "JLCPCB"
+url = "https://jlcpcb.com/help/article/pcb-assembly-price"
+ladder = [[1, 0.2952], [100, 0.2952], [1000, 0.27]]
+date = "30.09.2026"
+note = "elle dizgi nokta başına 0,0164 $ (siparişte 10.000 noktaya kadar), 0,015 $ (10.001-30.000)"
 
 [[part]]
 key = "tp4056"
@@ -587,28 +658,28 @@ key = "amplified-anchor"
 name.tr = "Şehir içi ve kırsal yayın birimi"
 name.en = "Urban and rural broadcast unit"
 parts = ["e28-2g4m20s", "stm32g031k8t6", "atecc608b", "gw-22-5151"]
-other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]
+other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt-anchor", "hand-anchor"]
 
 [[product]]
 key = "tunnel-anchor"
 name.tr = "Kritik bölge yayın birimi"
 name.en = "Critical area broadcast unit"
 parts = ["dwm3000-lcsc", "stm32g031k8t6", "atecc608b"]
-other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "gainta-g203", "passives", "pcb-2l", "smt"]
+other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "gainta-g203", "passives", "pcb-2l", "smt-tunnel", "hand-anchor"]
 
 [[product]]
 key = "pedestrian"
 name.tr = "Yaya alıcısı"
 name.en = "Pedestrian receiver"
 parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b", "atgm336h-5nr32", "pro-ob-430", "zdemmc04ga", "gdey0154d67", "seeed-solar-0.5w"]
-other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "fpc-24p", "ao3400a", "xrnr201610-10uh", "mbr0530:4", "gainta-g517", "passives", "pcb-2l", "smt"]
+other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "fpc-24p", "ao3400a", "xrnr201610-10uh", "mbr0530:4", "gainta-g517", "passives", "pcb-2l", "smt-pedestrian", "hand-pedestrian"]
 
 [[product]]
 key = "vehicle"
 name.tr = "Kara aracı alıcısı"
 name.en = "Vehicle receiver"
 parts = ["e28-2g4m20s", "dwm3000-lcsc", "at32f403argt7", "bno085", "atecc608b", "tcan1051", "ili9341-2.8", "gw-22-5151", "atgm336h-5nr32", "pro-ob-430", "zdemmc04ga"]
-other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-sma", "gainta-g212", "passives", "pcb-2l", "smt"]
+other = ["xl7015", "smbj33a", "ptc-0.5a", "ss34", "kf301-2p:2", "usb-c", "ipex-sma", "gainta-g212", "passives", "pcb-2l", "smt-vehicle", "hand-vehicle"]
 
 # The unit as it would be without the frequency hopping certificate: the
 # density limit holds it to 12,1 dBm, which the plain module reaches. No
@@ -619,4 +690,4 @@ key = "sx1280-anchor"
 name.tr = "FHSS ve LBT belgesi olmayan yayın birimi"
 name.en = "Broadcast unit without the FHSS and LBT certificate"
 parts = ["e28-2g4m12s", "gw-22-5151", "stm32g031k8t6", "atecc608b"]
-other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt"]
+other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", "kf301-2p:2", "ipex-sma", "gainta-g203", "passives", "pcb-2l", "smt-anchor", "hand-anchor"]
