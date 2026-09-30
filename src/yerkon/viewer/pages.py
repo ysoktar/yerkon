@@ -559,6 +559,10 @@ PHOTO_SOURCES = {
     "gainta-g203.webp": ("Gainta", "https://www.gainta.com/en/g203.html"),
     "gainta-g212.webp": ("Gainta", "https://www.gainta.com/en/g212.html"),
     "gainta-g517.webp": ("Gainta", "https://www.gainta.com/en/g517gbc-1.html"),
+    "rak-r1.webp": ("muzi works", "https://muzi.works/products/r1"),
+    "rak-wisblock.webp": ("RAKwireless", "https://store.rakwireless.com/products/wisblock-meshtastic-starter-kit"),
+    "atgm336h.webp": ("LCSC", "https://www.lcsc.com/product-detail/C90770.html"),
+    "whip.webp": ("RAKwireless", "https://store.rakwireless.com/products/lora-antenna"),
     "t1000-e.webp": ("Seeed Studio", "https://www.seeedstudio.com/SenseCAP-Card-Tracker-T1000-E-for-Meshtastic-p-5913.html"),
 }
 
@@ -586,7 +590,7 @@ PILOT_ITEMS = {
 
 #: The pilot's strip, in the slide's order.
 PILOT_PARTS = tuple(
-    (key, "t1000-e.webp" if key == "t1000-e" else "") for key in PILOT_ITEMS)
+    (key, "" if key == "sdr" else key + ".webp") for key in PILOT_ITEMS)
 
 SYSTEM = Page(
     slug="sistem",
@@ -1626,18 +1630,16 @@ SIMULATION = Page(
     nav=_w("Simülasyon", "The simulation"),
     title=_w("Simülasyon", "The simulation"),
     lead=_w(
-        "Simülasyonun tek bir işi vardı: karşılaştırma tablosundaki üç "
-        "YERKON satırını tahminle değil, her sayısı kaynağına kadar "
-        "izlenebilen bir modelle doldurmak. Sahada yapılmış bir ölçüm "
-        "değildir. Seçilen yerleşimler, istenen doğruluğa makul maliyetle "
-        "ulaşılabildiğini gösterir; birim sayısı ve yerleri değiştirilerek "
-        "başka yerlerde de istenen doğruluğa ulaşılabilir.",
-        "The simulation had one job: to fill the three YERKON rows of the "
-        "comparison table with a model whose every number can be traced, "
-        "instead of with an estimate. It is not a field measurement. The "
-        "placements chosen show that the accuracy wanted can be had at a "
-        "reasonable cost; with more units, or units elsewhere, it can be "
-        "had in other places too.",
+        "Simülasyon, yayın birimlerini Ankara'nın gerçek arazisine "
+        "yerleştirir ve bir alıcıyı yol boyunca yürütür. Alıcı her adımda "
+        "birimlere olan mesafeyi ölçer ve konumunu bu ölçümlerden hesaplar; "
+        "hesaplanan konum gerçek konumla karşılaştırılarak hata bulunur. "
+        "Sahada yapılmış bir ölçüm değildir.",
+        "The simulation places the broadcast units on Ankara's real terrain "
+        "and moves a receiver along the road. At every step the receiver "
+        "measures its distance to the units and works out its position from "
+        "those measurements; the error is found by comparing that position "
+        "with the true one. It is not a field measurement.",
     ),
     parts=(
         Part(
@@ -1891,14 +1893,10 @@ SIMULATION = Page(
                 _w(
                     "Aracın hareket sensörü ve tekerlek turu hesaba "
                     "katılmadı. Filtre yalnız telsiz ölçümlerini ve "
-                    "yükseklik haritasından gelen yüksekliği birleştiriyor. Ürünün "
-                    "tasarımında ikisi de var; buradaki sayılar bu yüzden "
-                    "gerçek bir araçtan daha kötü.",
+                    "yükseklik haritasından gelen yüksekliği birleştiriyor.",
                     "The vehicle's motion sensor and wheel turns are left "
                     "out. The filter combines only the radio measurements "
-                    "and the height from the elevation map. The product's design has "
-                    "both, so these numbers are worse than a real "
-                    "vehicle's.",
+                    "and the height from the elevation map.",
                 ),
                 _w(
                     "Sinyalin bina duvarlarından sekerek birden çok "
@@ -1933,13 +1931,13 @@ SIMULATION = Page(
                     "it was not measured at 6,5 GHz.",
                 ),
                 _w(
-                    "Güvenlik katmanı da yok. İmza doğrulama, anahtar "
-                    "yönetimi ve birimlerin merkeze gönderdiği yaşam "
-                    "sinyalleri tasarımın parçası, simülasyonun değil.",
-                    "The security layer is absent too. Signature checking, "
-                    "key management and the \"still working\" messages the "
-                    "units send the centre belong to the design rather than "
-                    "to the simulation.",
+                    "Güvenlik katmanı da modellenmedi: imza doğrulama, "
+                    "anahtar yönetimi ve birimlerin merkeze gönderdiği "
+                    "yaşam sinyalleri simülasyonda yok.",
+                    "The security layer is not modelled either: signature "
+                    "checking, key management and the \"still working\" "
+                    "messages the units send the centre are not in the "
+                    "simulation.",
                 ),
             ),
         ),
