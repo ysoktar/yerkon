@@ -129,9 +129,10 @@ url = "https://jlcpcb.com/partdetail/ARTERY-AT32F403ARGT7/C528440"
 ladder = [[1, 2.3538], [10, 1.9623], [30, 1.7171], [160, 1.4653], [480, 1.3516], [960, 1.3028]]
 date = "30.09.2026"
 
-# Both receivers keep the country's elevation model on board: the
-# Copernicus 30 m tiles over Türkiye are about 4 GB as published and
-# about half that at two bytes a height (docs/adr/0115).
+# Both receivers keep the country's elevation model on board: the 113
+# Copernicus 30 m tiles over Türkiye are about 4,5 GB as published and
+# 2,9 GB at two bytes a height, which the 3728 MB user area holds
+# (Zetta eMMC5.1 data sheet rev 1.2; docs/adr/0115).
 [[part]]
 key = "zdemmc04ga"
 name = "Zetta ZDEMMC04GA"
