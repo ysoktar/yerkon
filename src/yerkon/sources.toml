@@ -458,7 +458,7 @@ key = "news-ambulance"
 group = "news"
 label.tr = "Ambulans Uçağı Kazası (Mayıs 2026)"
 label.en = "The air ambulance crash (May 2026)"
-url = "https://www.military.com/air-medevac-crew-lost-gps-during-military-jamming-before-fatal-crash-ntsb-says?utm_source=gemini"
+url = "https://www.military.com/air-medevac-crew-lost-gps-during-military-jamming-before-fatal-crash-ntsb-says"
 
 [[source]]
 key = "news-baltic"

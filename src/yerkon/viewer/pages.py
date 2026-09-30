@@ -338,13 +338,13 @@ WHY = Page(
                     "Ruidoso'ya varamadan bir dağa çarptı. "
                     "[NTSB üzerine haber](https://www.military.com/"
                     "air-medevac-crew-lost-gps-during-military-jamming-"
-                    "before-fatal-crash-ntsb-says?utm_source=gemini)",
+                    "before-fatal-crash-ntsb-says)",
                     "**United States, May 2026.** An air ambulance out of "
                     "Roswell flew into military GPS jamming and hit a "
                     "mountain short of Ruidoso. "
                     "[Report on the NTSB finding](https://www.military.com/"
                     "air-medevac-crew-lost-gps-during-military-jamming-"
-                    "before-fatal-crash-ntsb-says?utm_source=gemini)",
+                    "before-fatal-crash-ntsb-says)",
                 ),
                 _w(
                     "**Baltık, Nisan 2024.** Finnair, Tartu uçuşlarını bir "
