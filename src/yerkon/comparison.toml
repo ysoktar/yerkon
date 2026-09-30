@@ -688,7 +688,7 @@ gerekiyorsa şebeke dışı besleme) toplamının senaryo alanına bölünmesidi
 Birim fiyatı kartın bütün parçalarını, kutusunu, baskılı devresini ve \
 dizgisini kapsar; test, kalibrasyon, belgelendirme, vergi ve kargo dahil \
 değildir. \
-Konum, radyo mesafe ölçümlerini ve haritadan gelen yüksekliği birleştiren \
+Konum, radyo mesafe ölçümlerini ve yükseklik haritasından gelen yüksekliği birleştiren \
 bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
 kullanılmamıştır. YERKON OPEX, yıllık işletme bedelidir: elektrik \
 (ticarethane tarifesi, Nisan 2026 zammıyla 5,62 TL/kWh), yenileme (vergi \
