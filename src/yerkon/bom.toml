@@ -504,6 +504,79 @@ url = "https://jlcpcb.com/partdetail/AbraconLLC-PRO_OB_430/C3284500"
 ladder = [[1, 1.0852], [10, 0.8854], [30, 0.7846], [100, 0.6856], [500, 0.6255], [1000, 0.5946]]
 date = "29.09.2026"
 
+# The pedestrian receiver shows the way on a small e-paper screen, which
+# draws power only when it changes and stays readable in sunlight, and it
+# tops up its cell from a panel on the back of the box. The bare panel
+# needs the maker's booster (one MOSFET, one inductor, three Schottky
+# diodes and a few capacitors under "passives") and a 24-pin connector;
+# a fourth diode keeps the battery from draining back into the solar
+# panel, which feeds the TP4056 charger directly.
+[[part]]
+key = "gdey0154d67"
+name = "Good Display GDEY0154D67"
+role.tr = "1,54 inç e-kâğıt ekran, 200x200, SPI"
+role.en = "1,54 inch e-paper screen, 200x200, SPI"
+seller = "Good Display"
+url = "https://www.buy-lcd.com/products/154-inch-electronic-paper-display-200x200-partial-refresh-digital-price-tags-sreen-gdey0154d67"
+ladder = [[1, 4.51], [2, 4.3747], [3, 4.2845]]
+date = "30.09.2026"
+note = "indirimli liste fiyatı; 2 adette %3, 3 adette %5 indirim; üstü yayımlanmamış, indirim varsayılmadı"
+
+[[part]]
+key = "seeed-solar-0.5w"
+name = "Seeed Studio SKU 313070004"
+role.tr = "güneş paneli, 0,5 W, 5,5 V, 55x70 mm"
+role.en = "solar panel, 0,5 W, 5,5 V, 55x70 mm"
+seller = "Seeed Studio"
+url = "https://www.seeedstudio.com/0-5W-Solar-Panel-55x70.html"
+ladder = [[1, 2.5]]
+date = "30.09.2026"
+note = "büyük adet fiyatı yayımlanmamış, indirim varsayılmadı"
+
+[[part]]
+key = "fpc-24p"
+name = "XUNPU FPC-05F-24PH20"
+role.tr = "e-kâğıt ekran bağlantısı, 24 uçlu, 0,5 mm"
+role.en = "e-paper screen connector, 24 pins, 0,5 mm"
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C2856805.html"
+ladder = [[5, 0.1053], [50, 0.084], [150, 0.0733], [500, 0.0653], [2000, 0.054], [4000, 0.0509]]
+date = "30.09.2026"
+note = "en küçük sipariş 5 adet"
+
+[[part]]
+key = "ao3400a"
+name = "AOS AO3400A"
+role.tr = "e-kâğıt yükseltecinin MOSFET'i"
+role.en = "MOSFET of the e-paper booster"
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C20917.html"
+ladder = [[5, 0.0853], [50, 0.0683], [150, 0.0596], [500, 0.0524], [3000, 0.0499], [6000, 0.0482]]
+date = "30.09.2026"
+note = "en küçük sipariş 5 adet"
+
+[[part]]
+key = "xrnr201610-10uh"
+name = "XR XRNR201610-10uH/M"
+role.tr = "e-kâğıt yükseltecinin bobini, 10 µH"
+role.en = "inductor of the e-paper booster, 10 µH"
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C5289252.html"
+ladder = [[10, 0.0487], [100, 0.0388], [300, 0.0339], [2000, 0.0288], [4000, 0.0259], [10000, 0.0244]]
+date = "30.09.2026"
+note = "en küçük sipariş 10 adet"
+
+[[part]]
+key = "mbr0530"
+name = "Shikues MBR0530"
+role.tr = "Schottky diyot: üçü e-kâğıt yükseltecinde, biri güneş girişinde"
+role.en = "Schottky diode: three in the e-paper booster, one on the solar input"
+seller = "LCSC"
+url = "https://www.lcsc.com/product-detail/C475718.html"
+ladder = [[50, 0.0188], [500, 0.0148], [3000, 0.0113], [6000, 0.0099], [24000, 0.0088], [51000, 0.0082]]
+date = "30.09.2026"
+note = "en küçük sipariş 50 adet"
+
 # --- Products ---------------------------------------------------------------
 
 # Certified as adaptive frequency hopping, the unit may radiate 20 dBm at
@@ -527,8 +600,8 @@ other = ["hlk-5m12", "tps563200", "smbj18a", "mov-10d471k", "ptc-0.5a", "ss34", 
 key = "pedestrian"
 name.tr = "Yaya alıcısı"
 name.en = "Pedestrian receiver"
-parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b", "atgm336h-5nr32", "pro-ob-430", "zdemmc04ga"]
-other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "gainta-g517", "passives", "pcb-2l", "smt"]
+parts = ["e28-2g4m20s", "dwm3000-lcsc", "esp32-s3", "bno085", "atecc608b", "atgm336h-5nr32", "pro-ob-430", "zdemmc04ga", "gdey0154d67", "seeed-solar-0.5w"]
+other = ["lipo-1000", "tp4056", "dw01a", "fs8205", "usb-c", "xc6206", "fpc-24p", "ao3400a", "xrnr201610-10uh", "mbr0530:4", "gainta-g517", "passives", "pcb-2l", "smt"]
 
 [[product]]
 key = "vehicle"

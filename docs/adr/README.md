@@ -125,3 +125,4 @@ Biçim: `.claude/skills/domain-modeling/ADR-FORMAT.md`.
 | [0113](0113-tunelde-olculmus-golgeleme-ve-40-m.md) | Tünelde ölçülmüş 2,7 dB gölgeleme payı ve 40 m aralık | Geçerli |
 | [0114](0114-alicilarda-uydu-konum-modulu.md) | Alıcılarda uydu konum modülü (ATGM336H-5NR32) | Geçerli |
 | [0115](0115-alicilarda-4-gb-bellek.md) | Alıcılarda 4 GB bellek (Zetta eMMC), araç alıcısında AT32F403A | Geçerli |
+| [0116](0116-yaya-alicisinda-ekran-ve-gunes-paneli.md) | Yaya alıcısında e-kâğıt ekran ve güneş paneli | Geçerli |
