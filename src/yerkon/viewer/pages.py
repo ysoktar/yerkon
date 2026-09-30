@@ -849,15 +849,14 @@ SYSTEM = Page(
                 ),
                 _w(
                     "**Nesnelerin interneti alıcısı.** Kapalı ve yarı açık "
-                    "alanda çalışan robot filoları için. Yaygın robot "
-                    "işletim "
-                    "sistemleriyle doğrudan konuşur; tekerleğin kaç tur "
+                    "alanda çalışan robot filoları için. Robotlarda yaygın "
+                    "kullanılan ROS ile doğrudan konuşur; tekerleğin kaç tur "
                     "döndüğüne ve kendi hareket sensörüne bakarak konumunu "
                     "sürekli düzeltir. Çoğu depo ve fabrikada DWM3000 "
                     "yeter.",
                     "**Internet of things.** For robot fleets indoors and "
-                    "in half open areas. It talks directly to the common "
-                    "robot operating systems and keeps correcting its "
+                    "in half open areas. It talks directly to ROS, the "
+                    "framework most robots use, and keeps correcting its "
                     "position from how far the wheels have turned and its "
                     "own motion sensor. A DWM3000 is enough for most "
                     "warehouse and factory work.",
