@@ -450,12 +450,12 @@ WHY = Page(
                 ),
                 _w(
                     "Sahte sinyale karşı YERKON yedekten fazlası: bir "
-                    "doğrulama mekanizması. Araç ya da gemi, uydunun "
+                    "doğrulama mekanizması. Araç, uydunun "
                     "verdiği konumla yerden gelen konumu karşılaştırarak "
                     "bir aldatma saldırısı altında olduğunu tespit "
                     "edebilir.",
                     "Against a fake signal YERKON is more than a standby: "
-                    "it is a cross-check. A vehicle or a ship can compare "
+                    "it is a cross-check. A vehicle can compare "
                     "the satellite's position with the one from the ground "
                     "and so detect that it is under a spoofing attack.",
                 ),
