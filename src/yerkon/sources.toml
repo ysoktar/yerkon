@@ -36,6 +36,11 @@ name.tr = "YERKON, fiyatlar ve kur"
 name.en = "YERKON, prices and exchange rates"
 
 [[group]]
+key = "policy"
+name.tr = "Ulaştırma politikası"
+name.en = "Transport policy"
+
+[[group]]
 key = "news"
 name.tr = "Haberler"
 name.en = "News"
@@ -452,6 +457,20 @@ group = "project"
 label.tr = "TCMB, 29 Eylül 2026 gösterge niteliğindeki kurlar"
 label.en = "Central Bank of the Republic of Türkiye, indicative rates of 29 September 2026"
 url = "https://www.tcmb.gov.tr/kurlar/202609/29092026.xml"
+
+[[source]]
+key = "policy-sura"
+group = "policy"
+label.tr = "12. Ulaştırma ve Haberleşme Şûrası Sonuç Bildirisi (2021)"
+label.en = "12th Transport and Communications Council, final declaration (2021)"
+url = "https://sgb.uab.gov.tr/uploads/pages/suralar/12-ulastirma-ve-haberlesme-surasi-sonuc-bildirisi.pdf"
+
+[[source]]
+key = "policy-plan"
+group = "policy"
+label.tr = "Ulaştırma ve Altyapı Bakanlığı, Ulaştırma ve Lojistik Ana Planı (2053)"
+label.en = "Ministry of Transport and Infrastructure, Transport and Logistics Master Plan (2053)"
+url = "https://sgb.uab.gov.tr/ulusal-ulastirma-ve-lojistik-ana-plani"
 
 [[source]]
 key = "news-ambulance"

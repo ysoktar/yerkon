@@ -590,7 +590,7 @@ SYSTEM = Page(
                     "inmek, her birimde bir atomik saat ve IEEE 1588 PTP "
                     "altyapısı demek. Çip ölçekli bir atomik saatin "
                     "(Microchip SA65) tek adedi yaklaşık 5500 dolar, "
-                    "yaklaşık 269500 lira ([Analog IC Tips, Eylül 2021]"
+                    "yaklaşık 270000 lira ([Analog IC Tips, Eylül 2021]"
                     "(https://www.analogictips.com/the-pc-board-atomic-clock-part-3-the-csac-cesium-physics-cell-faq/)). "
                     "Çift yönlü "
                     "ölçümde bu ağ geneli senkronizasyona gerek yok: "
@@ -603,7 +603,7 @@ SYSTEM = Page(
                     "accuracy. Going below a billionth of a second, for "
                     "instance, means an atomic clock and IEEE 1588 PTP at "
                     "every unit. One chip-scale atomic clock (Microchip "
-                    "SA65) costs about 5500 dollars, roughly 269500 lira "
+                    "SA65) costs about 5500 dollars, roughly 270000 lira "
                     "([Analog IC Tips, September 2021]"
                     "(https://www.analogictips.com/the-pc-board-atomic-clock-part-3-the-csac-cesium-physics-cell-faq/)). "
                     "Two way ranging needs no "
@@ -919,15 +919,17 @@ RESEARCH = Page(
                 _w(
                     "**Mevcut altyapıya en az dokunarak, sonradan "
                     "büyütülebilen bir sistem kurulabilir mi?** 12. "
-                    "Ulaştırma ve Haberleşme Şurası akıllı ulaşım "
-                    "altyapısının geliştirilmesini hedef koydu. Yol "
+                    "Ulaştırma ve Haberleşme Şûrası ve 2053 Ulaştırma ve "
+                    "Lojistik Ana Planı akıllı ulaşım altyapısının "
+                    "geliştirilmesini hedef koydu. Yol "
                     "kenarındaki ünitelerin ve trafik kontrol noktalarının "
                     "elektriğinin ve hattının kullanılması, montajı ucuza "
                     "getirmenin yolu.",
                     "**Can a system be built by touching the existing "
                     "infrastructure as little as possible, and grown "
                     "later?** The 12th Transport and Communications "
-                    "Council set developing intelligent transport "
+                    "Council and the 2053 Transport and Logistics Master "
+                    "Plan set developing intelligent transport "
                     "infrastructure as a goal. Using the power and the "
                     "line already at roadside units and traffic control "
                     "points is the way to make installation cheap.",
@@ -1019,7 +1021,7 @@ RESEARCH = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Pilot doğrulama", "The pilot"),
+            heading=_w("Uygulama süreci", "How it will be carried out"),
             lines=(
                 _w(
                     "Seçilecek bir ulaşım koridoruna 10 ile 15 yayın "
@@ -1066,20 +1068,28 @@ RESEARCH = Page(
                     "birimiyle alıcının haberleşmesi, paket ve protokol "
                     "yapısı, saha kapsaması, hareket eden alıcının "
                     "davranışı, uydu konumuyla karasal konumun "
-                    "karşılaştırılması ve radyo ortamı.",
+                    "karşılaştırılması ve radyo ortamı. Bu donanımla "
+                    "konumlandırma ve şifreleme mantığı doğrulanacak; "
+                    "T1000-E'nin LR1110 yongasıyla HPE ve VPE ölçümleri de "
+                    "yapılabilir, ancak sonuçlar nihai kartlarla birebir "
+                    "karşılaştırılabilir olmayacak.",
                     "Before the YERKON boards are made, the communication "
                     "design and the basic parts will be tried quickly and "
                     "cheaply on hardware the team already has: how the "
                     "unit and the receiver talk, the packet and protocol "
                     "layout, coverage in the field, how a moving receiver "
                     "behaves, the satellite position against the "
-                    "terrestrial one, and the radio environment.",
+                    "terrestrial one, and the radio environment. This "
+                    "hardware will verify the positioning and signing "
+                    "logic; the LR1110 chip in the T1000-E can also take "
+                    "HPE and VPE measurements, but the results will not be "
+                    "fully comparable with the final boards.",
                 ),
             ),
         ),
         Part(
             kind="slides", slides=PILOT_PARTS,
-            heading=_w("Pilot doğrulamanın parçaları", "The pilot's parts"),
+            heading=_w("Uygulama sürecinin ilk adımındaki donanım", "Hardware for the first step"),
         ),
     ),
 )
@@ -1227,27 +1237,27 @@ VALUE = Page(
                     "Doğruluğun ne çıktığı, ne kadar alanın kapsandığı, "
                     "hizmetin kesilip kesilmediği, kaç birim gerektiği ve "
                     "mevcut altyapının ne kadarının kullanılabildiği "
-                    "pilotta belli olacak.",
+                    "uygulama sürecinde belli olacak.",
                     "The first area is tunnels and critical transport "
                     "corridors, where satellite access is structurally "
                     "limited. "
                     "There the need can be stated plainly and performance "
                     "measured under control, so the boundaries of a first "
-                    "deployment are clear. The pilot is what settles "
+                    "deployment are clear. Carrying it out is what settles "
                     "accuracy, coverage, service continuity, how dense the "
                     "units have to be, and how much of the existing "
                     "infrastructure can be reused.",
                 ),
                 _w(
-                    "Kısa vadede pilot, hazır satılan donanımla "
-                    "doğrulanacak; yerli yazılım ve haberleşme kuralları "
+                    "Kısa vadede uygulama süreci elimizdeki hazır "
+                    "donanımla başlayacak; yerli yazılım ve haberleşme kuralları "
                     "yazılacak, ilk yayın ve alıcı kartları tasarlanacak. "
                     "Orta vadede yerli gömülü sistem ve telsiz "
                     "firmalarıyla ortaklık, savunma ve haberleşme "
                     "ekosistemiyle birlikte donanım geliştirme ve kritik "
                     "parçaların iki ayrı yerden tedariki.",
-                    "In the short term the pilot is proved on hardware "
-                    "bought off the shelf, while the domestic software and "
+                    "In the short term the work starts on off-the-shelf "
+                    "hardware the team already has, while the domestic software and "
                     "the rules the radios follow get written and the first "
                     "broadcast and receiver boards are designed. In the "
                     "medium term, partnership with domestic embedded and "
@@ -3391,7 +3401,7 @@ WHEN_UNDER = _w(
     "curiosity: the oldest is from 2017, the newest from this year.",
 )
 CLOCKS = (
-    ("~269500 TL", _w("birim başına atomik saat, TDoA",
+    ("~270000 TL", _w("birim başına atomik saat, TDoA",
                        "an atomic clock per unit, TDoA")),
     ("0 TL", _w("saat senkronizasyonu, YERKON (çift yönlü ölçüm)",
                 "clock synchronisation, YERKON (two way ranging)")),
