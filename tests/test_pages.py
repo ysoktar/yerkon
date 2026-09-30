@@ -461,9 +461,11 @@ def test_the_results_page_draws_the_other_systems_and_numbers_the_notes():
 
 
 def test_our_own_rows_are_marked_apart_from_the_published_ones():
-    """A reader has to see which three rows this project produced."""
+    """A reader has to see which rows this project produced: the three
+    runs and the whole-country row weighted from two of them."""
     drawn = render(page_at("/sonuclar"), "tr", a_record())
-    assert drawn.count('<tr class="ours">') == len(EVERY_ROW)
+    assert drawn.count('<tr class="ours">') == len(EVERY_ROW) + 1
+    assert "YERKON (Tüm Türkiye)" in drawn
 
 
 def test_the_other_systems_are_not_drawn_without_a_run_of_our_own():

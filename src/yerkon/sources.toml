@@ -473,6 +473,20 @@ label.en = "Central Bank of the Republic of Türkiye, indicative rates of 29 Sep
 url = "https://www.tcmb.gov.tr/kurlar/202609/29092026.xml"
 
 [[source]]
+key = "sen-corine"
+group = "project"
+label.tr = "Şen (2024), Menba Dergisi 10(1), Tablo 1: CORINE 2018'de Türkiye'nin %1,99'u yapay alan"
+label.en = "Şen (2024), Menba Journal 10(1), Table 1: 1.99 % of Türkiye artificial surfaces in CORINE 2018"
+url = "https://dergipark.org.tr/en/download/article-file/3847250"
+
+[[source]]
+key = "cia-turkey"
+group = "project"
+label.tr = "CIA World Factbook, Türkiye kara yüzölçümü (769.632 km²)"
+label.en = "CIA World Factbook, Türkiye land area (769,632 km²)"
+url = "https://web.archive.org/web/2025/https://www.cia.gov/the-world-factbook/countries/turkey-turkiye/"
+
+[[source]]
 key = "policy-sura"
 group = "policy"
 label.tr = "12. Ulaştırma ve Haberleşme Şûrası Sonuç Bildirisi (2021)"

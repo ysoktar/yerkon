@@ -1288,6 +1288,10 @@ VALUE = Page(
                     "Kısa vadede uygulama süreci elimizdeki hazır "
                     "donanımla başlayacak; yerli yazılım ve haberleşme kuralları "
                     "yazılacak, ilk yayın ve alıcı kartları tasarlanacak. "
+                    "Ulaştırma ve Altyapı Bakanlığı'nın desteği "
+                    "sağlanabilirse, seçilecek bir AUS koridorunda "
+                    "birimlerin mevcut kabin ve direklere takıldığı ortak "
+                    "bir saha çalışması yapılabilir. "
                     "Orta vadede yerli gömülü sistem ve telsiz "
                     "firmalarıyla ortaklık, savunma ve haberleşme "
                     "ekosistemiyle birlikte donanım geliştirme ve kritik "
@@ -1295,7 +1299,11 @@ VALUE = Page(
                     "In the short term the work starts on off-the-shelf "
                     "hardware the team already has, while the domestic software and "
                     "the rules the radios follow get written and the first "
-                    "broadcast and receiver boards are designed. In the "
+                    "broadcast and receiver boards are designed. With the "
+                    "Ministry of Transport and Infrastructure's support, if "
+                    "it can be had, a joint field trial could fit the units "
+                    "to existing cabinets and poles along a chosen "
+                    "intelligent transport corridor. In the "
                     "medium term, partnership with domestic embedded and "
                     "radio firms, hardware developed together with the "
                     "defence and communications industry, and two "
@@ -3706,6 +3714,7 @@ def _cost(published, language: str) -> str:
 IN_ENGLISH = {
     "YERKON (Şehir içi)": "YERKON (Urban)",
     "YERKON (Kırsal)": "YERKON (Rural)",
+    "YERKON (Tüm Türkiye)": "YERKON (All of Türkiye)",
     "YERKON (Tünel)": "YERKON (Tunnel)",
     "Dış": "Outdoor",
     "İç + dış": "Indoor and outdoor",
@@ -3727,6 +3736,42 @@ IN_ENGLISH = {
 def _in(text: str, language: str) -> str:
     """A row name, technology or environment in the page's language."""
     return text if language == "tr" else IN_ENGLISH.get(text, text)
+
+
+#: Share of Türkiye under artificial (urban) surfaces in CORINE 2018,
+#: 1,99 %, rounded to the 2 % the whole-country row weights by; the rest
+#: is taken as rural. Şen (2024), Menba Journal 10(1), table 1.
+URBAN_SHARE = 0.02
+#: Türkiye's land area, CIA World Factbook.
+TURKIYE_LAND_KM2 = 769632
+
+
+def nationwide(published):
+    """The whole-country row: urban and rural weighted by area, no tunnels.
+
+    Not a run of its own. Every column is the area weighted mean of the
+    two rows it comes from, which for the percentile columns is an
+    approximation, and the note on the row says so.
+    """
+    from dataclasses import replace
+
+    if "urban" not in published.keys or "rural" not in published.keys:
+        return None
+    urban, rural = published.row("urban"), published.row("rural")
+
+    def mix(name: str) -> float:
+        return ((1 - URBAN_SHARE) * getattr(rural, name)
+                + URBAN_SHARE * getattr(urban, name))
+
+    return replace(
+        rural,
+        system="YERKON (Tüm Türkiye)",
+        area_km2=float(TURKIYE_LAND_KM2),
+        reached_km2=None,
+        **{name: mix(name) for name in (
+            "hpe_p50_m", "hpe_p95_m", "vpe_p95_m", "availability",
+            "capex_tl_per_unit", "opex_tl_per_unit_year")},
+    )
 
 
 def _published(published, language: str, table=None) -> str:
@@ -3801,6 +3846,18 @@ def _published(published, language: str, table=None) -> str:
             note = mark(table.yerkon["by_route"])
             rest[5] += note
             rest[6] += note
+        body.append(marked + rest)
+    whole = nationwide(published)
+    if whole is not None:
+        cells = list(whole.cells())
+        per_row.append((said_in(cells[0]), []))
+        marked = [words(cells[0]), words(cells[1]), words(cells[2])]
+        marked[0] += mark(table.yerkon["nationwide"])
+        rest = [html.escape(one) for one in cells[3:]]
+        rest[3] += mark(table.yerkon["availability"])
+        rest[4] = "≈ " + decimal_comma(TURKIYE_LAND_KM2, 0)
+        rest[5] += mark(table.yerkon["capex"])
+        rest[6] += mark(table.yerkon["capex"])
         body.append(marked + rest)
     # The template is escaped once, by `_said`. What comes out of the
     # record is escaped here, and escaping the result again would put
