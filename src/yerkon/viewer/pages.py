@@ -3832,7 +3832,7 @@ CARRIED = ("site.css", "theme.js", "road.webp", "gnss.webp",
 #: 1,5 MB as PNG and 216 KB as WebP at quality 85, with the lettering in
 #: the diagrams still sharp.
 PICTURE_SIZES = {
-    "road.webp": (1200, 900),
+    "road.webp": (1200, 896),
     "gnss.webp": (700, 701),
     "architecture.webp": (1200, 800),
     "simulator.webp": (1600, 1000),
