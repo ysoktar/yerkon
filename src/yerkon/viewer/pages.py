@@ -3554,10 +3554,6 @@ WHEN = (
      _w("ambulans uçağı düştü", "air ambulance down")),
 )
 WHEN_TITLE = _w("Dokuz yılda beş olay", "Five events in nine years")
-WHEN_UNDER = _w(
-    "Beş olayın üçü 2024'ten bu yana yaşandı.",
-    "Three of the five happened in 2024 or later.",
-)
 CLOCKS = (
     ("~270000 TL", _w("birim başına atomik saat, TDoA",
                        "an atomic clock per unit, TDoA")),
@@ -3701,8 +3697,10 @@ def _figure(drawn: str, under, language: str, narrow: str = "",
         '<div class="only-wide">{}</div><div class="only-narrow">{}</div>'
         .format(drawn, narrow)
     )
-    return ('<figure class="chart">{}{}<figcaption>{}</figcaption>'
-            "</figure>").format(body, legend, _said(under, language))
+    said = _said(under, language) if under is not None else ""
+    caption = "<figcaption>{}</figcaption>".format(said) if said else ""
+    return '<figure class="chart">{}{}{}</figure>'.format(body, legend,
+                                                          caption)
 
 
 def _accuracy(published, language: str) -> str:
@@ -3757,7 +3755,7 @@ def _when(language: str) -> str:
               for year, where, what in WHEN]
     return _figure(
         charts.timeline(events, title=WHEN_TITLE.said(language)),
-        WHEN_UNDER, language, legend=_legend(("event",), language),
+        None, language, legend=_legend(("event",), language),
         narrow=charts.timeline_narrow(events,
                                       title=WHEN_TITLE.said(language)),
     )
