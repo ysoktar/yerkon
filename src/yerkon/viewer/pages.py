@@ -563,6 +563,7 @@ PHOTO_SOURCES = {
     "rak-wisblock.webp": ("RAKwireless", "https://store.rakwireless.com/products/wisblock-meshtastic-starter-kit"),
     "atgm336h.webp": ("LCSC", "https://www.lcsc.com/product-detail/C90770.html"),
     "whip.webp": ("RAKwireless", "https://store.rakwireless.com/products/lora-antenna"),
+    "sdr.webp": ("Great Scott Gadgets", "https://greatscottgadgets.com/hackrf/one/"),
     "t1000-e.webp": ("Seeed Studio", "https://www.seeedstudio.com/SenseCAP-Card-Tracker-T1000-E-for-Meshtastic-p-5913.html"),
 }
 
@@ -590,7 +591,7 @@ PILOT_ITEMS = {
 
 #: The pilot's strip, in the slide's order.
 PILOT_PARTS = tuple(
-    (key, "" if key == "sdr" else key + ".webp") for key in PILOT_ITEMS)
+    (key, key + ".webp") for key in PILOT_ITEMS)
 
 SYSTEM = Page(
     slug="sistem",
@@ -1646,13 +1647,12 @@ SIMULATION = Page(
             kind="picture",
             picture="simulator.webp",
             lines=(_w(
-                "Şehir içi satırı, simülasyon bitmiş hâlde: Kızılay'ın "
-                "gerçek arazisi, aydınlatma direklerine takılmış yayın "
-                "birimleri ve zemine boyanmış kapsama haritası. Renkler o "
-                "noktada kaç birimin duyulduğunu gösteriyor; konum hesabı "
-                "için en az dört gerekiyor. Sağdaki panel o sekmenin "
-                "kendi sonucu; sekiz farklı gölgeleme dağılımının ortak "
-                "sonucu.",
+                "Şehir içi satırı, simülasyonu tamamlanmış hâliyle: "
+                "Kızılay'ın gerçek arazisi, aydınlatma direklerindeki yayın "
+                "birimleri ve zemine boyanmış kapsama. Renkler o noktada kaç "
+                "birimin duyulabildiğini gösteriyor; konum hesaplamak için en"
+                " az dördü gerekiyor. Sağdaki panel o sekmenin kendi sonucu; "
+                "gölgelemenin sekiz ayrı çekilişinin birleşimi.",
                 "The urban row with its run finished: the real terrain "
                 "at Kızılay, the broadcast units on lighting columns, and "
                 "the coverage painted onto the ground. The colours show "
@@ -1667,23 +1667,22 @@ SIMULATION = Page(
             heading=_w("Arazi gerçek", "The ground is real"),
             lines=(
                 _w(
-                    "Üç satırın simülasyonu da Ankara'nın gerçek arazisi "
-                    "üzerinde çalıştırıldı. Yükseklik verisi Copernicus'un 30 metrelik "
-                    "haritasından bir kez indirilip paketin içine kondu, "
-                    "yani depoyu indiren biri tabloyu internete hiç "
-                    "çıkmadan yeniden üretebiliyor.",
+                    "Üç satırın hepsi Ankara yakınındaki gerçek arazi "
+                    "üzerinde duruyor. Arazi Copernicus'un 30 m'lik yükseklik"
+                    " modelinden bir kez indirildi ve pakete gömüldü; depoyu "
+                    "kopyalayan biri tabloyu internete bağlanmadan yeniden "
+                    "üretebilir.",
                     "All three rows stand on real ground near Ankara, "
                     "fetched once from the Copernicus 30 m DEM and baked "
                     "into the package, so a clone reproduces the table "
                     "without touching the network.",
                 ),
                 _w(
-                    "Şehir Kızılay: bir kenarı üç kilometre, en alçak ve "
-                    "en yüksek noktası arasında 91 metre fark var. Açık "
-                    "arazi Polatlı ovası: bir kenarı yirmi kilometre, 486 "
-                    "metre yükseklik farkıyla. Tünel ise "
-                    "Kızılcahamam'daki dağların içinden geçen gerçek bir 2 "
-                    "kilometrelik güzergâh.",
+                    "Şehir Kızılay: bir kenarı üç kilometre, en alçak ve en "
+                    "yüksek noktası arasında 91 metre var. Açık arazi Polatlı"
+                    " ovası: bir kenarı yirmi kilometre, arada 486 metre. "
+                    "Tünel, Kızılcahamam'daki dağların içinden geçen gerçek, "
+                    "iki kilometrelik bir tünel.",
                     "The city is Kızılay: three kilometres on a side, "
                     "with 91 metres between its lowest and highest point. "
                     "The open country is the Polatlı plain, twenty "
@@ -1692,10 +1691,9 @@ SIMULATION = Page(
                     "mountains at Kızılcahamam.",
                 ),
                 _w(
-                    "Hiçbir yerde \"düz zemin\" seçeneği yok. Düz bir "
-                    "yüzey modelin çizebileceği en tarafsız arazi değil, "
-                    "en elverişli arazidir: sonucu olduğundan iyi "
-                    "gösterirdi.",
+                    "Hiçbir yerde \"düz zemin\" seçeneği yok. Düz bir yüzey, "
+                    "modelin çizebileceği en tarafsız arazi değil, en "
+                    "elverişli arazidir: sonucu olduğundan iyi gösterirdi.",
                     "Nowhere is there a \"flat ground\" option. A flat "
                     "surface is not the most neutral terrain the model can "
                     "draw, it is the most favourable one: it would make "
@@ -1705,15 +1703,15 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Menzili tek bir hesap belirler",
+            heading=_w("Menzile tek bir hesap karar verir",
                        "One calculation decides the range"),
             lines=(
                 _w(
-                    "Kodun hiçbir yerinde \"azami menzil şu kadardır\" "
-                    "diye bir sayı yok. Menzil, sinyalin yolda ne kadar "
-                    "zayıfladığı hesaplanarak çıkıyor. Aynı hesap iki "
-                    "şeye birden karar veriyor: bağlantı kuruluyor mu ve "
-                    "kurulduysa ne kadar hassas ölçüyor.",
+                    "Kodun hiçbir yerinde \"azami menzil budur\" diyen bir sayı"
+                    " yok. Menzil, sinyalin yolda ne kadar zayıfladığının "
+                    "hesabından çıkar. Aynı hesap iki şeye birden karar "
+                    "verir: bağlantının kurulup kurulmadığına ve kurulduysa "
+                    "ne kadar hassas ölçtüğüne.",
                     "Nowhere in the code is there a number saying \"the "
                     "maximum range is this\". Range comes out of working "
                     "out how much the signal weakens on its way. The same "
@@ -1722,11 +1720,11 @@ SIMULATION = Page(
                     "does.",
                 ),
                 _w(
-                    "Sinyal alıcıya iki yoldan gelir: doğrudan ve "
-                    "zeminden sekerek. Belli bir mesafeden sonra bu ikisi "
-                    "ters düşüp birbirini zayıflatır. O mesafe anten "
-                    "yüksekliğiyle birlikte arttığı için, birimin alçağa "
-                    "konması menzilden götürür.",
+                    "Sinyal alıcıya iki yoldan ulaşır: doğrudan ve zeminden "
+                    "sekerek. Belli bir mesafeden sonra bu ikisinin adımı "
+                    "kayar ve birbirini zayıflatırlar. Bu mesafe anten "
+                    "yüksekliğiyle büyür; birimi alçağa takmak menzilden "
+                    "götürür.",
                     "The signal reaches the receiver two ways: directly, "
                     "and bouncing off the ground. Past a certain distance "
                     "those two fall out of step and weaken each other. "
@@ -1734,11 +1732,11 @@ SIMULATION = Page(
                     "a unit low costs range.",
                 ),
                 _w(
-                    "Sinyal engellerin üzerinden bükülerek geçer ve bu "
-                    "sırada zayıflar. Hesap, yoldaki en kötü tek engele "
-                    "değil bütün araziye bakıyor (ITU-R P.526-15 §4.5.2, "
-                    "delta-Bullington). Kızılay'da bir bağlantının önünde "
-                    "ortalama üç engel var, en kötüsünde on altı.",
+                    "Sinyal engellerin üzerinden bükülür ve bunu yaparken "
+                    "zayıflar. Hesap, yoldaki en kötü tek engele değil bütün "
+                    "araziye bakar (ITU-R P.526-15 §4.5.2, delta-Bullington)."
+                    " Kızılay'daki bir bağlantının önünde ortancada üç, en "
+                    "kötü durumda on altı engel var.",
                     "The signal bends over obstacles and weakens doing "
                     "it. The calculation looks at the whole terrain rather "
                     "than the worst single obstacle on the path (ITU-R "
@@ -1747,11 +1745,10 @@ SIMULATION = Page(
                     "median, sixteen at the worst.",
                 ),
                 _w(
-                    "Arazi on metrede bir okunuyor. Sabit 64 noktada "
-                    "okunsaydı 6,9 km'lik bir kırsal bağlantıda bu 108 "
-                    "metrede bir demek olurdu; aradaki tümsekler "
-                    "atlandığı için kayıp 37,60 dB yerine 31,28 dB "
-                    "çıkardı.",
+                    "Arazi her on metrede bir okunur. Sabit 64 noktada "
+                    "okunsaydı 6,9 km'lik bir kırsal bağlantı 108 metrede bir"
+                    " okunmuş olurdu; aradaki tümsekler atlanınca kayıp, "
+                    "doğrusu 37,60 dB iken 31,28 dB çıkardı.",
                     "The terrain is read every ten metres. Read at a "
                     "fixed 64 points, a 6,9 km rural link would be read "
                     "every 108 metres, and skipping the rises in between "
@@ -1759,22 +1756,21 @@ SIMULATION = Page(
                     "37,60.",
                 ),
                 _w(
-                    "Bir bağlantıda bu iki kayıptan büyük olan hesaba "
-                    "giriyor, ikisi toplanmıyor. İkisi de aynı arazinin aynı bağlantıya "
-                    "yaptığını anlatıyor; toplanırsa aynı tepe iki kez "
-                    "sayılmış olur.",
+                    "Bir bağlantıda bu iki kaybın toplamı değil, büyük olanı "
+                    "sayılır. İkisi de aynı arazinin aynı bağlantıya "
+                    "yaptığını anlatır; toplamak aynı tepeyi iki kez saymak "
+                    "olur.",
                     "A link counts the larger of those two losses, not "
                     "their sum. Both describe what the same terrain does "
                     "to the same link, and adding them would count the "
                     "same hill twice.",
                 ),
                 _w(
-                    "Bunların üstüne bir de gölgeleme biniyor: aynı "
-                    "mesafedeki iki bağlantının, arada ne olduğuna göre "
-                    "farklı çıkması. Yol açıkken 4 dB, kapalıyken 7,8 dB kadar "
-                    "(3GPP TR 38.901). Rastgele olduğu için hesap sekiz kez "
-                    "tekrarlanıyor ve sekiz denemenin bütün sonuçları bir "
-                    "arada değerlendiriliyor.",
+                    "Bunların üstüne gölgeleme biner: aynı uzaklıktaki iki "
+                    "bağlantı, arada ne durduğuna göre farklı çıkar. Yol "
+                    "açıkken 4 dB, kapalıyken 7,8 dB kadar (3GPP TR 38.901). "
+                    "Rastgele olduğu için hesap sekiz kez tekrarlanır ve "
+                    "sekizinin bütün sonuçları birlikte okunur.",
                     "Shadowing sits on top of those: two links the same "
                     "distance apart come out different depending on what "
                     "stands between. 4 dB with a clear path, about 7,8 dB without "
@@ -1786,15 +1782,14 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Mesajlaşma ve konum hesabı",
+            heading=_w("Mesajlar ve konum",
                        "The messages and the position"),
             lines=(
                 _w(
-                    "Mesafe hesapla çıkarılmaz, ölçülür. İki telsiz "
-                    "karşılıklı mesaj gönderir; SX1280'de bir ölçüm "
-                    "alışverişi, Göndermeden Önce Dinle (LBT) kuralının "
-                    "istediği %5 sessizlikle "
-                    "birlikte 33,4 milisaniye sürüyor.",
+                    "Mesafe hesaplanmaz, ölçülür. İki telsiz karşılıklı mesaj"
+                    " gönderir; SX1280'de bir ölçüm alışverişi, Göndermeden "
+                    "Önce Dinle (LBT) kuralının istediği %5 bekleme dahil "
+                    "33,4 milisaniye sürer.",
                     "A distance is measured rather than calculated. Two "
                     "radios send messages back and forth; on the SX1280 "
                     "one ranging exchange takes 33,4 milliseconds, "
@@ -1802,11 +1797,10 @@ SIMULATION = Page(
                     "asks for.",
                 ),
                 _w(
-                    "On iki birimle sırayla ölçüşme 401 milisaniye "
-                    "sürüyor. Bu sürede 100 km/sa giden araç 11,1 metre yol "
-                    "alıyor, yani bir turdaki ölçümler aynı ana ait değil. "
-                    "Hesap da onları aynı anda alınmış gibi kabul "
-                    "etmiyor.",
+                    "On iki birimle sırayla ölçüşmek 401 milisaniye sürer. "
+                    "100 km/sa giden bir araç bu sürede 11,1 metre yol alır; "
+                    "yani bir turdaki ölçümler tek bir ana ait değildir. "
+                    "Hesap da öyleymiş gibi davranmaz.",
                     "Measuring against twelve units in turn takes 401 "
                     "milliseconds. A car doing 100 km/h covers 11,1 metres "
                     "in that time, so the measurements in one round do not "
@@ -1814,10 +1808,10 @@ SIMULATION = Page(
                     "pretend they do.",
                 ),
                 _w(
-                    "Konumu hesaplayan kod, aracın gerçekte nerede "
-                    "olduğunu hiç görmez. Yalnızca şunları görür: ölçülen "
-                    "mesafe, birimin kurulumda ölçülmüş konumu, ölçümün "
-                    "saati ve o ölçüme ne kadar güvenildiği.",
+                    "Konumu hesaplayan kod aracın gerçekte nerede olduğunu "
+                    "hiç görmez. Yalnızca şunları görür: ölçülen mesafe, "
+                    "birimin kurulumda ölçülen konumu, ölçümün zamanı ve o "
+                    "ölçüme ne kadar güvenildiği.",
                     "The code that works out the position never sees "
                     "where the vehicle really is. It sees only these: the "
                     "measured distance, the unit's position as surveyed at "
@@ -1825,13 +1819,12 @@ SIMULATION = Page(
                     "much that measurement is trusted.",
                 ),
                 _w(
-                    "Yol kenarına dizilmiş birimler hep aynı yükseklikte "
-                    "olduğu için yüksekliği mesafelerle ölçmek zor. Filtre "
-                    "bu yüzden yol yüksekliğini alıcıdaki yükseklik "
-                    "haritasından bir ölçüm olarak alıyor, haritanın 2,43 "
-                    "m'lik hatasıyla; "
-                    "hata yol boyunca parça parça çekiliyor. Tablodaki VPE "
-                    "sütunu bu hesabın sonucu.",
+                    "Yol kenarına dizilmiş birimler aşağı yukarı aynı "
+                    "yükseklikte durduğu için düşey konumu mesafelerden "
+                    "ölçmek zordur. Filtre bu yüzden yolun yüksekliğini "
+                    "alıcıdaki yükseklik haritasından bir ölçüm olarak alır; "
+                    "haritanın 2,43 m'lik hatası yol boyunca parça parça "
+                    "çekilir. VPE sütunu bunun sonucudur.",
                     "Units strung along a roadside are all at much the "
                     "same height, which leaves the vertical hard to "
                     "measure from ranges. The filter therefore takes the "
@@ -1845,14 +1838,14 @@ SIMULATION = Page(
         Part(kind="shows", shows="spread"),
         Part(
             kind="points",
-            heading=_w("Ortalamayla geçmeyen üç hata",
+            heading=_w("Ortalama almanın gidermediği üç hata",
                        "Three errors that averaging will not remove"),
             lines=(
                 _w(
-                    "**Önü kapalı bir bağlantı olduğundan uzun ölçer.** "
-                    "Sinyal engelin üzerinden dolaşıyor ve ölçüm bu uzun "
-                    "yolu sayıyor. Hata hep aynı yöne, artı yöne gidiyor; "
-                    "bu yüzden çok ölçüp ortalama alma onu gidermiyor.",
+                    "**Önü kapalı bir bağlantı, olduğundan uzun ölçer.** "
+                    "Sinyal engelin çevresinden dolaşır ve ölçüm bu uzun yolu"
+                    " sayar. Hata hep aynı yöne gider; bu yüzden daha sık "
+                    "ölçüp ortalama almak onu gidermez.",
                     "**A blocked link measures longer than it is.** The "
                     "signal goes around the obstacle and the measurement "
                     "counts that longer way. The error always goes the "
@@ -1860,13 +1853,12 @@ SIMULATION = Page(
                     "not remove it.",
                 ),
                 _w(
-                    "**Birimin konumu kurulumda yanlış ölçüldüyse, o "
-                    "yanlış orada kalır.** Her birim için bir kez "
-                    "çekiliyor ve sonuna kadar taşınıyor. Tünelde "
-                    "hataların ortancası, birimler kusursuz ölçülmüş "
-                    "olsaydı 0,12 m çıkıyor; 15 cm'lik bir ölçüm hatasıyla "
+                    "**Birimin konumu kurulumda yanlış ölçüldüyse yanlış "
+                    "kalır.** Bu hata her birim için bir kez çekilir ve "
+                    "sonuna kadar taşınır. Tünelde hataların ortancası "
+                    "kusursuz bir ölçümle 0,12 m; 15 cm'lik ölçüm hatasıyla "
                     "bunun yaklaşık beş katı. Konum, birimlerin yerinin "
-                    "ölçüldüğünden daha iyi olamaz.",
+                    "ölçümünden daha iyi olamaz.",
                     "**If a unit's position is surveyed wrong at "
                     "installation, it stays wrong.** It is drawn once per "
                     "unit and carried to the end. In the tunnel the median "
@@ -1875,10 +1867,9 @@ SIMULATION = Page(
                     "cannot be better than the survey of the units.",
                 ),
                 _w(
-                    "**Kaybolan mesaj ölçüm vermez.** Kullanılan 2,4 GHz "
-                    "bandı kablosuz ağlarla ortak, yani kalabalık. Şehirde "
-                    "mesajların %15'i kayboluyor, açık yolda %5'i, tünelde "
-                    "hiçbiri.",
+                    "**Kaybolan mesaj ölçüm vermez.** 2,4 GHz bandı kablosuz "
+                    "ağlarla ortak, bu yüzden kalabalık. Mesajların şehirde "
+                    "%15'i, açık yolda %5'i kaybolur, tünelde hiçbiri.",
                     "**A lost message gives no measurement.** The 2,4 GHz "
                     "band is shared with wireless networks, so it is "
                     "crowded. 15% of messages are lost in the city, 5% on "
@@ -1888,23 +1879,22 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Modele girmeyenler", "What is left out"),
+            heading=_w("Modelin dışında kalanlar", "What is left out"),
             lines=(
                 _w(
-                    "Aracın hareket sensörü ve tekerlek turu hesaba "
-                    "katılmadı. Filtre yalnız telsiz ölçümlerini ve "
-                    "yükseklik haritasından gelen yüksekliği birleştiriyor.",
+                    "Aracın hareket sensörü ve tekerlek turu dışarıda "
+                    "bırakıldı. Filtre yalnız telsiz ölçümlerini ve yükseklik"
+                    " haritasından gelen yüksekliği birleştirir.",
                     "The vehicle's motion sensor and wheel turns are left "
                     "out. The filter combines only the radio measurements "
                     "and the height from the elevation map.",
                 ),
                 _w(
-                    "Sinyalin bina duvarlarından sekerek birden çok "
-                    "yoldan gelmesi (çok yollu yayılım) ayrıca "
-                    "modellenmedi; modelde yalnız zeminden sekme ve önü "
-                    "kapalı bağlantının uzun ölçmesi var. Telsizin kendi "
-                    "gürültüsü ve mesajlaşma sırasında saatin kayması ise "
-                    "modelde.",
+                    "Sinyalin bina duvarlarından sekip birkaç yoldan gelmesi "
+                    "(çok yollu yayılım) ayrıca modellenmedi; modelde "
+                    "zeminden sekme ve önü kapalı bağlantının uzun okunması "
+                    "var. Telsizin kendi gürültüsü ve alışveriş sırasında "
+                    "saatin kayması modelde.",
                     "The signal arriving by several paths after bouncing "
                     "off building walls (multipath) is not modelled on its "
                     "own; the model has the bounce off the ground and the "
@@ -1913,19 +1903,19 @@ SIMULATION = Page(
                     "model.",
                 ),
                 _w(
-                    "Ağaçlar simülasyona eklenmedi. Zemin ve binalar "
-                    "gerçek veriden geliyor, ama ağaçlar için ayrı bir "
-                    "kayıp hesaplanmadı. Ağacın arkasında kalan bir "
-                    "bağlantı gerçekte daha zayıf olabilir.",
+                    "Ağaçlar simülasyonda yok. Zemin ve binalar gerçek "
+                    "veriden geliyor, ama ağaçlar için ayrı bir kayıp "
+                    "hesaplanmıyor. Ağacın arkasındaki bir bağlantı gerçekte "
+                    "daha zayıf olabilir.",
                     "Trees are not in the simulation. The ground and the "
                     "buildings come from real data, but no separate loss "
                     "is worked out for trees. A link behind a tree may be "
                     "weaker in reality.",
                 ),
                 _w(
-                    "Tünel kaybı gerçek bir karayolu tünelinde 2,8-5 GHz'de "
-                    "ölçülmüş bir modelden geliyor ve 6,5 GHz'e taşındı; "
-                    "6,5 GHz'de ölçülmedi.",
+                    "Tünel kaybı, gerçek bir karayolu tünelinde 2,8-5 GHz'de "
+                    "ölçülmüş bir modelden gelir ve 6,5 GHz'e taşındı; 6,5 "
+                    "GHz'de ölçülmedi.",
                     "The tunnel loss comes from a model measured in a real "
                     "road tunnel at 2,8 to 5 GHz and carried to 6,5 GHz; "
                     "it was not measured at 6,5 GHz.",
@@ -1943,28 +1933,26 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Zaten yüksek yerler",
+            heading=_w("Zaten yüksek olan yerler",
                        "Places that are already high"),
             lines=(
                 _w(
-                    "Şehir içi ve kırsal satırlarda direkler bir ızgarada "
-                    "değil, bir yerleşim aramasının seçtiği yerlerde "
-                    "durur; simülatördeki **En iyi yerleşimi bul** bölümü "
-                    "ve **Hızlı başla** kutusu aynı aramayı haritadan "
-                    "seçilen başka bir yer için çalıştırır. Aday yerler "
-                    "var olan "
-                    "aydınlatma direkleri ve tabelalar, yol kenarındaki "
-                    "direkler (şehirde aydınlatma, kırsalda elektrik "
-                    "dağıtım direği) ve tepelere dikilecek 25 m'lik "
-                    "direklerdir. Çatılar bina sahibinden kiralandığı için "
-                    "aday sayılmıyor. "
-                    "Her aday bağlantı bütçesiyle denenir; seçim, ömür "
-                    "boyu maliyete göre bir örtme aramasıdır. Bir noktanın "
-                    "kapsandığı sayılması için dört birime ulaşması ve bu "
-                    "birimlerin noktanın etrafındaki dört yönün (kuzey, "
-                    "güney, doğu, batı çeyrekleri) en az üçüne dağılmış "
-                    "olması gerekiyor. Birimlerin hepsi aynı caddeye, aynı "
-                    "yöne dizilirse konum o cadde boyunca belirlenemez.",
+                    "Şehir içi ve kırsal satırlarda yayın birimleri bir "
+                    "ızgaraya değil, bir yerleşim aramasının koyduğu yerlere "
+                    "dizilir; simülatörün **En iyi yerleşimi bul** bölümü ve "
+                    "**Hızlı başla** kutusu aynı aramayı haritadan seçilen "
+                    "başka bir yer için çalıştırır. Adaylar var olan "
+                    "aydınlatma direkleri ve tabelalar, yol boyundaki "
+                    "direkler (şehirde aydınlatma direkleri, açık arazide "
+                    "elektrik dağıtım direkleri) ve tepelere dikilecek 25 "
+                    "m'lik direklerdir. Çatılar sahiplerinden kiralandığı "
+                    "için aday değildir. Her aday bağlantı bütçesiyle denenir"
+                    " ve seçim, ömür boyu maliyete göre bir örtme aramasıdır."
+                    " Bir noktanın kapsandığı sayılması için ona dört birimin"
+                    " ulaşması ve bu birimlerin çevresindeki dört çeyreğin en"
+                    " az üçüne dağılmış olması gerekir. Hepsi tek bir "
+                    "caddeye, tek bir yana dizilmiş birimler o cadde boyunca "
+                    "konum belirleyemez.",
                     "In the urban and rural rows the anchors do not stand "
                     "on a grid but where a placement search put them; the "
                     "simulator's **Find the best layout** section and its "
@@ -1986,10 +1974,10 @@ SIMULATION = Page(
                 ),
                 _w(
                     "Arama yerleri bulur ve kendi hızlı tahminini verir; o "
-                    "yerleşimin gerçek doğruluğunu simülasyon ölçer. "
-                    "Önerilen yerleşimi uygulayıp **Simülasyonu çalıştır** "
-                    "düğmesine basınca eski yerleşimle aynı yolculukta "
-                    "karşılaştırılır.",
+                    "yerleşimin gerçekte ne kadar doğru olduğunu simülasyon "
+                    "ölçer. Önerilen yerleşimi uygulayıp **Simülasyonu "
+                    "çalıştır** düğmesine basınca, yerini aldığı yerleşimle "
+                    "aynı yolculukta karşılaştırılır.",
                     "The search finds the places and gives its own quick "
                     "estimate; the simulation measures how accurate that "
                     "placement really is. Apply the proposed layout and press **Run the "
@@ -2000,18 +1988,18 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Tarayıcıda ve kendi makinende",
+            heading=_w("Tarayıcıda ve kendi bilgisayarında",
                        "In the browser, and on your own machine"),
             lines=(
                 _w(
                     "**Simülasyonu çalıştır** düğmesi simülatörü bu "
                     "tarayıcıda açar. Hiçbir sunucu hesap yapmaz: Python, "
-                    "numpy ve bu projenin kendi paketi sayfaya iner ve her "
-                    "şey bu bilgisayarda çalışır. İlk açılış yaklaşık 20 MB "
-                    "indirir ve bir dakika kadar sürebilir; sonra tarayıcı "
-                    "saklar. Tarayıcıda tek işlemci kullanıldığı için bir "
-                    "simülasyon kendi bilgisayarına kurulandan yavaştır; **Hızlı deneme** "
-                    "bunu kısaltır.",
+                    "numpy ve projenin kendi paketi sayfaya iner ve her şey "
+                    "bu bilgisayarda çalışır. İlk açılış yaklaşık 20 MB "
+                    "indirir ve bir dakika sürebilir; sonrasında tarayıcı "
+                    "bunları saklar. Tarayıcıda işi tek işlemci yaptığı için "
+                    "bir çalıştırma, bilgisayara kurulu sürümden yavaştır; "
+                    "**Hızlı deneme** süreyi kısaltır.",
                     "The **Run the simulation** button opens the simulator "
                     "in this browser. No server computes anything: Python, "
                     "numpy and this project's own package come down to "
@@ -2022,9 +2010,9 @@ SIMULATION = Page(
                     "a local install; **Quick trial** shortens it.",
                 ),
                 _w(
-                    "Tabloyu yeniden üretmek, başka bir şehrin zeminini "
-                    "indirmek ya da üç satırı birden tam çözünürlükte "
-                    "çalıştırmak için kod ve talimatlar "
+                    "Tabloyu yeniden üretmenin, başka bir şehrin zeminini "
+                    "indirmenin ya da üç satırı birden tam çözünürlükte "
+                    "çalıştırmanın kodu ve talimatları "
                     "[GitHub'da](https://github.com/ysoktar/yerkon).",
                     "The code and the instructions for reproducing the "
                     "table, fetching another city's ground, or running all "
@@ -2038,11 +2026,10 @@ SIMULATION = Page(
             lines=(
                 _w(
                     "Simülatördeki **Hızlı deneme** düğmesi iki şeyi "
-                    "kabalaştırır: yoldaki "
-                    "engellerin rastgele etkisi sekiz yerine bir kez "
-                    "denenir ve arazi 10 m'de bir yerine her bağlantıda "
-                    "sabit 64 noktada okunur. Hesap on beş dakikadan bir "
-                    "dakikaya iner.",
+                    "kabalaştırır: gölgeleme sekiz çekilişin birleşimi yerine"
+                    " tek çekilişle hesaplanır ve arazi kesiti 10 m'de bir "
+                    "yerine sabit 64 noktada okunur. Bir çalıştırma on beş "
+                    "dakikadan bir dakika kadara iner.",
                     "The **Quick trial** button in the simulator coarsens "
                     "two figures: the "
                     "shadows are drawn once instead of pooled over eight, "
@@ -2051,14 +2038,13 @@ SIMULATION = Page(
                     "minutes to about one.",
                 ),
                 _w(
-                    "Arazi seyrek okununca tepelerin arkasındaki zayıflama "
-                    "eksik hesaplanıyor, bu da hızlı sonucu çoğunlukla "
-                    "olduğundan iyi gösteriyor. Engellerin etkisinin bir kez "
-                    "denenmesi ise iki yöne de saptırabiliyor: aynı "
-                    "yerleşimde bir satır hızlıda iyi, başka biri kötü "
-                    "çıkabiliyor. Hızlı hesap yalnız denemek için; Sonuçlar "
-                    "sayfasındaki tablo yalnızca yavaş ve tam hesaptan "
-                    "gelir.",
+                    "Seyrek okunan arazi, engellerin üzerinden bükülmedeki "
+                    "kaybı düşük hesaplar; bu da hızlı sonucu çoğunlukla "
+                    "olduğundan iyi gösterir. Gölgelemenin tek çekilişi iki "
+                    "yöne de saptırabilir: aynı yerleşimde bir satır hızlıda "
+                    "daha iyi, başka biri daha kötü çıkabilir. Hızlı "
+                    "çalıştırma denemek içindir; Sonuçlar sayfasındaki tablo "
+                    "yalnızca yavaş ve tam çalıştırmadan gelir.",
                     "The coarse ground reads diffraction loss low, which "
                     "mostly makes a fast answer flatter the deployment. "
                     "The single shadow draw can err either way: on the same "
