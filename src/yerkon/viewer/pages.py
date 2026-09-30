@@ -406,20 +406,19 @@ WHY = Page(
                     "norways-northernmost-region/157622)",
                 ),
                 _w(
-                    "**Karadeniz, 22 Haziran 2017.** Rus elektronik harp "
-                    "birimleri GNSS sinyallerini değiştirdi ve yirmiden "
-                    "fazla ticari geminin alıcısı aynı anda yanlış konum "
-                    "bildirdi: gemiler denizin ortasındayken ekranları "
-                    "onları 32 km'den fazla içerideki Gelencik "
-                    "Havalimanı'nda gösterdi. "
+                    "**Karadeniz, 22 Haziran 2017.** Yirmiden fazla ticari "
+                    "geminin alıcısı aynı anda yanlış konum bildirdi: "
+                    "gemiler denizin ortasındayken ekranları onları 32 "
+                    "km'den fazla içerideki Gelencik Havalimanı'nda "
+                    "gösterdi. Olayın arkasında Rusya'nın olduğundan "
+                    "şüpheleniliyor. "
                     "[GalileoGNSS](https://galileognss.eu/"
                     "mass-gps-spoofing-attack-in-black-sea/)",
-                    "**The Black Sea, 22 June 2017.** Russian electronic "
-                    "warfare units altered the GNSS signals and receivers "
-                    "on more than twenty commercial ships reported a "
-                    "wrong position at the same time: at sea, their "
-                    "screens put them at Gelendzhik Airport, more than "
-                    "32 km inland. "
+                    "**The Black Sea, 22 June 2017.** Receivers on more "
+                    "than twenty commercial ships reported a wrong "
+                    "position at the same time: at sea, their screens put "
+                    "them at Gelendzhik Airport, more than 32 km inland. "
+                    "Russia is suspected to be behind it. "
                     "[GalileoGNSS](https://galileognss.eu/"
                     "mass-gps-spoofing-attack-in-black-sea/)",
                 ),
