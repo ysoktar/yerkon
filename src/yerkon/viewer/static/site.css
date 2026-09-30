@@ -316,9 +316,16 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
 @media (max-width: 1360px) {
   .brand span { display: none; }
 }
-/* Below this the links cannot sit in the middle of the page on one line
-   with the brand and the buttons beside them, so they take a row. */
-@media (max-width: 1370px) {
+/* One line for as long as it fits: the links stay in the middle of the
+   page while there is room and are pushed aside when there is not. The
+   gaps close up first; only below 1110 pixels do the links take a row. */
+@media (max-width: 1280px) {
+  header { column-gap: 12px; }
+  nav.pages { flex-wrap: nowrap; gap: 11px; }
+  nav.pages a { white-space: nowrap; }
+  header .actions { gap: 8px; }
+}
+@media (max-width: 1110px) {
   header { grid-template-columns: 1fr auto; }
   nav.pages { grid-column: 1 / -1; grid-row: 2; }
 }
