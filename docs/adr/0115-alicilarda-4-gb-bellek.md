@@ -11,8 +11,11 @@ Alıcı yüksekliğini haritadan alıyor (ADR-0088). Türkiye'yi Copernicus
 ile Copernicus'un parça listesi karşılaştırıldı; sınırdaki parçalar
 dahil). Bir parça 3600 × 3600 yükseklik. Yayımlandığı hâliyle (4 baytlık
 sayılar, sıkıştırılmış) Ankara'nın dört parçası 38-41 MB, 113 parça
-yaklaşık 4,5 GB. Yükseklik 2 baytla (10 cm adımlı) saklanırsa,
-sıkıştırmadan, 113 × 3600 × 3600 × 2 bayt = yaklaşık 2,9 GB. Alıcıların
+yaklaşık 4,5 GB. Yükseklik 2 baytla, 10 cm adımla ve -100 m'den
+başlayarak saklanırsa (0-65535 arası sayı, -100 ile 6453 m arasını
+kapsıyor; Türkiye'nin en yüksek yeri Ağrı Dağı, 5137 m), sıkıştırmadan
+113 × 3600 × 3600 × 2 = 2.928.960.000 bayt, yaklaşık 2,93 GB. İşaretli
+2 bayt 10 cm adımla yalnız ±3276 m'yi kapsadığı için yetmiyor. Alıcıların
 işlemcilerindeki bellek buna yetmiyor: yaya alıcısındaki ESP32-S3
 modülünde 8 MB, araç alıcısındaki STM32G0B1'de 512 KB.
 
@@ -22,8 +25,8 @@ modülünde 8 MB, araç alıcısındaki STM32G0B1'de 512 KB.
   1000 adette 2,6462 $ (456+ kademesi; 1064+ kademesi 2,5699 $). Stok
   bugün sıfır; stok parça seçiminde ölçüt değil. Veri sayfasına göre
   (Zetta eMMC5.1 datasheet, rev 1.2): kullanıcı alanı 3.909.091.328 bayt
-  (3728 MB), yani 2 baytlık Türkiye dosyası (2,9 GB) sığıyor, 4 baytlık
-  hâli sığmıyor; besleme 3,3 V (VCC 2,7-3,6 V, VCCQ 1,7-1,95 ya da
+  (3,91 GB), yani 2 baytlık Türkiye dosyası (2,93 GB) yaklaşık 0,98 GB
+  boşlukla sığıyor, 4 baytlık hâli sığmıyor; besleme 3,3 V (VCC 2,7-3,6 V, VCCQ 1,7-1,95 ya da
   2,7-3,6 V); çalışma sıcaklığı -25 ile 85 °C; 153 bilyeli FBGA,
   11,5 × 13 × 1,0 mm; eMMC 5.1, v4.5-v5.0 ile geriye uyumlu; veri yolu
   1, 4 ya da 8 bit.
@@ -67,3 +70,8 @@ sığmadığı için işlemci değişti.
 - eMMC 153 bilyeli BGA kılıfta. İki katlı kartta yollanıp
   yollanamayacağı kart tasarımında görülecek; dört kat gerekirse kart
   fiyatı artar, bu fiyata dahil değil.
+- Harita alıcıya USB-C kablosuyla yüklenir. İki işlemcinin USB'si de tam
+  hız (12 Mbit/s; AT32F403A veri sayfası, ESP32-S3 veri sayfası):
+  2,93 GB saniyede 1-1,2 MB ile alıcı başına yaklaşık 40-50 dakika
+  (hesap, ölçülmedi). Sonraki güncellemelerde yalnız değişen parçalar
+  yüklenir.
