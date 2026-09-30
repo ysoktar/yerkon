@@ -20,7 +20,10 @@ What goes wrong, and where each figure comes from:
 - Converting pressure to height needs the air's temperature; the one it
   uses is off by as much as the sensors' temperature is (`--delta-t`,
   which has no source: a unit on a pole in the sun and a receiver in a
-  cabin differ by an amount nobody has published for this).
+  cabin differ by an amount nobody has published for this). With
+  ``--strategy slope`` the receiver also fits the fall of pressure with
+  height from the units it heard, weighed against the temperature's
+  figure: where the units stand at different heights the fit wins.
 - The receiver's own offset. Either calibrated at the factory and then
   drifting for up to a year (`--calibration factory`), or learned on the
   road against the elevation model the receiver already carries, one
@@ -187,7 +190,31 @@ class Barometric:
         # What each unit's reading says the pressure is at its own
         # position, brought to height zero with the converting density.
         level = rows[:, 3] + rho_g * rows[:, 2]
-        if args.strategy == "plane" and len(rows) >= 3:
+        # With units at different heights the readings themselves say how
+        # fast pressure falls with height here. The fit weighs that
+        # against the fall the air temperature gives, each by how well it
+        # is known, so flat ground leans on the temperature and a hillside
+        # on the units.
+        if args.strategy == "slope" and len(rows) >= 4:
+            unit_pa = math.sqrt(sensor.noise_pa ** 2 + sensor.relative_pa ** 2
+                                + (sensor.tco_pa_k * args.delta_t) ** 2)
+            prior_sigma = max(RHO_G * args.delta_t / AIR_K, 1e-3)
+            design = np.vstack([
+                np.column_stack([np.ones(len(rows)), rows[:, 0], rows[:, 1],
+                                 rows[:, 2]]) / unit_pa,
+                np.array([[0.0, 0.0, 0.0, 1.0 / prior_sigma]])])
+            target = np.concatenate([rows[:, 3] / unit_pa,
+                                     [-rho_g / prior_sigma]])
+            fit, *_ = np.linalg.lstsq(design, target, rcond=None)
+            covariance = np.linalg.pinv(design.T @ design)
+            rest = fit[0] + fit[1] * x + fit[2] * y
+            height = (read_r - rest) / fit[3] - self.bias_hat_m
+            point = np.array([1.0, x, y, h])
+            spread_pa2 = float(point @ covariance @ point)
+            variance = (self.bias_var_m2
+                        + (sensor.noise_pa ** 2 + spread_pa2) / RHO_G ** 2)
+            return height, variance
+        if args.strategy in ("plane", "slope") and len(rows) >= 3:
             design = np.column_stack([np.ones(len(rows)), rows[:, 0],
                                       rows[:, 1]])
             fit, *_ = np.linalg.lstsq(design, level, rcond=None)
@@ -294,7 +321,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--sensor", choices=tuple(SENSORS),
                         default="spl07-003")
-    parser.add_argument("--strategy", choices=("plane", "nearest"),
+    parser.add_argument("--strategy", choices=("plane", "nearest", "slope"),
                         default="plane")
     parser.add_argument("--calibration", choices=("dem", "factory"),
                         default="dem")
