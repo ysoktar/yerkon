@@ -1,4 +1,4 @@
-# ADR-0117: Dizgi kart kart sayılır, elle lehim eklenir
+# ADR-0117: Dizgi kart kart sayılır, lehim eklenir
 
 ## Durum
 
@@ -20,9 +20,9 @@ güneş paneli kabloları hiç sayılmıyordu.
   (25 iki uçlu parça, LED, düğme) 56 nokta.
 - JLCPCB'nin fiyatları (Economic PCBA, 30 Eylül 2026): kurulum 8,18 $,
   şablon 1,53 $, genişletilmiş parça başına 3,07 $ (on parça varsayıldı),
-  SMD nokta başına 0,0016 $; elle dizgi nokta başına 0,0164 $ (siparişte
+  SMD nokta başına 0,0016 $; delikli parça ve kablo lehimi nokta başına 0,0164 $ (siparişte
   10.000 noktaya kadar), 0,015 $ (10.001-30.000).
-- Elle lehim noktaları: yayın birimlerinde 10 (HLK-5M12 4, varistör 2,
+- Lehim noktaları (delikli parçalar ve kablolar): yayın birimlerinde 10 (HLK-5M12 4, varistör 2,
   iki klemens 4), yaya alıcısında 4 (pil ve panel kabloları), araç
   alıcısında 18 (ekran başlığı 14, iki klemens 4).
 - Kartın kutuya takılması işçiliktir, bu fiyata dahil değil.
