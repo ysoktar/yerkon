@@ -522,6 +522,13 @@ label.en = "Search and rescue under GPS jamming in Norway (2017 onwards)"
 url = "https://www.thebarentsobserver.com/security/gps-jamming-jeopardizes-public-safety-in-norways-northernmost-region/157622"
 
 [[source]]
+key = "news-black-sea"
+group = "news"
+label.tr = "Karadeniz'de Toplu Gemi Yanıltması (2017)"
+label.en = "Mass ship spoofing in the Black Sea (2017)"
+url = "https://galileognss.eu/mass-gps-spoofing-attack-in-black-sea/"
+
+[[source]]
 key = "news-israel-aa"
 group = "news"
 label.tr = "Anadolu Ajansı, İsrail'in GPS yanıltması (Nisan 2024)"

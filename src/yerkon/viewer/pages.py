@@ -379,6 +379,35 @@ WHY = Page(
                     "baltic-officials/3205763)",
                 ),
                 _w(
+                    "**Tel Aviv, 4 Nisan 2024.** İsrail ordusu olası "
+                    "saldırılara karşı GPS sinyallerini bilerek yanılttı. "
+                    "Sürücülerin Waze ve Google Maps uygulamaları onları "
+                    "yaklaşık 210 km kuzeydeki Beyrut'ta gösterdi; "
+                    "taksiler yolunu bulamadı, taksi çağırma ve yemek "
+                    "siparişi uygulamaları aksadı. Ordu, bozmanın savunma "
+                    "amaçlı olduğunu doğruladı. Yanıltmanın en tehlikeli "
+                    "yanı fark edilmemesidir: Anadolu Ajansı'nın aktardığı "
+                    "sözlerle bir pilot, sinyalin sahte olduğunu bildiren "
+                    "hiçbir uyarı olmadığını söylüyor. "
+                    "[Anadolu Ajansı](https://www.aa.com.tr/en/middle-east/"
+                    "israel-spoofs-gps-signals-amid-gaza-onslaught/3202337) · "
+                    "[GPS World](https://www.gpsworld.com/gps-disruptions-in-"
+                    "tel-aviv-as-israel-braces-for-possible-iranian-attacks/)",
+                    "**Tel Aviv, 4 April 2024.** The Israeli army spoofed "
+                    "GPS signals on purpose to guard against possible "
+                    "attacks. Drivers' Waze and Google Maps apps put them "
+                    "in Beirut, about 210 km to the north; taxis could not "
+                    "find their way, and ride-hailing and food ordering "
+                    "apps faltered. The army confirmed the disruption was "
+                    "defensive. The worst of spoofing is that it goes "
+                    "unnoticed: in words Anadolu Agency reported, a pilot "
+                    "says there is no warning that the signal is fake. "
+                    "[Anadolu Agency](https://www.aa.com.tr/en/middle-east/"
+                    "israel-spoofs-gps-signals-amid-gaza-onslaught/3202337) · "
+                    "[GPS World](https://www.gpsworld.com/gps-disruptions-in-"
+                    "tel-aviv-as-israel-braces-for-possible-iranian-attacks/)",
+                ),
+                _w(
                     "**Norveç, 2017 sonbaharından bu yana.** Finnmark'ta "
                     "GPS sinyalleri defalarca kesildi; Norveç Savunma "
                     "Bakanlığı kaynağın Rusya'nın Kola Yarımadası olduğunu "
@@ -406,34 +435,26 @@ WHY = Page(
                     "norways-northernmost-region/157622)",
                 ),
                 _w(
-                    "**İsrail, 4 Nisan 2024.** İsrail ordusu olası "
-                    "saldırılara karşı GPS sinyallerini bilerek yanılttı. "
-                    "Tel Aviv'deki sürücülerin Waze ve Google Maps "
-                    "uygulamaları onları yaklaşık 210 km kuzeydeki "
-                    "Beyrut'ta gösterdi; taksi şoförleri yol bulamadı, "
-                    "taksi çağırma ve yemek dağıtım uygulamaları aksadı. "
-                    "İsrail ordusu GPS'i savunma amacıyla engellediğini "
-                    "doğruladı. Yanıltmada alıcıya bir uyarı gelmez: "
-                    "Lübnanlı bir pilotun sözleriyle, uçakta sinyalin sahte "
-                    "olduğunu bildiren bir uyarı yok. "
-                    "[Anadolu Ajansı](https://www.aa.com.tr/en/middle-east/"
-                    "israel-spoofs-gps-signals-amid-gaza-onslaught/3202337) · "
-                    "[GPS World](https://www.gpsworld.com/gps-disruptions-in-"
-                    "tel-aviv-as-israel-braces-for-possible-iranian-attacks/)",
-                    "**Israel, 4 April 2024.** The Israeli army spoofed GPS "
-                    "signals on purpose to guard against possible attacks. "
-                    "Drivers' Waze and Google Maps apps in Tel Aviv put "
-                    "them in Beirut, about 210 km to the north; taxi "
-                    "drivers could not find their way, and ride-hailing "
-                    "and food delivery apps faltered. The Israeli army "
-                    "confirmed it was blocking GPS for defensive purposes. "
-                    "Spoofing gives the receiver no warning: in a Lebanese "
-                    "pilot's words, nothing on the aircraft warns that the "
-                    "signal is spoofed. "
-                    "[Anadolu Agency](https://www.aa.com.tr/en/middle-east/"
-                    "israel-spoofs-gps-signals-amid-gaza-onslaught/3202337) · "
-                    "[GPS World](https://www.gpsworld.com/gps-disruptions-in-"
-                    "tel-aviv-as-israel-braces-for-possible-iranian-attacks/)",
+                    "**Karadeniz, 22 Haziran 2017.** Yirmiden fazla ticari "
+                    "geminin konum alıcısı aynı anda yanlış konum verdi: "
+                    "gemiler açık denizdeyken ekranları onları 32 km'den "
+                    "fazla içerideki Gelencik Havalimanı'nda gösterdi. "
+                    "Olayın arkasında Rusya'nın olduğundan şüpheleniliyor. "
+                    "Olay, yanıltmanın tek bir aracı değil, bir bölgedeki "
+                    "bütün alıcıları aynı anda kandırabildiğini gösteriyor; "
+                    "aynı saldırı bir karayolu koridorunda da yapılabilir. "
+                    "[GalileoGNSS](https://galileognss.eu/"
+                    "mass-gps-spoofing-attack-in-black-sea/)",
+                    "**The Black Sea, 22 June 2017.** The position "
+                    "receivers of more than twenty commercial ships gave a "
+                    "wrong position at the same time: out at sea, their "
+                    "screens put them at Gelendzhik Airport, more than "
+                    "32 km inland. Russia is suspected to be behind it. "
+                    "It shows that spoofing can fool not one vehicle but "
+                    "every receiver in an area at once; the same attack "
+                    "could be made on a road corridor. "
+                    "[GalileoGNSS](https://galileognss.eu/"
+                    "mass-gps-spoofing-attack-in-black-sea/)",
                 ),
             ),
         ),
@@ -3448,24 +3469,26 @@ LANDSCAPE_UNDER = _w(
     "A system that publishes only one of the two cannot be drawn "
     "either.",
 )
-#: The four events the problem page describes, on a line. The year is
+#: The five events the problem page describes, on a line. The year is
 #: the fractional one the event happened in, so April 2024 sits a third
 #: of the way through its year rather than on its first day.
 WHEN = (
+    (2017.47, _w("Karadeniz", "The Black Sea"),
+     _w("20+ gemi, 32 km sapma", "20+ ships, 32 km out")),
     (2017.75, _w("Norveç", "Norway"),
      _w("Finnmark, 2017'den beri", "Finnmark, since 2017")),
     (2024.3, _w("Baltık", "The Baltic"),
      _w("Tartu bir ay kapalı", "Tartu shut for a month")),
-    (2024.26, _w("İsrail", "Israel"),
+    (2024.26, _w("Tel Aviv", "Tel Aviv"),
      _w("sürücüler Beyrut'ta göründü", "drivers shown in Beirut")),
     (2026.4, _w("ABD", "United States"),
      _w("ambulans uçağı düştü", "air ambulance down")),
 )
-WHEN_TITLE = _w("Dört olay, dokuz yıl", "Four events, nine years")
+WHEN_TITLE = _w("Dokuz yılda beş olay", "Five events in nine years")
 WHEN_UNDER = _w(
-    "Yukarıdaki dört olay zaman içinde. Hiçbiri tarihi bir merak değil: "
+    "Yukarıdaki beş olay zaman içinde. Hiçbiri tarihi bir merak değil: "
     "en eskisi 2017'de, en yenisi bu yıl.",
-    "The four events above, in time. None of them is a historical "
+    "The five events above, in time. None of them is a historical "
     "curiosity: the oldest is from 2017, the newest from this year.",
 )
 CLOCKS = (
@@ -3660,7 +3683,7 @@ def _landscape(published, language: str) -> str:
 
 
 def _when(language: str) -> str:
-    """The four incidents on one line."""
+    """The five incidents on one line."""
     from yerkon.viewer import charts
 
     return _figure(
