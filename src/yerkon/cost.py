@@ -347,7 +347,9 @@ class OperatingRates:
     extra_off_grid_visits_per_year: Sourced
     #: A day of the fitting and maintenance crew: truck, electrician, helper.
     crew_day_tl: Sourced
-    central_operation_tl_per_year: Sourced
+    #: Each anchor's yearly share of the central system, which is spread
+    #: across a thousand anchors rather than added whole to every row.
+    central_operation_tl_per_anchor_year: Sourced
     #: What a crew member is paid a day away from the base city (H Cetveli).
     per_diem_tl: Sourced
     #: The part of it a same-day trip earns (Harcırah Kanunu, Madde 39).
@@ -359,10 +361,6 @@ class OperatingRates:
     battery_life_years: Sourced
     #: The rest of the standalone supply: panel, controller, bracket, cable.
     off_grid_life_years: Sourced
-    #: Anchors the central system is shared across. A national network
-    #: amortises it far wider than one corridor does, which is why this
-    #: is a rate rather than a constant added to every deployment.
-    anchors_sharing_central_operation: Sourced
 
 
 def operating_rates(settings: Settings = DEFAULTS) -> OperatingRates:
@@ -568,11 +566,7 @@ def price(
         * float(rates.per_diem_share.value)
         if inventory.crew_travels else 0.0
     )
-    central_tl = (
-        anchors
-        * float(rates.central_operation_tl_per_year.value)
-        / max(float(rates.anchors_sharing_central_operation.value), 1e-9)
-    )
+    central_tl = anchors * float(rates.central_operation_tl_per_anchor_year.value)
 
     operating = (
         LineItem(
@@ -612,13 +606,13 @@ def price(
         ),
         LineItem(
             "central operation", central_tl,
-            "{} anchors' share of a system serving {}".format(
+            "{} anchors at {} TL a year each".format(
                 anchors,
                 decimal_comma(
-                    float(rates.anchors_sharing_central_operation.value), 0
+                    float(rates.central_operation_tl_per_anchor_year.value), 0
                 ),
             ),
-            rates.central_operation_tl_per_year.provenance,
+            rates.central_operation_tl_per_anchor_year.provenance,
         ),
     )
 

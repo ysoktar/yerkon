@@ -614,31 +614,18 @@ note_en = """How many people are paid a per diem: the electrician and helper pri
 affects = "harcırah kalemini"
 affects_en = "the per diem line"
 
-[values."operating.central_operation_tl_per_year"]
-value = 237000.0
+[values."operating.central_operation_tl_per_anchor_year"]
+value = 237.0
 unit = "TL/year"
 provenance = "DERIVED"
 source = """yazılımcı medyan maaşı, Türkiye'deki şirketler, net aylık 95000 TL (Yazılımcı Maaşları 2026 anketi, Şubat 2026, 1223 katılımcı); 6 vCPU, 8 GB sanal sunucu aylık 374,90 TL (Karekod, en ucuz VDS fiyatları, 25 Eylül 2026)"""
 source_en = """median developer salary, companies in Türkiye, net 95000 TL a month (Yazılımcı Maaşları 2026 survey, February 2026, 1223 respondents); a 6 vCPU, 8 GB virtual server 374,90 TL a month (Karekod, cheapest VDS prices, 25 September 2026)"""
-note = """Merkezî yönetim sistemini bir yıl işletmek: birimlerin kayıtlarını izleyen, arızayı ekibe bildiren yazılım ve onu yürüten kişi. Bir yazılımcının haftada bir günü: 95000 x 12 x 0,2 = 228000 TL; birbirinin yedeği iki sunucu: 2 x 374,90 x 12 = 8998 TL. Toplam 236998, yuvarlanarak 237000 TL. Haftada bir gün, YERKON'un işletme tercihi."""
-note_en = """Running the central management system for a year: the software that watches the units' records and tells the crew of a failure, and the person who runs it. One day a week of a developer: 95000 x 12 x 0,2 = 228000 TL; two servers backing each other up: 2 x 374,90 x 12 = 8998 TL. 236998, rounded to 237000 TL. One day a week is YERKON's operating choice."""
+note = """Merkezî yönetim sistemini işletmenin bir birime düşen yıllık payı. Sistem, birimlerin kayıtlarını izleyen ve arızayı ekibe bildiren yazılım ile onu yürüten kişidir. Bir yazılımcının haftada bir günü: 95000 x 12 x 0,2 = 228000 TL; birbirinin yedeği iki sunucu: 2 x 374,90 x 12 = 8998 TL. Toplam 236998, yuvarlanarak 237000 TL/yıl. Haftada bir günlük bir kişi ve iki sunucu bin birimin kayıtlarını izleyebilir; tablo da birimleri 1000 adetlik fiyatla hesaplar. Bu yüzden gider bin birime bölünür: 237000 / 1000 = 237 TL/yıl. Haftada bir gün ve bin birim, YERKON'un işletme tercihi."""
+note_en = """Each unit's yearly share of running the central management system. The system is the software that watches the units' records and tells the crew of a failure, and the person who runs it. One day a week of a developer: 95000 x 12 x 0,2 = 228000 TL; two servers backing each other up: 2 x 374,90 x 12 = 8998 TL. 236998, rounded to 237000 TL a year. One person one day a week and two servers can watch the records of a thousand units, and the table prices the units at a thousand. So the cost is split across a thousand units: 237000 / 1000 = 237 TL a year. One day a week and a thousand units are YERKON's operating choice."""
 affects = "OPEX'i; her birime 237 TL/yıl"
 affects_en = "OPEX; 237 TL a year a unit"
 sensitivity = "iki katına çıkarmak her birime yılda 237 TL ekler"
 sensitivity_en = "doubling it adds 237 TL a year a unit"
-
-[values."operating.anchors_sharing_central_operation"]
-value = 1000.0
-unit = "anchors"
-provenance = "DESIGN"
-source = "YERKON tasarım tercihi"
-source_en = "YERKON design choice"
-note = """Merkezî sistemin kaç birime yayıldığı. Haftada bir günlük bir kişi ve iki sunucu bin birimin kayıtlarını izleyebilir; ülke çapında bir ağ bunu daha da geniş yayar. Bu yüzden her yerleşime eklenen sabit bir sayı değil, birim başına bir oran: 237000 / 1000 = 237 TL/yıl."""
-note_en = """How many units the central system is spread over. One person one day a week and two servers can watch the records of a thousand units; a national network spreads it wider still. That is why this is a rate a unit and not a constant added to every deployment: 237000 / 1000 = 237 TL a year."""
-affects = "OPEX'i; her birime 237 TL/yıl"
-affects_en = "OPEX; 237 TL a year a unit"
-sensitivity = "yarıya indirmek her birime yılda 237 TL ekler"
-sensitivity_en = "halving it adds 237 TL a year a unit"
 
 # --------------------------------------------------------------------------
 # Telsizlerin, kimsenin yayımlamadığı davranışları

@@ -19,8 +19,8 @@ usd_try = 49.0013
 usd_try_source = "TCMB gösterge niteliğindeki kurlar, 29.09.2026 (bülten 2026/183): USD döviz satış 49,0013 TL; EUR/USD çapraz kur 1,1349"
 
 #: Which tier the table prices a deployment at. A thousand, because the
-#: operating model already shares the central system across a thousand
-#: anchors (`operating.anchors_sharing_central_operation`).
+#: operating model already splits the central system across a thousand
+#: anchors (`operating.central_operation_tl_per_anchor_year`).
 used_tier = 1000
 
 # --- Parts ------------------------------------------------------------------

@@ -143,10 +143,9 @@ GROUPS = (
     (("Ömür ve merkezî sistem", "Service life and the central system"), (
         ("operating.service_life_years", ("Birimin ömrü", "A unit's service life")),
         ("operating.battery_life_years", ("Akünün ömrü", "The battery's life")),
-        ("operating.central_operation_tl_per_year",
-         ("Merkezî sistem, yıllık", "Central system, a year")),
-        ("operating.anchors_sharing_central_operation",
-         ("Merkezî sistemi paylaşan birim", "Units sharing the centre")),
+        ("operating.central_operation_tl_per_anchor_year",
+         ("Merkezî sistem, birim başına yıllık",
+          "Central system, a unit a year")),
     )),
 )
 
@@ -343,8 +342,8 @@ LINKS = {
     "mounting.rooftop.rent_tl_per_year": ("ibb-tariff-2025", "tarim-orman-2025"),
     "operating.service_life_years": ("gib-amortisman",),
     "operating.battery_life_years": ("gib-amortisman",),
-    "operating.central_operation_tl_per_year": ("yazilimci-maaslari-2026",
-                                                "vds-2026"),
+    "operating.central_operation_tl_per_anchor_year": (
+        "yazilimci-maaslari-2026", "vds-2026"),
 }
 
 

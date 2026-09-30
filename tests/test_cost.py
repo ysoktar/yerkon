@@ -88,14 +88,14 @@ def test_the_bill_leans_on_no_report_figure():
 def test_the_table_prices_hardware_for_the_network_it_runs():
     """A thousand units, because the operating model runs a thousand.
 
-    The central system is shared across a thousand anchors in the
+    The central system is split across a thousand anchors in the
     operating rates. Pricing the hardware at a hundred while running it
     as one of a thousand put two network sizes in one row.
     """
     from yerkon.bom import read
 
-    assert read().used_tier == int(
-        float(DEFAULT_RATES.anchors_sharing_central_operation.value))
+    assert read().used_tier == 1000
+    assert "237000 / 1000" in DEFAULT_RATES.central_operation_tl_per_anchor_year.note
     board = read().boards["sx1280-anchor"]
     assert float(SX1280_ANCHOR.unit_price_tl.value) == pytest.approx(
         board.thousand_tl, abs=0.01)
@@ -298,14 +298,14 @@ def _rate_of(value, unit="years"):
     return Sourced(value, unit, Provenance.ASSUMPTION, "test", note="a test value")
 
 
-def test_a_central_system_shared_wider_costs_each_deployment_less():
-    """Which is why it is a rate and not a constant added to every row."""
-    def central(sharing):
+def test_the_central_system_is_a_rate_a_unit_not_a_constant_a_row():
+    """Twice the share a unit costs a deployment twice as much."""
+    def central(share):
         from dataclasses import replace
 
         rates = replace(
             DEFAULT_RATES,
-            anchors_sharing_central_operation=_rate_of(sharing, "anchors"),
+            central_operation_tl_per_anchor_year=_rate_of(share, "TL/year"),
         )
         costing = price(an_inventory(), rates)
         return next(
@@ -313,7 +313,7 @@ def test_a_central_system_shared_wider_costs_each_deployment_less():
             if item.label == "central operation"
         )
 
-    assert central(2000.0) == pytest.approx(central(1000.0) / 2.0)
+    assert central(474.0) == pytest.approx(central(237.0) * 2.0)
 
 
 def test_an_off_grid_site_is_visited_more_often():
