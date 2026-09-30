@@ -1208,3 +1208,11 @@ def test_the_english_table_has_no_turkish_words():
     drawn = render(page_at("/sonuclar"), "en", read_published())
     for turkish in ("Şehir içi", "Kırsal)", "Dış<", "Karasal konumlandırma"):
         assert turkish not in drawn, turkish
+
+
+def test_an_amount_after_capex_or_opex_is_grouped_and_a_part_number_is_not():
+    """CAPEX and OPEX are capitals like a brand, but what follows them is
+    an amount: the site printed "CAPEX 10053 TL/km²" beside "9.336"."""
+    assert grouped("CAPEX 10053 TL/km²") == "CAPEX 10.053 TL/km²"
+    assert grouped("OPEX 33160 TL") == "OPEX 33.160 TL"
+    assert grouped("YDL 803040") == "YDL 803040"

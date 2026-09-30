@@ -70,7 +70,8 @@ _NAMES = _re.compile(
     r"Tablo|Table|ADR|ADR-|FY|Q\d|\d\d\.\d\d\.\d{4},?|No\.|isteği|request|"
     r"Kanun\S*\s*\(|Law\s*\(|"
     # A brand or a standard in capitals names what follows: YDL 803040.
-    r"\b[A-Z][A-Z0-9]{1,}(?:-[A-Z0-9]+)?)\s*$")
+    # CAPEX and OPEX are amounts, not brands: CAPEX 10.053 TL/km².
+    r"\b(?!CAPEX\b|OPEX\b)[A-Z][A-Z0-9]{1,}(?:-[A-Z0-9]+)?)\s*$")
 
 
 #: What after a number makes it a name: a law's articles, or a word
