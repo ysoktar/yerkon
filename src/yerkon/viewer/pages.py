@@ -265,16 +265,16 @@ WHY = Page(
     nav=_w("Sorun", "The problem"),
     title=_w("GNSS neden yetmiyor", "Why GNSS is not enough"),
     lead=_w(
-        "Bugün konum bulmanın, yol tarif etmenin ve saati hassas tutmanın "
-        "neredeyse tamamı GPS, Galileo, GLONASS ve BeiDou'dan geliyor. Bu "
-        "bağımlılık araç navigasyonuyla bitmiyor: acil çağrı ekipleri, "
-        "kamu araç filoları, telefon şebekeleri, elektrik şebekesi ve "
-        "kargo taşımacılığı da aynı dört sisteme bağlı.",
-        "Nearly everything that finds a position, gives directions or "
-        "keeps precise time today runs on GPS, Galileo, GLONASS and "
-        "BeiDou. The dependency does not stop at vehicle navigation: "
-        "emergency crews, public fleets, telephone networks, the "
-        "electrical grid and freight all hang on the same four systems.",
+        "Bugün konum bulmanın ve yol tarif etmenin neredeyse tamamı GPS, "
+        "Galileo, GLONASS ve BeiDou'dan geliyor. Bu bağımlılık araç "
+        "navigasyonuyla bitmiyor: acil çağrı ekipleri, kamu araç "
+        "filoları, insansız araçlar ve kargo taşımacılığı da aynı dört "
+        "sisteme bağlı.",
+        "Nearly everything that finds a position or gives directions "
+        "today runs on GPS, Galileo, GLONASS and BeiDou. The dependency "
+        "does not stop at vehicle navigation: emergency crews, public "
+        "fleets, unmanned vehicles and freight all hang on the same four "
+        "systems.",
     ),
     parts=(
         Part(
@@ -1135,8 +1135,10 @@ VALUE = Page(
     lead=_w(
         "Konumun hayati olduğu, ama uydu sinyalinin kesildiği, "
         "zayıfladığı ya da artık güvenilmediği yerlerde ulaşımın ve "
-        "haberleşmenin durmaması için; sayfanın sonunda ticarileşmesi.",
-        "So that transport and communications do not stop where position "
+        "konuma bağlı hizmetlerin durmaması için; sayfanın sonunda "
+        "ticarileşmesi.",
+        "So that transport and the services that need a position do not "
+        "stop where position "
         "is vital and the satellite signal is cut, weakened or no longer "
         "trusted; how it is commercialised closes the page.",
     ),
