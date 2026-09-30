@@ -214,6 +214,20 @@ label.en = "ION, NextNav TerraPoiNT P50/P95 2D performance"
 url = "https://www.ion.org/publications/abstract.cfm?articleID=18074"
 
 [[source]]
+key = "nextnav-timing"
+group = "terrestrial"
+label.tr = "NextNav, TerraPoiNT zamanlama ağı: atomik saatli öncü vericiler, lisanslı 920-928 MHz"
+label.en = "NextNav, the TerraPoiNT timing network: leader beacons with atomic clocks, licensed 920-928 MHz"
+url = "https://wsts.atis.org/wp-content/uploads/2021/03/TerraPoiNT_The-Resilient-Terrestrial-Timing-Network_Deshpande.pdf"
+
+[[source]]
+key = "locata-timeloc"
+group = "terrestrial"
+label.tr = "Sensors, Locata: 2,4 GHz lisanssız bant ve TimeLoc eşitlemesi"
+label.en = "Sensors, Locata: licence-free 2.4 GHz and TimeLoc synchronisation"
+url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC6514591/"
+
+[[source]]
 key = "jrc-nextnav"
 group = "terrestrial"
 label.tr = "European Commission JRC, NextNav dikey doğruluk"
