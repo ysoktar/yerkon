@@ -336,15 +336,14 @@ WHY = Page(
                     "**ABD, Mayıs 2026.** Roswell'den kalkan bir ambulans "
                     "uçağı askeri GPS karıştırmasına maruz kaldı ve "
                     "Ruidoso'ya varamadan bir dağa çarptı. "
-                    "[NTSB üzerine haber](https://www.military.com/"
-                    "air-medevac-crew-lost-gps-during-military-jamming-"
-                    "before-fatal-crash-ntsb-says)",
+                    "[NTSB ön raporu](https://data.ntsb.gov/carol-repgen/"
+                    "api/Aviation/ReportMain/GenerateNewestReport/202990/pdf)",
                     "**United States, May 2026.** An air ambulance out of "
                     "Roswell flew into military GPS jamming and hit a "
                     "mountain short of Ruidoso. "
-                    "[Report on the NTSB finding](https://www.military.com/"
-                    "air-medevac-crew-lost-gps-during-military-jamming-"
-                    "before-fatal-crash-ntsb-says)",
+                    "[NTSB preliminary report](https://data.ntsb.gov/"
+                    "carol-repgen/api/Aviation/ReportMain/"
+                    "GenerateNewestReport/202990/pdf)",
                 ),
                 _w(
                     "**Baltık, Nisan 2024.** Finnair, Tartu uçuşlarını bir "
@@ -366,37 +365,47 @@ WHY = Page(
                     "baltic-officials/3205763)",
                 ),
                 _w(
-                    "**Norveç, 2019'dan bu yana.** Kola Yarımadası'ndan "
-                    "yayılan düzenli karıştırma, Finnmark'taki polis, "
-                    "ambulans ve kurtarma ekiplerinin navigasyonunu "
-                    "defalarca kör etti. Bir kar fırtınasında kaybolan "
-                    "kişinin acil durum vericisi çalışmadı ve kurtarma "
-                    "helikopterleri kör uçtu. "
+                    "**Norveç, 2017 sonbaharından bu yana.** Finnmark'ta "
+                    "GPS sinyalleri defalarca kesildi; Norveç Savunma "
+                    "Bakanlığı kaynağın Rusya'nın Kola Yarımadası olduğunu "
+                    "doğruladı. Bölgedeki polis, ambulans ve kurtarma "
+                    "ekipleri navigasyonda GPS'e dayanıyor. Bölge polis "
+                    "şefi, bir kar fırtınasında kaybolan bir kişinin GPS'li "
+                    "acil durum vericisi sayesinde kurtarıldığını, GPS "
+                    "olmasa yoğun kar içinde bulunamayacağını anlatarak "
+                    "karıştırmanın bu tür kurtarmaları tehlikeye attığını "
+                    "vurguladı. "
                     "[The Barents Observer](https://www.thebarentsobserver"
                     ".com/security/gps-jamming-jeopardizes-public-safety-in-"
                     "norways-northernmost-region/157622)",
-                    "**Norway, 2019 onwards.** Steady jamming from the "
-                    "Kola Peninsula has repeatedly blinded police, "
-                    "ambulance and rescue navigation in Finnmark. During "
-                    "one snowstorm a missing person's emergency beacon "
-                    "failed and the rescue helicopters flew blind. "
+                    "**Norway, since autumn 2017.** GPS signals in "
+                    "Finnmark have been cut again and again; Norway's "
+                    "defence ministry confirmed the source as Russia's "
+                    "Kola Peninsula. Police, ambulance and rescue teams "
+                    "there navigate by GPS. The regional police chief "
+                    "told of a person lost in a snowstorm who was saved "
+                    "because his GPS emergency beacon worked and could "
+                    "not have been found in the deep snow without GPS, "
+                    "to stress that jamming puts such rescues at risk. "
                     "[The Barents Observer](https://www.thebarentsobserver"
                     ".com/security/gps-jamming-jeopardizes-public-safety-in-"
                     "norways-northernmost-region/157622)",
                 ),
                 _w(
-                    "**Karadeniz, 2017.** Rus elektronik harp birimleri "
-                    "GNSS sinyallerini değiştirdi ve yirmiden fazla ticari "
-                    "geminin alıcısı aynı anda yanlış konum bildirdi: "
-                    "gemiler denizin ortasındayken ekranları onları 40 km "
-                    "içerideki bir havalimanında gösterdi. "
+                    "**Karadeniz, 22 Haziran 2017.** Rus elektronik harp "
+                    "birimleri GNSS sinyallerini değiştirdi ve yirmiden "
+                    "fazla ticari geminin alıcısı aynı anda yanlış konum "
+                    "bildirdi: gemiler denizin ortasındayken ekranları "
+                    "onları 32 km'den fazla içerideki Gelencik "
+                    "Havalimanı'nda gösterdi. "
                     "[GalileoGNSS](https://galileognss.eu/"
                     "mass-gps-spoofing-attack-in-black-sea/)",
-                    "**The Black Sea, 2017.** Russian electronic warfare "
-                    "units altered the GNSS signals and receivers on more "
-                    "than twenty commercial ships reported a wrong "
-                    "position at the same time: at sea, their screens put "
-                    "them at an airport 40 km inland. "
+                    "**The Black Sea, 22 June 2017.** Russian electronic "
+                    "warfare units altered the GNSS signals and receivers "
+                    "on more than twenty commercial ships reported a "
+                    "wrong position at the same time: at sea, their "
+                    "screens put them at Gelendzhik Airport, more than "
+                    "32 km inland. "
                     "[GalileoGNSS](https://galileognss.eu/"
                     "mass-gps-spoofing-attack-in-black-sea/)",
                 ),
@@ -3352,10 +3361,10 @@ LANDSCAPE_UNDER = _w(
 #: the fractional one the event happened in, so April 2024 sits a third
 #: of the way through its year rather than on its first day.
 WHEN = (
-    (2017.9, _w("Karadeniz", "The Black Sea"),
-     _w("20+ gemi, 40 km sapma", "20+ ships, 40 km out")),
-    (2019.0, _w("Norveç", "Norway"),
-     _w("Finnmark, süregelen", "Finnmark, still going")),
+    (2017.47, _w("Karadeniz", "The Black Sea"),
+     _w("20+ gemi, 32 km sapma", "20+ ships, 32 km out")),
+    (2017.75, _w("Norveç", "Norway"),
+     _w("Finnmark, 2017'den beri", "Finnmark, since 2017")),
     (2024.3, _w("Baltık", "The Baltic"),
      _w("Tartu bir ay kapalı", "Tartu shut for a month")),
     (2026.4, _w("ABD", "United States"),
@@ -3364,10 +3373,9 @@ WHEN = (
 WHEN_TITLE = _w("Dört olay, dokuz yıl", "Four events, nine years")
 WHEN_UNDER = _w(
     "Yukarıdaki dört olay zaman içinde. Hiçbiri tarihi bir merak değil: "
-    "en eskisi 2017, en yenisi bu yıl ve aradaki boşluklar kapanıyor.",
+    "en eskisi 2017'de, en yenisi bu yıl.",
     "The four events above, in time. None of them is a historical "
-    "curiosity: the oldest is 2017, the newest is this year, and the "
-    "gaps between them are closing.",
+    "curiosity: the oldest is from 2017, the newest from this year.",
 )
 CLOCKS = (
     ("~269500 TL", _w("birim başına atomik saat, TDoA",

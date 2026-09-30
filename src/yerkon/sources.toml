@@ -458,7 +458,7 @@ key = "news-ambulance"
 group = "news"
 label.tr = "Ambulans Uçağı Kazası (Mayıs 2026)"
 label.en = "The air ambulance crash (May 2026)"
-url = "https://www.military.com/air-medevac-crew-lost-gps-during-military-jamming-before-fatal-crash-ntsb-says"
+url = "https://data.ntsb.gov/carol-repgen/api/Aviation/ReportMain/GenerateNewestReport/202990/pdf"
 
 [[source]]
 key = "news-baltic"
@@ -470,8 +470,8 @@ url = "https://www.aa.com.tr/en/europe/suspected-russian-gps-jamming-too-dangero
 [[source]]
 key = "news-norway"
 group = "news"
-label.tr = "Norveç Arama-Kurtarma Zafiyeti (2019-Günümüz)"
-label.en = "Search and rescue blinded in Norway (2019 onwards)"
+label.tr = "Norveç Arama-Kurtarma Zafiyeti (2017-Günümüz)"
+label.en = "Search and rescue under GPS jamming in Norway (2017 onwards)"
 url = "https://www.thebarentsobserver.com/security/gps-jamming-jeopardizes-public-safety-in-norways-northernmost-region/157622"
 
 [[source]]
