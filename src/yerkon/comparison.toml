@@ -33,7 +33,7 @@ technology = "GNSS"
 environment = "Dış"
 cells = ["-^gnss-p50", "≤ 8 / ≤ 15^gps-performance", "≤ 13 / ≤ 33",
          "≥ %99 / ≥ %90", "≈ 148,94 milyon^land-area",
-         "≈ 2341,76^gps-capex", "≈ 130,10^gps-opex"]
+         "≈ 2368,80^gps-capex", "≈ 131,60^gps-opex"]
 
 [[row]]
 system = "Galileo OS"
@@ -41,7 +41,7 @@ technology = "GNSS"
 environment = "Dış"
 cells = ["-", "≤ 1,41^galileo-performance", "≤ 2,40",
          "≥ %99,58^galileo-availability", "≈ 148,94 milyon",
-         "≈ 2109,23^galileo-capex", "≈ 223,01^galileo-opex"]
+         "≈ 2083,43^galileo-capex", "≈ 220,29^galileo-opex"]
 
 [[row]]
 system = "GLONASS"
@@ -49,7 +49,7 @@ technology = "GNSS"
 environment = "Dış"
 cells = ["-", "≤ 5 / ≤ 12^glonass-pair", "≤ 9 / ≤ 25^glonass-pair",
          "≥ %99 / ≥ %90^glonass-pair", "≈ 148,94 milyon",
-         "-^glonass-capex", "≈ 61,10^glonass-opex"]
+         "-^glonass-capex", "≈ 63,98^glonass-opex"]
 
 [[row]]
 system = "BeiDou BDS"
@@ -57,7 +57,7 @@ technology = "GNSS"
 environment = "Dış"
 cells = ["-", "≈ 1,52^beidou-accuracy", "≈ 2,64^beidou-accuracy",
          "> %95^beidou-availability", "≈ 148,94 milyon",
-         "≥ 2714,05^beidou-capex", "-^beidou-opex"]
+         "≥ 2763,64^beidou-capex", "-^beidou-opex"]
 
 [[row]]
 system = "QZSS SLAS"
@@ -65,7 +65,7 @@ technology = "Bölgesel GNSS düzeltme servisi"
 environment = "Dış"
 cells = ["-", "≤ 1,70^qzss-accuracy", "≤ 2,73^qzss-accuracy",
          "%99,996^qzss-availability", "≈ 377974,87^qzss-area",
-         "-^qzss-capex", "≤ 10904,49^qzss-opex"]
+         "-^qzss-capex", "≤ 10976,83^qzss-opex"]
 
 [[row]]
 system = "NavIC SPS"
@@ -177,19 +177,19 @@ location and over 90 % at the worst. The 2024 analysis found the L1 \
 C/A commitments met."""
 
 [note.gps-capex]
-sources = ["gps-investment", "banque-de-france"]
+sources = ["gps-investment", "tcmb-rates"]
 tr = """GPS CAPEX değeri 7,2 milyar USD tedarik ile araştırma geliştirme \
 toplamından türetilmiş tarihsel bir yatırım vekilidir; bugünkü yeniden \
-kurulum maliyeti ya da muhasebe CAPEX'i değildir. 4 Eylül 2026 kuruyla \
+kurulum maliyeti ya da muhasebe CAPEX'i değildir. 29 Eylül 2026 TCMB kuruyla \
 TL'ye çevrilip kara paydasına bölündü."""
 en = """The GPS CAPEX figure is a historical investment proxy derived from \
 7,2 billion USD of procurement plus research and development. It is \
 neither today's cost of building it again nor an accounting CAPEX. It was \
-converted to lira at the 4 September 2026 rate and divided by the land \
+converted to lira at the central bank's 29 September 2026 rate and divided by the land \
 denominator."""
 
 [note.gps-opex]
-sources = ["gps-sustain", "banque-de-france"]
+sources = ["gps-sustain", "tcmb-rates"]
 tr = """GPS OPEX değeri 1993 DOD/DOT ortak çalışma grubunun, asgari GPS \
 hizmetini sürdürmek için FY1993 dolarıyla yılda yaklaşık 400 milyon USD \
 tahminidir. Enflasyon düzeltmesi yapılmadı."""
@@ -231,7 +231,7 @@ The official minimum targets are 87 % at the worst location and 90 % at \
 the average one, assessed against 7,5 m horizontal and 15 m vertical."""
 
 [note.galileo-capex]
-sources = ["eca-galileo", "banque-de-france"]
+sources = ["eca-galileo", "tcmb-rates"]
 tr = """Galileo CAPEX değeri 5,58 milyar EUR'luk tarihsel program uygulama \
 maliyetinden türetilmiş yatırım vekilidir; geliştirme ve konuşlandırmayı \
 içerir."""
@@ -240,7 +240,7 @@ en = """The Galileo CAPEX figure is an investment proxy derived from the \
 development and deployment."""
 
 [note.galileo-opex]
-sources = ["ec-galileo", "banque-de-france"]
+sources = ["ec-galileo", "tcmb-rates"]
 tr = """Avrupa Komisyonu'nun 2011 maliyet tablosu, 2010 fiyatlarıyla \
 yıllık ortalama tam altyapı işletme maliyetini 800 milyon EUR verir: 590 \
 milyonu Galileo, 110 milyonu EGNOS, 100 milyonu diğer kalemler. Yalnız \
@@ -272,7 +272,7 @@ programme figures do not reliably separate development, use and \
 sustainment from pure deployment investment."""
 
 [note.glonass-opex]
-sources = ["kommersant-run", "kommersant-items", "banque-de-france"]
+sources = ["kommersant-run", "kommersant-items", "tcmb-rates"]
 tr = """GLONASS OPEX değeri 2012-2020 dönemindeki 146898,9 milyon RUB \
 sistem sürdürme bütçesinin dokuz yıllık basit ortalamasına dayanan \
 tarihsel bir vekildir."""
@@ -304,7 +304,7 @@ service availability as over 95 %. The figure the same source puts over \
 positioning service availability, so it was not put in the cell."""
 
 [note.beidou-capex]
-sources = ["casi-beidou", "banque-de-france"]
+sources = ["casi-beidou", "tcmb-rates"]
 tr = """BeiDou CAPEX değeri, CASI'nin aktardığı en düşük tarihsel program \
 tahmini olan 56 milyar CNY'yi alt sınır kabul eden bir vekildir; saf \
 muhasebe CAPEX'i değildir."""
@@ -354,7 +354,7 @@ a land comparison Japan's national area of 1 April 2026, 377974,87 km², \
 is used as an open proxy. It is not the real SLAS service area."""
 
 [note.qzss-opex]
-sources = ["cao-budget", "cao-archive", "banque-de-france"]
+sources = ["cao-budget", "cao-archive", "tcmb-rates"]
 tr = """13,294 milyar JPY/yıl, FY2026'da QZSS hizmet sunumuna ayrılan \
 bütçenin tamamıdır, yalnız SLAS değildir. Japonya kara vekiline \
 bölündü; bu yüzden bir üst sınırdır ve "≤" ile yazıldı."""
@@ -681,7 +681,7 @@ kilometre is the figure a tunnel operator would ask for. The other two \
 rows are divided by area, so this cell is not the same measure as theirs."""
 
 [note.yerkon-capex]
-sources = ["digikey", "lcsc", "mouser", "banque-de-france", "sepetli-ankara", "yevmiye-2026", "dicle-surici", "forelektrik-2026", "zam-nisan-2026", "yazilimci-maaslari-2026", "vds-2026"]
+sources = ["digikey", "lcsc", "mouser", "tcmb-rates", "sepetli-ankara", "yevmiye-2026", "dicle-surici", "forelektrik-2026", "zam-nisan-2026", "yazilimci-maaslari-2026", "vds-2026"]
 tr = """YERKON CAPEX, senaryodaki yayın birimlerinin 1000 adetlik malzeme \
 listesi fiyatı ile her birimin yapıya takılma bedelinin (tutucu, işçilik, \
 gerekiyorsa şebeke dışı besleme) toplamının senaryo alanına bölünmesidir. \

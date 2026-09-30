@@ -568,7 +568,7 @@ SYSTEM = Page(
                     "inmek, her birimde bir atomik saat ve IEEE 1588 PTP "
                     "altyapısı demek. Çip ölçekli bir atomik saatin "
                     "(Microchip SA65) tek adedi yaklaşık 5500 dolar, "
-                    "yaklaşık 266400 lira ([Analog IC Tips, Eylül 2021]"
+                    "yaklaşık 269500 lira ([Analog IC Tips, Eylül 2021]"
                     "(https://www.analogictips.com/the-pc-board-atomic-clock-part-3-the-csac-cesium-physics-cell-faq/)). "
                     "Çift yönlü "
                     "ölçümde bu ağ geneli senkronizasyona gerek yok: "
@@ -581,7 +581,7 @@ SYSTEM = Page(
                     "accuracy. Going below a billionth of a second, for "
                     "instance, means an atomic clock and IEEE 1588 PTP at "
                     "every unit. One chip-scale atomic clock (Microchip "
-                    "SA65) costs about 5500 dollars, roughly 266400 lira "
+                    "SA65) costs about 5500 dollars, roughly 269500 lira "
                     "([Analog IC Tips, September 2021]"
                     "(https://www.analogictips.com/the-pc-board-atomic-clock-part-3-the-csac-cesium-physics-cell-faq/)). "
                     "Two way ranging needs no "
@@ -1932,12 +1932,14 @@ SOURCES = Page(
                    "Qorvo DWM3000 datasheets, and the SX1280 long range "
                    "test."),
                 _w("DigiKey, LCSC, JLCPCB, Mouser, Gainta ve diğer "
-                   "satıcıların kademe fiyatları, 25-28 Eylül 2026. Kur 4 "
-                   "Eylül 2026, 48,44 TL/USD ve 1,1622 USD/EUR.",
+                   "satıcıların kademe fiyatları, 24-30 Eylül 2026. Kur: "
+                   "TCMB'nin 29 Eylül 2026 gösterge niteliğindeki döviz "
+                   "satış kurları, 49,0013 TL/USD ve 55,6103 TL/EUR.",
                    "Tier prices from DigiKey, LCSC, JLCPCB, Mouser, Gainta "
-                   "and other sellers, 25 to 28 September 2026. Exchange "
-                   "rates of 4 September 2026, 48,44 TL a dollar and "
-                   "1,1622 dollars a euro."),
+                   "and other sellers, 24 to 30 September 2026. Exchange "
+                   "rates: the central bank's indicative forex selling "
+                   "rates of 29 September 2026, 49,0013 TL a dollar and "
+                   "55,6103 TL a euro."),
                 _w("Karşılaştırma tablosunun bizim olmayan satırları "
                    "aşağıdaki kaynakçadan gelir. Tablonun altındaki her "
                    "dipnot, dayandığı girdiye bağlıdır.",
@@ -3366,7 +3368,7 @@ WHEN_UNDER = _w(
     "gaps between them are closing.",
 )
 CLOCKS = (
-    ("~266400 TL", _w("birim başına atomik saat, TDoA",
+    ("~269500 TL", _w("birim başına atomik saat, TDoA",
                        "an atomic clock per unit, TDoA")),
     ("0 TL", _w("saat senkronizasyonu, YERKON (çift yönlü ölçüm)",
                 "clock synchronisation, YERKON (two way ranging)")),

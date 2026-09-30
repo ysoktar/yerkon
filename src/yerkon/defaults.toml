@@ -141,8 +141,8 @@ unit = "m"
 provenance = "STANDARD"
 source = """TEDAŞ, LED'li Yol Aydınlatma Tasarımına İlişkin Usul ve Esaslar (Ağustos 2022), Ek-1: M1 sınıfı yollarda direk 12-14 m, M2 ve M3'te 10-12 m, M4'te 8-10 m, M5'te 8 m, yaya yollarında 6-8 m"""
 source_en = """TEDAŞ, rules for LED road lighting design (August 2022), annex 1: columns 12 to 14 m on M1 roads, 10 to 12 m on M2 and M3, 8 to 10 m on M4, 8 m on M5, 6 to 8 m on footways"""
-note = """Birimin durduğu aydınlatma direğinin boyu. TEDAŞ'ın çizelgesinde boylar bir küme: 6, 8, 10, 12, 14 m, yol sınıfına göre. Kızılay'ın ana caddeleri M1-M3 sınıfında, yani 10-14 m; 12 m bu aralığın ortası. Şehir içi satır kümenin her değeriyle çalıştırıldı (29 Eylül 2026): 8 m'de HPE P95 9,07 m, kullanılabilirlik %94,96, CAPEX 10053 TL/km²; 10 m'de 8,83 m, %96,18, 9336 TL/km²; 12 m'de tablodaki değerler; 14 m'de 8,67 m, %96,82, 8954 TL/km². Kullanılabilirlik ve maliyet yükseklikle düzgün iyileşiyor, P95 iyileşmiyor: 12 m'deki P95 10 ve 14 m'dekinden yüksek. P95, sekiz rastgele gölgeleme tekrarının en kötü ucundan geldiği için bu kadar oynuyor."""
-note_en = """How tall the lighting column a unit stands on is. In TEDAŞ's table the heights are a set, 6, 8, 10, 12, 14 m, by road class. Kızılay's main streets are M1 to M3, so 10 to 14 m; 12 m is the middle of that. The town row was run at every value of the set (29 September 2026): at 8 m HPE P95 9,07 m, availability 94,96 %, CAPEX 10053 TL/km²; at 10 m 8,83 m, 96,18 %, 9336 TL/km²; at 12 m the table's own figures; at 14 m 8,67 m, 96,82 %, 8954 TL/km². Availability and cost improve smoothly with height and P95 does not: P95 at 12 m is higher than at 10 m and 14 m. P95 is the tail of eight shadow draws, so it moves this much."""
+note = """Birimin durduğu aydınlatma direğinin boyu. TEDAŞ'ın çizelgesinde boylar bir küme: 6, 8, 10, 12, 14 m, yol sınıfına göre. Kızılay'ın ana caddeleri M1-M3 sınıfında, yani 10-14 m; 12 m bu aralığın ortası. Şehir içi satır kümenin her değeriyle çalıştırıldı (29 Eylül 2026): 8 m'de HPE P95 9,07 m, kullanılabilirlik %94,96, CAPEX 10077 TL/km²; 10 m'de 8,83 m, %96,18, 9358 TL/km²; 12 m'de tablodaki değerler; 14 m'de 8,67 m, %96,82, 8976 TL/km². Kullanılabilirlik ve maliyet yükseklikle düzgün iyileşiyor, P95 iyileşmiyor: 12 m'deki P95 10 ve 14 m'dekinden yüksek. P95, sekiz rastgele gölgeleme tekrarının en kötü ucundan geldiği için bu kadar oynuyor."""
+note_en = """How tall the lighting column a unit stands on is. In TEDAŞ's table the heights are a set, 6, 8, 10, 12, 14 m, by road class. Kızılay's main streets are M1 to M3, so 10 to 14 m; 12 m is the middle of that. The town row was run at every value of the set (29 September 2026): at 8 m HPE P95 9,07 m, availability 94,96 %, CAPEX 10077 TL/km²; at 10 m 8,83 m, 96,18 %, 9358 TL/km²; at 12 m the table's own figures; at 14 m 8,67 m, 96,82 %, 8976 TL/km². Availability and cost improve smoothly with height and P95 does not: P95 at 12 m is higher than at 10 m and 14 m. P95 is the tail of eight shadow draws, so it moves this much."""
 affects = "aydınlatma direğinden kullanılabilir menzili ve şehir içi satırın alanını"
 affects_en = "usable range from a column and the town row's area"
 
@@ -210,8 +210,8 @@ unit = "m"
 provenance = "ASSUMPTION"
 source = """direk boyları: TEDAŞ-MLZ/99-34 santrifüj betonarme direk şartnamesi (9,3-10-11 m, 12-13-14 m, 15-16 m ve üstü); iletkene mesafe: Elektrik Kuvvetli Akım Tesisleri Yönetmeliği, hava hattı iletkenlerinin haberleşme hatlarına en küçük düşey uzaklığı orta gerilimde 2,5 m, alçak gerilimde 1 m; gömülme derinliği için bir kaynak bulunamadı"""
 source_en = """pole lengths: TEDAŞ-MLZ/99-34, spun concrete pole specification (9,3-10-11 m, 12-13-14 m, 15-16 m and up); distance from the conductors: the Regulation on Electrical Power Installations, least vertical distance from overhead conductors to communication lines 2,5 m at medium voltage and 1 m at low voltage; no source was found for the buried depth"""
-note = """Kırsal dağıtım direğinde birimin yerden yüksekliği: direğin toprak üstündeki boyu eksi orta gerilim iletkenlerine 2,5 m. Direk boyları bir küme (TEDAŞ), mesafe yönetmelikten; direğin ne kadarının toprağa gömüldüğü için kaynak bulunamadı, bu yüzden değer hâlâ varsayım. Kırsal satır aynı yerleşimle üç yükseklikte çalıştırıldı (29 Eylül 2026): 6 m'de HPE P95 8,67 m, kullanılabilirlik %91,00, alan 327,50 km², CAPEX 1231 TL/km²; 8 m'de 8,22 m, %93,26, 344,58 km², 1170 TL/km²; 10 m'de tablodaki değerler. Birim alçaldıkça kapsama ve kullanılabilirlik düşüyor."""
-note_en = """How high a unit stands on a rural distribution pole: the pole's height above ground less 2,5 m to the medium-voltage conductors. The pole lengths are a set (TEDAŞ) and the distance comes from the regulation; no source was found for how much of the pole is buried, so the value is still an assumption. The rural row was run at three heights on the same placement (29 September 2026): at 6 m HPE P95 8,67 m, availability 91,00 %, area 327,50 km², CAPEX 1231 TL/km²; at 8 m 8,22 m, 93,26 %, 344,58 km², 1170 TL/km²; at 10 m the table's own figures. The lower the unit, the less it covers and the less often it gives a position."""
+note = """Kırsal dağıtım direğinde birimin yerden yüksekliği: direğin toprak üstündeki boyu eksi orta gerilim iletkenlerine 2,5 m. Direk boyları bir küme (TEDAŞ), mesafe yönetmelikten; direğin ne kadarının toprağa gömüldüğü için kaynak bulunamadı, bu yüzden değer hâlâ varsayım. Kırsal satır aynı yerleşimle üç yükseklikte çalıştırıldı (29 Eylül 2026): 6 m'de HPE P95 8,67 m, kullanılabilirlik %91,00, alan 327,50 km², CAPEX 1232 TL/km²; 8 m'de 8,22 m, %93,26, 344,58 km², 1171 TL/km²; 10 m'de tablodaki değerler. Birim alçaldıkça kapsama ve kullanılabilirlik düşüyor."""
+note_en = """How high a unit stands on a rural distribution pole: the pole's height above ground less 2,5 m to the medium-voltage conductors. The pole lengths are a set (TEDAŞ) and the distance comes from the regulation; no source was found for how much of the pole is buried, so the value is still an assumption. The rural row was run at three heights on the same placement (29 September 2026): at 6 m HPE P95 8,67 m, availability 91,00 %, area 327,50 km², CAPEX 1232 TL/km²; at 8 m 8,22 m, 93,26 %, 344,58 km², 1171 TL/km²; at 10 m the table's own figures. The lower the unit, the less it covers and the less often it gives a position."""
 affects = "kırsal satırın menzilini ve kapsamasını"
 affects_en = "the rural row's reach and coverage"
 
@@ -1577,18 +1577,18 @@ note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. \
 Tünelde kayıp 50 m'den sonra mesafeyle çok yavaş artıyor, o yüzden bir \
 birim menzilinin sınırına konursa komşularının hepsi sınırın hemen altında \
 kalıyor. 29 Eylül 2026, tünelin ölçülmüş 2,7 dB gölgeleme payıyla, tam \
-çözünürlük: 40 m'de HPE P95 1,08 m, %99,55, km başına 154568 TL; 45 m'de \
-1,13 m ve %91,04, 136384 TL; 50 m'de 1,28 m ve %88,82, 124261 TL; 60 m'de \
-1,93 m ve %84,07, 103045 TL. 60 m, en yakın komşuda payı tam 0,0 dB \
+çözünürlük: 40 m'de HPE P95 1,08 m, %99,55, km başına 154803 TL; 45 m'de \
+1,13 m ve %91,04, 136591 TL; 50 m'de 1,28 m ve %88,82, 124449 TL; 60 m'de \
+1,93 m ve %84,07, 103202 TL. 60 m, en yakın komşuda payı tam 0,0 dB \
 bırakıyor. 40 m, km başına %50 daha pahalı ama tünelin her yerinde konum \
 veriyor."""
 note_en = """How far apart the brackets stand along the bore. In a tunnel \
 the loss grows very slowly with distance past 50 m, so a unit placed at the \
 edge of its reach leaves every neighbour just below the bar. 29 September \
 2026, with the tunnel's measured 2,7 dB shadow spread, full resolution: at \
-40 m HPE P95 1,08 m, 99,55 %, 154568 TL per km; at 45 m 1,13 m and 91,04 %, \
-136384 TL; at 50 m 1,28 m and 88,82 %, 124261 TL; at 60 m 1,93 m and \
-84,07 %, 103045 TL. 60 m leaves the nearest neighbour exactly 0,0 dB of \
+40 m HPE P95 1,08 m, 99,55 %, 154803 TL per km; at 45 m 1,13 m and 91,04 %, \
+136591 TL; at 50 m 1,28 m and 88,82 %, 124449 TL; at 60 m 1,93 m and \
+84,07 %, 103202 TL. 60 m leaves the nearest neighbour exactly 0,0 dB of \
 margin. 40 m costs 50 % more per km but gives a position everywhere in the \
 bore."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \

@@ -447,11 +447,11 @@ label.en = "Mouser, electronic component prices"
 url = "https://www.mouser.com/"
 
 [[source]]
-key = "banque-de-france"
+key = "tcmb-rates"
 group = "project"
-label.tr = "Banque de France, 4 Eylül 2026 referans kurları"
-label.en = "Banque de France, reference rates of 4 September 2026"
-url = "https://www.banque-france.fr/en/statistics/rates-and-prices/exchange-rates-daily-parities-2026-09-04"
+label.tr = "TCMB, 29 Eylül 2026 gösterge niteliğindeki kurlar"
+label.en = "Central Bank of the Republic of Türkiye, indicative rates of 29 September 2026"
+url = "https://www.tcmb.gov.tr/kurlar/202609/29092026.xml"
 
 [[source]]
 key = "news-ambulance"

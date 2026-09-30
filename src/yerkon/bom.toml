@@ -12,10 +12,11 @@
 # buy. Where no tier is published, no discount is assumed: the last known
 # tier holds (ADR-0105).
 
-#: TL per USD on 4 September 2026, the free market rate that morning,
-#: which the central bank's reference sits within a few kuruş of.
-usd_try = 48.44
-usd_try_source = "USD/TRY 4 Eylül 2026, serbest piyasa 09:30 satış 48,4445 (BloombergHT)"
+#: TL per USD: the central bank's indicative forex selling rate of
+#: 29 September 2026, the one date every lira figure is converted at.
+#: Euro prices go to dollars at the same bulletin's cross rate, 1,1349.
+usd_try = 49.0013
+usd_try_source = "TCMB gösterge niteliğindeki kurlar, 29.09.2026 (bülten 2026/183): USD döviz satış 49,0013 TL; EUR/USD çapraz kur 1,1349"
 
 #: Which tier the table prices a deployment at. A thousand, because the
 #: operating model already shares the central system across a thousand
@@ -340,7 +341,7 @@ role.tr = "dış ortam kutusu, 115x65x40 mm, IP65 (4,99 €)"
 role.en = "outdoor box, 115x65x40 mm, IP65 (4,99 €)"
 seller = "Gainta"
 url = "https://www.gainta.com/en/g203.html"
-ladder = [[1, 5.7994]]
+ladder = [[1, 5.6632]]
 date = "25.09.2026"
 note = "100+ fiyatı teklifle; indirim varsayılmadı"
 
@@ -351,7 +352,7 @@ role.tr = "araç kutusu, 115x90x55 mm, IP65 (5,98 €)"
 role.en = "vehicle box, 115x90x55 mm, IP65 (5,98 €)"
 seller = "Gainta"
 url = "https://www.gainta.com/en/g212.html"
-ladder = [[1, 6.95]]
+ladder = [[1, 6.7867]]
 date = "25.09.2026"
 note = "100+ fiyatı teklifle; indirim varsayılmadı"
 
@@ -362,7 +363,7 @@ role.tr = "el tipi kutu, pil bölmeli, 92x66,5x21 mm (1,86 €)"
 role.en = "hand-held box with a battery bay, 92x66,5x21 mm (1,86 €)"
 seller = "Gainta"
 url = "https://www.gainta.com/en/g517gbc-1.html"
-ladder = [[1, 2.1617]]
+ladder = [[1, 2.1109]]
 date = "25.09.2026"
 note = "100+ fiyatı teklifle; indirim varsayılmadı"
 
