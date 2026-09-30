@@ -1058,11 +1058,37 @@ RESEARCH = Page(
             heading=_w("Uygulama süreci", "How it will be carried out"),
             lines=(
                 _w(
-                    "Seçilecek bir ulaşım koridoruna 10 ile 15 yayın "
+                    "Özel YERKON kartları yapılmadan önce haberleşme "
+                    "mimarisi ve temel bileşenler, ekibin elindeki hazır "
+                    "donanımla hızlı ve ucuz biçimde denenecek: yayın "
+                    "birimiyle alıcının haberleşmesi, paket ve protokol "
+                    "yapısı, saha kapsaması, hareket eden alıcının "
+                    "davranışı, uydu konumuyla karasal konumun "
+                    "karşılaştırılması ve radyo ortamı. Bu donanımla "
+                    "konumlandırma ve şifreleme mantığı doğrulanacak; "
+                    "T1000-E'nin LR1110 yongasıyla HPE ve VPE ölçümleri de "
+                    "yapılabilir, ancak sonuçlar nihai yayın birimleriyle "
+                    "birebir karşılaştırılabilir olmayacak.",
+                    "Before the YERKON boards are made, the communication "
+                    "design and the basic parts will be tried quickly and "
+                    "cheaply on hardware the team already has: how the "
+                    "unit and the receiver talk, the packet and protocol "
+                    "layout, coverage in the field, how a moving receiver "
+                    "behaves, the satellite position against the "
+                    "terrestrial one, and the radio environment. This "
+                    "hardware will verify the positioning and signing "
+                    "logic; the LR1110 chip in the T1000-E can also take "
+                    "HPE and VPE measurements, but the results will not be "
+                    "fully comparable with the final units.",
+                ),
+                _w(
+                    "Sonraki adımda, özel kartlar üretildikten sonra "
+                    "seçilecek bir ulaşım koridoruna 10 ile 15 yayın "
                     "birimi kurulacak. Araç, el tipi ve sabit alıcı "
                     "prototipleri açık alanda, tünelde, yüksek binaların "
                     "arasında ve kapsamanın bittiği yerde denenecek.",
-                    "Between 10 and 15 units will go up along one "
+                    "In the next step, once the project's own boards are "
+                    "made, between 10 and 15 units will go up along one "
                     "transport corridor. Vehicle, handheld and fixed "
                     "receiver prototypes will be tried in the open, in a "
                     "tunnel, between tall buildings and where coverage "
@@ -1094,30 +1120,6 @@ RESEARCH = Page(
                     "dangerous. Instead the satellite signal will be cut "
                     "under control, recorded signals will be played back, "
                     "and attacks will be imitated in a laboratory.",
-                ),
-                _w(
-                    "Özel YERKON kartları yapılmadan önce haberleşme "
-                    "mimarisi ve temel bileşenler, ekibin elindeki hazır "
-                    "donanımla hızlı ve ucuz biçimde denenecek: yayın "
-                    "birimiyle alıcının haberleşmesi, paket ve protokol "
-                    "yapısı, saha kapsaması, hareket eden alıcının "
-                    "davranışı, uydu konumuyla karasal konumun "
-                    "karşılaştırılması ve radyo ortamı. Bu donanımla "
-                    "konumlandırma ve şifreleme mantığı doğrulanacak; "
-                    "T1000-E'nin LR1110 yongasıyla HPE ve VPE ölçümleri de "
-                    "yapılabilir, ancak sonuçlar nihai kartlarla birebir "
-                    "karşılaştırılabilir olmayacak.",
-                    "Before the YERKON boards are made, the communication "
-                    "design and the basic parts will be tried quickly and "
-                    "cheaply on hardware the team already has: how the "
-                    "unit and the receiver talk, the packet and protocol "
-                    "layout, coverage in the field, how a moving receiver "
-                    "behaves, the satellite position against the "
-                    "terrestrial one, and the radio environment. This "
-                    "hardware will verify the positioning and signing "
-                    "logic; the LR1110 chip in the T1000-E can also take "
-                    "HPE and VPE measurements, but the results will not be "
-                    "fully comparable with the final boards.",
                 ),
             ),
         ),
