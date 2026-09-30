@@ -617,7 +617,7 @@ def spread(rows: Sequence[tuple[str, Figure, Figure, Optional[Figure]]], *,
 
 
 def timeline(events: Sequence[tuple[float, str, str]], *, title: str,
-             width: float = 860.0) -> str:
+             width: float = 860.0, drawn: bool = True) -> str:
     """When each thing happened, on one line.
 
     Five events over nine years: a chart of counts would say nothing,
@@ -631,15 +631,18 @@ def timeline(events: Sequence[tuple[float, str, str]], *, title: str,
     left, right = 28.0, 28.0
     # The line sits low: every event is labelled above it in two tiers,
     # and the years go under it, so nothing shares a row with anything.
-    line_y, plot_w = 104.0, width - left - right
-    height = 142.0
+    # Without a heading drawn over it, the room for one goes too.
+    lift = 0.0 if drawn else 22.0
+    line_y, plot_w = 104.0 - lift, width - left - right
+    height = 142.0 - lift
     low = math.floor(first) - 0.6
     high = math.ceil(last) + 0.6
 
     def across(year: float) -> float:
         return left + plot_w * ((year - low) / (high - low))
 
-    out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600"),
+    out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600")
+           if drawn else "",
            '<line x1="{:.1f}" y1="{:g}" x2="{:.1f}" y2="{:g}" '
            'stroke="var(--line)" stroke-width="2"/>'.format(
                left, line_y, left + plot_w, line_y)]
@@ -680,7 +683,8 @@ def timeline(events: Sequence[tuple[float, str, str]], *, title: str,
 
 
 def timeline_narrow(events: Sequence[tuple[float, str, str]], *,
-                    title: str, width: float = 344.0) -> str:
+                    title: str, width: float = 344.0,
+                    drawn: bool = True) -> str:
     """The same events for a phone: time runs down the page.
 
     Laid across 860 pixels and shrunk to a phone, the labels came out at
@@ -693,12 +697,13 @@ def timeline_narrow(events: Sequence[tuple[float, str, str]], *,
     ordered = sorted(events)
     low = math.floor(ordered[0][0]) - 0.4
     high = math.ceil(ordered[-1][0]) + 0.4
-    top, axis_x, plot_h = 44.0, 52.0, 380.0
+    top, axis_x, plot_h = 44.0 if drawn else 14.0, 52.0, 380.0
 
     def down(year: float) -> float:
         return top + plot_h * ((year - low) / (high - low))
 
-    out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600"),
+    out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600")
+           if drawn else "",
            '<line x1="{0:g}" y1="{1:g}" x2="{0:g}" y2="{2:g}" '
            'stroke="var(--line)" stroke-width="2"/>'.format(
                axis_x, top, top + plot_h)]

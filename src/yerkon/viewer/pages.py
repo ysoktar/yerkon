@@ -3594,7 +3594,9 @@ WHEN = (
     (2026.4, _w("ABD", "United States"),
      _w("ambulans uçağı düştü", "air ambulance down")),
 )
-WHEN_TITLE = _w("Dokuz yılda beş olay", "Five events in nine years")
+#: Not drawn: the chart has no heading. Kept as the drawing's name for
+#: screen readers.
+WHEN_TITLE = _w("Olayların tarihi", "When the events happened")
 CLOCKS = (
     ("~270000 TL", _w("birim başına atomik saat, TDoA",
                        "an atomic clock per unit, TDoA")),
@@ -3795,10 +3797,12 @@ def _when(language: str) -> str:
     events = [(year, where.said(language), what.said(language))
               for year, where, what in WHEN]
     return _figure(
-        charts.timeline(events, title=WHEN_TITLE.said(language)),
+        charts.timeline(events, title=WHEN_TITLE.said(language),
+                        drawn=False),
         None, language, legend=_legend(("event",), language),
         narrow=charts.timeline_narrow(events,
-                                      title=WHEN_TITLE.said(language)),
+                                      title=WHEN_TITLE.said(language),
+                                      drawn=False),
     )
 
 
