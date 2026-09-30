@@ -2,7 +2,7 @@
   --ink: #12181f;
   --paper: #f4f6f8;
   --line: #ccd4dc;
-  --accent: #1f6feb;
+  --accent: #2178fe;
   --warn: #b4551d;
 }
 * { box-sizing: border-box; }
@@ -192,7 +192,7 @@ table.out th { color: #6b7681; font-weight: 500; }
 .bar {
   height: 4px;
   border-radius: 2px;
-  background: #1f6feb;
+  background: #2178fe;
   margin-top: 2px;
 }
 
@@ -443,7 +443,7 @@ i.prov {
 }
 
 i.prov.datasheet { background: #2f9e57; }
-i.prov.measurement { background: #1f6feb; }
+i.prov.measurement { background: #2178fe; }
 i.prov.standard { background: #7a3f9e; }
 i.prov.derived { background: #5c6b7a; }
 i.prov.design { background: #0f9b9b; }

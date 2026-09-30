@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YERKON simülasyonu</title>
+<meta name="description" content="YERKON'un karasal konumlandırma simülasyonu: yayın birimlerini haritaya yerleştirip konum doğruluğunu ve maliyeti tarayıcıda hesaplayın.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
@@ -54,7 +57,7 @@
 
   <!--
     The way in for somebody who has never seen this page: a place on a
-    map, and the page does the rest — fetches it, places the units on
+    map, and the page does the rest, fetches it, places the units on
     what already stands there, and runs a quick simulation (ADR-0107).
     Everything below is still there for whoever wants to take it apart.
   -->
@@ -67,7 +70,7 @@
 
   <!--
     Named arrangements. Under the tabs because that is what it is about:
-    which arrangement this tab is showing. One per tab, separately —
+    which arrangement this tab is showing. One per tab, separately,
     loading one replaces this tab and touches no other (ADR-0043).
   -->
   <div id="presets">
@@ -181,8 +184,8 @@
     <p class="hint" data-say="site.rows"></p>
     <!--
       Ten metres, not five hundred.
-      A fetch comes back at whatever the grid came back at — Kızılay is
-      2970 m — and a coarse step cannot land there, so the browser rounded
+      A fetch comes back at whatever the grid came back at, Kızılay is
+      2970 m, and a coarse step cannot land there, so the browser rounded
       the handle down and the slider read 2500 beside a box reading 2970.
       The handle said one thing and the site was another (ADR-0048).
     -->

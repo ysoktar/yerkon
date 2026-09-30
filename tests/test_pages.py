@@ -146,7 +146,8 @@ def test_the_site_links_to_nothing_the_server_does_not_serve():
         address = reference.split("?")[0]
         if address == SIMULATOR:
             assert (STATIC / "simulator.html").exists()
-        elif address.rsplit(".", 1)[-1] in ("css", "js", "png", "webp"):
+        elif address.rsplit(".", 1)[-1] in ("css", "js", "png", "webp",
+                                            "ico", "svg"):
             # On disk, and routed: a picture the server does not serve is
             # a broken image on a page that otherwise looks finished.
             assert (STATIC / address.lstrip("/")).exists(), reference
@@ -794,6 +795,8 @@ def test_the_folder_carries_both_languages_and_every_page(tmp_path):
     names = {str(path.relative_to(tmp_path)) for path in written}
     assert "tr/index.html" in names and "en/index.html" in names
     assert "tr/simulasyon/index.html" in names
+    assert "en/simulation/index.html" in names
+    # The old English address still answers, and sends the visitor on.
     assert "en/simulasyon/index.html" in names
     assert "site.css" in names and ".nojekyll" in names
     assert (tmp_path / "CNAME").read_text() == "yerkon.com\n"
@@ -802,6 +805,8 @@ def test_the_folder_carries_both_languages_and_every_page(tmp_path):
     # The root and every old address send the visitor on: one per page
     # in each language but the English front page, which is itself.
     onward = 1 + 2 * (len(PAGES) - 1) + 1
+    # An English page renamed in English keeps its Turkish folder too.
+    onward += sum(1 for page in PAGES if page.slug_in("en") != page.slug)
     assert len(written) == (2 * len(PAGES) + len(CARRIED) + 2
                             + len(browser_simulator()) + onward)
 
@@ -810,7 +815,9 @@ def test_an_old_address_sends_the_visitor_to_the_new_one(tmp_path):
     written = write_pages_of(tmp_path)
     assert 'url=tr/"' in (tmp_path / "index.html").read_text()
     assert 'url=tr/sistem/"' in (tmp_path / "sistem.html").read_text()
-    assert 'url=sistem/"' in (tmp_path / "en" / "sistem.html").read_text()
+    assert 'url=system/"' in (tmp_path / "en" / "sistem.html").read_text()
+    moved = (tmp_path / "en" / "sistem" / "index.html").read_text()
+    assert 'url=../system/"' in moved
     # The simulator keeps its language in the address it is sent on with.
     old = (tmp_path / "calistir.html").read_text()
     assert 'url=calistir/"' in old and "location.search" in old

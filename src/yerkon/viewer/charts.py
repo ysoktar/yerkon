@@ -472,13 +472,19 @@ def scatter(points: Sequence[tuple[Mark, Figure]], *, title: str,
             'stroke="var(--paper)" stroke-width="2"/>'.format(
                 x, y, 6 if mark.ours else 5, colour)
         )
-        # A leader only where the label had to move off its dot.
+        # A leader only where the label had to move off its dot, from
+        # the dot's edge to the label's first letter: a tick beside the
+        # label that stopped short of the dot pointed at nothing.
         if abs(label_y - (y + 4)) > 2:
+            end_x = x + (-10 if flip else 10)
+            end_y = label_y - size * 0.35
+            run = math.hypot(end_x - x, end_y - y) or 1.0
+            edge = (6 if mark.ours else 5) + 2
             out.append(
                 '<line x1="{:.1f}" y1="{:.1f}" x2="{:.1f}" y2="{:.1f}" '
                 'stroke="{}" stroke-width="1" stroke-opacity="0.45"/>'.format(
-                    x + (-9 if flip else 9), y + 3,
-                    x + (-9 if flip else 9), label_y - 4, colour)
+                    x + (end_x - x) * edge / run, y + (end_y - y) * edge / run,
+                    end_x, end_y, colour)
             )
         out.append(_text(
             x + (-11 if flip else 11), label_y, mark.named(narrow),
@@ -614,9 +620,9 @@ def timeline(events: Sequence[tuple[float, str, str]], *, title: str,
              width: float = 860.0) -> str:
     """When each thing happened, on one line.
 
-    Four events over nine years: a chart of counts would say nothing,
-    but where they sit against each other is the point — they are not
-    a historical curiosity, they are recent and they are speeding up.
+    Five events over nine years: a chart of counts would say nothing,
+    but where they sit against each other is the point. They are
+    recent, and three of them fall in the last three years.
     """
     if not events:
         return ""
@@ -670,6 +676,69 @@ def timeline(events: Sequence[tuple[float, str, str]], *, title: str,
         out.append(_text(x, base, where, size=11, anchor=anchor,
                          fill="var(--ink)", weight="600"))
         out.append(_text(x, base + 15, what, size=11, anchor=anchor))
+    return _frame(width, height, "".join(out), title)
+
+
+def timeline_narrow(events: Sequence[tuple[float, str, str]], *,
+                    title: str, width: float = 344.0) -> str:
+    """The same events for a phone: time runs down the page.
+
+    Laid across 860 pixels and shrunk to a phone, the labels came out at
+    five pixels. Standing up, the years keep their spacing and every
+    label keeps its size; a label pushed down by the one above it is
+    tied back to its dot.
+    """
+    if not events:
+        return ""
+    ordered = sorted(events)
+    low = math.floor(ordered[0][0]) - 0.4
+    high = math.ceil(ordered[-1][0]) + 0.4
+    top, axis_x, plot_h = 44.0, 52.0, 380.0
+
+    def down(year: float) -> float:
+        return top + plot_h * ((year - low) / (high - low))
+
+    out = [_text(0, 18, title, size=13, fill="var(--ink)", weight="600"),
+           '<line x1="{0:g}" y1="{1:g}" x2="{0:g}" y2="{2:g}" '
+           'stroke="var(--line)" stroke-width="2"/>'.format(
+               axis_x, top, top + plot_h)]
+    for year in range(int(math.ceil(low)), int(math.floor(high)) + 1):
+        at = down(year)
+        out.append(
+            '<line x1="{0:g}" y1="{1:.1f}" x2="{2:g}" y2="{1:.1f}" '
+            'stroke="var(--line)" stroke-width="1"/>'.format(
+                axis_x - 5, at, axis_x)
+        )
+        if year % 2 == 1 or year == int(math.floor(high)):
+            out.append(_text(axis_x - 10, at + 4, str(year), size=11,
+                             anchor="end"))
+    floor = 0.0
+    for year, where, what in ordered:
+        at = down(year)
+        label = max(at + 4, floor)
+        floor = label + 38
+        x = axis_x + 22
+        if label - (at + 4) > 2:
+            out.append(
+                '<line x1="{:.1f}" y1="{:.1f}" x2="{:.1f}" y2="{:.1f}" '
+                'stroke="var(--chart-mark)" stroke-width="1" '
+                'stroke-opacity="0.45"/>'.format(
+                    axis_x + 7, at + 3, x - 4, label - 4)
+            )
+        else:
+            out.append(
+                '<line x1="{:g}" y1="{:.1f}" x2="{:g}" y2="{:.1f}" '
+                'stroke="var(--chart-mark)" stroke-width="1" '
+                'stroke-opacity="0.45"/>'.format(axis_x + 7, at, x - 4, at)
+            )
+        out.append(
+            '<circle cx="{:g}" cy="{:.1f}" r="6" fill="var(--chart-mark)" '
+            'stroke="var(--paper)" stroke-width="2"/>'.format(axis_x, at)
+        )
+        out.append(_text(x, label, where, size=12, anchor="start",
+                         fill="var(--ink)", weight="600"))
+        out.append(_text(x, label + 15, what, size=12, anchor="start"))
+    height = max(top + plot_h, floor) + 12
     return _frame(width, height, "".join(out), title)
 
 

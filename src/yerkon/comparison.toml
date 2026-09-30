@@ -564,9 +564,9 @@ tr = """Şehir içi satırın simülasyonu Kızılay'ın gerçek zemini üzerind
 gerçek sokaklarda sürüyor. Birimlerin yeri için var olan aydınlatma \
 direkleri, trafik ışıkları, levhalar ve duraklar ile tepelere dikilecek \
 direkler denendi; arama bunlar arasından 19 aydınlatma direğini seçti. \
-Simülasyondaki yerleşim maliyet yapılabilirliğini göstermek için: birim \
-sayısı ve yeri değiştirilerek istenilen yerde istenilen doğruluğa \
-ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
+Bu yerleşim, istenen doğruluğa makul maliyetle ulaşılabildiğini \
+gösterir; birim sayısı ve yerleri değiştirilerek başka yerlerde de \
+istenen doğruluğa ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
 türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir. \
 Ağaçlar simülasyona eklenmedi; ağacın arkasında kalan bir bağlantı \
 gerçekte daha zayıf olabilir."""
@@ -574,9 +574,8 @@ en = """The urban row was run over the real ground at Kızılay; the units \
 drive the real streets. Standing lighting columns, traffic lights, signs \
 and stops, and masts to be put up on hilltops, were all tried as places \
 for the units; the search chose 19 lighting columns among them. The \
-placement in the simulation is there to show cost feasibility: with more \
-units, or units elsewhere, the accuracy wanted can be had where it is \
-wanted. Its range error model is derived from published SX1280 \
+placement shows that the accuracy wanted can be had at a reasonable cost; \
+with more units, or units elsewhere, it can be had in other places too. Its range error model is derived from published SX1280 \
 measurements, so the result is a model output rather than a field \
 measurement. Trees are not in the simulation; a link behind a tree may \
 be weaker in reality."""
@@ -587,9 +586,10 @@ tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yollarında sürüyor;
 birim bir yerleşim aramasının seçtiği yerlerde (47 elektrik dağıtım \
 direği, 5 aydınlatma direği). Yol boyundaki elektrik dağıtım direkleri, \
 var olan aydınlatma direkleri ve levhalar ile tepelere dikilecek direkler \
-denendi; çatılar kiralık olduğu için aramaya sokulmuyor. Simülasyondaki \
-yerleşim maliyet yapılabilirliğini göstermek için: birim sayısı ve yeri \
-değiştirilerek istenilen yerde istenilen doğruluğa ulaşılabilir. Hata modeli kısa menzilde yayımlanmış SX1280 \
+denendi; çatılar kiralık olduğu için aramaya sokulmuyor. Bu \
+yerleşim, istenen doğruluğa makul maliyetle ulaşılabildiğini gösterir; \
+birim sayısı ve yerleri değiştirilerek başka yerlerde de istenen \
+doğruluğa ulaşılabilir. Hata modeli kısa menzilde yayımlanmış SX1280 \
 ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
 saha ölçümü değil, model çıktısıdır. Ağaçlar simülasyona eklenmedi; \
 ağacın arkasında kalan bir bağlantı gerçekte daha zayıf olabilir. \
@@ -603,9 +603,8 @@ anchors stand where a placement search put them (47 distribution poles, \
 5 lighting columns). Distribution poles along the roads, standing \
 lighting columns and signs, and masts to be put up on hilltops were \
 tried; roofs are rented, so the search is not offered them. The \
-placement in the simulation is there to show cost feasibility: with more \
-units, or units elsewhere, the accuracy wanted can be had where it is \
-wanted. Its error model is derived from \
+placement shows that the accuracy wanted can be had at a reasonable cost; \
+with more units, or units elsewhere, it can be had in other places too. Its error model is derived from \
 published SX1280 measurements at short range. Its long range result is \
 therefore a model output rather than a direct field measurement. Trees \
 are not in the simulation; a link behind a tree may be weaker in \
@@ -717,22 +716,24 @@ system is one day a week of a developer and two servers, 237000 TL a year \
 spread over 1000 units."""
 
 [note.yerkon-nationwide]
-sources = ["sen-corine", "cia-turkey"]
+sources = ["sen-corine", "hgm-yuzolcum"]
 tr = """Tüm Türkiye satırı (tüneller hariç), şehir içi ve kırsal satırlarının \
 alanla ağırlıklı ortalamasıdır. CORINE 2018'e göre Türkiye'nin %1,99'u yapay \
 (kentsel) alan olduğu için yaklaşık %2'si şehir, %98'i kırsal kabul edildi. \
-Alan, Türkiye'nin kara yüzölçümüdür. Satır, sistemin ülke ölçeğinde de düşük \
+Alan, Harita Genel Müdürlüğü'nün verdiği Türkiye yüzölçümüdür (780.043 \
+km²). Satır, sistemin ülke ölçeğinde de düşük \
 maliyetli kalacağını göstermek içindir; destek sağlanırsa ülke geneline \
 yayılabilir. Bu kabulle ülke geneli kurulum yaklaşık \
-1,0 milyar TL, işletme yılda yaklaşık 279 milyon TL'dir; bunlar kesin fiyat \
+1,0 milyar TL, işletme yılda yaklaşık 282 milyon TL'dir; bunlar kesin fiyat \
 değil, vergi hariç tahminlerdir. Hata sütunları alan ağırlıklı yaklaşık \
 değerlerdir, ayrı bir simülasyonun çıktısı değildir."""
 en = """The whole Türkiye row (tunnels left out) is the area weighted mean of \
 the urban and rural rows. CORINE 2018 puts 1.99 % of Türkiye under artificial \
 (urban) surfaces, so about 2 % is taken as urban and 98 % as rural. The area \
-is Türkiye's land area. The row is there to show the system stays cheap at a \
+is Türkiye's surface area as the General Directorate of Mapping gives it \
+(780,043 km²). The row is there to show the system stays cheap at a \
 national scale; with support it could be spread across the country. On that \
 basis, building it nationwide comes to about \
-1.0 billion lira and running it to about 279 million lira a year; these are \
+1.0 billion lira and running it to about 282 million lira a year; these are \
 estimates before tax, not final prices. The error columns are area weighted \
 approximations, not the output of a separate simulation."""

@@ -480,11 +480,11 @@ label.en = "Şen (2024), Menba Journal 10(1), Table 1: 1.99 % of Türkiye artifi
 url = "https://dergipark.org.tr/en/download/article-file/3847250"
 
 [[source]]
-key = "cia-turkey"
+key = "hgm-yuzolcum"
 group = "project"
-label.tr = "CIA World Factbook, Türkiye kara yüzölçümü (769.632 km²)"
-label.en = "CIA World Factbook, Türkiye land area (769,632 km²)"
-url = "https://web.archive.org/web/2025/https://www.cia.gov/the-world-factbook/countries/turkey-turkiye/"
+label.tr = "Harita Genel Müdürlüğü, il ve ilçe yüzölçümleri (Türkiye 780.043 km²)"
+label.en = "General Directorate of Mapping, province and district areas (Türkiye 780,043 km²)"
+url = "https://www.harita.gov.tr/il-ve-ilce-yuzolcumleri"
 
 [[source]]
 key = "policy-sura"

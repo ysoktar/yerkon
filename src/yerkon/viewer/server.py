@@ -368,9 +368,13 @@ class Handler(BaseHTTPRequestHandler):
                     "/theme.js"):
             return self._file(path.lstrip("/"), "text/javascript; charset=utf-8")
         if path == "/favicon.ico":
-            self.send_response(204)
-            self.end_headers()
-            return
+            return self._file("favicon.ico", "image/x-icon")
+        if path == "/favicon.svg":
+            return self._file("favicon.svg", "image/svg+xml")
+        if path in ("/apple-touch-icon.png", "/icon-192.png", "/icon-512.png"):
+            return self._file(path.lstrip("/"), "image/png")
+        if path == "/yerkon-rapor.pdf":
+            return self._file("yerkon-rapor.pdf", "application/pdf")
         if path in ("/style.css", "/site.css"):
             return self._file(path.lstrip("/"), "text/css; charset=utf-8")
         if path in ("/road.webp", "/gnss.webp", "/architecture.webp",

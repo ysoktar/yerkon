@@ -15,11 +15,11 @@
   --paper: #ffffff;
   --shade: #f4f6f8;
   --line: #ccd4dc;
-  --accent: #1f6feb;
+  --accent: #2178fe;
   --accent-ink: #ffffff;
   --warn: #b4551d;
   --plate: #ffffff;
-  --chart-mark: #1f6feb;
+  --chart-mark: #2178fe;
   --chart-context: #7c8b99;
 }
 
@@ -70,17 +70,23 @@ body {
 
 /* --- the chrome --------------------------------------------------------- */
 
+/* Three columns: the brand on the left, the pages in the middle of the
+   page, and the simulator, the theme and the language on the right. The
+   page links take the space the outer two leave and sit in its middle. */
 header {
   position: sticky; top: 0; z-index: 5;
-  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
-  padding: 10px 24px; background: var(--paper);
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+  gap: 10px 18px; padding: 10px 24px; background: var(--paper);
   border-bottom: 1px solid var(--line);
 }
+header .brand { justify-self: start; }
+header .actions { justify-self: end; display: flex; align-items: center;
+  gap: 12px; }
 .brand { display: flex; align-items: baseline; gap: 10px;
   text-decoration: none; color: inherit; }
 .brand b { font-size: 17px; letter-spacing: 0.16em; }
 .brand span { font-size: 11px; color: var(--quiet); }
-nav.pages { display: flex; flex-wrap: wrap; gap: 14px; margin-left: auto; }
+nav.pages { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
 nav.pages a { font-size: 13px; color: var(--quiet); text-decoration: none; }
 nav.pages a:hover { color: var(--ink); }
 nav.pages a.here { color: var(--ink); font-weight: 600; }
@@ -114,7 +120,7 @@ button.theme:hover { color: var(--ink); border-color: var(--accent); }
 a.run {
   padding: 7px 14px; border-radius: 4px; background: var(--accent);
   color: var(--accent-ink); font-size: 13px; font-weight: 600;
-  text-decoration: none;
+  text-decoration: none; white-space: nowrap;
 }
 a.run:hover { filter: brightness(1.08); }
 
@@ -122,8 +128,9 @@ footer {
   margin-top: 56px; padding: 22px 24px 40px;
   border-top: 1px solid var(--line); background: var(--shade);
 }
-footer p { max-width: 720px; margin: 0 auto; color: var(--quiet);
-  font-size: 12px; }
+footer p { display: flex; align-items: center; justify-content: flex-end;
+  gap: 6px; margin: 0; color: var(--quiet); font-size: 12px; }
+footer .heart { width: 14px; height: 14px; fill: #e0245e; flex: none; }
 
 /* --- the page ----------------------------------------------------------- */
 
@@ -216,7 +223,7 @@ figcaption { max-width: 672px; margin: 10px auto 0; color: var(--quiet);
 /* A table scrolls inside itself rather than pushing the page sideways.
    Under the published one the note stays put, because a note that slides
    out of view with the columns it explains is a note nobody reads. */
-.scroll { overflow-x: auto; }
+.scroll { overflow-x: auto; position: relative; margin-bottom: 20px; }
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
 th, td { padding: 7px 10px; border-bottom: 1px solid var(--line);
   text-align: left; vertical-align: top; }
@@ -309,15 +316,17 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
   .brand span { display: none; }
 }
 @media (max-width: 1080px) {
-  .brand { margin-right: auto; }
-  nav.pages { margin-left: 0; order: 4; width: 100%; }
+  header { grid-template-columns: 1fr auto; }
+  nav.pages { grid-column: 1 / -1; grid-row: 2; }
 }
 
 @media (max-width: 760px) {
   header { position: static; padding: 10px 16px; }
-  nav.pages { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+  nav.pages { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px;
+    justify-content: flex-start; }
   nav.pages a { flex: none; }
-  nav.pages { margin-left: 0; order: 4; width: 100%; }
+  header .actions { gap: 8px; }
+  a.run { padding: 6px 10px; font-size: 12px; }
   main { padding: 28px 16px 0; }
   h1 { font-size: 24px; }
   .figures { grid-template-columns: 1fr 1fr; }

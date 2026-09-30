@@ -103,6 +103,14 @@ class Page:
     title: Words
     lead: Words
     parts: tuple[Part, ...] = ()
+    #: The English page's address, in English. Empty means the same as
+    #: `slug`.
+    slug_en: str = ""
+
+    def slug_in(self, code: str) -> str:
+        """The page's address in a language: the English pages are named
+        in English, the Turkish ones in Turkish."""
+        return (self.slug_en or self.slug) if code == "en" else self.slug
 
 
 def _w(tr: str, en: str) -> Words:
@@ -120,7 +128,7 @@ class Where:
 
     In the folder each language has its own folder and each page a
     folder of its own inside it, so an address never ends in ".html":
-    `tr/` is the Turkish front page, `tr/sistem/` a page, `en/sistem/`
+    `tr/` is the Turkish front page, `tr/sistem/` a page, `en/system/`
     its English (ADR-0112). Links are relative, so the folder works at
     the domain's root and under a path of its own alike.
     """
@@ -161,7 +169,8 @@ class Where:
 
     @staticmethod
     def folder(page: "Page", code: str) -> str:
-        return code + "/" + (page.slug + "/" if page.slug else "")
+        slug = page.slug_in(code)
+        return code + "/" + (slug + "/" if slug else "")
 
     @staticmethod
     def file(page: "Page", code: str) -> str:
@@ -187,6 +196,15 @@ HOME = Page(
         "to the units around it.",
     ),
     parts=(
+        Part(
+            kind="text",
+            lines=(_w(
+                "Başvuru raporunun tamamı: [YERKON raporu (PDF, 20 sayfa)]"
+                "(https://yerkon.com/yerkon-rapor.pdf)",
+                "The full application report, in Turkish: [YERKON report "
+                "(PDF, 20 pages)](https://yerkon.com/yerkon-rapor.pdf)",
+            ),),
+        ),
         Part(
             kind="picture",
             picture="road.webp",
@@ -262,6 +280,7 @@ HOME = Page(
 
 WHY = Page(
     slug="sorun",
+    slug_en="problem",
     nav=_w("Sorun", "The problem"),
     title=_w("GNSS neden yetmiyor", "Why GNSS is not enough"),
     lead=_w(
@@ -538,6 +557,7 @@ PILOT_PARTS = tuple((key, "") for key in PILOT_ITEMS)
 
 SYSTEM = Page(
     slug="sistem",
+    slug_en="system",
     nav=_w("Sistem", "The system"),
     title=_w("Mimari", "The architecture"),
     lead=_w(
@@ -964,6 +984,7 @@ SYSTEM = Page(
 
 RESEARCH = Page(
     slug="arge",
+    slug_en="research",
     nav=_w("AR-GE", "Research"),
     title=_w("Araştırma soruları", "The research questions"),
     lead=_w(
@@ -1173,6 +1194,7 @@ RESEARCH = Page(
 
 VALUE = Page(
     slug="fayda",
+    slug_en="benefits",
     nav=_w("Fayda", "What it is for"),
     title=_w("Kime ne sağlar", "Who it is for"),
     lead=_w(
@@ -1426,6 +1448,7 @@ VALUE = Page(
 
 RESULTS = Page(
     slug="sonuclar",
+    slug_en="results",
     nav=_w("Sonuçlar", "Results"),
     title=_w("Karşılaştırma tablosu", "The comparison table"),
     lead=_w(
@@ -1566,22 +1589,22 @@ RESULTS = Page(
 
 SIMULATION = Page(
     slug="simulasyon",
+    slug_en="simulation",
     nav=_w("Simülasyon", "The simulation"),
     title=_w("Simülasyon", "The simulation"),
     lead=_w(
-        "Simülasyon bu projenin bir parçası, tamamı değil. Tek bir işi "
-        "vardı: karşılaştırma tablosundaki üç YERKON satırını tahminle "
-        "değil, her sayısı kaynağına kadar izlenebilen bir modelle "
-        "doldurmak. Sahada yapılmış bir ölçüm değildir. Yerleşimler maliyet "
-        "yapılabilirliğini göstermek için; birim sayısı ve yeri "
-        "değiştirilerek istenilen yerde istenilen doğruluğa ulaşılabilir.",
-        "The simulation is one part of this project rather than the whole "
-        "of it. It had one job: to fill the three YERKON rows of the "
+        "Simülasyonun tek bir işi vardı: karşılaştırma tablosundaki üç "
+        "YERKON satırını tahminle değil, her sayısı kaynağına kadar "
+        "izlenebilen bir modelle doldurmak. Sahada yapılmış bir ölçüm "
+        "değildir. Seçilen yerleşimler, istenen doğruluğa makul maliyetle "
+        "ulaşılabildiğini gösterir; birim sayısı ve yerleri değiştirilerek "
+        "başka yerlerde de istenen doğruluğa ulaşılabilir.",
+        "The simulation had one job: to fill the three YERKON rows of the "
         "comparison table with a model whose every number can be traced, "
         "instead of with an estimate. It is not a field measurement. The "
-        "placements are there to show cost feasibility; with more units, or "
-        "units elsewhere, the accuracy wanted can be had where it is "
-        "wanted.",
+        "placements chosen show that the accuracy wanted can be had at a "
+        "reasonable cost; with more units, or units elsewhere, it can be "
+        "had in other places too.",
     ),
     parts=(
         Part(
@@ -2020,6 +2043,7 @@ SIMULATION = Page(
 
 SOURCES = Page(
     slug="kaynaklar",
+    slug_en="sources",
     nav=_w("Kaynaklar", "Sources"),
     title=_w("Neye dayanıyor", "What it rests on"),
     lead=_w(
@@ -2033,6 +2057,15 @@ SOURCES = Page(
         "or an assumption written down.",
     ),
     parts=(
+        Part(
+            kind="text",
+            lines=(_w(
+                "Başvuru raporunun tamamı: [YERKON raporu (PDF, 20 sayfa)]"
+                "(https://yerkon.com/yerkon-rapor.pdf)",
+                "The full application report, in Turkish: [YERKON report "
+                "(PDF, 20 pages)](https://yerkon.com/yerkon-rapor.pdf)",
+            ),),
+        ),
         Part(
             kind="points",
             heading=_w("Standartlar ve veri", "Standards and data"),
@@ -2111,6 +2144,7 @@ SOURCES = Page(
 
 COST = Page(
     slug="maliyet",
+    slug_en="cost",
     nav=_w("Maliyet", "Cost"),
     title=_w("Ne kadara mal oluyor", "What it costs"),
     lead=_w(
@@ -2315,6 +2349,7 @@ EN_300_328 = ("https://www.etsi.org/deliver/etsi_en/300300_300399/300328/"
 
 LAW = Page(
     slug="mevzuat",
+    slug_en="regulation",
     nav=_w("Mevzuat", "Regulation"),
     title=_w("Hangi kurallar, hangi sınırlar", "Which rules, which limits"),
     lead=_w(
@@ -2773,7 +2808,7 @@ LAW = Page(
                 _w("Uyumlaştırılmış standartlar uygulanırsa Onaylanmış "
                    "Kuruluşa gitme zorunluluğu yok: [Telsiz Ekipmanları "
                    "Yönetmeliği (2014/53/AB)](https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) Madde 20(3), "
-                   "Ek–2'deki iç üretim kontrolüne izin veriyor. "
+                   "Ek-2'deki iç üretim kontrolüne izin veriyor. "
                    "Bu, uygunluğun bedelsiz olduğu anlamına gelmiyor; "
                    "üretici uygunluğu teknik dosya ve ölçüm sonuçlarıyla "
                    "göstermek zorunda.",
@@ -3134,8 +3169,8 @@ FONT = ("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700"
         "&amp;display=swap")
 
 FOOTER = _w(
-    "YERKON takımı tarafından sevgiyle hazırlanmıştır.",
-    "Made with love by the YERKON team.",
+    "YERKON ekibi tarafından sevgiyle hazırlanmıştır",
+    "Made with love by the YERKON team",
 )
 
 WEIGHTING = _w(
@@ -3198,11 +3233,25 @@ def render(
         stylesheet=where.asset("site.css"),
         script=where.asset("theme.js"),
         body="\n".join(body),
+        description=_described(_said(page.lead, language)),
+        icon=where.asset(""),
     ))
 
 
+def _described(lead: str) -> str:
+    """The page's lead as a search result shows it: plain words, no
+    markup, no long dashes, and short enough not to be cut mid-word."""
+    text = re.sub(r"<[^>]+>", "", lead)
+    text = html.unescape(text).replace("—", ",").replace("–", "-")
+    text = " ".join(text.split())
+    if len(text) <= 160:
+        return text
+    cut = text[:157].rsplit(" ", 1)[0].rstrip(",;:")
+    return cut + "…"
+
+
 def _document(title: str, language: str, stylesheet: str, script: str,
-              body: str) -> str:
+              body: str, description: str = "", icon: str = "") -> str:
     return (
         "<!doctype html>\n"
         '<html lang="{language}">\n'
@@ -3210,6 +3259,13 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         "<title>{title}</title>\n"
+        '<meta name="description" content="{description}">\n'
+        '<meta property="og:title" content="{title}">\n'
+        '<meta property="og:description" content="{description}">\n'
+        '<link rel="icon" href="{icon}favicon.ico" sizes="48x48">\n'
+        '<link rel="icon" href="{icon}favicon.svg" type="image/svg+xml">\n'
+        '<link rel="apple-touch-icon" href="{icon}apple-touch-icon.png">\n'
+        '<meta name="theme-color" content="#2178fe">\n'
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link rel="stylesheet" href="{font}">\n'
@@ -3218,6 +3274,8 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         "</head>\n"
         "<body>\n{body}\n</body>\n</html>\n"
     ).format(language=language, title=html.escape(title), font=FONT,
+             description=html.escape(description, quote=True),
+             icon=html.escape(icon, quote=True),
              stylesheet=html.escape(stylesheet, quote=True),
              script=html.escape(script, quote=True), body=body)
 
@@ -3236,14 +3294,17 @@ def _header(page: Page, language: str, where: Where) -> str:
         )
         for code, label in LANGUAGES
     )
+    # The brand on the left, the pages in the middle, and on the right,
+    # outward: the simulator, the theme, then the language at the edge.
     return (
         "<header>\n"
         '<a class="brand" href="{home}"><b>YERKON</b></a>\n'
         '<nav class="pages">{links}</nav>\n'
-        '<nav class="tongues">{tongues}'
+        '<div class="actions">'
+        '<a class="run" href="{simulator}">{label}</a>'
         '<button class="theme" id="theme" type="button" hidden></button>'
-        "</nav>\n"
-        '<a class="run" href="{simulator}">{label}</a>\n'
+        '<nav class="tongues">{tongues}</nav>'
+        "</div>\n"
         "</header>"
     ).format(
         home=where.page(HOME),
@@ -3254,8 +3315,16 @@ def _header(page: Page, language: str, where: Where) -> str:
     )
 
 
+#: A heart after the footer's words, drawn rather than typed so it looks
+#: the same everywhere.
+HEART = ('<svg class="heart" viewBox="0 0 24 24" aria-hidden="true">'
+         '<path d="M12 21s-7.5-4.6-10-9.3C.4 8.5 2.2 4.5 6 4.5c2.2 0 3.6 1.2 '
+         '6 3.6 2.4-2.4 3.8-3.6 6-3.6 3.8 0 5.6 4 4 7.2C19.5 16.4 12 21 '
+         '12 21z"/></svg>')
+
+
 def _footer(language: str) -> str:
-    return "<footer><p>{}</p></footer>".format(_said(FOOTER, language))
+    return "<footer><p>{} {}</p></footer>".format(_said(FOOTER, language), HEART)
 
 
 def _part(part: Part, language: str, published, where: Optional[Where] = None) -> str:
@@ -3486,10 +3555,8 @@ WHEN = (
 )
 WHEN_TITLE = _w("Dokuz yılda beş olay", "Five events in nine years")
 WHEN_UNDER = _w(
-    "Yukarıdaki beş olay zaman içinde. Hiçbiri tarihi bir merak değil: "
-    "en eskisi 2017'de, en yenisi bu yıl.",
-    "The five events above, in time. None of them is a historical "
-    "curiosity: the oldest is from 2017, the newest from this year.",
+    "Beş olayın üçü 2024'ten bu yana yaşandı.",
+    "Three of the five happened in 2024 or later.",
 )
 CLOCKS = (
     ("~270000 TL", _w("birim başına atomik saat, TDoA",
@@ -3686,13 +3753,13 @@ def _when(language: str) -> str:
     """The five incidents on one line."""
     from yerkon.viewer import charts
 
+    events = [(year, where.said(language), what.said(language))
+              for year, where, what in WHEN]
     return _figure(
-        charts.timeline(
-            [(year, where.said(language), what.said(language))
-             for year, where, what in WHEN],
-            title=WHEN_TITLE.said(language),
-        ),
+        charts.timeline(events, title=WHEN_TITLE.said(language)),
         WHEN_UNDER, language, legend=_legend(("event",), language),
+        narrow=charts.timeline_narrow(events,
+                                      title=WHEN_TITLE.said(language)),
     )
 
 
@@ -3789,8 +3856,8 @@ def _in(text: str, language: str) -> str:
 #: 1,99 %, rounded to the 2 % the whole-country row weights by; the rest
 #: is taken as rural. Şen (2024), Menba Journal 10(1), table 1.
 URBAN_SHARE = 0.02
-#: Türkiye's land area, CIA World Factbook.
-TURKIYE_LAND_KM2 = 769632
+#: Türkiye's surface area, the General Directorate of Mapping (HGM).
+TURKIYE_LAND_KM2 = 780043
 
 
 def nationwide(published):
@@ -3997,7 +4064,10 @@ def _table(
 
 #: Files copied beside the pages rather than rendered.
 CARRIED = ("site.css", "theme.js", "road.webp", "gnss.webp",
-           "architecture.webp", "simulator.webp")
+           "architecture.webp", "simulator.webp", "yerkon-rapor.pdf",
+           "favicon.svg",
+           "favicon.ico", "apple-touch-icon.png", "icon-192.png",
+           "icon-512.png")
 
 #: Each picture's pixel size. WebP rather than PNG: the four came to
 #: 1,5 MB as PNG and 216 KB as WebP at quality 85, with the lettering in
@@ -4053,6 +4123,8 @@ def browser_simulator() -> dict:
         # where the files are.
         ('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="../">'),
         ('href="/style.css"', 'href="style.css"'),
+        ('href="/favicon.ico"', 'href="favicon.ico"'),
+        ('href="/favicon.svg"', 'href="favicon.svg"'),
         ('<a id="back" href="/"', '<a id="back" href="tr/"'),
         ('href="/api/figures.toml"', 'href="api/figures.toml"'),
         ('<script type="module" src="/app.js"></script>',
@@ -4171,7 +4243,12 @@ def write_pages(into, published=None) -> tuple:
         # English front page, not a way to it.
         if page.slug:
             put(page.slug + ".html", _onward(Where.folder(page, "tr")))
-            put("en/" + page.slug + ".html", _onward(page.slug + "/"))
+            put("en/" + page.slug + ".html", _onward(page.slug_in("en") + "/"))
+            # The English pages were once at their Turkish names; those
+            # addresses send the visitor on to the English ones.
+            if page.slug_in("en") != page.slug:
+                put("en/" + page.slug + "/index.html",
+                    _onward("../" + page.slug_in("en") + "/"))
     put("calistir.html", _onward(BROWSER_SIMULATOR, keep_query=True))
     put("CNAME", (DOMAIN + "\n").encode("utf-8"))
     # Without this the pages are handed to Jekyll, which is a static site
