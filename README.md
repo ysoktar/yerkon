@@ -42,7 +42,7 @@ yerkon table --publish  # koşuyu src/yerkon/published.toml'a yazar
 |---|---|---|---|---|---|---|---|---|---|
 | YERKON (Şehir içi) | Karasal konumlandırma (E28-2G4M20S, LoRa TWR) | Dış | 2,29 | 9,19 | 4,00 | %96,65 | 8,14 | 9.061 | 1.940 |
 | YERKON (Kırsal) | Karasal konumlandırma (E28-2G4M20S, LoRa TWR) | Dış | 2,16 | 8,15 | 4,96 | %94,58 | 354,00 | 1.138 | 330 |
-| YERKON (Tünel) | Karasal konumlandırma (DWM3000, UWB TWR) | İç + dış | 0,37 | 1,08 | 2,57 | %99,55 | 0,02 | 162.442 /km | 33.160 /km |
+| YERKON (Tünel) | Karasal konumlandırma (DWM3000, UWB TWR) | İç + dış | 0,37 | 1,08 | 2,57 | %99,55 | 0,02 | 154.568 /km | 32.372 /km |
 
 Tünel satırının maliyeti km² değil güzergâh km'si başına ("/km").
 

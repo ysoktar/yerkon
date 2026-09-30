@@ -231,12 +231,12 @@ HOME = Page(
                 ),
                 _w(
                     "Bir yayın birimi 1000 adetlik üretimde, kutusu, "
-                    "baskılı devresi ve dizgisiyle yaklaşık 1400 ile 1700 "
-                    "lira arasında. Hedef, AUS "
+                    "baskılı devresi ve dizgisiyle yaklaşık 1400 lira. "
+                    "Hedef, AUS "
                     "noktalarında zaten "
                     "duran elektrik ve haberleşme altyapısının yeniden "
                     "kullanılması; maliyeti aşağıda tutan da bu.",
-                    "A broadcast unit costs roughly 1400 to 1700 lira at "
+                    "A broadcast unit costs roughly 1400 lira at "
                     "a thousand units, box, printed board and assembly "
                     "included. The aim is to reuse "
                     "the power and "
@@ -804,11 +804,11 @@ SYSTEM = Page(
             heading=_w("Donanım ve fiyatı", "The hardware and its price"),
             lines=(
                 _w(
-                    "1000 adette bir yayın birimi yaklaşık 1400-1700 lira, "
-                    "bir alıcı yaklaşık 2600-3400 lira. Her ürünün 1, 100 "
+                    "1000 adette bir yayın birimi yaklaşık 1400 lira, "
+                    "bir alıcı yaklaşık 2300-3100 lira. Her ürünün 1, 100 "
                     "ve 1000 adetlik fiyat tablosu Maliyet sayfasında.",
                     "At a thousand units a broadcast unit is roughly 1400 "
-                    "to 1700 lira and a receiver roughly 2600 to 3400 "
+                    "lira and a receiver roughly 2300 to 3100 "
                     "lira. Every product's price at one, a hundred and a "
                     "thousand is tabled on the Cost page.",
                 ),

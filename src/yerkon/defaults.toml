@@ -1577,18 +1577,18 @@ note = """Askıların tünel boyunca birbirinden ne kadar uzakta durduğu. \
 Tünelde kayıp 50 m'den sonra mesafeyle çok yavaş artıyor, o yüzden bir \
 birim menzilinin sınırına konursa komşularının hepsi sınırın hemen altında \
 kalıyor. 29 Eylül 2026, tünelin ölçülmüş 2,7 dB gölgeleme payıyla, tam \
-çözünürlük: 40 m'de HPE P95 1,08 m, %99,55, km başına 162442 TL; 45 m'de \
-1,13 m ve %91,04, 143331 TL; 50 m'de 1,28 m ve %88,82, 130590 TL; 60 m'de \
-1,93 m ve %84,07, 108294 TL. 60 m, en yakın komşuda payı tam 0,0 dB \
+çözünürlük: 40 m'de HPE P95 1,08 m, %99,55, km başına 154568 TL; 45 m'de \
+1,13 m ve %91,04, 136384 TL; 50 m'de 1,28 m ve %88,82, 124261 TL; 60 m'de \
+1,93 m ve %84,07, 103045 TL. 60 m, en yakın komşuda payı tam 0,0 dB \
 bırakıyor. 40 m, km başına %50 daha pahalı ama tünelin her yerinde konum \
 veriyor."""
 note_en = """How far apart the brackets stand along the bore. In a tunnel \
 the loss grows very slowly with distance past 50 m, so a unit placed at the \
 edge of its reach leaves every neighbour just below the bar. 29 September \
 2026, with the tunnel's measured 2,7 dB shadow spread, full resolution: at \
-40 m HPE P95 1,08 m, 99,55 %, 162442 TL per km; at 45 m 1,13 m and 91,04 %, \
-143331 TL; at 50 m 1,28 m and 88,82 %, 130590 TL; at 60 m 1,93 m and \
-84,07 %, 108294 TL. 60 m leaves the nearest neighbour exactly 0,0 dB of \
+40 m HPE P95 1,08 m, 99,55 %, 154568 TL per km; at 45 m 1,13 m and 91,04 %, \
+136384 TL; at 50 m 1,28 m and 88,82 %, 124261 TL; at 60 m 1,93 m and \
+84,07 %, 103045 TL. 60 m leaves the nearest neighbour exactly 0,0 dB of \
 margin. 40 m costs 50 % more per km but gives a position everywhere in the \
 bore."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \

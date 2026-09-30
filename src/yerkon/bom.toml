@@ -183,12 +183,12 @@ key = "dwm3000-lcsc"
 name = "Qorvo DWM3000TR13"
 role.tr = "UWB telsiz modülü"
 role.en = "UWB radio module"
-seller = "LCSC"
-url = "https://www.lcsc.com/product-detail/C5299931.html"
-volume_url = "https://www.lcsc.com/product-image/C5299931.html?whichImg=0"
-ladder = [[1, 23.1998], [10, 22.5844]]
-date = "28.09.2026"
-note = "LCSC'nin tablosu 10+ kademesinde bitiyor"
+seller = "JLCPCB; DigiKey (25+)"
+url = "https://jlcpcb.com/partdetail/Qorvo-DWM3000TR13/C5299931"
+volume_url = "https://www.digikey.com/en/products/detail/qorvo/DWM3000TR13/24367320"
+ladder = [[1, 23.1003], [10, 22.4875], [25, 20.19], [100, 19.84], [500, 16.21]]
+date = "30.09.2026"
+note = "her kademede en ucuzu: 1 ve 10+ JLCPCB; 25+ ve 100+ DigiKey kesik bant; 500+ DigiKey makara (1000 adet bu kademeden)"
 
 [[part]]
 key = "esp32-s3"
