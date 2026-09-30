@@ -612,6 +612,40 @@ SYSTEM = Page(
                     "there-and-back between the unit and the receiver.",
                 ),
                 _w(
+                    "Benzer ticari sistemlerden teknik fark da buradan "
+                    "geliyor. NextNav TerraPoiNT ve Locata'da alıcı yalnız "
+                    "dinler, bu yüzden vericilerin saatleri nanosaniye "
+                    "düzeyinde eşitlenmelidir: NextNav bunun için atomik "
+                    "saatli vericiler ve ABD'de lisanslı 920-928 MHz "
+                    "bandını, Locata ise vericilerin birbirini dinleyerek "
+                    "eşitlendiği TimeLoc yöntemini ve kendi özel verici "
+                    "donanımını kullanır. Pozyx UWB ile yalnız küçük kapalı "
+                    "alanlara hizmet verir. YERKON birimler arasında saat "
+                    "eşitlemesi istemez; lisanssız 2,4 GHz ve UWB "
+                    "bantlarında, yol kenarında zaten duran yapılara "
+                    "takılan birimlerle açık yolu ve tüneli aynı alıcıyla "
+                    "kapsar. Bedeli, alıcının da yayın yapması ve kullanıcı "
+                    "sayısının sınırlanması; bunun için TWR CDMA ve yazılım "
+                    "tanımlı radyo tabanlı yöntemler eklenecek.",
+                    "The technical difference from similar commercial "
+                    "systems comes from the same place. In NextNav "
+                    "TerraPoiNT and Locata the receiver only listens, so "
+                    "the transmitters' clocks have to agree to within "
+                    "nanoseconds: NextNav uses transmitters with atomic "
+                    "clocks and its licensed 920-928 MHz band in the United "
+                    "States, Locata its TimeLoc method, where transmitters "
+                    "listen to each other to stay in step, and its own "
+                    "transmitter hardware. Pozyx serves only small indoor "
+                    "areas with UWB. YERKON needs no clock agreement "
+                    "between units; in the licence-free 2.4 GHz and UWB "
+                    "bands, with units fixed to structures already by the "
+                    "road, one receiver covers the open road and the "
+                    "tunnel. The price is that the receiver transmits too "
+                    "and the number of users is limited; methods built on "
+                    "TWR CDMA and software defined radio will be added for "
+                    "that.",
+                ),
+                _w(
                     "Her telsiz yongası zamanı kendi kristaliyle sayar ve "
                     "iki yonganın kristali birebir aynı hızda çalışmaz. "
                     "Çift yönlü ölçümde bu fark yalnız birimin cevap "
@@ -939,9 +973,9 @@ RESEARCH = Page(
                     "Bu eksiler şunlar: havada daha çok mesaj dolaşıyor "
                     "ve alıcı sayısı arttıkça sıra beklemek gerekiyor. "
                     "Tek yönlü yayın yapan sistemler alıcıdan cevap "
-                    "beklemediği için bu yükü taşımıyor. TWR CDMA "
-                    "gibi yaklaşımlar ve yazılım tanımlı radyo bu farkı "
-                    "kapatmak için denenecek. "
+                    "beklemediği için bu yükü taşımıyor. Bu farkı "
+                    "kapatmak için TWR CDMA ve yazılım tanımlı radyo "
+                    "tabanlı yöntemler sisteme eklenecek. "
                     "[TWR CDMA makalesi](https://ieeexplore.ieee.org/"
                     "abstract/document/11435291)",
                     "**Can two way ranging's two drawbacks be brought "
@@ -949,9 +983,9 @@ RESEARCH = Page(
                     "the air, and receivers have to wait their turn as "
                     "their number grows. Systems that broadcast one way "
                     "expect no answer from the receiver, so they carry "
-                    "neither cost. Approaches such as "
-                    "TWR CDMA and software defined radio will be tried to "
-                    "close that gap. "
+                    "neither cost. Methods built on TWR CDMA and software "
+                    "defined radio will be added to the system to close "
+                    "that gap. "
                     "[The TWR CDMA paper](https://ieeexplore.ieee.org/"
                     "abstract/document/11435291)",
                 ),
