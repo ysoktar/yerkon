@@ -797,8 +797,7 @@ SYSTEM = Page(
                     "kart üzerinde çip anten, uydu için kart üzerinde "
                     "Abracon PRO-OB-430 yama anten. Türkiye'nin yükseklik "
                     "haritası kart üzerindeki 4 GB'lık Zetta eMMC bellekte "
-                    "durur. Konumu ve yönlendirmeleri güneş altında da "
-                    "okunan, yalnız "
+                    "durur. Konumu güneş altında da okunan, yalnız "
                     "görüntü değişirken güç çeken 1,54 inç e-kâğıt ekranda "
                     "gösterir; kutunun arkasındaki 0,5 W güneş paneli pilini "
                     "doldurur.",
@@ -817,7 +816,7 @@ SYSTEM = Page(
                     "for 2,4 GHz, and an Abracon PRO-OB-430 patch on the "
                     "board for the satellites. Türkiye's elevation model "
                     "is kept on the board, in 4 GB of Zetta eMMC storage. "
-                    "It shows its position and directions on a 1,54 inch "
+                    "It shows its position on a 1,54 inch "
                     "e-paper screen, "
                     "which stays readable in sunlight and draws power only "
                     "when the picture changes; a 0,5 W solar panel on the "
