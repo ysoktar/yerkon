@@ -12,7 +12,7 @@
  * a distance to one side of it, so a bore that bends is drawn straight.
  */
 
-import { BANDS, RISING, bandOf } from "./draw.js?v=0a424e2cb5";
+import { BANDS, RISING, bandOf } from "./draw.js?v=0fcf9e6a3d";
 
 /* What part of the bore is on screen, in metres along it. */
 export const bore = { start: 0, span: 0, length: 0 };
