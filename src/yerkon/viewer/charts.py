@@ -649,8 +649,12 @@ def timeline(events: Sequence[tuple[float, str, str]], *, title: str,
                              anchor="middle"))
     for index, (year, where, what) in enumerate(ordered):
         at = across(year)
-        # Near the right edge a label would run off, so it hangs left.
-        edge = at > left + plot_w * 0.78
+        # Near the right edge a label would run off, so it hangs left; so
+        # does one whose neighbour on the same tier is too close to leave
+        # it room.
+        crowded = any(0 < across(later[0]) - at < 180
+                      for later in ordered[index + 2::2])
+        edge = at > left + plot_w * 0.78 or crowded
         anchor = "end" if edge else "start"
         x = at + (-11 if edge else 11)
         base = line_y - (66 if index % 2 == 0 else 26)

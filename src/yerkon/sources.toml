@@ -522,11 +522,18 @@ label.en = "Search and rescue under GPS jamming in Norway (2017 onwards)"
 url = "https://www.thebarentsobserver.com/security/gps-jamming-jeopardizes-public-safety-in-norways-northernmost-region/157622"
 
 [[source]]
-key = "news-black-sea"
+key = "news-israel-aa"
 group = "news"
-label.tr = "Karadeniz'de Toplu Gemi Yanıltması / Spoofing (2017)"
-label.en = "Mass ship spoofing in the Black Sea (2017)"
-url = "https://galileognss.eu/mass-gps-spoofing-attack-in-black-sea/"
+label.tr = "Anadolu Ajansı, İsrail'in GPS yanıltması (Nisan 2024)"
+label.en = "Anadolu Agency, Israel's GPS spoofing (April 2024)"
+url = "https://www.aa.com.tr/en/middle-east/israel-spoofs-gps-signals-amid-gaza-onslaught/3202337"
+
+[[source]]
+key = "news-israel-gpsworld"
+group = "news"
+label.tr = "Tel Aviv'de Sürücülerin Yanıltılması (Nisan 2024)"
+label.en = "Drivers spoofed in Tel Aviv (April 2024)"
+url = "https://www.gpsworld.com/gps-disruptions-in-tel-aviv-as-israel-braces-for-possible-iranian-attacks/"
 
 [[source]]
 key = "semtech-sx1280-datasheet"
