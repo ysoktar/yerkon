@@ -357,26 +357,33 @@ HOME = Page(
             states=("done", "done", "todo", "todo", "todo"),
         ),
         Part(kind="map", heading=_w("Sayfalar", "Pages")),
+        # One column a person, a line between them; each line of a
+        # person's entry is a line of the column.
         Part(
-            kind="points",
+            kind="people",
             heading=_w("Ekip ve iletişim", "Team and contact"),
             lines=(
-                _w("**Yavuz Selim OKTAR**, grup temsilcisi. TOBB ETÜ Yapay "
-                   "Zekâ Mühendisliği, 3. sınıf. "
+                _w("**Yavuz Selim OKTAR**\nGrup temsilcisi\nTOBB ETÜ Yapay "
+                   "Zekâ Mühendisliği, 3. sınıf\n"
                    "[yavuzselimoktar@gmail.com](mailto:yavuzselimoktar@gmail.com)",
-                   "**Yavuz Selim OKTAR**, team representative. TOBB ETÜ "
-                   "Artificial Intelligence Engineering, third year. "
+                   "**Yavuz Selim OKTAR**\nTeam representative\nTOBB ETÜ "
+                   "Artificial Intelligence Engineering, third year\n"
                    "[yavuzselimoktar@gmail.com](mailto:yavuzselimoktar@gmail.com)"),
-                _w("**Mustafa Göktürk BİNAY**. TOBB ETÜ Bilgisayar "
-                   "Mühendisliği, 2. sınıf. "
+                _w("**Mustafa Göktürk BİNAY**\nTOBB ETÜ Bilgisayar "
+                   "Mühendisliği, 2. sınıf\n"
                    "[gokturkbnay@gmail.com](mailto:gokturkbnay@gmail.com)",
-                   "**Mustafa Göktürk BİNAY**. TOBB ETÜ Computer "
-                   "Engineering, second year. "
+                   "**Mustafa Göktürk BİNAY**\nTOBB ETÜ Computer "
+                   "Engineering, second year\n"
                    "[gokturkbnay@gmail.com](mailto:gokturkbnay@gmail.com)"),
-                _w("**Mehmet GÖNÜL**. TOBB ETÜ Bilgisayar Mühendisliği, "
-                   "4. sınıf. [mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)",
-                   "**Mehmet GÖNÜL**. TOBB ETÜ Computer Engineering, fourth "
-                   "year. [mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)"),
+                _w("**Mehmet GÖNÜL**\nTOBB ETÜ Bilgisayar Mühendisliği, "
+                   "4. sınıf\n[mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)",
+                   "**Mehmet GÖNÜL**\nTOBB ETÜ Computer Engineering, fourth "
+                   "year\n[mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)"),
+            ),
+        ),
+        Part(
+            kind="text",
+            lines=(
                 _w("Simülasyonun kodu ve yöntemi: "
                    "[GitHub](https://github.com/ysoktar/yerkon)",
                    "The simulation's code and method: "
@@ -3537,6 +3544,12 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
                 "<li>{}</li>".format(_said(line, language))
                 for line in part.lines
             ))
+    elif part.kind == "people":
+        drawn = '<div class="people">{}</div>'.format("".join(
+            '<div class="person">{}</div>'.format("".join(
+                "<p>{}</p>".format(_marked(row))
+                for row in line.said(language).split("\n")))
+            for line in part.lines))
     elif part.kind == "table":
         # In a scroller, because a price column that will not wrap is
         # wider than a phone and would otherwise push the whole page
