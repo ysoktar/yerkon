@@ -1,14 +1,14 @@
 # YERKON
 
-> YERKON, uydu sinyali kesildiğinde ya da bozulduğunda da karayolunda konum bulunabilsin diye önerilen, yere kurulu bir konumlandırma sistemidir. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
+> YERKON, karayolunda uydu konumlandırmasının (GNSS) yanında çalışan, uydudan bağımsız ve yere kurulu bir konumlandırma katmanıdır. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
 
-> YERKON is a proposed ground-based positioning system that lets road vehicles find their position when the satellite signal is lost or corrupted. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
+> YERKON is a ground-based positioning layer for roads that works alongside satellite positioning (GNSS) without depending on it. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
 
 - [Başvuru raporu / Application report (PDF, Türkçe)](https://yerkon.com/yerkon-rapor.pdf)
 
 ## Sayfalar (Türkçe)
 
-- [Anasayfa](https://yerkon.com/tr/): YERKON, uydu sinyali kesildiğinde ya da bozulduğunda da karayolunda konum bulunabilsin diye önerilen, yere kurulu bir konumlandırma sistemidir. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
+- [Anasayfa](https://yerkon.com/tr/): YERKON, karayolunda uydu konumlandırmasının (GNSS) yanında çalışan, uydudan bağımsız ve yere kurulu bir konumlandırma katmanıdır. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
 - [Sorun](https://yerkon.com/tr/sorun/): Bugün konum bulmanın ve yol tarif etmenin neredeyse tamamı GPS, Galileo, GLONASS ve BeiDou'dan geliyor. Bu bağımlılık araç navigasyonuyla bitmiyor: acil çağrı ekipleri, kamu araç filoları, insansız araçlar ve kargo taşımacılığı da aynı dört sisteme bağlı.
 - [Sistem](https://yerkon.com/tr/sistem/): Üç parça: ölçülmüş konumlarda duran yayın birimleri, konumunu kendi hesaplayan alıcılar ve kimlikleri güncel tutan merkezi yönetim sistemi.
 - [AR-GE](https://yerkon.com/tr/arge/): Proje dört soruya cevap arıyor. Hiçbiri kapanmış değil ve her birinin altında ne yapılacağı yazılı.
@@ -21,7 +21,7 @@
 
 ## Pages (English)
 
-- [Home](https://yerkon.com/en/): YERKON is a proposed ground-based positioning system that lets road vehicles find their position when the satellite signal is lost or corrupted. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
+- [Home](https://yerkon.com/en/): YERKON is a ground-based positioning layer for roads that works alongside satellite positioning (GNSS) without depending on it. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
 - [The problem](https://yerkon.com/en/problem/): Nearly everything that finds a position or gives directions today runs on GPS, Galileo, GLONASS and BeiDou. The dependency does not stop at vehicle navigation: emergency crews, public fleets, unmanned vehicles and freight all hang on the same four systems.
 - [The system](https://yerkon.com/en/system/): Three parts: broadcast units standing at surveyed positions, receivers that work out their own position, and a management system that keeps the identities current.
 - [Research](https://yerkon.com/en/research/): The project is looking for answers to four questions. None of them is closed, and under each one is what will be done.

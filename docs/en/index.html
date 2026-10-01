@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YERKON</title>
-<meta name="description" content="YERKON is a proposed ground-based positioning system that lets road vehicles find their position when the satellite signal is lost or corrupted. Low cost…">
+<meta name="description" content="YERKON is a ground-based positioning layer for roads that works alongside satellite positioning (GNSS) without depending on it. Low cost broadcast units go…">
 <meta property="og:title" content="YERKON">
-<meta property="og:description" content="YERKON is a proposed ground-based positioning system that lets road vehicles find their position when the satellite signal is lost or corrupted. Low cost…">
+<meta property="og:description" content="YERKON is a ground-based positioning layer for roads that works alongside satellite positioning (GNSS) without depending on it. Low cost broadcast units go…">
 <link rel="icon" href="../favicon.ico" sizes="48x48">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
@@ -25,7 +25,7 @@
 </header>
 <main>
 <h1>YERKON</h1>
-<p class="lead">YERKON is a proposed ground-based positioning system that lets road vehicles find their position when the satellite signal is lost or corrupted. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.</p>
+<p class="lead">YERKON is a ground-based positioning layer for roads that works alongside satellite positioning (GNSS) without depending on it. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.</p>
 <section><p>The full application report, in Turkish: <a href="https://yerkon.com/yerkon-rapor.pdf" target="_blank" rel="noopener">YERKON report (PDF, 20 pages)</a></p></section>
 <section><figure><img src="../road.webp" width="1200" height="896" loading="lazy" decoding="async" alt="The broadcast units sit on roadside masts and cabinets. The receiver always uses the satellites and the ground units together: while the satellites work, comparing the two positions helps catch jamming and spoofing; when the satellite signal is lost, the position comes from the ground units."><figcaption>The broadcast units sit on roadside masts and cabinets. The receiver always uses the satellites and the ground units together: while the satellites work, comparing the two positions helps catch jamming and spoofing; when the satellite signal is lost, the position comes from the ground units.</figcaption></figure></section>
 <section><h2>What it proposes</h2><p>The Ministry of Transport and Infrastructure already has points on the power and communications network: intelligent transport cabinets, roadside units, traffic lights, tunnel lighting and toll gates. YERKON adds a low cost radio broadcast unit to those points. The unit broadcasts its identity and the position surveyed when it was installed. Where those points are sparse, the other poles along the road are used: in the simulation, lighting columns in town and mostly electricity distribution poles in open country.</p><p>A broadcast unit costs roughly 1.400 lira at a thousand units, box, printed board and assembly included. The aim is to reuse the power and communications already standing at intelligent transport points, and that is what keeps the cost down.</p><p>YERKON does not aim to replace the satellites. While they work, the two positions sit side by side, and comparing them can help detect a spoofing attack.</p></section>

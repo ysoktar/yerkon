@@ -184,14 +184,14 @@ HOME = Page(
     nav=_w("Anasayfa", "Home"),
     title=_w("YERKON", "YERKON"),
     lead=_w(
-        "YERKON, uydu sinyali kesildiğinde ya da bozulduğunda da "
-        "karayolunda konum bulunabilsin diye önerilen, yere kurulu bir "
-        "konumlandırma sistemidir. Yol kenarında zaten duran direklere ve "
+        "YERKON, karayolunda uydu konumlandırmasının (GNSS) yanında "
+        "çalışan, uydudan bağımsız ve yere kurulu bir konumlandırma "
+        "katmanıdır. Yol kenarında zaten duran direklere ve "
         "kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı "
         "bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.",
-        "YERKON is a proposed ground-based positioning system that lets "
-        "road vehicles find their position when the satellite signal is "
-        "lost or corrupted. Low cost broadcast units go onto masts and "
+        "YERKON is a ground-based positioning layer for roads that works "
+        "alongside satellite positioning (GNSS) without depending on it. "
+        "Low cost broadcast units go onto masts and "
         "cabinets already standing by the road, and the receiver in a "
         "vehicle works out its own position by measuring its distance to "
         "them.",
