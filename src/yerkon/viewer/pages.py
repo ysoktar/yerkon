@@ -3468,11 +3468,14 @@ def _header(page: Page, language: str, where: Where) -> str:
         links.append('<a href="{}"{}>{}</a>'.format(
             where.page(other), here, _said(other.nav, language)
         ))
+    # The language being read is lit and is not a link: a lit button that
+    # took a press and did nothing read as a switch that had not worked.
+    # Only the other one can be pressed.
     tongues = "".join(
-        '<a href="{}"{}>{}</a>'.format(
-            where.tongue(page, code),
-            ' class="here"' if code == language else "", label,
-        )
+        '<span class="here" aria-current="true">{}</span>'.format(label)
+        if code == language else
+        '<a href="{}" hreflang="{}" lang="{}">{}</a>'.format(
+            where.tongue(page, code), code, code, label)
         for code, label in LANGUAGES
     )
     # The brand on the left, the pages in the middle, and on the right,

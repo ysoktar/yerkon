@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=f47f1ab808";
+import { decimal, say, speak, speaks } from "./words.js?v=90c6ba6028";
 
 /* The choices whose names are this page's to give.
  *
@@ -607,7 +607,11 @@ function drawLanguages() {
     const pick = document.createElement("button");
     pick.textContent = code.toUpperCase();
     pick.title = name;
-    if (code === speaks()) pick.classList.add("on");
+    // The language in use is lit and takes no press, as on the site.
+    if (code === speaks()) {
+      pick.classList.add("on");
+      pick.setAttribute("aria-current", "true");
+    }
     pick.onclick = () => switchTo(code);
     host.appendChild(pick);
   }
@@ -1735,9 +1739,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=f47f1ab808";
-import * as flat from "./bore.js?v=f47f1ab808";
-import * as pick from "./map.js?v=f47f1ab808";
+import * as draw from "./draw.js?v=90c6ba6028";
+import * as flat from "./bore.js?v=90c6ba6028";
+import * as pick from "./map.js?v=90c6ba6028";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");

@@ -124,8 +124,8 @@
     shut.focus();
   });
 
-  /* A strip of slides gets its arrows: each moves it by what is in
-     view, and an arrow with nowhere to go is greyed out. */
+  /* A strip of slides gets its arrows: each moves it by one card and the
+     gap after it, and an arrow with nowhere to go is greyed out. */
   Array.prototype.forEach.call(document.querySelectorAll(".slider"),
     function (slider) {
       var strip = slider.querySelector(".slides");
@@ -136,11 +136,16 @@
         on.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2;
       }
       back.hidden = on.hidden = false;
+      function card() {
+        var first = strip.children[0];
+        var gap = parseFloat(getComputedStyle(strip).columnGap) || 0;
+        return first ? first.getBoundingClientRect().width + gap : strip.clientWidth;
+      }
       back.addEventListener("click", function () {
-        strip.scrollBy({ left: -strip.clientWidth, behavior: "smooth" });
+        strip.scrollBy({ left: -card(), behavior: "smooth" });
       });
       on.addEventListener("click", function () {
-        strip.scrollBy({ left: strip.clientWidth, behavior: "smooth" });
+        strip.scrollBy({ left: card(), behavior: "smooth" });
       });
       strip.addEventListener("scroll", mark, { passive: true });
       window.addEventListener("resize", mark);

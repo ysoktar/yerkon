@@ -528,6 +528,8 @@ i.prov.assumption { background: var(--warn); }
 #languages button:first-child { border-radius: 4px 0 0 4px; }
 #languages button + button { border-left: 0; border-radius: 0 4px 4px 0; }
 #languages button.on {
+  cursor: default;
+  pointer-events: none;
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;

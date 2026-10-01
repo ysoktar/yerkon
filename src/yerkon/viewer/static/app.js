@@ -607,7 +607,11 @@ function drawLanguages() {
     const pick = document.createElement("button");
     pick.textContent = code.toUpperCase();
     pick.title = name;
-    if (code === speaks()) pick.classList.add("on");
+    // The language in use is lit and takes no press, as on the site.
+    if (code === speaks()) {
+      pick.classList.add("on");
+      pick.setAttribute("aria-current", "true");
+    }
     pick.onclick = () => switchTo(code);
     host.appendChild(pick);
   }

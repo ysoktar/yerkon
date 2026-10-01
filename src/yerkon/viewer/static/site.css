@@ -134,14 +134,14 @@ nav.pages a.here { color: var(--ink); font-weight: 600; }
 /* The two languages as one square switch: the one in use is the filled
    square, the other the empty half of the same box. */
 nav.tongues { display: flex; align-items: center; gap: 6px; }
-nav.tongues a {
+nav.tongues a, nav.tongues span {
   display: inline-flex; align-items: center; justify-content: center;
   width: 30px; height: 24px; border: 1px solid var(--line);
   background: var(--shade); font: inherit; font-size: 11px; font-weight: 600;
   color: var(--quiet); text-decoration: none; cursor: pointer;
 }
-nav.tongues a:first-child { border-radius: 4px 0 0 4px; }
-nav.tongues a + a { margin-left: -6px; border-left: 0; border-radius: 0 4px 4px 0; }
+nav.tongues > :first-child { border-radius: 4px 0 0 4px; }
+nav.tongues > * + * { margin-left: -6px; border-left: 0; border-radius: 0 4px 4px 0; }
 nav.tongues a:hover { color: var(--ink); }
 /* Light and dark as a two-way switch: the sun and the moon sit in the
    track, the knob covers the one that is not in use. */
@@ -155,8 +155,9 @@ button.theme .knob { position: absolute; top: 2px; left: 2px; width: 18px;
   height: 18px; border-radius: 50%; background: var(--paper);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); transition: left 0.18s ease; }
 button.theme[aria-checked="true"] .knob { left: 28px; }
-nav.tongues a.here { background: var(--accent); border-color: var(--accent);
-  color: var(--accent-ink); }
+/* The language being read: lit, and not a link, so nothing to press. */
+nav.tongues .here { background: var(--accent); border-color: var(--accent);
+  color: var(--accent-ink); cursor: default; }
 button.theme:hover { color: var(--ink); border-color: var(--accent); }
 a.run {
   padding: 7px 14px; border-radius: 4px; background: var(--accent);
