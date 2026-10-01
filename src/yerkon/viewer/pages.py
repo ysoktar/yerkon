@@ -3270,7 +3270,7 @@ def render(
         script=where.asset(_tagged("theme.js")),
         body="\n".join(body),
         description=_described(_said(page.lead, language)),
-        icon=where.asset(""),
+        icon=where.asset(""), front=page is PAGES[0],
     )))
 
 
@@ -3287,7 +3287,23 @@ def _described(lead: str) -> str:
 
 
 def _document(title: str, language: str, stylesheet: str, script: str,
-              body: str, description: str = "", icon: str = "") -> str:
+              body: str, description: str = "", icon: str = "",
+              front: bool = False) -> str:
+    # The front pages say what the site is called and which picture is
+    # its logo, in the form search engines read (schema.org JSON-LD).
+    named = ""
+    if front:
+        named = ('<script type="application/ld+json">{}</script>\n'.format(
+            json.dumps({
+                "@context": "https://schema.org",
+                "@graph": [
+                    {"@type": "WebSite", "name": "YERKON",
+                     "url": "https://{}/".format(DOMAIN)},
+                    {"@type": "Organization", "name": "YERKON",
+                     "url": "https://{}/".format(DOMAIN),
+                     "logo": "https://{}/icon-512.png".format(DOMAIN)},
+                ],
+            }, ensure_ascii=False)))
     return (
         "<!doctype html>\n"
         '<html lang="{language}">\n'
@@ -3300,8 +3316,12 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         '<meta property="og:description" content="{description}">\n'
         '<link rel="icon" href="{icon}favicon.ico" sizes="48x48">\n'
         '<link rel="icon" href="{icon}favicon.svg" type="image/svg+xml">\n'
+        '<link rel="icon" href="{icon}icon-192.png" type="image/png" '
+        'sizes="192x192">\n'
         '<link rel="apple-touch-icon" href="{icon}apple-touch-icon.png">\n'
         '<meta name="theme-color" content="#2178fe">\n'
+        '<meta property="og:site_name" content="YERKON">\n'
+        '{named}'
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link rel="stylesheet" href="{font}">\n'
@@ -3311,7 +3331,7 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         "<body>\n{body}\n</body>\n</html>\n"
     ).format(language=language, title=html.escape(title), font=FONT,
              description=html.escape(description, quote=True),
-             icon=html.escape(icon, quote=True),
+             icon=html.escape(icon, quote=True), named=named,
              stylesheet=html.escape(stylesheet, quote=True),
              script=html.escape(script, quote=True), body=body)
 
