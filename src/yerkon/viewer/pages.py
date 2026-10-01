@@ -3441,8 +3441,8 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         # The same strip and arrows as the parts' photos: a reader sees
         # there is more to the right without having to find a scrollbar.
         drawn = (
-            '<div class="slider"><button class="slide-back" type="button" '
-            'hidden aria-label="{back}">‹</button>'
+            '<div class="slider pages"><button class="slide-back" '
+            'type="button" hidden aria-label="{back}">‹</button>'
             '<div class="cards slides">{cards}</div>'
             '<button class="slide-on" type="button" hidden '
             'aria-label="{on}">›</button></div>'
