@@ -2730,3 +2730,34 @@ def test_in_a_browser_a_task_finishes_before_the_first_poll(monkeypatch):
     monkeypatch.setattr(parallel.sys, "platform", "emscripten")
     assert parallel.workers() == 1
     assert parallel.spread(abs, [-1, -2, -3]) == (1, 2, 3)
+
+
+def test_every_script_the_pages_load_parses():
+    """Each script the site and the simulator load is valid JavaScript.
+
+    A typeface change once put double quotes inside a double-quoted string
+    in bore.js; the module failed to parse, app.js could not import it,
+    and the simulator never started, while every other test passed.
+    Node's own parser is the check, where Node is installed.
+    """
+    import shutil
+    import subprocess
+
+    import pytest
+
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("node is not installed")
+    from yerkon.viewer.pages import STATIC
+
+    modules = {"app.js", "bore.js", "draw.js", "map.js", "words.js"}
+    for script in sorted(STATIC.glob("*.js")):
+        if script.name in modules:
+            checked = subprocess.run(
+                [node, "--input-type=module", "--check"],
+                stdin=script.open("rb"), capture_output=True)
+        else:
+            checked = subprocess.run([node, "--check", str(script)],
+                                     capture_output=True)
+        assert checked.returncode == 0, (
+            script.name, checked.stderr.decode()[:400])
