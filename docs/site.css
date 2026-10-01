@@ -481,10 +481,10 @@ figure.slide figcaption small a { color: inherit; }
 .people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
   column-gap: 40px; margin: 4px 0 18px; }
 .person { position: relative; display: flex; flex-direction: column; gap: 4px;
-  min-width: 0; padding: 2px 0; text-align: left; }
+  min-width: 0; padding: 2px 0; text-align: center; }
 .person + .person::before { content: ""; position: absolute; top: 2px;
   bottom: 2px; left: -20px; border-left: 1px solid var(--line); }
-.person p { margin: 0; text-align: left; font-size: 14px; line-height: 1.45; color: var(--dim);
+.person p { margin: 0; text-align: center; font-size: 14px; line-height: 1.45; color: var(--dim);
   overflow-wrap: anywhere; }
 .person p:first-child { font-size: 15px; color: var(--ink); }
 @media (max-width: 640px) {
