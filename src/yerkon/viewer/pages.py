@@ -494,7 +494,7 @@ WHY = Page(
         Part(kind="shows", shows="when"),
         Part(
             kind="text",
-            heading=_w("Bu problemi YERKON nasıl çözüyor", "How YERKON solves this problem"),
+            heading=_w("YERKON'un çözümü", "YERKON's solution"),
             lines=(
                 _w(
                     "Kırsal yayın birimi için 8-10 km'lik bir haberleşme ve "
