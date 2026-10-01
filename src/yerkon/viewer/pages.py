@@ -211,13 +211,17 @@ HOME = Page(
             picture="road.webp",
             lines=(_w(
                 "Yayın birimleri yol kenarındaki direklerde ve "
-                "kabinlerde. Alıcı uyduyu ve yerdeki birimleri birlikte "
-                "kullanır; uydu kesildiğinde yerdeki birimlerle devam "
-                "eder.",
+                "kabinlerde. Alıcı uyduyu ve yerdeki birimleri her zaman "
+                "birlikte kullanır: uydu çalışırken iki konumun "
+                "karşılaştırılması karıştırma ve aldatma (spoofing) "
+                "girişimlerini fark etmeye yarar; uydu sinyali "
+                "kesildiğinde konum yerdeki birimlerden bulunur.",
                 "The broadcast units sit on roadside masts and cabinets. "
-                "The receiver uses the satellites and the ground units "
-                "together, and carries on with the ground units when the "
-                "satellites are lost.",
+                "The receiver always uses the satellites and the ground "
+                "units together: while the satellites work, comparing the "
+                "two positions helps catch jamming and spoofing; when the "
+                "satellite signal is lost, the position comes from the "
+                "ground units.",
             ),),
         ),
         Part(
