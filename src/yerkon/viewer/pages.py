@@ -4601,7 +4601,16 @@ def _marked(text: str) -> str:
         r'<a href="\2">\1</a>',
         out,
     )
-    return out
+    # A range ("10-15", "2.500-8.000") stays on one line: a browser
+    # breaks after a hyphen, and "10-" at the end of a line with "15" on
+    # the next reads as two numbers. Text only, never inside a tag.
+    return "".join(
+        piece if piece.startswith("<") else _RANGED.sub(
+            r'<span class="nb">\g<0></span>', piece)
+        for piece in re.split(r"(<[^>]+>)", out))
+
+
+_RANGED = re.compile(r"(?<![\w\-])\d[\d.,]*-\d[\d.,]*(?![\w\-])")
 
 
 def _pdfs_apart(page: str) -> str:

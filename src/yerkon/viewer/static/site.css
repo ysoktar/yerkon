@@ -467,3 +467,6 @@ ul.status li > strong:first-child {
 }
 ul.status li.done > strong:first-child { background: var(--done-bg); color: var(--done-ink); }
 ul.status li.todo > strong:first-child { background: var(--todo-bg); color: var(--todo-ink); }
+
+/* A number range kept on one line (see _marked in pages.py). */
+.nb { white-space: nowrap; }
