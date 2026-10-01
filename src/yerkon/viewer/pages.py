@@ -184,16 +184,17 @@ HOME = Page(
     nav=_w("Anasayfa", "Home"),
     title=_w("YERKON", "YERKON"),
     lead=_w(
-        "YERKON, karayolunda konumun yabancı uydulara bağımlılığını "
-        "azaltmak için bir öneri. Yol kenarında zaten duran direklere ve "
-        "kabinlere ucuz birer yayın birimi takılıyor; araçtaki alıcı da "
-        "çevresindeki birimlere olan mesafesini ölçerek nerede olduğunu "
-        "kendi buluyor.",
-        "YERKON is a proposal for road transport to depend less on "
-        "foreign satellites for position. A cheap broadcast unit goes "
-        "onto masts and cabinets already standing by the road, and the "
-        "receiver in a vehicle finds where it is by measuring its distance "
-        "to the units around it.",
+        "YERKON, uydu sinyali kesildiğinde ya da bozulduğunda da "
+        "karayolunda konum bulunabilsin diye önerilen, yere kurulu bir "
+        "konumlandırma sistemidir. Yol kenarında zaten duran direklere ve "
+        "kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı "
+        "bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.",
+        "YERKON is a proposed ground-based positioning system that lets "
+        "road vehicles find their position when the satellite signal is "
+        "lost or corrupted. Low cost broadcast units go onto masts and "
+        "cabinets already standing by the road, and the receiver in a "
+        "vehicle works out its own position by measuring its distance to "
+        "them.",
     ),
     parts=(
         Part(
@@ -209,14 +210,14 @@ HOME = Page(
             kind="picture",
             picture="road.webp",
             lines=(_w(
-                "Yayın birimleri yol kenarında zaten duran "
-                "noktalara takılıyor. Alıcı hem uyduyu hem yerdeki "
-                "birimleri görüyor ve uydu kesilince yerdekilerle devam "
-                "ediyor.",
-                "The broadcast units go onto points "
-                "already standing by the road. A receiver sees both the "
-                "satellites and the units on the ground, and carries on "
-                "with the ground ones when the satellites go.",
+                "Yayın birimleri yol kenarındaki direklerde ve "
+                "kabinlerde. Alıcı uyduyu ve yerdeki birimleri birlikte "
+                "kullanır; uydu kesildiğinde yerdeki birimlerle devam "
+                "eder.",
+                "The broadcast units sit on roadside masts and cabinets. "
+                "The receiver uses the satellites and the ground units "
+                "together, and carries on with the ground units when the "
+                "satellites are lost.",
             ),),
         ),
         Part(
@@ -3244,7 +3245,7 @@ def render(
 
     # Every quantity on the page with its thousands marked, whichever
     # file it was written in (the page, the table's notes, the settings).
-    return grouped_html(_document(
+    return _pdfs_apart(grouped_html(_document(
         title=named if named == "YERKON" else "{} · YERKON".format(named),
         language=language,
         stylesheet=where.asset(_tagged("site.css")),
@@ -3252,7 +3253,7 @@ def render(
         body="\n".join(body),
         description=_described(_said(page.lead, language)),
         icon=where.asset(""),
-    ))
+    )))
 
 
 def _described(lead: str) -> str:
@@ -4264,7 +4265,16 @@ def write_pages(into, published=None) -> tuple:
     # The domain's root and every address the site had before its pages
     # moved into folders: each sends the visitor on, so a link somebody
     # kept still arrives (ADR-0112).
-    put("index.html", _onward("tr/"))
+    # The domain's own address is the Turkish front page itself rather
+    # than a page that sends the visitor there: a reader that does not
+    # run scripts or follow a refresh, as most AI tools and some search
+    # engines do not, found only the word YERKON at yerkon.com.
+    put("index.html", _at_root(
+        render(PAGES[0], "tr", published,
+               Where(language="tr", loose=True, at=PAGES[0]))))
+    put("robots.txt", _robots())
+    put("sitemap.xml", _sitemap())
+    put("llms.txt", _llms())
     for page in PAGES:
         # The front pages are tr/ and en/ themselves: en/index.html is the
         # English front page, not a way to it.
@@ -4292,6 +4302,63 @@ def write_pages(into, published=None) -> tuple:
         if stale not in kept:
             stale.unlink()
     return tuple(written)
+
+
+def _at_root(page: str) -> bytes:
+    """The Turkish front page, drawn for tr/, served at the root.
+
+    One base puts every relative address where it points from tr/, and
+    the canonical address tells a search engine which copy is the page.
+    """
+    return page.replace(
+        '<meta charset="utf-8">',
+        '<meta charset="utf-8">\n<base href="tr/">\n'
+        '<link rel="canonical" href="https://{}/tr/">'.format(DOMAIN), 1,
+    ).encode("utf-8")
+
+
+def _robots() -> bytes:
+    """Every reader is welcome, and told where the list of pages is."""
+    return ("User-agent: *\nAllow: /\n\nSitemap: https://{}/sitemap.xml\n"
+            .format(DOMAIN)).encode("utf-8")
+
+
+def _sitemap() -> bytes:
+    """Every page in both languages, for a search engine to find."""
+    addresses = "".join(
+        "<url><loc>https://{}/{}</loc></url>\n".format(
+            DOMAIN, Where.folder(page, code))
+        for code, _ in LANGUAGES for page in PAGES
+    )
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            "{}</urlset>\n").format(addresses).encode("utf-8")
+
+
+def _plain(words: str) -> str:
+    """A phrase without its emphasis marks, its links kept as Markdown."""
+    return words.replace("**", "").replace("`", "")
+
+
+def _llms() -> bytes:
+    """The site in a few lines of Markdown, for a language model.
+
+    The llms.txt convention: a title, a summary, then the pages worth
+    reading with a line on each.
+    """
+    lines = ["# YERKON", "", "> " + _plain(PAGES[0].lead.tr), "",
+             "> " + _plain(PAGES[0].lead.en), "",
+             "- [Başvuru raporu / Application report (PDF, Türkçe)]"
+             "(https://{}/yerkon-rapor.pdf)".format(DOMAIN), ""]
+    for code, heading in (("tr", "## Sayfalar (Türkçe)"),
+                          ("en", "## Pages (English)")):
+        lines += [heading, ""]
+        for page in PAGES:
+            lines.append("- [{}](https://{}/{}): {}".format(
+                page.nav.said(code), DOMAIN, Where.folder(page, code),
+                _plain(page.lead.said(code))))
+        lines.append("")
+    return "\n".join(lines).encode("utf-8")
 
 
 def _tagged(name: str) -> str:
@@ -4334,12 +4401,25 @@ def _marked(text: str) -> str:
     # The whole text went through html.escape above, so the address the
     # regex hands back is already safe to sit in an attribute. Escaping
     # it again would turn & into &amp;amp; and break the address.
-    # A PDF opens in a tab of its own, so the page stays where it was.
-    def link(found) -> str:
-        words, address = found.group(1), found.group(2)
-        away = (' target="_blank" rel="noopener"'
-                if address.lower().endswith(".pdf") else "")
-        return '<a href="{}"{}>{}</a>'.format(address, away, words)
-
-    out = re.sub(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", link, out)
+    out = re.sub(
+        r"\[([^\]]+)\]\((https?://[^)\s]+)\)",
+        r'<a href="\2">\1</a>',
+        out,
+    )
     return out
+
+
+def _pdfs_apart(page: str) -> str:
+    """Every link to a PDF opens in a tab of its own, so the page the
+    reader came from stays where it was."""
+    def opened(found) -> str:
+        address = html.unescape(found.group(1)).lower().split("#")[0]
+        path = address.split("://", 1)[-1].split("?")[0].split("/")[1:]
+        # A maker's download page can hand over a PDF from an address
+        # that never ends in .pdf (pdf-down.aspx, downpdf/304.html).
+        if not (address.endswith(".pdf") or any("pdf" in part
+                                                 for part in path)):
+            return found.group(0)
+        return found.group(0)[:-1] + ' target="_blank" rel="noopener">'
+
+    return re.sub(r'<a href="([^"]+)"(?![^>]*target=)[^>]*>', opened, page)

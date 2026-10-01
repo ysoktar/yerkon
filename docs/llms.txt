@@ -1,0 +1,33 @@
+# YERKON
+
+> YERKON, uydu sinyali kesildiğinde ya da bozulduğunda da karayolunda konum bulunabilsin diye önerilen, yere kurulu bir konumlandırma sistemidir. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
+
+> YERKON is a proposed ground-based positioning system that lets road vehicles find their position when the satellite signal is lost or corrupted. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
+
+- [Başvuru raporu / Application report (PDF, Türkçe)](https://yerkon.com/yerkon-rapor.pdf)
+
+## Sayfalar (Türkçe)
+
+- [Anasayfa](https://yerkon.com/tr/): YERKON, uydu sinyali kesildiğinde ya da bozulduğunda da karayolunda konum bulunabilsin diye önerilen, yere kurulu bir konumlandırma sistemidir. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
+- [Sorun](https://yerkon.com/tr/sorun/): Bugün konum bulmanın ve yol tarif etmenin neredeyse tamamı GPS, Galileo, GLONASS ve BeiDou'dan geliyor. Bu bağımlılık araç navigasyonuyla bitmiyor: acil çağrı ekipleri, kamu araç filoları, insansız araçlar ve kargo taşımacılığı da aynı dört sisteme bağlı.
+- [Sistem](https://yerkon.com/tr/sistem/): Üç parça: ölçülmüş konumlarda duran yayın birimleri, konumunu kendi hesaplayan alıcılar ve kimlikleri güncel tutan merkezi yönetim sistemi.
+- [AR-GE](https://yerkon.com/tr/arge/): Proje dört soruya cevap arıyor. Hiçbiri kapanmış değil ve her birinin altında ne yapılacağı yazılı.
+- [Fayda](https://yerkon.com/tr/fayda/): Konumun hayati olduğu, ama uydu sinyalinin kesildiği, zayıfladığı ya da artık güvenilmediği yerlerde ulaşımın ve konuma bağlı hizmetlerin durmaması için; sayfanın sonunda ticarileşmesi.
+- [Sonuçlar](https://yerkon.com/tr/sonuclar/): On üç sistem, aynı sütunlarla yan yana. Koyu zeminli üç satırı simülasyon doldurdu; geri kalan on satır, o sistemlerin kendi kaynaklarının yayımladığı değerler. Bir sayıya ne yapıldığı, satırın sonundaki düğmeyle açılan kutuda ve sayfanın sonundaki dipnotlarda yazıyor. Boş hücre, o kaynağın bu sütuna uyan bir şey yayımlamadığı anlamına geliyor.
+- [Maliyet](https://yerkon.com/tr/maliyet/): Tablodaki her maliyet hücresinin kalem kalem dökümü: hangi parça, kaça, kimden; hangi sayı, neye dayanarak. Bu sayfadaki sayılar modelden ve parça listesinden hesaplanıyor; biri değişince sayfa da değişiyor. Yalnız direk fiyatları tablosu kaynaklarından aktarıldı.
+- [Mevzuat](https://yerkon.com/tr/mevzuat/): YERKON'un gücünü, piyasaya çıkışını ve bakım maliyetini belirleyen kurallar, resmî kaynaklarıyla. Güç, bakım ve kira için burada yazan her sınır modelde de aynen kullanılıyor; prototip cihazlarının frekans kuralları sahadaki denemeler için.
+- [Simülasyon](https://yerkon.com/tr/simulasyon/): Simülasyon, yayın birimlerini Ankara'nın gerçek arazisine yerleştirir ve bir alıcıyı yol boyunca yürütür. Alıcı her adımda birimlere olan mesafeyi ölçer ve konumunu bu ölçümlerden hesaplar; hesaplanan konum gerçek konumla karşılaştırılarak hata bulunur. Sahada yapılmış bir ölçüm değildir.
+- [Kaynaklar](https://yerkon.com/tr/kaynaklar/): Buradaki her sayının dayanağı altı türden biri: yayımlanmış bir fiyat ya da veri sayfası, bir ölçüm, bir standart ya da mevzuat, kaynaklı sayılardan yapılmış bir hesap, bir tasarım kararı ya da açıkça yazılmış bir varsayım.
+
+## Pages (English)
+
+- [Home](https://yerkon.com/en/): YERKON is a proposed ground-based positioning system that lets road vehicles find their position when the satellite signal is lost or corrupted. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
+- [The problem](https://yerkon.com/en/problem/): Nearly everything that finds a position or gives directions today runs on GPS, Galileo, GLONASS and BeiDou. The dependency does not stop at vehicle navigation: emergency crews, public fleets, unmanned vehicles and freight all hang on the same four systems.
+- [The system](https://yerkon.com/en/system/): Three parts: broadcast units standing at surveyed positions, receivers that work out their own position, and a management system that keeps the identities current.
+- [Research](https://yerkon.com/en/research/): The project is looking for answers to four questions. None of them is closed, and under each one is what will be done.
+- [What it is for](https://yerkon.com/en/benefits/): So that transport and the services that need a position do not stop where position is vital and the satellite signal is cut, weakened or no longer trusted; how it is commercialised closes the page.
+- [Results](https://yerkon.com/en/results/): Thirteen systems side by side under the same columns. The three shaded rows are the YERKON rows the simulation filled; the rest are what their own sources publish. What was done to a cell is in the box the button at the end of its row opens and in the notes at the foot of the page, and an empty cell means the source publishes nothing that fits that column.
+- [Cost](https://yerkon.com/en/cost/): Every cost cell in the table, line by line: which part, for how much, from whom; which figure, resting on what. The numbers on this page are worked out from the model and the parts list, so when one changes the page does too. Only the pole price table is copied from its sources.
+- [Regulation](https://yerkon.com/en/regulation/): The rules that set YERKON's power, its route to market and its maintenance cost, with their official sources. Every limit on power, maintenance and rent written here is the one the model uses; the frequency rules for the prototype devices are for the field trials.
+- [The simulation](https://yerkon.com/en/simulation/): The simulation places the broadcast units on Ankara's real terrain and moves a receiver along the road. At every step the receiver measures its distance to the units and works out its position from those measurements; the error is found by comparing that position with the true one. It is not a field measurement.
+- [Sources](https://yerkon.com/en/sources/): Every number here rests on one of six kinds of thing: a published price or datasheet, a measurement, a standard or regulation, a calculation from sourced figures, a design choice, or an assumption written down.

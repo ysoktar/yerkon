@@ -812,13 +812,21 @@ def test_the_folder_carries_both_languages_and_every_page(tmp_path):
     onward += sum(1 for page in PAGES if page.slug_in("en") != page.slug)
     photos = sum(1 for path in (STATIC / "photos").iterdir()
                  if path.suffix == ".webp")
+    # robots.txt, sitemap.xml and llms.txt, for readers that are not
+    # people.
+    readers = 3
     assert len(written) == (2 * len(PAGES) + len(CARRIED) + 2
-                            + len(browser_simulator()) + onward + photos)
+                            + len(browser_simulator()) + onward + photos
+                            + readers)
 
 
 def test_an_old_address_sends_the_visitor_to_the_new_one(tmp_path):
     written = write_pages_of(tmp_path)
-    assert 'url=tr/"' in (tmp_path / "index.html").read_text()
+    # The root is the Turkish front page itself, not a way to it: a
+    # reader that runs no script and follows no refresh still finds it.
+    root = (tmp_path / "index.html").read_text()
+    assert '<base href="tr/">' in root and "<main" in root
+    assert "refresh" not in root
     assert 'url=tr/sistem/"' in (tmp_path / "sistem.html").read_text()
     assert 'url=system/"' in (tmp_path / "en" / "sistem.html").read_text()
     moved = (tmp_path / "en" / "sistem" / "index.html").read_text()
