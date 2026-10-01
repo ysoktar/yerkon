@@ -3433,6 +3433,8 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         "<head>\n"
         '<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        '<meta http-equiv="Content-Security-Policy" content="{policy}">\n'
+        "{referrer}\n"
         "<title>{title}</title>\n"
         '<meta name="description" content="{description}">\n'
         '<meta property="og:title" content="{title}">\n'
@@ -3453,6 +3455,7 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         "</head>\n"
         "<body>\n{body}\n</body>\n</html>\n"
     ).format(language=language, title=html.escape(title), font=FONT,
+             policy=PAGE_POLICY, referrer=REFERRER,
              description=html.escape(description, quote=True),
              icon=html.escape(icon, quote=True), named=named,
              addresses=addresses,
@@ -4340,13 +4343,52 @@ def _loose(text: str, swaps) -> str:
     return text
 
 
+#: What a page of the site may load and talk to, said in the page because
+#: GitHub Pages sends no headers of its own: its own scripts and pictures,
+#: Google's fonts, and nothing else. No page has an inline script or
+#: style to allow, and the one place that writes a script, the address
+#: forwarders, carries no rule because it carries no content.
+PAGE_POLICY = (
+    "default-src 'self'; script-src 'self'; "
+    "style-src 'self' https://fonts.googleapis.com; "
+    "font-src https://fonts.gstatic.com; img-src 'self' data:; "
+    "connect-src 'self'; object-src 'none'; base-uri 'self'; "
+    "form-action 'none'; upgrade-insecure-requests"
+)
+
+#: The simulator's, wider by exactly what it reaches for from the page:
+#: the map's tiles, the place search, the satellite picture, and the
+#: ground, buildings and roads a fetch brings. The engine itself runs in
+#: a worker, which answers to its own address rather than to this rule.
+SIMULATOR_POLICY = (
+    "default-src 'self'; script-src 'self'; worker-src 'self' blob:; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src https://fonts.gstatic.com; "
+    "img-src 'self' data: blob: https://tile.openstreetmap.org "
+    "https://server.arcgisonline.com; "
+    "connect-src 'self' data: blob: https://nominatim.openstreetmap.org "
+    "https://tile.openstreetmap.org https://server.arcgisonline.com "
+    "https://cdn.jsdelivr.net https://overpass-api.de "
+    "https://*.amazonaws.com https://api.opentopodata.org; "
+    "object-src 'none'; base-uri 'self'; form-action 'none'; "
+    "upgrade-insecure-requests"
+)
+
+#: Where a link from the site goes, the receiving site sees the domain
+#: and not the page.
+REFERRER = '<meta name="referrer" content="strict-origin-when-cross-origin">'
+
+
 def browser_simulator() -> dict:
     """The simulator's files for a folder served by nothing, by name."""
     page = _loose((STATIC / "simulator.html").read_text(encoding="utf-8"), (
         # The page sits in calistir/ and everything it loads at the root:
         # one base puts every relative address, the worker's included,
         # where the files are.
-        ('<meta charset="utf-8">', '<meta charset="utf-8">\n<base href="../">'),
+        ('<meta charset="utf-8">',
+         '<meta charset="utf-8">\n<base href="../">\n'
+         '<meta http-equiv="Content-Security-Policy" content="{}">\n{}'.format(
+             SIMULATOR_POLICY, REFERRER)),
         ('href="/style.css"', 'href="style.css"'),
         ('href="/favicon.ico"', 'href="favicon.ico"'),
         ('href="/favicon.svg"', 'href="favicon.svg"'),
