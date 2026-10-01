@@ -226,6 +226,7 @@ HOME = Page(
                 "ground units.",
             ),),
         ),
+        Part(kind="shows", shows="headline"),
         Part(
             kind="text",
             heading=_w("Ne öneriyor", "What it proposes"),
@@ -287,8 +288,97 @@ HOME = Page(
                 ),
             ),
         ),
-        Part(kind="shows", shows="headline"),
+        Part(
+            kind="points",
+            heading=_w("Kimin işine yarar", "Who it serves"),
+            lines=(
+                _w("**Acil yardım ve afet.** 112 ve AFAD ekipleri tünelde, "
+                   "kapalı alanda, yüksek binaların arasında ve afet "
+                   "bölgesinde de görünür kalır.",
+                   "**Emergency services and disasters.** Ambulance and "
+                   "disaster teams stay visible in tunnels, indoors, "
+                   "between tall buildings and in disaster areas."),
+                _w("**Karayolu, kargo ve toplu taşıma.** Kamu araçları, "
+                   "otobüsler ve tehlikeli madde taşıyan araçlar uydudan "
+                   "bağımsız ikinci bir takip kazanır.",
+                   "**Road, freight and public transport.** Public "
+                   "vehicles, buses and dangerous goods carriers gain a "
+                   "second way of being tracked that does not depend on "
+                   "the satellites."),
+                _w("**Tüneller.** Uydunun girmediği tünellerde konum "
+                   "kesintisiz sürer; ilk kurulum için en uygun yer.",
+                   "**Tunnels.** Position carries on where the satellites "
+                   "cannot reach; the best place for a first deployment."),
+                _w("**Karıştırma ve aldatma haritası.** Uydu konumu ile "
+                   "YERKON konumu ayrıştığında olay merkeze iletilir; "
+                   "Bakanlık ülke genelinde bir olay haritası elde eder.",
+                   "**A map of jamming and spoofing.** When the satellite "
+                   "position and YERKON's part ways, the event goes to the "
+                   "centre, and the Ministry gets a map of such events "
+                   "across the country."),
+            ),
+        ),
+        Part(
+            kind="points",
+            heading=_w("Projenin durumu", "Where the project stands"),
+            lines=(
+                _w("**Tamamlandı: simülasyon.** Şehir içi, kırsal ve tünel, "
+                   "Ankara'nın gerçek arazisinde; sonuçlar Karşılaştırma "
+                   "sayfasında.",
+                   "**Done: the simulation.** Urban, rural and tunnel, over "
+                   "real ground near Ankara; the results are on the "
+                   "Comparison page."),
+                _w("**Tamamlandı: tasarım ve maliyet.** Yayın birimi ve "
+                   "alıcıların parça listesi, 1000 adetlik fiyatları ve "
+                   "mevzuat incelemesi.",
+                   "**Done: design and cost.** The parts list of the "
+                   "broadcast unit and the receivers, their prices at a "
+                   "thousand, and the regulatory review."),
+                _w("**Sonraki adım: ekipteki hazır donanımla denemeler.** "
+                   "Haberleşme, kapsama, konumlandırma ve şifreleme mantığı "
+                   "ekibin elindeki cihazlarla sınanacak.",
+                   "**Next: trials on the team's own hardware.** "
+                   "Communication, coverage, positioning and signing logic "
+                   "get tried on devices the team already has."),
+                _w("**Ardından: 10-15 birimlik bir koridor.** Özel kartlar "
+                   "üretildikten sonra seçilecek bir ulaşım koridoruna 10-15 "
+                   "yayın birimi kurulacak.",
+                   "**Then: a corridor of 10 to 15 units.** Once the "
+                   "project's own boards are made, 10 to 15 broadcast units "
+                   "go up along a chosen transport corridor."),
+                _w("**Henüz yapılmadı: saha ölçümü.** Sitedeki doğruluk ve "
+                   "kapsama sayıları simülasyon sonucudur.",
+                   "**Not yet done: field measurement.** The accuracy and "
+                   "coverage figures on this site are simulation results."),
+            ),
+        ),
         Part(kind="map", heading=_w("Sayfalar", "Pages")),
+        Part(
+            kind="points",
+            heading=_w("Ekip ve iletişim", "Team and contact"),
+            lines=(
+                _w("**Yavuz Selim OKTAR**, grup temsilcisi. TOBB ETÜ Yapay "
+                   "Zekâ Mühendisliği, 3. sınıf. "
+                   "[yavuzselimoktar@gmail.com](mailto:yavuzselimoktar@gmail.com)",
+                   "**Yavuz Selim OKTAR**, team representative. TOBB ETÜ "
+                   "Artificial Intelligence Engineering, third year. "
+                   "[yavuzselimoktar@gmail.com](mailto:yavuzselimoktar@gmail.com)"),
+                _w("**Mustafa Göktürk BİNAY**. TOBB ETÜ Bilgisayar "
+                   "Mühendisliği, 2. sınıf. "
+                   "[gokturkbnay@gmail.com](mailto:gokturkbnay@gmail.com)",
+                   "**Mustafa Göktürk BİNAY**. TOBB ETÜ Computer "
+                   "Engineering, second year. "
+                   "[gokturkbnay@gmail.com](mailto:gokturkbnay@gmail.com)"),
+                _w("**Mehmet GÖNÜL**. TOBB ETÜ Bilgisayar Mühendisliği, "
+                   "4. sınıf. [mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)",
+                   "**Mehmet GÖNÜL**. TOBB ETÜ Computer Engineering, fourth "
+                   "year. [mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)"),
+                _w("Simülasyonun kodu ve yöntemi: "
+                   "[GitHub](https://github.com/ysoktar/yerkon)",
+                   "The simulation's code and method: "
+                   "[GitHub](https://github.com/ysoktar/yerkon)"),
+            ),
+        ),
     ),
 )
 
@@ -3283,7 +3373,22 @@ def render(
         body="\n".join(body),
         description=_described(_said(page.lead, language)),
         icon=where.asset(""), front=page is PAGES[0],
+        addresses=_addresses(page, language),
     )))
+
+
+def _addresses(page: Page, language: str) -> str:
+    """The page's own address and its twin in the other language, for
+    search engines: one canonical address, and hreflang to say the
+    Turkish and English pages are the same page (Turkish by default)."""
+    tr = "https://{}/{}".format(DOMAIN, Where.folder(page, "tr"))
+    en = "https://{}/{}".format(DOMAIN, Where.folder(page, "en"))
+    return (
+        '<link rel="canonical" href="{own}">\n'
+        '<link rel="alternate" hreflang="tr" href="{tr}">\n'
+        '<link rel="alternate" hreflang="en" href="{en}">\n'
+        '<link rel="alternate" hreflang="x-default" href="{tr}">\n'
+    ).format(own=tr if language == "tr" else en, tr=tr, en=en)
 
 
 def _described(lead: str) -> str:
@@ -3300,7 +3405,7 @@ def _described(lead: str) -> str:
 
 def _document(title: str, language: str, stylesheet: str, script: str,
               body: str, description: str = "", icon: str = "",
-              front: bool = False) -> str:
+              front: bool = False, addresses: str = "") -> str:
     # The front pages say what the site is called and which picture is
     # its logo, in the form search engines read (schema.org JSON-LD).
     named = ""
@@ -3333,7 +3438,7 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         '<link rel="apple-touch-icon" href="{icon}apple-touch-icon.png">\n'
         '<meta name="theme-color" content="#2178fe">\n'
         '<meta property="og:site_name" content="YERKON">\n'
-        '{named}'
+        '{addresses}{named}'
         '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
         '<link rel="stylesheet" href="{font}">\n'
@@ -3344,6 +3449,7 @@ def _document(title: str, language: str, stylesheet: str, script: str,
     ).format(language=language, title=html.escape(title), font=FONT,
              description=html.escape(description, quote=True),
              icon=html.escape(icon, quote=True), named=named,
+             addresses=addresses,
              stylesheet=html.escape(stylesheet, quote=True),
              script=html.escape(script, quote=True), body=body)
 
@@ -3419,7 +3525,7 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         # In a scroller, because a price column that will not wrap is
         # wider than a phone and would otherwise push the whole page
         # sideways.
-        drawn = '<div class="scroll">{}</div>'.format(_table(
+        drawn = '<div class="scroll" tabindex="0">{}</div>'.format(_table(
             [[_said(cell, language) for cell in row] for row in part.rows],
             numeric_from=part.numbers_from,
         ))
@@ -4105,7 +4211,7 @@ def _published(published, language: str, table=None) -> str:
     if language == "en":
         body = [[_english_cell(cell) for cell in row] for row in body]
     return (
-        '<div class="wide"><div class="scroll">{table}</div></div>'
+        '<div class="wide"><div class="scroll" tabindex="0">{table}</div></div>'
         '<div class="rowpanels" hidden>{panels}</div>'
         '<details class="fold notes"><summary><h2>{heading}</h2></summary>'
         '<ol class="notes">{notes}</ol></details>'
@@ -4391,8 +4497,7 @@ def _at_root(page: str) -> bytes:
     """
     return page.replace(
         '<meta charset="utf-8">',
-        '<meta charset="utf-8">\n<base href="tr/">\n'
-        '<link rel="canonical" href="https://{}/tr/">'.format(DOMAIN), 1,
+        '<meta charset="utf-8">\n<base href="tr/">', 1,
     ).encode("utf-8")
 
 
@@ -4480,8 +4585,9 @@ def _marked(text: str) -> str:
     # The whole text went through html.escape above, so the address the
     # regex hands back is already safe to sit in an attribute. Escaping
     # it again would turn & into &amp;amp; and break the address.
+    # mailto: too, for the team's addresses on the front page.
     out = re.sub(
-        r"\[([^\]]+)\]\((https?://[^)\s]+)\)",
+        r"\[([^\]]+)\]\(((?:https?://|mailto:)[^)\s]+)\)",
         r'<a href="\2">\1</a>',
         out,
     )

@@ -15,7 +15,10 @@
   --paper: #ffffff;
   --shade: #f4f6f8;
   --line: #ccd4dc;
-  --accent: #2178fe;
+  /* The YERKON blue (#2178fe) is the logo and the charts' colour; text,
+     links and buttons take a shade darker so they read at 4,5:1 on
+     white and on the grey footer (WCAG AA). */
+  --accent: #0163fa;
   --accent-ink: #ffffff;
   --warn: #b4551d;
   --plate: #ffffff;
@@ -117,7 +120,7 @@ button.theme .knob { position: absolute; top: 2px; left: 2px; width: 18px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); transition: left 0.18s ease; }
 button.theme[aria-checked="true"] .knob { left: 28px; }
 nav.tongues a.here { background: var(--accent); border-color: var(--accent);
-  color: #fff; }
+  color: var(--accent-ink); }
 button.theme:hover { color: var(--ink); border-color: var(--accent); }
 a.run {
   padding: 7px 14px; border-radius: 4px; background: var(--accent);
@@ -437,3 +440,7 @@ figure.slide figcaption small a { color: inherit; }
 
 /* A heading set in the middle, over the strip of pages. */
 h2.centred { text-align: center; }
+
+/* The team's lines hold an address that cannot break; justified, the
+   words around it spread apart. */
+main li:has(a[href^="mailto:"]) { text-align: left; }

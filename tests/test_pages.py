@@ -141,7 +141,7 @@ def test_the_site_links_to_nothing_the_server_does_not_serve():
     for reference in sorted(wanted):
         if reference.startswith("http"):
             continue
-        if reference.startswith("#"):
+        if reference.startswith("#") or reference.startswith("mailto:"):
             continue
         address = reference.split("?")[0]
         if address == SIMULATOR:
@@ -850,7 +850,7 @@ def test_a_page_in_the_folder_points_at_files_that_are_there(tmp_path):
         if declared:
             base = (path.parent / declared.group(1)).resolve()
         for reference in re.findall(r'(?:href|src)="([^"]+)"', drawn):
-            if reference.startswith("http") or reference.startswith("#"):
+            if reference.startswith(("http", "#", "mailto:")):
                 continue
             # The simulator is asked for its language in the address.
             reference = reference.split("?")[0]
