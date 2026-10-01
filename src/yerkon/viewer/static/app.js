@@ -626,18 +626,29 @@ function drawLanguages() {
  */
 async function switchTo(code) {
   if (code === speaks()) return;
+  // The page's own words change at once. The engine's follow when it
+  // answers, and its answer can wait in line behind work it already has,
+  // the first sweep of a fresh page above all: the button used to sit
+  // unlit for half a minute after a press and read as a switch that had
+  // not worked.
+  const before = speaks();
+  speak(code);
+  drawWords();
+  drawLanguages();
   try {
     const { state: moved } = await ask("/api/language", { language: code });
-    speak(code);
     state = moved;
-    drawWords();
-    drawLanguages();
     await refreshWords();
     fillControls();
     await loadFigures();
     await loadOptions();
     wireTasks();
-  } catch (error) { flash(error.message, true); }
+  } catch (error) {
+    speak(before);
+    drawWords();
+    drawLanguages();
+    flash(error.message, true);
+  }
 }
 
 /* The three rows. Switching keeps what each one holds (ADR-0028). */
