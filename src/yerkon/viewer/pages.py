@@ -3430,13 +3430,24 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
     elif part.kind == "map":
         where = where or Where(language=language)
         drawn = "".join(
-            '<a class="card" href="{}"><b>{}</b><span>{}</span></a>'.format(
-                where.page(other), _said(other.nav, language),
-                _said(other.lead, language),
+            '<a class="card" href="{}"><i>{:02d}</i><b>{}</b>'
+            '<span>{}</span><em>{} →</em></a>'.format(
+                where.page(other), at, _said(other.nav, language),
+                _said(other.lead, language), _said(CARD_OPEN, language),
             )
-            for other in PAGES if other.slug
+            for at, other in enumerate(
+                (one for one in PAGES if one.slug), start=1)
         )
-        drawn = '<div class="cards">{}</div>'.format(drawn)
+        # The same strip and arrows as the parts' photos: a reader sees
+        # there is more to the right without having to find a scrollbar.
+        drawn = (
+            '<div class="slider"><button class="slide-back" type="button" '
+            'hidden aria-label="{back}">‹</button>'
+            '<div class="cards slides">{cards}</div>'
+            '<button class="slide-on" type="button" hidden '
+            'aria-label="{on}">›</button></div>'
+        ).format(back=_said(SLIDE_BACK, language),
+                 on=_said(SLIDE_ON, language), cards=drawn)
         heading = heading.replace("<h2>", '<h2 class="centred">', 1)
     elif part.kind == "picture":
         where = where or Where(language=language)
@@ -3506,6 +3517,9 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
             "</details></section>".format(heading, drawn)
     return "<section>{}{}</section>".format(heading, drawn)
 
+
+#: The line at the foot of each page card on the front page.
+CARD_OPEN = _w("Sayfaya git", "Open the page")
 
 #: The arrows either side of a strip of slides.
 SLIDE_BACK = _w("Önceki", "Previous")
