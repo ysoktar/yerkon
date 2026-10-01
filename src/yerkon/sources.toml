@@ -224,7 +224,7 @@ url = "https://wsts.atis.org/wp-content/uploads/2021/03/TerraPoiNT_The-Resilient
 key = "locata-timeloc"
 group = "terrestrial"
 label.tr = "Sensors, Locata: 2,4 GHz lisanssız bant ve TimeLoc eşitlemesi"
-label.en = "Sensors, Locata: licence-free 2.4 GHz and TimeLoc synchronisation"
+label.en = "Sensors, Locata: licence-free 2,4 GHz and TimeLoc synchronisation"
 url = "https://pmc.ncbi.nlm.nih.gov/articles/PMC6514591/"
 
 [[source]]
@@ -476,14 +476,14 @@ url = "https://www.tcmb.gov.tr/kurlar/202609/29092026.xml"
 key = "sen-corine"
 group = "project"
 label.tr = "Şen (2024), Menba Dergisi 10(1), Tablo 1: CORINE 2018'de Türkiye'nin %1,99'u yapay alan"
-label.en = "Şen (2024), Menba Journal 10(1), Table 1: 1.99 % of Türkiye artificial surfaces in CORINE 2018"
+label.en = "Şen (2024), Menba Journal 10(1), Table 1: 1,99 % of Türkiye artificial surfaces in CORINE 2018"
 url = "https://dergipark.org.tr/en/download/article-file/3847250"
 
 [[source]]
 key = "hgm-yuzolcum"
 group = "project"
 label.tr = "Harita Genel Müdürlüğü, il ve ilçe yüzölçümleri (Türkiye 780.043 km²)"
-label.en = "General Directorate of Mapping, province and district areas (Türkiye 780,043 km²)"
+label.en = "General Directorate of Mapping, province and district areas (Türkiye 780.043 km²)"
 url = "https://www.harita.gov.tr/il-ve-ilce-yuzolcumleri"
 
 [[source]]

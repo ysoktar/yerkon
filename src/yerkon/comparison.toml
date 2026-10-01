@@ -728,12 +728,12 @@ yayılabilir. Bu kabulle ülke geneli kurulum yaklaşık \
 değil, vergi hariç tahminlerdir. Hata sütunları alan ağırlıklı yaklaşık \
 değerlerdir, ayrı bir simülasyonun çıktısı değildir."""
 en = """The whole Türkiye row (tunnels left out) is the area weighted mean of \
-the urban and rural rows. CORINE 2018 puts 1.99 % of Türkiye under artificial \
+the urban and rural rows. CORINE 2018 puts 1,99 % of Türkiye under artificial \
 (urban) surfaces, so about 2 % is taken as urban and 98 % as rural. The area \
 is Türkiye's surface area as the General Directorate of Mapping gives it \
-(780,043 km²). The row is there to show the system stays cheap at a \
+(780.043 km²). The row is there to show the system stays cheap at a \
 national scale; with support it could be spread across the country. On that \
 basis, building it nationwide comes to about \
-1.0 billion lira and running it to about 282 million lira a year; these are \
+1,0 billion lira and running it to about 282 million lira a year; these are \
 estimates before tax, not final prices. The error columns are area weighted \
 approximations, not the output of a separate simulation."""

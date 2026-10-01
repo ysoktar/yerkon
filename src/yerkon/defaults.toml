@@ -52,7 +52,7 @@ işçiliği. Levhalar hakkında bir olgu değil."""
 note_en = """Bracket, enclosure and the labour to fit a unit to a sign that already \
 stands. Not a fact about signs."""
 affects = "levhadaki her direğin CAPEX'ini"
-affects_en = "CAPEX of every anchor on a sign"
+affects_en = "CAPEX of every unit on a sign"
 sensitivity = """levhalar direkleri ancak 62242 TL'nin üstünde geçmeyi bırakır, yani \
 bunun 25 katı"""
 sensitivity_en = "signs stop beating masts only above 62242 TL, so 25 times this"
@@ -89,7 +89,7 @@ note = """Levha gibi, artı trafiğe açık şeritler üzerindeki bir portalın 
 gerektirdiği trafik yönetimi."""
 note_en = """As a sign, plus the traffic management a gantry over live lanes needs."""
 affects = "portaldaki her direğin CAPEX'ini"
-affects_en = "CAPEX of every anchor on a gantry"
+affects_en = "CAPEX of every unit on a gantry"
 
 [values."mounting.sign_gantry.per_crew_day"]
 value = 4.0
@@ -122,7 +122,7 @@ source_en = "YERKON assumption"
 note = "Levha gibi, artı erişim ekipmanı ve sahibinin izni."
 note_en = "As a sign, plus access equipment and the owner's consent."
 affects = "panodaki her direğin CAPEX'ini"
-affects_en = "CAPEX of every anchor on a billboard"
+affects_en = "CAPEX of every unit on a billboard"
 
 [values."mounting.billboard.per_crew_day"]
 value = 8.0
@@ -150,12 +150,12 @@ affects_en = "usable range from a column and the town row's area"
 value = 2500.0
 unit = "TL"
 provenance = "DERIVED"
-source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80.000-110.000 TL, düz işçi günlük 2.500-3.200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80.000-110.000 TL a month, a labourer 2.500-3.200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Bir ekip günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL; usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Bir ekip zaten duran direklere günde sekiz birim takar (aydınlatma direğinde günde uğranan birim, Dicle Elektrik örneğinden): 17570 / 8 = 2196 TL; paslanmaz kelepçe, kablo ve sigorta 300 TL. Toplam 2496, yuvarlanarak 2500 TL. Kutu ve güç kaynağı birimin içinde."""
 note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. A crew fits eight units a day to columns that already stand (columns a crew reaches in a day, from the Dicle Elektrik example): 17570 / 8 = 2196 TL; stainless clamps, cable and a fuse 300 TL. 2496, rounded to 2500 TL. The enclosure and power supply are inside the unit."""
 affects = "aydınlatma direğindeki her direğin CAPEX'ini; şehir içi sermayenin çoğu"
-affects_en = "CAPEX of every anchor on a column; most of the urban capital"
+affects_en = "CAPEX of every unit on a column; most of the urban capital"
 sensitivity = """günde sekiz yerine dört birim takılırsa 4690 TL olur ve şehir içi CAPEX yarıdan fazla artar"""
 sensitivity_en = """four units a day instead of eight makes it 4690 TL and raises urban CAPEX by more than half"""
 [values."mounting.lighting_column.per_crew_day"]
@@ -219,12 +219,12 @@ affects_en = "the rural row's reach and coverage"
 value = 4690.0
 unit = "TL"
 provenance = "DERIVED"
-source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80.000-110.000 TL, düz işçi günlük 2.500-3.200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80.000-110.000 TL a month, a labourer 2.500-3.200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Bir ekip günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL; usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Sahalar kilometrelerce ayrı olduğu için ekip günde dört birim takar (dağıtım direğinde günde uğranan birim): 17570 / 4 = 4392 TL; kelepçe ve kablo 300 TL. Toplam 4692, yuvarlanarak 4690 TL. Panel ve akü ayrı: güneş paneli ve akü."""
 note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. The sites are kilometres apart, so a crew fits four a day (poles a crew reaches in a day): 17570 / 4 = 4392 TL; clamps and cable 300 TL. 4692, rounded to 4690 TL. The panel and battery are priced apart: the solar panel and battery."""
 affects = "dağıtım direğindeki her direğin CAPEX'ini; kırsal sermayenin çoğu"
-affects_en = "CAPEX of every anchor on a distribution pole; most of the rural capital"
+affects_en = "CAPEX of every unit on a distribution pole; most of the rural capital"
 
 [values."mounting.distribution_pole.per_crew_day"]
 value = 4.0
@@ -246,7 +246,7 @@ source_en = "YERKON design choice: a public-sector agreement"
 note = """Dağıtım şirketinin direğine birim taşıtmanın yıllık bedeli: sıfır. Birimler kamu protokolüyle konuyor; AUS kabinleri, yol kenarı üniteleri ve dağıtım direkleri gibi hazır kamu yapılarına dahil edilebilmeleri öngörülüyor. Dağıtım şirketlerinin direğe cihaz için yayımladığı bir bedel de yok: Ulaştırma Bakanlığı'nın geçiş hakkı usul ve esasları, Türk Telekom'un bağlantı ve nakil ücretleri ve Genel Aydınlatma Yönetmeliği direk başına bir bedel yazmıyor. Ticari kullanıcılara uygulanan bedeller karşılaştırma için: dağıtım şirketleri 2015'ten beri EPDK izniyle direklerde reklam alanı kiralıyor, en küçük afiş ayda 4700 TL (Tr724, 11 Mayıs 2019); İstanbul Büyükşehir Belediyesi 2025 tarifesi belediye mülküne konan bir repeater ya da small cell için yıllık 24500 TL, BEDAŞ ve AYEDAŞ aydınlatma direğindeki bir kabinet için yer seçim belgesi ücretinin iki katını alıyor. Protokol olmazsa direk başına yıllık 1200 TL kırsal OPEX'i yaklaşık yarı yarıya artırır."""
 note_en = """What the distribution company charges a year to carry a unit on its pole: nothing. The units go up under a public-sector agreement, with the prospect of being included in public structures that already stand, such as ITS cabinets, roadside units and distribution poles. Nor has any distribution company published a fee for equipment on its poles: the transport ministry's rights-of-way rules, Türk Telekom's connection fees and the General Lighting Regulation name no per-pole fee. Fees charged to commercial users, for comparison: distribution companies have rented advertising space on their poles since 2015 with the regulator's leave, the smallest poster 4700 TL a month (Tr724, 11 May 2019); Istanbul Metropolitan Municipality's 2025 tariff charges 24500 TL a year for a repeater or small cell on its property, and twice the site selection fee for a cabinet on a BEDAŞ or AYEDAŞ lighting column. Without the agreement, 1200 TL a pole a year would raise rural OPEX by about half."""
 affects = "dağıtım direğindeki direklerin OPEX'ini"
-affects_en = "OPEX of anchors on distribution poles"
+affects_en = "OPEX of units on distribution poles"
 sensitivity = "direk başına yıllık 1200 TL kırsal OPEX'i yaklaşık %47 artırır"
 sensitivity_en = "1200 TL a pole a year raises rural OPEX by about 47 %"
 
@@ -270,8 +270,8 @@ affects_en = "the reach of units on roofs"
 value = 1890.0
 unit = "TL"
 provenance = "DERIVED"
-source = """işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """işçilik: elektrik ustası aylık 80.000-110.000 TL, düz işçi günlük 2.500-3.200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """labour: an electrician 80.000-110.000 TL a month, a labourer 2.500-3.200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Sepetli araç gerekmiyor, çatıya merdivenle çıkılıyor. Usta 3170 TL ve yardımcı 3200 TL, izin ve erişim yüzünden günde dört çatı (çatıda günde uğranan birim): 6370 / 4 = 1592 TL; tutucu, kablo ve binanın beslemesinden bir hat 300 TL. Toplam 1892, yuvarlanarak 1890 TL."""
 note_en = """No bucket truck: the roof is reached by the stairs. An electrician 3170 TL and a helper 3200 TL, four roofs a day because of permission and access (roofs a crew reaches in a day): 6370 / 4 = 1592 TL; a bracket, cable and a tap into the building's supply 300 TL. 1892, rounded to 1890 TL."""
 affects = "çatıdaki her birimin CAPEX'ini"
@@ -281,8 +281,8 @@ affects_en = "CAPEX of every unit on a roof"
 value = 6370.0
 unit = "TL"
 provenance = "DERIVED"
-source = """işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """işçilik: elektrik ustası aylık 80.000-110.000 TL, düz işçi günlük 2.500-3.200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """labour: an electrician 80.000-110.000 TL a month, a labourer 2.500-3.200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Çatıda bir ekip günü: sepetli araç gerekmiyor, çatıya merdivenle çıkılıyor. Usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 6370 TL."""
 note_en = """A crew day on roofs: no bucket truck, the roof is reached by the stairs. Electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 6370 TL in all."""
 affects = "çatıdaki birimlerin bakım bedelini"
@@ -352,10 +352,10 @@ affects_en = "usable range inside a bore"
 value = 4690.0
 unit = "TL"
 provenance = "DERIVED"
-source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80.000-110.000 TL, düz işçi günlük 2.500-3.200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80.000-110.000 TL a month, a labourer 2.500-3.200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Bir ekip günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL; usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Tünelde iş Karayolları'nın şerit kapatmasına bağlı olduğu için ekip günde dört birim takar (tünelde günde uğranan birim): 17570 / 4 = 4392 TL; paslanmaz askı, dübel ve kablo 300 TL. Toplam 4692, yuvarlanarak 4690 TL. Şerit kapatmanın kendisi Karayolları'nın bakım kapanışına denk getiriliyor, ayrı fiyatlanmadı."""
-note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. In the tunnel the work depends on the highways authority's lane closure, so a crew fits four a day (tunnel units a crew reaches in a day): 17570 / 4 = 4392 TL; a stainless bracket, anchors and cable 300 TL. 4692, rounded to 4690 TL. The closure itself is timed to the authority's maintenance closures and not priced apart."""
+note_en = """One crew day: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL; electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. In the tunnel the work depends on the highways authority's lane closure, so a crew fits four a day (tunnel units a crew reaches in a day): 17570 / 4 = 4392 TL; a stainless bracket, units and cable 300 TL. 4692, rounded to 4690 TL. The closure itself is timed to the authority's maintenance closures and not priced apart."""
 affects = "tünel satırının sermayesinin çoğu"
 affects_en = "most of the tunnel row's capital"
 
@@ -386,7 +386,7 @@ source_en = """commercial, low voltage, single rate, taxes included 4,78 TL/kWh,
 note = """Bir birimin çektiği elektriğin birim fiyatı. Birim aydınlatma direğinin genel aydınlatma hattından bedava beslenemez: Genel Aydınlatma Yönetmeliği, bağlantı noktasından genel aydınlatma dışında bir amaca enerji verilmesine izin vermiyor; birim ayrı sayaçlı bir ticarethane abonesi sayılıyor. 4,78 x 1,175 = 5,62 TL/kWh."""
 note_en = """What a unit's electricity costs a kilowatt-hour. A unit cannot draw from a lighting column's public lighting circuit for free: the General Lighting Regulation allows no energy from that connection for any purpose other than public lighting; the unit counts as a separately metered commercial subscriber. 4,78 x 1,175 = 5,62 TL/kWh."""
 affects = "şebeke elektriği taşıyan yapılardaki direklerin OPEX'ini"
-affects_en = "OPEX of anchors on structures that carry mains"
+affects_en = "OPEX of units on structures that carry mains"
 sensitivity = "yılda 3 kWh ile birim başına yılda 16,86 TL; tarifenin iki katı bile OPEX'te %1'i geçmez"
 sensitivity_en = "at 3 kWh a year, 16,86 TL a unit a year; even twice the tariff moves OPEX by less than 1 %"
 
@@ -408,7 +408,7 @@ mains converter's idle loss and the replies it sends, the average stays \
 under 0,34 W, which is 3 kWh a year. That is a generous upper bound."""
 affects = """şebekeli direklerin enerji kalemini ve şebeke dışı beslemenin \
 boyutunu"""
-affects_en = """the energy line of mains-fed anchors and the size of an \
+affects_en = """the energy line of mains-fed units and the size of an \
 off-grid supply"""
 sensitivity = "enerji kalemi her satırda OPEX'in %2'sinden az"
 sensitivity_en = "the energy line is under 2 % of OPEX in every row"
@@ -428,7 +428,7 @@ birim merkeze düzenli aralıklarla kısa bir "çalışıyorum" mesajı (yaşam 
 sinyali) gönderiyor; mesajı gelmeyen birim arızalı sayılıyor. Alıcılar \
 GPS karıştırması ya da aldatması gördüğünde bunu yakındaki yayın birimine \
 iletiyor, uyarı da aynı yoldan merkeze ulaşıyor."""
-note_en = """What a year of data costs an anchor with no line of its own: \
+note_en = """What a year of data costs a unit with no line of its own: \
 nothing, because no unit carries a SIM card. A unit on a structure with a \
 line reaches the centre over it: the tunnel's communications spine in a \
 tunnel, a signalised junction's cabinet in town, an ITS point on the road \
@@ -439,7 +439,7 @@ stops coming is taken as failed. When a receiver sees GPS jamming or \
 spoofing it passes that to a nearby broadcast unit, and the warning \
 reaches the centre the same way."""
 affects = "kendi hattı olmayan direklerin OPEX'ini"
-affects_en = "OPEX of anchors with no line of their own"
+affects_en = "OPEX of units with no line of their own"
 
 [values."operating.off_grid_supply_tl"]
 value = 2090.0
@@ -447,12 +447,12 @@ unit = "TL"
 provenance = "DERIVED"
 source = """Akakçe, Eylül 2026, bulunan en ucuzlar: 10 W güneş paneli 518,72 TL; 12 V 7 Ah kuru akü 524,40 TL; 10 A PWM şarj denetleyicisi 276,67 TL; ABS güneş paneli montaj braket seti 421,01 TL; Çet-San termoplastik sıva üstü buat 260x180x75, IP65, 147,41 TL; 4 mm² solar kablo metresi 25-40 TL (Power Enerji, solar kablo fiyatları 2026)"""
 source_en = """Akakçe, September 2026, the cheapest found: 10 W solar panel 518,72 TL; 12 V 7 Ah sealed battery 524,40 TL; 10 A PWM charge controller 276,67 TL; ABS solar panel mounting bracket set 421,01 TL; Çet-San thermoplastic surface box 260x180x75, IP65, 147,41 TL; 4 mm² solar cable 25-40 TL a metre (Power Enerji, solar cable prices 2026)"""
-note = """Şebekesi olmayan bir yapıdaki birim için panel, akü, denetleyici, tutucu, kutu ve kablo. 0,34 W'lık bir yük günde 8 Wh ister: Ankara'nın kışında günde iki saatlik tam güneşle 10 W'lık panel bunu verir, 84 Wh'lik akü beş günü taşır. Panel 518,72 + akü 524,40 + denetleyici 276,67 + braket 421,01 + akü ve denetleyici için IP65 kutu 147,41 + 5 m kablo, metresi üst fiyattan 40 TL, 200 = 2088,21, yuvarlanarak 2090 TL."""
-note_en = """Panel, battery, controller, bracket, box and cable for a unit on a structure with no mains. A 0,34 W load needs 8 Wh a day: a 10 W panel gives that on two hours of full sun in an Ankara winter, and an 84 Wh battery carries five days. Panel 518,72 + battery 524,40 + controller 276,67 + bracket 421,01 + an IP65 box for the battery and controller 147,41 + 5 m of cable at the top price of 40 TL a metre, 200 = 2088,21, rounded to 2090 TL."""
+note = """Şebekesi olmayan bir yapıdaki birim için panel, akü, denetleyici, tutucu, kutu ve kablo. 0,34 W'lık bir yük günde 8 Wh ister: Ankara'nın kışında günde iki saatlik tam güneşle 10 W'lık panel bunu verir, 84 Wh'lik akü beş günü taşır. Panel 518,72 + akü 524,40 + denetleyici 276,67 + braket 421,01 + akü ve denetleyici için IP65 kutu 147,41 + 5 m kablo, metresi üst fiyattan 40 TL, 200 = 2.088,21, yuvarlanarak 2090 TL."""
+note_en = """Panel, battery, controller, bracket, box and cable for a unit on a structure with no mains. A 0,34 W load needs 8 Wh a day: a 10 W panel gives that on two hours of full sun in an Ankara winter, and an 84 Wh battery carries five days. Panel 518,72 + battery 524,40 + controller 276,67 + bracket 421,01 + an IP65 box for the battery and controller 147,41 + 5 m of cable at the top price of 40 TL a metre, 200 = 2.088,21, rounded to 2090 TL."""
 affects = "şebeke dışı direklerin CAPEX ve OPEX'ini"
-affects_en = "CAPEX and OPEX of off-grid anchors"
+affects_en = "CAPEX and OPEX of off-grid units"
 sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
-sensitivity_en = "no effect on an anchor on a structure with mains"
+sensitivity_en = "no effect on a unit on a structure with mains"
 
 [values."operating.service_life_years"]
 value = 10.0
@@ -466,10 +466,10 @@ note = """Bir yayın biriminin kaç yılda yenilendiği. Yayın birimi bir \
 telsiz sistemi; vergi mevzuatının ona verdiği faydalı ömür 10 yıl. Konum \
 belirleme satırı (3.49.8, 5 yıl) uydu ile konum belirleyen cihazlar için; \
 yayın birimi uyduya dayanmıyor."""
-note_en = """How many years a unit lasts before it is replaced. An anchor \
+note_en = """How many years a unit lasts before it is replaced. A unit \
 is a radio system, and the tax rules give that 10 years. The positioning \
 line (3.49.8, 5 years) is for devices that locate by satellite, which an \
-anchor does not."""
+unit does not."""
 affects = "OPEX'in yenileme kalemini"
 affects_en = "OPEX, the replacement line"
 sensitivity = "5 yıl (konum belirleme satırı) yenileme kalemini iki katına çıkarır"
@@ -484,12 +484,12 @@ note = """Bir direğe yılda kaç kez gidildiği. Merkezî sistem her birimin \
 durumunu görüyor (her birim düzenli bir yaşam sinyali gönderiyor), bu \
 yüzden ekip takvimle değil arıza olduğunda gider. Kutusu kapalı, hareketli \
 parçası olmayan bir kart için beş yılda bir arıza kötümser bir sayı."""
-note_en = """How often an anchor is visited a year. The central system \
+note_en = """How often a unit is visited a year. The central system \
 sees every unit's status (each unit sends a regular "still working" \
 message), so a crew goes when one fails rather than by the calendar. One failure in \
 five years is a pessimistic figure for a sealed board."""
 affects = "her direğin OPEX'ini"
-affects_en = "OPEX of every anchor"
+affects_en = "OPEX of every unit"
 sensitivity = "0,5'e geri çekmek bakım kalemini 2,5 katına çıkarır"
 sensitivity_en = "putting it back to 0,5 multiplies the maintenance line by 2,5"
 
@@ -502,16 +502,16 @@ source_en = "Turkish Revenue Administration depreciation list, 3.14.7: accumulat
 note = """Şebeke dışı bir sahanın ek bakımı: akü beş yılda bir değişiyor (akünün ömrü), yani yılda 1 / 5 = 0,2 ziyaret; panel o ziyarette temizleniyor."""
 note_en = """The extra attendance an off-grid site needs: the battery is replaced every five years (the battery's life), so 1 / 5 = 0,2 visits a year; the panel is cleaned on that visit."""
 affects = "şebeke dışı direklerin OPEX'ini"
-affects_en = "OPEX of anchors on structures with no mains"
+affects_en = "OPEX of units on structures with no mains"
 sensitivity = "şebekeli yapıya konan hiçbir direği etkilemez"
-sensitivity_en = "no effect on an anchor on a structure with mains"
+sensitivity_en = "no effect on a unit on a structure with mains"
 
 [values."operating.crew_day_tl"]
 value = 17570.0
 unit = "TL/day"
 provenance = "DERIVED"
-source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80000-110000 TL, düz işçi günlük 2500-3200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
-source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80000-110000 TL a month, a labourer 2500-3200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
+source = """sepetli araç: Ankara'da 20 m sepetli araç saati yaklaşık 2000 TL, günlük kiralamada %30 indirim (Ankara Sepetli Vinç Kiralama, fiyat rehberi, 2026); işçilik: elektrik ustası aylık 80.000-110.000 TL, düz işçi günlük 2.500-3.200 TL, büyükşehirde üst banda yakın (Yapı Arenası, 12 Ağustos 2026)"""
+source_en = """bucket truck: a 20 m bucket truck is about 2000 TL an hour in Ankara, 30 % off by the day (Ankara Sepetli Vinç Kiralama, price guide, 2026); labour: an electrician 80.000-110.000 TL a month, a labourer 2.500-3.200 TL a day, near the top in large cities (Yapı Arenası, 12 August 2026)"""
 note = """Montaj ve bakım ekibinin bir günü: sepetli araç 2000 TL x 8 saat x 0,7 = 11200 TL (sertifikalı operatör kiraya dahil); usta, aylık aralığın ortası 95000 TL'nin 30'da biri 3170 TL; yardımcı, büyükşehir üst bandı 3200 TL. Toplam 17570 TL. Bir bakım ziyaretinin bedeli, ekip gününün o gün uğranan birim sayısına bölünmesiyle bulunuyor: aydınlatma direğinde 17570 / 8 = 2196 TL, kırsaldaki dağıtım direğinde ve tünelde 17570 / 4 = 4392 TL. Çatıda sepetli araç yok: 6370 / 4 = 1592 TL."""
 note_en = """A day of the fitting and maintenance crew: bucket truck 2000 TL x 8 hours x 0,7 = 11200 TL (a certified operator comes with the hire); electrician, a thirtieth of the middle of the monthly range, 95000 TL, 3170 TL; helper, the large-city top of the band, 3200 TL. 17570 TL in all. A maintenance visit is this divided by the sites the crew reaches on that structure in a day: 17570 / 8 = 2196 TL on a lighting column, 17570 / 4 = 4392 TL on a rural distribution pole and in a tunnel. A roof needs no bucket truck: 6370 / 4 = 1592 TL."""
 affects = "OPEX'in bakım kalemini; her senaryodaki en büyük tek kalem"
@@ -530,7 +530,7 @@ note = """Şebeke dışı beslemenin akü payı. Kendi ömrüyle ayrı yenileniy
 note_en = """The battery's part of the standalone supply. Replaced on its \
 own life, because it wears out before the panel and the controller."""
 affects = "şebeke dışı direklerin yenileme kalemini"
-affects_en = "the replacement line of off-grid anchors"
+affects_en = "the replacement line of off-grid units"
 
 [values."operating.battery_life_years"]
 value = 5.0
@@ -541,7 +541,7 @@ source_en = "Turkish Revenue Administration depreciation list, 3.14.7: accumulat
 note = "Akünün faydalı ömrü."
 note_en = "The battery's useful life."
 affects = "şebeke dışı direklerin yenileme kalemini"
-affects_en = "the replacement line of off-grid anchors"
+affects_en = "the replacement line of off-grid units"
 
 [values."operating.off_grid_life_years"]
 value = 10.0
@@ -556,7 +556,7 @@ note_en = """The solar supply apart from the battery: panel, controller, \
 bracket, cable. The list has no line for a panel on its own; the power \
 plant line is the nearest."""
 affects = "şebeke dışı direklerin yenileme kalemini"
-affects_en = "the replacement line of off-grid anchors"
+affects_en = "the replacement line of off-grid units"
 
 [values."operating.per_diem_tl"]
 value = 850.0
@@ -573,13 +573,14 @@ istisna kısım 193 sayılı Gelir Vergisi Kanunu 24/2'ye göre aynı aylık \
 seviyesindeki devlet memurunun gündeliğidir. Cetvelde 5-15. derece 850 TL; \
 bir saha teknisyeninin maaşı bu aralığa düştüğü için bu satır alındı. \
 Günübirlik görevde bunun yalnız bir kısmı ödenir: günübirlik görevde gündeliğin payı."""
-note_en = """The daily allowance of one crew member for a day out of the \
-city. In the private sector the tax-exempt part follows Income Tax Law \
-24/2: the allowance of a civil servant on the same salary level; grades \
-5-15 (850 TL) are taken as the nearest level for a field technician. \
-Whether a same-day trip earns all of it or part is not verified; all of it \
-is used, the cautious side for cost. No lodging: both sites are a day \
-trip."""
+note_en = """The full daily allowance of one crew member for a day spent \
+outside the place of duty. Under Travel Allowance Law 6245 it is paid to \
+someone sent on a temporary duty outside the place of duty; in the \
+private sector the tax-exempt part follows Income Tax Law 193, Article \
+24(2): the allowance of a civil servant on the same salary level. The \
+schedule gives 850 TL for grades 5-15; a field technician's pay falls in \
+that range, so that line is taken. On a day trip only part of it is paid: \
+the share of the allowance on a day trip."""
 affects = "kırsal ve tünel satırlarının OPEX'ini"
 affects_en = "OPEX of the rural and tunnel rows"
 
@@ -591,14 +592,14 @@ source = """6245 sayılı Harcırah Kanunu, Madde 39: öğle (13.00) ya da akşa
 (19.00) yemeği zamanlarından birini geçirene 1/3, ikisini geçirene 2/3, \
 geceyi de geçirene tam gündelik"""
 source_en = """Travel Allowance Law 6245, Article 39: a third of the daily \
-allowance for one of the lunch (13.00) or dinner (19.00) times away, two \
+allowance for one of the lunch (13:00) or dinner (19:00) times away, two \
 thirds for both, all of it for a night"""
 note = """Bir bakım ziyareti günübirlik: ekip sabah çıkıp öğleden sonra \
 dönüyor, yani öğle yemeği zamanını görevde geçiriyor: gündeliğin 1/3'ü \
 (kişi başı 283,33 TL). Akşam 19.00'u da geçerse 2/3'ü olur."""
 note_en = """A maintenance visit is a day trip: the crew leaves in the \
 morning and is back in the afternoon, so it spends the lunch time away: a \
-third of the allowance (283,33 TL a person). Past 19.00 it would be two \
+third of the allowance (283,33 TL a person). Past 19:00 it would be two \
 thirds."""
 affects = "görev yeri dışına giden ekibin harcırahını"
 affects_en = "the per diem of a crew that leaves its place of duty"
@@ -610,7 +611,7 @@ provenance = "DERIVED"
 source = """ekip günü'deki ekip: usta ve yardımcı (Yapı Arenası, 12 Ağustos 2026); sepetli aracın operatörü kiralama şirketinin"""
 source_en = """the crew in the crew day: an electrician and a helper (Yapı Arenası, 12 August 2026); the bucket truck's operator belongs to the hire company"""
 note = """Harcırahı ödenen kişi sayısı: ekip gününe fiyatlanan usta ve yardımcı. Sepetli aracın operatörü kiraya dahil, onun harcırahını kiralama şirketi öder."""
-note_en = """How many people are paid a per diem: the electrician and helper priced into the crew day. The bucket truck's operator comes with the hire, and the hire company pays his per diem."""
+note_en = """How many people are paid a per diem: the electrician and helper priced into the crew day. The bucket truck's operator comes with the hire, and the hire company pays that person's per diem."""
 affects = "harcırah kalemini"
 affects_en = "the per diem line"
 
@@ -645,7 +646,7 @@ optimistic end for an integrated 2,4 GHz front end, chosen so the budget \
 does not manufacture a pessimistic range by accident."""
 affects = """her link bütçesini: menzil, kullanılabilirlik ve dolayısıyla direk \
 sayısı"""
-affects_en = "every link budget: range, availability, and therefore anchor count"
+affects_en = "every link budget: range, availability, and therefore unit count"
 
 [values."radio.sx1280.demodulation_threshold_db"]
 value = -12.08
@@ -1029,7 +1030,7 @@ buildings: where it brings its own footprints the obstruction is in the \
 terrain, and charging both counts the same buildings twice."""
 affects = """binasız zeminde şehir içi bir direğin ne kadar uzağa eriştiğini; \
 dört Ankara sahası bina taşıdığı için yayımlanan satırlarda okunmuyor"""
-affects_en = """how far an urban anchor reaches over ground with no buildings; the four \
+affects_en = """how far an urban unit reaches over ground with no buildings; the four \
 Ankara sites carry them, so it goes unread in the published rows"""
 
 [values."site.fix_horizontal_sigma_m"]
@@ -1149,10 +1150,10 @@ direğin katkıda bulunduğu her konuma doğrudan geçer. Ölçüm başına \
 çekilmek yerine direk başına sabit: bir ölçüm hatası alışverişler \
 arasında değişmez ve ortalamayla kaybolmaz. On beş santimetre, yol \
 kenarındaki bir yapının dikkatli bir GNSS ölçümüyle ulaşılan değerdir."""
-note_en = """How well an anchor's own position is known. The estimator is given the \
+note_en = """How well a unit's own position is known. The estimator is given the \
 surveyed position and treats it as exact, so whatever is wrong with it \
-goes straight into every fix that anchor contributes to. Fixed per \
-anchor rather than drawn per measurement: a survey error does not change \
+goes straight into every fix that unit contributes to. Fixed per \
+unit rather than drawn per measurement: a survey error does not change \
 between exchanges and does not average out. Fifteen centimetres is what \
 a careful GNSS survey of a roadside structure achieves."""
 affects = "HPE'nin altındaki, hiçbir ölçümün kaldıramadığı tabanı: sıfır alınırsa tünelde HPE P50 0,12 m, P95 0,46 m olur"
@@ -1289,7 +1290,7 @@ note = """Sırtların birbirinden ne kadar uzak olduğu, aynı ızgaradan. Dört
 kilometrelik bir direk aralığının profil üzerinde tek bir şanslı noktaya \
 oturmayacağı kadar uzun."""
 note_en = """How far apart the ridges are, from the same grid. Long enough that a \
-four kilometre anchor spacing does not sit at one lucky point on the \
+four kilometre unit spacing does not sit at one lucky point on the \
 profile."""
 affects = """kırsal yedek zeminde bir bağlantının ne sıklıkta bir sırtla kesildiğini"""
 affects_en = "how often a link in the rural fallback is blocked by a ridge"
@@ -1317,7 +1318,7 @@ affects = "tünel satırının düşey geometrisini, dolayısıyla VPE'sini"
 affects_en = "the tunnel row's vertical geometry, and therefore its VPE"
 sensitivity = """düz bir taban her direği ve her alıcıyı tek bir yüksekliğe koyardı; \
 hiçbir tünel böyle yapılmaz"""
-sensitivity_en = """a level floor would put every anchor and every receiver at one height, \
+sensitivity_en = """a level floor would put every unit and every receiver at one height, \
 which no tunnel is built to"""
 
 # --- Yerleşim geometrisi -------------------------------------------------
@@ -1339,7 +1340,7 @@ note_en = """How far the town runs, on a side. Three kilometres of Ankara centre
 which is what the fetched Kızılay grid covers."""
 affects = """şehir içi satırın hizmet alanını, direk sayısını ve dolayısıyla \
 kilometrekare başına maliyetini"""
-affects_en = """the urban row's service area, anchor count and therefore its cost per \
+affects_en = """the urban row's service area, unit count and therefore its cost per \
 square kilometre"""
 
 [values."urban.anchor_spacing_m"]
@@ -1353,15 +1354,15 @@ uzakta durduğu. 250 ile 800 m arasındaki taramada 600 m, 500 m'ye göre 36 \
 yerine 25 direk veriyor: km² başına CAPEX ve OPEX yaklaşık %23 düşük, HPE \
 P95 10 m hedefinin altında, kullanılabilirlik 6 puan kadar düşük. 700 m ve \
 üstünde kullanılabilirlik çöküyor."""
-note_en = """How far apart the lighting columns carrying anchors stand. In \
-a sweep from 250 to 800 m, 600 m gives 25 anchors where 500 m gives 36: \
+note_en = """How far apart the lighting columns carrying units stand. In \
+a sweep from 250 to 800 m, 600 m gives 25 units where 500 m gives 36: \
 CAPEX and OPEX per km² about 23 % lower, HPE P95 under the 10 m target, \
 availability about 6 points lower. At 700 m and above availability \
 collapses."""
 affects = "şehir içi satırın direk sayısını, kapsamasını ve maliyetini"
-affects_en = "the urban row's anchor count, coverage and cost"
+affects_en = "the urban row's unit count, coverage and cost"
 sensitivity = "yarıya indirmek direk sayısını, dolayısıyla sermayeyi dörde katlar"
-sensitivity_en = "halving it quadruples the anchors and therefore the capital"
+sensitivity_en = "halving it quadruples the units and therefore the capital"
 
 [values."urban.anchor_stagger_m"]
 value = 300.0
@@ -1372,7 +1373,7 @@ source_en = "YERKON design choice"
 note = """Ardışık sıraların boyuna ne kadar kaydığı. Kusursuz bir ızgara, bir \
 alıcının görebildiği her direği içinden geçen iki çizgiden birine koyar; \
 bu da kimsenin yapmadığı, daha kötü bir düzendir."""
-note_en = """How far alternate rows shift along. A perfect grid puts every anchor a \
+note_en = """How far alternate rows shift along. A perfect grid puts every unit a \
 receiver can see on one of two lines through it, which is a worse \
 arrangement than anything anybody builds."""
 affects = "şehir içi satırın yatay geometrisini"
@@ -1385,11 +1386,11 @@ provenance = "DESIGN"
 source = "YERKON tasarım tercihi"
 source_en = "YERKON design choice"
 note = """Izgaranın kaçta kaçı ışıklı bir kavşakta duruyor: her ikinci sıranın her ikinci noktası, yani dörtte biri. Bir şehrin ana caddeleri ışıklıdır ve ışıklı bir kavşakta sinyal dolabı zaten durur: hem şebeke beslemesi hem de trafik yönetim merkezine giden bir hat. Oradaki direk, belediyenin kameralarının ve dedektörlerinin yaptığının aynısını yapar, hattını o dolaptan alır ve kendine bir veri paketi satın almaz. Yapı, yükseklik ve montaj bedeli aynı aydınlatma direğidir; dolayısıyla geometride hiçbir şey kımıldamaz. Dörtte bir, ihtiyatlı okuma: Ankara merkezinde ana cadde kavşaklarının yarısı da savunulabilir ve iki katı tasarruf eder."""
-note_en = """How much of the grid stands at a signalised junction: every second spot of every second row, so a quarter. A town's main streets are signalised, and a signalised junction already carries a controller cabinet: mains for the heads and a line to the traffic management centre. An anchor there does what the municipality's cameras and detectors already do, takes its link from that cabinet, and buys no data plan of its own. The structure, the height and the fitting cost are the same lighting column, so nothing about the geometry moves. A quarter is the conservative reading: half of the main-street junctions in Ankara's centre is defensible too, and saves twice as much."""
+note_en = """How much of the grid stands at a signalised junction: every second spot of every second row, so a quarter. A town's main streets are signalised, and a signalised junction already carries a controller cabinet: mains for the heads and a line to the traffic management centre. A unit there does what the municipality's cameras and detectors already do, takes its link from that cabinet, and buys no data plan of its own. The structure, the height and the fitting cost are the same lighting column, so nothing about the geometry moves. A quarter is the conservative reading: half of the main-street junctions in Ankara's centre is defensible too, and saves twice as much."""
 affects = "yalnız ızgara yerleşiminde şehir içi satırın bağlantı kalemini; tablodaki satır arama yerleşimini kullanıyor ve kavşaktaki birimi o yerleşim kendisi işaretliyor"
 affects_en = "the urban row's connectivity line on the grid layout only; the table's row uses the searched placement, which marks its own junction unit"
 sensitivity = """1 yapmak her direği bağlar ve bağlantı kalemini sıfırlar; 0 yapmak hiçbirini bağlamaz"""
-sensitivity_en = """setting it to 1 connects every anchor and zeroes the connectivity line; 0 connects none"""
+sensitivity_en = """setting it to 1 connects every unit and zeroes the connectivity line; 0 connects none"""
 
 [values."urban.crew_travels"]
 value = 0.0
@@ -1419,8 +1420,8 @@ yollarda, aramanın 19 direğiyle, tam çözünürlükte: 8 direkle HPE P50 2,03
 P95 9,80 m, %96,37; 12 direkle 2,28, 8,94 m, %96,64. On iki P95'i 0,86 m \
 iyileştiriyor; bedeli P50'de 0,25 m ve saniyede 1,87 yerine 1,25 konum. \
 Maliyet değişmiyor (ADR-0098, ADR-0099)."""
-note_en = """How many anchors a unit polls before it is fixed. On the real \
-roads, with the search's 19 anchors, at full resolution: with 8, HPE P50 \
+note_en = """How many units a receiver polls before it is fixed. On the real \
+roads, with the search's 19 units, at full resolution: with 8, HPE P50 \
 2,03, P95 9,80 m, 96,37 %; with 12, 2,28, 8,94 m, 96,64 %. Twelve improve \
 P95 by 0,86 m, at 0,25 m of P50 and 1,25 fixes a second instead of 1,87. \
 The cost does not move (ADR-0098, ADR-0099)."""
@@ -1516,8 +1517,8 @@ yollarda, aramanın 50 direğiyle, tam çözünürlükte: 8 direkle HPE P50 1,97
 P95 8,58 m, %94,21; 12 direkle 2,14, 7,45 m, %96,26. On iki P95'i 1,13 m \
 iyileştiriyor, kullanılabilirliği 2,1 puan artırıyor; bedeli P50'de \
 0,17 m ve saniyede 1,87 yerine 1,25 konum (ADR-0098, ADR-0099)."""
-note_en = """How many anchors a unit polls before it is fixed. On the real \
-roads, with the search's 50 anchors, at full resolution: with 8, HPE P50 \
+note_en = """How many units a receiver polls before it is fixed. On the real \
+roads, with the search's 50 units, at full resolution: with 8, HPE P50 \
 1,97, P95 8,58 m, 94,21 %; with 12, 2,14, 7,45 m, 96,26 %. Twelve improve \
 P95 by 1,13 m and availability by 2,1 points, at 0,17 m of P50 and 1,25 \
 fixes a second instead of 1,87 (ADR-0098, ADR-0099)."""
@@ -1582,7 +1583,7 @@ margin. 40 m costs 50 % more per km but gives a position everywhere in the \
 bore."""
 affects = """tünel satırının direk sayısını ve sermayesini; tablodaki kilometrekare \
 başına en büyük sermaye"""
-affects_en = """the tunnel row's anchor count and its capital, which is the largest per \
+affects_en = """the tunnel row's unit count and its capital, which is the largest per \
 square kilometre in the table"""
 
 [values."tunnel.anchor_offset_m"]
@@ -1759,7 +1760,7 @@ source_en = "YERKON design choice"
 note = """Bir birimin konumlanmadan önce kaç direği yokladığı. Burada sekiz doğru: \
 korunaklı bir tünelde 150 m aralıkta yoklananın neredeyse hepsi cevap \
 verir."""
-note_en = """How many anchors a unit polls before it is fixed. Eight is right here: \
+note_en = """How many units a receiver polls before it is fixed. Eight is right here: \
 at 150 m spacing in a shielded bore, almost everything polled answers."""
 affects = "tünel satırının güncelleme hızını; tablodaki en hızlısı"
 affects_en = "the tunnel row's update rate, which is the fastest in the table"
@@ -2031,13 +2032,13 @@ note = """Direklerin nereye konduğu: \"placed\", yerleşim aramasının seçti�
 levhalar, yol kenarı, ölçülmüş çatılar, tepeler); \"grid\", kaydırmalı ızgara. \
 Şehir içinde arama \"daha ucuz\" hedefiyle koşuldu: ızgaranın kapsamasını en \
 az maliyetle. Izgaranın 25 noktasından 10'u bina içine düşüyordu."""
-note_en = """Where the anchors go: \"placed\", the spots the placement search chose \
+note_en = """Where the units go: \"placed\", the spots the placement search chose \
 and wrote to `src/yerkon/placements/urban.toml` (standing columns and \
 signs, the road side, measured roofs, hilltops); \"grid\", the staggered \
 lattice. In town the search was asked \"cheaper\": the lattice's cover for \
 the least cost. Ten of the lattice's 25 spots fell inside a building."""
 affects = "şehir içi satırın direk sayısını, maliyetini ve geometrisini"
-affects_en = "the urban row's anchor count, cost and geometry"
+affects_en = "the urban row's unit count, cost and geometry"
 
 [values."urban.route"]
 value = "road"
@@ -2087,11 +2088,11 @@ source_en = "YERKON design choice"
 note = """Direklerin nereye konduğu, şehir içindekiyle aynı anlamda; yer \
 `src/yerkon/placements/rural.toml`. Kırsalda arama \"daha iyi\" hedefiyle \
 koşuldu: ızgaranın maliyetiyle en çok kapsama."""
-note_en = """Where the anchors go, as for the urban row; the spots are in \
+note_en = """Where the units go, as for the urban row; the spots are in \
 `src/yerkon/placements/rural.toml`. In open country the search was asked \
 \"better\": the most cover for the lattice's cost."""
 affects = "kırsal satırın direk sayısını, maliyetini ve geometrisini"
-affects_en = "the rural row's anchor count, cost and geometry"
+affects_en = "the rural row's unit count, cost and geometry"
 
 [values."rural.route"]
 value = "road"

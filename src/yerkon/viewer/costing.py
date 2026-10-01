@@ -44,6 +44,15 @@ STRUCTURES = {
     "rooftop": ("çatı", "rooftop"),
 }
 
+
+def _counted(name: str, n: int, language: str) -> str:
+    """A structure's name after a count: English takes a plural past one,
+    on the noun before any "at ..." that follows it; Turkish never does."""
+    if language != "en" or n == 1:
+        return name
+    noun, at, rest = name.partition(" at ")
+    return noun + "s" + at + rest
+
 #: The settings file's units, in the page's two languages.
 UNITS = {
     "TL/year": ("TL/yıl", "TL/year"),
@@ -217,7 +226,8 @@ def rows(published, language: str, table) -> str:
         for anchor in deployed.scenario.deployment.anchors:
             counted[anchor.mounting.kind] = counted.get(anchor.mounting.kind, 0) + 1
         what = ", ".join(
-            "{} {}".format(n, _say(STRUCTURES.get(kind, (kind, kind)), language))
+            "{} {}".format(n, _counted(
+                _say(STRUCTURES.get(kind, (kind, kind)), language), n, language))
             for kind, n in counted.items())
         out.append("<h3>{}</h3><p>{}</p><div class=\"scroll\" tabindex=\"0\">{}</div>".format(
             html.escape(_say(name, language)),
@@ -273,7 +283,8 @@ def parts(language: str, table) -> str:
         )]
         body = []
         for part, count in board.lines:
-            name = part.name if count == 1 else "{} x {}".format(count, part.name)
+            called = part.called(language)
+            name = called if count == 1 else "{} x {}".format(count, called)
             role = part.role(language)
             if part.note and language != "en":
                 role = "{} ({})".format(role, part.note)
@@ -502,7 +513,7 @@ def units(published, language: str, table) -> str:
         "elektriği olmayan dağıtım direği ve güneş paneli, tünelde şerit "
         "kapatmaya bağlı bir askı.</p>",
         "<p>The town and open country rows use the same broadcast unit: the "
-        "amplified SX1280 module E28-2G4M20S, an outdoor 5 dBi whip, the "
+        "amplified SX1280 module E28-2G4M20S, an outdoor 5 dBi rod antenna, the "
         "same microcontroller and secure element. In the tunnel the unit "
         "carries the DWM3000 UWB module. What differs is not the unit but "
         "the structure it goes on: a lighting column with mains in town, a "

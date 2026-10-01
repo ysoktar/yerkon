@@ -36,9 +36,16 @@ class Part:
     date: str = ""
     note: str = ""
     volume_url: str = ""
+    #: The name in English, where the name is words rather than a part
+    #: number ("Pasifler ve gösterge"); empty when one name serves both.
+    name_en: str = ""
 
     def role(self, language: Optional[str] = None) -> str:
         return self.role_en if language == "en" else self.role_tr
+
+    def called(self, language: Optional[str] = None) -> str:
+        """The name to show in `language`."""
+        return self.name_en if language == "en" and self.name_en else self.name
 
     def at(self, pieces: int) -> float:
         """USD a piece when `pieces` are bought.
@@ -133,6 +140,7 @@ def read(path: pathlib.Path = FILE) -> Bill:
             role_en=p["role"]["en"], seller=p["seller"], url=p["url"],
             ladder=_ladder(p["key"], p["ladder"]), date=p.get("date", ""),
             note=p.get("note", ""), volume_url=p.get("volume_url", ""),
+            name_en=p.get("name_en", ""),
         )
         for p in raw["part"]
     }

@@ -833,7 +833,7 @@ SYSTEM = Page(
                     "listen to each other to stay in step, and its own "
                     "transmitter hardware. Pozyx serves only small indoor "
                     "areas with UWB. YERKON needs no clock agreement "
-                    "between units; in the licence-free 2.4 GHz and UWB "
+                    "between units; in the licence-free 2,4 GHz and UWB "
                     "bands, with units fixed to structures already by the "
                     "road, one receiver covers the open road and the "
                     "tunnel. The price is that the receiver transmits too "
@@ -2070,7 +2070,7 @@ SIMULATION = Page(
                     " az üçüne dağılmış olması gerekir. Hepsi tek bir "
                     "caddeye, tek bir yana dizilmiş birimler o cadde boyunca "
                     "konum belirleyemez.",
-                    "In the urban and rural rows the anchors do not stand "
+                    "In the urban and rural rows the units do not stand "
                     "on a grid but where a placement search put them; the "
                     "simulator's **Find the best layout** section and its "
                     "**Quick start** box run the same search for another "
@@ -2369,7 +2369,7 @@ COST = Page(
                     "bedava değil. Mevcut yapılar bunu karşılanabilir "
                     "kılıyor: her ek birim yeni bir saha değil, bir yayın birimi ve "
                     "bir montaj.",
-                    "Adding anchors raises availability, but not for "
+                    "Adding units raises availability, but not for "
                     "nothing. What the existing structures do is make that "
                     "trade affordable, because each extra unit is a device "
                     "and a fitting rather than a site.",
@@ -3044,7 +3044,7 @@ LAW = Page(
                    "birkaç birime uğradığı için bu, ziyaretlere bölünüyor: "
                    "kırsalda günde dört direk, ziyaret başına 141,67 TL.",
                    "On a day trip: a third of the allowance for being "
-                   "away over one of the lunch (13.00) or dinner (19.00) "
+                   "away over one of the lunch (13:00) or dinner (19:00) "
                    "times, two thirds for both, all of it for a night "
                    "(Article 39). A maintenance visit leaves in the "
                    "morning and is back in the afternoon: 283,33 TL a "
@@ -3660,7 +3660,7 @@ def _slides(slides, language: str, where: Optional["Where"]) -> str:
     cards = []
     for key, photo in slides:
         if key in parts:
-            name = parts[key].name
+            name = parts[key].called(language)
             role = parts[key].role(language)
         else:
             name = _said(PILOT_ITEMS[key][0], language)

@@ -79,6 +79,14 @@ _NAMES = _re.compile(
 _NAMED_AFTER = _re.compile(r"\s*(?:sayılı|Ek\b|Additional|[A-Z][a-z]+[A-Z])")
 
 
+#: Two whole numbers joined by a dash, a range: 80000-110000 TL. The
+#: single-number pattern leaves a number touching a dash alone, so a part
+#: number (KF301-5) keeps its digits; a range is two quantities.
+_RANGE = _re.compile(
+    r"(?<![\w.,/:\-#=&?%+])(\d{4,})([-–])(\d{4,})"
+    r"(?=(?:,\d+)?(?![\w/\-]|[.,]\d))")
+
+
 def grouped(text: str, lone_years: bool = False) -> str:
     """Every quantity in running text with its thousands marked by a dot,
     as Turkish writes them: 1.400 TL, 162.442 TL/km, 6.489,6 MHz.
@@ -87,6 +95,30 @@ def grouped(text: str, lone_years: bool = False) -> str:
     as they are written, because grouping them would change what they
     name.
     """
+    def ranged(found):
+        # Both ends are read against what follows the whole range, so a
+        # year span (2012-2020 dönemi) stays and a price span is grouped.
+        before = text[max(0, found.start() - 12):found.start()]
+        after = text[found.end():found.end() + 12]
+        return "{}{}{}".format(_mark(found.group(1), before, after),
+                               found.group(2),
+                               _mark(found.group(3), before, after))
+
+    def _mark(digits, before, after):
+        if _NAMES.search(before):
+            return digits
+        alone = not lone_years and not text.strip(" ≈≤≥<>~%/km²-,0123456789\n")
+        if (not alone and len(digits) == 4 and 1900 <= int(digits) <= 2099
+                and not _UNITS.match(after.lstrip(",0123456789"))):
+            return digits
+        if _NAMED_AFTER.match(after) and not _UNITS.match(after):
+            return digits
+        head = len(digits) % 3 or 3
+        return ".".join([digits[:head]] + [digits[i:i + 3]
+                                           for i in range(head, len(digits), 3)])
+
+    text = _RANGE.sub(ranged, text)
+
     def one(found):
         digits = found.group(1)
         before = text[max(0, found.start() - 12):found.start()]
