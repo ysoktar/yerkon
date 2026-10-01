@@ -66,7 +66,7 @@ body {
 }
 /* Selected text in the line blue, the colour the charts draw with, see
    through enough that what is selected stays readable. */
-::selection { background: color-mix(in srgb, var(--chart-mark) 30%, transparent); }
+::selection { background: color-mix(in srgb, var(--chart-mark) 50%, transparent); }
 
 /* --- the chrome --------------------------------------------------------- */
 
