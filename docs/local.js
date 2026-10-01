@@ -47,7 +47,7 @@
   const show = () => document.body.append(cover);
   if (document.body) show(); else addEventListener("DOMContentLoaded", show);
 
-  const worker = new Worker("sim-worker.js?v=be8eea5c00", { type: "module" });
+  const worker = new Worker("sim-worker.js?v=41f45ecd8f", { type: "module" });
   // A worker that dies while loading says nothing on its own, and the
   // cover would promise a load that is never coming.
   worker.onerror = event => {
