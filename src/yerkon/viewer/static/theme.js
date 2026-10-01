@@ -145,7 +145,85 @@
       strip.addEventListener("scroll", mark, { passive: true });
       window.addEventListener("resize", mark);
       mark();
+      draggable(strip);
     });
+
+  /* A strip a mouse can throw, the way a finger throws it on a phone:
+     press, drag, let go, and it glides on and settles on the nearest
+     card. Touch is left to the browser, which already does this; only
+     a mouse is handled here. A drag is not a click, so letting go over
+     a card after moving the strip does not open it. */
+  function draggable(strip) {
+    var still = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var down = null, moved = false, gliding = 0, lastX = 0, lastT = 0, speed = 0;
+    strip.classList.add("draggable");
+
+    function settle() {
+      // The card whose start is nearest where the strip stopped, its
+      // left edge kept clear of the cut by the strip's own padding.
+      var edge = strip.getBoundingClientRect().left;
+      var best = 0, gap = Infinity;
+      Array.prototype.forEach.call(strip.children, function (card) {
+        var at = strip.scrollLeft + card.getBoundingClientRect().left - edge - 2;
+        if (Math.abs(at - strip.scrollLeft) < gap) {
+          gap = Math.abs(at - strip.scrollLeft); best = at;
+        }
+      });
+      strip.classList.remove("dragging");
+      strip.scrollTo({ left: Math.max(0, best), behavior: still ? "auto" : "smooth" });
+    }
+
+    function glide() {
+      cancelAnimationFrame(gliding);
+      if (still || Math.abs(speed) < 0.05) { settle(); return; }
+      var then = performance.now();
+      (function step(now) {
+        var dt = Math.min(32, now - then); then = now;
+        var before = strip.scrollLeft;
+        strip.scrollLeft -= speed * dt;
+        speed *= Math.pow(0.994, dt);
+        if (Math.abs(speed) < 0.05 || strip.scrollLeft === before) settle();
+        else gliding = requestAnimationFrame(step);
+      })(then);
+    }
+
+    strip.addEventListener("pointerdown", function (event) {
+      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      cancelAnimationFrame(gliding);
+      down = { x: event.clientX, left: strip.scrollLeft, id: event.pointerId };
+      moved = false; speed = 0; lastX = event.clientX; lastT = performance.now();
+    });
+    strip.addEventListener("pointermove", function (event) {
+      if (!down || event.pointerId !== down.id) return;
+      var dx = event.clientX - down.x;
+      if (!moved && Math.abs(dx) > 5) {
+        moved = true;
+        strip.classList.add("dragging");
+        strip.setPointerCapture(event.pointerId);
+      }
+      if (!moved) return;
+      var now = performance.now();
+      if (now > lastT) {
+        speed = 0.8 * speed + 0.2 * (event.clientX - lastX) / (now - lastT);
+      }
+      lastX = event.clientX; lastT = now;
+      strip.scrollLeft = down.left - dx;
+    });
+    function release(event) {
+      if (!down || event.pointerId !== down.id) return;
+      down = null;
+      if (moved) glide();
+    }
+    strip.addEventListener("pointerup", release);
+    strip.addEventListener("pointercancel", release);
+    // The click that ends a drag is swallowed; one that did not move is
+    // an ordinary click on the card.
+    strip.addEventListener("click", function (event) {
+      if (moved) { event.preventDefault(); event.stopPropagation(); moved = false; }
+    }, true);
+    strip.addEventListener("dragstart", function (event) { event.preventDefault(); });
+  }
 
   /* A note number in the table opens the folded notes before the page
      moves to the note. */

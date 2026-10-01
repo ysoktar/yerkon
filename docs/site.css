@@ -464,6 +464,15 @@ figure.slide figcaption span { font-size: 12px; color: var(--quiet); }
 figure.slide figcaption small { display: block; margin-top: 6px;
   font-size: 11px; color: var(--quiet); }
 figure.slide figcaption small a { color: inherit; }
+/* With the script, a mouse drags the strip as a finger does, so the bar
+   underneath goes, as it does on a phone; the arrows stay for a click. */
+.slides.draggable { scrollbar-width: none; }
+.slides.draggable::-webkit-scrollbar { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .slides.draggable { cursor: grab; }
+}
+.slides.dragging { cursor: grabbing; scroll-snap-type: none;
+  scroll-behavior: auto; user-select: none; -webkit-user-select: none; }
 .slider > button { position: absolute; top: calc(50% - 36px); z-index: 2;
   width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%;
   background: var(--paper); color: var(--ink); font-size: 20px; line-height: 1;
