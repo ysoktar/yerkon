@@ -4,7 +4,7 @@
 
 > YERKON is a ground-based positioning layer for roads that does not depend on satellites: when GNSS is lost it gives the position, and while GNSS works it checks the position GNSS gives. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
 
-- [Başvuru raporu / Application report (PDF, Türkçe)](https://yerkon.com/yerkon-rapor.pdf)
+- [Proje dokümanı / Project document (PDF, Türkçe)](https://yerkon.com/yerkon-rapor.pdf)
 
 ## Sayfalar (Türkçe)
 

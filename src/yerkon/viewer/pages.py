@@ -202,9 +202,9 @@ HOME = Page(
         Part(
             kind="text",
             lines=(_w(
-                "Başvuru raporunun tamamı: [YERKON raporu (PDF, 20 sayfa)]"
+                "Proje dokümanı: [YERKON raporu (PDF, 20 sayfa)]"
                 "(https://yerkon.com/yerkon-rapor.pdf)",
-                "The full application report, in Turkish: [YERKON report "
+                "Project document, in Turkish: [YERKON report "
                 "(PDF, 20 pages)](https://yerkon.com/yerkon-rapor.pdf)",
             ),),
         ),
@@ -2104,9 +2104,9 @@ SOURCES = Page(
         Part(
             kind="text",
             lines=(_w(
-                "Başvuru raporunun tamamı: [YERKON raporu (PDF, 20 sayfa)]"
+                "Proje dokümanı: [YERKON raporu (PDF, 20 sayfa)]"
                 "(https://yerkon.com/yerkon-rapor.pdf)",
-                "The full application report, in Turkish: [YERKON report "
+                "Project document, in Turkish: [YERKON report "
                 "(PDF, 20 pages)](https://yerkon.com/yerkon-rapor.pdf)",
             ),),
         ),
@@ -4427,7 +4427,7 @@ def _llms() -> bytes:
     """
     lines = ["# YERKON", "", "> " + _plain(PAGES[0].lead.tr), "",
              "> " + _plain(PAGES[0].lead.en), "",
-             "- [Başvuru raporu / Application report (PDF, Türkçe)]"
+             "- [Proje dokümanı / Project document (PDF, Türkçe)]"
              "(https://{}/yerkon-rapor.pdf)".format(DOMAIN), ""]
     for code, heading in (("tr", "## Sayfalar (Türkçe)"),
                           ("en", "## Pages (English)")):
