@@ -496,7 +496,7 @@ They are not a general product guarantee."""
 [note.pozyx-area]
 sources = ["pozyx-case"]
 tr = """0,035 km², 2023'te iki Avrupa tesisinden büyük olanında 35000 \
-m² üzerinde ve 250 anchor ile kurulmuş gerçek bir endüstriyel \
+m² üzerinde ve 250 sabit birimle kurulmuş gerçek bir endüstriyel \
 uygulamadan."""
 en = """0,035 km² comes from a real industrial installation in 2023, the \
 larger of two European sites, over 35000 m² with 250 anchors."""
@@ -510,8 +510,8 @@ requirement rather than measured availability, so the cell is empty."""
 
 [note.pozyx-capex]
 sources = ["pozyx-case"]
-tr = """Katalog donanım ve lisans fiyatları, 35000 m² ve 250 anchor'lı \
-projenin tam sözleşme ve kurulum maliyetini temsil etmiyor."""
+tr = """Katalog donanım ve lisans fiyatları, 35000 m²'lik ve 250 sabit \
+birimli projenin tam sözleşme ve kurulum maliyetini temsil etmiyor."""
 en = """Catalogue hardware and licence prices do not represent the full \
 contract and installation cost of the 35000 m², 250 anchor project."""
 

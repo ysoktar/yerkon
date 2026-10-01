@@ -419,7 +419,7 @@ url = "https://insidegnss.com/air-force-awards-white-sands-contract-to-locata/"
 [[source]]
 key = "pozyx-case"
 group = "terrestrial"
-label.tr = "Pozyx, 35000 m² ve 250 anchor'lı kurulum"
+label.tr = "Pozyx, 35000 m²'lik, 250 sabit birimli kurulum"
 label.en = "Pozyx, a 35000 m² installation with 250 anchors"
 url = "https://www.pozyx.io/case-studies/intralogistics-optimization-case-study"
 
