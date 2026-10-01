@@ -686,8 +686,8 @@ sources = ["digikey", "lcsc", "mouser", "tcmb-rates", "sepetli-ankara", "yevmiye
 tr = """YERKON CAPEX, senaryodaki yayın birimlerinin 1000 adetlik malzeme \
 listesi fiyatı ile her birimin yapıya takılma bedelinin (tutucu, işçilik, \
 gerekiyorsa şebeke dışı besleme) toplamının senaryo alanına bölünmesidir. \
-Birim fiyatı kartın bütün parçalarını, kutusunu, baskılı devresini ve \
-dizgisini kapsar; test, kalibrasyon, belgelendirme, vergi ve kargo dahil \
+Birim fiyatı kartın bütün parçalarını, kutusunu, baskılı devresini, \
+dizgisini ve lehimini kapsar; test, kalibrasyon, belgelendirme, vergi ve kargo dahil \
 değildir. \
 Konum, radyo mesafe ölçümlerini ve yükseklik haritasından gelen yüksekliği birleştiren \
 bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
@@ -703,7 +703,7 @@ en = """YERKON CAPEX is the thousand unit bill of materials price of a \
 scenario's broadcast units plus what fitting each one costs (bracket, \
 labour and, where needed, a standalone supply), divided by the scenario's \
 area. The unit price covers every part of the board, its box, the printed \
-board and its assembly; test, calibration, certification, tax and shipping \
+board, its assembly and soldering; test, calibration, certification, tax and shipping \
 are excluded. The position comes from a Kalman filter that combines radio \
 ranges with the height from a map; no inertial unit or odometry is used. \
 YERKON OPEX is the yearly running cost: electricity (the commercial tariff, \

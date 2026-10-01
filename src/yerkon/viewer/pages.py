@@ -256,14 +256,15 @@ HOME = Page(
                 ),
                 _w(
                     "Bir yayın birimi 1000 adetlik üretimde, kutusu, "
-                    "baskılı devresi ve dizgisiyle yaklaşık 1400 lira. "
+                    "baskılı devresi, dizgisi ve lehimiyle yaklaşık 1400 "
+                    "lira. "
                     "Hedef, AUS "
                     "noktalarında zaten "
                     "duran elektrik ve haberleşme altyapısının yeniden "
                     "kullanılması; maliyeti aşağıda tutan da bu.",
                     "A broadcast unit costs roughly 1400 lira at "
-                    "a thousand units, box, printed board and assembly "
-                    "included. The aim is to reuse "
+                    "a thousand units, box, printed board, assembly and "
+                    "soldering included. The aim is to reuse "
                     "the power and "
                     "communications already standing at intelligent "
                     "transport points, and that is what keeps the cost "
@@ -784,9 +785,11 @@ SYSTEM = Page(
             heading=_w("Üç kurulum grubu", "Three kinds of installation"),
             lines=(
                 _w(
-                    "**Şehir içi.** Çok sayıda, kısa menzilli birim: baz "
-                    "istasyonları, trafik levhaları ve lambaları, reklam "
-                    "panoları, yol kenarı aydınlatmaları. Birimde EBYTE'nin "
+                    "**Şehir içi.** Kırsaldakiyle aynı yayın birimi; "
+                    "binalar sinyali kestiği için daha sık yerleştirilir. "
+                    "Takılabileceği yerler: baz istasyonları, trafik "
+                    "levhaları ve lambaları, reklam panoları, yol kenarı "
+                    "aydınlatmaları. Birimde EBYTE'nin "
                     "E28-2G4M20S modülü kullanılıyor; içindeki 2,4 GHz "
                     "telsiz yongası Semtech SX1280. Semtech bu yonga için "
                     "açık görüş hattında yaklaşık ±1 m mesafe ölçüm "
@@ -795,8 +798,10 @@ SYSTEM = Page(
                     "hatası birimlerin geometrisine, çok yollu yayılıma ve "
                     "engellere de bağlı ve ayrıca HPE P50 ile HPE P95 "
                     "üzerinden değerlendirilecek.",
-                    "**Urban.** Many short range units: base station "
-                    "sites, traffic signs and lights, advertising boards, "
+                    "**Urban.** The same broadcast unit as in open "
+                    "country, placed closer together because buildings "
+                    "cut the signal. It can go on base station sites, "
+                    "traffic signs and lights, advertising boards and "
                     "roadside lighting. The unit uses EBYTE's E28-2G4M20S "
                     "module, whose 2,4 GHz radio chip is the Semtech "
                     "SX1280; Semtech states about ±1 m of ranging accuracy "
@@ -973,11 +978,12 @@ SYSTEM = Page(
             lines=(
                 _w(
                     "1000 adette bir yayın birimi yaklaşık 1400 lira, "
-                    "bir alıcı yaklaşık 2300-3100 lira. Her ürünün 1, 100 "
+                    "yaya alıcısı yaklaşık 2700, kara aracı alıcısı "
+                    "yaklaşık 3170 lira. Her ürünün 1, 100 "
                     "ve 1000 adetlik fiyat tablosu Maliyet sayfasında.",
                     "At a thousand units a broadcast unit is roughly 1400 "
-                    "lira and a receiver roughly 2300 to 3100 "
-                    "lira. Every product's price at one, a hundred and a "
+                    "lira, a pedestrian receiver roughly 2700 lira and a "
+                    "vehicle receiver roughly 3170 lira. Every product's price at one, a hundred and a "
                     "thousand is tabled on the Cost page.",
                 ),
                 _w(
@@ -1000,14 +1006,14 @@ SYSTEM = Page(
                 _w(
                     "Fiyatlar birimin bütün parçalarını kapsıyor: ana "
                     "parçalar, besleme ve koruma, klemensler, anten "
-                    "kablosu, kutu, direnç ve kondansatörler, baskılı devre "
-                    "ve dizgi. Test, ayar, belgelendirme, vergi ve kargo "
+                    "kablosu, kutu, direnç ve kondansatörler, baskılı devre, "
+                    "dizgi ve lehim. Test, ayar, belgelendirme, vergi ve kargo "
                     "bu rakamların dışında; sahadaki montaj ayrı bir kalem "
                     "olarak tabloya giriyor.",
                     "The prices cover every part of the unit: the main "
                     "parts, supply and protection, terminals, antenna "
                     "cable, box, the passive components, the printed "
-                    "board and its assembly. Test, calibration, "
+                    "board, its assembly and soldering. Test, calibration, "
                     "certification, tax and shipping are outside them; "
                     "installation goes into the table as a line of its "
                     "own.",
@@ -1039,15 +1045,15 @@ RESEARCH = Page(
     nav=_w("AR-GE", "Research"),
     title=_w("Araştırma soruları", "The research questions"),
     lead=_w(
-        "Proje dört soruya cevap arıyor. Hiçbiri kapanmış değil ve her "
+        "Proje altı soruya cevap arıyor. Hiçbiri kapanmış değil ve her "
         "birinin altında ne yapılacağı yazılı.",
-        "The project is looking for answers to four questions. None of "
+        "The project is looking for answers to six questions. None of "
         "them is closed, and under each one is what will be done.",
     ),
     parts=(
         Part(
             kind="points",
-            heading=_w("Dört soru", "Four questions"),
+            heading=_w("Altı soru", "Six questions"),
             lines=(
                 _w(
                     "**Yerden gelen yayınlar, araç sensörleri ve harita "
@@ -1055,13 +1061,13 @@ RESEARCH = Page(
                     "konum çıkar mı?** Önce şehirde denenecek. Çevredeki "
                     "modemlerin kimliğinden, baz istasyonlarına olan "
                     "uzaklıktan ve kameradan gelen görüntüden de "
-                    "yararlanılacak.",
+                    "yararlanılması değerlendirilecek.",
                     "**If broadcasts from the ground, vehicle sensors and "
                     "the map are put together, does a good enough position "
                     "come out without the satellites?** It gets tried in a "
-                    "city first. What nearby modems call themselves, the "
-                    "distance to base stations and the picture from a "
-                    "camera all get used as well.",
+                    "city first. Using what nearby modems call themselves, "
+                    "the distance to base stations and the picture from a "
+                    "camera will be considered as well.",
                 ),
                 _w(
                     "**Mevcut altyapıya en az dokunarak, sonradan "
@@ -1119,13 +1125,9 @@ RESEARCH = Page(
                     "message came from and that it was not altered on the "
                     "way.",
                 ),
-            ),
-        ),
-        Part(
-            kind="text",
-            heading=_w("Sahte sinyali erken görme", "Seeing spoofing early"),
-            lines=(
                 _w(
+                    "**GNSS'in aldatıldığını erkenden fark eden bir "
+                    "mekanizma geliştirilebilir mi?** "
                     "Sahte sinyal altında alıcı, dışarıdan bakınca "
                     "kusursuz görünen ama yanlış bir konum ve hız verir. "
                     "YERKON uydudan tamamen ayrı çalıştığı için bir "
@@ -1136,6 +1138,8 @@ RESEARCH = Page(
                     "sonra yeniden yakınsama süresi, boşuna verilen alarm "
                     "oranı ve aldatma ile karıştırmanın yakalanma "
                     "oranı.",
+                    "**Can a way be built to notice early that GNSS is "
+                    "being spoofed?** "
                     "Under a spoofing attack the receiver gives a "
                     "position and speed that look flawless from outside "
                     "and are wrong. YERKON runs entirely apart from the "
@@ -1149,14 +1153,15 @@ RESEARCH = Page(
                     "and jamming are caught.",
                 ),
                 _w(
-                    "Kurulumun kendisi de araştırma konusu. Amaç, "
+                    "**Kurulum en pratik hâle nasıl getirilebilir?** Amaç, "
                     "birimleri uzman olmayan birinin de doğru yere "
                     "koyabilmesi: afette ya da askeri bir durumda geçici "
                     "ağ kuracak personel, ekrandaki "
                     "\"en iyi sinyal için 120 derece yönünde 50 metre "
                     "ilerleyin\" gibi yönlendirmeleri takip ederek "
                     "birimleri yerleştirebilecek.",
-                    "Installation is itself part of the research. The aim "
+                    "**How can installation be made as practical as "
+                    "possible?** The aim "
                     "is that somebody who is not an expert can put the "
                     "units in the right place: personnel setting up a "
                     "temporary network after a disaster or in a military "
