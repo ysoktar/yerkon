@@ -20,6 +20,8 @@ Everything here produces RangeObservations and nothing else. See ADR-0003.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 from dataclasses import dataclass
 from typing import Callable, Optional, Sequence
@@ -295,7 +297,7 @@ def sigma_terms_m(
 def _quadrature(terms: dict, live: "Terms" = ALL_TERMS) -> float:
     """The sigma of whichever terms are switched on, in metres."""
     return math.sqrt(
-        sum(
+        added(
             value * value
             for name, value in terms.items()
             if getattr(live, name)

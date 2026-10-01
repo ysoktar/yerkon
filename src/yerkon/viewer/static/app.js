@@ -3046,6 +3046,10 @@ function frameEverything() {
 /* ---------- numbers ---------- */
 
 const tr = (value, places = 2) => decimal(value, places);
+// A share as each language writes it: "%96,65" in Turkish, "96,65 %"
+// in English, the way the site's pages do.
+const percent = (share, places = 2) => speaks() === "en"
+  ? `${tr(share * 100, places)} %` : `%${tr(share * 100, places)}`;
 
 function showNumbers(drawn, result, pending) {
   const list = document.getElementById("numbers");
@@ -3053,6 +3057,8 @@ function showNumbers(drawn, result, pending) {
 
   const warn = say("result.assumed_share");
   const hurried = say("result.hurry");
+  // Whether any of the cost rests on an assumption; set with the numbers.
+  let leaning = false;
 
   rows.push([say("result.anchors"), drawn.anchors.length]);
   // Per group, because a UWB bracket and a mast on one corridor do not
@@ -3153,21 +3159,24 @@ function showNumbers(drawn, result, pending) {
     rows.push([say("result.hpe50"), `${tr(result.hpe_p50_m)} m`]);
     rows.push([say("result.hpe95"), `${tr(result.hpe_p95_m)} m`]);
     rows.push([say("result.vpe95"), `${tr(result.vpe_p95_m)} m`]);
-    rows.push([say("result.availability"), `%${tr(result.availability * 100)}`]);
+    rows.push([say("result.availability"), percent(result.availability)]);
     rows.push([say("result.capex"), `${tr(result.capex_tl, 0)} TL`]);
     rows.push([say("result.opex"), `${tr(result.opex_tl_per_year, 0)} TL`]);
     rows.push([say("result.capex_km2"), `${tr(result.capex_tl_per_km2, 0)} TL`]);
     rows.push([say("result.opex_km2"),
                `${tr(result.opex_tl_per_km2_year, 0)} TL`]);
-    rows.push([warn, `%${tr(result.assumed_share * 100, 0)}`]);
+    rows.push([warn, percent(result.assumed_share, 0)]);
+    leaning = result.assumed_share > 0;
   }
 
   // While the engine is working these rows describe the arrangement
   // before the edit, so they are not shown as if they described this
   // one. The names stay, because a panel whose rows come and go moves
   // under the reader.
+  // The share resting on assumptions is flagged only when there is one:
+  // "%0" in the warning colour read as a problem that was not there.
   list.innerHTML = rows.map(([name, value]) =>
-    `<dt>${name}</dt><dd${name === warn || name === hurried
+    `<dt>${name}</dt><dd${(name === warn && leaning) || name === hurried
       ? ' class="warn"' : ""}>`
     + `${pending ? WORKING : value}</dd>`
   ).join("");

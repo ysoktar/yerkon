@@ -28,6 +28,8 @@ has to open with no network and no script (ADR-0065).
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import html
 import math
 import re
@@ -507,7 +509,7 @@ def budget(shares: Sequence[tuple[str, float]], *, title: str,
     if not kept:
         return ""
     kept = sorted(kept, key=lambda pair: pair[1], reverse=True)
-    total = sum(share for _, share in kept)
+    total = added(share for _, share in kept)
     row_height, gap, top = 24.0, 7.0, 34.0
     label_width, bar_width = 172.0, width - 172.0 - 66.0
     height = top + len(kept) * (row_height + gap) + 10

@@ -8,6 +8,23 @@ their running text with ``grouped_html`` on the way out.
 
 from __future__ import annotations
 
+import functools as _functools
+import operator as _operator
+
+
+def added(values, start=0):
+    """The sum of these, added one after another from the left.
+
+    Python 3.12 made the built-in ``sum`` of floats compensated, so the
+    same figures add up a few units in the last place differently under
+    3.11, under 3.13 and under the 3.14 the browser simulator runs on. A
+    link that closes by a hair under one closes short under another, and
+    the simulator on the site gave a VPE of 3,97 m where the table, run
+    under 3.11, says 4,00. Plain addition is what 3.11 did, so the table
+    stands as published and every interpreter now agrees with it.
+    """
+    return _functools.reduce(_operator.add, values, start)
+
 
 def readable(value: float) -> str:
     """A figure at whatever precision it actually needs, and no more.

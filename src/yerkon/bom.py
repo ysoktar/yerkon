@@ -11,6 +11,8 @@ Nothing here knows about radios or deployments. It prices boards.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import pathlib
 import tomllib
 from dataclasses import dataclass
@@ -83,7 +85,7 @@ class Board:
 
     def usd(self, boards: int) -> float:
         """One board's parts in USD when `boards` are made."""
-        return sum(n * part.at(n * boards) for part, n in self.lines)
+        return added(n * part.at(n * boards) for part, n in self.lines)
 
     def at(self, tier: int) -> float:
         """One board in TL when `tier` of them are made."""

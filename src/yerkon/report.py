@@ -14,6 +14,8 @@ a weighted average over the three; ADR-0068 says why it went.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 import textwrap
 from dataclasses import dataclass, replace
@@ -235,13 +237,13 @@ def folded(draws: Sequence[Result], rates: OperatingRates) -> Result:
     areas = [r.area_km2 for r in draws if math.isfinite(r.area_km2)]
     reached = [r.reached_km2 for r in draws
                if r.reached_km2 is not None and math.isfinite(r.reached_km2)]
-    area_km2 = sum(areas) / len(areas) if areas else first.area_km2
+    area_km2 = added(areas) / len(areas) if areas else first.area_km2
     return Result(
         first.deployed,
         pooled([r.samples for r in draws], first.deployed.scenario.name),
         price(first.deployed.inventory(area_km2), rates),
         area_km2,
-        sum(reached) / len(reached) if reached else None,
+        added(reached) / len(reached) if reached else None,
     )
 
 

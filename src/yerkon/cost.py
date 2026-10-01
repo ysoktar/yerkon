@@ -16,6 +16,8 @@ hides that is worse than no total.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 from dataclasses import dataclass
 from typing import Optional
 
@@ -406,15 +408,15 @@ class Costing:
 
     @property
     def capex_tl(self) -> float:
-        return sum(item.tl for item in self.capital)
+        return added(item.tl for item in self.capital)
 
     @property
     def opex_tl_per_year(self) -> float:
-        return sum(item.tl for item in self.operating)
+        return added(item.tl for item in self.operating)
 
     @property
     def receiver_tl(self) -> float:
-        return sum(item.tl for item in self.receivers)
+        return added(item.tl for item in self.receivers)
 
     @property
     def capex_tl_per_km2(self) -> float:
@@ -453,7 +455,7 @@ class Costing:
         total = self.capex_tl + self.opex_tl_per_year
         if total <= 0.0:
             return 0.0
-        assumed = sum(
+        assumed = added(
             item.tl
             for item in self.capital + self.operating
             if item.is_assumed
@@ -505,8 +507,8 @@ def price(
     off_grid = inventory.off_grid_anchors
     unconnected = inventory.unconnected_anchors
 
-    units_tl = sum(float(a.product.unit_price_tl.value) for a in inventory.anchors)
-    sites_tl = sum(float(a.site_cost_tl.value) for a in inventory.anchors)
+    units_tl = added(float(a.product.unit_price_tl.value) for a in inventory.anchors)
+    sites_tl = added(float(a.site_cost_tl.value) for a in inventory.anchors)
     supplies_tl = off_grid * float(rates.off_grid_supply_tl.value)
 
     capital = (
@@ -532,7 +534,7 @@ def price(
         * float(rates.anchor_kwh_per_year.value)
         * float(rates.electricity_tl_per_kwh.value)
     )
-    rent_tl = sum(a.rent_tl_per_year for a in inventory.anchors)
+    rent_tl = added(a.rent_tl_per_year for a in inventory.anchors)
     rented = sum(1 for a in inventory.anchors if a.rent_tl_per_year > 0.0)
     connectivity_tl = unconnected * float(rates.connectivity_tl_per_year.value)
     # Each part over its own life in the tax depreciation list: the radio

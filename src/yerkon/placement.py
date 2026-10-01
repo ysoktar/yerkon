@@ -33,6 +33,8 @@ simulation sees geometry, rounds, shadows and noise.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 from dataclasses import dataclass, replace
 from typing import Optional, Sequence
@@ -114,7 +116,7 @@ class Problem:
         return Cover(self, chosen).share()
 
     def cost(self, chosen: Sequence[int]) -> float:
-        return float(sum(self.candidates[i].lifecycle_tl for i in chosen))
+        return float(added(self.candidates[i].lifecycle_tl for i in chosen))
 
 
 # --- Cost -----------------------------------------------------------------

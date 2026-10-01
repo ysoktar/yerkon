@@ -29,6 +29,8 @@ than about the report. See ADR-0020.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 from dataclasses import dataclass
 from typing import Optional, Sequence
@@ -106,7 +108,7 @@ class Dissection:
         simplifies.
         """
         return math.sqrt(
-            sum(c.alone_p50_m ** 2 for c in self.contributions)
+            added(c.alone_p50_m ** 2 for c in self.contributions)
             + self.residue_p50_m ** 2
         )
 

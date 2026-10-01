@@ -11,6 +11,8 @@ instant, the sweep takes seconds, and the run takes longer still.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 from functools import lru_cache
 from typing import Optional
@@ -1038,7 +1040,7 @@ def pool(state: ViewState) -> dict:
     return _numbers(
         state, deployed,
         pooled([samples for samples, _ in drawn], deployed.scenario.name),
-        sum(served) / len(served) if served else math.nan,
-        sum(reached) / len(reached) if reached else math.nan,
+        added(served) / len(served) if served else math.nan,
+        added(reached) / len(reached) if reached else math.nan,
         done=len(scenarios), wanted=len(scenarios),
     )

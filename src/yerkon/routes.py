@@ -24,6 +24,8 @@ back** is how a survey vehicle actually drives a corridor.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 from dataclasses import dataclass
 from typing import Sequence
@@ -448,7 +450,7 @@ def _longest_run(pieces, join_m: float = 1.0):
 
 
 def _walked(points) -> float:
-    return sum(math.dist(a, b) for a, b in zip(points, points[1:]))
+    return added(math.dist(a, b) for a, b in zip(points, points[1:]))
 
 
 _SHAPES = {

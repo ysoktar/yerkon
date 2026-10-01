@@ -14,6 +14,8 @@ not, and the ratio between them is the design question.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 from bisect import bisect_left
 from dataclasses import dataclass, field, replace
@@ -290,7 +292,7 @@ class Terrain:
                       np.array([h for _, h in profile], dtype=float))
         every_fraction, every_height = arrays
         heights = every_height.tolist()
-        surface_m = sum(heights) / len(heights)
+        surface_m = added(heights) / len(heights)
 
         for _ in range(4):
             h1 = max(a[2] - surface_m, 0.1)
@@ -357,14 +359,14 @@ def _plane_through(window: Sequence[tuple[float, float]]) -> tuple[float, float]
     if count < 3:
         return 0.0, 0.0
 
-    mean_f = sum(f for f, _ in window) / count
-    mean_h = sum(h for _, h in window) / count
-    across = sum((f - mean_f) ** 2 for f, _ in window)
+    mean_f = added(f for f, _ in window) / count
+    mean_h = added(h for _, h in window) / count
+    across = added((f - mean_f) ** 2 for f, _ in window)
     if across <= 0.0:
         return 0.0, 0.0
 
-    slope = sum((f - mean_f) * (h - mean_h) for f, h in window) / across
-    left = sum(
+    slope = added((f - mean_f) * (h - mean_h) for f, h in window) / across
+    left = added(
         (h - (mean_h + slope * (f - mean_f))) ** 2 for f, h in window
     )
     return math.sqrt(left / count), slope
@@ -1124,7 +1126,7 @@ class Road:
 
     @cached_property
     def length_m(self) -> float:
-        return sum(
+        return added(
             math.dist(a, b)
             for a, b in zip(self.centreline_m, self.centreline_m[1:])
         )
@@ -1253,7 +1255,7 @@ def graded_alignment(
     if max_grade <= 0.0:
         raise ValueError("max_grade must be positive")
 
-    length_m = sum(
+    length_m = added(
         math.dist(a, b) for a, b in zip(centreline_m, centreline_m[1:])
     )
     n = max(int(length_m / step_m), 1)

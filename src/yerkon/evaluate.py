@@ -16,6 +16,8 @@ first stopped, and every swept comparison it published was contaminated.
 
 from __future__ import annotations
 
+from yerkon.numbers import added
+
 import math
 from dataclasses import dataclass, replace
 from typing import Optional, Sequence
@@ -198,7 +200,7 @@ class Deployment:
             # Nothing is driving yet, so price a single unit carrying
             # every waveform present. That is the deployment's own
             # worst case and the number a coverage map implies.
-            demand_s = sum(
+            demand_s = added(
                 exchange_duration_s(anchor.radio, self.scheme)
                 for anchor in self.anchors
             )
