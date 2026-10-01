@@ -451,7 +451,7 @@ WHY = Page(
                     "Kriz anında sistem üzerindeki karar yetkisi "
                     "Türkiye'de değil.",
                     "In a crisis the authority over the system does not "
-                    "sit in Turkey.",
+                    "sit in Türkiye.",
                 ),
             ),
         ),
@@ -2971,7 +2971,7 @@ LAW = Page(
                    "alt bantlar koşullu.",
                    "The prototype's Meshtastic devices work at 868 or "
                    "915 MHz. The 902-928 MHz band is not licence-exempt in "
-                   "Turkey; only narrow sub-bands such as 917,4-919,4 MHz "
+                   "Türkiye; only narrow sub-bands such as 917,4-919,4 MHz "
                    "are, under conditions."),
                 _w("863-870 MHz alt bantlarının çoğunda 25 mW e.r.p. ve "
                    "%0,1 ile %1 görev çevrimi (vericinin açık kaldığı zaman oranı); "

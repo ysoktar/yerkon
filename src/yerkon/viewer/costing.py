@@ -569,7 +569,11 @@ def units(published, language: str, table) -> str:
             a1=decimal_comma(a1 / c1, 2), a2=decimal_comma(a2 / c2, 2),
             c1=c1, A1=decimal_comma(a1, 2), d1=decimal_comma(c1 / a1, 2),
             c2=c2, A2=decimal_comma(a2, 2), d2=decimal_comma(c2 / a2, 2)))
-    return '<div class="scroll" tabindex="0">{}</div>{}'.format(
+    # One column a structure, too many for the reading column: it takes
+    # the page's width, as the comparison table does, rather than arriving
+    # cut off at the right on a desktop.
+    return ('<div class="wide"><div class="scroll" tabindex="0">{}</div>'
+            '</div>{}').format(
         table([head] + body, numeric_from=1), "".join(said))
 
 

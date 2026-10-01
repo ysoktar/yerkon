@@ -104,7 +104,7 @@ TURKEY = SpectrumRule(
         "for wideband modulation other than FHSS",
     ),
     note=(
-        "Turkey follows the CEPT position and cites the harmonised "
+        "Türkiye follows the CEPT position and cites the harmonised "
         "standard directly, so the limits match the European ones. The "
         "density cap binds at every SX1280 bandwidth, which is why legal "
         "power here rises with bandwidth instead of being flat."
@@ -157,7 +157,7 @@ UNITED_STATES = SpectrumRule(
         "The limit is on conducted power, not radiated, and it assumes up "
         "to 6 dBi of antenna. Beyond that, power comes down decibel for "
         "decibel, so the radiated ceiling sits at 36 dBm. That is about "
-        "21 dB above what Turkey allows at this bandwidth, and it is why "
+        "21 dB above what Türkiye allows at this bandwidth, and it is why "
         "range figures cannot be quoted without naming the region."
     ),
 )

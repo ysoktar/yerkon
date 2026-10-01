@@ -108,7 +108,9 @@ def grouped(text: str, lone_years: bool = False) -> str:
         if _NAMES.search(before):
             return digits
         alone = not lone_years and not text.strip(" ≈≤≥<>~%/km²-,0123456789\n")
+        # A year has no decimals: 2083,43 is an amount.
         if (not alone and len(digits) == 4 and 1900 <= int(digits) <= 2099
+                and not _re.match(r",\d", after)
                 and not _UNITS.match(after.lstrip(",0123456789"))):
             return digits
         if _NAMED_AFTER.match(after) and not _UNITS.match(after):
@@ -128,6 +130,7 @@ def grouped(text: str, lone_years: bool = False) -> str:
         # A number alone, as in a table cell, is a quantity, not a year.
         alone = not lone_years and not text.strip(" ≈≤≥<>~%/km²-,0123456789\n")
         if (not alone and len(digits) == 4 and 1900 <= int(digits) <= 2099
+                and not _re.match(r",\d", after)
                 and not _UNITS.match(after.lstrip(",0123456789"))):
             return digits
         if _NAMED_AFTER.match(after) and not _UNITS.match(after):
