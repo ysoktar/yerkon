@@ -1505,8 +1505,8 @@ VALUE = Page(
 RESULTS = Page(
     slug="sonuclar",
     slug_en="results",
-    nav=_w("Sonuçlar", "Results"),
-    title=_w("Karşılaştırma tablosu", "The comparison table"),
+    nav=_w("Karşılaştırma", "Comparison"),
+    title=_w("Karşılaştırma", "Comparison"),
     lead=_w(
         "YERKON ve diğer on konumlandırma sistemi, aynı sütunlarla yan "
         "yana. Koyu zeminli satırlar YERKON'un simülasyon sonuçları; "
@@ -1516,12 +1516,6 @@ RESULTS = Page(
         "rest are what those systems' own sources publish.",
     ),
     parts=(
-        Part(kind="shows", shows="landscape"),
-        Part(
-            kind="shows", shows="accuracy",
-            heading=_w("Doğruluk yan yana", "Accuracy side by side"),
-        ),
-        Part(kind="shows", shows="cost"),
         Part(
             kind="table",
             heading=_w("Sütunlar ne demek", "What the columns mean"),
@@ -1646,6 +1640,13 @@ RESULTS = Page(
             ),
         ),
         Part(kind="shows", shows="published"),
+        Part(kind="shows", shows="landscape",
+             heading=_w("Maliyet ve doğruluk", "Cost and accuracy")),
+        Part(
+            kind="shows", shows="accuracy",
+            heading=_w("Doğruluk yan yana", "Accuracy side by side"),
+        ),
+        Part(kind="shows", shows="cost"),
     ),
 )
 
@@ -2067,14 +2068,14 @@ SIMULATION = Page(
                     "olduğundan iyi gösterir. Gölgelemenin tek çekilişi iki "
                     "yöne de saptırabilir: aynı yerleşimde bir satır hızlıda "
                     "daha iyi, başka biri daha kötü çıkabilir. Hızlı "
-                    "çalıştırma denemek içindir; Sonuçlar sayfasındaki tablo "
+                    "çalıştırma denemek içindir; Karşılaştırma sayfasındaki tablo "
                     "yalnızca yavaş ve tam çalıştırmadan gelir.",
                     "The coarse ground reads diffraction loss low, which "
                     "mostly makes a fast answer flatter the deployment. "
                     "The single shadow draw can err either way: on the same "
                     "placement one row can come out better fast and "
                     "another worse. A fast run is for trying things; the "
-                    "table on the Results page comes from the slow, full "
+                    "table on the Comparison page comes from the slow, full "
                     "run only.",
                 ),
             ),
@@ -3615,8 +3616,8 @@ LANDSCAPE_UNDER = _w(
     "hassas. Uydu sistemlerinin paydası dünyanın bütün kara yüzeyi, "
     "YERKON'unki satırın kendi alanı. YERKON'un kırsal satırı uydu "
     "sistemlerinden ucuz, şehir içi satırı pahalı: şehirde binalar "
-    "sinyali kestiği için kilometrekareye daha çok birim gerekiyor. İkisi "
-    "de uydularla aynı doğruluk kuşağında. Tünel satırı burada yok: o "
+    "sinyali kestiği için kilometrekareye daha çok birim gerekiyor. "
+    "İkisinin doğruluğu GPS'inkine yakın. Tünel satırı burada yok: o "
     "kilometreye bölünüyor, yani aynı eksene konamaz. Hem maliyetini "
     "hem doğruluğunu yayımlamayan sistem de çizilemedi.",
     "Capital per square kilometre across, horizontal error up, both "
@@ -3624,8 +3625,8 @@ LANDSCAPE_UNDER = _w(
     "satellite systems are divided by all the land on earth, YERKON by "
     "each row's own area. YERKON's rural row costs less than the "
     "satellite systems and its town row more: in town buildings cut the "
-    "signal, so a square kilometre needs more units. Both sit in the "
-    "satellites' band of accuracy. The tunnel row is absent: "
+    "signal, so a square kilometre needs more units. Both are close "
+    "to GPS in accuracy. The tunnel row is absent: "
     "it is divided by route kilometre and does not belong on this axis. "
     "A system that publishes only one of the two cannot be drawn "
     "either.",
