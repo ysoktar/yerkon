@@ -1508,18 +1508,12 @@ RESULTS = Page(
     nav=_w("Sonuçlar", "Results"),
     title=_w("Karşılaştırma tablosu", "The comparison table"),
     lead=_w(
-        "On üç sistem, aynı sütunlarla yan yana. Koyu zeminli üç satırı "
-        "simülasyon doldurdu; geri kalan on satır, o sistemlerin kendi "
-        "kaynaklarının yayımladığı değerler. Bir sayıya ne yapıldığı, "
-        "satırın sonundaki düğmeyle açılan kutuda ve sayfanın sonundaki "
-        "dipnotlarda yazıyor. Boş hücre, o kaynağın bu sütuna uyan bir "
-        "şey yayımlamadığı anlamına geliyor.",
-        "Thirteen systems side by side under the same columns. The three "
-        "shaded rows are the YERKON rows the simulation filled; the rest "
-        "are what their own sources publish. What was done to a cell is "
-        "in the box the button at the end of its row opens and in the "
-        "notes at the foot of the page, and an empty cell means the "
-        "source publishes nothing that fits that column.",
+        "YERKON ve diğer on konumlandırma sistemi, aynı sütunlarla yan "
+        "yana. Koyu zeminli satırlar YERKON'un simülasyon sonuçları; "
+        "diğerleri o sistemlerin kendi kaynaklarının yayımladığı değerler.",
+        "YERKON and ten other positioning systems side by side under the "
+        "same columns. The shaded rows are YERKON's simulation results; the "
+        "rest are what those systems' own sources publish.",
     ),
     parts=(
         Part(kind="shows", shows="landscape"),
@@ -1593,9 +1587,21 @@ RESULTS = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Tabloyu okurken üç uyarı",
-                       "Three warnings for reading the table"),
+            heading=_w("Tabloyu okurken",
+                       "Reading the table"),
             lines=(
+                _w(
+                    "**Her sayının açıklaması tabloda.** Bir sayıya ne "
+                    "yapıldığı, satırın sonundaki düğmeyle açılan kutuda ve "
+                    "sayfanın sonundaki dipnotlarda yazıyor. Boş hücre, o "
+                    "kaynağın bu sütuna uyan bir şey yayımlamadığı anlamına "
+                    "geliyor.",
+                    "**Every figure is explained in the table.** What was "
+                    "done to a cell is in the box the button at the end of "
+                    "its row opens and in the notes at the foot of the page; "
+                    "an empty cell means the source publishes nothing that "
+                    "fits that column.",
+                ),
                 _w(
                     "**Tünel satırının maliyeti kilometre başına, "
                     "diğerleri kilometrekare başına.** 12 m genişliğinde "

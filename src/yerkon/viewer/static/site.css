@@ -130,6 +130,11 @@ a.run .short { display: none; }
   a.run .long { display: none; }
   a.run .short { display: inline; }
 }
+/* The narrowest phones: the bar's gaps close up so nothing spills. */
+@media (max-width: 340px) {
+  header .actions { gap: 5px !important; }
+  .brand b { letter-spacing: 0.06em !important; }
+}
 
 footer {
   margin-top: 56px; padding: 22px 24px 40px;
@@ -357,9 +362,8 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
   header .actions { gap: 8px; }
   a.run { padding: 6px 8px; font-size: 12px; }
   header { column-gap: 8px; }
-  .brand { gap: 7px; }
-  .brand img { width: 22px; height: 22px; border-radius: 5px; }
-  .brand b { font-size: 15px; letter-spacing: 0.1em; }
+  .brand { gap: 8px; }
+  .brand b { letter-spacing: 0.12em; }
   main { padding: 28px 16px 0; }
   h1 { font-size: 24px; }
   .figures { grid-template-columns: 1fr 1fr; }
