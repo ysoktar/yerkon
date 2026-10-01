@@ -36,7 +36,7 @@
     "position:fixed", "inset:0", "z-index:1000", "display:flex",
     "flex-direction:column", "align-items:center", "justify-content:center",
     "gap:12px", "background:rgba(20,24,28,0.92)", "color:#f4f4f2",
-    "font:16px/1.5 system-ui,sans-serif", "text-align:center", "padding:24px",
+    "font:16px/1.5 \"IBM Plex Sans\",system-ui,sans-serif", "text-align:center", "padding:24px",
   ].join(";");
   const line = document.createElement("div");
   const note = document.createElement("div");

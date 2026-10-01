@@ -114,15 +114,15 @@ export function paintBore(context, width, height, scene, options) {
   const Y = d => mid - d / halfWidth * (planH / 2);
 
   context.save();
-  context.font = "12px Inter, system-ui, sans-serif";
+  context.font = "12px "IBM Plex Sans", system-ui, sans-serif";
   context.textBaseline = "alphabetic";
 
   // Titles.
   context.fillStyle = ink;
-  context.font = "600 13px Inter, system-ui, sans-serif";
+  context.font = "600 13px "IBM Plex Sans", system-ui, sans-serif";
   context.fillText(say("bore.plan"), left, planTop - 40);
   context.fillStyle = quiet;
-  context.font = "12px Inter, system-ui, sans-serif";
+  context.font = "12px "IBM Plex Sans", system-ui, sans-serif";
   if (!small) {
     context.fillText(say("bore.plan.note", { width: Math.round(halfWidth * 2) }),
                      left, planTop - 22);
@@ -189,7 +189,7 @@ export function paintBore(context, width, height, scene, options) {
   for (const at of [inX, outX]) context.fillRect(at - 3, planTop - 14, 6, planH + 28);
   context.restore();
   context.fillStyle = ink;
-  context.font = "600 12px Inter, system-ui, sans-serif";
+  context.font = "600 12px "IBM Plex Sans", system-ui, sans-serif";
   if (inX >= left - 1) {
     context.textAlign = "left";
     context.fillText(say("bore.portal.in"), Math.max(left, inX - 3), planTop + planH + 30);
@@ -202,7 +202,7 @@ export function paintBore(context, width, height, scene, options) {
 
   // Chainage along the bottom of the plan.
   const every = step(bore.span, plotW, 80);
-  context.font = "11px Inter, system-ui, sans-serif";
+  context.font = "11px "IBM Plex Sans", system-ui, sans-serif";
   context.fillStyle = quiet;
   context.strokeStyle = quiet;
   context.lineWidth = 1;
@@ -234,7 +234,7 @@ export function paintBore(context, width, height, scene, options) {
     context.stroke();
     if (room > 34) {
       context.fillStyle = "#fff";
-      context.font = "10px Inter, system-ui, sans-serif";
+      context.font = "10px "IBM Plex Sans", system-ui, sans-serif";
       context.textAlign = "center";
       context.fillText(anchor.id, x, anchor.at.d > 0 ? y + 17 : y - 10);
       context.textAlign = "left";
@@ -271,7 +271,7 @@ export function paintBore(context, width, height, scene, options) {
     context.fill();
     context.stroke();
     context.fillStyle = "#fff";
-    context.font = "600 11px Inter, system-ui, sans-serif";
+    context.font = "600 11px "IBM Plex Sans", system-ui, sans-serif";
     context.fillText(unit.id, x + 10, y - 8);
   }
   context.restore();
@@ -288,10 +288,10 @@ export function paintBore(context, width, height, scene, options) {
   const high = Math.max(...zs) + 6;
   const Z = z => sectionTop + sectionH - (z - low) / (high - low || 1) * sectionH;
   context.fillStyle = ink;
-  context.font = "600 13px Inter, system-ui, sans-serif";
+  context.font = "600 13px "IBM Plex Sans", system-ui, sans-serif";
   context.fillText(say("bore.section"), left, sectionTop - 22);
   context.fillStyle = quiet;
-  context.font = "12px Inter, system-ui, sans-serif";
+  context.font = "12px "IBM Plex Sans", system-ui, sans-serif";
   context.fillText(say("bore.section.note", {
     rise: Math.round(Math.max(...zs) - Math.min(...zs)),
   }), left, sectionTop - 6);
@@ -321,7 +321,7 @@ export function paintBore(context, width, height, scene, options) {
   context.restore();
   // The heights on the vertical axis, highest at the top.
   context.fillStyle = quiet;
-  context.font = "11px Inter, system-ui, sans-serif";
+  context.font = "11px "IBM Plex Sans", system-ui, sans-serif";
   context.fillText(metres(Math.max(...zs)), left + 6, Z(Math.max(...zs)) - 6);
   context.fillText(metres(Math.min(...zs)), left + 6, Z(Math.min(...zs)) + 16);
   context.restore();

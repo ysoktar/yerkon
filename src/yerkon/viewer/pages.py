@@ -3307,10 +3307,11 @@ INFO_ICON = (
     'stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
 )
 
-#: The typeface: Inter, for the Turkish letters and the equal-width
-#: figures the tables line up on.
-FONT = ("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700"
-        "&amp;display=swap")
+#: The typeface, IBM Plex Sans, is declared in the stylesheets and served
+#: from fonts/ beside them: the Turkish letters and the equal-width figures
+#: the tables line up on, and no request to anybody else's server.
+FONTS = ("ibm-plex-sans-latin.woff2", "ibm-plex-sans-latin-ext.woff2",
+         "OFL.txt")
 
 FOOTER = _w(
     "YERKON ekibi tarafından sevgiyle hazırlanmıştır",
@@ -3447,14 +3448,11 @@ def _document(title: str, language: str, stylesheet: str, script: str,
         '<meta name="theme-color" content="#2178fe">\n'
         '<meta property="og:site_name" content="YERKON">\n'
         '{addresses}{named}'
-        '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-        '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-        '<link rel="stylesheet" href="{font}">\n'
         '<link rel="stylesheet" href="{stylesheet}">\n'
         '<script src="{script}" defer></script>\n'
         "</head>\n"
         "<body>\n{body}\n</body>\n</html>\n"
-    ).format(language=language, title=html.escape(title), font=FONT,
+    ).format(language=language, title=html.escape(title),
              policy=PAGE_POLICY, referrer=REFERRER,
              description=html.escape(description, quote=True),
              icon=html.escape(icon, quote=True), named=named,
@@ -4344,14 +4342,13 @@ def _loose(text: str, swaps) -> str:
 
 
 #: What a page of the site may load and talk to, said in the page because
-#: GitHub Pages sends no headers of its own: its own scripts and pictures,
-#: Google's fonts, and nothing else. No page has an inline script or
+#: GitHub Pages sends no headers of its own: its own scripts, pictures
+#: and fonts, and nothing else. No page has an inline script or
 #: style to allow, and the one place that writes a script, the address
 #: forwarders, carries no rule because it carries no content.
 PAGE_POLICY = (
     "default-src 'self'; script-src 'self'; "
-    "style-src 'self' https://fonts.googleapis.com; "
-    "font-src https://fonts.gstatic.com; img-src 'self' data:; "
+    "style-src 'self'; font-src 'self'; img-src 'self' data:; "
     "connect-src 'self'; object-src 'none'; base-uri 'self'; "
     "form-action 'none'; upgrade-insecure-requests"
 )
@@ -4362,8 +4359,7 @@ PAGE_POLICY = (
 #: a worker, which answers to its own address rather than to this rule.
 SIMULATOR_POLICY = (
     "default-src 'self'; script-src 'self'; worker-src 'self' blob:; "
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-    "font-src https://fonts.gstatic.com; "
+    "style-src 'self' 'unsafe-inline'; font-src 'self'; "
     "img-src 'self' data: blob: https://tile.openstreetmap.org "
     "https://server.arcgisonline.com; "
     "connect-src 'self' data: blob: https://nominatim.openstreetmap.org "
@@ -4494,6 +4490,9 @@ def write_pages(into, published=None) -> tuple:
                 render(page, code, published, where).encode("utf-8"))
     for name in CARRIED:
         put(name, (STATIC / name).read_bytes())
+    # The typeface and its licence, which travels with it (OFL 1.1, §2).
+    for name in FONTS:
+        put("fonts/" + name, (STATIC / "fonts" / name).read_bytes())
     # The parts' photos, whatever is in the folder (Part.slides).
     for photo in sorted((STATIC / "photos").iterdir()):
         if photo.suffix.lower() in (".webp", ".jpg", ".jpeg", ".png"):

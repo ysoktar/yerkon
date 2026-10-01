@@ -373,6 +373,13 @@ class Handler(BaseHTTPRequestHandler):
             return self._file("favicon.svg", "image/svg+xml")
         if path in ("/apple-touch-icon.png", "/icon-192.png", "/icon-512.png"):
             return self._file(path.lstrip("/"), "image/png")
+        if path.startswith("/fonts/"):
+            name = path[len("/fonts/"):]
+            kinds = {".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8"}
+            kind = next((v for k, v in kinds.items() if name.endswith(k)), None)
+            if not kind or "/" in name or name.startswith("."):
+                return self.send_error(404)
+            return self._file("fonts/" + name, kind)
         if path.startswith("/photos/") and path.endswith(".webp"):
             name = path[len("/photos/"):]
             if "/" in name or name.startswith("."):

@@ -815,9 +815,12 @@ def test_the_folder_carries_both_languages_and_every_page(tmp_path):
     # robots.txt, sitemap.xml and llms.txt, for readers that are not
     # people.
     readers = 3
+    # The typeface, served from the site, and its licence.
+    from yerkon.viewer.pages import FONTS
+    assert {"fonts/" + name for name in FONTS} <= names
     assert len(written) == (2 * len(PAGES) + len(CARRIED) + 2
                             + len(browser_simulator()) + onward + photos
-                            + readers)
+                            + readers + len(FONTS))
 
 
 def test_an_old_address_sends_the_visitor_to_the_new_one(tmp_path):
