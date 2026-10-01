@@ -184,14 +184,16 @@ HOME = Page(
     nav=_w("Anasayfa", "Home"),
     title=_w("YERKON", "YERKON"),
     lead=_w(
-        "YERKON, karayolunda uydu konumlandırmasının (GNSS) yanında "
-        "çalışan, uydudan bağımsız ve yere kurulu bir konumlandırma "
-        "katmanıdır. Yol kenarında zaten duran direklere ve "
+        "YERKON, karayolu için uydudan bağımsız, yere kurulu bir "
+        "konumlandırma katmanıdır: GNSS kesildiğinde konumu o verir, GNSS "
+        "çalışırken de onun verdiği konumu doğrular. Yol kenarında "
+        "zaten duran direklere ve "
         "kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı "
         "bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.",
-        "YERKON is a ground-based positioning layer for roads that works "
-        "alongside satellite positioning (GNSS) without depending on it. "
-        "Low cost broadcast units go onto masts and "
+        "YERKON is a ground-based positioning layer for roads that does "
+        "not depend on satellites: when GNSS is lost it gives the "
+        "position, and while GNSS works it checks the position GNSS "
+        "gives. Low cost broadcast units go onto masts and "
         "cabinets already standing by the road, and the receiver in a "
         "vehicle works out its own position by measuring its distance to "
         "them.",
@@ -268,13 +270,19 @@ HOME = Page(
                     "down.",
                 ),
                 _w(
-                    "YERKON uydunun yerine geçmeyi hedeflemiyor. Uydu "
-                    "çalışırken iki konum yan yana duruyor ve ikisini "
-                    "karşılaştırmak bir aldatma saldırısını tespit etmeye "
-                    "yarayabilir.",
-                    "YERKON does not aim to replace the satellites. While "
-                    "they work, the two positions sit side by side, and "
-                    "comparing them can help detect a spoofing attack.",
+                    "YERKON yalnızca GNSS kesildiğinde devreye giren bir "
+                    "yedek değildir; GNSS çalışırken de onu denetleyen "
+                    "bağımsız bir doğrulama katmanıdır. Alıcı, uydunun "
+                    "verdiği konumu YERKON'un verdiği konumla sürekli "
+                    "karşılaştırır; ikisi birbirinden ayrıldığında "
+                    "karıştırma ya da aldatma (spoofing) girişimi fark "
+                    "edilir.",
+                    "YERKON is not only a backup that takes over when GNSS "
+                    "is lost; while GNSS works, it is an independent layer "
+                    "that checks it. The receiver keeps comparing the "
+                    "position from the satellites with the position from "
+                    "YERKON, and when the two part ways, jamming or "
+                    "spoofing is caught.",
                 ),
             ),
         ),
