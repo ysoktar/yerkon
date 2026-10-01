@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=cf23ba09fe";
+import { decimal, say, speak, speaks } from "./words.js?v=7db8e67541";
 
 /* The choices whose names are this page's to give.
  *
@@ -1735,9 +1735,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=cf23ba09fe";
-import * as flat from "./bore.js?v=cf23ba09fe";
-import * as pick from "./map.js?v=cf23ba09fe";
+import * as draw from "./draw.js?v=7db8e67541";
+import * as flat from "./bore.js?v=7db8e67541";
+import * as pick from "./map.js?v=7db8e67541";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1763,6 +1763,16 @@ let detail = null;
 
 function drawnTerrain() {
   return detail || terrainData;
+}
+
+/* The whole mesh's edge, [west, east, south, north], for cutting the
+ * coverage squares back to it; null on ground with no edge. The near
+ * detail is a window inside it, so it is the full mesh that is asked. */
+function groundEdge() {
+  const mesh = terrainData;
+  if (!mesh || !mesh.xs || !mesh.xs.length || !mesh.ys || !mesh.ys.length) return null;
+  return [Math.min(...mesh.xs), Math.max(...mesh.xs),
+          Math.min(...mesh.ys), Math.max(...mesh.ys)];
 }
 
 /* The aerial photograph of the fetched ground, once it has arrived.
@@ -2417,7 +2427,8 @@ function paintScene() {
     ...(showBuildings ? draw.blocks(
       view, blocksOnDrawnGround(), light, drawnPhotograph(), bias) : []),
     ...(shownLayer === "ground" ? []
-      : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer)),
+      : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer,
+                       groundEdge())),
     // The streets under the route, light: context, not a result, unless
     // they have been brought forward.
     ...(showRoads ? onDrawnGround(latest.terrain.roads || []).flatMap(

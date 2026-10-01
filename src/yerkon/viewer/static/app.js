@@ -1765,6 +1765,16 @@ function drawnTerrain() {
   return detail || terrainData;
 }
 
+/* The whole mesh's edge, [west, east, south, north], for cutting the
+ * coverage squares back to it; null on ground with no edge. The near
+ * detail is a window inside it, so it is the full mesh that is asked. */
+function groundEdge() {
+  const mesh = terrainData;
+  if (!mesh || !mesh.xs || !mesh.xs.length || !mesh.ys || !mesh.ys.length) return null;
+  return [Math.min(...mesh.xs), Math.max(...mesh.xs),
+          Math.min(...mesh.ys), Math.max(...mesh.ys)];
+}
+
 /* The aerial photograph of the fetched ground, once it has arrived.
  *
  * Fetched as a picture and read once into an offscreen canvas, not sent
@@ -2417,7 +2427,8 @@ function paintScene() {
     ...(showBuildings ? draw.blocks(
       view, blocksOnDrawnGround(), light, drawnPhotograph(), bias) : []),
     ...(shownLayer === "ground" ? []
-      : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer)),
+      : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer,
+                       groundEdge())),
     // The streets under the route, light: context, not a result, unless
     // they have been brought forward.
     ...(showRoads ? onDrawnGround(latest.terrain.roads || []).flatMap(

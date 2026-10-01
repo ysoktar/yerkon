@@ -125,7 +125,7 @@ export const SAY = {
   "preset.load": { tr: "Yükle", en: "Load" },
   "preset.save": { tr: "Kaydet", en: "Save" },
   "preset.drop": { tr: "Sil", en: "Delete" },
-  "preset.name": { tr: "Bu düzenlemenin adı…", en: "Name this arrangement…" },
+  "preset.name": { tr: "Yeni ad…", en: "New name…" },
   "preset.replaced": {
     tr: "{name} yüklendi. Bu sekmedeki her şeyin yerine geçti: zemin, "
         + "sahanın boyu ve eni, bütün yayın birimi grupları ve alıcılar, "

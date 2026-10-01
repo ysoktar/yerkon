@@ -480,7 +480,12 @@ export function bandOf(value, edges, rising) {
 export const RISING = { anchors: true, margin_db: true,
                         dilution: false, error_m: false };
 
-export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors") {
+/* `within` is the ground's own edge, [west, east, south, north]. A cell
+ * is a square around its point, so the outer row reached half a cell past
+ * the mesh and was painted over nothing: a ragged frame of pale squares
+ * round the site. Each square is cut back to the ground instead. */
+export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors",
+                          within = null) {
   if (!sweep) return [];
   const { xs, ys, resolution_m: size } = sweep;
   const values = (sweep.layers && sweep.layers[layer]) || sweep.counts;
@@ -510,10 +515,15 @@ export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors") {
       // hill it describes. Sorting them in front on purpose says the
       // same thing without moving them, and says it at every distance.
       const z = groundAt(x, y) * VERTICAL;
+      let [x0, x1, y0, y1] = [x - half, x + half, y - half, y + half];
+      if (within) {
+        x0 = Math.max(x0, within[0]); x1 = Math.min(x1, within[1]);
+        y0 = Math.max(y0, within[2]); y1 = Math.min(y1, within[3]);
+        if (x1 <= x0 || y1 <= y0) continue;
+      }
       const painted = face(
         view,
-        [[x - half, y - half, z], [x + half, y - half, z],
-         [x + half, y + half, z], [x - half, y + half, z]],
+        [[x0, y0, z], [x1, y0, z], [x1, y1, z], [x0, y1, z]],
         BANDS[band],
         // The better the ground, the more solidly it is stated. The
         // faint end is where the picture is least certain anyway.
