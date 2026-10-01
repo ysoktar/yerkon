@@ -363,10 +363,10 @@ HOME = Page(
             kind="people",
             heading=_w("Ekip ve iletişim", "Team and contact"),
             lines=(
-                _w("**Yavuz Selim OKTAR**\nGrup temsilcisi\nTOBB ETÜ Yapay "
+                _w("**Yavuz Selim OKTAR**\nTOBB ETÜ Yapay "
                    "Zekâ Mühendisliği, 3. sınıf\n"
                    "[yavuzselimoktar@gmail.com](mailto:yavuzselimoktar@gmail.com)",
-                   "**Yavuz Selim OKTAR**\nTeam representative\nTOBB ETÜ "
+                   "**Yavuz Selim OKTAR**\nTOBB ETÜ "
                    "Artificial Intelligence Engineering, third year\n"
                    "[yavuzselimoktar@gmail.com](mailto:yavuzselimoktar@gmail.com)"),
                 _w("**Mustafa Göktürk BİNAY**\nTOBB ETÜ Bilgisayar "
