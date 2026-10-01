@@ -228,7 +228,7 @@ date = "28.09.2026"
 
 [[part]]
 key = "ili9341-2.8"
-name = "2,8 inç ILI9341 SPI TFT modülü"
+name = "ILI9341 SPI TFT, 2,8\""
 role.tr = "2,8 inç ekran"
 role.en = "2,8 inch display"
 seller = "Elecrow; Alibaba (1000+)"

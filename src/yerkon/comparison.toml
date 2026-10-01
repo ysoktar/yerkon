@@ -570,7 +570,7 @@ istenen doğruluğa ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 öl
 türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir. \
 Ağaçlar simülasyona eklenmedi; ağacın arkasında kalan bir bağlantı \
 gerçekte daha zayıf olabilir."""
-en = """The urban row was run over the real ground at Kızılay; the units \
+en = """The urban row was run over the real ground at Kızılay; the receivers \
 drive the real streets. Standing lighting columns, traffic lights, signs \
 and stops, and masts to be put up on hilltops, were all tried as places \
 for the units; the search chose 19 lighting columns among them. The \
@@ -598,8 +598,8 @@ birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
 edilebilmeleri öngörülüyor. Yol üzerinde AUS noktası varsa birim ona \
 takılıyor; yoksa güneş paneliyle çalışıyor ve merkeze giden mesajlarını \
 kendi telsiziyle hattı olan en yakın birime iletiyor."""
-en = """In the rural row the units drive Polatlı's real roads; the 52 \
-anchors stand where a placement search put them (47 distribution poles, \
+en = """In the rural row the receivers drive Polatlı's real roads; the 52 \
+units stand where a placement search put them (47 distribution poles, \
 5 lighting columns). Distribution poles along the roads, standing \
 lighting columns and signs, and masts to be put up on hilltops were \
 tried; roofs are rented, so the search is not offered them. The \

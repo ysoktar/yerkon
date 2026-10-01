@@ -512,8 +512,8 @@ WHY = Page(
                     "the unit too. Units around an airport could offer a "
                     "terrestrial positioning service that keeps working "
                     "even with the satellites silenced. These are the "
-                    "report's targets, and this repository measured none "
-                    "of them in the field.",
+                    "report's targets; none of them has been measured in "
+                    "the field yet.",
                 ),
                 _w(
                     "Sahte sinyale karşı YERKON yedekten fazlası: bir "
@@ -990,15 +990,15 @@ SYSTEM = Page(
                     "Her ürünün 1, 100 ve 1000 adetteki fiyatı, birimin "
                     "parçalarının satıcılarının kendi kademe fiyatlarıyla "
                     "toplanıyor: telsiz modülü, mikrodenetleyici, anten, "
-                    "besleme, koruma, kutu, pasifler, baskılı devre ve "
-                    "dizgi. Tablo 1000 adetlik fiyatla hesaplanıyor, çünkü "
+                    "besleme, koruma, kutu, pasifler, baskılı devre, "
+                    "dizgi ve lehim. Tablo 1000 adetlik fiyatla hesaplanıyor, çünkü "
                     "işletme modeli bin birimlik bir ağ varsayıyor. Her "
                     "parça, satıcısı ve fiyatı Maliyet sayfasında.",
                     "Each product's price at one, a hundred and a thousand "
                     "is the sum of its parts at their sellers' own tier "
                     "prices: radio module, microcontroller, antenna, "
-                    "supply, protection, box, passives, printed board and "
-                    "assembly. The table prices at a thousand, because the "
+                    "supply, protection, box, passives, printed board, "
+                    "assembly and soldering. The table prices at a thousand, because the "
                     "operating model assumes a network of a thousand "
                     "units. Every part, its seller and its price are on "
                     "the Cost page.",
@@ -2323,14 +2323,15 @@ COST = Page(
                     "Her parça satıcısının kendi kademe tablosuyla yazılı: "
                     "ana parçalar ve birimin geri kalanı, yani şebeke "
                     "beslemesi, düşürücü, koruma, klemens, anten kablosu, "
-                    "kutu, pasifler, baskılı devre ve dizgi. Bir parça bir "
+                    "kutu, pasifler, baskılı devre, dizgi ve lehim. Bir "
+                    "parça bir "
                     "birimde birden çok varsa (klemens, pasifler) kademe o "
                     "kadar birim için alınan adete göre seçiliyor.",
                     "Every part carries its seller's own price ladder: the "
                     "main parts and the rest of the unit, that is the "
                     "mains supply, regulator, protection, terminals, "
-                    "antenna cable, box, passives, the printed board and "
-                    "its assembly. Where a unit holds more than one of a "
+                    "antenna cable, box, passives, the printed board, its "
+                    "assembly and soldering. Where a unit holds more than one of a "
                     "part (terminals, passives), the tier is the one the "
                     "pieces for that many units reach.",
                 ),
@@ -2745,14 +2746,14 @@ LAW = Page(
                    "her uç karşıyı 4,7 dB daha iyi duyuyor. Modülün kart "
                    "üstü anteni kutunun içinde kalıyor ve EBYTE kazancını "
                    "vermiyor; kart üstü antenle kapsanan alan küçülüyor, "
-                   "km² başına maliyet artıyor (ADR-0100).",
+                   "km² başına maliyet artıyor.",
                    "The E28-2G4M20S already gives 20 dBm, so the 5 dBi "
                    "antenna adds nothing on transmit: the module is turned "
                    "down to 15,3 dBm and 100 mW still leaves the antenna. "
                    "The gain is on receive: each end hears the other 4,7 dB "
                    "better. The module's on-board antenna stays inside the "
                    "box and EBYTE gives no gain for it; with it the covered "
-                   "area shrinks and the cost per km² rises (ADR-0100)."),
+                   "area shrinks and the cost per km² rises."),
                 _w("Güç sınırı antenin en güçlü yayın yaptığı yöne göre "
                    "uygulanıyor; başka yönlerde alıcıya daha az güç "
                    "ulaşıyor.",
@@ -4050,6 +4051,8 @@ def _published(published, language: str, table=None) -> str:
                     '<li value="{}">{}</li>'.format(numbered[key],
                                                     explained(key))
                     for key in keys)))
+    if language == "en":
+        body = [[_english_cell(cell) for cell in row] for row in body]
     return (
         '<div class="wide"><div class="scroll">{table}</div></div>'
         '<div class="rowpanels" hidden>{panels}</div>'
@@ -4074,6 +4077,14 @@ def _cited(keys, bibliography, language: str) -> str:
         )
         for key in keys
     ))
+
+
+def _english_cell(cell: str) -> str:
+    """A table cell as English writes it: "million" for "milyon" and the
+    per cent sign after the number, the way the English notes write it
+    ("95 %"). The record keeps the Turkish forms the report prints."""
+    cell = cell.replace(" milyon", " million")
+    return re.sub(r"%(\d[\d.,]*)", r"\1 %", cell)
 
 
 def _table(
