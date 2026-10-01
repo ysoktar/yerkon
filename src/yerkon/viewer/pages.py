@@ -1506,7 +1506,8 @@ RESULTS = Page(
     slug="sonuclar",
     slug_en="results",
     nav=_w("Karşılaştırma", "Comparison"),
-    title=_w("Karşılaştırma", "Comparison"),
+    title=_w("Diğer sistemlerin yanında YERKON",
+             "YERKON beside the other systems"),
     lead=_w(
         "YERKON ve diğer on konumlandırma sistemi, aynı sütunlarla yan "
         "yana. Koyu zeminli satırlar YERKON'un simülasyon sonuçları; "
@@ -1537,12 +1538,12 @@ RESULTS = Page(
                     _w("Kullanılabilirlik", "Availability"),
                     _w(
                         "Konum hesaplama denemelerinin yüzde kaçının "
-                        "geçerli bir sonuç verdiği. Yalnızca modele giren "
+                        "geçerli bir sonuç verdiği. Yalnızca simülasyona giren "
                         "aksaklıkları sayar; bir hizmet garantisi "
                         "değildir.",
                         "What share of the attempts to work out a "
                         "position gave a valid one. It counts only the "
-                        "failures in the model, and is not a promise about "
+                        "failures in the simulation, and is not a promise about "
                         "a service.",
                     ),
                 ),
@@ -1654,7 +1655,7 @@ SIMULATION = Page(
     slug="simulasyon",
     slug_en="simulation",
     nav=_w("Simülasyon", "The simulation"),
-    title=_w("Simülasyon", "The simulation"),
+    title=_w("Simülasyon nasıl çalışıyor", "How the simulation works"),
     lead=_w(
         "Simülasyon, yayın birimlerini Ankara'nın gerçek arazisine "
         "yerleştirir ve bir alıcıyı yol boyunca yürütür. Alıcı her adımda "
@@ -1717,10 +1718,10 @@ SIMULATION = Page(
                 ),
                 _w(
                     "Hiçbir yerde \"düz zemin\" seçeneği yok. Düz bir yüzey, "
-                    "modelin çizebileceği en tarafsız arazi değil, en "
+                    "simülasyonun çizebileceği en tarafsız arazi değil, en "
                     "elverişli arazidir: sonucu olduğundan iyi gösterirdi.",
                     "Nowhere is there a \"flat ground\" option. A flat "
-                    "surface is not the most neutral terrain the model can "
+                    "surface is not the most neutral terrain the simulation can "
                     "draw, it is the most favourable one: it would make "
                     "the result look better than it is.",
                 ),
@@ -1904,7 +1905,7 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Modelin dışında kalanlar", "What is left out"),
+            heading=_w("Simülasyonun dışında kalanlar", "What is left out"),
             lines=(
                 _w(
                     "Aracın hareket sensörü ve tekerlek turu dışarıda "
@@ -1916,16 +1917,17 @@ SIMULATION = Page(
                 ),
                 _w(
                     "Sinyalin bina duvarlarından sekip birkaç yoldan gelmesi "
-                    "(çok yollu yayılım) ayrıca modellenmedi; modelde "
-                    "zeminden sekme ve önü kapalı bağlantının uzun okunması "
-                    "var. Telsizin kendi gürültüsü ve alışveriş sırasında "
-                    "saatin kayması modelde.",
+                    "(çok yollu yayılım) simülasyona ayrıca katılmadı; "
+                    "simülasyonda zeminden sekme ve önü kapalı bağlantının "
+                    "uzun okunması var. Telsizin kendi gürültüsü ve "
+                    "alışveriş sırasında saatin kayması da simülasyonda "
+                    "var.",
                     "The signal arriving by several paths after bouncing "
-                    "off building walls (multipath) is not modelled on its "
-                    "own; the model has the bounce off the ground and the "
-                    "long reading of a blocked link. The radio's own noise "
-                    "and the clock drifting during the exchange are in the "
-                    "model.",
+                    "off building walls (multipath) is not in the "
+                    "simulation on its own; the simulation has the bounce "
+                    "off the ground and the long reading of a blocked link. "
+                    "The radio's own noise and the clock drifting during "
+                    "the exchange are in the simulation too.",
                 ),
                 _w(
                     "Ağaçlar simülasyonda yok. Zemin ve binalar gerçek "
@@ -1946,10 +1948,10 @@ SIMULATION = Page(
                     "it was not measured at 6,5 GHz.",
                 ),
                 _w(
-                    "Güvenlik katmanı da modellenmedi: imza doğrulama, "
+                    "Güvenlik katmanı da simülasyona katılmadı: imza doğrulama, "
                     "anahtar yönetimi ve birimlerin merkeze gönderdiği "
                     "yaşam sinyalleri simülasyonda yok.",
-                    "The security layer is not modelled either: signature "
+                    "The security layer is not simulated either: signature "
                     "checking, key management and the \"still working\" "
                     "messages the units send the centre are not in the "
                     "simulation.",
@@ -2089,14 +2091,14 @@ SOURCES = Page(
     nav=_w("Kaynaklar", "Sources"),
     title=_w("Neye dayanıyor", "What it rests on"),
     lead=_w(
-        "Buradaki her sayının dayanağı altı türden biri: yayımlanmış bir "
-        "fiyat ya da veri sayfası, bir ölçüm, bir standart ya da mevzuat, "
-        "kaynaklı sayılardan yapılmış bir hesap, bir tasarım kararı ya "
-        "da açıkça yazılmış bir varsayım.",
-        "Every number here rests on one of six kinds of thing: a "
-        "published price or datasheet, a measurement, a standard or "
-        "regulation, a calculation from sourced figures, a design choice, "
-        "or an assumption written down.",
+        "Sitedeki bütün kaynaklar, konularına göre. Her sayı şunlardan "
+        "birine dayanıyor: yayımlanmış bir fiyat ya da veri sayfası, bir "
+        "ölçüm, bir standart ya da yönetmelik, bu kaynaklarla yapılmış bir "
+        "hesap, bir tasarım kararı ya da açıkça yazılmış bir varsayım.",
+        "Every source on the site, grouped by subject. Each number rests on "
+        "one of these: a published price or datasheet, a measurement, a "
+        "standard or regulation, a calculation from those sources, a "
+        "design choice, or an assumption written down.",
     ),
     parts=(
         Part(
@@ -2192,12 +2194,12 @@ COST = Page(
     lead=_w(
         "Tablodaki her maliyet hücresinin kalem kalem dökümü: hangi parça, "
         "kaça, kimden; hangi sayı, neye dayanarak. Bu sayfadaki sayılar "
-        "modelden ve parça listesinden hesaplanıyor; biri değişince sayfa "
+        "simülasyondan ve parça listesinden hesaplanıyor; biri değişince sayfa "
         "da değişiyor. Yalnız direk fiyatları tablosu kaynaklarından "
         "aktarıldı.",
         "Every cost cell in the table, line by line: which part, for how "
         "much, from whom; which figure, resting on what. The numbers on "
-        "this page are worked out from the model and the parts list, so "
+        "this page are worked out from the simulation and the parts list, so "
         "when one changes the page does too. Only the pole price table is copied from its "
         "sources.",
     ),
@@ -2398,11 +2400,11 @@ LAW = Page(
     lead=_w(
         "YERKON'un gücünü, piyasaya çıkışını ve bakım maliyetini belirleyen "
         "kurallar, resmî kaynaklarıyla. Güç, bakım ve kira için burada "
-        "yazan her sınır modelde de aynen kullanılıyor; prototip "
+        "yazan her sınır simülasyonda da aynen kullanılıyor; prototip "
         "cihazlarının frekans kuralları sahadaki denemeler için.",
         "The rules that set YERKON's power, its route to market and its "
         "maintenance cost, with their official sources. Every limit on power, "
-        "maintenance and rent written here is the one the model uses; the "
+        "maintenance and rent written here is the one the simulation uses; the "
         "frequency rules for the prototype devices are for the field "
         "trials.",
     ),
@@ -2579,7 +2581,7 @@ LAW = Page(
                    "aşağıda kalır. Anten takılması serbest, ama TS EN 300 328 "
                    "cihazın o antenle test edilmesini ve yazılımın izin "
                    "verdiği hiçbir güç ayarının sınırı aşmamasını istiyor "
-                   "(4.2.4 ve 4.3.1.2). Model her birimin gücünü antenin "
+                   "(4.2.4 ve 4.3.1.2). Simülasyon her birimin gücünü antenin "
                    "en güçlü yönünde sınıra kısıyor; sonuçlar bu güçle.",
                    "The module's power is from [EBYTE's E28-2G4M20S "
                    "datasheet](https://www.ebyte.com/downpdf/304.html): "
@@ -2594,7 +2596,7 @@ LAW = Page(
                    "below it. An antenna may be fitted, but TS EN 300 328 "
                    "has the equipment tested with that antenna and no "
                    "power setting the software allows may exceed the limit "
-                   "(4.2.4 and 4.3.1.2). The model holds every unit to the "
+                   "(4.2.4 and 4.3.1.2). The simulation holds every unit to the "
                    "limit in its antenna's strongest direction; the "
                    "results use that power."),
                 _w("UWB birimleri (DWM3000) kendi antenleriyle -41,3 "
@@ -2640,12 +2642,12 @@ LAW = Page(
                        "Mean -41,3 dBm/MHz, peak 0 dBm; TS EN 302 065-2"),
                     _w("İnsanların ve nesnelerin konumunu izleyen sistemler "
                        "için. Tünel birimleri bu satırda: 499,2 MHz'lik "
-                       "kanalda -14,3 dBm e.i.r.p., model de bunu "
+                       "kanalda -14,3 dBm e.i.r.p., simülasyon da bunu "
                        "kullanıyor.",
                        "For systems that track where people and objects "
                        "are. The tunnel units are in this row: -14,3 dBm "
                        "e.i.r.p. over a 499,2 MHz channel, which is what "
-                       "the model uses."),
+                       "the simulation uses."),
                 ),
                 (
                     _w("Karayolu ve demiryolu taşıtları ([Madde 18(2), "
@@ -2666,7 +2668,7 @@ LAW = Page(
                        "-41,3 dBm/MHz serbest (EN 302 065-3, 4.3.4.2 ve "
                        "Tablo 4). Tünel birimleri araç anteninin altında, "
                        "yoldan 1,2 m yüksekte durunca bu sınıra takılmıyor; "
-                       "model de böyle hesaplıyor. Kapalı alan için otomatik bir istisna "
+                       "simülasyon da böyle hesaplıyor. Kapalı alan için otomatik bir istisna "
                        "yok, Ek C.1 eşdeğer korumanın kanıtlanmasına izin "
                        "veriyor.",
                        "The vehicle receiver is in this row and has to "
@@ -2675,7 +2677,7 @@ LAW = Page(
                        "dBm/MHz); below it -41,3 dBm/MHz holds (EN 302 "
                        "065-3, 4.3.4.2 and table 4). Tunnel units below the "
                        "vehicle's antenna, 1,2 m above the road, stay clear "
-                       "of that limit, and the model works it out that "
+                       "of that limit, and the simulation works it out that "
                        "way. There is no automatic "
                        "exemption for enclosed spaces; Annex C.1 allows "
                        "equivalent protection to be demonstrated."),
@@ -2912,7 +2914,7 @@ LAW = Page(
                    "kendisi belirler, ama vergiden istisna kısım 193 "
                    "sayılı Gelir Vergisi Kanunu'nun 24. maddesinin 2. "
                    "bendine göre aynı aylık seviyesindeki devlet "
-                   "memuruna ödenen gündeliktir. Model bu yüzden kamu "
+                   "memuruna ödenen gündeliktir. Simülasyon bu yüzden kamu "
                    "cetvelini kullanıyor.",
                    "A per diem is the daily allowance paid, with the "
                    "fare, to a worker sent on a temporary duty outside "
@@ -2920,7 +2922,7 @@ LAW = Page(
                    "law is for public servants; a private employer sets "
                    "its own, but the tax-exempt part is the allowance of "
                    "a civil servant on the same salary level (Income Tax "
-                   "Law 193, Article 24(2)). The model uses the public "
+                   "Law 193, Article 24(2)). The simulation uses the public "
                    "schedule for that reason."),
                 _w("Ne kadar: 2026 Merkezi Yönetim Bütçe Kanunu'nun (7567) "
                    "H Cetveli, aylık/kadro derecesi 5-15 için yurt içi "
@@ -2965,13 +2967,13 @@ LAW = Page(
                    "yerel bir teknik firma yapıyor, yani kimse görev "
                    "yeri dışına çıkmıyor. Bakım Ankara merkezden "
                    "yapılsaydı ekip gününe 566,67 TL eklenirdi; kural "
-                   "modelde bu yüzden duruyor.",
+                   "simülasyonda bu yüzden duruyor.",
                    "Zero in YERKON today: in town the crew is in its own "
                    "district; in open country and the tunnel a local "
                    "firm in that district does the maintenance, so "
                    "nobody leaves the place of duty. Were it done from "
                    "central Ankara, each crew day would add 566,67 TL; "
-                   "that is why the rule stays in the model."),
+                   "that is why the rule stays in the simulation."),
             ),
         ),
         Part(
@@ -3058,7 +3060,7 @@ LAW = Page(
                    "82510,32 TL (Tarım ve Orman Bakanlığı, 2025 rayiç "
                    "bedelleri). İstanbul Büyükşehir Belediyesi'nin tarifesi "
                    "bu kuralla kuruluyor. YERKON birimleri kamu protokolüyle "
-                   "konduğu için modelde dağıtım direği kirası sıfır.",
+                   "konduğu için simülasyonda dağıtım direği kirası sıfır.",
                    "Zoning Law 3194, Additional Article 9(7): the yearly "
                    "fee a public body charges an electronic communications "
                    "station for space may not exceed five times the "
@@ -3069,7 +3071,7 @@ LAW = Page(
                    "and 82510,32 TL elsewhere (Ministry of Agriculture and "
                    "Forestry, 2025 rates). Istanbul's municipal tariff is "
                    "built on this rule. YERKON units go up under a public "
-                   "agreement, so the model charges no pole rent."),
+                   "agreement, so the simulation charges no pole rent."),
                 _w("Genel Aydınlatma Yönetmeliği: aydınlatma tesisinin "
                    "bağlantı noktasından genel aydınlatma dışında bir "
                    "amaca enerji verilmez; aydınlatma tesisleri TEDAŞ'ın "
@@ -3617,7 +3619,7 @@ LANDSCAPE_UNDER = _w(
     "YERKON'unki satırın kendi alanı. YERKON'un kırsal satırı uydu "
     "sistemlerinden ucuz, şehir içi satırı pahalı: şehirde binalar "
     "sinyali kestiği için kilometrekareye daha çok birim gerekiyor. "
-    "İkisinin doğruluğu GPS'inkine yakın. Tünel satırı burada yok: o "
+    "İkisinin de doğruluğu GPS'inkine yakın. Tünel satırı burada yok: o "
     "kilometreye bölünüyor, yani aynı eksene konamaz. Hem maliyetini "
     "hem doğruluğunu yayımlamayan sistem de çizilemedi.",
     "Capital per square kilometre across, horizontal error up, both "

@@ -567,7 +567,7 @@ direkler denendi; arama bunlar arasından 19 aydınlatma direğini seçti. \
 Bu yerleşim, istenen doğruluğa makul maliyetle ulaşılabildiğini \
 gösterir; birim sayısı ve yerleri değiştirilerek başka yerlerde de \
 istenen doğruluğa ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
-türetilmiştir; sonuç bir model çıktısıdır, saha ölçümü değildir. \
+türetilmiştir; sonuç bir simülasyon çıktısıdır, saha ölçümü değildir. \
 Ağaçlar simülasyona eklenmedi; ağacın arkasında kalan bir bağlantı \
 gerçekte daha zayıf olabilir."""
 en = """The urban row was run over the real ground at Kızılay; the receivers \
@@ -576,7 +576,7 @@ and stops, and masts to be put up on hilltops, were all tried as places \
 for the units; the search chose 19 lighting columns among them. The \
 placement shows that the accuracy wanted can be had at a reasonable cost; \
 with more units, or units elsewhere, it can be had in other places too. Its range error model is derived from published SX1280 \
-measurements, so the result is a model output rather than a field \
+measurements, so the result is a simulation output rather than a field \
 measurement. Trees are not in the simulation; a link behind a tree may \
 be weaker in reality."""
 
@@ -591,7 +591,7 @@ yerleşim, istenen doğruluğa makul maliyetle ulaşılabildiğini gösterir; \
 birim sayısı ve yerleri değiştirilerek başka yerlerde de istenen \
 doğruluğa ulaşılabilir. Hata modeli kısa menzilde yayımlanmış SX1280 \
 ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
-saha ölçümü değil, model çıktısıdır. Ağaçlar simülasyona eklenmedi; \
+saha ölçümü değil, simülasyon çıktısıdır. Ağaçlar simülasyona eklenmedi; \
 ağacın arkasında kalan bir bağlantı gerçekte daha zayıf olabilir. \
 Dağıtım direği kirası sıfır alındı: \
 birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
@@ -606,7 +606,7 @@ tried; roofs are rented, so the search is not offered them. The \
 placement shows that the accuracy wanted can be had at a reasonable cost; \
 with more units, or units elsewhere, it can be had in other places too. Its error model is derived from \
 published SX1280 measurements at short range. Its long range result is \
-therefore a model output rather than a direct field measurement. Trees \
+therefore a simulation output rather than a direct field measurement. Trees \
 are not in the simulation; a link behind a tree may be weaker in \
 reality. The distribution pole rent is taken as nothing: the units go up under a \
 public-sector agreement, with the prospect of being included in public \
