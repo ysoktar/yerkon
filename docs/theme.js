@@ -151,7 +151,55 @@
       window.addEventListener("resize", mark);
       mark();
       draggable(strip);
+      gauge(slider, strip);
     });
+
+  /* A thin blue bar over the strip: how much of it is in view and
+     where, standing in for the scroll bar a phone does not show. A click
+     or a drag on it moves the strip there. */
+  function gauge(slider, strip) {
+    var bar = document.createElement("div");
+    var thumb = document.createElement("i");
+    bar.className = "strip-bar";
+    bar.setAttribute("aria-hidden", "true");
+    bar.appendChild(thumb);
+    strip.parentNode.insertBefore(bar, strip);
+    function paint() {
+      var room = strip.scrollWidth - strip.clientWidth;
+      bar.hidden = room <= 2;
+      if (bar.hidden) return;
+      var shown = strip.clientWidth / strip.scrollWidth;
+      thumb.style.width = (shown * 100) + "%";
+      thumb.style.left = (strip.scrollLeft / room * (1 - shown) * 100) + "%";
+    }
+    function to(event) {
+      var box = bar.getBoundingClientRect();
+      var at = (event.clientX - box.left) / box.width;
+      var shown = strip.clientWidth / strip.scrollWidth;
+      var share = Math.min(1, Math.max(0, (at - shown / 2) / (1 - shown)));
+      strip.scrollLeft = share * (strip.scrollWidth - strip.clientWidth);
+    }
+    var held = null;
+    bar.addEventListener("pointerdown", function (event) {
+      held = event.pointerId;
+      bar.setPointerCapture(event.pointerId);
+      strip.classList.add("dragging");
+      to(event);
+    });
+    bar.addEventListener("pointermove", function (event) {
+      if (held === event.pointerId) to(event);
+    });
+    function let_go(event) {
+      if (held !== event.pointerId) return;
+      held = null;
+      strip.classList.remove("dragging");
+    }
+    bar.addEventListener("pointerup", let_go);
+    bar.addEventListener("pointercancel", let_go);
+    strip.addEventListener("scroll", paint, { passive: true });
+    window.addEventListener("resize", paint);
+    paint();
+  }
 
   /* A strip a mouse can throw, the way a finger throws it on a phone:
      press, drag, let go, and it glides on and settles on the nearest
