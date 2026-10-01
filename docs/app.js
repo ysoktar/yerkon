@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=488812789e";
+import { decimal, say, speak, speaks } from "./words.js?v=cf23ba09fe";
 
 /* The choices whose names are this page's to give.
  *
@@ -1735,9 +1735,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=488812789e";
-import * as flat from "./bore.js?v=488812789e";
-import * as pick from "./map.js?v=488812789e";
+import * as draw from "./draw.js?v=cf23ba09fe";
+import * as flat from "./bore.js?v=cf23ba09fe";
+import * as pick from "./map.js?v=cf23ba09fe";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -3066,10 +3066,11 @@ function showNumbers(drawn, result, pending) {
   }
 
   // What each group's units and each receiver are built from, and what
-  // one costs at one, a hundred and a thousand, from the bill.
+  // one costs at one, a hundred and a thousand, from the bill, to the
+  // kuruş as the Cost page prints it.
   for (const board of drawn.boards || []) {
     rows.push([say("result.board." + board.of, { name: board.name }),
-               `${board.parts.join(", ")}: ${board.tl.map(v => tr(v, 0)).join(" / ")} TL`]);
+               `${board.parts.join(", ")}: ${board.tl.map(v => tr(v, 2)).join(" / ")} TL`]);
   }
 
   rows.push([say("result.units"), (drawn.units || []).length]);

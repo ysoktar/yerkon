@@ -3066,10 +3066,11 @@ function showNumbers(drawn, result, pending) {
   }
 
   // What each group's units and each receiver are built from, and what
-  // one costs at one, a hundred and a thousand, from the bill.
+  // one costs at one, a hundred and a thousand, from the bill, to the
+  // kuruş as the Cost page prints it.
   for (const board of drawn.boards || []) {
     rows.push([say("result.board." + board.of, { name: board.name }),
-               `${board.parts.join(", ")}: ${board.tl.map(v => tr(v, 0)).join(" / ")} TL`]);
+               `${board.parts.join(", ")}: ${board.tl.map(v => tr(v, 2)).join(" / ")} TL`]);
   }
 
   rows.push([say("result.units"), (drawn.units || []).length]);
