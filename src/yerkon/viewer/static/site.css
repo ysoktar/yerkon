@@ -83,8 +83,9 @@ header {
 header .brand { justify-self: start; }
 header .actions { justify-self: end; display: flex; align-items: center;
   gap: 12px; }
-.brand { display: flex; align-items: baseline; gap: 10px;
+.brand { display: flex; align-items: center; gap: 10px;
   text-decoration: none; color: inherit; }
+.brand img { display: block; width: 26px; height: 26px; border-radius: 6px; }
 .brand b { font-size: 17px; letter-spacing: 0.16em; }
 .brand span { font-size: 11px; color: var(--quiet); }
 nav.pages { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
@@ -124,6 +125,11 @@ a.run {
   text-decoration: none; white-space: nowrap;
 }
 a.run:hover { filter: brightness(1.08); }
+a.run .short { display: none; }
+@media (max-width: 420px) {
+  a.run .long { display: none; }
+  a.run .short { display: inline; }
+}
 
 footer {
   margin-top: 56px; padding: 22px 24px 40px;
@@ -318,14 +324,14 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
 }
 /* One line for as long as it fits: the links stay in the middle of the
    page while there is room and are pushed aside when there is not. The
-   gaps close up first; only below 1110 pixels do the links take a row. */
+   gaps close up first; only below 1150 pixels do the links take a row. */
 @media (max-width: 1280px) {
   header { column-gap: 12px; }
   nav.pages { flex-wrap: nowrap; gap: 11px; }
   nav.pages a { white-space: nowrap; }
   header .actions { gap: 8px; }
 }
-@media (max-width: 1110px) {
+@media (max-width: 1150px) {
   header { grid-template-columns: 1fr auto; }
   nav.pages { grid-column: 1 / -1; grid-row: 2; }
 }
@@ -336,7 +342,11 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
     justify-content: flex-start; }
   nav.pages a { flex: none; }
   header .actions { gap: 8px; }
-  a.run { padding: 6px 10px; font-size: 12px; }
+  a.run { padding: 6px 8px; font-size: 12px; }
+  header { column-gap: 8px; }
+  .brand { gap: 7px; }
+  .brand img { width: 22px; height: 22px; border-radius: 5px; }
+  .brand b { font-size: 15px; letter-spacing: 0.1em; }
   main { padding: 28px 16px 0; }
   h1 { font-size: 24px; }
   .figures { grid-template-columns: 1fr 1fr; }

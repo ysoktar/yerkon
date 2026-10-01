@@ -3161,6 +3161,9 @@ PAGES = (HOME, WHY, SYSTEM, RESEARCH, VALUE, RESULTS, COST, LAW,
 #: test holds that.
 SIMULATOR = "/calistir"
 SIMULATOR_LABEL = _w("Simülasyonu çalıştır", "Run the simulation")
+#: The same button on a narrow phone, where the long one pushes the bar
+#: past the screen.
+SIMULATOR_SHORT = _w("Çalıştır", "Run")
 
 BACK_TO_SITE = _w("Siteye dön", "Back to the site")
 
@@ -3354,20 +3357,25 @@ def _header(page: Page, language: str, where: Where) -> str:
     # outward: the simulator, the theme, then the language at the edge.
     return (
         "<header>\n"
-        '<a class="brand" href="{home}"><b>YERKON</b></a>\n'
+        '<a class="brand" href="{home}"><img src="{logo}" alt="" '
+        'width="26" height="26"><b>YERKON</b></a>\n'
         '<nav class="pages">{links}</nav>\n'
         '<div class="actions">'
-        '<a class="run" href="{simulator}">{label}</a>'
+        '<a class="run" href="{simulator}" title="{label}">'
+        '<span class="long">{label}</span><span class="short">{short}</span>'
+        '</a>'
         '<button class="theme" id="theme" type="button" hidden></button>'
         '<nav class="tongues">{tongues}</nav>'
         "</div>\n"
         "</header>"
     ).format(
         home=where.page(HOME),
+        logo=where.asset("favicon.svg"),
         links="".join(links),
         tongues=tongues,
         simulator=where.simulator(),
         label=_said(SIMULATOR_LABEL, language),
+        short=_said(SIMULATOR_SHORT, language),
     )
 
 
