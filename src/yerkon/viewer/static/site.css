@@ -24,6 +24,11 @@
   --plate: #ffffff;
   --chart-mark: #2178fe;
   --chart-context: #7c8b99;
+  /* What the project has done and what it has not, on the home page. */
+  --done-bg: #d3f5dc;
+  --done-ink: #0f5c28;
+  --todo-bg: #fff1a8;
+  --todo-ink: #5c4700;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,6 +48,10 @@
     --plate: #eef2f6;
     --chart-mark: #6ba6ff;
     --chart-context: #5b6b7a;
+    --done-bg: #183d25;
+    --done-ink: #8be3a5;
+    --todo-bg: #4a3d0a;
+    --todo-ink: #ffe27a;
   }
 }
 
@@ -59,6 +68,10 @@
   --plate: #eef2f6;
   --chart-mark: #6ba6ff;
   --chart-context: #5b6b7a;
+  --done-bg: #183d25;
+  --done-ink: #8be3a5;
+  --todo-bg: #4a3d0a;
+  --todo-ink: #ffe27a;
 }
 
 * { box-sizing: border-box; }
@@ -444,3 +457,13 @@ h2.centred { text-align: center; }
 /* The team's lines hold an address that cannot break; justified, the
    words around it spread apart. */
 main li:has(a[href^="mailto:"]) { text-align: left; }
+
+/* The project's state on the home page: what is done in green, what is
+   still to come in yellow, on the label that opens each line. */
+main ul.status li { text-align: left; }
+ul.status li > strong:first-child {
+  padding: 1px 7px; border-radius: 5px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+ul.status li.done > strong:first-child { background: var(--done-bg); color: var(--done-ink); }
+ul.status li.todo > strong:first-child { background: var(--todo-bg); color: var(--todo-ink); }

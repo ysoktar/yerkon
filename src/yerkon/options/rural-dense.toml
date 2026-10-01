@@ -11,7 +11,7 @@ title = 'Kırsal: 2,5 km ızgara, dağıtım direkleri'
 title_en = 'Rural: a 2,5 km grid on distribution poles'
 origin = 'shipped'
 note = """Üç kilometrede kırk dokuz dağıtım direği yerine iki buçuk kilometrede altmış sekiz: direk sayısı %39 artıyor. Kaba okumada kullanılabilirlik birkaç puan artıyor, kilometrekare başına maliyet ondan fazla artıyor. Kullanılabilirliği yükseltmek için yükseklik ya da turda yoklanan direk sayısı da denenebilir."""
-note_en = """Sixty eight distribution poles at two and a half kilometres instead of forty nine at three: 39 % more poles. On a coarse read availability rises by a few points and the cost per square kilometre rises by more. Height or how many anchors a round polls are other ways to raise availability."""
+note_en = """Sixty eight distribution poles at two and a half kilometres instead of forty nine at three: 39 % more poles. On a coarse read availability rises by a few points and the cost per square kilometre rises by more. Height or how many units a receiver polls in a round are other ways to raise availability."""
 
 [values]
 'rural.anchor_spacing_m' = 2500.0

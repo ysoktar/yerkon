@@ -773,6 +773,11 @@ def figures(state: ViewState) -> dict:
     see is how much of the study is still resting on guesses, and that is
     a property of the list rather than of any part of it.
     """
+    from yerkon.viewer.costing import UNITS
+
+    def unit_named(unit, language):
+        return UNITS.get(unit, (unit, unit))[language == "en"]
+
     settings = state.settings()
     listed = []
     for key, entry in sorted(settings.entries.items()):
@@ -783,7 +788,7 @@ def figures(state: ViewState) -> dict:
             "value": entry.sourced.value if entry.sourced.is_text
             else float(entry.sourced.value),
             "is_text": entry.sourced.is_text,
-            "unit": entry.sourced.unit,
+            "unit": unit_named(entry.sourced.unit, state.language),
             "provenance": entry.sourced.provenance.value,
             "source": entry.sourced.source,
             "note": entry.sourced.note,

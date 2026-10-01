@@ -65,6 +65,14 @@ UNITS = {
     "anchors": ("birim", "units"),
     "people": ("kişi", "people"),
     "fraction": ("oran", "fraction"),
+    "seed": ("tohum", "seed"),
+    "draws": ("tekrar", "draws"),
+    "choice": ("seçim", "choice"),
+    "yes/no": ("evet/hayır", "yes/no"),
+    "scales": ("katman", "scales"),
+    "exponent": ("üs", "exponent"),
+    "bytes": ("bayt", "bytes"),
+    "fetched site": ("getirilen yer", "fetched site"),
 }
 
 #: The rows, in table order, with what each is called.

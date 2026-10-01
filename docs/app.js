@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=731d0695e0";
+import { decimal, say, speak, speaks } from "./words.js?v=d1b3632415";
 
 /* The choices whose names are this page's to give.
  *
@@ -357,11 +357,11 @@ const WORDS = {
     width_m: ["The site's width", ""],
     site: ["Ground", ""],
     from_m: ["The group's start",
-             "an anchor past the end of the site stands on ground nothing "
-             + "models and nothing drives past"],
+             "a broadcast unit past the end of the site stands on ground the "
+             + "simulation does not model, and no receiver passes it"],
     to_m: ["The group's end",
-           "an anchor past the end of the site stands on ground nothing "
-           + "models and nothing drives past"],
+           "a broadcast unit past the end of the site stands on ground the "
+           + "simulation does not model, and no receiver passes it"],
   },
 };
 
@@ -851,7 +851,7 @@ function drawRuns() {
   state.runs.forEach((run, index) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.dataset.find = `yayın birimi direk grup anchor group ${run.identifier} `
+    card.dataset.find = `yayın birimi direk grup anchor group broadcast unit ${run.identifier} `
       + `modül montaj aralık yoldan kaydırma başlangıç bitiş `
       + `module mounting spacing stagger start end `
       + `${run.radio} ${run.mounting}`;
@@ -1254,7 +1254,9 @@ const TERMS = {
  * first.
  */
 const named = key => key.split(".").slice(1).map(
-  part => (speaks() === "en" ? part.replace(/_/g, " ") : TERMS[part] || part)
+  part => (speaks() === "en"
+    ? part.replace(/_/g, " ").replace(/\banchor(s?)\b/g, "unit$1")
+    : TERMS[part] || part)
 ).join(" · ");
 
 const CASCADING_FIGURES = /(height_m|noise_figure_db|threshold_db|clutter|residual_ppm|tolerance_ppm|turnaround_s|payload_bytes)/;
@@ -1306,7 +1308,7 @@ function drawFigures() {
       mark.title = whence;
       name.querySelector("b").textContent = named(figure.key);
       name.querySelector("span").textContent = figure.affects;
-      name.title = `${figure.key}\n\n${figure.note}` + (
+      name.title = `${named("·." + figure.key)}\n\n${figure.note}` + (
         figure.sensitivity ? `\n\n${figure.sensitivity}` : "");
       row.appendChild(name);
 
@@ -1733,9 +1735,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=731d0695e0";
-import * as flat from "./bore.js?v=731d0695e0";
-import * as pick from "./map.js?v=731d0695e0";
+import * as draw from "./draw.js?v=d1b3632415";
+import * as flat from "./bore.js?v=d1b3632415";
+import * as pick from "./map.js?v=d1b3632415";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -3207,10 +3209,10 @@ function drawOptions() {
     moves.className = "moves";
     // Named the way the figures list names them, so a person reading an
     // option and a person reading the figure it moves read the same
-    // words. The key itself is a hover away.
+    // words. Which row it belongs to is a hover away.
     moves.innerHTML = option.moves.length
       ? option.moves.map(m =>
-          `<span title="${m.key}">${named(m.key)}: ` +
+          `<span title="${named("·." + m.key)}">${named(m.key)}: ` +
           `${m.from} → ${m.to}</span>`).join("")
       : `<span>${say("options.same")}</span>`;
     card.appendChild(moves);
@@ -3347,7 +3349,8 @@ function drawSolveScenarios() {
   if (!select || !optionsData) return;
   const names = Object.keys(optionsData.searchable);
   select.innerHTML = names
-    .map(name => `<option value="${name}">${name}</option>`).join("");
+    .map(name => `<option value="${name}">${MODE_LABEL[name] || name}</option>`)
+    .join("");
   select.value = names.includes(state.scenario) ? state.scenario
     : names.includes("rural") ? "rural" : names[0];
   select.onchange = () => {
@@ -3399,7 +3402,7 @@ function drawSolveVary() {
       .map(figure =>
         `<option value="${figure.key}"` +
         `${figure.key === row.key ? " selected" : ""}>` +
-        `${figure.key}</option>`).join("");
+        `${named("·." + figure.key)}</option>`).join("");
     which.onchange = () => {
       varying[index].key = which.value;
       drawSolveVary();

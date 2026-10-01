@@ -174,9 +174,9 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "hepsi silinmiş. Elle yerleşim bilerek boş başlar: birimleri "
               "sürükleyerek koy ya da başka bir yöntem seç. (Boş bir "
               "düzenleme çizilebilir ama çalıştırılamaz.)",
-        "en": "No anchors: every run either places none or has had them all "
-              "removed. The `manual` layout places none on purpose: drag "
-              "anchors in, or choose another method. (An empty arrangement "
+        "en": "No broadcast units: every group either places none or has had "
+              "them all removed. The by-hand layout starts empty on purpose: "
+              "drag units in, or choose another method. (An empty arrangement "
               "can be drawn; it cannot be run.)",
     },
     # -- named arrangements (ADR-0043) ------------------------------------
@@ -318,7 +318,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     "solve.title": {
         "tr": "{scenario}: {target}, {anchors} yayın birimi, {capex} TL",
-        "en": "{scenario}: {target}, {anchors} anchors, {capex} TL",
+        "en": "{scenario}: {target}, {anchors} broadcast units, {capex} TL",
     },
     "solve.note": {
         "tr": "{scenario} satırının {tried} yerleşimi, üzerinde durduğu gerçek "
@@ -335,7 +335,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "cheapest that met {target}.\n\n"
               "It delivers {availability} % availability, {hpe_p50} m at "
               "the fiftieth percentile and {hpe_p95} m at the ninety-fifth, "
-              "at {fixes} fixes a second, from {anchors} anchors.\n\n"
+              "at {fixes} fixes a second, from {anchors} broadcast units.\n\n"
               "Every candidate was a full simulation rather than a fitted "
               "model, so these figures come from the same engine the table "
               "does.",
@@ -398,8 +398,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
     "panel.past_the_site": {
         "tr": "sahanın ucunu geçen bir yayın birimi, modelde olmayan bir "
               "zeminde durur ve hiçbir alıcı oradan geçmez",
-        "en": "an anchor past the end of the site stands on ground nothing "
-              "models and nothing drives past",
+        "en": "a broadcast unit past the end of the site stands on ground the "
+              "simulation does not model, and no receiver passes it",
     },
     "panel.filled_the_ground": {
         "tr": "saha, getirilen zeminin tamamıydı ve öyle kalıyor",
@@ -442,7 +442,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
     "task.solve.candidate": {
         "tr": "[{seen}/{candidates}] {anchors} yayın birimi · {availability} "
               "kullanılabilirlik · HPE50 {hpe_p50} m · {capex} TL{meets}",
-        "en": "[{seen}/{candidates}] {anchors} anchors · {availability} "
+        "en": "[{seen}/{candidates}] {anchors} broadcast units · {availability} "
               "availability · HPE50 {hpe_p50} m · {capex} TL{meets}",
     },
     "task.solve.meets": {"tr": "  ← karşılıyor", "en": "  ← meets"},
@@ -473,7 +473,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "tr": "{anchors} yayın birimi yeri seçildi ({kinds}). Hizmet verilen "
               "hücre %{share} (şimdiki yerleşim %{grid_share}); ömür boyu "
               "maliyet {cost} TL (şimdiki yerleşim {grid_cost} TL).",
-        "en": "Chose {anchors} anchors ({kinds}). Cells served {share} % "
+        "en": "Chose {anchors} broadcast unit sites ({kinds}). Cells served {share} % "
               "(current layout {grid_share} %); lifecycle cost {cost} TL "
               "(current layout {grid_cost} TL).",
     },

@@ -24,7 +24,7 @@ export const SAY = {
   "back.site": { tr: "Ana sayfa", en: "Home page" },
   "title.sim": { tr: "simülasyonu", en: "simulation" },
   "terrain.note": { tr: "{ground} · {anchors} yayın birimi",
-                    en: "{ground} · {anchors|anchor|anchors}" },
+                    en: "{ground} · {anchors|broadcast unit|broadcast units}" },
 
   // -- step 1, the ground -------------------------------------------------
   "step.place": { tr: "Yer", en: "Place" },
@@ -100,7 +100,7 @@ export const SAY = {
   },
   "ground.roads.from": {
     tr: "Getirilen yol ağı; araçlar kalın çizgideki güzergâhı sürüyor.",
-    en: "The fetched road network; the units drive the route drawn thick.",
+    en: "The fetched road network; the receivers drive the route drawn thick.",
   },
   "ground.roads.none": {
     tr: "Bu zeminde getirilmiş yol yok.",
@@ -132,8 +132,8 @@ export const SAY = {
         + "elle taşınmış ve silinmiş yayın birimleri ve elle değiştirilmiş bütün "
         + "değerler. Diğer sekmelere dokunulmadı.",
     en: "{name} is loaded. It replaced everything in this tab: the "
-        + "ground, the site's length and width, every anchor group and "
-        + "receiver, anchors moved and deleted by hand, and every figure "
+        + "ground, the site's length and width, every broadcast unit group and "
+        + "receiver, broadcast units moved and deleted by hand, and every figure "
         + "edited by hand. No other tab was touched.",
   },
   "preset.saved": { tr: "{name} kaydedildi → {path}",
@@ -246,15 +246,15 @@ export const SAY = {
         + "dizilir ve alıcılar düz gider. Sıfırdan büyükken saha bir alandır: "
         + "yayın birimleri kaydırmalı bir ızgaraya yayılır, alıcılar alanın "
         + "çevresini ve ortasını dolaşır. Geometri ikisinde tamamen farklıdır.",
-    en: "At zero width the site is a corridor: anchors line the road either "
-        + "side and units drive straight. Above zero it is an area: anchors "
-        + "spread over a staggered grid and units drive a circuit round the "
+    en: "At zero width the site is a corridor: broadcast units line the road "
+        + "either side and receivers drive straight. Above zero it is an area: "
+        + "broadcast units spread over a staggered grid and receivers drive a circuit round the "
         + "edge and across the middle. The geometry is not comparable.",
   },
 
   // -- step 3, the deployment ---------------------------------------------
   "step.layout": { tr: "Yerleşim", en: "Deployment" },
-  "runs.head": { tr: "Yayın birimi grupları", en: "Anchor groups" },
+  "runs.head": { tr: "Yayın birimi grupları", en: "Broadcast unit groups" },
   "runs.add": { tr: "Grup ekle", en: "Add a group" },
   "units.head": { tr: "Alıcılar", en: "Receivers" },
   "units.add": { tr: "Alıcı ekle", en: "Add a receiver" },
@@ -262,9 +262,9 @@ export const SAY = {
     tr: "Bir yayın birimini sürükleyerek taşı, Shift ile tıklayarak kaldır. "
         + "Her grubun kendi modülü ve montajı var; alıcı yalnız kendi "
         + "taşıdığı modülü kullanan birimleri duyar.",
-    en: "Drag an anchor to move it, shift-click to remove it. Each group "
+    en: "Drag a broadcast unit to move it, shift-click to remove it. Each group "
         + "carries its own module and mounting; each receiver hears the "
-        + "anchors whose modules it carries.",
+        + "units whose modules it carries.",
   },
   "run.module": { tr: "Modül", en: "Module" },
   "run.mounting": { tr: "Montaj", en: "Mounting" },
@@ -272,13 +272,13 @@ export const SAY = {
   "run.to": { tr: "Grubun bittiği yer (m)", en: "End (m)" },
   "run.method": { tr: "Yerleştirme yöntemi", en: "Placement" },
   "run.target_dop": { tr: "Hedef HDOP", en: "Target HDOP" },
-  "run.cover_k": { tr: "Her noktaya erişecek birim sayısı", en: "Anchors per point" },
-  "run.most": { tr: "En fazla yayın birimi", en: "Anchor budget" },
+  "run.cover_k": { tr: "Her noktaya erişecek birim sayısı", en: "Units reaching each point" },
+  "run.most": { tr: "En fazla yayın birimi", en: "Most broadcast units" },
   "run.spacing": { tr: "Birimler arası uzaklık (m)", en: "Spacing (m)" },
   "run.offset": { tr: "Yol eksenine uzaklık (m)", en: "From the road (m)" },
   "run.stagger": { tr: "İki yan arasındaki kaydırma (m)", en: "Stagger (m)" },
   "run.drop": { tr: "Grubu kaldır", en: "Remove the group" },
-  "run.count": { tr: "{anchors} yayın birimi · menzil {reach} km", en: "{anchors} anchors · reach {reach} km" },
+  "run.count": { tr: "{anchors} yayın birimi · menzil {reach} km", en: "{anchors|broadcast unit|broadcast units} · reach {reach} km" },
   "run.disc": {
     tr: "aramada kullanılan menzil: {metres} m, bu zeminde ölçüldü",
     en: "the search placed against {metres} m, measured on this ground",
@@ -304,7 +304,7 @@ export const SAY = {
   // which is one anchor, and a position needs four (ADR-0060).
   "run.bar.served": {
     tr: "dört birimin eriştiği alan: %{share}",
-    en: "{share} % has four anchors in reach",
+    en: "{share} % has four units in reach",
   },
   "run.bar.serves_nothing": {
     tr: "ama hiçbir yere dört birim erişmiyor: bu yerleşim konum vermez",
@@ -323,12 +323,12 @@ export const SAY = {
   "run.bar.anchors_in_reach": {
     tr: "hedefe ulaşılamadı: bir yerde yalnız {got} birim duyuluyor, "
         + "istenen {wanted}",
-    en: "did not clear its bar: somewhere has {got} anchors in reach "
+    en: "did not clear its bar: somewhere has {got} units in reach "
         + "against {wanted} asked for",
   },
   "run.bar.covered_share": {
     tr: "hedefe ulaşılamadı: {short} hücreye hiçbir birim erişmiyor",
-    en: "did not clear its bar: no anchor reaches {short} cells",
+    en: "did not clear its bar: no broadcast unit reaches {short} cells",
   },
   "run.bar.budget": {
     tr: "sınıra gelindi: {most} birim yerleştirildi", en: "budget spent, {most} placed",
@@ -337,7 +337,7 @@ export const SAY = {
     tr: "işe yarayacak yeni bir yer kalmadı", en: "nothing left to add would help",
   },
   "run.least": { tr: "En az bir yayın birimi grubu gerekli.",
-                 en: "At least one anchor group is needed." },
+                 en: "At least one broadcast unit group is needed." },
   "unit.kind": { tr: "Tür", en: "Kind" },
   "unit.vehicle": { tr: "Kara aracı alıcısı", en: "Vehicle receiver" },
   "unit.pedestrian": { tr: "Yaya alıcısı", en: "Pedestrian receiver" },
@@ -345,7 +345,7 @@ export const SAY = {
   "unit.start": { tr: "Başlangıç noktası (m)", en: "Start (m)" },
   "unit.antenna": { tr: "Anten yüksekliği (m)", en: "Antenna (m)" },
   "unit.drop": { tr: "Alıcıyı kaldır", en: "Remove the receiver" },
-  "unit.hears": { tr: "{anchors} yayın birimini duyuyor", en: "hears {anchors} anchors" },
+  "unit.hears": { tr: "{anchors} yayın birimini duyuyor", en: "hears {anchors|broadcast unit|broadcast units}" },
   "unit.least": { tr: "En az bir alıcı gerekli.",
                   en: "At least one receiver is needed." },
   "unit.needs_module": { tr: "Alıcıda en az bir modül olmalı.",
@@ -356,9 +356,9 @@ export const SAY = {
   "target.setup": { tr: "Donanım kurulumu", en: "Hardware setup" },
   "target.setup.note": {
     tr: "Yayın biriminin, araç alıcısının ve yaya alıcısının modülünü, yayın birimi ve araç antenini ve uyulacak kuralı birlikte seçer. UWB grupları değişmez.",
-    en: "Picks the pole's, the vehicle's and the pedestrian's module, the pole and vehicle antennas and the rule together. UWB groups stay as they are.",
+    en: "Picks the module of the broadcast unit, the vehicle receiver and the pedestrian receiver, the broadcast unit and vehicle antennas and the rule together. UWB groups stay as they are.",
   },
-  "target.pole_antenna": { tr: "Yayın birimi anteni", en: "Pole antenna" },
+  "target.pole_antenna": { tr: "Yayın birimi anteni", en: "Broadcast unit antenna" },
   "target.vehicle_antenna": { tr: "Araç anteni", en: "Vehicle antenna" },
   "antenna.pole.row": { tr: "5 dBi çubuk (Taoglas GW.22.5151)", en: "5 dBi rod (Taoglas GW.22.5151)" },
   "antenna.pole.mast": { tr: "12 dBi dış ortam anteni, kabloyla (TP-Link TL-ANT2412D)", en: "12 dBi mast antenna on a cable (TP-Link TL-ANT2412D)" },
@@ -366,9 +366,9 @@ export const SAY = {
   "antenna.vehicle.roof": { tr: "8 dBi araç tavanı anteni, kabloyla (L-com HGV-2409U)", en: "8 dBi roof antenna on a cable (L-com HGV-2409U)" },
   "setup.custom": { tr: "Elle ayarlanmış", en: "Set by hand" },
   "setup.e28-20s": { tr: "E28-2G4M20S her birimde, FHSS ve LBT ile belgeli (tablonun)", en: "E28-2G4M20S on every unit, certified with FHSS and LBT (the table's)" },
-  "setup.e28-12s": { tr: "E28-2G4M12S yalnız yayın biriminde, FHSS ve LBT ile belgeli", en: "E28-2G4M12S on the pole only, certified with FHSS and LBT" },
-  "setup.e28-27s": { tr: "E28-2G4M27S yalnız yayın biriminde, FHSS ve LBT ile belgeli", en: "E28-2G4M27S on the pole only, certified with FHSS and LBT" },
-  "setup.e28-12s-uncertified": { tr: "E28-2G4M12S yalnız yayın biriminde, belgesiz", en: "E28-2G4M12S on the pole only, no certificate" },
+  "setup.e28-12s": { tr: "E28-2G4M12S yalnız yayın biriminde, FHSS ve LBT ile belgeli", en: "E28-2G4M12S on the broadcast unit only, certified with FHSS and LBT" },
+  "setup.e28-27s": { tr: "E28-2G4M27S yalnız yayın biriminde, FHSS ve LBT ile belgeli", en: "E28-2G4M27S on the broadcast unit only, certified with FHSS and LBT" },
+  "setup.e28-12s-uncertified": { tr: "E28-2G4M12S yalnız yayın biriminde, belgesiz", en: "E28-2G4M12S on the broadcast unit only, no certificate" },
   "setup.o4": { tr: "Eski kurulum (O4): E28-2G4M12S, 12 dBi dış ortam ve 8 dBi araç tavanı anteni, belgesiz", en: "Old setup (O4): E28-2G4M12S, 12 dBi mast and 8 dBi roof antennas, no certificate" },
   "target.region": { tr: "Bölge", en: "Region" },
   "target.scheme": { tr: "Mesafe ölçme yöntemi", en: "Ranging scheme" },
@@ -476,13 +476,13 @@ export const SAY = {
         + "denenir; bir hücre, dört birim ona ulaştığında ve bu birimler "
         + "çevresindeki dört çeyreğin en az üçünde durduğunda sayılır. "
         + "Ölçülmüş zemin ister ve birkaç dakika sürer.",
-    en: "Puts the anchors on places that are already high rather than on "
+    en: "Puts the broadcast units on places that are already high rather than on "
         + "a grid: existing lighting columns and signs, poles along the "
         + "road (lighting columns in town, electricity distribution poles in "
         + "open country) and 25 m masts to be put up on hilltops. Roofs are "
         + "rented, so they are not offered. "
         + "Every candidate is tried with the link budget; a cell counts "
-        + "once four anchors reach it and they stand in at least three of "
+        + "once four units reach it and they stand in at least three of "
         + "the four quarters around it. Needs measured ground and takes a "
         + "few minutes.",
   },
@@ -494,7 +494,7 @@ export const SAY = {
   "place.go": { tr: "Yerleştir", en: "Place" },
   "place.served": { tr: "Hizmet verilen hücre", en: "Cells served" },
   "place.cost": { tr: "Ömür boyu maliyet", en: "Lifecycle cost" },
-  "place.anchors": { tr: "Yayın birimi", en: "Anchors" },
+  "place.anchors": { tr: "Yayın birimi", en: "Broadcast units" },
   "place.now": { tr: "Şimdiki yerleşim", en: "Current layout" },
   "place.found": { tr: "Aramanın bulduğu", en: "Search" },
   "place.use": { tr: "Bu yerleşimi uygula", en: "Use this layout" },
@@ -526,7 +526,7 @@ export const SAY = {
     tr: "arazi kesiti her 10 m yerine sabit 64 noktada okunuyor",
     en: "the profile is read at a fixed 64 samples rather than every 10 m",
   },
-  "result.anchors": { tr: "Yayın birimi sayısı", en: "Anchors" },
+  "result.anchors": { tr: "Yayın birimi sayısı", en: "Broadcast units" },
   "result.units": { tr: "Alıcı sayısı", en: "Receivers" },
   "result.round": { tr: "Bir ölçüm turunun süresi", en: "Round" },
   "result.rate": { tr: "Konum sıklığı", en: "Fix rate" },
@@ -544,11 +544,11 @@ export const SAY = {
   },
   "result.capacity.busy_km2": {
     tr: "Her birim tam doluyken en çok alıcı / km²",
-    en: "Most receivers per km², every anchor busy",
+    en: "Most receivers per km², every broadcast unit busy",
   },
   "result.capacity.busy_km": {
     tr: "Her birim tam doluyken en çok alıcı / km",
-    en: "Most receivers per km, every anchor busy",
+    en: "Most receivers per km, every broadcast unit busy",
   },
   "result.reach": { tr: "{run}: menzil", en: "{run}: reach" },
   "result.closure": { tr: "{run}: bağlantının koptuğu uzaklık", en: "{run}: closure" },
@@ -685,7 +685,7 @@ export const SAY = {
   "bore.section": { tr: "Boyuna kesit", en: "Long section" },
   "bore.section.note": {
     tr: "Yolun yüksekliği ve birimler; iki ağız arasında {rise} m fark var.",
-    en: "The road's height and the units; the portals are {rise} m apart "
+    en: "The road's height and the broadcast units; the portals are {rise} m apart "
         + "in height.",
   },
   "scene.along": { tr: "tünel boyunca kaydır", en: "slide along the tunnel" },
@@ -693,7 +693,7 @@ export const SAY = {
   "scene.fits": { tr: "bütün tüneli sığdır", en: "fit the whole tunnel" },
   "scene.arrows": { tr: "Oklar", en: "Arrows" },
   // -- what the ground overlay reads (ADR-0044) ------------------------
-  "layer.anchors": { tr: "Kaç yayın birimi erişiyor", en: "Anchors in reach" },
+  "layer.anchors": { tr: "Kaç yayın birimi erişiyor", en: "Broadcast units in reach" },
   "layer.margin_db": { tr: "Sinyal payı", en: "Signal margin" },
   "layer.dilution": { tr: "Yerleşim geometrisi (HDOP)", en: "Geometry (HDOP)" },
   "layer.error_m": { tr: "Beklenen konum hatası", en: "Expected position error" },
@@ -707,7 +707,7 @@ export const SAY = {
   "layer.anchors.note": {
     tr: "Bir hücreye kaç yayın biriminin eriştiği. Konum için en az üç "
         + "gerekir; dördüncüsü konumu denetler.",
-    en: "How many anchors reach a cell. Three is the fewest that gives a "
+    en: "How many broadcast units reach a cell. Three is the fewest that gives a "
         + "position; a fourth checks it.",
   },
   "layer.margin_db.note": {
@@ -720,8 +720,8 @@ export const SAY = {
     tr: "Birimlerin diziliminin mesafe ölçme hatasını kaç katına "
         + "çıkardığı. Birimler tek sıra hâlindeyse sıraya dik yöndeki hata "
         + "sonsuza gider.",
-    en: "How much the anchors' geometry multiplies a ranging error. "
-        + "Anchors in a line take it to infinity across that line.",
+    en: "How much the layout of the broadcast units multiplies a ranging "
+        + "error. Units in a single line take it to infinity across that line.",
   },
   "layer.error_m.note": {
     tr: "Mesafe ölçme hatası × geometri. Bu satırın kendi toleransının "
@@ -735,11 +735,11 @@ export const SAY = {
         + "through. The published number comes from the run.",
   },
   "legend.nothing": { tr: "boyanmayan yer: hiçbir yayın birimi erişmiyor",
-                      en: "unpainted: no anchor reaches" },
+                      en: "unpainted: no broadcast unit reaches" },
   "legend.served": { tr: "Konum alınabilen alan (≥4 yayın birimi)",
-                     en: "Ground with a position (≥4 anchors)" },
+                     en: "Ground with a position (≥4 broadcast units)" },
   "legend.reached": { tr: "Sinyalin ulaştığı alan (≥1 yayın birimi)",
-                      en: "Ground a packet reaches (≥1 anchor)" },
+                      en: "Ground a packet reaches (≥1 broadcast unit)" },
   "legend.reach": { tr: "Grubun kullanılabilir menzili",
                     en: "The group's usable range" },
   "legend.unit": { tr: "Alıcı ve izlediği yol", en: "A receiver and its route" },
@@ -753,7 +753,7 @@ export const SAY = {
                      en: "{length} × {width} area" },
   "sum.site.corridor": { tr: "{length} koridor", en: "{length} corridor" },
   "sum.layout": { tr: "{anchors} yayın birimi · {runs} grup · {units} alıcı",
-                  en: "{anchors|anchor|anchors} · {runs|group|groups} · "
+                  en: "{anchors|broadcast unit|broadcast units} · {runs|group|groups} · "
                       + "{units|receiver|receivers}" },
   "sum.target": { tr: "±{tolerance} · {region} · {scheme}",
                   en: "±{tolerance} · {region} · {scheme}" },

@@ -90,6 +90,9 @@ class Part:
     #: bom.toml or PILOT_ITEMS, photo file under photos/ or "" while
     #: there is none).
     slides: tuple[tuple[str, str], ...] = ()
+    #: For a list of where the project stands: "done" or "todo" for each
+    #: line, drawn green or yellow. Empty for every other list.
+    states: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -351,6 +354,7 @@ HOME = Page(
                    "**Not yet done: field measurement.** The accuracy and "
                    "coverage figures on this site are simulation results."),
             ),
+            states=("done", "done", "todo", "todo", "todo"),
         ),
         Part(kind="map", heading=_w("Sayfalar", "Pages")),
         Part(
@@ -3518,9 +3522,15 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
             "<p>{}</p>".format(_said(line, language)) for line in part.lines
         )
     elif part.kind == "points":
-        drawn = "<ul>{}</ul>".format("".join(
-            "<li>{}</li>".format(_said(line, language)) for line in part.lines
-        ))
+        if part.states:
+            drawn = '<ul class="status">{}</ul>'.format("".join(
+                '<li class="{}">{}</li>'.format(state, _said(line, language))
+                for state, line in zip(part.states, part.lines)))
+        else:
+            drawn = "<ul>{}</ul>".format("".join(
+                "<li>{}</li>".format(_said(line, language))
+                for line in part.lines
+            ))
     elif part.kind == "table":
         # In a scroller, because a price column that will not wrap is
         # wider than a phone and would otherwise push the whole page
