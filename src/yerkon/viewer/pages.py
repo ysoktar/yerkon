@@ -2492,6 +2492,10 @@ COST = Page(
 BTK_EXEMPT = ("https://www.btk.gov.tr/s3/web-btk-site/"
               "7708c26c-5161-4919-8b3d-daa31d4ac8fb/2026/07/"
               "b02b513d-09b2-4035-bc04-64f59d02f707.pdf")
+#: The 2018 amendment that gave the safety certificate regulation its
+#: name and its present scope (Article 2).
+SAFETY_CERTIFICATE = ("https://www.resmigazete.gov.tr/eskiler/2018/04/"
+                      "20180417-2.htm")
 EN_300_328 = ("https://www.etsi.org/deliver/etsi_en/300300_300399/300328/"
               "02.02.02_60/en_300328v020202p.pdf")
 
@@ -3190,6 +3194,33 @@ LAW = Page(
         Part(
             kind="points",
             sub=True,
+            heading=_w("Güvenlik sertifikası", "Safety certificate"),
+            lines=(
+                _w("[Elektronik Haberleşme Cihazları Güvenlik Sertifikası "
+                   "Yönetmeliği](" + SAFETY_CERTIFICATE + "), elektromanyetik "
+                   "alan bakımından sabit vericilerin yerini, kurulumunu, "
+                   "denetimini ve güvenlik sertifikasını düzenliyor. "
+                   "Yönetmeliğin 2. maddesi, hücresel sistemler dışında, son "
+                   "kullanıcı terminal cihazlarını ve çıkış gücü 5 W ve "
+                   "altındaki cihazları kapsam dışı tutuyor. YERKON'un yayın "
+                   "birimleri en çok 100 mW yayıyor, alıcılar son kullanıcı "
+                   "cihazı; bu yüzden hiçbiri için güvenlik sertifikası "
+                   "gerekmiyor.",
+                   "The [Regulation on Safety Certificates for Electronic "
+                   "Communications Devices](" + SAFETY_CERTIFICATE + ") "
+                   "governs where fixed transmitters go, how they are "
+                   "installed and inspected, and their safety certificate, "
+                   "with regard to electromagnetic fields. Its Article 2 "
+                   "leaves out, cellular systems aside, end-user terminal "
+                   "devices and devices with an output power of 5 W or "
+                   "less. YERKON's broadcast units put out at most 100 mW "
+                   "and the receivers are end-user devices, so none of them "
+                   "needs a safety certificate."),
+            ),
+        ),
+        Part(
+            kind="points",
+            sub=True,
             heading=_w("Harita ve uydu görüntüsü", "Maps and imagery"),
             lines=(
                 _w("Yer seçme haritası OpenStreetMap'in karolarını kullanıyor "
@@ -3229,7 +3260,14 @@ LAW = Page(
                      url="https://www.btk.gov.tr/piyasa-gozetimi-ve-denetimi-sikca-sorulan-sorular"),
                 Link(label=_w("BTK: frekans tahsisinden muaf telsiz cihazların teknik ölçütleri",
                               "BTK: technical criteria for licence-exempt radio devices"),
-                     url="https://www.btk.gov.tr/uploads/pages/frekans-tahsisinden-muaf-telsiz-cihaz-sistemleri-olcutler-633d4ca68c0b1.pdf"),
+                     url=BTK_EXEMPT),
+                Link(label=_w("Elektronik Haberleşme Cihazları Güvenlik "
+                              "Sertifikası Yönetmeliği, Madde 2 (Resmî "
+                              "Gazete, 17 Nisan 2018, sayı 30394)",
+                              "Regulation on Safety Certificates for "
+                              "Electronic Communications Devices, Article 2 "
+                              "(Resmî Gazete, 17 April 2018, issue 30394)"),
+                     url=SAFETY_CERTIFICATE),
                 Link(label=_w("6245 sayılı Harcırah Kanunu (Madde 3/g ve 39)",
                               "Travel Allowance Law 6245 (Articles 3(g) and 39)"),
                      url="https://www.mevzuat.gov.tr/mevzuatmetin/1.3.6245.pdf"),
