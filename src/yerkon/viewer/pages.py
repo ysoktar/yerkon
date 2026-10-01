@@ -363,16 +363,16 @@ HOME = Page(
             kind="people",
             heading=_w("Ekip ve iletişim", "Team and contact"),
             lines=(
+                _w("**Mehmet GÖNÜL**\nTOBB ETÜ Bilgisayar Mühendisliği, "
+                   "4. sınıf\n[mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)",
+                   "**Mehmet GÖNÜL**\nTOBB ETÜ Computer Engineering, fourth "
+                   "year\n[mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)"),
                 _w("**Mustafa Göktürk BİNAY**\nTOBB ETÜ Bilgisayar "
                    "Mühendisliği, 2. sınıf\n"
                    "[gokturkbnay@gmail.com](mailto:gokturkbnay@gmail.com)",
                    "**Mustafa Göktürk BİNAY**\nTOBB ETÜ Computer "
                    "Engineering, second year\n"
                    "[gokturkbnay@gmail.com](mailto:gokturkbnay@gmail.com)"),
-                _w("**Mehmet GÖNÜL**\nTOBB ETÜ Bilgisayar Mühendisliği, "
-                   "4. sınıf\n[mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)",
-                   "**Mehmet GÖNÜL**\nTOBB ETÜ Computer Engineering, fourth "
-                   "year\n[mgonul@etu.edu.tr](mailto:mgonul@etu.edu.tr)"),
                 _w("**Yavuz Selim OKTAR**\nTOBB ETÜ Yapay "
                    "Zekâ Mühendisliği, 3. sınıf\n"
                    "[yavuzselimoktar@gmail.com](mailto:yavuzselimoktar@gmail.com)",
