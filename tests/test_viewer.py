@@ -222,7 +222,7 @@ def test_an_arrangement_with_nothing_in_it_draws_but_will_not_run():
         state.scenario_object,
         state.deployed,
     ):
-        with pytest.raises(ValueError, match="Yayın birimi yok|No anchors"):
+        with pytest.raises(ValueError, match="Yayın birimi bulunmamaktadır|No anchors"):
             produces_a_number()
 
 
@@ -1176,7 +1176,7 @@ def test_a_blank_target_field_is_not_a_bar_of_zero():
     wide = target_from({"availability": 0.9, "hpe_p50_m": ""})
     assert wide.availability == 0.9
     assert math.isinf(wide.hpe_p50_m)
-    assert target_from({}).describe() == "belirli bir şey değil"
+    assert target_from({}).describe() == "belirli bir hedef tanımlanmamıştır"
 
 
 def test_applying_an_option_keeps_the_edits_already_made():

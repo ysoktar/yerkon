@@ -332,23 +332,23 @@ const WORDS = {
     surface_roughness_m: ["Yüzey pürüzü", ""],
     target_ranging_sigma_m: ["Mesafe ölçme toleransı", ""],
     eirp_dbm: ["Yasal yayın gücü",
-               "gücü bölgenin tavanı ve antenin kazancı belirliyor"],
+               "güç, bölgenin yasal sınırı ve antenin kazancıyla belirlenmektedir"],
     anchor_height_m: ["Yayın biriminin yüksekliği",
-                      "birimin ne kadar yükseğe takılacağını montaj yapısı belirliyor"],
+                      "yayın biriminin yüksekliği montaj yapısıyla belirlenmektedir"],
     corridor_m: ["Sahanın boyu", ""],
     width_m: ["Sahanın eni", ""],
     site: ["Zemin", ""],
     from_m: ["Grubun başlangıcı",
-             "sahanın dışında kalan birim, modelde olmayan ve hiçbir "
-             + "alıcının geçmediği bir zeminde durur"],
+             "sahanın dışında kalan birim, modelde bulunmayan ve hiçbir "
+             + "alıcının geçmediği bir zeminde yer almaktadır"],
     to_m: ["Grubun bitişi",
-           "sahanın dışında kalan birim, modelde olmayan ve hiçbir "
-           + "alıcının geçmediği bir zeminde durur"],
+           "sahanın dışında kalan birim, modelde bulunmayan ve hiçbir "
+           + "alıcının geçmediği bir zeminde yer almaktadır"],
     usable_range_m: ["Kullanılabilir menzil",
                      "menzil, istenen hassasiyette bağlantı bütçesinin izin "
-                     + "verdiği kadar"],
+                     + "verdiği mesafeyle sınırlıdır"],
     closure_range_m: ["Bağlantının koptuğu mesafe",
-                      "bağlantının nerede koptuğunu aynı bütçe belirliyor"],
+                      "bağlantının koptuğu mesafe aynı bütçeyle belirlenmektedir"],
   },
   // In English the engine's own label and reason are already English, so
   // this only names the two the page adds.
@@ -1177,7 +1177,7 @@ const TERMS = {
   battery_life_years: "akü ömrü (amortisman)",
   battery_tl: "akü fiyatı",
   crew_size: "bakım ekibi kişi sayısı",
-  crew_travels: "ekip şehir dışına gidiyor",
+  crew_travels: "ekibin görev yeri dışına çıkması",
   off_grid_life_years: "güneş beslemesi ömrü (amortisman)",
   per_diem_tl: "harcırah, kişi başı gündelik",
   per_diem_share: "günübirlik görevde gündeliğin payı",
@@ -3066,6 +3066,15 @@ const tr = (value, places = 2) => decimal(value, places);
 const percent = (share, places = 2) => speaks() === "en"
   ? `${tr(share * 100, places)} %` : `%${tr(share * 100, places)}`;
 
+/* Whether the folded price list in the readout is open. The readout is
+   drawn again on every change, so the reader's choice is kept here. */
+let pricesOpen = false;
+document.getElementById("numbers").addEventListener("toggle", event => {
+  if (event.target.classList && event.target.classList.contains("prices")) {
+    pricesOpen = event.target.open;
+  }
+}, true);
+
 function showNumbers(drawn, result, pending) {
   const list = document.getElementById("numbers");
   const rows = [];
@@ -3099,10 +3108,19 @@ function showNumbers(drawn, result, pending) {
 
   // What each group's units and each receiver are built from, and what
   // one costs at one, a hundred and a thousand, from the bill, to the
-  // kuruş as the Cost page prints it.
-  for (const board of drawn.boards || []) {
-    rows.push([say("result.board." + board.of, { name: board.name }),
-               `${board.parts.join(", ")}: ${board.tl.map(v => tr(v, 2)).join(" / ")} TL`]);
+  // kuruş as the Cost page prints it. Folded into one row and closed at
+  // first: the parts lists are long and push every figure below them
+  // out of the panel. Whether the reader opened it outlives a redraw.
+  const boards = drawn.boards || [];
+  if (boards.length) {
+    const items = boards.map(board =>
+      `<li><b>${say("result.prices." + board.of, { name: board.name })}</b>`
+      + `<br>${board.parts.join(", ")}`
+      + `<br>${board.tl.map(v => tr(v, 2)).join(" / ")} TL</li>`).join("");
+    rows.push([say("result.prices"),
+               `<details class="prices"${pricesOpen ? " open" : ""}>`
+               + `<summary>${say("result.prices.show", { count: boards.length })}</summary>`
+               + `<ul>${items}</ul></details>`]);
   }
 
   rows.push([say("result.units"), (drawn.units || []).length]);
@@ -3190,9 +3208,11 @@ function showNumbers(drawn, result, pending) {
   // under the reader.
   // The share resting on assumptions is flagged only when there is one:
   // "%0" in the warning colour read as a problem that was not there.
+  const prices = say("result.prices");
   list.innerHTML = rows.map(([name, value]) =>
-    `<dt>${name}</dt><dd${(name === warn && leaning) || name === hurried
-      ? ' class="warn"' : ""}>`
+    `<dt${name === prices ? ' class="wide"' : ""}>${name}</dt>`
+    + `<dd${(name === warn && leaning) || name === hurried ? ' class="warn"'
+      : name === prices ? ' class="wide"' : ""}>`
     + `${pending ? WORKING : value}</dd>`
   ).join("");
 }

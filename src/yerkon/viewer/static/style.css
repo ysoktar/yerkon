@@ -501,6 +501,12 @@ i.prov.assumption { background: var(--warn); }
    its own box: pinned to the bottom and taller than the panel, its top
    went under the pinned tabs where no scrolling could reach it. */
 #numbers { max-height: 42vh; overflow-y: auto; overscroll-behavior: contain; }
+/* The price list, folded into one row and closed until asked for. */
+#numbers details.prices summary { cursor: pointer; color: var(--accent); }
+#numbers dt.wide { grid-column: 1 / -1; }
+#numbers dd.wide { grid-column: 1 / -1; text-align: left; font-size: 12.5px; }
+#numbers details.prices ul { margin: 6px 0 0; padding: 0; list-style: none; }
+#numbers details.prices li { margin-bottom: 8px; }
 
 
 /* ---------- two languages, both on screen ----------

@@ -281,6 +281,19 @@ img { margin-left: auto; margin-right: auto; }
   background: rgba(8, 12, 16, 0.9); cursor: zoom-out; }
 .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain;
   background: var(--plate); border-radius: 8px; }
+/* Previous and next, on either side, over the dark backdrop in both
+   themes; the count of where the reader is sits under the picture. */
+.lightbox .step { position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 64px; border: 0; border-radius: 8px;
+  background: rgba(8, 12, 16, 0.62); color: #fff; font-size: 34px;
+  line-height: 1; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.lightbox .step:hover, .lightbox .step:focus-visible {
+  background: rgba(8, 12, 16, 0.85); outline: 2px solid #fff; outline-offset: 2px; }
+.lightbox .back { left: 12px; }
+.lightbox .on { right: 12px; }
+.lightbox .count { position: absolute; bottom: 14px; left: 50%;
+  transform: translateX(-50%); color: #fff; font-size: 13px;
+  font-variant-numeric: tabular-nums; opacity: 0.8; }
 figcaption { max-width: 672px; margin: 10px auto 0; color: var(--quiet);
   font-size: 12px; text-align: left; }
 

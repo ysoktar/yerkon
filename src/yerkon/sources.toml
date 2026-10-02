@@ -552,7 +552,7 @@ url = "https://mm.digikey.com/Volume0/opasdata/d220001/medias/docus/483/SX1280-8
 [[source]]
 key = "ebyte-e28-27s-manual"
 group = "radio"
-label.tr = "EBYTE E28-2G4M27S kullanım kılavuzu v1.3 (2024): yongayı SX1281 diye veriyor"
+label.tr = "EBYTE E28-2G4M27S kullanım kılavuzu v1.3 (2024): yongayı SX1281 olarak belirtmektedir"
 label.en = "EBYTE E28-2G4M27S user manual v1.3 (2024): names the chip SX1281"
 url = "https://www.cdebyte.com/pdf-down.aspx?id=2969"
 
@@ -615,7 +615,7 @@ url = "https://www.ebyte.com/product/304.html"
 [[source]]
 key = "ebyte-e22-lbt"
 group = "radio"
-label.tr = "EBYTE: E22 serisi LoRa modüllerinin işlevleri (LBT dahil); E28-2G4M20S sayfasındaki LBT bağlantısı bu yazıya gidiyor"
+label.tr = "EBYTE: E22 serisi LoRa modüllerinin işlevleri (LBT dahil); E28-2G4M20S sayfasındaki LBT bağlantısı bu yazıya yönlendirmektedir"
 label.en = "EBYTE: what the E22 LoRa modules do (LBT among it); the LBT link on the E28-2G4M20S page leads here"
 url = "https://www.ebyte.com/news/2386.html"
 
@@ -685,7 +685,7 @@ url = "https://www.mevzuat.gov.tr/mevzuatmetin/1.4.193.pdf"
 [[source]]
 key = "ebyte-e28-20s-antenna"
 group = "radio"
-label.tr = "EBYTE E28-2G4M20S kullanım kılavuzu v1.30, 9. bölüm: kart üstü PCB anten (varsayılan) ya da IPEX; PCB antenin kazancı verilmiyor"
+label.tr = "EBYTE E28-2G4M20S kullanım kılavuzu v1.30, 9. bölüm: kart üstü PCB anten (varsayılan) ya da IPEX; PCB antenin kazancı belirtilmemektedir"
 label.en = "EBYTE E28-2G4M20S user manual v1.30, section 9: on-board PCB antenna (default) or IPEX; no gain given for the PCB antenna"
 url = "https://www.f1depo.com/class/INNOVAEditor/assets/E28-2G4M20S_Usermanual_EN_v1.30.pdf"
 
@@ -769,7 +769,7 @@ url = "https://satis.powerenerji.com/solar-kablo/"
 [[source]]
 key = "direk-reklam"
 group = "project"
-label.tr = "Tr724: elektrik direkleri reklamları (dağıtım şirketleri 2015'ten beri direkte reklam alanı kiralıyor, en küçük afiş ayda 4700 TL), 11 Mayıs 2019"
+label.tr = "Tr724: elektrik direkleri reklamları (dağıtım şirketleri 2015'ten beri direkte reklam alanı kiralamaktadır, en küçük afiş ayda 4700 TL), 11 Mayıs 2019"
 label.en = "Tr724: advertising on electricity poles (distribution companies have rented pole space since 2015, the smallest poster 4700 TL a month), 11 May 2019"
 url = "https://www.tr724.com/elektrik-direkleri-reklamlari-kimin-cebine-giriyor/"
 
@@ -860,7 +860,7 @@ url = "https://www.analogictips.com/the-pc-board-atomic-clock-part-3-the-csac-ce
 [[source]]
 key = "ege-test-center"
 group = "project"
-label.tr = "Ege Test Center: akredite RED ve EMC testleri (ETSI EN 300 328, EN 301 489-1, -3, -17, -52; EN 17025); fiyat yayımlamıyor, çevrim içi başvuruyla teklif"
+label.tr = "Ege Test Center: akredite RED ve EMC testleri (ETSI EN 300 328, EN 301 489-1, -3, -17, -52; EN 17025); fiyat yayımlamamaktadır; teklif çevrim içi başvuruyla alınmaktadır"
 label.en = "Ege Test Center: accredited RED and EMC tests (ETSI EN 300 328, EN 301 489-1, -3, -17, -52; EN 17025); no published prices, quotation by online application"
 url = "https://www.egetestcenter.com/akredite-red-emc-testleri/"
 

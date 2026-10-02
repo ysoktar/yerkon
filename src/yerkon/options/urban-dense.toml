@@ -10,7 +10,13 @@ name = 'urban-dense'
 title = 'Şehir içi: 300 m ızgara, daha sık aydınlatma direği'
 title_en = 'Urban: a 300 m grid, units on more lighting columns'
 origin = 'shipped'
-note = """Aydınlatma direklerine 600 m yerine 300 m arayla birim. Bir şehirde yapılar zaten var; dolayısıyla bu, geometriyi bir sahanın bedeline değil modüllerin ve montajın bedeline satın alır. Tam çözünürlükteki taramada kullanılabilirlik artıyor, ama direk sayısı dört katına yakın ve maliyet onunla doğrusal artıyor, çünkü her direğin bedeli modül artı montaj."""
+note = """Yayın birimleri aydınlatma direklerine 600 m yerine 300 m arayla \
+yerleştirilmektedir. Şehirde yapılar hâlihazırda bulunduğundan daha \
+iyi geometri yeni saha maliyetiyle değil, yalnızca modül ve montaj \
+maliyetiyle elde edilmektedir. Tam çözünürlüklü taramada \
+kullanılabilirlik artmakta, ancak direk sayısı yaklaşık dört katına \
+çıkmakta ve her direğin maliyeti modül ile montajdan oluştuğundan \
+toplam maliyet de doğrusal olarak artmaktadır."""
 note_en = """Units on lighting columns 300 m apart instead of 600 m. A town has the structures already, so this buys geometry for the price of the modules and the fitting rather than the price of a site. In the full resolution sweep availability rises, but the unit count nearly quadruples and the cost rises with it, because every unit is a module plus a fitting."""
 
 [values]

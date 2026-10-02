@@ -41,7 +41,7 @@ seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C411310.html"
 ladder = [[1, 4.3869], [100, 4.2582]]
 date = "25.09.2026"
-note = "LCSC'nin tablosu 100+ kademesinde bitiyor"
+note = "LCSC tablosu 100+ kademesinde sona ermektedir"
 
 [[part]]
 key = "e28-2g4m20s"
@@ -52,7 +52,7 @@ seller = "JLCPCB"
 url = "https://jlcpcb.com/partdetail/Chengdu_Ebyte_ElecTech-E282G4M20S/C411311"
 ladder = [[1, 5.9566], [10, 5.8105]]
 date = "28.09.2026"
-note = "JLCPCB'nin tablosu 10+ kademesinde bitiyor"
+note = "JLCPCB tablosu 10+ kademesinde sona ermektedir"
 
 [[part]]
 key = "gw-22-5151"
@@ -81,7 +81,7 @@ seller = "LCSC"
 url = "https://www.lcsc.com/product-detail/C411312.html"
 ladder = [[1, 8.7416], [100, 8.4593]]
 date = "25.09.2026"
-note = "güncel kılavuz ve ürün sayfası yongayı SX1281 diye veriyor"
+note = "güncel kılavuz ve ürün sayfası yongayı SX1281 olarak belirtmektedir"
 
 [[part]]
 key = "tl-ant2412d"

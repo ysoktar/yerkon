@@ -18,7 +18,7 @@ export const SAY = {
   // -- chrome ------------------------------------------------------------
   "find.placeholder": { tr: "Ayarlarda ara…  ( / )", en: "Search settings…  ( / )" },
   "find.clear": { tr: "Aramayı temizle", en: "Clear the search" },
-  "find.empty": { tr: "Bu arama hiçbir ayara uymuyor.",
+  "find.empty": { tr: "Bu aramayla eşleşen bir ayar bulunamadı.",
                   en: "Nothing here matches that." },
   "language.pick": { tr: "Dil", en: "Language" },
   "back.site": { tr: "Ana sayfa", en: "Home page" },
@@ -31,36 +31,38 @@ export const SAY = {
   "ground.pick": { tr: "Zemin", en: "Ground" },
   "ground.modelled": { tr: "Modellenmiş (tepeli)", en: "Modelled (rolling)" },
   "ground.real": { tr: "{site} (gerçek zemin)", en: "{site} (real ground)" },
-  "ground.none": { tr: "Ölçülmüş bir zemin seçilmedi; tepeler aşağıdan modellenir.",
+  "ground.none": { tr: "Ölçülmüş bir zemin seçilmemiştir; tepeler aşağıdaki değerlerle"
+                     + " modellenmektedir.",
                    en: "No measured ground chosen; the hills are modelled below." },
   "ground.modelled.note": {
-    tr: "Ölçülmüş bir zemin seçilmemişse tepeler aşağıdaki üç değerden "
-        + "modellenir. Hiçbir yer düz değildir, bu yüzden düz bir seçenek yoktur.",
+    tr: "Ölçülmüş bir zemin seçilmediğinde tepeler aşağıdaki üç değerle"
+      + " modellenmektedir. Gerçekte hiçbir yer düz olmadığından düz "
+      + "zemin seçeneği bulunmamaktadır.",
     en: "With no measured ground chosen, the hills come from the three "
         + "figures below. Nowhere is flat, so there is no flat option.",
   },
   "ground.buildings.note": {
-    tr: "Bu zemin kendi binalarını getiriyor, dolayısıyla engel arazinin "
-        + "içinde. Kilometre başına bir kayıp, arazinin gösteremediği "
-        + "engelin yerine geçer; ikisinin birden sayılması aynı binaların iki "
-        + "kez sayılması olur.",
+    tr: "Bu zemin kendi bina verisini içermektedir; dolayısıyla "
+      + "engeller arazi modelinde yer almaktadır. Kilometre başına "
+      + "kayıp, arazinin gösteremediği engellerin yerine "
+      + "kullanılmaktadır; ikisinin birlikte uygulanması aynı binaların"
+      + " iki kez hesaba katılması anlamına gelecektir.",
     en: "This ground brings its own buildings, so the obstruction is in "
         + "the terrain. A loss per kilometre stands in for obstruction the "
         + "terrain cannot show; charging both counts the same buildings "
         + "twice.",
   },
   "ground.bore.note": {
-    tr: "Bir tünel tepenin içinden geçer, üzerinden değil: tabanı iki "
-        + "portal arasındaki düz çizgidir. Aşağıdaki üç değer, zemin "
-        + "seçilmiş olsun ya da olmasın, bu satırda kullanılmaz.",
+    tr: "Tünel tepenin üzerinden değil içinden geçmektedir: tabanı iki "
+      + "portal arasındaki düz çizgidir. Aşağıdaki üç değer, zemin "
+      + "seçilmiş olsun veya olmasın, bu senaryoda kullanılmamaktadır.",
     en: "A bore goes through the hill rather than over it: its floor is "
         + "the straight line between two portals. The three figures below "
         + "go unread on this row, measured ground or not.",
   },
   "ground.real.note": {
-    tr: "Ölçülmüş bir zemin kendi yükseklik farkını, kendi pürüzünü ve "
-        + "kendi engellerini getirir, bu yüzden aşağıdaki üç değer "
-        + "uygulanmaz.",
+    tr: "Ölçülmüş zemin kendi yükselti farkını, pürüzlülüğünü ve "
+      + "engellerini içerdiğinden aşağıdaki üç değer uygulanmamaktadır.",
     en: "Measured ground brings its own relief, its own roughness and its "
         + "own obstructions, so the three figures below stop applying.",
   },
@@ -70,16 +72,17 @@ export const SAY = {
   // The photograph is under the coverage colours until they are turned
   // off, which read as a photograph that had not loaded.
   "ground.photo.plain": {
-    tr: "Uydu görüntüsü kapsama renklerinin altında kalır. Renksiz görmek "
-        + "için sahnenin sol üstündeki listeden «Yalnız zemin (uydu ve "
-        + "yollar)» seç.",
+    tr: "Uydu görüntüsü kapsama renklerinin altında kalmaktadır. "
+      + "Renksiz görüntülemek için sahnenin sol üstündeki listeden "
+      + "«Yalnız zemin (uydu ve yollar)» seçeneğini seçiniz.",
     en: "The photograph sits under the coverage colours. To see it plain, "
         + "choose “Ground only (photograph and roads)” in the list at the "
         + "top left of the scene.",
   },
   "ground.photo.none": {
-    tr: "Bu yer uydu görüntüsü olmadan getirilmiş. Yeni bir yer getirirken \"Uydu "
-        + "görüntüsünü de getir\" kutusu işaretliyse görüntü de gelir.",
+    tr: "Bu saha uydu görüntüsü olmadan indirilmiştir. Yeni bir saha "
+      + "indirilirken \"Uydu görüntüsünü de getir\" kutusu işaretlenirse "
+      + "görüntü de indirilmektedir.",
     en: "This place was fetched without one. Tick \"Fetch the satellite "
         + "photograph too\" when fetching somewhere new and it comes along.",
   },
@@ -89,8 +92,8 @@ export const SAY = {
   "relief.two": { tr: "Yükseklik: 2 kat abartılı", en: "Relief doubled" },
   "relief.five": { tr: "Yükseklik: 5 kat abartılı", en: "Relief five times" },
   "ground.buildings.from": {
-    tr: "Getirilen binalar; model her birini aynı alanda bir blok olarak "
-        + "görüyor.",
+    tr: "İndirilen binalar; model her binayı aynı taban alanına sahip "
+      + "bir blok olarak ele almaktadır.",
     en: "The fetched buildings; the model sees each as a block of the "
         + "same area.",
   },
@@ -99,7 +102,8 @@ export const SAY = {
     en: "This ground carries no fetched buildings.",
   },
   "ground.roads.from": {
-    tr: "Getirilen yol ağı; araçlar kalın çizgideki güzergâhı sürüyor.",
+    tr: "İndirilen yol ağı; araçlar kalın çizgiyle gösterilen güzergâhı"
+      + " izlemektedir.",
     en: "The fetched road network; the receivers drive the route drawn thick.",
   },
   "ground.roads.none": {
@@ -107,19 +111,21 @@ export const SAY = {
     en: "This ground carries no fetched roads.",
   },
   "ground.photo.modelled": {
-    tr: "Modellenmiş zemin gerçek bir yer olmadığı için uydu görüntüsü yoktur.",
+    tr: "Modellenmiş zemin gerçek bir yere karşılık gelmediğinden uydu "
+      + "görüntüsü bulunmamaktadır.",
     en: "Modelled ground has no photograph: it is nowhere.",
   },
   // -- named arrangements --------------------------------------------
   "site.clipped": {
-    tr: "{asked} km istendi, {held} km tutuldu: saha getirilen zeminden "
-        + "büyük olamaz. Daha büyüğü için o yeri yeniden getir.",
+    tr: "{asked} km istenmiş, {held} km kullanılmıştır: saha indirilen "
+      + "zeminden büyük olamaz. Daha büyük bir saha için ilgili yeri "
+      + "yeniden indiriniz.",
     en: "Asked for {asked} km, held at {held} km: a site cannot be larger "
         + "than the ground fetched for it. Fetch that place again for more.",
   },
   "unit.route": { tr: "Güzergâh", en: "Route" },
   "route.no_road": {
-    tr: "Bu zemin yol geometrisi taşımıyor.",
+    tr: "Bu zeminde yol geometrisi bulunmamaktadır.",
     en: "This ground carries no road geometry.",
   },
   "preset.load": { tr: "Yükle", en: "Load" },
@@ -127,10 +133,11 @@ export const SAY = {
   "preset.drop": { tr: "Sil", en: "Delete" },
   "preset.name": { tr: "Yeni ad…", en: "New name…" },
   "preset.replaced": {
-    tr: "{name} yüklendi. Bu sekmedeki her şeyin yerine geçti: zemin, "
-        + "sahanın boyu ve eni, bütün yayın birimi grupları ve alıcılar, "
-        + "elle taşınmış ve silinmiş yayın birimleri ve elle değiştirilmiş bütün "
-        + "değerler. Diğer sekmelere dokunulmadı.",
+    tr: "{name} yüklenmiştir. Bu sekmedeki tüm ayarların yerini "
+      + "almıştır: zemin, sahanın boyu ve eni, tüm yayın birimi "
+      + "grupları ve alıcılar, elle taşınmış ve silinmiş yayın "
+      + "birimleri ve elle değiştirilmiş tüm değerler. Diğer sekmeler "
+      + "değiştirilmemiştir.",
     en: "{name} is loaded. It replaced everything in this tab: the "
         + "ground, the site's length and width, every broadcast unit group and "
         + "receiver, broadcast units moved and deleted by hand, and every figure "
@@ -141,16 +148,17 @@ export const SAY = {
   "preset.dropped": { tr: "{name} silindi", en: "Deleted {name}" },
   "preset.loaded": { tr: "{name} yüklendi", en: "Loaded {name}" },
   "preset.needs_name": {
-    tr: "Kaydetmek için bir ad yaz. Hazır gelenlerin üzerine yazılmaz.",
+    tr: "Kaydetmek için bir ad giriniz. Hazır düzenlemelerin üzerine "
+      + "yazılamaz.",
     en: "Type a name to save under. The shipped ones are not overwritten.",
   },
   "preset.shipped_kept": {
-    tr: "{name} hazır gelen bir düzenleme; silinmez ve üzerine yazılmaz. "
-        + "Farklı bir ad yaz.",
+    tr: "{name} hazır bir düzenlemedir; silinemez ve üzerine yazılamaz."
+      + " Lütfen farklı bir ad giriniz.",
     en: "{name} is a shipped arrangement; it is not deleted or overwritten. "
         + "Type a different name.",
   },
-  "preset.sure_drop": { tr: "{name} silinsin mi? Dosyası da silinir.",
+  "preset.sure_drop": { tr: "{name} silinsin mi? İlgili dosya da silinecektir.",
                         en: "Delete {name}? Its file goes from the disk." },
   "fetch.map.open": { tr: "Haritadan seç…", en: "Pick it on a map…" },
   "fetch.map.search": { tr: "Yer ara: Konya, Bolu Dağı, D100…",
@@ -162,8 +170,9 @@ export const SAY = {
   "fetch.map.span": { tr: "{across} × {along} km · {points} ızgara noktası",
                       en: "{across} × {along} km · {points} grid points" },
   "fetch.map.hint": {
-    tr: "Sürükle: kaydır · Tekerlek: yakınlaş · Kutuyu taşı, köşelerinden "
-        + "çek · Shift+sürükle ya da Kutu çiz: sıfırdan kutu",
+    tr: "Sürükleme: kaydırma · Tekerlek: yakınlaştırma · Kutuyu taşımak"
+      + " veya köşelerinden boyutlandırmak mümkündür · Shift+sürükleme "
+      + "veya Kutu çiz: yeni kutu",
     en: "Drag to pan · Wheel to zoom · Move the box, drag its corners · "
         + "Shift-drag or Draw a box to start a new one",
   },
@@ -173,8 +182,8 @@ export const SAY = {
   "fetch.map.credit": { tr: "© OpenStreetMap katkıda bulunanları",
                         en: "© OpenStreetMap contributors" },
   "fetch.map.none": {
-    tr: "Harita karosu adresi verilmedi (--map-tiles), o yüzden altta "
-        + "harita yok. Kutuyu yine de çizebilir ve alabilirsin.",
+    tr: "Harita karosu adresi verilmediğinden (--map-tiles) altlık "
+      + "harita gösterilmemektedir. Kutu yine de çizilip alınabilir.",
     en: "No map tile address was given (--map-tiles), so there is no map "
         + "underneath. The box can still be drawn and taken.",
   },
@@ -182,23 +191,26 @@ export const SAY = {
   "fetch.map.nothing": { tr: "Bu ada uyan bir yer bulunamadı.",
                          en: "Nothing here matches that name." },
   "fetch.map.offline": {
-    tr: "Arama servisine ulaşılamadı. Yeri elle bulup kutuyu çizebilirsin.",
+    tr: "Arama servisine ulaşılamamıştır. Yer haritada elle bulunarak "
+      + "kutu çizilebilir.",
     en: "The search service did not answer. Find the place by hand and "
         + "draw the box.",
   },
   "fetch.imagery": { tr: "Uydu görüntüsünü de getir",
                      en: "Fetch the satellite photograph too" },
   "fetch.imagery.note": {
-    tr: "Uydu görüntüsü yalnız zemini boyar, hesaba girmez. Kaynak: Esri, Maxar, "
-        + "Earthstar Geographics, GIS User Community.",
+    tr: "Uydu görüntüsü yalnızca zemin kaplaması olarak kullanılmakta, "
+      + "hesaplamalara dahil edilmemektedir. Kaynak: Esri, Maxar, "
+      + "Earthstar Geographics, GIS User Community.",
     en: "The ground is painted with the photograph; nothing is computed "
         + "from it. Imagery: Esri, Maxar, Earthstar Geographics, GIS User "
         + "Community.",
   },
   "fetch.open": { tr: "Yeni bir yer getir", en: "Fetch somewhere new" },
   "fetch.note": {
-    tr: "Ankara ya da başka bir yer. İnternet yalnız bunun için gerekir; yer bir "
-        + "kez getirilir, sonrası internetsiz çalışır.",
+    tr: "Ankara veya başka bir yer. İnternet bağlantısı yalnızca bu "
+      + "adım için gereklidir; saha bir kez indirildikten sonra "
+      + "simülatör internet bağlantısı olmadan çalışmaktadır.",
     en: "Ankara or anywhere else. This is the only thing that uses the "
         + "network; fetched once, everything after it runs offline.",
   },
@@ -211,14 +223,14 @@ export const SAY = {
   "fetch.size": { tr: "Kutunun bir kenarı", en: "Box across" },
   "fetch.size.out": { tr: "{km} km", en: "{km} km" },
   "fetch.box.map": {
-    tr: "{points} ızgara noktası: haritadan seçilen kutu. Kaydırma çubuğunu "
-        + "geri getirmek için «Bırak».",
+    tr: "{points} ızgara noktası: haritadan seçilen kutu. Kaydırma "
+      + "çubuğuna dönmek için «Bırak» düğmesini kullanınız.",
     en: "{points} grid points: the box picked on the map. Press “Drop” to "
         + "get the slider back.",
   },
   "fetch.box": {
-    tr: "{km} × {km} km, {points} ızgara noktası. Merkezi haritada sağ "
-        + "tıklayarak alabilirsin.",
+    tr: "{km} × {km} km, {points} ızgara noktası. Merkez, haritada sağ "
+      + "tıklanarak seçilebilir.",
     en: "{km} × {km} km, {points} grid points. Right-click a map to read "
         + "the centre off it.",
   },
@@ -234,18 +246,21 @@ export const SAY = {
   // -- step 2, the site ---------------------------------------------------
   "step.site": { tr: "Saha", en: "Site" },
   "site.rows": {
-    tr: "Tablonun üç satırı üç ayrı sekmede durur. Başka sekmeye geçince "
-        + "yaptığın değişiklikler silinmez; her sekme kendi yerleşimini tutar.",
+    tr: "Tablonun üç senaryosu üç ayrı sekmede yer almaktadır. Başka "
+      + "bir sekmeye geçildiğinde yapılan değişiklikler korunmakta; her"
+      + " sekme kendi yerleşimini saklamaktadır.",
     en: "All three rows are held at once. Switching tabs does not discard "
         + "your edits; each tab keeps its own arrangement.",
   },
   "knob.length": { tr: "Boy", en: "Length" },
   "knob.width": { tr: "En", en: "Width" },
   "site.shape": {
-    tr: "En sıfırken saha bir koridordur: yayın birimleri yolun iki yanına "
-        + "dizilir ve alıcılar düz gider. Sıfırdan büyükken saha bir alandır: "
-        + "yayın birimleri kaydırmalı bir ızgaraya yayılır, alıcılar alanın "
-        + "çevresini ve ortasını dolaşır. Geometri ikisinde tamamen farklıdır.",
+    tr: "En sıfır olduğunda saha bir koridordur: yayın birimleri yolun "
+      + "iki yanına dizilmekte ve alıcılar düz bir hat boyunca "
+      + "ilerlemektedir. En sıfırdan büyük olduğunda saha bir alandır: "
+      + "yayın birimleri kaydırmalı bir ızgaraya yerleştirilmekte, "
+      + "alıcılar ise alanın çevresini ve ortasını dolaşmaktadır. İki "
+      + "durumda geometri tamamen farklıdır.",
     en: "At zero width the site is a corridor: broadcast units line the road "
         + "either side and receivers drive straight. Above zero it is an area: "
         + "broadcast units spread over a staggered grid and receivers drive a circuit round the "
@@ -259,9 +274,10 @@ export const SAY = {
   "units.head": { tr: "Alıcılar", en: "Receivers" },
   "units.add": { tr: "Alıcı ekle", en: "Add a receiver" },
   "layout.note": {
-    tr: "Bir yayın birimini sürükleyerek taşı, Shift ile tıklayarak kaldır. "
-        + "Her grubun kendi modülü ve montajı var; alıcı yalnız kendi "
-        + "taşıdığı modülü kullanan birimleri duyar.",
+    tr: "Yayın birimleri sürüklenerek taşınabilir, Shift tuşuyla "
+      + "tıklanarak kaldırılabilir. Her grubun kendi modülü ve montajı "
+      + "bulunmaktadır; alıcı yalnızca kendi taşıdığı modülü kullanan "
+      + "birimlerin sinyalini alabilmektedir.",
     en: "Drag a broadcast unit to move it, shift-click to remove it. Each group "
         + "carries its own module and mounting; each receiver hears the "
         + "units whose modules it carries.",
@@ -280,19 +296,20 @@ export const SAY = {
   "run.drop": { tr: "Grubu kaldır", en: "Remove the group" },
   "run.count": { tr: "{anchors} yayın birimi · menzil {reach} km", en: "{anchors|broadcast unit|broadcast units} · reach {reach} km" },
   "run.disc": {
-    tr: "aramada kullanılan menzil: {metres} m, bu zeminde ölçüldü",
+    tr: "aramada kullanılan menzil: {metres} m, bu zemin üzerinde "
+      + "ölçülmüştür",
     en: "the search placed against {metres} m, measured on this ground",
   },
   "run.disc.ceiling": {
-    tr: "aramada kullanılan menzil: {metres} m, ama ölçülemedi: en yakın "
-        + "uzaklıkta bile bağlantıların onda biri kurulamıyor, gerçek "
-        + "menzil bunun altında",
+    tr: "aramada kullanılan menzil: {metres} m; ancak ölçülememiştir: "
+      + "en yakın mesafede bile bağlantıların onda biri "
+      + "kurulamamaktadır, gerçek menzil bu değerin altındadır",
     en: "the search placed against {metres} m, but nothing was measured: "
         + "even the closest band loses a tenth of its links, so the reach "
         + "is somewhere below it",
   },
   "run.disc.by_hand": {
-    tr: "aramada kullanılan menzil: {metres} m, elle girildi",
+    tr: "aramada kullanılan menzil: {metres} m, elle girilmiştir",
     en: "the search placed against {metres} m, set by hand",
   },
   "run.bar.met": {
@@ -307,12 +324,13 @@ export const SAY = {
     en: "{share} % has four units in reach",
   },
   "run.bar.serves_nothing": {
-    tr: "ama hiçbir yere dört birim erişmiyor: bu yerleşim konum vermez",
+    tr: "ancak hiçbir noktaya dört birim ulaşmamaktadır: bu yerleşim "
+      + "konum üretemez",
     en: "but nowhere has four: this arrangement gives no position",
   },
   "run.bar.dilution.short": {
-    tr: "hedefe ulaşılamadı: sahanın bir kısmında hiç konum "
-        + "alınamıyor, {short} bağlantı eksik",
+    tr: "hedefe ulaşılamadı: sahanın bir bölümünde konum "
+      + "hesaplanamamaktadır, {short} bağlantı eksiktir",
     en: "did not clear its bar: part of the site cannot be fixed at all, "
         + "{short} sightings short",
   },
@@ -321,13 +339,14 @@ export const SAY = {
     en: "did not clear its bar: HDOP {got} against {wanted} asked for",
   },
   "run.bar.anchors_in_reach": {
-    tr: "hedefe ulaşılamadı: bir yerde yalnız {got} birim duyuluyor, "
-        + "istenen {wanted}",
+    tr: "hedefe ulaşılamadı: bir noktada yalnızca {got} birim "
+      + "alınabilmektedir, istenen {wanted}",
     en: "did not clear its bar: somewhere has {got} units in reach "
         + "against {wanted} asked for",
   },
   "run.bar.covered_share": {
-    tr: "hedefe ulaşılamadı: {short} hücreye hiçbir birim erişmiyor",
+    tr: "hedefe ulaşılamadı: {short} hücreye hiçbir birim "
+      + "ulaşmamaktadır",
     en: "did not clear its bar: no broadcast unit reaches {short} cells",
   },
   "run.bar.budget": {
@@ -345,7 +364,7 @@ export const SAY = {
   "unit.start": { tr: "Başlangıç noktası (m)", en: "Start (m)" },
   "unit.antenna": { tr: "Anten yüksekliği (m)", en: "Antenna (m)" },
   "unit.drop": { tr: "Alıcıyı kaldır", en: "Remove the receiver" },
-  "unit.hears": { tr: "{anchors} yayın birimini duyuyor", en: "hears {anchors|broadcast unit|broadcast units}" },
+  "unit.hears": { tr: "{anchors} yayın biriminden sinyal alıyor", en: "hears {anchors|broadcast unit|broadcast units}" },
   "unit.least": { tr: "En az bir alıcı gerekli.",
                   en: "At least one receiver is needed." },
   "unit.needs_module": { tr: "Alıcıda en az bir modül olmalı.",
@@ -355,7 +374,9 @@ export const SAY = {
   "step.target": { tr: "Hedef", en: "Target" },
   "target.setup": { tr: "Donanım kurulumu", en: "Hardware setup" },
   "target.setup.note": {
-    tr: "Yayın biriminin, araç alıcısının ve yaya alıcısının modülünü, yayın birimi ve araç antenini ve uyulacak kuralı birlikte seçer. UWB grupları değişmez.",
+    tr: "Yayın birimi, araç alıcısı ve yaya alıcısının modülünü, yayın "
+      + "birimi ve araç antenini ve uygulanacak mevzuat kuralını "
+      + "birlikte belirler. UWB grupları değişmemektedir.",
     en: "Picks the module of the broadcast unit, the vehicle receiver and the pedestrian receiver, the broadcast unit and vehicle antennas and the rule together. UWB groups stay as they are.",
   },
   "target.pole_antenna": { tr: "Yayın birimi anteni", en: "Broadcast unit antenna" },
@@ -365,9 +386,10 @@ export const SAY = {
   "antenna.vehicle.row": { tr: "5 dBi çubuk (Taoglas GW.22.5151)", en: "5 dBi rod (Taoglas GW.22.5151)" },
   "antenna.vehicle.roof": { tr: "8 dBi araç tavanı anteni, kabloyla (L-com HGV-2409U)", en: "8 dBi roof antenna on a cable (L-com HGV-2409U)" },
   "setup.custom": { tr: "Elle ayarlanmış", en: "Set by hand" },
-  "setup.e28-20s": { tr: "E28-2G4M20S her birimde, FHSS ve LBT ile belgeli (tablonun)", en: "E28-2G4M20S on every unit, certified with FHSS and LBT (the table's)" },
-  "setup.e28-12s": { tr: "E28-2G4M12S yalnız yayın biriminde, FHSS ve LBT ile belgeli", en: "E28-2G4M12S on the broadcast unit only, certified with FHSS and LBT" },
-  "setup.e28-27s": { tr: "E28-2G4M27S yalnız yayın biriminde, FHSS ve LBT ile belgeli", en: "E28-2G4M27S on the broadcast unit only, certified with FHSS and LBT" },
+  "setup.e28-20s": { tr: "Tüm birimlerde E28-2G4M20S, FHSS ve LBT ile belgeli (tablodaki"
+                       + " düzen)", en: "E28-2G4M20S on every unit, certified with FHSS and LBT (the table's)" },
+  "setup.e28-12s": { tr: "Yalnızca yayın biriminde E28-2G4M12S, FHSS ve LBT ile belgeli", en: "E28-2G4M12S on the broadcast unit only, certified with FHSS and LBT" },
+  "setup.e28-27s": { tr: "Yalnızca yayın biriminde E28-2G4M27S, FHSS ve LBT ile belgeli", en: "E28-2G4M27S on the broadcast unit only, certified with FHSS and LBT" },
   "setup.e28-12s-uncertified": { tr: "E28-2G4M12S yalnız yayın biriminde, belgesiz", en: "E28-2G4M12S on the broadcast unit only, no certificate" },
   "setup.o4": { tr: "Eski kurulum (O4): E28-2G4M12S, 12 dBi dış ortam ve 8 dBi araç tavanı anteni, belgesiz", en: "Old setup (O4): E28-2G4M12S, 12 dBi mast and 8 dBi roof antennas, no certificate" },
   "target.region": { tr: "Bölge", en: "Region" },
@@ -390,14 +412,16 @@ export const SAY = {
   "step.basis": { tr: "Dayanak", en: "Basis" },
   "options.head": { tr: "Hazır seçenekler", en: "Ready-made options" },
   "options.note": {
-    tr: "Her seçenek, hesapta kullanılan birkaç değeri değiştiren kısa bir "
-        + "listedir. Uygulanınca elle yaptığın değişikliklerin yanına eklenir; "
-        + "hepsini geri almak için \"Değişiklikleri geri al\" yeter.",
+    tr: "Her seçenek, hesapta kullanılan birkaç değeri değiştiren kısa "
+      + "bir listedir. Uygulandığında elle yapılan değişikliklere "
+      + "eklenmektedir; tümünü geri almak için \"Değişiklikleri geri al\""
+      + " düğmesi kullanılabilir.",
     en: "Each option is a short list of edits to the figures. Applying "
         + "one composes with your own edits rather than replacing them; "
         + "\"Undo edits\" takes them all back.",
   },
-  "options.none": { tr: "Hazır seçenek yok. «En ucuz yerleşimi ara» ile bir tane kaydedebilirsin.",
+  "options.none": { tr: "Hazır seçenek bulunmamaktadır. «En ucuz yerleşimi ara» ile "
+                      + "yeni bir seçenek kaydedilebilir.",
                     en: "No options yet. Save one with “Search for the cheapest layout”." },
   "options.same": { tr: "şu anki değerlerle aynı",
                     en: "the same as the current settings" },
@@ -405,8 +429,9 @@ export const SAY = {
   "options.applied": { tr: "{name} uygulandı.", en: "{name} applied." },
   "figures.head": { tr: "Hesapta kullanılan değerler", en: "Default figures" },
   "figures.note": {
-    tr: "Hesabın dayandığı bütün değerler burada, kaynaklarıyla. Birini "
-        + "değiştirdiğinde her şey yeniden hesaplanır.",
+    tr: "Hesabın dayandığı tüm değerler kaynaklarıyla birlikte burada "
+      + "listelenmektedir. Bir değer değiştirildiğinde tüm sonuçlar "
+      + "yeniden hesaplanmaktadır.",
     en: "Every figure the calculation rests on is here, with its source. "
         + "Change one and everything is worked out again.",
   },
@@ -431,10 +456,11 @@ export const SAY = {
   // -- step 6, running it -------------------------------------------------
   "step.run": { tr: "Çalıştır", en: "Run" },
   "run.note": {
-    tr: "Tablonun satırlarını bu sayfadaki değerlerle çalıştırır, ekranda "
-        + "sürüklediğin yerleşimle değil; onun için aşağıdaki "
-        + "\"Simülasyonu çalıştır\" düğmesi var. Birkaç dakika sürer; "
-        + "ilerlemesi aşağıda görünür.",
+    tr: "Tablonun senaryolarını ekranda düzenlenen yerleşimle değil, bu"
+      + " sayfadaki değerlerle çalıştırır; düzenlenen yerleşim için "
+      + "aşağıdaki \"Simülasyonu çalıştır\" düğmesi kullanılmalıdır. "
+      + "İşlem birkaç dakika sürmekte olup ilerleme aşağıda "
+      + "gösterilmektedir.",
     en: "Runs the table's rows against the figures on this page, not "
         + "against the arrangement you dragged on screen; \"Run the "
         + "simulation\" below does that. Minutes, with progress below.",
@@ -450,9 +476,9 @@ export const SAY = {
   "deliver.go": { tr: "Markdown dosyası olarak kaydet", en: "Write as Markdown" },
   "solve.head": { tr: "En ucuz yerleşimi ara", en: "Search for the cheapest layout" },
   "solve.note": {
-    tr: "Hedefi karşılayan en ucuz yerleşimi arar. Boş bıraktığın kutu "
-        + "koşul sayılmaz. Bulduğu yerleşimi verdiğin adla hazır seçenek "
-        + "olarak kaydeder.",
+    tr: "Hedefi karşılayan en düşük maliyetli yerleşimi arar. Boş "
+      + "bırakılan kutular koşul olarak değerlendirilmez. Bulunan "
+      + "yerleşim, girilen adla hazır seçenek olarak kaydedilir.",
     en: "Searches for the cheapest arrangement that meets the target. A "
         + "field left empty is not a condition. Saves what it finds under "
         + "a name, as an option.",
@@ -468,14 +494,16 @@ export const SAY = {
   // -- the placement search (ADR-0081) -------------------------------------
   "place.head": { tr: "En iyi yerleşimi bul", en: "Find the best layout" },
   "place.note": {
-    tr: "Yayın birimlerini ızgaraya değil zaten yüksek olan yerlere koyar: var olan "
-        + "aydınlatma direkleri ve tabelalar, yol kenarındaki direkler "
-        + "(şehirde aydınlatma, kırsalda elektrik dağıtım direği) ve "
-        + "tepelere dikilecek 25 m'lik direkler. Çatılar kiralık olduğu için "
-        + "aday sayılmaz. Her aday bağlantı bütçesiyle "
-        + "denenir; bir hücre, dört birim ona ulaştığında ve bu birimler "
-        + "çevresindeki dört çeyreğin en az üçünde durduğunda sayılır. "
-        + "Ölçülmüş zemin ister ve birkaç dakika sürer.",
+    tr: "Yayın birimlerini bir ızgaraya değil, mevcut yüksek yapılara "
+      + "yerleştirir: aydınlatma direkleri ve tabelalar, yol "
+      + "kenarındaki direkler (şehir içinde aydınlatma direği, kırsalda"
+      + " elektrik dağıtım direği) ve tepelere dikilecek 25 m'lik "
+      + "direkler. Çatılar kira gerektirdiğinden aday olarak "
+      + "değerlendirilmez. Her aday bağlantı bütçesiyle sınanır; bir "
+      + "hücrenin kapsanmış sayılması için dört birimin bu hücreye "
+      + "ulaşması ve bu birimlerin hücrenin çevresindeki dört çeyreğin "
+      + "en az üçünde bulunması gerekir. Ölçülmüş zemin gerektirir ve "
+      + "birkaç dakika sürer.",
     en: "Puts the broadcast units on places that are already high rather than on "
         + "a grid: existing lighting columns and signs, poles along the "
         + "road (lighting columns in town, electricity distribution poles in "
@@ -499,8 +527,9 @@ export const SAY = {
   "place.found": { tr: "Aramanın bulduğu", en: "Search" },
   "place.use": { tr: "Bu yerleşimi uygula", en: "Use this layout" },
   "place.judge": {
-    tr: "Bu sayılar aramanın kendi hesabı. Asıl sonucu simülasyon verir: "
-        + "uyguladıktan sonra \"Simülasyonu çalıştır\" düğmesine bas.",
+    tr: "Bu değerler aramanın kendi tahminidir. Asıl sonuç simülasyonla"
+      + " elde edilmektedir: yerleşimi uyguladıktan sonra \"Simülasyonu "
+      + "çalıştır\" düğmesine basınız.",
     en: "These are the search's own count. The simulation decides: "
         + "after applying it, press \"Run the simulation\".",
   },
@@ -515,21 +544,29 @@ export const SAY = {
   "result.hurry": { tr: "Hızlı deneme", en: "Quick trial" },
   "result.hurry.on": { tr: "Hızlı deneme: açık", en: "Quick trial: on" },
   "result.hurried": {
-    tr: "Bu sayılar hızlı denemeden, yayımlanacak olanlar değil",
+    tr: "Bu değerler hızlı denemeden elde edilmiştir; yayımlanan "
+      + "sonuçlar değildir",
     en: "from a quick trial, not the published figures",
   },
   "result.hurried.draws": {
-    tr: "rastgele gölgeleme sekiz yerine bir kez üretiliyor",
+    tr: "rastgele gölgeleme sekiz yerine bir kez üretilmektedir",
     en: "the shadows are drawn once rather than eight times",
   },
   "result.hurried.profile": {
-    tr: "arazi kesiti her 10 m yerine sabit 64 noktada okunuyor",
+    tr: "arazi kesiti her 10 m yerine sabit 64 noktada örneklenmektedir",
     en: "the profile is read at a fixed 64 samples rather than every 10 m",
   },
   "result.anchors": { tr: "Yayın birimi sayısı", en: "Broadcast units" },
   "result.units": { tr: "Alıcı sayısı", en: "Receivers" },
   "result.round": { tr: "Bir ölçüm turunun süresi", en: "Round" },
   "result.rate": { tr: "Konum sıklığı", en: "Fix rate" },
+  "result.prices": { tr: "Birim fiyatları", en: "Unit prices" },
+  "result.prices.show": {
+    tr: "{count} ürün, 1 / 100 / 1000 adetlik fiyatlar",
+    en: "{count|product|products}, priced at 1 / 100 / 1000",
+  },
+  "result.prices.run": { tr: "{name} yayın birimi", en: "{name} broadcast unit" },
+  "result.prices.unit": { tr: "{name} alıcısı", en: "{name} receiver" },
   "result.board.run": { tr: "{name} yayın birimi (1 / 100 / 1000 adet)", en: "{name} broadcast unit (1 / 100 / 1000)" },
   "result.board.unit": { tr: "{name} alıcısı (1 / 100 / 1000 adet)", en: "{name} receiver (1 / 100 / 1000)" },
   "result.unit_range": { tr: "{unit} ↔ {run}: menzil", en: "{unit} ↔ {run}: range" },
@@ -585,18 +622,19 @@ export const SAY = {
   "confirm.follows": { tr: "Bunlar da değişti", en: "These followed" },
   "confirm.group": { tr: "{run} grubu", en: "group {run}" },
   // The one question left: deleting a saved arrangement's file.
-  "confirm.head": { tr: "Emin misin?", en: "Are you sure?" },
+  "confirm.head": { tr: "Emin misiniz?", en: "Are you sure?" },
   "confirm.yes": { tr: "Sil", en: "Delete" },
   "confirm.no": { tr: "Vazgeç", en: "Cancel" },
 
   // -- the first-time path: a place, a layout, a run -----------------------
-  "quick.head": { tr: "Hızlı başla: seçtiğin yer için en iyi yerleşim",
+  "quick.head": { tr: "Hızlı başla: seçilen yer için en iyi yerleşim",
                   en: "Quick start: the best layout for a place you pick" },
   "quick.note": {
-    tr: "Haritada bir yer seç. Sayfa oranın zeminini, binalarını, yollarını "
-        + "ve uydu görüntüsünü getirir, yayın birimlerini var olan yüksek "
-        + "yerlere en iyi biçimde yerleştirir ve hızlı bir simülasyon çalıştırır. "
-        + "2 km'lik bir kutu birkaç dakika sürer; kutu büyüdükçe süre uzar.",
+    tr: "Haritada bir yer seçiniz. Sayfa, seçilen yerin zeminini, "
+      + "binalarını, yollarını ve uydu görüntüsünü indirir, yayın "
+      + "birimlerini mevcut yüksek yapılara en uygun biçimde "
+      + "yerleştirir ve hızlı bir simülasyon çalıştırır. 2 km'lik bir "
+      + "kutu birkaç dakika sürmekte; kutu büyüdükçe süre uzamaktadır.",
     en: "Pick a place on the map. The page fetches its ground, buildings, "
         + "roads and satellite photograph, puts the broadcast units on the "
         + "best of the high places already there, and runs a quick "
@@ -604,12 +642,12 @@ export const SAY = {
   },
   "quick.go": { tr: "Haritadan yer seç ve başla", en: "Pick a place and start" },
   "quick.map": {
-    tr: "Yeri ara ya da haritayı kaydır, kutuyu yerleştir ve «Bu alanı al» "
-        + "düğmesine bas. 2-3 km önerilir.",
+    tr: "Yeri arayınız veya haritayı kaydırınız, kutuyu yerleştirip «Bu"
+      + " alanı al» düğmesine basınız. 2-3 km önerilmektedir.",
     en: "Search for the place or drag the map, set the box and press "
         + "“Take this ground”. 2 to 3 km is best.",
   },
-  "quick.fetch": { tr: "Zemin, binalar, yollar ve uydu görüntüsü getiriliyor",
+  "quick.fetch": { tr: "Zemin, binalar, yollar ve uydu görüntüsü indiriliyor",
                    en: "Fetching the ground, buildings, roads and photograph" },
   "quick.ground": { tr: "Yeni zemine geçiliyor", en: "Moving onto the new ground" },
   "quick.place": { tr: "Yayın birimleri en iyi yerlere yerleştiriliyor",
@@ -617,15 +655,16 @@ export const SAY = {
   "quick.run": { tr: "Hızlı simülasyon çalıştırılıyor",
                  en: "Running a quick simulation" },
   "quick.done": {
-    tr: "Bitti. Sonuç aşağıda. Yayımlanacak doğrulukta sayı için «Hızlı "
-        + "deneme: açık» düğmesini kapatıp «Simülasyonu çalıştır»a bas.",
+    tr: "İşlem tamamlanmıştır; sonuç aşağıdadır. Yayımlanan sonuçlarla "
+      + "aynı doğrulukta değerler için «Hızlı deneme: açık» düğmesini "
+      + "kapatıp «Simülasyonu çalıştır» düğmesine basınız.",
     en: "Done. The result is below. For publication-grade figures, turn "
         + "“Quick trial: on” off and press “Run the simulation”.",
   },
   "quick.failed": { tr: "Durdu: {why}", en: "Stopped: {why}" },
   "quick.big": {
-    tr: "Bu kutu {area} km². Büyük kutularda yerleştirme uzun sürer; 2-3 km "
-        + "daha hızlıdır.",
+    tr: "Bu kutu {area} km²'dir. Büyük kutularda yerleştirme uzun "
+      + "sürmektedir; 2-3 km'lik kutular daha hızlıdır.",
     en: "This box is {area} km². Placing takes long on big boxes; 2 to 3 km "
         + "is quicker.",
   },
@@ -647,7 +686,8 @@ export const SAY = {
   "roads.forward": { tr: "Yolları öne çıkar", en: "Bring the roads forward" },
   "sweep.cell": { tr: "Kapsama çözünürlüğü: {metres} m", en: "Coverage cell: {metres} m" },
   "sweep.note": {
-    tr: "Kapsamanın kaç metrede bir hesaplandığı. Küçük değer daha ayrıntılı ama daha yavaş.",
+    tr: "Kapsamanın kaç metrede bir hesaplandığıdır. Küçük değerler "
+      + "daha ayrıntılı, ancak daha yavaştır.",
     en: "How often coverage is worked out, in metres. A smaller cell is finer and slower.",
   },
   "quality.auto": { tr: "Görüntü kalitesi: otomatik ({level})", en: "Picture quality: automatic ({level})" },
@@ -658,10 +698,12 @@ export const SAY = {
   "quality.medium": { tr: "Görüntü kalitesi: orta", en: "Picture quality: medium" },
   "quality.high": { tr: "Görüntü kalitesi: yüksek", en: "Picture quality: high" },
   "quality.note": {
-    tr: "Sahnenin bu cihazda ne kadar ayrıntılı çizileceği: ekran keskinliği, çizilen "
-        + "bina ve uydu görüntüsü parçası sayısı, ayrıntılı zeminin ne kadar geniş bir "
-        + "alana getirildiği ve sahne dönerken de tam çizilip çizilmediği. Otomatik "
-        + "seçenek, cihazın işlemci sayısına ve belleğine bakarak seçer.",
+    tr: "Sahnenin bu cihazda hangi ayrıntı düzeyinde çizileceğidir: "
+      + "ekran keskinliği, çizilen bina ve uydu görüntüsü parçası "
+      + "sayısı, ayrıntılı zeminin kapsadığı alan ve sahne "
+      + "döndürülürken de tam çizim yapılıp yapılmadığı. Otomatik "
+      + "seçenek, cihazın işlemci sayısına ve belleğine göre seçim "
+      + "yapar.",
     en: "How much this device draws: sharpness against the screen, how many buildings "
         + "and photo tiles, how wide the near ground is fetched, and whether a moving "
         + "frame keeps the exact picture. Automatic reads the device's processors and "
@@ -669,14 +711,16 @@ export const SAY = {
   },
   "scene.motion": { tr: "Telefonu çevirerek bak", en: "Look by turning the phone" },
   "scene.motion.denied": {
-    tr: "Telefon hareket bilgisini vermedi; ayarlardan izin verilebilir.",
+    tr: "Telefon hareket sensörü verisine erişim izni vermemiştir; izin"
+      + " cihaz ayarlarından verilebilir.",
     en: "The phone did not give its motion; it can be allowed in its settings.",
   },
   // -- the tunnel, drawn flat ------------------------------------------
   "bore.plan": { tr: "Tünel, üstten", en: "The tunnel from above" },
   "bore.plan.note": {
-    tr: "Tünel {width} m genişliğinde; iki duvar ayırt edilsin diye genişlik "
-        + "uzunluğa göre büyütülerek çizildi.",
+    tr: "Tünel {width} m genişliğindedir; iki duvarın ayırt "
+      + "edilebilmesi için genişlik, uzunluğa göre büyütülerek "
+      + "çizilmiştir.",
     en: "The bore is {width} m wide; the width is stretched against the "
         + "length so the two walls can be told apart.",
   },
@@ -684,7 +728,8 @@ export const SAY = {
   "bore.portal.out": { tr: "Çıkış ağzı", en: "Exit portal" },
   "bore.section": { tr: "Boyuna kesit", en: "Long section" },
   "bore.section.note": {
-    tr: "Yolun yüksekliği ve birimler; iki ağız arasında {rise} m fark var.",
+    tr: "Yol yüksekliği ve yayın birimleri; iki portal arasında {rise} "
+      + "m yükselti farkı bulunmaktadır.",
     en: "The road's height and the broadcast units; the portals are {rise} m apart "
         + "in height.",
   },
@@ -693,48 +738,52 @@ export const SAY = {
   "scene.fits": { tr: "bütün tüneli sığdır", en: "fit the whole tunnel" },
   "scene.arrows": { tr: "Oklar", en: "Arrows" },
   // -- what the ground overlay reads (ADR-0044) ------------------------
-  "layer.anchors": { tr: "Kaç yayın birimi erişiyor", en: "Broadcast units in reach" },
+  "layer.anchors": { tr: "Ulaşan yayın birimi sayısı", en: "Broadcast units in reach" },
   "layer.margin_db": { tr: "Sinyal payı", en: "Signal margin" },
   "layer.dilution": { tr: "Yerleşim geometrisi (HDOP)", en: "Geometry (HDOP)" },
   "layer.error_m": { tr: "Beklenen konum hatası", en: "Expected position error" },
   "layer.ground": { tr: "Yalnız zemin (uydu ve yollar)",
                     en: "Ground only (photograph and roads)" },
   "layer.ground.note": {
-    tr: "Kapsama renkleri kapalı; zemin, uydu görüntüsü ve yollar görünür.",
+    tr: "Kapsama renkleri kapalıdır; zemin, uydu görüntüsü ve yollar "
+      + "görüntülenmektedir.",
     en: "Coverage colours off, so the ground, the photograph and the "
         + "roads show.",
   },
   "layer.anchors.note": {
-    tr: "Bir hücreye kaç yayın biriminin eriştiği. Konum için en az üç "
-        + "gerekir; dördüncüsü konumu denetler.",
+    tr: "Bir hücreye ulaşan yayın birimi sayısıdır. Konum hesabı için "
+      + "en az üç birim gerekmekte, dördüncü birim ise konumun "
+      + "doğrulanmasını sağlamaktadır.",
     en: "How many broadcast units reach a cell. Three is the fewest that gives a "
         + "position; a fourth checks it.",
   },
   "layer.margin_db.note": {
-    tr: "En güçlü bağlantının kopmadan önce ne kadar daha zayıflayabileceği. "
-        + "6 dB'nin altı az, 20 dB rahat.",
+    tr: "En güçlü bağlantının kopmadan önce ne kadar daha "
+      + "zayıflayabileceğidir. 6 dB'nin altı yetersiz, 20 dB ise "
+      + "yeterli bir paydır.",
     en: "How much the strongest link has to spare before it stops "
         + "working. Under 6 dB is thin; 20 dB is comfortable.",
   },
   "layer.dilution.note": {
-    tr: "Birimlerin diziliminin mesafe ölçme hatasını kaç katına "
-        + "çıkardığı. Birimler tek sıra hâlindeyse sıraya dik yöndeki hata "
-        + "sonsuza gider.",
+    tr: "Yayın birimlerinin geometrik diziliminin mesafe ölçüm hatasını"
+      + " kaç kat büyüttüğüdür. Birimler tek sıra hâlinde dizildiğinde "
+      + "sıraya dik yöndeki hata sınırsız büyümektedir.",
     en: "How much the layout of the broadcast units multiplies a ranging "
         + "error. Units in a single line take it to infinity across that line.",
   },
   "layer.error_m.note": {
-    tr: "Mesafe ölçme hatası × geometri. Bu satırın kendi toleransının "
-        + "katlarıyla renklendiriliyor. Bu bir tahmin, simülasyon "
-        + "değil: saat kayması, kaybolan mesaj ve gerçekten oradan geçen "
-        + "bir alıcı yok. Yayımlanan sayı 'Simülasyonu çalıştır' "
-        + "düğmesinden gelir.",
+    tr: "Mesafe ölçüm hatası × geometri. Renkler, bu senaryonun kendi "
+      + "toleransının katlarına göre belirlenmektedir. Bu değer bir "
+      + "tahmin olup simülasyon sonucu değildir: saat kayması, kaybolan"
+      + " mesajlar ve bölgeden fiilen geçen bir alıcı hesaba "
+      + "katılmamaktadır. Yayımlanan değerler 'Simülasyonu çalıştır' "
+      + "düğmesiyle elde edilmektedir.",
     en: "Ranging sigma times geometry, coloured in multiples of this "
         + "row's own tolerance. An estimate and not a simulation: no "
         + "clock drift, no lost packets, no receiver actually driving "
         + "through. The published number comes from the run.",
   },
-  "legend.nothing": { tr: "boyanmayan yer: hiçbir yayın birimi erişmiyor",
+  "legend.nothing": { tr: "renklendirilmeyen alan: hiçbir yayın birimi ulaşmamaktadır",
                       en: "unpainted: no broadcast unit reaches" },
   "legend.served": { tr: "Konum alınabilen alan (≥4 yayın birimi)",
                      en: "Ground with a position (≥4 broadcast units)" },
@@ -778,15 +827,17 @@ export const SAY = {
   "budget.first": { tr: "İlk iyileştirilecek yer: {remedy}.",
                     en: "Where to spend first: {remedy}." },
   "budget.no_dominant": {
-    tr: "Tek bir baskın kaynak yok: en büyük ikisi birbirine yakın.",
+    tr: "Tek bir baskın hata kaynağı bulunmamaktadır: en büyük iki "
+      + "kaynak birbirine yakındır.",
     en: "No single source dominates: the largest two are close.",
   },
   "budget.note": {
-    tr: "\"Tek başına\" o kaynak tek olsaydı kalacak hata; \"kalkarsa\" o "
-        + "kaynak gidince toplamın ineceği yer. İkincisi her zaman daha "
-        + "küçüktür, çünkü hatalar kareleri üzerinden toplanır; bir "
-        + "parçayı iyileştirmeye değip değmeyeceğine ona bakarak karar "
-        + "verilir.",
+    tr: "\"Tek başına\", yalnızca o kaynak bulunsaydı oluşacak hatayı; "
+      + "\"kalkarsa\", o kaynak giderildiğinde toplam hatanın ineceği "
+      + "değeri göstermektedir. Hatalar kareleri üzerinden "
+      + "toplandığından ikinci değer her zaman daha küçüktür; bir "
+      + "bileşenin iyileştirilmesinin değip değmeyeceğine bu değere "
+      + "bakılarak karar verilmelidir.",
     en: "\"Alone\" is the error that would remain if that source were the "
         + "only one; \"removed\" is where the total falls to once it is "
         + "gone. The second is always the smaller, because errors add in "
@@ -799,10 +850,12 @@ export const SAY = {
   "vary.add": { tr: "Değer ekle", en: "Add a figure" },
   "vary.reset": { tr: "Önerilen değerlere dön", en: "Back to the suggested" },
   "vary.count": {
-    tr: "{candidates} yerleşim denenecek. Her biri tam bir simülasyon.",
+    tr: "{candidates} yerleşim denenecektir. Her biri tam bir "
+      + "simülasyon gerektirmektedir.",
     en: "{candidates} arrangements will be tried. Each is a full simulation.",
   },
-  "vary.none": { tr: "Aranacak değer yok. Bir değer ekle ya da önerilen değerlere dön.",
+  "vary.none": { tr: "Aranacak değer bulunmamaktadır. Bir değer ekleyiniz veya "
+                   + "önerilen değerlere dönünüz.",
                  en: "Nothing to search over. Add a figure, or go back to "
                      + "the suggested." },
 
@@ -852,8 +905,9 @@ export const SAY = {
   "busy.working": { tr: "Çalışıyor…", en: "Working…" },
   "busy.starting": { tr: "Başlatılıyor…", en: "Starting…" },
   "fetch.cannot": {
-    tr: "Bu kurulum saha indiremiyor: {missing} eksik. Kurmak için: "
-        + "pip install -e \".[dev,sites]\". Windows için docs/WINDOWS.md.",
+    tr: "Bu kurulum saha indirememektedir: {missing} eksiktir. Kurulum "
+      + "için: pip install -e \".[dev,sites]\". Windows için "
+      + "docs/WINDOWS.md dosyasına bakınız.",
     en: "This install cannot fetch ground: {missing} missing. Install with: "
         + "pip install -e \".[dev,sites]\". On Windows see docs/WINDOWS.md.",
   },

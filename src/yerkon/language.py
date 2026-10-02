@@ -99,59 +99,64 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "{count} buildings from {source}",
     },
     "site.no_buildings": {
-        "tr": "bina verisi yok, bu yüzden her yerde açık arazi varsayıldı",
+        "tr": "bina verisi bulunmadığından her yerde açık arazi "
+              "varsayılmıştır",
         "en": "no building data, so open ground is assumed everywhere",
     },
     "site.heights_tagged": {
-        "tr": "{tagged} bina yüksekliği etiketlenmiş, {levels} tanesi kat "
-              "sayısından, {defaulted} tanesi {default_m:.0f} m varsayıldı",
+        "tr": "{tagged} bina yüksekliği etiketten alınmış, {levels} "
+              "tanesi kat sayısından hesaplanmış, {defaulted} tanesi için"
+              " {default_m:.0f} m varsayılmıştır",
         "en": "{tagged} building heights tagged, {levels} from storey "
               "counts, {defaulted} defaulted to {default_m:.0f} m",
     },
     "site.footprints": {
-        "tr": "Taban alanları, yükseklikten çıkarılan bir alana sahip "
-              "dairelerdir; çünkü OpenStreetMap'ten dış hatlar değil "
-              "merkezler getirildi. Bir link bütçesi yalnızca bir binanın "
-              "yolda olup olmadığını sorar.",
+        "tr": "OpenStreetMap'ten bina dış hatları değil merkez noktaları "
+              "indirildiğinden taban alanları, yükseklikten türetilen "
+              "alana sahip daireler olarak modellenmiştir. Bağlantı "
+              "bütçesi için yalnızca bir binanın sinyal yolu üzerinde "
+              "bulunup bulunmadığı önemlidir.",
         "en": "Footprints are circles of an area implied by height, "
               "because OpenStreetMap centres were fetched rather than "
               "outlines. A link budget only asks whether a building is in "
               "the way.",
     },
     "site.unreachable": {
-        "tr": "{name} erişilemedi: {error}",
+        "tr": "{name} kaynağına erişilemedi: {error}",
         "en": "{name} unavailable: {error}",
     },
     "site.no_answer": {
-        "tr": "{name} cevap vermedi: {error}",
+        "tr": "{name} yanıt vermedi: {error}",
         "en": "{name} did not answer: {error}",
     },
     "site.footprints_measured": {
-        "tr": "Taban alanları, her binanın kendi sınır kutusundan ölçüldü "
-              "({release} sürümü); yükseklikten çıkarılmadı.",
+        "tr": "Taban alanları, her binanın kendi sınır kutusundan "
+              "ölçülmüştür ({release} sürümü); yükseklikten "
+              "türetilmemiştir.",
         "en": "Footprints are measured from each building's own bounding "
               "box (release {release}), not implied by height.",
     },
     "point.none": {
-        "tr": "Merkez girilmedi. Haritada yere sağ tıklayıp koordinatı "
-              "yapıştır, örneğin 39,9250 32,8370",
+        "tr": "Merkez girilmedi. Haritada ilgili yere sağ tıklayıp "
+              "koordinatı yapıştırınız; örneğin 39,9250 32,8370",
         "en": "No centre given. Right-click the place on a map and paste "
               "what it gives you, for example 39.9250, 32.8370",
     },
     "point.unreadable": {
-        "tr": "{text!r} bir enlem ve boylam olarak okunmuyor. 39,9250 "
-              "32,8370 ya da 39.9250, 32.8370 gibi yaz.",
+        "tr": "{text!r} enlem ve boylam olarak okunamadı. Lütfen 39,9250 "
+              "32,8370 veya 39.9250, 32.8370 biçiminde giriniz.",
         "en": "{text!r} does not read as a latitude and a longitude. Write "
               "them as 39,9250 32,8370 or 39.9250, 32.8370",
     },
     "point.not_a_latitude": {
-        "tr": "{value} bir enlem değil; enlem -90 ile 90 arasındadır. "
-              "Önce enlem yazılır.",
+        "tr": "{value} geçerli bir enlem değildir; enlem -90 ile 90 "
+              "arasında olmalıdır. Önce enlem girilmelidir.",
         "en": "{value} is not a latitude; it runs from -90 to 90. Latitude "
               "comes first.",
     },
     "point.not_a_longitude": {
-        "tr": "{value} bir boylam değil; boylam -180 ile 180 arasındadır.",
+        "tr": "{value} geçerli bir boylam değildir; boylam -180 ile 180 "
+              "arasında olmalıdır.",
         "en": "{value} is not a longitude; it runs from -180 to 180.",
     },
     # -- routes a receiver drives (ADR-0045) -------------------------------
@@ -164,16 +169,18 @@ CATALOGUE: dict[str, dict[str, str]] = {
     "route.waypoints": { "tr": "Rastgele duraklar", "en": "Random waypoints" },
     "route.road": { "tr": "Gerçek yol", "en": "The real road" },
     "route.no_road": {
-        "tr": "Bu zemin yol geometrisi taşımıyor, o yüzden gerçek yol "
-              "çizilemiyor. Getirmenin yolları da alması gerekir.",
+        "tr": "Bu zeminde yol geometrisi bulunmadığından gerçek yol "
+              "güzergâhı çizilememektedir. Saha indirilirken yol "
+              "verisinin de indirilmesi gerekmektedir.",
         "en": "This ground carries no road geometry, so the real road "
               "cannot be drawn. A fetch has to bring roads too.",
     },
     "deployment.no_anchors": {
-        "tr": "Yayın birimi yok: ya hiçbir grup birim yerleştirmiyor ya da "
-              "hepsi silinmiş. Elle yerleşim bilerek boş başlar: birimleri "
-              "sürükleyerek koy ya da başka bir yöntem seç. (Boş bir "
-              "düzenleme çizilebilir ama çalıştırılamaz.)",
+        "tr": "Yayın birimi bulunmamaktadır: hiçbir grup birim "
+              "yerleştirmemekte veya tüm birimler silinmiş durumdadır. "
+              "Elle yerleşim bilinçli olarak boş başlamaktadır: birimleri"
+              " sürükleyerek yerleştiriniz veya başka bir yöntem seçiniz."
+              " (Boş bir düzenleme çizilebilir, ancak çalıştırılamaz.)",
         "en": "No broadcast units: every group either places none or has had "
               "them all removed. The by-hand layout starts empty on purpose: "
               "drag units in, or choose another method. (An empty arrangement "
@@ -181,14 +188,15 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     # -- named arrangements (ADR-0043) ------------------------------------
     "preset.bad_name": {
-        "tr": "{name!r} bir düzenleme adı değil: harf ya da rakamla başlar, "
-              "içinde harf, rakam, tire ve alt çizgi olur.",
+        "tr": "{name!r} geçerli bir düzenleme adı değildir: ad harf veya "
+              "rakamla başlamalı ve yalnızca harf, rakam, tire ve alt "
+              "çizgi içermelidir.",
         "en": "{name!r} is not an arrangement name: it starts with a letter "
               "or a digit and holds letters, digits, dashes and underscores.",
     },
     "preset.unknown": {
-        "tr": "{directory} içinde {name!r} diye bir düzenleme yok. "
-              "Olanlar: {known}",
+        "tr": "{directory} içinde {name!r} adlı bir düzenleme "
+              "bulunmamaktadır. Mevcut düzenlemeler: {known}",
         "en": "No arrangement called {name!r} in {directory}. "
               "There are: {known}",
     },
@@ -197,7 +205,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "{path} could not be read: {error}",
     },
     "preset.incomplete": {
-        "tr": "{source} bir düzenleme değil; eksik olan: {missing}",
+        "tr": "{source} geçerli bir düzenleme değildir; eksik alan: "
+              "{missing}",
         "en": "{source} is not an arrangement; it is missing: {missing}",
     },
     "preset.from": {
@@ -213,7 +222,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "{count} road segments from {name} ({classes})",
     },
     "site.no_roads": {
-        "tr": "{name} bu kutuda sürülecek yol bulamadı",
+        "tr": "{name} bu kutuda izlenecek bir yol bulamadı",
         "en": "{name} found no road to drive in this box",
     },
     "site.furniture": {
@@ -230,17 +239,20 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Aerial imagery needs Pillow: pip install \"yerkon[sites]\"",
     },
     "site.no_imagery_url": {
-        "tr": "Hava görüntüsü için bir karo adresi verilmedi. Sağlayıcıyı "
-              "sen seçiyorsun: her birinin kendi koşulları var ve çoğu "
-              "anahtar istiyor. Bir örnek README.md'de, \"Yeni bir saha "
-              "getirmek\" başlığında.",
+        "tr": "Hava görüntüsü için bir karo adresi verilmemiştir. "
+              "Sağlayıcı kullanıcı tarafından seçilmelidir: her "
+              "sağlayıcının kendi kullanım koşulları bulunmakta ve çoğu "
+              "bir erişim anahtarı gerektirmektedir. Örnek bir "
+              'yapılandırma README.md dosyasının "Yeni bir saha getirmek"'
+              " başlığında yer almaktadır.",
         "en": "No tile URL given for the imagery. You choose the provider: "
               "each has its own terms and most want a key. There is an "
               "example in README.md, under \"Yeni bir saha getirmek\".",
     },
     "site.too_many_tiles": {
-        "tr": "{tiles} karo, {zoom} yakınlıkta; sınır {most}. Daha düşük "
-              "bir yakınlık ya da daha küçük bir kutu seç.",
+        "tr": "{zoom} yakınlıkta {tiles} karo gerekmektedir; sınır "
+              "{most}. Daha düşük bir yakınlık veya daha küçük bir kutu "
+              "seçiniz.",
         "en": "{tiles} tiles at zoom {zoom}, and the limit is {most}. Pick a "
               "lower zoom or a smaller box.",
     },
@@ -249,8 +261,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
         # names the source, and "aerial imagery unreachable: aerial
         # imagery returned no tiles" is a sentence nobody wrote on
         # purpose.
-        "tr": "hiçbir karo dönmedi. Adres şablonunu, anahtarı ve ağı "
-              "denetle.",
+        "tr": "hiçbir karo alınamadı. Adres şablonunu, erişim anahtarını "
+              "ve ağ bağlantısını kontrol ediniz.",
         "en": "no tiles came back at all. Check the URL template, the key "
               "and the network.",
     },
@@ -281,7 +293,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "pip install -e \".[dev,sites]\"",
     },
     "site.no_elevation": {
-        "tr": "Hiçbir yükseklik kaynağı cevap vermedi.\n  {detail}",
+        "tr": "Hiçbir yükseklik kaynağı yanıt vermedi.\n  {detail}",
         "en": "No elevation source answered.\n  {detail}",
     },
     "site.no_sources": {
@@ -300,18 +312,19 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "{value} fixes a second",
     },
     "target.nothing": {
-        "tr": "belirli bir şey değil",
+        "tr": "belirli bir hedef tanımlanmamıştır",
         "en": "nothing in particular",
     },
     "solve.none_met": {
-        "tr": "{target} koşulunu hiçbir yerleşim karşılamadı; kaydedilecek bir "
-              "seçenek yok",
+        "tr": "{target} koşulunu karşılayan bir yerleşim bulunamadı; "
+              "kaydedilecek bir seçenek bulunmamaktadır",
         "en": "nothing met {target}; there is no option to save",
     },
     "solve.already_met": {
-        "tr": "ayarlar {target} koşulunu zaten karşılıyor; onu karşılayan en "
-              "ucuz yerleşim şimdiki yerleşimin kendisi, yani kaydedilecek bir "
-              "şey yok",
+        "tr": "mevcut ayarlar {target} koşulunu zaten karşılamaktadır; bu"
+              " koşulu karşılayan en düşük maliyetli yerleşim mevcut "
+              "yerleşimdir, dolayısıyla kaydedilecek yeni bir seçenek "
+              "bulunmamaktadır",
         "en": "the settings already meet {target}; the cheapest arrangement "
               "that meets it is the one you have, so there is nothing to "
               "save",
@@ -321,15 +334,16 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "{scenario}: {target}, {anchors} broadcast units, {capex} TL",
     },
     "solve.note": {
-        "tr": "{scenario} satırının {tried} yerleşimi, üzerinde durduğu gerçek "
-              "zemine karşı denenerek bulundu; {target} koşulunu "
-              "karşılayanların en ucuzu tutuldu.\n\n"
-              "{anchors} yayın birimiyle, %{availability} kullanılabilirlik, "
-              "ellinci yüzdelikte {hpe_p50} m ve doksan beşinci yüzdelikte "
-              "{hpe_p95} m, saniyede {fixes} sabitleme veriyor.\n\n"
-              "Her aday, uydurulmuş bir model değil tam bir benzetimdi; "
-              "yani bu sayılar tablonun geldiği motorun ta kendisinden "
-              "geliyor.",
+        "tr": "{scenario} senaryosu için {tried} yerleşim, senaryonun "
+              "gerçek zemini üzerinde denenmiş; {target} koşulunu "
+              "karşılayanlar arasından en düşük maliyetli olanı "
+              "seçilmiştir.\n\nSeçilen yerleşim {anchors} yayın birimiyle "
+              "%{availability} kullanılabilirlik, ellinci yüzdelikte "
+              "{hpe_p50} m, doksan beşinci yüzdelikte {hpe_p95} m hata ve"
+              " saniyede {fixes} konum sağlamaktadır.\n\nHer aday, yaklaşık"
+              " bir model yerine tam bir simülasyonla "
+              "değerlendirilmiştir; dolayısıyla bu değerler tablonun "
+              "hesaplandığı motorla aynı yöntemden elde edilmektedir.",
         "en": "Found by searching {tried} arrangements of the {scenario} "
               "row against the real ground it stands on, and keeping the "
               "cheapest that met {target}.\n\n"
@@ -350,7 +364,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Regular grid",
     },
     "layout.hex": {
-        "tr": "Petek ızgara: alanı en az birimle örter",
+        "tr": "Petek ızgara: alanı en az birimle kapsar",
         "en": "Honeycomb grid: covers the area with the fewest units",
     },
     "layout.corridor": {
@@ -362,7 +376,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Only round the edge of the site",
     },
     "layout.greedy-coverage": {
-        "tr": "Otomatik: sinyal en geniş alana ulaşsın",
+        "tr": "Otomatik: sinyalin en geniş alana ulaşması",
         "en": "Automatic: the signal reaches the widest area",
     },
     "layout.greedy-dop": {
@@ -370,7 +384,7 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Automatic: the best geometry for a position",
     },
     "layout.k-cover": {
-        "tr": "Otomatik: her noktaya dört birim",
+        "tr": "Otomatik: her noktaya dört birimin ulaşması",
         "en": "Automatic: four units over every point",
     },
     "layout.placed": {
@@ -378,7 +392,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Best layout: existing poles and structures (what the table uses)",
     },
     "layout.manual": {
-        "tr": "Elle: boş başla, birimleri kendin koy",
+        "tr": "Elle: boş başlangıç, birimler kullanıcı tarafından "
+              "yerleştirilir",
         "en": "By hand: start empty and put the units yourself",
     },
     # The four kinds the list is grouped under, so the nine read as four
@@ -389,26 +404,27 @@ CATALOGUE: dict[str, dict[str, str]] = {
                               "en": "Structures already standing"},
     "layout.group.hand": {"tr": "Elle", "en": "By hand"},
     "layout.needs_map": {
-        "tr": "Bu yöntem yol kenarındaki yapıları kullanır; bu zemin "
-              "getirilmiş yol verisi taşımıyor.",
+        "tr": "Bu yöntem yol kenarındaki yapıları kullanmaktadır; ancak "
+              "bu zeminde indirilmiş yol verisi bulunmamaktadır.",
         "en": "This method uses the structures beside the road, and this "
               "ground carries no fetched road data.",
     },
     # -- why the confirmation panel says a figure has to move ------------
     "panel.past_the_site": {
-        "tr": "sahanın ucunu geçen bir yayın birimi, modelde olmayan bir "
-              "zeminde durur ve hiçbir alıcı oradan geçmez",
+        "tr": "sahanın sınırını aşan bir yayın birimi, modelde bulunmayan"
+              " bir zeminde yer alır ve hiçbir alıcı oradan geçmez",
         "en": "a broadcast unit past the end of the site stands on ground the "
               "simulation does not model, and no receiver passes it",
     },
     "panel.filled_the_ground": {
-        "tr": "saha, getirilen zeminin tamamıydı ve öyle kalıyor",
+        "tr": "saha, indirilen zeminin tamamını kapsamaktadır ve bu "
+              "şekilde korunmaktadır",
         "en": "the site was the whole of its ground and stays so",
     },
     "panel.past_the_measurement": {
         "tr": "bir saha, kendisi için indirilen zeminden büyük olamaz; "
-              "kenarın ötesinde yalnızca sınır satırının bir düzleme "
-              "uzatılmışı vardır",
+              "sınırın ötesinde yalnızca kenar verisinin düz bir yüzeye "
+              "uzatılmış hâli bulunmaktadır",
         "en": "a site is no larger than the ground fetched for it; past the "
               "edge there is only the boundary row extruded into a plane",
     },
@@ -423,16 +439,16 @@ CATALOGUE: dict[str, dict[str, str]] = {
     # that reports in Turkish is the half-and-half surface ADR-0035 was
     # written to end.
     "task.table.running": {
-        "tr": "{rows} satır {workers} süreçte çalışıyor.",
+        "tr": "{rows} senaryo {workers} süreçte çalıştırılıyor.",
         "en": "Running {rows} row{s} on {workers} processes.",
     },
     "task.budget.running": {
-        "tr": "{runs} simülasyon çalışıyor: {rows} satır, {sources} hata "
-              "kaynağına karşı, {workers} süreçte.",
+        "tr": "{runs} simülasyon çalıştırılıyor: {rows} senaryo, "
+              "{sources} hata kaynağı, {workers} süreç.",
         "en": "Running {runs} simulations: {rows} scenario{s} against "
               "{sources} sources, on {workers} processes.",
     },
-    "task.done": {"tr": "Bitti.", "en": "Done."},
+    "task.done": {"tr": "Tamamlandı.", "en": "Done."},
     "task.solve.searching": {
         "tr": "{scenario} için {candidates} yerleşim, {target} hedefine karşı, "
               "{workers} süreçte aranıyor.",
@@ -447,15 +463,15 @@ CATALOGUE: dict[str, dict[str, str]] = {
     },
     "task.solve.meets": {"tr": "  ← karşılıyor", "en": "  ← meets"},
     "task.solve.none_met": {
-        "tr": "Hiçbiri karşılamadı.",
+        "tr": "Hiçbir yerleşim koşulu karşılamadı.",
         "en": "Nothing met it.",
     },
     "task.solve.met": {
-        "tr": "{tried} yerleşimin {met} tanesi karşıladı.",
+        "tr": "{tried} yerleşimin {met} tanesi koşulu karşıladı.",
         "en": "{met} of {tried} met it.",
     },
     "task.solve.saved": {
-        "tr": "{name} olarak kaydedildi.",
+        "tr": "{name} adıyla kaydedildi.",
         "en": "Saved as {name}.",
     },
     "task.place.searching": {
@@ -470,22 +486,24 @@ CATALOGUE: dict[str, dict[str, str]] = {
         "en": "Candidates tried: {share} %",
     },
     "task.place.chose": {
-        "tr": "{anchors} yayın birimi yeri seçildi ({kinds}). Hizmet verilen "
-              "hücre %{share} (şimdiki yerleşim %{grid_share}); ömür boyu "
-              "maliyet {cost} TL (şimdiki yerleşim {grid_cost} TL).",
+        "tr": "{anchors} yayın birimi konumu seçildi ({kinds}). Hizmet "
+              "verilen hücre oranı %{share} (mevcut yerleşim "
+              "%{grid_share}); ömür boyu maliyet {cost} TL (mevcut "
+              "yerleşim {grid_cost} TL).",
         "en": "Chose {anchors} broadcast unit sites ({kinds}). Cells served {share} % "
               "(current layout {grid_share} %); lifecycle cost {cost} TL "
               "(current layout {grid_cost} TL).",
     },
     "task.place.needs_ground": {
-        "tr": "En iyi yerleşim araması ölçülmüş bir zemin ister: yapıları, "
-              "binaları ve yolları oradan okur.",
+        "tr": "En iyi yerleşim araması ölçülmüş bir zemin "
+              "gerektirmektedir: yapılar, binalar ve yollar bu zeminden "
+              "okunmaktadır.",
         "en": "The placement search needs measured ground: it reads the "
               "structures, buildings and roads from it.",
     },
     # The anchors the row already had, whatever laid them out: the
     # search keeps them as candidates so it can never do worse.
-    "place.origin.grid": {"tr": "şimdiki yerleşimden", "en": "from the current layout"},
+    "place.origin.grid": {"tr": "mevcut yerleşimden", "en": "from the current layout"},
     "place.origin.furniture": {"tr": "var olan direkler ve tabelalar",
                                "en": "existing columns and signs"},
     "place.origin.rooftop": {"tr": "çatı", "en": "rooftop"},
@@ -501,7 +519,8 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "{spacing_m} m.",
     },
     "task.fetch.slow": {
-        "tr": "Buradaki ağı kullanan tek şey. Bir süre alabilir.",
+        "tr": "Bu adım internet bağlantısı gerektiren tek işlemdir ve bir"
+              " süre alabilir.",
         "en": "The only thing here that uses the network. It can take a "
               "while.",
     },
@@ -512,11 +531,12 @@ CATALOGUE: dict[str, dict[str, str]] = {
               "{roughness_m} m",
     },
     "task.deliver.table": {
-        "tr": "Tablo çalışıyor.",
+        "tr": "Tablo hesaplanıyor.",
         "en": "Running the table.",
     },
     "task.deliver.budget": {
-        "tr": "Hata parçalarına ayrılıyor. Yavaş olan kısım bu.",
+        "tr": "Hata, bileşenlerine ayrıştırılıyor. Bu adım işlemin en "
+              "yavaş kısmıdır.",
         "en": "Taking the error apart. This is the slow part.",
     },
     "task.deliver.wrote": {"tr": "{path} yazıldı", "en": "Wrote {path}"},

@@ -166,7 +166,7 @@ def test_a_site_without_buildings_says_so_rather_than_implying_open_ground():
     """The difference between 'no buildings here' and 'nobody looked'."""
     manifest = SiteManifest("SRTM", 30.0, "2026-09-09T00:00:00+00:00")
     assert not manifest.has_buildings
-    assert "bina verisi yok" in manifest.describe()
+    assert "bina verisi bulunmadığından" in manifest.describe()
 
 
 def test_a_site_with_buildings_reports_where_they_came_from():
@@ -255,7 +255,7 @@ def test_a_source_that_failed_is_recorded_not_hidden():
 
 
 def test_no_ground_at_all_is_the_one_fatal_case():
-    with pytest.raises(Unreachable, match="Hiçbir yükseklik kaynağı cevap vermedi"):
+    with pytest.raises(Unreachable, match="Hiçbir yükseklik kaynağı yanıt vermedi"):
         build_site(ANKARA, elevation_sources=(DeadSource(),))
 
 
@@ -274,7 +274,7 @@ def test_missing_buildings_do_not_stop_a_fetch():
     )
     assert site.buildings is None
     assert not site.manifest.has_buildings
-    assert any("dead OSM erişilemedi" in note for note in site.manifest.notes)
+    assert any("dead OSM kaynağına erişilemedi" in note for note in site.manifest.notes)
 
 
 # --- The GeoTIFF reader ---------------------------------------------------
@@ -422,7 +422,7 @@ def test_a_mapped_height_beats_a_storey_count_beats_a_default(monkeypatch):
     # The one with no centre is dropped; Overpass returns those.
     assert len(buildings.height_m) == 4
     assert list(buildings.height_m) == [24.0, 31.0, 24.0, 9.0]
-    assert "2 bina yüksekliği etiketlenmiş, 1 tanesi kat sayısından" in (
+    assert "2 bina yüksekliği etiketten alınmış, 1 tanesi kat sayısından" in (
         " ".join(notes)
     )
 

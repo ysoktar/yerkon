@@ -256,7 +256,7 @@ def test_a_search_will_not_save_an_option_that_changes_nothing():
             "rural.anchor_spacing_m": DEFAULTS.number("rural.anchor_spacing_m")
         }),),
     )
-    with pytest.raises(AlreadyMet, match="zaten karşılıyor"):
+    with pytest.raises(AlreadyMet, match="zaten karşılamaktadır"):
         found.as_option("pointless")
 
 

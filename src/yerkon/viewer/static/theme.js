@@ -11,8 +11,10 @@
   var root = document.documentElement;
   var button = document.getElementById("theme");
   var words = {
-    tr: { title: "Koyu ve açık arasında geç", close: "Kapat" },
-    en: { title: "Switch dark and light", close: "Close" },
+    tr: { title: "Koyu ve açık arasında geç", close: "Kapat",
+          back: "Önceki fotoğraf", on: "Sonraki fotoğraf" },
+    en: { title: "Switch dark and light", close: "Close",
+          back: "Previous picture", on: "Next picture" },
   };
   var SUN = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" '
     + 'stroke="currentColor" stroke-width="2" stroke-linecap="round">'
@@ -67,23 +69,73 @@
       link.rel = "noopener";
     });
 
-  /* Any picture in a figure opens to the whole screen. */
+  /* Any picture in a figure opens to the whole screen. With others
+     beside it (the pictures of the same strip, or else of the page) the
+     arrows on screen and the arrow keys move through them, and so does
+     a swipe on a phone. */
   document.addEventListener("click", function (event) {
     var picture = event.target.closest && event.target.closest("figure img");
     if (!picture) return;
+    var strip = picture.closest(".slides");
+    var group = Array.prototype.slice.call(
+      (strip || document).querySelectorAll("figure img"));
+    var at = Math.max(0, group.indexOf(picture));
     var box = document.createElement("div");
     box.className = "lightbox";
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-label", said.close);
     var big = document.createElement("img");
-    big.src = picture.currentSrc || picture.src;
-    big.alt = picture.alt;
     box.appendChild(big);
+    var count = document.createElement("span");
+    count.className = "count";
+    function show(index) {
+      at = (index + group.length) % group.length;
+      var shown = group[at];
+      big.src = shown.currentSrc || shown.src;
+      big.alt = shown.alt;
+      count.textContent = (at + 1) + " / " + group.length;
+    }
+    function arrow(name, step, glyph) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "step " + name;
+      button.title = said[name];
+      button.setAttribute("aria-label", said[name]);
+      button.textContent = glyph;
+      button.addEventListener("click", function (click) {
+        click.stopPropagation();
+        show(at + step);
+      });
+      box.appendChild(button);
+    }
+    if (group.length > 1) {
+      arrow("back", -1, "‹");
+      arrow("on", 1, "›");
+      box.appendChild(count);
+    }
+    show(at);
     function close() {
       box.remove();
       document.removeEventListener("keydown", onKey);
     }
-    function onKey(key) { if (key.key === "Escape") close(); }
+    function onKey(key) {
+      if (key.key === "Escape") close();
+      else if (group.length > 1 && key.key === "ArrowLeft") show(at - 1);
+      else if (group.length > 1 && key.key === "ArrowRight") show(at + 1);
+    }
+    var startX = null;
+    box.addEventListener("touchstart", function (touch) {
+      startX = touch.touches.length === 1 ? touch.touches[0].clientX : null;
+    }, { passive: true });
+    box.addEventListener("touchend", function (touch) {
+      if (startX === null || group.length < 2) return;
+      var dx = touch.changedTouches[0].clientX - startX;
+      startX = null;
+      if (Math.abs(dx) > 50) {
+        touch.preventDefault();
+        show(at + (dx < 0 ? 1 : -1));
+      }
+    });
     box.addEventListener("click", close);
     document.addEventListener("keydown", onKey);
     document.body.appendChild(box);
