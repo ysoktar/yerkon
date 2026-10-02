@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=4c1c841012";
+import { decimal, say, speak, speaks } from "./words.js?v=3e1d1f1af2";
 
 /* The choices whose names are this page's to give.
  *
@@ -574,7 +574,15 @@ function drawWords() {
 function drawGestures() {
   const gestures = document.getElementById("gestures");
   if (!gestures) return;
-  const lines = flatTunnel() ? [
+  // A tablet has no wheel, no right button and no keyboard: it is told
+  // what its fingers do instead.
+  const touch = window.matchMedia
+    && matchMedia("(pointer: coarse)").matches
+    && !matchMedia("(any-pointer: fine)").matches;
+  const lines = touch ? [
+    [say("scene.finger"), flatTunnel() ? say("scene.along") : say("scene.turns")],
+    [say("scene.fingers"), say("scene.pinch")],
+  ] : flatTunnel() ? [
     [say("scene.drag"), say("scene.along")],
     [say("scene.wheel"), say("scene.closer")],
     [say("scene.arrows"), say("scene.along")],
@@ -590,6 +598,7 @@ function drawGestures() {
   ];
   gestures.innerHTML = lines.map(([key, what]) => `<b>${key}</b>: ${what}`)
     .join(" · ");
+  keepLegendUnderHint();
   // What only the three dimensional scene has.
   for (const id of ["relief-pick", "roads-forward"]) {
     const control = document.getElementById(id);
@@ -598,6 +607,30 @@ function drawGestures() {
   const turning = document.getElementById("motion");
   if (turning && turning.dataset.can) turning.hidden = flatTunnel();
 }
+
+/* The key sits under the camera hint, however many lines the hint takes
+ * on a narrow scene; at a fixed height a two-line hint covered it. */
+function keepLegendUnderHint() {
+  const hint = document.getElementById("controls-hint");
+  const legend = document.getElementById("legend");
+  if (!hint || !legend) return;
+  legend.style.top = "";
+  const box = hint.getBoundingClientRect();
+  if (!box.height) return;
+  legend.style.top = `${Math.round(box.bottom + 8)}px`;
+}
+window.addEventListener("resize", keepLegendUnderHint);
+
+(function wireLegendToggle() {
+  const toggle = document.getElementById("legend-toggle");
+  const legend = document.getElementById("legend");
+  if (!toggle || !legend) return;
+  toggle.onclick = () => {
+    const open = !legend.classList.contains("open");
+    legend.classList.toggle("open", open);
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  };
+})();
 
 function drawLanguages() {
   const host = document.getElementById("languages");
@@ -681,7 +714,7 @@ async function showRow(name) {
 function drawSites() {
   const select = document.getElementById("site");
   const entries = [["", say("ground.modelled")]]
-    .concat(SITES.map(name => [name, say("ground.real", { site: name })]));
+    .concat(SITES.map(name => [name, say("ground.real", { site: placeName(name) })]));
   select.innerHTML = options(entries, state.site || "");
   // Through the panel: a smaller fetch cannot hold a larger site, so
   // choosing ground can pull the length, the width and the anchor runs
@@ -1050,7 +1083,7 @@ function drawUnits() {
     const head = document.createElement("header");
     head.innerHTML =
       `<span class="swatch" style="background:#b4551d;border-radius:50%"></span>` +
-      `<b>${unit.identifier}</b>` +
+      `<b>${unitName(unit.identifier)}</b>` +
       `<button class="drop" title="${say("unit.drop")}">✕</button>`;
     head.querySelector(".drop").onclick = () => {
       const units = state.units.filter((_, i) => i !== index);
@@ -1431,7 +1464,7 @@ function drawSummary() {
 
   const said = {
     "sum-place": state.site
-      ? say("sum.place.real", { site: state.site })
+      ? say("sum.place.real", { site: placeName(state.site) })
       : say("sum.place.modelled", {
           relief: UNITS.relief_m(state.relief_m),
           spacing: UNITS.hill_spacing_m(state.hill_spacing_m),
@@ -1755,9 +1788,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=4c1c841012";
-import * as flat from "./bore.js?v=4c1c841012";
-import * as pick from "./map.js?v=4c1c841012";
+import * as draw from "./draw.js?v=3e1d1f1af2";
+import * as flat from "./bore.js?v=3e1d1f1af2";
+import * as pick from "./map.js?v=3e1d1f1af2";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1881,15 +1914,19 @@ function quality() {
  * looking at the map's to make. */
 /* The answer folds away, and starts folded: the scene is what a visitor
  * comes for first, and the numbers are one tap away. */
+function openReadout(open) {
+  const box = document.getElementById("readout");
+  const head = document.getElementById("readout-head");
+  if (!box || !head) return;
+  box.classList.toggle("open", open);
+  head.setAttribute("aria-expanded", open ? "true" : "false");
+}
+
 function wireReadout() {
   const box = document.getElementById("readout");
   const head = document.getElementById("readout-head");
   if (!box || !head) return;
-  head.onclick = () => {
-    const open = !box.classList.contains("open");
-    box.classList.toggle("open", open);
-    head.setAttribute("aria-expanded", open ? "true" : "false");
-  };
+  head.onclick = () => openReadout(!box.classList.contains("open"));
 }
 wireReadout();
 
@@ -2512,7 +2549,7 @@ function paintScene() {
       ));
     }
   }
-  items.push(...draw.units(view, latest.units || []));
+  items.push(...draw.units(view, latest.units || [], unitName));
 
   markers = items.filter(item => item.kind === "mast");
   draw.paint(context, width, height, items);
@@ -3074,6 +3111,21 @@ function frameEverything() {
 
 /* ---------- numbers ---------- */
 
+/* A receiver's name as the reader's language says it. The rows name
+ * their receivers in Turkish ("araç", "yaya"), and those names are also
+ * their keys, so only what is shown changes; a name somebody typed is
+ * shown as typed. */
+/* A shipped place's name as it is spelled, rather than the folder it
+ * is kept in ("kizilay"); a place somebody fetched keeps its own name. */
+const PLACE_NAMES = { kizilay: "Kızılay", polatli: "Polatlı",
+                      golbasi: "Gölbaşı", kizilcahamam: "Kızılcahamam" };
+const placeName = name => PLACE_NAMES[name] || name;
+
+const UNIT_NAMES = { en: { "araç": "vehicle", "yaya": "pedestrian" } };
+function unitName(id) {
+  return (UNIT_NAMES[speaks()] || {})[id] || id;
+}
+
 const tr = (value, places = 2) => decimal(value, places);
 // A share as each language writes it: "%96,65" in Turkish, "96,65 %"
 // in English, the way the site's pages do.
@@ -3113,7 +3165,7 @@ function showNumbers(drawn, result, pending) {
   // the run uses, both ways and over open ground: the most the pairing
   // gives, where the group's reach above uses a stock antenna at both ends.
   for (const pair of drawn.ranges || []) {
-    rows.push([say("result.unit_range", { unit: pair.unit, run: pair.run }),
+    rows.push([say("result.unit_range", { unit: unitName(pair.unit), run: pair.run }),
                pair.closes_m == null ? say("result.unit_range.none")
                  : say("result.unit_range.value", {
                      closes: tr(pair.closes_m / 1000),
@@ -3128,7 +3180,8 @@ function showNumbers(drawn, result, pending) {
   const boards = drawn.boards || [];
   if (boards.length) {
     const items = boards.map(board =>
-      `<li><b>${say("result.prices." + board.of, { name: board.name })}</b>`
+      `<li><b>${say("result.prices." + board.of, {
+        name: board.of === "unit" ? unitName(board.name) : board.name })}</b>`
       + `<br>${board.parts.join(", ")}`
       + `<br>${board.tl.map(v => tr(v, 2)).join(" / ")} TL</li>`).join("");
     rows.push([say("result.prices"),
@@ -4566,6 +4619,9 @@ let simulationWanted = 0;
 async function runSimulation() {
   const button = document.getElementById("run");
   const mine = ++simulationWanted;
+  // Pressing Run asks for the answer, so the answer is shown: folded, a
+  // run of three minutes ended with nothing on screen having changed.
+  openReadout(true);
   button.disabled = true;
   button.textContent = say("result.running");
   let first;

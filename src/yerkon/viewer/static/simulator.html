@@ -400,6 +400,10 @@
   colours and the numbers beside them cannot disagree (ADR-0044).
 -->
 <div id="legend">
+  <!-- On a phone the key folds into this one button, so the scene is
+       not half covered by it. -->
+  <button id="legend-toggle" class="quiet" type="button"
+          aria-expanded="false" data-say="legend.toggle"></button>
   <select id="layer-pick" title=""></select>
   <select id="relief-pick" data-find="yükseklik abartma rölyef relief exaggeration">
     <option value="1" data-say="relief.true"></option>

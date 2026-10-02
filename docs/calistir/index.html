@@ -10,7 +10,7 @@
 <meta name="description" content="YERKON'un karasal konumlandırma simülasyonu: yayın birimlerini haritaya yerleştirip konum doğruluğunu ve maliyeti tarayıcıda hesaplayın.">
 <link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="style.css?v=4c1c841012">
+<link rel="stylesheet" href="style.css?v=3e1d1f1af2">
 </head>
 <body>
 
@@ -403,6 +403,10 @@
   colours and the numbers beside them cannot disagree (ADR-0044).
 -->
 <div id="legend">
+  <!-- On a phone the key folds into this one button, so the scene is
+       not half covered by it. -->
+  <button id="legend-toggle" class="quiet" type="button"
+          aria-expanded="false" data-say="legend.toggle"></button>
   <select id="layer-pick" title=""></select>
   <select id="relief-pick" data-find="yükseklik abartma rölyef relief exaggeration">
     <option value="1" data-say="relief.true"></option>
@@ -439,7 +443,7 @@
 
 <div id="status"></div>
 
-<script src="local.js?v=4c1c841012"></script>
-<script type="module" src="app.js?v=4c1c841012"></script>
+<script src="local.js?v=3e1d1f1af2"></script>
+<script type="module" src="app.js?v=3e1d1f1af2"></script>
 </body>
 </html>

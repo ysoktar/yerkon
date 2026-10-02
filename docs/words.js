@@ -684,6 +684,9 @@ export const SAY = {
 
   // -- the scene ----------------------------------------------------------
   "scene.drag": { tr: "Sürükle", en: "Drag" },
+  "scene.finger": { tr: "Tek parmak", en: "One finger" },
+  "scene.fingers": { tr: "İki parmak", en: "Two fingers" },
+  "scene.pinch": { tr: "yaklaş ya da uzaklaş", en: "zoom in or out" },
   "scene.turns": { tr: "döndür", en: "turn" },
   "scene.slide_keys": { tr: "Sağ tık ya da Shift+sürükle",
                         en: "Right-click or Shift+drag" },
@@ -805,6 +808,7 @@ export const SAY = {
   "legend.reach": { tr: "Grubun kullanılabilir menzili",
                     en: "The group's usable range" },
   "legend.unit": { tr: "Alıcı ve izlediği yol", en: "A receiver and its route" },
+  "legend.toggle": { tr: "Görünüm ve işaretler", en: "View and key" },
   "legend.mast": { tr: "Yayın birimi (rengi grubunu gösterir)",
                    en: "Broadcast unit (its colour is its group)" },
   "legend.route": { tr: "Alıcıların sürdüğü güzergâh",

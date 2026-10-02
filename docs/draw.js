@@ -590,14 +590,14 @@ export function masts(view, anchors, colourOf) {
   return out;
 }
 
-export function units(view, moving) {
+export function units(view, moving, named = id => id) {
   /* Each unit as a dot at its start with its route behind it. */
   const out = [];
   for (const unit of moving) {
     const at = view.project([unit.at[0], unit.at[1], lift(unit.at[2])]);
     if (!at) continue;
     out.push({
-      kind: "unit", id: unit.id, label: unit.id,
+      kind: "unit", id: unit.id, label: named(unit.id),
       at, depth: at[2], pedestrian: unit.kind === "pedestrian",
     });
   }

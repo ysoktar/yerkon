@@ -172,7 +172,20 @@ a.button { display: inline-flex; align-items: center; justify-content: center;
 }
 
 #controls-hint b { color: #22282e; font-weight: 600; }
-#controls-hint button { padding: 2px 8px; font-size: 11px; }
+#legend-toggle { display: none; }
+@media (max-width: 760px) {
+  #legend-toggle { display: block; padding: 4px 10px; font-size: 12px;
+    background: rgba(255, 255, 255, 0.92); }
+  #legend-toggle::after { content: " ▾"; }
+  #legend.open #legend-toggle::after { content: " ▴"; }
+}
+#controls-hint button { padding: 2px 8px; font-size: 11px; flex: none;
+  white-space: nowrap; }
+/* Over the scene only: across the whole window it covered the panel's
+   name and tabs on a tablet held upright. */
+@media (min-width: 761px) {
+  #controls-hint { max-width: calc(100vw - 340px - 24px); flex-wrap: wrap; }
+}
 
 .option {
   border: 1px solid #dfe4e9;
@@ -850,11 +863,16 @@ i.prov.assumption { background: var(--warn); }
   #legend select { min-height: 0; font-size: 11px; padding: 2px 3px;
     margin-bottom: 3px; }
   #legend .note { display: none; }
-  #legend > span { display: none; }
+  #legend.open { max-width: 74vw; }
+  #legend:not(.open) > :not(#legend-toggle) { display: none; }
+  #legend:not(.open) { padding: 0; border: 0; background: none; }
   #legend-bands { gap: 1px; }
   #status { left: 8px; right: 8px; bottom: auto; top: calc(46dvh - 34px); }
   #notice { left: 8px; right: 8px; bottom: 8px; max-width: none; max-height: 34vh; }
-  #activity { right: 8px; bottom: auto; top: 8px; min-width: 0;
+  #controls-hint button { white-space: nowrap; }
+  /* Above the status line at the foot of the scene, clear of the
+     buttons at its top. */
+  #activity { right: 8px; top: auto; bottom: calc(100% - 46dvh + 44px); min-width: 0;
     max-width: 50vw; font-size: 10px; padding: 5px 8px; }
   .sheet { width: calc(100vw - 24px); max-height: 86vh; padding: 16px; }
   .row { flex-wrap: wrap; }
