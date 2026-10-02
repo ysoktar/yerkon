@@ -70,11 +70,11 @@
     });
 
   /* Any picture in a figure opens to the whole screen. In a strip of
-     pictures the arrows on screen and the arrow keys move through the
+     pictures the arrows beside it and the arrow keys move through the
      strip, and so does a swipe on a phone; a picture standing on its own
      opens alone. While it is open the page behind does not scroll, and
-     on closing the page is where it was and the strip has slid to the
-     last picture looked at. */
+     on closing the page is where it was and the last picture looked at
+     sits in the middle of the strip. */
   document.addEventListener("click", function (event) {
     var picture = event.target.closest && event.target.closest("figure img");
     if (!picture) return;
@@ -90,8 +90,11 @@
     box.className = "lightbox";
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-label", said.close);
+    var frame = document.createElement("div");
+    frame.className = "frame";
     var big = document.createElement("img");
-    box.appendChild(big);
+    frame.appendChild(big);
+    box.appendChild(frame);
     var count = document.createElement("span");
     count.className = "count";
     function show(index) {
@@ -112,9 +115,10 @@
         click.stopPropagation();
         show(at + step);
       });
-      box.appendChild(button);
+      frame.appendChild(button);
     }
     if (group.length > 1) {
+      box.className += " group";
       arrow("back", -1, "‹");
       arrow("on", 1, "›");
       box.appendChild(count);
@@ -127,10 +131,7 @@
       window.scrollTo(window.scrollX, scrolled);
       if (strip) {
         var card = group[at].closest(".slides > *") || group[at];
-        var edge = strip.getBoundingClientRect().left;
-        strip.scrollTo({
-          left: strip.scrollLeft + card.getBoundingClientRect().left - edge - 2,
-          behavior: "auto" });
+        strip.scrollTo({ left: centred(strip, card), behavior: "auto" });
       }
     }
     // A wheel or a finger over the picture moves nothing behind it.
@@ -233,15 +234,18 @@
   var still = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Where the strip can rest: each card's start at the strip's padding,
-     the last ones clamped to the end the strip can reach. */
+  /* Where the strip can rest: each card in the middle of the strip, the
+     first and last ones clamped to the ends the strip can reach. */
+  function centred(strip, card) {
+    var box = strip.getBoundingClientRect(), it = card.getBoundingClientRect();
+    return strip.scrollLeft + it.left + it.width / 2
+      - (box.left + strip.clientLeft + strip.clientWidth / 2);
+  }
   function snaps(strip) {
-    var edge = strip.getBoundingClientRect().left;
     var most = strip.scrollWidth - strip.clientWidth;
     var out = [];
     Array.prototype.forEach.call(strip.children, function (card) {
-      var at = strip.scrollLeft + card.getBoundingClientRect().left - edge - 2;
-      at = Math.min(most, Math.max(0, at));
+      var at = Math.min(most, Math.max(0, centred(strip, card)));
       if (!out.length || Math.abs(at - out[out.length - 1]) > 1) out.push(at);
     });
     return out.length ? out : [0];

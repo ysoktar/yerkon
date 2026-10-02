@@ -244,7 +244,7 @@ a { color: var(--accent); }
   scroll-padding-inline: 2px;
   scroll-snap-type: x mandatory; scrollbar-width: thin; }
 .card { display: flex; flex-direction: column; flex: 0 0 calc((100% - 24px) / 3);
-  scroll-snap-align: start; padding: 16px 18px 14px;
+  scroll-snap-align: center; padding: 16px 18px 14px;
   border: 1px solid var(--line); border-radius: 10px; background: var(--paper);
   color: inherit; text-decoration: none;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
@@ -279,18 +279,30 @@ img { margin-left: auto; margin-right: auto; }
 .lightbox { position: fixed; inset: 0; z-index: 50; display: flex;
   align-items: center; justify-content: center; padding: 16px;
   background: rgba(8, 12, 16, 0.9); cursor: zoom-out; }
-.lightbox img { max-width: 100%; max-height: 100%; object-fit: contain;
+/* The picture sits in a frame its arrows hang on, so they stay right
+   beside it whatever its shape rather than at the edges of the screen. */
+.lightbox .frame { position: relative; display: flex; }
+.lightbox img { max-width: calc(100vw - 32px); max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px); object-fit: contain;
   background: var(--plate); border-radius: 8px; }
-/* Previous and next, on either side, over the dark backdrop in both
-   themes; the count of where the reader is sits under the picture. */
+.lightbox.group img { max-width: calc(100vw - 144px);
+  max-height: calc(100vh - 80px); max-height: calc(100dvh - 80px); }
+/* Previous and next, either side of the picture, over the dark backdrop
+   in both themes; the count of where the reader is sits under it. */
 .lightbox .step { position: absolute; top: 50%; transform: translateY(-50%);
   width: 44px; height: 64px; border: 0; border-radius: 8px;
   background: rgba(8, 12, 16, 0.62); color: #fff; font-size: 34px;
   line-height: 1; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25); }
 .lightbox .step:hover, .lightbox .step:focus-visible {
   background: rgba(8, 12, 16, 0.85); outline: 2px solid #fff; outline-offset: 2px; }
-.lightbox .back { left: 12px; }
-.lightbox .on { right: 12px; }
+.lightbox .back { right: calc(100% + 12px); }
+.lightbox .on { left: calc(100% + 12px); }
+/* A phone has no room beside the picture: the arrows sit on its edges. */
+@media (max-width: 760px) {
+  .lightbox.group img { max-width: calc(100vw - 32px); }
+  .lightbox .back { right: auto; left: 6px; }
+  .lightbox .on { left: auto; right: 6px; }
+}
 .lightbox .count { position: absolute; bottom: 14px; left: 50%;
   transform: translateX(-50%); color: #fff; font-size: 13px;
   font-variant-numeric: tabular-nums; opacity: 0.8; }
@@ -458,14 +470,15 @@ h3.sub + ul, h3.sub + p { font-size: inherit; }
 h3.sub + ul li { margin-bottom: 9px; overflow-wrap: normal; }
 
 /* Parts, one card each, in a strip that slides: three in view on a wide
-   window, two on a phone. The arrows appear with the script. */
+   window, one with the edges of its neighbours on a phone. The card
+   looked at rests in the middle. The arrows appear with the script. */
 .slider { position: relative; }
 .slides { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
   padding-inline: 2px; scroll-padding-inline: 2px;
   scroll-snap-type: x mandatory; scroll-behavior: smooth; }
 figure.slide { flex: 0 0 calc((100% - 24px) / 3); width: auto; margin: 0;
   transform: none;
-  scroll-snap-align: start; border: 1px solid var(--line); border-radius: 6px;
+  scroll-snap-align: center; border: 1px solid var(--line); border-radius: 6px;
   overflow: hidden; background: var(--paper); }
 figure.slide .photo { display: flex; align-items: center;
   justify-content: center; aspect-ratio: 4 / 3; background: var(--shade); }
@@ -528,7 +541,7 @@ figure.slide figcaption small a { color: inherit; }
 .slider > button:hover { border-color: var(--accent); }
 .slider > button:disabled { opacity: 0; pointer-events: none; }
 @media (max-width: 760px) {
-  figure.slide { flex-basis: calc((100% - 12px) / 2); width: auto; }
+  figure.slide { flex-basis: 82%; width: auto; }
   .slider > button.slide-back { left: -6px; }
   .slider > button.slide-on { right: -6px; }
 }
