@@ -2696,41 +2696,41 @@ LAW = Page(
                        "Legal power unit by unit, 2,4 GHz"),
             rows=(
                 (_w("Birim", "Unit"),
-                 _w("E28-2G4M20S çıkışı, en az / tipik / en çok",
-                    "E28-2G4M20S output, min / typ / max"),
-                 _w("Anten, net kazanç", "Antenna, net gain"),
-                 _w("Tam güçte e.i.r.p.", "E.i.r.p. at full power"),
-                 _w("FHSS ve LBT ile en yüksek ayar",
-                    "Highest setting with FHSS and LBT"),
-                 _w("FHSS olmadan en yüksek ayar",
-                    "Highest setting without FHSS")),
+                 _w("E28-2G4M20S çıkışı\nen az / tipik / en çok",
+                    "E28-2G4M20S output\nmin / typ / max"),
+                 _w("Anten,\nnet kazanç", "Antenna,\nnet gain"),
+                 _w("Tam güçte\ne.i.r.p.", "E.i.r.p.\nat full power"),
+                 _w("FHSS ve LBT ile\nen yüksek ayar",
+                    "Highest, with\nFHSS and LBT"),
+                 _w("FHSS olmadan\nen yüksek ayar",
+                    "Highest,\nwithout FHSS")),
                 (_w("Yayın birimi, şehir içi ve kırsal",
                     "Broadcast unit, town and open country"),
-                 _w("19 / 20 / 21 dBm", "19 / 20 / 21 dBm"),
-                 _w("Taoglas GW.22.5151, 4,7 dBi",
-                    "Taoglas GW.22.5151, 4,7 dBi"),
-                 _w("234-372 mW, sınırı aşıyor",
-                    "234-372 mW, over the limit"),
-                 _w("15,3 dBm (34 mW)", "15,3 dBm (34 mW)"),
-                 _w("7,4 dBm (5,5 mW)", "7,4 dBm (5,5 mW)")),
+                 _w("19 / 20 / 21\u00a0dBm", "19 / 20 / 21\u00a0dBm"),
+                 _w("Taoglas GW.22.5151, 4,7\u00a0dBi",
+                    "Taoglas GW.22.5151, 4,7\u00a0dBi"),
+                 _w("234-372\u00a0mW, sınırı aşıyor",
+                    "234-372\u00a0mW, over the limit"),
+                 _w("15,3\u00a0dBm (34\u00a0mW)", "15,3\u00a0dBm (34\u00a0mW)"),
+                 _w("7,4\u00a0dBm (5,5\u00a0mW)", "7,4\u00a0dBm (5,5\u00a0mW)")),
                 (_w("Kara aracı alıcısı", "Vehicle receiver"),
-                 _w("19 / 20 / 21 dBm", "19 / 20 / 21 dBm"),
-                 _w("Taoglas GW.22.5151, 4,7 dBi",
-                    "Taoglas GW.22.5151, 4,7 dBi"),
-                 _w("234-372 mW, sınırı aşıyor",
-                    "234-372 mW, over the limit"),
-                 _w("15,3 dBm (34 mW)", "15,3 dBm (34 mW)"),
-                 _w("7,4 dBm (5,5 mW)", "7,4 dBm (5,5 mW)")),
+                 _w("19 / 20 / 21\u00a0dBm", "19 / 20 / 21\u00a0dBm"),
+                 _w("Taoglas GW.22.5151, 4,7\u00a0dBi",
+                    "Taoglas GW.22.5151, 4,7\u00a0dBi"),
+                 _w("234-372\u00a0mW, sınırı aşıyor",
+                    "234-372\u00a0mW, over the limit"),
+                 _w("15,3\u00a0dBm (34\u00a0mW)", "15,3\u00a0dBm (34\u00a0mW)"),
+                 _w("7,4\u00a0dBm (5,5\u00a0mW)", "7,4\u00a0dBm (5,5\u00a0mW)")),
                 (_w("Yaya alıcısı", "Pedestrian receiver"),
-                 _w("19 / 20 / 21 dBm", "19 / 20 / 21 dBm"),
-                 _w("kart üstü, 3,2 dBi (hesapta kullanılan değer; üretici "
+                 _w("19 / 20 / 21\u00a0dBm", "19 / 20 / 21\u00a0dBm"),
+                 _w("kart üstü, 3,2\u00a0dBi (hesapta kullanılan değer; üretici "
                     "kazancı vermiyor)",
-                    "on-board, 3,2 dBi (the figure used in the calculation; "
+                    "on-board, 3,2\u00a0dBi (the figure used in the calculation; "
                     "the maker gives none)"),
-                 _w("166-263 mW, sınırı aşıyor",
-                    "166-263 mW, over the limit"),
-                 _w("16,8 dBm (48 mW)", "16,8 dBm (48 mW)"),
-                 _w("8,9 dBm (7,8 mW)", "8,9 dBm (7,8 mW)")),
+                 _w("166-263\u00a0mW, sınırı aşıyor",
+                    "166-263\u00a0mW, over the limit"),
+                 _w("16,8\u00a0dBm (48\u00a0mW)", "16,8\u00a0dBm (48\u00a0mW)"),
+                 _w("8,9\u00a0dBm (7,8\u00a0mW)", "8,9\u00a0dBm (7,8\u00a0mW)")),
             ),
         ),
         Part(
@@ -4414,7 +4414,10 @@ def _table(
 
     out = ["<table><thead><tr>"]
     for at, cell in enumerate(head):
-        out.append('<th{}>{}</th>'.format(kind(at, len(head)), cell))
+        # A heading is kept on one line, so a long one is broken where it
+        # says, with a newline, rather than wherever the column ends.
+        out.append('<th{}>{}</th>'.format(
+            kind(at, len(head)), cell.replace("\n", "<br>")))
     out.append("</tr></thead><tbody>")
     for line, row in enumerate(body):
         ours = ours_from is not None and line >= ours_from

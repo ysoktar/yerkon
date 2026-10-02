@@ -46,6 +46,7 @@
   --warn: #b4551d;
   --plate: #ffffff;
   --chart-mark: #2178fe;
+  --selection: color-mix(in srgb, var(--chart-mark) 60%, transparent);
   --chart-context: #7c8b99;
   /* What the project has done and what it has not, on the home page. */
   --done-bg: #d3f5dc;
@@ -70,6 +71,7 @@
      * so they sit on a plate that is meant to be light in both modes. */
     --plate: #eef2f6;
     --chart-mark: #6ba6ff;
+    --selection: color-mix(in srgb, var(--chart-mark) 40%, transparent);
     --chart-context: #5b6b7a;
     --done-bg: #183d25;
     --done-ink: #8be3a5;
@@ -90,6 +92,7 @@
   --warn: #e2914f;
   --plate: #eef2f6;
   --chart-mark: #6ba6ff;
+  --selection: color-mix(in srgb, var(--chart-mark) 40%, transparent);
   --chart-context: #5b6b7a;
   --done-bg: #183d25;
   --done-ink: #8be3a5;
@@ -105,7 +108,7 @@ body {
 }
 /* Selected text in the line blue, the colour the charts draw with, see
    through enough that what is selected stays readable. */
-::selection { background: color-mix(in srgb, var(--chart-mark) 50%, transparent); }
+::selection { background: var(--selection); }
 
 /* --- the chrome --------------------------------------------------------- */
 
