@@ -69,17 +69,23 @@
       link.rel = "noopener";
     });
 
-  /* Any picture in a figure opens to the whole screen. With others
-     beside it (the pictures of the same strip, or else of the page) the
-     arrows on screen and the arrow keys move through them, and so does
-     a swipe on a phone. */
+  /* Any picture in a figure opens to the whole screen. In a strip of
+     pictures the arrows on screen and the arrow keys move through the
+     strip, and so does a swipe on a phone; a picture standing on its own
+     opens alone. While it is open the page behind does not scroll, and
+     on closing the page is where it was and the strip has slid to the
+     last picture looked at. */
   document.addEventListener("click", function (event) {
     var picture = event.target.closest && event.target.closest("figure img");
     if (!picture) return;
     var strip = picture.closest(".slides");
-    var group = Array.prototype.slice.call(
-      (strip || document).querySelectorAll("figure img"));
+    var group = strip
+      ? Array.prototype.slice.call(strip.querySelectorAll("figure img"))
+      : [picture];
     var at = Math.max(0, group.indexOf(picture));
+    var scrolled = window.scrollY;
+    var overflow = root.style.overflow;
+    root.style.overflow = "hidden";
     var box = document.createElement("div");
     box.className = "lightbox";
     box.setAttribute("role", "dialog");
@@ -117,7 +123,21 @@
     function close() {
       box.remove();
       document.removeEventListener("keydown", onKey);
+      root.style.overflow = overflow;
+      window.scrollTo(window.scrollX, scrolled);
+      if (strip) {
+        var card = group[at].closest(".slides > *") || group[at];
+        var edge = strip.getBoundingClientRect().left;
+        strip.scrollTo({
+          left: strip.scrollLeft + card.getBoundingClientRect().left - edge - 2,
+          behavior: "auto" });
+      }
     }
+    // A wheel or a finger over the picture moves nothing behind it.
+    box.addEventListener("wheel", function (wheel) { wheel.preventDefault(); },
+      { passive: false });
+    box.addEventListener("touchmove", function (move) { move.preventDefault(); },
+      { passive: false });
     function onKey(key) {
       if (key.key === "Escape") close();
       else if (group.length > 1 && key.key === "ArrowLeft") show(at - 1);
