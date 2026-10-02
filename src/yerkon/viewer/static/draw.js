@@ -935,17 +935,30 @@ export function paint(context, width, height, items) {
       continue;
     }
     if (item.kind === "mast") {
+      // A white edge round the stem and the head, so a unit stands out
+      // on the photograph, the grey roofs and the green alike.
       context.globalAlpha = 1;
+      context.lineCap = "round";
+      context.strokeStyle = "#fff";
+      context.lineWidth = 6;
+      context.beginPath();
+      context.moveTo(item.base[0], item.base[1]);
+      context.lineTo(item.top[0], item.top[1]);
+      context.stroke();
       context.strokeStyle = item.colour || "#3a4652";
       context.lineWidth = 3;
       context.beginPath();
       context.moveTo(item.base[0], item.base[1]);
       context.lineTo(item.top[0], item.top[1]);
       context.stroke();
+      context.lineCap = "butt";
       context.fillStyle = item.colour || "#22282e";
+      context.strokeStyle = "#fff";
+      context.lineWidth = 2;
       context.beginPath();
-      context.arc(item.top[0], item.top[1], 4.5, 0, Math.PI * 2);
+      context.arc(item.top[0], item.top[1], 6.5, 0, Math.PI * 2);
       context.fill();
+      context.stroke();
       continue;
     }
     if (item.kind === "face" && item.texture && texturing.on) {

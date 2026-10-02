@@ -805,6 +805,11 @@ export const SAY = {
   "legend.reach": { tr: "Grubun kullanılabilir menzili",
                     en: "The group's usable range" },
   "legend.unit": { tr: "Alıcı ve izlediği yol", en: "A receiver and its route" },
+  "legend.mast": { tr: "Yayın birimi (rengi grubunu gösterir)",
+                   en: "Broadcast unit (its colour is its group)" },
+  "legend.route": { tr: "Alıcıların sürdüğü güzergâh",
+                    en: "The route the receivers drive" },
+  "legend.street": { tr: "Yollar ve sokaklar", en: "Roads and streets" },
 
   // -- the step summaries --------------------------------------------------
   "sum.place.real": { tr: "{site} · ölçülmüş zemin",

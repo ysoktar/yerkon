@@ -121,6 +121,19 @@ dd.warn { color: var(--warn); }
 .pair input[type=number] { width: 100%; padding: 3px 5px; border: 1px solid var(--line);
   border-radius: 4px; font: inherit; font-size: 12px; }
 #legend i.unit { background: #b4551d; border-radius: 50%; }
+/* The same marks the scene draws: a unit's pin, the route the receivers
+   drive, and the streets. */
+#legend i.mast { position: relative; width: 11px; height: 13px;
+  background: none; }
+#legend i.mast::before { content: ""; position: absolute; left: 4px; top: 5px;
+  width: 3px; height: 8px; background: #3a4652; }
+#legend i.mast::after { content: ""; position: absolute; left: 1px; top: 0;
+  width: 9px; height: 9px; border-radius: 50%; background: #3a4652;
+  box-shadow: 0 0 0 1.5px #fff, 0 0 0 2.5px rgba(0,0,0,0.15); }
+#legend i.route { height: 3px; vertical-align: 3px; border-radius: 0;
+  background: #22282e; }
+#legend i.street { height: 4px; vertical-align: 2px; border-radius: 0;
+  background: #fff; box-shadow: 0 0 0 1px #b9c2cb; }
 
 .tag { float: right; font-size: 10px; font-weight: 400; letter-spacing: 0;
   color: var(--warn); text-transform: none; }
