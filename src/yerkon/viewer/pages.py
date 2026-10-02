@@ -1681,12 +1681,15 @@ RESULTS = Page(
     slug="sonuclar",
     slug_en="results",
     nav=_w("Karşılaştırma", "Comparison"),
-    title=_w("Diğer sistemlerin yanında YERKON",
+    title=_w("YERKON ve mevcut konumlandırma sistemlerinin "
+             "karşılaştırılması",
              "YERKON beside the other systems"),
     lead=_w(
-        "YERKON ve diğer on konumlandırma sistemi, aynı sütunlarla yan "
-        "yana. Koyu zeminli satırlar YERKON'un simülasyon sonuçları; "
-        "diğerleri o sistemlerin kendi kaynaklarının yayımladığı değerler.",
+        "YERKON ve diğer on konumlandırma sistemi aynı ölçütler "
+        "üzerinden karşılaştırılmaktadır. Koyu zeminli satırlar "
+        "YERKON'un simülasyon sonuçlarını, diğer satırlar ise "
+        "ilgili sistemlerin kendi kaynaklarında yayımlanan "
+        "değerleri göstermektedir.",
         "YERKON and ten other positioning systems side by side under the "
         "same columns. The shaded rows are YERKON's simulation results; the "
         "rest are what those systems' own sources publish.",
@@ -1694,15 +1697,15 @@ RESULTS = Page(
     parts=(
         Part(
             kind="table",
-            heading=_w("Sütunlar ne demek", "What the columns mean"),
+            heading=_w("Sütunların anlamı", "What the columns mean"),
             rows=(
                 (_w("Sütun", "Column"), _w("Anlamı", "Meaning")),
                 (
                     _w("HPE, VPE", "HPE, VPE"),
                     _w(
-                        "Konumun yatayda ve düşeyde kaç metre şaştığı. "
-                        "P50 hataların yarısının, P95 yüzde 95'inin altında "
-                        "kaldığı değer.",
+                        "Hesaplanan konumun yatay (HPE) ve düşey (VPE) eksende "
+                        "gerçek konumdan metre cinsinden sapması. P50, hataların "
+                        "yarısının; P95 ise yüzde 95'inin altında kaldığı değerdir.",
                         "How far the position is out, horizontally and "
                         "vertically, in metres. P50 is the value half the "
                         "errors stay under, P95 the one 95 per cent of "
@@ -1712,10 +1715,10 @@ RESULTS = Page(
                 (
                     _w("Kullanılabilirlik", "Availability"),
                     _w(
-                        "Konum hesaplama denemelerinin yüzde kaçının "
-                        "geçerli bir sonuç verdiği. Yalnızca simülasyona giren "
-                        "aksaklıkları sayar; bir hizmet garantisi "
-                        "değildir.",
+                        "Konum hesaplama denemelerinin geçerli bir sonuç verdiği "
+                        "oran. Yalnızca simülasyonda modellenen aksaklıkları "
+                        "kapsamakta olup bir hizmet garantisi niteliği "
+                        "taşımamaktadır.",
                         "What share of the attempts to work out a "
                         "position gave a valid one. It counts only the "
                         "failures in the simulation, and is not a promise about "
@@ -1725,9 +1728,9 @@ RESULTS = Page(
                 (
                     _w("Alan", "Area"),
                     _w(
-                        "Konum hesaplamaya yetecek kadar birimin "
-                        "duyulduğu zemin, gerçek arazi taranarak bulundu. "
-                        "Sinyalin ulaştığı zeminle aynı şey değil.",
+                        "Konum hesaplamaya yetecek sayıda yayın biriminin "
+                        "alınabildiği alan; gerçek arazi verisi taranarak "
+                        "belirlenmiştir. Sinyalin ulaştığı alandan farklıdır.",
                         "The ground where enough units can be heard to "
                         "work out a position, found by sweeping the real "
                         "terrain. Not the same as the ground the signal "
@@ -1737,9 +1740,9 @@ RESULTS = Page(
                 (
                     _w("CAPEX", "CAPEX"),
                     _w(
-                        "Yayın birimlerinin donanım maliyeti, hizmet "
-                        "verilen alana bölündü; birimin bütün parçaları ve "
-                        "montaj dahil.",
+                        "Yayın birimlerinin tüm parçaları ve montaj dahil donanım "
+                        "maliyetinin hizmet verilen alana bölünmesiyle elde edilen "
+                        "ilk yatırım maliyeti.",
                         "Unit hardware cost divided by the service area; "
                         "every part of the unit and the fitting included.",
                     ),
@@ -1747,8 +1750,9 @@ RESULTS = Page(
                 (
                     _w("OPEX", "OPEX"),
                     _w(
-                        "Bir km²'yi bir yıl işletmenin masrafı; tek tek "
-                        "yazılmış gider kalemlerinden çıkıyor.",
+                        "Bir km²'lik alanın bir yıllık işletme gideri; ayrı ayrı "
+                        "listelenen gider kalemlerinin toplamından "
+                        "hesaplanmaktadır.",
                         "What a year of running one km² costs, from an "
                         "itemised list of what recurs.",
                     ),
@@ -1757,15 +1761,15 @@ RESULTS = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Tabloyu okurken",
+            heading=_w("Tablonun okunmasına ilişkin notlar",
                        "Reading the table"),
             lines=(
                 _w(
-                    "**Her sayının açıklaması tabloda.** Bir sayıya ne "
-                    "yapıldığı, satırın sonundaki düğmeyle açılan kutuda ve "
-                    "sayfanın sonundaki dipnotlarda yazıyor. Boş hücre, o "
-                    "kaynağın bu sütuna uyan bir şey yayımlamadığı anlamına "
-                    "geliyor.",
+                    "**Her değerin açıklaması tabloda yer almaktadır.** Bir "
+                    "değerin nasıl elde edildiği, satır sonundaki düğmeyle "
+                    "açılan pencerede ve sayfa sonundaki dipnotlarda "
+                    "açıklanmaktadır. Boş hücre, ilgili kaynağın bu sütuna "
+                    "karşılık gelen bir değer yayımlamadığını göstermektedir.",
                     "**Every figure is explained in the table.** What was "
                     "done to a cell is in the box the button at the end of "
                     "its row opens and in the notes at the foot of the page; "
@@ -1773,15 +1777,17 @@ RESULTS = Page(
                     "fits that column.",
                 ),
                 _w(
-                    "**Tünel satırının maliyeti kilometre başına, "
-                    "diğerleri kilometrekare başına.** 12 m genişliğinde "
-                    "2 km'lik bir tünel bir km²'nin ellide biri kadar yer "
-                    "kaplar; alana bölünce sayı, tünel pahalı olduğu için "
-                    "değil payda küçük olduğu için büyür. Tünel bir "
-                    "alana değil bir hatta hizmet ediyor, o yüzden o iki "
-                    "hücre güzergâh kilometresine bölündü ve \"/km\" ile "
-                    "işaretli. Aynı ölçü olmadığı için diğer satırlarla "
-                    "yan yana okunmamalı.",
+                    "**Tünel satırının maliyeti kilometre başına, diğer "
+                    "satırlarınki kilometrekare başına verilmiştir.** 12 m "
+                    "genişliğinde ve 2 km uzunluğundaki bir tünel, bir km²'nin "
+                    "ellide biri kadar alan kaplamaktadır; maliyet alana "
+                    "bölündüğünde ortaya çıkan büyük değer, tünelin pahalı "
+                    "olmasından değil paydanın küçük olmasından "
+                    "kaynaklanmaktadır. Tünel bir alana değil bir hatta hizmet "
+                    "verdiğinden bu iki hücre güzergâh kilometresine bölünmüş "
+                    've "/km" ile işaretlenmiştir. Ölçü birimleri farklı '
+                    "olduğundan bu değerler diğer satırlarla doğrudan "
+                    "karşılaştırılmamalıdır.",
                     "**The tunnel row is priced per kilometre, the other "
                     "two per square kilometre.** Twelve metres wide over "
                     "two kilometres is a fiftieth of a square kilometre, "
@@ -1793,20 +1799,22 @@ RESULTS = Page(
                     "rows and should not be read beside them.",
                 ),
                 _w(
-                    "**Hizmet alanı, konum alınabilen yerdir**, sinyalin "
-                    "ulaştığı yer değil. Sinyalin ulaştığı zemin daha "
-                    "geniş: bir birimi duymak yetmiyor, konum için aynı "
-                    "anda dört birim gerekiyor.",
+                    "**Hizmet alanı, konum hesaplanabilen alanı ifade "
+                    "etmektedir**; sinyalin ulaştığı alan değildir. Sinyalin "
+                    "ulaştığı alan daha geniştir; çünkü konum hesaplamak için "
+                    "tek bir yayın birimini almak yeterli olmayıp aynı anda "
+                    "dört yayın birimine ihtiyaç duyulmaktadır.",
                     "**The service area is where a position can be had**, "
                     "not where the signal arrives. The ground the signal "
                     "reaches is wider: hearing one unit is not enough, a "
                     "position needs four at once.",
                 ),
                 _w(
-                    "**Yüzdeler aynı şeyi ölçmüyor.** Uydu sistemlerinin "
-                    "yayımladığı kullanılabilirlik değerleri farklı "
-                    "testlerden, farklı sürelerden ve farklı eşiklerden "
-                    "geliyor. Aynı ölçüm gibi yan yana okunmamalı.",
+                    "**Kullanılabilirlik yüzdeleri aynı büyüklüğü "
+                    "ölçmemektedir.** Uydu sistemlerinin yayımladığı "
+                    "kullanılabilirlik değerleri farklı test yöntemlerine, "
+                    "sürelere ve eşiklere dayanmaktadır; bu nedenle aynı ölçüm "
+                    "gibi doğrudan karşılaştırılmamalıdır.",
                     "**The percentages do not measure the same thing.** "
                     "The availability figures the satellite systems "
                     "publish come from different tests, over different "
@@ -1820,7 +1828,7 @@ RESULTS = Page(
              heading=_w("Maliyet ve doğruluk", "Cost and accuracy")),
         Part(
             kind="shows", shows="accuracy",
-            heading=_w("Doğruluk yan yana", "Accuracy side by side"),
+            heading=_w("Doğruluk karşılaştırması", "Accuracy side by side"),
         ),
         Part(kind="shows", shows="cost"),
     ),
