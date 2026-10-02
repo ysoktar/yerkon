@@ -61,10 +61,17 @@ export const SAY = {
         + "go unread on this row, measured ground or not.",
   },
   "ground.real.note": {
-    tr: "Ölçülmüş zemin kendi yükselti farkını, pürüzlülüğünü ve "
-      + "engellerini içerdiğinden aşağıdaki üç değer uygulanmamaktadır.",
-    en: "Measured ground brings its own relief, its own roughness and its "
-        + "own obstructions, so the three figures below stop applying.",
+    tr: "Gerçek zeminde tepeler ölçülmüş yüksekliklerden gelmektedir; bu "
+      + "nedenle aşağıdaki tepe yüksekliği, tepe aralığı ve yüzey pürüzü "
+      + "ayarları kapalıdır. Bu ayarlar, Zemin listesinden «Modellenmiş "
+      + "(tepeli)» seçildiğinde açılmaktadır. Tepeleri ekranda daha belirgin "
+      + "görmek için sahnenin solundaki «Yükseklik» listesinden abartma "
+      + "seçilebilir.",
+    en: "On real ground the hills come from measured heights, so the hill "
+        + "height, hill spacing and surface roughness below are switched "
+        + "off. They come back when “Modelled (rolling)” is chosen in the "
+        + "Ground list. To see the hills more clearly, pick a stretch in "
+        + "the “Height” list beside the scene.",
   },
   "ground.photo": { tr: "Uydu görüntüsünü zeminde göster",
                     en: "Drape the photograph over the ground" },
@@ -662,6 +669,12 @@ export const SAY = {
         + "“Quick trial: on” off and press “Run the simulation”.",
   },
   "quick.failed": { tr: "Durdu: {why}", en: "Stopped: {why}" },
+  "quick.nobuildings": {
+    tr: "Bina verisi alınamadı: harita sunucularının hiçbiri yanıt vermedi. "
+      + "Zemin binasız kuruldu; bir süre sonra yeniden deneyiniz.",
+    en: "No buildings came back: none of the map servers answered. The "
+      + "ground was built without them; try again in a while.",
+  },
   "quick.big": {
     tr: "Bu kutu {area} km²'dir. Büyük kutularda yerleştirme uzun "
       + "sürmektedir; 2-3 km'lik kutular daha hızlıdır.",

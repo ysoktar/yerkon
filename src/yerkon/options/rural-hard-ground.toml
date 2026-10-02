@@ -11,11 +11,11 @@ title = 'Kırsal: Gölbaşı tepeleri, tasarlanmadığı arazide'
 title_en = 'Rural: the Gölbaşı hills, terrain it was not designed for'
 origin = 'shipped'
 note = """Aynı yerleşim, Polatlı'nın 486 m'lik yükselti farkı yerine Gölbaşı'nın \
-907 m'lik rölyefi üzerinde çalıştırılmaktadır. Bu bir öneri değildir: \
+907 m'lik yükselti farkı üzerinde çalıştırılmaktadır. Bu bir öneri değildir: \
 tasarımın, tasarlanmadığı bir arazideki performansını göstermekte olup \
 sonucun yeniden üretilebilmesi amacıyla burada yer almaktadır.
 
-Bu seçenek yedek rölyef değerini değil, senaryonun sahasını \
+Bu seçenek yedek yükselti farkı değerini değil, senaryonun sahasını \
 değiştirmektedir: site.rural_relief_m yalnızca hiçbir zemin \
 indirilmemişken kullanılmaktadır."""
 note_en = """The same deployment on Gölbaşı's 907 m of relief instead of Polatlı's 486 m. This is not a proposal: it shows what the design costs in terrain it was not meant for, and it is here so that result can be reproduced rather than quoted.

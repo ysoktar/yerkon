@@ -817,24 +817,41 @@ class OpenStreetMapBuildings:
         )
 
 
+#: Public Overpass servers that answer a page from any address, tried in
+#: this order after the one a source names. The main server turns a
+#: query away with 429 or 504 whenever it is busy, which is often; a
+#: town fetched at such a moment used to arrive with no buildings at all.
+OVERPASS_MIRRORS = (
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+    "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+)
+
+
 def _overpass(endpoint: str, name: str, query: str) -> dict:
     """One Overpass query, answered or refused with a sentence.
 
     Through `yerkon.site.http`, so the same query runs from a terminal
     and from the published site's worker; Overpass answers a browser
-    from any page (ADR-0086).
+    from any page (ADR-0086). The named server first and then the
+    mirrors, so one busy server is not the end of the fetch; refused
+    only when none of them answered, with the first server's reason.
     """
     if not http.can_ask():
         raise Unreachable(say("site.needs_requests"))
-    try:
-        response = http.post_form(
-            endpoint, {"data": query}, timeout=DEFAULT_TIMEOUT_S * 3)
-        response.raise_for_status()
-        return response.json()
-    except Exception as error:
-        raise Unreachable(
-            say("site.no_answer", None, name=name, error=error)
-        ) from error
+    first = None
+    for address in (endpoint,) + tuple(
+            m for m in OVERPASS_MIRRORS if m != endpoint):
+        try:
+            response = http.post_form(
+                address, {"data": query}, timeout=DEFAULT_TIMEOUT_S * 3)
+            response.raise_for_status()
+            return response.json()
+        except Exception as error:      # noqa: BLE001 — the next server
+            first = first or error
+    raise Unreachable(
+        say("site.no_answer", None, name=name, error=first)
+    ) from first
 
 
 #: Which OpenStreetMap roads a vehicle drives on: the same classes

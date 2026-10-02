@@ -1458,8 +1458,8 @@ source_en = """Copernicus DEM 30 m, Polatlı 39,48-39,66 N 32,02-32,28 E, fetche
 2026-09-10"""
 note = """Kırsal senaryonun temsil ettiği yirmi kilometrelik açık arazide \
 zeminin yükselti farkıdır. Şehirlerarası yolların geçtiği Anadolu \
-bozkırını temsil etmekte olup Gölbaşı tepelerinin rölyefinin yarısı \
-kadardır. Bu değerin senaryonun gerçekte üzerinde bulunduğu sahayla \
+bozkırını temsil etmekte olup Gölbaşı tepelerindeki yükselti farkının \
+yarısı kadardır. Bu değerin senaryonun gerçekte üzerinde bulunduğu sahayla \
 uyumlu olması gerekmektedir; aksi hâlde önbelleği bulunmayan bir \
 bilgisayar fark edilmeden daha zor bir senaryo çalıştırmış olacaktır."""
 note_en = """Ground rise and fall across the twenty kilometres of open \
@@ -1469,7 +1469,7 @@ the site the row actually stands on, or a machine with no cache runs a \
 harder study than one with it and nothing says so."""
 affects = "hiçbir saha getirilmemişken kırsal satırın engel geometrisini"
 affects_en = "the rural row's obstruction geometry when no site is fetched"
-sensitivity = """40 m'lik bir rölyef neredeyse her kırsal bağlantının \
+sensitivity = """40 m'lik bir yükselti farkı neredeyse her kırsal bağlantının \
 açıktan geçmesine izin verir; Gölbaşı'nın 907 m'sinde karşılanabilir \
 hiçbir aralık bunu yapamaz"""
 sensitivity_en = """a 40 m relief lets almost every rural link run clear; \
@@ -2364,7 +2364,7 @@ note = """Senaryonun üzerinde çalıştırıldığı, indirilmiş zemin verisid
 `src/yerkon/site/places/` altındaki klasör adıyla belirtilmektedir. \
 Ankara'nın batısında, şehirlerarası yolların geçtiği Polatlı ovasıdır. \
 Değer `golbasi` olarak değiştirildiğinde aynı yerleşim 907 m'lik \
-rölyef üzerinde çalıştırılmakta; bu da yerleşimin tasarlanmadığı bir \
+yükselti farkı üzerinde çalıştırılmakta; bu da yerleşimin tasarlanmadığı bir \
 arazideki performansını göstermektedir. Boş bırakılması durumunda \
 modellenmiş zemin kullanılmaktadır; bu zemin de tepelidir ve hiçbir \
 zaman düz değildir. `yerkon fetch` komutuyla indirilen her saha \

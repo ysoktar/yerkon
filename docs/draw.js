@@ -17,8 +17,24 @@
  * stands on them keep their true height whatever this is. */
 export let VERTICAL = 1;
 
+/* The height the stretch is measured from: the lowest ground in the
+ * scene. Stretched from sea level, ground a thousand metres up was lifted
+ * four thousand more at five times and left the camera looking at empty
+ * sky; stretched from its own floor, the ground stays where it was and
+ * only its hills grow. */
+let DATUM = 0;
+
 export function setVertical(times) {
   VERTICAL = Math.max(1, Number(times) || 1);
+}
+
+export function setDatum(z) {
+  DATUM = Number.isFinite(z) ? z : 0;
+}
+
+/* A ground height as drawn. */
+export function lift(z) {
+  return DATUM + (z - DATUM) * VERTICAL;
 }
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -225,10 +241,10 @@ export function groundFaces(view, terrain, light, photo) {
   for (let row = 0; row < ys.length - 1; row++) {
     for (let column = 0; column < xs.length - 1; column++) {
       const corners = [
-        [xs[column], ys[row], heights[row][column] * VERTICAL],
-        [xs[column + 1], ys[row], heights[row][column + 1] * VERTICAL],
-        [xs[column + 1], ys[row + 1], heights[row + 1][column + 1] * VERTICAL],
-        [xs[column], ys[row + 1], heights[row + 1][column] * VERTICAL],
+        [xs[column], ys[row], lift(heights[row][column])],
+        [xs[column + 1], ys[row], lift(heights[row][column + 1])],
+        [xs[column + 1], ys[row + 1], lift(heights[row + 1][column + 1])],
+        [xs[column], ys[row + 1], lift(heights[row + 1][column])],
       ];
       const normal = unit(cross(
         sub(corners[1], corners[0]), sub(corners[3], corners[0]),
@@ -289,7 +305,7 @@ export function groundPatches(view, terrain, photo, across = 16) {
   const step = Math.max(1, Math.ceil(Math.max(xs.length, ys.length) / across));
   const node = (row, column) => {
     const r = Math.min(row, ys.length - 1), c = Math.min(column, xs.length - 1);
-    return [xs[c], ys[r], heights[r][c] * VERTICAL];
+    return [xs[c], ys[r], lift(heights[r][c])];
   };
   const triangles = [];
   const covered = new Set();
@@ -378,8 +394,8 @@ const WALL = [196, 190, 180];
 export function blocks(view, list, light, photo, bias = 0) {
   const out = [];
   for (const [x, y, half, height, low, high, outline] of list || []) {
-    const base = low * VERTICAL;
-    const top = (high ?? low) * VERTICAL + height;
+    const base = lift(low);
+    const top = lift(high ?? low) + height;
     // Sorted a little nearer than its middle, by its own size: a roof a
     // hundred metres across sits over ground quads ten metres across, and
     // at the depth of its middle it is painted before the ones under it.
@@ -514,7 +530,7 @@ export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors",
       // times over, so close up the overlay hovers visibly above the
       // hill it describes. Sorting them in front on purpose says the
       // same thing without moving them, and says it at every distance.
-      const z = groundAt(x, y) * VERTICAL;
+      const z = lift(groundAt(x, y));
       let [x0, x1, y0, y1] = [x - half, x + half, y - half, y + half];
       if (within) {
         x0 = Math.max(x0, within[0]); x1 = Math.min(x1, within[1]);
@@ -540,7 +556,7 @@ export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors",
  * whatever structure under it (a roof) at its true height. */
 export function standingZ(anchor) {
   const bare = anchor.bare_z ?? anchor.ground_z;
-  return bare * VERTICAL + (anchor.ground_z - bare);
+  return lift(bare) + (anchor.ground_z - bare);
 }
 
 export function masts(view, anchors, colourOf) {
@@ -578,7 +594,7 @@ export function units(view, moving) {
   /* Each unit as a dot at its start with its route behind it. */
   const out = [];
   for (const unit of moving) {
-    const at = view.project([unit.at[0], unit.at[1], unit.at[2] * VERTICAL]);
+    const at = view.project([unit.at[0], unit.at[1], lift(unit.at[2])]);
     if (!at) continue;
     out.push({
       kind: "unit", id: unit.id, label: unit.id,

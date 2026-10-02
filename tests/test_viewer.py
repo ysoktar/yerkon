@@ -1477,13 +1477,14 @@ def test_the_point_the_camera_turns_around_rides_on_the_ground():
     assert "function onGround" in application
     body = application[application.index("function onGround"):]
     body = body[: body.index("\n}")]
-    assert "groundAt(" in body and "draw.VERTICAL" in body
+    assert "groundAt(" in body and "draw.lift(" in body
 
     # Every gesture that slides the pivot has to use it, or the one that
     # does not is the one that buries the camera again.
     for gesture in ("panning", "wheel", "NUDGE"):
         assert gesture in application, gesture
-    assert application.count("orbit.target = onGround(") == 4, (
+    # The fifth is the height stretch, which moves the ground under it.
+    assert application.count("orbit.target = onGround(") == 5, (
         "a gesture moves the pivot without putting it back on the ground"
     )
 
@@ -1531,9 +1532,24 @@ def test_framing_aims_at_the_ground_rather_than_at_sea_level():
     body = application[application.index("function frameEverything"):]
     body = body[: body.index("\n}")]
     assert "ground_z" in body, "the framing ignores how high the ground is"
-    assert "draw.VERTICAL" in body, (
+    assert "draw.lift(" in body, (
         "the framing ignores the vertical exaggeration it is drawn with"
     )
+
+
+def test_the_height_stretch_starts_from_the_lowest_ground():
+    """Stretched from sea level, ground 900 m up rose to 4.500 m at five
+    times and the camera was left looking at empty sky: picking 2 or 5
+    times in the height list emptied the screen. Stretched from the
+    scene's own floor, the ground stays put and only its hills grow."""
+    drawing = (STATIC / "draw.js").read_text(encoding="utf-8")
+    assert "return DATUM + (z - DATUM) * VERTICAL;" in drawing
+    assert "* VERTICAL" not in drawing.replace(
+        "(z - DATUM) * VERTICAL", "")
+    application = read_app_js()
+    assert "draw.VERTICAL" not in application.replace(
+        "relief.value = String(draw.VERTICAL)", "")
+    assert "draw.setDatum(lowestGround(terrainData))" in application
 
 
 def test_a_slide_reads_the_cursor_against_the_camera_it_started_with():

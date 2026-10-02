@@ -4679,6 +4679,7 @@ SIMULATOR_POLICY = (
     "connect-src 'self' data: blob: https://nominatim.openstreetmap.org "
     "https://tile.openstreetmap.org https://server.arcgisonline.com "
     "https://cdn.jsdelivr.net https://overpass-api.de "
+    "https://overpass.private.coffee https://maps.mail.ru "
     "https://*.amazonaws.com https://api.opentopodata.org; "
     "object-src 'none'; base-uri 'self'; form-action 'none'; "
     "upgrade-insecure-requests"

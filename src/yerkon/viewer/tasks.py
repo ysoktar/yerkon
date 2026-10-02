@@ -586,6 +586,9 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             "relief_m": round(site.relief_m, 1),
             "roughness_m": round(site.roughness_m(), 2),
             "buildings": site.manifest.building_count,
+            # Asked for and not brought: no server answered, which is not
+            # the same as a place with no buildings in it.
+            "buildings_missed": want_buildings and site.manifest.feature_source is None,
             "aerial": site.aerial is not None or site.drape is not None,
             "roads": len(site.roads_m),
             "furniture": 0 if site.furniture is None else len(site.furniture),

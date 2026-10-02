@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=5f29acc1a9";
+import { decimal, say, speak, speaks } from "./words.js?v=892cbf5a39";
 
 /* The choices whose names are this page's to give.
  *
@@ -1713,6 +1713,11 @@ function wireControls() {
     relief.value = String(draw.VERTICAL);
     relief.onchange = () => {
       draw.setVertical(relief.value);
+      // The point turned about goes back onto the ground, which has just
+      // risen or fallen under it.
+      if (orbit.target) {
+        orbit.target = onGround(orbit.target[0], orbit.target[1]);
+      }
       render();
     };
   }
@@ -1750,9 +1755,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=5f29acc1a9";
-import * as flat from "./bore.js?v=5f29acc1a9";
-import * as pick from "./map.js?v=5f29acc1a9";
+import * as draw from "./draw.js?v=892cbf5a39";
+import * as flat from "./bore.js?v=892cbf5a39";
+import * as pick from "./map.js?v=892cbf5a39";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1775,6 +1780,15 @@ let markers = [];
  * already as fine as the window would be.
  */
 let detail = null;
+
+/* The lowest height in a mesh, which the height stretch starts from. */
+function lowestGround(mesh) {
+  let low = Infinity;
+  for (const row of (mesh && mesh.heights) || []) {
+    for (const z of row) if (z < low) low = z;
+  }
+  return Number.isFinite(low) ? low : 0;
+}
 
 function drawnTerrain() {
   return detail || terrainData;
@@ -2449,14 +2463,14 @@ function paintScene() {
     ...(showRoads ? onDrawnGround(latest.terrain.roads || []).flatMap(
       street => draw.polyline(
         view,
-        street.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 4]),
+        street.map(p => [p[0], p[1], draw.lift(p[2]) + 4]),
         roadStyle.colour, roadStyle.width, bias,
       )) : []),
     ...draw.masts(view, latest.anchors, colourOf),
     ...onDrawnGround([latest.road.map(p => [p.x, p.y, p.z])]).flatMap(
       run => draw.polyline(
         view,
-        run.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 10]),
+        run.map(p => [p[0], p[1], draw.lift(p[2]) + 10]),
         "#22282e", 2, bias,
       )),
   ];
@@ -2493,7 +2507,7 @@ function paintScene() {
     for (const run of onDrawnGround([unit.trail])) {
       items.push(...draw.polyline(
         view,
-        run.map(p => [p[0], p[1], p[2] * draw.VERTICAL + 20]),
+        run.map(p => [p[0], p[1], draw.lift(p[2]) + 20]),
         "rgba(180,85,29,0.55)", 1.5, bias,
       ));
     }
@@ -2587,10 +2601,10 @@ function markerAt(px, py) {
  * would drop an anchor visibly away from the cursor. */
 function groundUnder(px, py) {
   const camera = view();
-  const flat = camera.onPlane(px, py, groundAt(0, 0) * draw.VERTICAL);
+  const flat = camera.onPlane(px, py, draw.lift(groundAt(0, 0)));
   if (!flat) return null;
   const settled = camera.onPlane(
-    px, py, groundAt(flat[0], flat[1]) * draw.VERTICAL);
+    px, py, draw.lift(groundAt(flat[0], flat[1])));
   return settled || flat;
 }
 
@@ -2604,7 +2618,7 @@ function groundUnder(px, py) {
  * turning feel like walking round something.
  */
 function onGround(x, y) {
-  return [x, y, groundAt(x, y) * draw.VERTICAL];
+  return [x, y, draw.lift(groundAt(x, y))];
 }
 
 function frameOn(target, distance) {
@@ -3053,7 +3067,7 @@ function frameEverything() {
   frameOn(
     [(Math.min(...xs) + Math.max(...xs)) / 2,
      (Math.min(...ys) + Math.max(...ys)) / 2,
-     (zs.reduce((total, z) => total + z, 0) / zs.length) * draw.VERTICAL],
+     draw.lift(zs.reduce((total, z) => total + z, 0) / zs.length)],
     span * 1.6,
   );
 }
@@ -4110,6 +4124,12 @@ async function quickStart(box, span) {
       },
     }, line => doing(0, line));
     done(0);
+    if (fetched.buildings_missed) {
+      const warn = document.createElement("li");
+      warn.className = "bad";
+      warn.textContent = say("quick.nobuildings");
+      items[0].after(warn);
+    }
 
     // 2. The row that fits the box, standing on the whole of it.
     at = 1;
@@ -4438,6 +4458,7 @@ async function refreshScene() {
     ground: latest.terrain.description, anchors: latest.anchors.length,
   });
   terrainData = latest.terrain;
+  draw.setDatum(lowestGround(terrainData));
   // The photograph of the ground, where the fetch brought one. Asked for
   // here beside the mesh and for the same reason: both describe the site
   // this scene just became.
