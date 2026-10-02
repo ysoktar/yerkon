@@ -490,6 +490,9 @@ figure.slide figcaption small a { color: inherit; }
 }
 .slides.dragging { cursor: grabbing; scroll-snap-type: none;
   scroll-behavior: auto; user-select: none; -webkit-user-select: none; }
+/* A card does not lift under the pointer while the strip moves under it. */
+.slides.dragging .card, .slides.dragging .card:hover { transform: none;
+  transition: none; }
 /* The team, one column a person with a hairline between them; one
    above the other, with the line across, where three do not fit. */
 /* Every column the same width: the line sits in the middle of the gap

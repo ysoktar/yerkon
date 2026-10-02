@@ -213,22 +213,80 @@
         var gap = parseFloat(getComputedStyle(strip).columnGap) || 0;
         return first ? first.getBoundingClientRect().width + gap : strip.clientWidth;
       }
-      back.addEventListener("click", function () {
-        strip.scrollBy({ left: -card(), behavior: "smooth" });
-      });
-      on.addEventListener("click", function () {
-        strip.scrollBy({ left: card(), behavior: "smooth" });
-      });
+      // Each click moves one card from where the strip is headed, so two
+      // quick clicks go two cards rather than one and a half.
+      function step(by) {
+        var list = snaps(strip);
+        var from = strip._target != null ? strip._target : strip.scrollLeft;
+        var at = nearest(list, from) + by;
+        glideTo(strip, list[Math.max(0, Math.min(list.length - 1, at))]);
+      }
+      back.addEventListener("click", function () { step(-1); });
+      on.addEventListener("click", function () { step(1); });
       strip.addEventListener("scroll", mark, { passive: true });
       window.addEventListener("resize", mark);
       mark();
-      draggable(strip);
+      draggable(strip, card);
       gauge(slider, strip);
     });
 
+  var still = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Where the strip can rest: each card's start at the strip's padding,
+     the last ones clamped to the end the strip can reach. */
+  function snaps(strip) {
+    var edge = strip.getBoundingClientRect().left;
+    var most = strip.scrollWidth - strip.clientWidth;
+    var out = [];
+    Array.prototype.forEach.call(strip.children, function (card) {
+      var at = strip.scrollLeft + card.getBoundingClientRect().left - edge - 2;
+      at = Math.min(most, Math.max(0, at));
+      if (!out.length || Math.abs(at - out[out.length - 1]) > 1) out.push(at);
+    });
+    return out.length ? out : [0];
+  }
+
+  function nearest(list, x) {
+    var best = 0;
+    for (var i = 1; i < list.length; i++) {
+      if (Math.abs(list[i] - x) < Math.abs(list[best] - x)) best = i;
+    }
+    return best;
+  }
+
+  /* One continuous, slowing movement to a resting place. The browser's
+     own snapping stays off until the strip is there: let back in early,
+     it pulled the strip to its own choice in a single frame. */
+  function glideTo(strip, left) {
+    cancelAnimationFrame(strip._glide || 0);
+    var from = strip.scrollLeft, distance = left - from;
+    strip._target = left;
+    strip.classList.add("dragging");
+    function done() {
+      strip._glide = 0;
+      strip._target = null;
+      strip.classList.remove("dragging");
+    }
+    if (still || Math.abs(distance) < 1) {
+      strip.scrollLeft = left;
+      done();
+      return;
+    }
+    var duration = Math.min(560, Math.max(260, 220 + Math.abs(distance) * 0.45));
+    var began = performance.now();
+    (function frame(now) {
+      var t = Math.min(1, (now - began) / duration);
+      strip.scrollLeft = from + distance * (1 - Math.pow(1 - t, 3));
+      if (t < 1) strip._glide = requestAnimationFrame(frame);
+      else done();
+    })(began);
+  }
+
   /* A thin blue bar over the strip: how much of it is in view and
      where, standing in for the scroll bar a phone does not show. A click
-     or a drag on it moves the strip there. */
+     or a drag on it moves the strip there, and letting go lets the strip
+     come to rest on the nearest card. */
   function gauge(slider, strip) {
     var bar = document.createElement("div");
     var thumb = document.createElement("i");
@@ -255,6 +313,8 @@
     bar.addEventListener("pointerdown", function (event) {
       held = event.pointerId;
       bar.setPointerCapture(event.pointerId);
+      cancelAnimationFrame(strip._glide || 0);
+      strip._target = null;
       strip.classList.add("dragging");
       to(event);
     });
@@ -264,7 +324,8 @@
     function let_go(event) {
       if (held !== event.pointerId) return;
       held = null;
-      strip.classList.remove("dragging");
+      var list = snaps(strip);
+      glideTo(strip, list[nearest(list, strip.scrollLeft)]);
     }
     bar.addEventListener("pointerup", let_go);
     bar.addEventListener("pointercancel", let_go);
@@ -274,50 +335,24 @@
   }
 
   /* A strip a mouse can throw, the way a finger throws it on a phone:
-     press, drag, let go, and it glides on and settles on the nearest
-     card. Touch is left to the browser, which already does this; only
-     a mouse is handled here. A drag is not a click, so letting go over
-     a card after moving the strip does not open it. */
-  function draggable(strip) {
-    var still = window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var down = null, moved = false, gliding = 0, lastX = 0, lastT = 0, speed = 0;
+     press, drag, let go, and it carries on in one slowing movement to a
+     card. Where it comes to rest follows the throw: a quick flick or a
+     drag past a quarter of a card goes on to the next card, a slow short
+     drag goes back, and a drag held still before letting go stays on the
+     nearest card. Touch is left to the browser, which already does this;
+     only a mouse is handled here. A drag is not a click, so letting go
+     over a card after moving the strip does not open it. */
+  function draggable(strip, card) {
+    var down = null, moved = false, trail = [];
     strip.classList.add("draggable");
-
-    function settle() {
-      // The card whose start is nearest where the strip stopped, its
-      // left edge kept clear of the cut by the strip's own padding.
-      var edge = strip.getBoundingClientRect().left;
-      var best = 0, gap = Infinity;
-      Array.prototype.forEach.call(strip.children, function (card) {
-        var at = strip.scrollLeft + card.getBoundingClientRect().left - edge - 2;
-        if (Math.abs(at - strip.scrollLeft) < gap) {
-          gap = Math.abs(at - strip.scrollLeft); best = at;
-        }
-      });
-      strip.classList.remove("dragging");
-      strip.scrollTo({ left: Math.max(0, best), behavior: still ? "auto" : "smooth" });
-    }
-
-    function glide() {
-      cancelAnimationFrame(gliding);
-      if (still || Math.abs(speed) < 0.05) { settle(); return; }
-      var then = performance.now();
-      (function step(now) {
-        var dt = Math.min(32, now - then); then = now;
-        var before = strip.scrollLeft;
-        strip.scrollLeft -= speed * dt;
-        speed *= Math.pow(0.994, dt);
-        if (Math.abs(speed) < 0.05 || strip.scrollLeft === before) settle();
-        else gliding = requestAnimationFrame(step);
-      })(then);
-    }
 
     strip.addEventListener("pointerdown", function (event) {
       if (event.pointerType !== "mouse" || event.button !== 0) return;
-      cancelAnimationFrame(gliding);
+      cancelAnimationFrame(strip._glide || 0);
+      strip._target = null;
       down = { x: event.clientX, left: strip.scrollLeft, id: event.pointerId };
-      moved = false; speed = 0; lastX = event.clientX; lastT = performance.now();
+      moved = false;
+      trail = [[performance.now(), event.clientX]];
     });
     strip.addEventListener("pointermove", function (event) {
       if (!down || event.pointerId !== down.id) return;
@@ -329,17 +364,72 @@
       }
       if (!moved) return;
       var now = performance.now();
-      if (now > lastT) {
-        speed = 0.8 * speed + 0.2 * (event.clientX - lastX) / (now - lastT);
-      }
-      lastX = event.clientX; lastT = now;
+      trail.push([now, event.clientX]);
+      while (trail.length > 2 && now - trail[0][0] > 100) trail.shift();
       strip.scrollLeft = down.left - dx;
     });
     function release(event) {
       if (!down || event.pointerId !== down.id) return;
+      var origin = down.left;
       down = null;
-      if (moved) glide();
+      if (!moved) return;
+      // The speed of the last tenth of a second, and none at all if the
+      // pointer was held still before letting go.
+      var now = performance.now(), first = trail[0], last = trail[trail.length - 1];
+      var speed = (now - last[0] > 90 || last[0] === first[0]) ? 0
+        : (last[1] - first[1]) / (last[0] - first[0]);
+      rest(origin, -speed);
     }
+
+    // Where a throw comes to rest. `speed` is how fast the strip itself
+    // was moving on, in pixels a millisecond, forwards positive.
+    function rest(origin, speed) {
+      var list = snaps(strip);
+      var here = strip.scrollLeft;
+      var start = nearest(list, origin);
+      var at = nearest(list, here + speed * 300);
+      var way = here > origin ? 1 : -1;
+      if (at === start && (Math.abs(speed) > 0.3
+          || Math.abs(here - origin) > card() * 0.25)) {
+        at = Math.max(0, Math.min(list.length - 1, start + way));
+      }
+      glideTo(strip, list[at]);
+    }
+
+    // A sideways swipe on a touchpad, or a wheel turned with Shift held,
+    // moves the strip under the fingers and, once they stop, carries it
+    // on to a card the same way a throw does. Left to the browser's own
+    // snapping, a short swipe sprang back and a long one jumped a card in
+    // a single frame. An upward or downward wheel still scrolls the page.
+    var wheelFrom = null, wheelTrail = [], wheelDone = 0;
+    strip.addEventListener("wheel", function (event) {
+      var across = event.deltaX || (event.shiftKey ? event.deltaY : 0);
+      if (!across || (!event.shiftKey
+          && Math.abs(event.deltaY) > Math.abs(event.deltaX))) return;
+      event.preventDefault();
+      if (event.deltaMode === 1) across *= 40;
+      else if (event.deltaMode === 2) across *= strip.clientWidth;
+      if (wheelFrom === null) {
+        cancelAnimationFrame(strip._glide || 0);
+        strip._target = null;
+        wheelFrom = strip.scrollLeft;
+        wheelTrail = [];
+        strip.classList.add("dragging");
+      }
+      strip.scrollLeft += across;
+      var now = performance.now();
+      wheelTrail.push([now, strip.scrollLeft]);
+      while (wheelTrail.length > 2 && now - wheelTrail[0][0] > 100) wheelTrail.shift();
+      clearTimeout(wheelDone);
+      wheelDone = setTimeout(function () {
+        var first = wheelTrail[0], last = wheelTrail[wheelTrail.length - 1];
+        var speed = last[0] === first[0] ? 0
+          : (last[1] - first[1]) / (last[0] - first[0]);
+        var origin = wheelFrom;
+        wheelFrom = null;
+        rest(origin, speed);
+      }, 140);
+    }, { passive: false });
     strip.addEventListener("pointerup", release);
     strip.addEventListener("pointercancel", release);
     // The click that ends a drag is swallowed; one that did not move is
