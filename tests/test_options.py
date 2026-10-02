@@ -240,7 +240,7 @@ def test_a_search_that_meets_nothing_returns_nothing():
         tried=(an_outcome(availability=0.5), an_outcome(availability=0.6)),
     )
     assert found.best is None
-    with pytest.raises(ValueError, match="hiçbir yerleşim karşılamadı"):
+    with pytest.raises(ValueError, match="karşılayan bir yerleşim bulunamadı"):
         found.as_option("hopeless")
 
 
