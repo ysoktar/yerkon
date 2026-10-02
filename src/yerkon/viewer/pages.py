@@ -2492,6 +2492,16 @@ COST = Page(
 BTK_EXEMPT = ("https://www.btk.gov.tr/s3/web-btk-site/"
               "7708c26c-5161-4919-8b3d-daa31d4ac8fb/2026/07/"
               "b02b513d-09b2-4035-bc04-64f59d02f707.pdf")
+#: The regulation that makes a device within the criteria licence-free.
+EXEMPT_REGULATION = ("https://www.resmigazete.gov.tr/eskiler/2018/11/"
+                     "20181127-18.htm")
+#: The BTK's call for comments on the draft that would bring in the
+#: cyber security requirements of RED Article 3(3).
+CYBER_DRAFT = ("https://www.btk.tr/duyurular/bilgi-teknolojileri-ve-"
+               "iletisim-kurulunun-06-05-2025-tarihli-ve-2025-ik-ted-128-"
+               "sayili-karari-ile-internet-baglantili-telsiz-ekipmanlarinin-"
+               "ek-temel-gereklerinin-uygulanmasina-dair-teblig-taslagi-na-"
+               "iliskin-olarak-kurum-disi-goruslerin-alinmasi")
 #: The 2018 amendment that gave the safety certificate regulation its
 #: name and its present scope (Article 2).
 SAFETY_CERTIFICATE = ("https://www.resmigazete.gov.tr/eskiler/2018/04/"
@@ -2561,6 +2571,55 @@ LAW = Page(
                    "interference mitigation techniques at least equivalent "
                    "to those of the reference standard ([Article 2]("
                    + BTK_EXEMPT + "#page=6))."),
+                _w("Bu ölçütlere uyan cihaz ruhsatsız kullanılıyor: "
+                   "telsiz ruhsatnamesi, telsiz kurma ve kullanma izni, "
+                   "frekans tahsisi ve tescili gerekmiyor ([Frekans "
+                   "Tahsisinden Muaf Telsiz Cihaz ve Sistemleri Hakkında "
+                   "Yönetmelik](" + EXEMPT_REGULATION + "), Madde 5). Cihaz "
+                   "başka telsizlere zararlı girişim yapamaz ve onlardan "
+                   "gelen girişime karşı koruma isteyemez (Madde 5(3)). "
+                   "Muafiyet dışında ve mevzuata aykırı kullanımda "
+                   "Elektronik Haberleşme Kanunu'nun 63. maddesine göre "
+                   "işlem yapılıyor (Madde 7).",
+                   "A device within these criteria is used without a "
+                   "licence: no radio licence, no permit to set up and "
+                   "use it, no frequency assignment or registration "
+                   "([Regulation on Radio Equipment and Systems Exempt "
+                   "from Frequency Assignment](" + EXEMPT_REGULATION + "), "
+                   "Article 5). It may not cause harmful interference to "
+                   "other radio systems and may not claim protection from "
+                   "theirs (Article 5(3)). Use outside the exemption and "
+                   "against the rules is dealt with under Article 63 of "
+                   "the Electronic Communications Law (Article 7)."),
+                _w("Açık bir soru: Teknik Ölçütler'in [Madde 8]("
+                   + BTK_EXEMPT + "#page=17)'i radyo-tespit cihazlarını, "
+                   "yani bir nesnenin konumunu telsizle belirleyen "
+                   "cihazları ayrıca düzenliyor; 2400-2483,5 MHz'de sınır "
+                   "25 mW e.i.r.p., referans standart TS EN 300 440. Aynı "
+                   "madde noktadan noktaya ve noktadan çok noktaya telsiz "
+                   "haberleşmesini kapsam dışı sayıyor. YERKON konumu "
+                   "birimler arasındaki paket alışverişiyle bulduğu için "
+                   "iki maddeye de girebilir. Site ve simülasyon Madde 5'i "
+                   "esas alıyor. Madde 8 geçerli sayılırsa yayın gücü "
+                   "dörtte bire (6 dB) iner, menzil kısalır (engelsiz "
+                   "yayılmada kabaca yarıya), daha çok birim gerekir ve "
+                   "km² başına maliyet artar. Kesin cevap BTK'dan görüş "
+                   "istenerek alınacak.",
+                   "An open question: [Article 8](" + BTK_EXEMPT
+                   + "#page=17) of the Technical Criteria deals separately "
+                   "with radiodetermination devices, those that find an "
+                   "object's position by radio; at 2400-2483,5 MHz the "
+                   "limit is 25 mW e.i.r.p. and the reference standard TS "
+                   "EN 300 440. The same article leaves out point-to-point "
+                   "and point-to-multipoint radio communication. YERKON "
+                   "finds position through packets exchanged between "
+                   "units, so it can be read under either article. The "
+                   "site and the simulation rest on Article 5. Were "
+                   "Article 8 to apply, the transmit power would fall to a "
+                   "quarter (6 dB), the range would shrink (roughly by "
+                   "half without obstacles), more units would be needed "
+                   "and the cost per km² would rise. The definitive answer "
+                   "will come from asking the BTK for its opinion."),
             ),
         ),
         Part(
@@ -2909,7 +2968,14 @@ LAW = Page(
                    "vermeme, kişisel verilerin korunması ve sahtekârlığa "
                    "karşı korunma gerekleri (EN 18031) de kapsama "
                    "girebilir; Madde 5(4)'e göre bunları BTK kendi "
-                   "düzenlemesiyle uygulamaya alıyor. O kanıtın bedeli bu "
+                   "düzenlemesiyle uygulamaya alıyor. BTK bunun için "
+                   "[İnternet Bağlantılı Telsiz Ekipmanlarının Ek Temel "
+                   "Gereklerinin Uygulanmasına Dair Tebliğ Taslağı]("
+                   + CYBER_DRAFT + ")'nı 6 Mayıs 2025 tarihli ve "
+                   "2025/İK-TED/128 sayılı kararla görüşe açtı (son gün "
+                   "3 Temmuz 2025); AB'deki karşılığı 2022/30 sayılı "
+                   "tüzük. Tebliğin yürürlüğe girdiğini gösteren bir "
+                   "duyuru bulunamadı (1 Ekim 2026). O kanıtın bedeli bu "
                    "aralığın dışında. "
                    "UWB (Qorvo DWM3000) taşıyan tünel birimi, yaya ve araç "
                    "alıcısına EN 302 065 de gerekiyor: yaya alıcısına genel "
@@ -2940,7 +3006,14 @@ LAW = Page(
                    "(https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) on harm to the network, "
                    "personal data and fraud (EN 18031) may apply as "
                    "well; under Article 5(4) the BTK brings them into "
-                   "force by its own rules. That evidence costs extra. "
+                   "force by its own rules. For this the BTK opened the "
+                   "[draft communiqué on the additional essential "
+                   "requirements for internet-connected radio equipment]("
+                   + CYBER_DRAFT + ") for comment by Board decision "
+                   "2025/İK-TED/128 of 6 May 2025 (deadline 3 July 2025); "
+                   "its EU counterpart is Regulation 2022/30. No notice "
+                   "was found that it has come into force (1 October "
+                   "2026). That evidence costs extra. "
                    "The tunnel unit and the "
                    "pedestrian and vehicle receivers carry UWB (Qorvo "
                    "DWM3000) and also need EN 302 065: [-1]"
@@ -3261,6 +3334,19 @@ LAW = Page(
                 Link(label=_w("BTK: frekans tahsisinden muaf telsiz cihazların teknik ölçütleri",
                               "BTK: technical criteria for licence-exempt radio devices"),
                      url=BTK_EXEMPT),
+                Link(label=_w("Frekans Tahsisinden Muaf Telsiz Cihaz ve "
+                              "Sistemleri Hakkında Yönetmelik, Madde 5 ve 7 "
+                              "(Resmî Gazete, 27 Kasım 2018, sayı 30608)",
+                              "Regulation on Radio Equipment and Systems "
+                              "Exempt from Frequency Assignment, Articles 5 "
+                              "and 7 (Resmî Gazete, 27 November 2018, issue "
+                              "30608)"),
+                     url=EXEMPT_REGULATION),
+                Link(label=_w("BTK: İnternet bağlantılı telsiz ekipmanları "
+                              "tebliğ taslağı, 2025/İK-TED/128",
+                              "BTK: draft communiqué on internet-connected "
+                              "radio equipment, 2025/İK-TED/128"),
+                     url=CYBER_DRAFT),
                 Link(label=_w("Elektronik Haberleşme Cihazları Güvenlik "
                               "Sertifikası Yönetmeliği, Madde 2 (Resmî "
                               "Gazete, 17 Nisan 2018, sayı 30394)",

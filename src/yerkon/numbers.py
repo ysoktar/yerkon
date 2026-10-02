@@ -83,7 +83,7 @@ _UNITS = _re.compile(
 
 #: Names in front of which a number is an identifier, not a quantity.
 _NAMES = _re.compile(
-    r"(?:IEEE|ISO|IEC|EN|TS|ETSI|RG|Madde|Article|sayı|No|no|Kanun|Law|"
+    r"(?:IEEE|ISO|IEC|EN|TS|ETSI|RG|Madde|Article|sayı|issue|No|no|Kanun|Law|"
     r"Tablo|Table|ADR|ADR-|FY|Q\d|\d\d\.\d\d\.\d{4},?|No\.|isteği|request|"
     r"Kanun\S*\s*\(|Law\s*\(|"
     # A brand or a standard in capitals names what follows: YDL 803040.

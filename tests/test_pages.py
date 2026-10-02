@@ -1241,3 +1241,12 @@ def test_an_amount_after_capex_or_opex_is_grouped_and_a_part_number_is_not():
     assert grouped("CAPEX 10053 TL/km²") == "CAPEX 10.053 TL/km²"
     assert grouped("OPEX 33160 TL") == "OPEX 33.160 TL"
     assert grouped("YDL 803040") == "YDL 803040"
+
+
+def test_an_issue_of_the_gazette_is_a_number_not_an_amount():
+    """The English pages printed "issue 31.295" for Resmî Gazete 31295,
+    which the Turkish ones wrote "sayı 31295"."""
+    assert grouped("Resmî Gazete, 5 November 2020, issue 31295") == (
+        "Resmî Gazete, 5 November 2020, issue 31295")
+    assert grouped("Resmî Gazete, 5 Kasım 2020, sayı 31295") == (
+        "Resmî Gazete, 5 Kasım 2020, sayı 31295")
