@@ -20,13 +20,15 @@
     ready: "Getting the simulator ready (4 of 4): drawing the first scene…",
     failed: "The simulator could not start in this browser. Try a current Chrome, Edge, Firefox or Safari. Detail: ",
     note: "The simulation runs on this device; nothing is sent anywhere. The first visit can take a minute or two; later visits are quicker, because the downloaded files stay in the browser.",
+    home: "Back to the site",
   } : {
     python: "Simülatör hazırlanıyor (1/4): hesap motoru indiriliyor…",
     numpy: "Simülatör hazırlanıyor (2/4): matematik kütüphanesi yükleniyor…",
     package: "Simülatör hazırlanıyor (3/4): YERKON modeli ve Ankara haritaları açılıyor…",
     ready: "Simülatör hazırlanıyor (4/4): ilk sahne çiziliyor…",
-    failed: "Simülatör bu tarayıcıda açılamadı. Güncel bir Chrome, Edge, Firefox ya da Safari ile dene. Ayrıntı: ",
-    note: "Simülasyon bu cihazda çalışıyor, hiçbir veri dışarı gönderilmiyor. İlk açılış bir iki dakika sürebilir; indirilen dosyalar tarayıcıda kaldığı için sonraki açılışlar daha hızlıdır.",
+    failed: "Simülatör bu tarayıcıda açılamadı. Güncel bir Chrome, Edge, Firefox ya da Safari ile deneyiniz. Ayrıntı: ",
+    note: "Simülasyon bu cihazda çalışmakta, hiçbir veri dışarı gönderilmemektedir. İlk açılış bir iki dakika sürebilir; indirilen dosyalar tarayıcıda kaldığı için sonraki açılışlar daha hızlıdır.",
+    home: "Siteye dön",
   };
 
   const cover = document.createElement("div");
@@ -43,11 +45,29 @@
   note.style.cssText = "opacity:0.75;font-size:14px;max-width:32em";
   note.textContent = words.note;
   line.textContent = words.python;
-  cover.append(line, note);
+  // The way home, over the cover: the page's own home button is under it
+  // until the first scene is drawn, and nobody should have to wait a
+  // minute for the simulator only to leave it.
+  const home = document.createElement("a");
+  home.href = english ? "en/" : "tr/";
+  home.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" '
+    + 'aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" '
+    + 'stroke-linecap="round" stroke-linejoin="round" '
+    + 'style="vertical-align:-3px;margin-right:6px">'
+    + '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h5v-5.5h3V20h5V9.5"/>'
+    + "</svg>";
+  home.append(words.home);
+  home.style.cssText = [
+    "position:absolute", "top:16px", "right:16px", "padding:7px 14px",
+    "border:1px solid rgba(244,244,242,0.45)", "border-radius:6px",
+    "color:#f4f4f2", "text-decoration:none", "font-size:14px",
+    "background:rgba(255,255,255,0.06)",
+  ].join(";");
+  cover.append(home, line, note);
   const show = () => document.body.append(cover);
   if (document.body) show(); else addEventListener("DOMContentLoaded", show);
 
-  const worker = new Worker("sim-worker.js?v=e45b0ca885", { type: "module" });
+  const worker = new Worker("sim-worker.js?v=4c1c841012", { type: "module" });
   // A worker that dies while loading says nothing on its own, and the
   // cover would promise a load that is never coming.
   worker.onerror = event => {

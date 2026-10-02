@@ -3779,7 +3779,10 @@ def _header(page: Page, language: str, where: Where) -> str:
         'width="26" height="26"><b>YERKON</b></a>\n'
         '<nav class="pages">{links}</nav>\n'
         '<div class="actions">'
-        '<a class="run" href="{simulator}" title="{label}">'
+        # In a tab of its own: the simulator takes a while to start, and
+        # the page it was opened from stays where it was read.
+        '<a class="run" href="{simulator}" title="{label}" '
+        'target="_blank" rel="noopener">'
         '<span class="long">{label}</span><span class="short">{short}</span>'
         '</a>'
         '<button class="theme" id="theme" type="button" hidden></button>'
