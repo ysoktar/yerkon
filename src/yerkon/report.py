@@ -69,7 +69,7 @@ class Row:
     #: "area" for a deployment that serves ground, "route" for one that
     #: serves a line. A tunnel is 12 m wide and 2 km long, so dividing
     #: its capital by its area produces a number that is large because
-    #: the denominator is a fiftieth of a square kilometre and not
+    #: the denominator is about a fortieth of a square kilometre and not
     #: because a tunnel is dear. Per route kilometre is the figure a
     #: reader can use, and it is the one a tunnel operator would ask
     #: for (ADR-0073).

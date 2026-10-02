@@ -1779,8 +1779,9 @@ RESULTS = Page(
                 _w(
                     "**Tünel satırının maliyeti kilometre başına, diğer "
                     "satırlarınki kilometrekare başına verilmiştir.** 12 m "
-                    "genişliğinde ve 2 km uzunluğundaki bir tünel, bir km²'nin "
-                    "ellide biri kadar alan kaplamaktadır; maliyet alana "
+                    "genişliğinde ve 2 km uzunluğundaki bir tünel 0,024 km², "
+                    "yani bir km²'nin yaklaşık kırkta biri kadar alan "
+                    "kaplamaktadır; maliyet alana "
                     "bölündüğünde ortaya çıkan büyük değer, tünelin pahalı "
                     "olmasından değil paydanın küçük olmasından "
                     "kaynaklanmaktadır. Tünel bir alana değil bir hatta hizmet "
@@ -1790,7 +1791,8 @@ RESULTS = Page(
                     "karşılaştırılmamalıdır.",
                     "**The tunnel row is priced per kilometre, the other "
                     "two per square kilometre.** Twelve metres wide over "
-                    "two kilometres is a fiftieth of a square kilometre, "
+                    "two kilometres is 0,024 km², about a fortieth of a "
+                    "square kilometre, "
                     "so dividing by area makes the number large because "
                     "the denominator is small rather than because a "
                     "tunnel is dear. A tunnel serves a line, so those two "
@@ -1838,13 +1840,15 @@ SIMULATION = Page(
     slug="simulasyon",
     slug_en="simulation",
     nav=_w("Simülasyon", "The simulation"),
-    title=_w("Simülasyon nasıl çalışıyor", "How the simulation works"),
+    title=_w("Simülasyonun çalışma yöntemi", "How the simulation works"),
     lead=_w(
-        "Simülasyon, yayın birimlerini Ankara'nın gerçek arazisine "
-        "yerleştirir ve bir alıcıyı yol boyunca yürütür. Alıcı her adımda "
-        "birimlere olan mesafeyi ölçer ve konumunu bu ölçümlerden hesaplar; "
-        "hesaplanan konum gerçek konumla karşılaştırılarak hata bulunur. "
-        "Sahada yapılmış bir ölçüm değildir.",
+        "Simülasyon, yayın birimlerini Ankara'nın gerçek arazi "
+        "verisi üzerine yerleştirmekte ve bir alıcıyı yol boyunca "
+        "hareket ettirmektedir. Alıcı her adımda yayın birimlerine "
+        "olan mesafeyi ölçmekte ve konumunu bu ölçümlerden "
+        "hesaplamaktadır; hesaplanan konum gerçek konumla "
+        "karşılaştırılarak hata belirlenmektedir. Sonuçlar saha "
+        "ölçümü değil, simülasyon çıktısıdır.",
         "The simulation places the broadcast units on Ankara's real terrain "
         "and moves a receiver along the road. At every step the receiver "
         "measures its distance to the units and works out its position from "
@@ -1856,12 +1860,14 @@ SIMULATION = Page(
             kind="picture",
             picture="simulator.webp",
             lines=(_w(
-                "Şehir içi satırı, simülasyonu tamamlanmış hâliyle: "
-                "Kızılay'ın gerçek arazisi, aydınlatma direklerindeki yayın "
-                "birimleri ve zemine boyanmış kapsama. Renkler o noktada kaç "
-                "birimin duyulabildiğini gösteriyor; konum hesaplamak için en"
-                " az dördü gerekiyor. Sağdaki panel o sekmenin kendi sonucu; "
-                "gölgelemenin sekiz ayrı çekilişinin birleşimi.",
+                "Şehir içi senaryosunun tamamlanmış simülasyonu: Kızılay'ın"
+                " gerçek arazisi, aydınlatma direklerine yerleştirilen "
+                "yayın birimleri ve zemin üzerinde gösterilen kapsama. "
+                "Renkler, ilgili noktada kaç yayın biriminin alınabildiğini"
+                " göstermektedir; konum hesaplamak için en az dört birim "
+                "gerekmektedir. Sağdaki panel, gölgelemenin sekiz ayrı "
+                "çekilişinin birleştirilmesiyle elde edilen sonucu "
+                "göstermektedir.",
                 "The urban row with its run finished: the real terrain "
                 "at Kızılay, the broadcast units on lighting columns, and "
                 "the coverage painted onto the ground. The colours show "
@@ -1873,25 +1879,28 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Arazi gerçek", "The ground is real"),
+            heading=_w("Gerçek arazi verisi", "The ground is real"),
             lines=(
                 _w(
-                    "Üç satırın hepsi Ankara yakınındaki gerçek arazi "
-                    "üzerinde duruyor. Arazi Copernicus'un 30 m'lik yükseklik"
-                    " modelinden bir kez indirildi ve pakete gömüldü; depoyu "
-                    "kopyalayan biri tabloyu internete bağlanmadan yeniden "
-                    "üretebilir.",
+                    "Üç senaryonun tamamı Ankara yakınlarındaki gerçek arazi "
+                    "verisi üzerinde çalıştırılmaktadır. Arazi verisi "
+                    "Copernicus'un 30 m çözünürlüklü yükseklik modelinden bir "
+                    "kez indirilmiş ve yazılım paketine eklenmiştir; böylece "
+                    "kaynak kodu indiren herkes tabloyu internet bağlantısı "
+                    "olmadan yeniden üretebilmektedir.",
                     "All three rows stand on real ground near Ankara, "
                     "fetched once from the Copernicus 30 m DEM and baked "
                     "into the package, so a clone reproduces the table "
                     "without touching the network.",
                 ),
                 _w(
-                    "Şehir Kızılay: bir kenarı üç kilometre, en alçak ve en "
-                    "yüksek noktası arasında 91 metre var. Açık arazi Polatlı"
-                    " ovası: bir kenarı yirmi kilometre, arada 486 metre. "
-                    "Tünel, Kızılcahamam'daki dağların içinden geçen gerçek, "
-                    "iki kilometrelik bir tünel.",
+                    "Şehir içi senaryo Kızılay'dadır: bir kenarı üç kilometre "
+                    "olan alanda en alçak ve en yüksek nokta arasında 91 metre "
+                    "fark bulunmaktadır. Kırsal senaryo Polatlı ovasındadır: "
+                    "bir kenarı yirmi kilometre olan alanda yükselti farkı 486 "
+                    "metredir. Tünel senaryosu, Kızılcahamam'daki dağların "
+                    "içinden geçen gerçek ve iki kilometre uzunluğundaki bir "
+                    "tüneldir.",
                     "The city is Kızılay: three kilometres on a side, "
                     "with 91 metres between its lowest and highest point. "
                     "The open country is the Polatlı plain, twenty "
@@ -1900,9 +1909,9 @@ SIMULATION = Page(
                     "mountains at Kızılcahamam.",
                 ),
                 _w(
-                    "Hiçbir yerde \"düz zemin\" seçeneği yok. Düz bir yüzey, "
-                    "simülasyonun çizebileceği en tarafsız arazi değil, en "
-                    "elverişli arazidir: sonucu olduğundan iyi gösterirdi.",
+                    'Simülasyonda "düz zemin" seçeneği bulunmamaktadır. Düz bir'
+                    " yüzey en tarafsız değil, en elverişli arazi koşuludur ve "
+                    "sonuçların olduğundan iyi görünmesine yol açacaktır.",
                     "Nowhere is there a \"flat ground\" option. A flat "
                     "surface is not the most neutral terrain the simulation can "
                     "draw, it is the most favourable one: it would make "
@@ -1912,15 +1921,16 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Menzile tek bir hesap karar verir",
+            heading=_w("Menzilin belirlenmesi",
                        "One calculation decides the range"),
             lines=(
                 _w(
-                    "Kodun hiçbir yerinde \"azami menzil budur\" diyen bir sayı"
-                    " yok. Menzil, sinyalin yolda ne kadar zayıfladığının "
-                    "hesabından çıkar. Aynı hesap iki şeye birden karar "
-                    "verir: bağlantının kurulup kurulmadığına ve kurulduysa "
-                    "ne kadar hassas ölçtüğüne.",
+                    "Kodda sabit bir azami menzil değeri tanımlanmamıştır. "
+                    "Menzil, sinyalin yol boyunca ne kadar zayıfladığının "
+                    "hesabından elde edilmektedir. Aynı hesap iki konuyu "
+                    "birlikte belirlemektedir: bağlantının kurulup "
+                    "kurulamayacağını ve kurulduğu durumda ölçümün ne kadar "
+                    "hassas olacağını.",
                     "Nowhere in the code is there a number saying \"the "
                     "maximum range is this\". Range comes out of working "
                     "out how much the signal weakens on its way. The same "
@@ -1929,11 +1939,12 @@ SIMULATION = Page(
                     "does.",
                 ),
                 _w(
-                    "Sinyal alıcıya iki yoldan ulaşır: doğrudan ve zeminden "
-                    "sekerek. Belli bir mesafeden sonra bu ikisinin adımı "
-                    "kayar ve birbirini zayıflatırlar. Bu mesafe anten "
-                    "yüksekliğiyle büyür; birimi alçağa takmak menzilden "
-                    "götürür.",
+                    "Sinyal alıcıya iki yoldan ulaşmaktadır: doğrudan ve "
+                    "zeminden yansıyarak. Belirli bir mesafeden sonra bu iki "
+                    "bileşenin fazı kaymakta ve birbirlerini zayıflatmaktadır "
+                    "(iki ışınlı model). Bu mesafe anten yüksekliğiyle birlikte"
+                    " artmaktadır; dolayısıyla yayın biriminin alçağa "
+                    "yerleştirilmesi menzili azaltmaktadır.",
                     "The signal reaches the receiver two ways: directly, "
                     "and bouncing off the ground. Past a certain distance "
                     "those two fall out of step and weaken each other. "
@@ -1941,11 +1952,12 @@ SIMULATION = Page(
                     "a unit low costs range.",
                 ),
                 _w(
-                    "Sinyal engellerin üzerinden bükülür ve bunu yaparken "
-                    "zayıflar. Hesap, yoldaki en kötü tek engele değil bütün "
-                    "araziye bakar (ITU-R P.526-15 §4.5.2, delta-Bullington)."
-                    " Kızılay'daki bir bağlantının önünde ortancada üç, en "
-                    "kötü durumda on altı engel var.",
+                    "Sinyal engellerin üzerinden kırınıma uğramakta ve bu "
+                    "sırada zayıflamaktadır. Hesap, yol üzerindeki en kötü tek "
+                    "engeli değil arazinin tamamını dikkate almaktadır (ITU-R "
+                    "P.526-15 §4.5.2, delta-Bullington). Kızılay'daki bir "
+                    "bağlantının önünde ortanca değer olarak üç, en kötü "
+                    "durumda on altı engel bulunmaktadır.",
                     "The signal bends over obstacles and weakens doing "
                     "it. The calculation looks at the whole terrain rather "
                     "than the worst single obstacle on the path (ITU-R "
@@ -1954,10 +1966,11 @@ SIMULATION = Page(
                     "median, sixteen at the worst.",
                 ),
                 _w(
-                    "Arazi her on metrede bir okunur. Sabit 64 noktada "
-                    "okunsaydı 6,9 km'lik bir kırsal bağlantı 108 metrede bir"
-                    " okunmuş olurdu; aradaki tümsekler atlanınca kayıp, "
-                    "doğrusu 37,60 dB iken 31,28 dB çıkardı.",
+                    "Arazi kesiti her on metrede bir örneklenmektedir. Sabit 64"
+                    " noktada örneklenmesi durumunda 6,9 km'lik bir kırsal "
+                    "bağlantı 108 metrede bir örneklenmiş olacak; aradaki "
+                    "tümsekler atlandığı için doğru değeri 37,60 dB olan kayıp "
+                    "31,28 dB olarak hesaplanacaktı.",
                     "The terrain is read every ten metres. Read at a "
                     "fixed 64 points, a 6,9 km rural link would be read "
                     "every 108 metres, and skipping the rises in between "
@@ -1966,20 +1979,23 @@ SIMULATION = Page(
                 ),
                 _w(
                     "Bir bağlantıda bu iki kaybın toplamı değil, büyük olanı "
-                    "sayılır. İkisi de aynı arazinin aynı bağlantıya "
-                    "yaptığını anlatır; toplamak aynı tepeyi iki kez saymak "
-                    "olur.",
+                    "dikkate alınmaktadır. Her ikisi de aynı arazinin aynı "
+                    "bağlantı üzerindeki etkisini ifade ettiğinden toplanmaları"
+                    " aynı engelin iki kez hesaba katılması anlamına "
+                    "gelecektir.",
                     "A link counts the larger of those two losses, not "
                     "their sum. Both describe what the same terrain does "
                     "to the same link, and adding them would count the "
                     "same hill twice.",
                 ),
                 _w(
-                    "Bunların üstüne gölgeleme biner: aynı uzaklıktaki iki "
-                    "bağlantı, arada ne durduğuna göre farklı çıkar. Yol "
-                    "açıkken 4 dB, kapalıyken 7,8 dB kadar (3GPP TR 38.901). "
-                    "Rastgele olduğu için hesap sekiz kez tekrarlanır ve "
-                    "sekizinin bütün sonuçları birlikte okunur.",
+                    "Bu kayıplara gölgeleme etkisi eklenmektedir: aynı "
+                    "uzaklıktaki iki bağlantı, aradaki engellere bağlı olarak "
+                    "farklı sonuç vermektedir. Gölgeleme, görüş hattı açıkken 4"
+                    " dB, kapalıyken 7,8 dB standart sapmayla modellenmektedir "
+                    "(3GPP TR 38.901). Etki rastgele olduğundan hesap sekiz kez"
+                    " tekrarlanmakta ve sekiz çekilişin sonuçları birlikte "
+                    "değerlendirilmektedir.",
                     "Shadowing sits on top of those: two links the same "
                     "distance apart come out different depending on what "
                     "stands between. 4 dB with a clear path, about 7,8 dB without "
@@ -1991,14 +2007,15 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Mesajlar ve konum",
+            heading=_w("Mesajlaşma ve konum hesabı",
                        "The messages and the position"),
             lines=(
                 _w(
-                    "Mesafe hesaplanmaz, ölçülür. İki telsiz karşılıklı mesaj"
-                    " gönderir; SX1280'de bir ölçüm alışverişi, Göndermeden "
-                    "Önce Dinle (LBT) kuralının istediği %5 bekleme dahil "
-                    "33,4 milisaniye sürer.",
+                    "Mesafe hesaplanmamakta, ölçülmektedir. İki telsiz "
+                    "karşılıklı mesaj göndermekte; SX1280'de bir ölçüm "
+                    "alışverişi, Göndermeden Önce Dinle (LBT) kuralının "
+                    "gerektirdiği %5'lik bekleme dahil 33,4 milisaniye "
+                    "sürmektedir.",
                     "A distance is measured rather than calculated. Two "
                     "radios send messages back and forth; on the SX1280 "
                     "one ranging exchange takes 33,4 milliseconds, "
@@ -2006,10 +2023,11 @@ SIMULATION = Page(
                     "asks for.",
                 ),
                 _w(
-                    "On iki birimle sırayla ölçüşmek 401 milisaniye sürer. "
-                    "100 km/sa giden bir araç bu sürede 11,1 metre yol alır; "
-                    "yani bir turdaki ölçümler tek bir ana ait değildir. "
-                    "Hesap da öyleymiş gibi davranmaz.",
+                    "On iki yayın birimiyle sırayla ölçüm yapılması 401 "
+                    "milisaniye sürmektedir. 100 km/sa hızla giden bir araç bu "
+                    "sürede 11,1 metre yol almaktadır; dolayısıyla bir turdaki "
+                    "ölçümler tek bir zaman anına ait değildir ve hesap bu "
+                    "farkı dikkate almaktadır.",
                     "Measuring against twelve units in turn takes 401 "
                     "milliseconds. A car doing 100 km/h covers 11,1 metres "
                     "in that time, so the measurements in one round do not "
@@ -2017,10 +2035,10 @@ SIMULATION = Page(
                     "pretend they do.",
                 ),
                 _w(
-                    "Konumu hesaplayan kod aracın gerçekte nerede olduğunu "
-                    "hiç görmez. Yalnızca şunları görür: ölçülen mesafe, "
-                    "birimin kurulumda ölçülen konumu, ölçümün zamanı ve o "
-                    "ölçüme ne kadar güvenildiği.",
+                    "Konumu hesaplayan kod, aracın gerçek konumuna hiçbir "
+                    "aşamada erişmemektedir. Kullanılan bilgiler yalnızca "
+                    "ölçülen mesafe, yayın biriminin kurulumda ölçülen konumu, "
+                    "ölçümün zamanı ve ölçümün güvenilirlik düzeyidir.",
                     "The code that works out the position never sees "
                     "where the vehicle really is. It sees only these: the "
                     "measured distance, the unit's position as surveyed at "
@@ -2028,12 +2046,13 @@ SIMULATION = Page(
                     "much that measurement is trusted.",
                 ),
                 _w(
-                    "Yol kenarına dizilmiş birimler aşağı yukarı aynı "
-                    "yükseklikte durduğu için düşey konumu mesafelerden "
-                    "ölçmek zordur. Filtre bu yüzden yolun yüksekliğini "
-                    "alıcıdaki yükseklik haritasından bir ölçüm olarak alır; "
-                    "haritanın 2,43 m'lik hatası yol boyunca parça parça "
-                    "çekilir. VPE sütunu bunun sonucudur.",
+                    "Yol kenarına yerleştirilen yayın birimleri yaklaşık aynı "
+                    "yükseklikte bulunduğundan düşey konumun yalnızca mesafe "
+                    "ölçümlerinden belirlenmesi güçtür. Bu nedenle filtre, "
+                    "yolun yüksekliğini alıcıdaki yükseklik haritasından bir "
+                    "ölçüm olarak almaktadır; haritanın 2,43 m'lik hatası yol "
+                    "boyunca parçalı olarak modellenmektedir. VPE sütunu bu "
+                    "yaklaşımın sonucudur.",
                     "Units strung along a roadside are all at much the "
                     "same height, which leaves the vertical hard to "
                     "measure from ranges. The filter therefore takes the "
@@ -2047,14 +2066,15 @@ SIMULATION = Page(
         Part(kind="shows", shows="spread"),
         Part(
             kind="points",
-            heading=_w("Ortalama almanın gidermediği üç hata",
+            heading=_w("Ortalama alınarak giderilemeyen üç hata",
                        "Three errors that averaging will not remove"),
             lines=(
                 _w(
-                    "**Önü kapalı bir bağlantı, olduğundan uzun ölçer.** "
-                    "Sinyal engelin çevresinden dolaşır ve ölçüm bu uzun yolu"
-                    " sayar. Hata hep aynı yöne gider; bu yüzden daha sık "
-                    "ölçüp ortalama almak onu gidermez.",
+                    "**Görüş hattı kapalı bir bağlantı, mesafeyi olduğundan "
+                    "uzun ölçmektedir.** Sinyal engelin çevresinden dolaşmakta "
+                    "ve ölçüm bu uzun yolu kaydetmektedir. Hata her zaman aynı "
+                    "yönde olduğundan daha sık ölçüm yapıp ortalama almak bu "
+                    "hatayı gidermemektedir.",
                     "**A blocked link measures longer than it is.** The "
                     "signal goes around the obstacle and the measurement "
                     "counts that longer way. The error always goes the "
@@ -2062,12 +2082,13 @@ SIMULATION = Page(
                     "not remove it.",
                 ),
                 _w(
-                    "**Birimin konumu kurulumda yanlış ölçüldüyse yanlış "
-                    "kalır.** Bu hata her birim için bir kez çekilir ve "
-                    "sonuna kadar taşınır. Tünelde hataların ortancası "
-                    "kusursuz bir ölçümle 0,12 m; 15 cm'lik ölçüm hatasıyla "
-                    "bunun yaklaşık beş katı. Konum, birimlerin yerinin "
-                    "ölçümünden daha iyi olamaz.",
+                    "**Yayın biriminin konumu kurulumda hatalı ölçüldüyse bu "
+                    "hata kalıcıdır.** Bu hata her yayın birimi için bir kez "
+                    "belirlenmekte ve simülasyon boyunca korunmaktadır. Tünelde"
+                    " hataların ortancası, kusursuz bir konum ölçümüyle 0,12 m "
+                    "iken 15 cm'lik konum ölçüm hatasıyla yaklaşık beş katına "
+                    "çıkmaktadır. Hesaplanan konum, yayın birimlerinin konum "
+                    "ölçümünden daha doğru olamaz.",
                     "**If a unit's position is surveyed wrong at "
                     "installation, it stays wrong.** It is drawn once per "
                     "unit and carried to the end. In the tunnel the median "
@@ -2076,9 +2097,10 @@ SIMULATION = Page(
                     "cannot be better than the survey of the units.",
                 ),
                 _w(
-                    "**Kaybolan mesaj ölçüm vermez.** 2,4 GHz bandı kablosuz "
-                    "ağlarla ortak, bu yüzden kalabalık. Mesajların şehirde "
-                    "%15'i, açık yolda %5'i kaybolur, tünelde hiçbiri.",
+                    "**Kaybolan mesaj ölçüm üretmez.** 2,4 GHz bandı kablosuz "
+                    "ağlarla paylaşıldığından yoğundur. Simülasyonda mesajların"
+                    " şehir içinde %15'inin, açık yolda %5'inin kaybolduğu, "
+                    "tünelde ise kayıp olmadığı varsayılmaktadır.",
                     "**A lost message gives no measurement.** The 2,4 GHz "
                     "band is shared with wireless networks, so it is "
                     "crowded. 15% of messages are lost in the city, 5% on "
@@ -2088,23 +2110,24 @@ SIMULATION = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Simülasyonun dışında kalanlar", "What is left out"),
+            heading=_w("Simülasyonun kapsamı dışında kalanlar", "What is left out"),
             lines=(
                 _w(
-                    "Aracın hareket sensörü ve tekerlek turu dışarıda "
-                    "bırakıldı. Filtre yalnız telsiz ölçümlerini ve yükseklik"
-                    " haritasından gelen yüksekliği birleştirir.",
+                    "Aracın atalet ölçüm birimi ve odometri verisi kapsam "
+                    "dışında bırakılmıştır. Filtre yalnızca telsiz ölçümlerini "
+                    "ve yükseklik haritasından elde edilen yüksekliği "
+                    "birleştirmektedir.",
                     "The vehicle's motion sensor and wheel turns are left "
                     "out. The filter combines only the radio measurements "
                     "and the height from the elevation map.",
                 ),
                 _w(
-                    "Sinyalin bina duvarlarından sekip birkaç yoldan gelmesi "
-                    "(çok yollu yayılım) simülasyona ayrıca katılmadı; "
-                    "simülasyonda zeminden sekme ve önü kapalı bağlantının "
-                    "uzun okunması var. Telsizin kendi gürültüsü ve "
-                    "alışveriş sırasında saatin kayması da simülasyonda "
-                    "var.",
+                    "Sinyalin bina duvarlarından yansıyarak birden fazla yoldan"
+                    " gelmesi (çok yollu yayılım) simülasyona ayrıca dahil "
+                    "edilmemiştir; zeminden yansıma ve görüş hattı kapalı "
+                    "bağlantının mesafeyi uzun ölçmesi ise modellenmiştir. "
+                    "Telsizin kendi gürültüsü ve ölçüm alışverişi sırasındaki "
+                    "saat kayması da simülasyonda yer almaktadır.",
                     "The signal arriving by several paths after bouncing "
                     "off building walls (multipath) is not in the "
                     "simulation on its own; the simulation has the bounce "
@@ -2113,27 +2136,27 @@ SIMULATION = Page(
                     "the exchange are in the simulation too.",
                 ),
                 _w(
-                    "Ağaçlar simülasyonda yok. Zemin ve binalar gerçek "
-                    "veriden geliyor, ama ağaçlar için ayrı bir kayıp "
-                    "hesaplanmıyor. Ağacın arkasındaki bir bağlantı gerçekte "
-                    "daha zayıf olabilir.",
+                    "Ağaçlar simülasyona dahil edilmemiştir. Zemin ve binalar "
+                    "gerçek verilere dayanmakta, ancak ağaçlar için ayrı bir "
+                    "kayıp hesaplanmamaktadır. Ağacın arkasında kalan bir "
+                    "bağlantı gerçekte daha zayıf olabilir.",
                     "Trees are not in the simulation. The ground and the "
                     "buildings come from real data, but no separate loss "
                     "is worked out for trees. A link behind a tree may be "
                     "weaker in reality.",
                 ),
                 _w(
-                    "Tünel kaybı, gerçek bir karayolu tünelinde 2,8-5 GHz'de "
-                    "ölçülmüş bir modelden gelir ve 6,5 GHz'e taşındı; 6,5 "
-                    "GHz'de ölçülmedi.",
+                    "Tünel kaybı, gerçek bir karayolu tünelinde 2,8-5 GHz "
+                    "bandında ölçülmüş bir modelden alınmış ve 6,5 GHz'e "
+                    "taşınmıştır; 6,5 GHz'de ölçülmemiştir.",
                     "The tunnel loss comes from a model measured in a real "
                     "road tunnel at 2,8 to 5 GHz and carried to 6,5 GHz; "
                     "it was not measured at 6,5 GHz.",
                 ),
                 _w(
-                    "Güvenlik katmanı da simülasyona katılmadı: imza doğrulama, "
-                    "anahtar yönetimi ve birimlerin merkeze gönderdiği "
-                    "yaşam sinyalleri simülasyonda yok.",
+                    "Güvenlik katmanı da simülasyona dahil edilmemiştir: imza "
+                    "doğrulama, anahtar yönetimi ve yayın birimlerinin merkeze "
+                    "gönderdiği durum mesajları simülasyonda yer almamaktadır.",
                     "The security layer is not simulated either: signature "
                     "checking, key management and the \"still working\" "
                     "messages the units send the centre are not in the "
@@ -2143,26 +2166,28 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Zaten yüksek olan yerler",
+            heading=_w("Mevcut yüksek yapıların kullanılması",
                        "Places that are already high"),
             lines=(
                 _w(
-                    "Şehir içi ve kırsal satırlarda yayın birimleri bir "
-                    "ızgaraya değil, bir yerleşim aramasının koyduğu yerlere "
-                    "dizilir; simülatörün **En iyi yerleşimi bul** bölümü ve "
-                    "**Hızlı başla** kutusu aynı aramayı haritadan seçilen "
-                    "başka bir yer için çalıştırır. Adaylar var olan "
-                    "aydınlatma direkleri ve tabelalar, yol boyundaki "
-                    "direkler (şehirde aydınlatma direkleri, açık arazide "
-                    "elektrik dağıtım direkleri) ve tepelere dikilecek 25 "
-                    "m'lik direklerdir. Çatılar sahiplerinden kiralandığı "
-                    "için aday değildir. Her aday bağlantı bütçesiyle denenir"
-                    " ve seçim, ömür boyu maliyete göre bir örtme aramasıdır."
-                    " Bir noktanın kapsandığı sayılması için ona dört birimin"
-                    " ulaşması ve bu birimlerin çevresindeki dört çeyreğin en"
-                    " az üçüne dağılmış olması gerekir. Hepsi tek bir "
-                    "caddeye, tek bir yana dizilmiş birimler o cadde boyunca "
-                    "konum belirleyemez.",
+                    "Şehir içi ve kırsal senaryolarda yayın birimleri bir "
+                    "ızgaraya değil, bir yerleşim aramasının belirlediği "
+                    "noktalara yerleştirilmektedir; simülatördeki **En iyi "
+                    "yerleşimi bul** bölümü ve **Hızlı başla** kutusu aynı "
+                    "aramayı haritadan seçilen başka bir bölge için "
+                    "çalıştırmaktadır. Aday noktalar mevcut aydınlatma "
+                    "direkleri ve tabelalar, yol boyundaki direkler (şehir "
+                    "içinde aydınlatma direkleri, kırsalda elektrik dağıtım "
+                    "direkleri) ve tepelere dikilecek 25 m'lik direklerdir. "
+                    "Çatılar kira gerektirdiğinden aday olarak "
+                    "değerlendirilmemektedir. Her aday bağlantı bütçesiyle "
+                    "sınanmakta ve seçim, ömür boyu maliyeti esas alan bir "
+                    "kapsama araması ile yapılmaktadır. Bir noktanın kapsanmış "
+                    "sayılması için bu noktaya dört yayın biriminin ulaşması ve"
+                    " bu birimlerin noktanın çevresindeki dört çeyreğin en az "
+                    "üçüne dağılmış olması gerekmektedir. Tek bir caddenin tek "
+                    "bir tarafına dizilmiş birimler, o cadde boyunca konum "
+                    "belirleyememektedir.",
                     "In the urban and rural rows the units do not stand "
                     "on a grid but where a placement search put them; the "
                     "simulator's **Find the best layout** section and its "
@@ -2183,11 +2208,12 @@ SIMULATION = Page(
                     "that street.",
                 ),
                 _w(
-                    "Arama yerleri bulur ve kendi hızlı tahminini verir; o "
-                    "yerleşimin gerçekte ne kadar doğru olduğunu simülasyon "
-                    "ölçer. Önerilen yerleşimi uygulayıp **Simülasyonu "
-                    "çalıştır** düğmesine basınca, yerini aldığı yerleşimle "
-                    "aynı yolculukta karşılaştırılır.",
+                    "Arama, yerleşim noktalarını belirlemekte ve kendi hızlı "
+                    "tahminini sunmaktadır; yerleşimin gerçek doğruluğu ise "
+                    "simülasyonla ölçülmektedir. Önerilen yerleşim uygulanıp "
+                    "**Simülasyonu çalıştır** düğmesine basıldığında, yeni "
+                    "yerleşim yerini aldığı yerleşimle aynı güzergâh üzerinde "
+                    "karşılaştırılmaktadır.",
                     "The search finds the places and gives its own quick "
                     "estimate; the simulation measures how accurate that "
                     "placement really is. Apply the proposed layout and press **Run the "
@@ -2198,18 +2224,21 @@ SIMULATION = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Tarayıcıda ve kendi bilgisayarında",
+            heading=_w("Tarayıcıda ve yerel bilgisayarda çalıştırma",
                        "In the browser, and on your own machine"),
             lines=(
                 _w(
-                    "**Simülasyonu çalıştır** düğmesi simülatörü bu "
-                    "tarayıcıda açar. Hiçbir sunucu hesap yapmaz: Python, "
-                    "numpy ve projenin kendi paketi sayfaya iner ve her şey "
-                    "bu bilgisayarda çalışır. İlk açılış yaklaşık 20 MB "
-                    "indirir ve bir dakika sürebilir; sonrasında tarayıcı "
-                    "bunları saklar. Tarayıcıda işi tek işlemci yaptığı için "
-                    "bir çalıştırma, bilgisayara kurulu sürümden yavaştır; "
-                    "**Hızlı deneme** süreyi kısaltır.",
+                    "**Simülasyonu çalıştır** düğmesi simülatörü bu tarayıcıda "
+                    "açmaktadır. Hesaplamalar herhangi bir sunucuda "
+                    "yapılmamaktadır: Python, numpy ve projenin kendi yazılım "
+                    "paketi sayfaya indirilmekte ve tüm işlemler kullanıcının "
+                    "bilgisayarında yürütülmektedir. İlk açılışta yaklaşık 20 "
+                    "MB veri indirilmekte ve bu işlem bir dakika kadar "
+                    "sürebilmektedir; sonraki açılışlarda tarayıcı bu dosyaları"
+                    " önbellekten kullanmaktadır. Tarayıcıda hesaplama tek "
+                    "işlemci çekirdeğiyle yapıldığından bir çalıştırma, "
+                    "bilgisayara kurulan sürüme göre daha yavaştır; **Hızlı "
+                    "deneme** seçeneği süreyi kısaltmaktadır.",
                     "The **Run the simulation** button opens the simulator "
                     "in this browser. No server computes anything: Python, "
                     "numpy and this project's own package come down to "
@@ -2220,10 +2249,11 @@ SIMULATION = Page(
                     "a local install; **Quick trial** shortens it.",
                 ),
                 _w(
-                    "Tabloyu yeniden üretmenin, başka bir şehrin zeminini "
-                    "indirmenin ya da üç satırı birden tam çözünürlükte "
-                    "çalıştırmanın kodu ve talimatları "
-                    "[GitHub'da](https://github.com/ysoktar/yerkon).",
+                    "Tablonun yeniden üretilmesi, başka bir şehrin arazi "
+                    "verisinin indirilmesi veya üç senaryonun birlikte tam "
+                    "çözünürlükte çalıştırılması için gerekli kod ve talimatlar"
+                    " [GitHub](https://github.com/ysoktar/yerkon) üzerinde yer "
+                    "almaktadır.",
                     "The code and the instructions for reproducing the "
                     "table, fetching another city's ground, or running all "
                     "three rows at full resolution are [on GitHub](https://github.com/ysoktar/yerkon).",
@@ -2235,11 +2265,12 @@ SIMULATION = Page(
             heading=_w("Hızlı deneme", "The quick trial"),
             lines=(
                 _w(
-                    "Simülatördeki **Hızlı deneme** düğmesi iki şeyi "
-                    "kabalaştırır: gölgeleme sekiz çekilişin birleşimi yerine"
-                    " tek çekilişle hesaplanır ve arazi kesiti 10 m'de bir "
-                    "yerine sabit 64 noktada okunur. Bir çalıştırma on beş "
-                    "dakikadan bir dakika kadara iner.",
+                    "Simülatördeki **Hızlı deneme** düğmesi iki hesabı "
+                    "basitleştirmektedir: gölgeleme sekiz çekilişin birleşimi "
+                    "yerine tek çekilişle hesaplanmakta ve arazi kesiti 10 m'de"
+                    " bir yerine sabit 64 noktada örneklenmektedir. Böylece bir"
+                    " çalıştırmanın süresi on beş dakikadan yaklaşık bir "
+                    "dakikaya inmektedir.",
                     "The **Quick trial** button in the simulator coarsens "
                     "two figures: the "
                     "shadows are drawn once instead of pooled over eight, "
@@ -2248,13 +2279,15 @@ SIMULATION = Page(
                     "minutes to about one.",
                 ),
                 _w(
-                    "Seyrek okunan arazi, engellerin üzerinden bükülmedeki "
-                    "kaybı düşük hesaplar; bu da hızlı sonucu çoğunlukla "
-                    "olduğundan iyi gösterir. Gölgelemenin tek çekilişi iki "
-                    "yöne de saptırabilir: aynı yerleşimde bir satır hızlıda "
-                    "daha iyi, başka biri daha kötü çıkabilir. Hızlı "
-                    "çalıştırma denemek içindir; Karşılaştırma sayfasındaki tablo "
-                    "yalnızca yavaş ve tam çalıştırmadan gelir.",
+                    "Seyrek örneklenen arazi, kırınım kaybının düşük "
+                    "hesaplanmasına yol açmakta ve hızlı sonucu çoğunlukla "
+                    "olduğundan iyi göstermektedir. Gölgelemenin tek çekilişle "
+                    "hesaplanması sonucu her iki yönde de saptırabilmektedir: "
+                    "aynı yerleşimde bir senaryo hızlı denemede daha iyi, bir "
+                    "diğeri daha kötü çıkabilmektedir. Hızlı deneme yalnızca ön"
+                    " değerlendirme amaçlıdır; Karşılaştırma sayfasındaki tablo"
+                    " yalnızca tam çözünürlüklü çalıştırmadan elde "
+                    "edilmektedir.",
                     "The coarse ground reads diffraction loss low, which "
                     "mostly makes a fast answer flatter the deployment. "
                     "The single shadow draw can err either way: on the same "
@@ -2272,12 +2305,14 @@ SOURCES = Page(
     slug="kaynaklar",
     slug_en="sources",
     nav=_w("Kaynaklar", "Sources"),
-    title=_w("Neye dayanıyor", "What it rests on"),
+    title=_w("Kaynaklar ve dayanaklar", "What it rests on"),
     lead=_w(
-        "Sitedeki bütün kaynaklar, konularına göre. Her sayı şunlardan "
-        "birine dayanıyor: yayımlanmış bir fiyat ya da veri sayfası, bir "
-        "ölçüm, bir standart ya da yönetmelik, bu kaynaklarla yapılmış bir "
-        "hesap, bir tasarım kararı ya da açıkça yazılmış bir varsayım.",
+        "Sitede kullanılan tüm kaynaklar konularına göre "
+        "listelenmiştir. Her değer şunlardan birine dayanmaktadır: "
+        "yayımlanmış bir fiyat veya veri sayfası, bir ölçüm, bir "
+        "standart veya yönetmelik, bu kaynaklarla yapılmış bir "
+        "hesap, bir tasarım kararı ya da açıkça belirtilmiş bir "
+        "varsayım.",
         "Every source on the site, grouped by subject. Each number rests on "
         "one of these: a published price or datasheet, a measurement, a "
         "standard or regulation, a calculation from those sources, a "
@@ -2299,14 +2334,14 @@ SOURCES = Page(
             lines=(
                 _w("ITU-R P.526-15 §4.5.2, delta-Bullington kırınımı.",
                    "ITU-R P.526-15 §4.5.2, delta Bullington diffraction."),
-                _w("ITU-R P.452 ve P.1812: sinyalin yolda nasıl zayıfladığı.",
+                _w("ITU-R P.452 ve P.1812: sinyalin yol boyunca zayıflaması.",
                    "ITU-R P.452 and P.1812: how the signal weakens on its way."),
                 _w("3GPP TR 38.901 Tablo 7.4.1-1: gölgeleme genişlikleri.",
                    "3GPP TR 38.901 Table 7.4.1-1: shadowing widths."),
-                _w("Copernicus DEM 30 m: arazinin yükseklikleri.",
+                _w("Copernicus DEM 30 m: arazi yükseklikleri.",
                    "Copernicus DEM 30 m: ground heights."),
-                _w("OpenStreetMap ve Overture: binalar ve yol kenarındaki "
-                   "direkler, levhalar, panolar.",
+                _w("OpenStreetMap ve Overture: binalar ile yol kenarındaki "
+                   "direkler, levhalar ve panolar.",
                    "OpenStreetMap and Overture: buildings, and the masts, "
                    "signs and boards along the road."),
                 _w("Semtech SX1280, EBYTE E28-2G4M20S ve E28-2G4M12S, Qorvo "
@@ -2323,9 +2358,10 @@ SOURCES = Page(
                    "rates: the central bank's indicative forex selling "
                    "rates of 29 September 2026, 49,0013 TL a dollar and "
                    "55,6103 TL a euro."),
-                _w("Karşılaştırma tablosunun bizim olmayan satırları "
-                   "aşağıdaki kaynakçadan gelir. Tablonun altındaki her "
-                   "dipnot, dayandığı girdiye bağlıdır.",
+                _w("Karşılaştırma tablosunda YERKON dışındaki satırların "
+                   "değerleri aşağıdaki kaynakçadan alınmıştır. Tablonun "
+                   "altındaki her dipnot, dayandığı kaynağa bağlantı "
+                   "vermektedir.",
                    "The rows of the comparison table that are not ours "
                    "come from the bibliography below. Every note under the "
                    "table links to the entry it rests on."),
@@ -2336,9 +2372,9 @@ SOURCES = Page(
             heading=_w("Kaynakça", "Bibliography"),
             lines=(
                 _w(
-                    "Başvurunun kaynakçasındaki bütün bağlantılar ve "
-                    "maliyet ile mevzuat hesapları için eklenen kaynaklar. "
-                    "Hiçbir dipnotun anmadığı kaynaklar da listede.",
+                    "Başvurunun kaynakçasındaki tüm bağlantılar ile maliyet ve "
+                    "mevzuat hesapları için eklenen kaynaklar. Herhangi bir "
+                    "dipnotta anılmayan kaynaklar da listeye dahil edilmiştir.",
                     "Every link in the application's bibliography, and "
                     "the sources added for the cost and regulation "
                     "figures. A source no note cites is still listed.",
@@ -2349,8 +2385,8 @@ SOURCES = Page(
         Part(
             kind="text",
             lines=(
-                _w("Sonuçları yeniden üretmek için kod ve talimatlar "
-                   "GitHub'da.",
+                _w("Sonuçların yeniden üretilmesi için gerekli kod ve "
+                   "talimatlar GitHub üzerinde yer almaktadır.",
                    "The code and the instructions for reproducing the "
                    "results are on GitHub."),
             ),
@@ -2373,13 +2409,15 @@ COST = Page(
     slug="maliyet",
     slug_en="cost",
     nav=_w("Maliyet", "Cost"),
-    title=_w("Ne kadara mal oluyor", "What it costs"),
+    title=_w("Maliyet analizi", "What it costs"),
     lead=_w(
-        "Tablodaki her maliyet hücresinin kalem kalem dökümü: hangi parça, "
-        "kaça, kimden; hangi sayı, neye dayanarak. Bu sayfadaki sayılar "
-        "simülasyondan ve parça listesinden hesaplanıyor; biri değişince sayfa "
-        "da değişiyor. Yalnız direk fiyatları tablosu kaynaklarından "
-        "aktarıldı.",
+        "Bu sayfada karşılaştırma tablosundaki her maliyet "
+        "hücresinin kalem kalem dökümü yer almaktadır: hangi "
+        "parçanın hangi fiyattan ve hangi satıcıdan alındığı ile "
+        "her değerin dayanağı. Sayfadaki değerler simülasyondan ve "
+        "parça listesinden hesaplanmakta; bunlardan biri "
+        "değiştiğinde sayfa da güncellenmektedir. Yalnızca direk "
+        "fiyatları tablosu doğrudan kaynaklarından aktarılmıştır.",
         "Every cost cell in the table, line by line: which part, for how "
         "much, from whom; which figure, resting on what. The numbers on "
         "this page are worked out from the simulation and the parts list, so "
@@ -2389,23 +2427,24 @@ COST = Page(
     parts=(
         Part(
             kind="shows", shows="cost-rows",
-            heading=_w("Satır satır", "Row by row"),
+            heading=_w("Senaryolara göre maliyet dökümü", "Row by row"),
         ),
         Part(
             kind="points",
             lines=(
                 _w(
-                    "Şehir içi ve kırsal satırlar hizmet verdikleri alana, "
-                    "tünel ise uzunluğuna bölünüyor; tablodaki hücreler bu "
-                    "dökümün son satırlarıdır.",
+                    "Şehir içi ve kırsal senaryoların maliyeti hizmet "
+                    "verdikleri alana, tünel senaryosununki ise tünel "
+                    "uzunluğuna bölünmektedir; karşılaştırma tablosundaki "
+                    "hücreler bu dökümün son satırlarına karşılık gelmektedir.",
                     "The urban and rural rows are divided by the ground "
                     "they serve and the tunnel by its length; the cells in "
                     "the table are the last lines of this breakdown.",
                 ),
                 _w(
-                    "Alıcılar bu dökümde yok. Onları kimin alacağı "
-                    "başvuruda belirlenmedi, o yüzden kilometrekare başına "
-                    "rakamlara girmiyorlar.",
+                    "Alıcılar bu döküme dahil edilmemiştir. Alıcıların kim "
+                    "tarafından temin edileceği başvuruda belirlenmediğinden "
+                    "kilometrekare başına maliyetlere yansıtılmamıştır.",
                     "Receivers are not in this breakdown. The application "
                     "does not settle who buys them, so they never enter the "
                     "per square kilometre figures.",
@@ -2414,30 +2453,33 @@ COST = Page(
         ),
         Part(
             kind="shows", shows="units",
-            heading=_w("Yayın birimleri: bir birim nerede ne kadar",
+            heading=_w("Yayın birimlerinin kurulum yerine göre maliyeti",
                        "Broadcast units: what one costs where"),
         ),
         Part(
             kind="text",
             lines=(
                 _w(
-                    "Yapı iki şey sağlıyor: elektrik ve merkeze giden bir "
-                    "hat. Işıklı bir kavşakta sinyal dolabı durur; hem "
-                    "besleme hem de trafik yönetim merkezine giden hat "
-                    "oradadır ve belediyenin kameraları o hattı zaten "
-                    "kullanıyor. Hattı olan yapıdaki birim merkeze o "
-                    "hattan bağlanıyor: şehirde ışıklı kavşak, tünelde "
-                    "tünelin haberleşme omurgası, kırsalda yol üzerindeki "
-                    "AUS noktası. Hattı olmayan birim, örneğin kırsalda "
-                    "AUS'tan uzak bir dağıtım direğindeki, güneş paneliyle "
-                    "çalışmaya devam ediyor ve mesajlarını kendi telsiziyle "
-                    "hattı olan en yakın birime iletiyor; hiçbir birime SIM "
-                    "kartı konmuyor. Her birim merkeze düzenli aralıklarla "
-                    "kısa bir \"çalışıyorum\" mesajı (yaşam sinyali) "
-                    "gönderiyor; mesajı gelmeyen birim arızalı sayılıyor ve "
-                    "ekip gönderiliyor. Alıcılar GPS karıştırması ya da "
-                    "aldatması gördüğünde bunu yakındaki yayın birimine "
-                    "iletiyor, uyarı da aynı yoldan merkeze ulaşıyor.",
+                    "Kurulum yapısı iki imkân sağlamaktadır: elektrik ve "
+                    "merkeze giden bir haberleşme hattı. Sinyalize bir kavşakta"
+                    " bulunan sinyal kontrol kabininde hem besleme hem de "
+                    "trafik yönetim merkezine giden hat mevcuttur ve "
+                    "belediyenin kameraları bu hattı hâlihazırda "
+                    "kullanmaktadır. Haberleşme hattı bulunan yapıdaki yayın "
+                    "birimi merkeze bu hat üzerinden bağlanmaktadır: şehir "
+                    "içinde sinyalize kavşak, tünelde tünelin haberleşme "
+                    "omurgası, kırsalda ise yol üzerindeki AUS noktası. "
+                    "Haberleşme hattı bulunmayan bir birim, örneğin kırsalda "
+                    "AUS noktasından uzak bir dağıtım direğindeki birim, güneş "
+                    "paneliyle çalışmakta ve mesajlarını kendi telsiziyle hattı"
+                    " bulunan en yakın birime iletmektedir; hiçbir birimde SIM "
+                    "kart kullanılmamaktadır. Her yayın birimi merkeze düzenli "
+                    "aralıklarla kısa bir durum mesajı (yaşam sinyali) "
+                    "göndermekte; mesajı alınamayan birim arızalı kabul "
+                    "edilerek bakım ekibi yönlendirilmektedir. Alıcılar GPS "
+                    "karıştırması veya aldatması tespit ettiğinde bunu "
+                    "yakındaki yayın birimine iletmekte, uyarı da aynı yol "
+                    "üzerinden merkeze ulaşmaktadır.",
                     "A structure gives two things: power and a line to the "
                     "centre. A signalised junction carries a controller "
                     "cabinet with both the mains and a line to the traffic "
@@ -2458,10 +2500,11 @@ COST = Page(
                     "the centre the same way.",
                 ),
                 _w(
-                    "Direk ekleme kullanılabilirliği yükseltiyor ama "
-                    "bedava değil. Mevcut yapılar bunu karşılanabilir "
-                    "kılıyor: her ek birim yeni bir saha değil, bir yayın birimi ve "
-                    "bir montaj.",
+                    "Yayın birimi sayısının artırılması kullanılabilirliği "
+                    "yükseltmekte, ancak ek maliyet getirmektedir. Mevcut "
+                    "yapıların kullanılması bu maliyeti karşılanabilir "
+                    "kılmaktadır: her ek birim yeni bir saha değil, yalnızca "
+                    "bir yayın birimi ve bir montaj gerektirmektedir.",
                     "Adding units raises availability, but not for "
                     "nothing. What the existing structures do is make that "
                     "trade affordable, because each extra unit is a device "
@@ -2471,7 +2514,7 @@ COST = Page(
         ),
         Part(
             kind="table",
-            heading=_w("Direklerin boyu ve fiyatı", "Pole heights and prices"),
+            heading=_w("Direk boyları ve fiyatları", "Pole heights and prices"),
             rows=(
                 (_w("Yapı", "Structure"), _w("Boy", "Height"), _w("Fiyat", "Price"), _w("Kaynak", "Source")),
                 (_w("Aydınlatma direği, TEDAŞ tipi galvaniz poligon", "Lighting column, TEDAŞ-type galvanised polygonal"), _w("6 / 8 / 10 / 12 / 14 / 15 m", "6 / 8 / 10 / 12 / 14 / 15 m"), _w("6500 / 9750 / 14750 / 18250 / 24750 / 27500 TL", "6500 / 9750 / 14750 / 18250 / 24750 / 27500 TL"), _w("Pana Bayrak Direği, Eylül 2026", "Pana Bayrak Direği, September 2026")),
@@ -2483,12 +2526,13 @@ COST = Page(
         Part(
             kind="text",
             lines=(
-                _w("YERKON var olan direği kullanıyor, direk satın almıyor; "
-                   "bu fiyatlar yeni bir direk dikmenin ne tuttuğunu ve "
-                   "25 m direğin bedelinin nereden geldiğini gösteriyor. "
-                   "Aydınlatma direği boyları TEDAŞ'ın yol sınıfı "
-                   "çizelgesinden (6-14 m), dağıtım direği boyları "
-                   "TEDAŞ-MLZ/99-34'ten; kaynakları Mevzuat sayfasında.",
+                _w("YERKON mevcut direkleri kullanmakta, yeni direk satın "
+                   "almamaktadır; bu fiyatlar yeni bir direk dikmenin "
+                   "maliyetini ve 25 m'lik direk bedelinin dayanağını "
+                   "göstermek amacıyla verilmiştir. Aydınlatma direği boyları "
+                   "TEDAŞ'ın yol sınıfı çizelgesinden (6-14 m), dağıtım direği"
+                   " boyları ise TEDAŞ-MLZ/99-34 şartnamesinden alınmıştır; "
+                   "kaynaklar Mevzuat sayfasında yer almaktadır.",
                    "YERKON uses the pole that stands and buys none; these "
                    "prices show what raising a new one costs and where the "
                    "25 m mast's figure comes from. The column heights come "
@@ -2509,16 +2553,17 @@ COST = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Fiyatlar nereden geldi", "Where the prices came from"),
+            heading=_w("Fiyatların dayanağı", "Where the prices came from"),
             lines=(
                 _w(
-                    "Her parça satıcısının kendi kademe tablosuyla yazılı: "
-                    "ana parçalar ve birimin geri kalanı, yani şebeke "
-                    "beslemesi, düşürücü, koruma, klemens, anten kablosu, "
-                    "kutu, pasifler, baskılı devre, dizgi ve lehim. Bir "
-                    "parça bir "
-                    "birimde birden çok varsa (klemens, pasifler) kademe o "
-                    "kadar birim için alınan adete göre seçiliyor.",
+                    "Her parça, satıcısının kendi kademe fiyat tablosuyla "
+                    "listelenmiştir: ana bileşenler ile birimin geri kalan "
+                    "parçaları, yani şebeke beslemesi, gerilim düşürücü, koruma"
+                    " devreleri, klemens, anten kablosu, muhafaza, pasif "
+                    "bileşenler, baskılı devre kartı, dizgi ve lehim. Bir "
+                    "parçanın bir birimde birden fazla kullanıldığı durumlarda "
+                    "(klemens, pasif bileşenler) fiyat kademesi, ilgili birim "
+                    "sayısı için alınacak toplam adede göre seçilmektedir.",
                     "Every part carries its seller's own price ladder: the "
                     "main parts and the rest of the unit, that is the "
                     "mains supply, regulator, protection, terminals, "
@@ -2528,14 +2573,16 @@ COST = Page(
                     "pieces for that many units reach.",
                 ),
                 _w(
-                    "Satıcı bir adette kademe yayımlamamışsa indirim "
-                    "varsayılmıyor, bilinen son kademe kullanılıyor. "
-                    "Kutuların 100 adet üstü fiyatı teklifle veriliyor; "
-                    "baskılı devrenin ve pilin büyük adet fiyatı okunamadı; "
-                    "bunlar her adette tek adet fiyatıyla giriyor. Dizginin "
-                    "kurulum, şablon ve parça yükleme bedeli siparişe bir "
-                    "kez ödendiği için birime düşen payı adet büyüdükçe "
-                    "küçülüyor. Maliyet tablosu 1000 adeti kullanıyor.",
+                    "Satıcının belirli bir adet için kademe fiyatı "
+                    "yayımlamadığı durumlarda indirim varsayılmamakta, bilinen "
+                    "son kademe fiyatı kullanılmaktadır. Muhafazaların 100 adet"
+                    " üzerindeki fiyatı teklif usulüyle verilmektedir; baskılı "
+                    "devre kartı ve pilin yüksek adetli fiyatlarına "
+                    "ulaşılamamıştır; bu kalemler her adette tek adet fiyatıyla"
+                    " hesaba katılmaktadır. Dizgide kurulum, şablon ve parça "
+                    "yükleme bedelleri sipariş başına bir kez ödendiğinden "
+                    "birime düşen pay adet arttıkça azalmaktadır. Maliyet "
+                    "tablosunda 1000 adetlik fiyatlar kullanılmaktadır.",
                     "Where a seller published no tier for a quantity, no "
                     "discount is assumed and the last known tier holds. "
                     "The boxes are priced on request above a hundred, and "
@@ -2547,10 +2594,11 @@ COST = Page(
                     "the thousand.",
                 ),
                 _w(
-                    "Parça fiyatları satıcıların 25-28 Eylül 2026 liste "
-                    "fiyatları; bağlantılar yukarıda. Sipariş öncesinde "
-                    "teklifle doğrulanmalı. Bir fiyat değişirse bu sayfa da "
-                    "tablo da kendiliğinden güncellenir.",
+                    "Parça fiyatları, satıcıların 25-28 Eylül 2026 tarihli "
+                    "liste fiyatlarıdır; bağlantılar yukarıda verilmiştir. "
+                    "Fiyatların sipariş öncesinde teklif alınarak doğrulanması "
+                    "gerekmektedir. Bir fiyat değiştiğinde bu sayfa ve "
+                    "karşılaştırma tablosu otomatik olarak güncellenmektedir.",
                     "The part prices are the sellers' list prices of 25 "
                     "to 28 September 2026; the links are above. They are "
                     "to be confirmed by quotation before ordering. If a "
@@ -2593,12 +2641,14 @@ LAW = Page(
     slug="mevzuat",
     slug_en="regulation",
     nav=_w("Mevzuat", "Regulation"),
-    title=_w("Hangi kurallar, hangi sınırlar", "Which rules, which limits"),
+    title=_w("İlgili mevzuat ve sınırlar", "Which rules, which limits"),
     lead=_w(
-        "YERKON'un gücünü, piyasaya çıkışını ve bakım maliyetini belirleyen "
-        "kurallar, resmî kaynaklarıyla. Güç, bakım ve kira için burada "
-        "yazan her sınır simülasyonda da aynen kullanılıyor; prototip "
-        "cihazlarının frekans kuralları sahadaki denemeler için.",
+        "Bu sayfada YERKON'un yayın gücünü, piyasaya arzını ve "
+        "bakım maliyetini belirleyen kurallar resmî kaynaklarıyla "
+        "birlikte sunulmaktadır. Güç, bakım ve kira için belirtilen"
+        " her sınır simülasyonda da aynen uygulanmaktadır; prototip"
+        " cihazlarına ilişkin frekans kuralları ise saha denemeleri"
+        " için verilmiştir.",
         "The rules that set YERKON's power, its route to market and its "
         "maintenance cost, with their official sources. Every limit on power, "
         "maintenance and rent written here is the one the simulation uses; the "
@@ -2608,22 +2658,23 @@ LAW = Page(
     parts=(
         Part(
             kind="text",
-            heading=_w("2,4 GHz'de ne kadar güç", "How much power at 2,4 GHz"),
+            heading=_w("2,4 GHz bandında izin verilen güç", "How much power at 2,4 GHz"),
             lines=(
-                _w("Şehir içi ve kırsal birimler 2400-2483,5 MHz bandında "
-                   "genişband veri iletim sistemi olarak çalışıyor: [BTK, "
+                _w("Şehir içi ve kırsal yayın birimleri 2400-2483,5 MHz "
+                   "bandında genişbant veri iletim sistemi olarak "
+                   "çalışmaktadır: [BTK, "
                    "Frekans Tahsisinden Muaf Telsiz Cihaz ve Sistemlerine "
                    "İlişkin Teknik Ölçütler, Madde 5, Tablo 3, satır 3]("
                    + BTK_EXEMPT + "#page=11) (Kurul Kararı 23.09.2022, "
                    "2022/İK-SYD/245; [BTK'nın sayfası]"
                    "(https://www.btk.gov.tr/frekans-tahsisinden-muaf-telsiz-"
-                   "cihaz-ve-sistemleri)). En çok 100 mW e.i.r.p. "
-                   "(20 dBm); yeterli spektrum paylaşım mekanizması "
-                   "gerekli (örneğin LBT, DAA); referans standart "
-                   "[TS EN 300 328](" + EN_300_328 + "). Frekans Atlamalı "
+                   "cihaz-ve-sistemleri)). Azami güç 100 mW e.i.r.p. "
+                   "(20 dBm) olup yeterli bir spektrum paylaşım mekanizması "
+                   "(örneğin LBT, DAA) gerekmektedir; referans standart "
+                   "[TS EN 300 328](" + EN_300_328 + ")'dir. Frekans Atlamalı "
                    "Spektrum Yayılımı (FHSS) kullanıldığında e.i.r.p. "
                    "yoğunluğu en çok 100 mW/100 kHz, FHSS dışındaki "
-                   "genişband modülasyonlarda en çok 10 mW/MHz.",
+                   "genişbant modülasyonlarda en çok 10 mW/MHz'dir.",
                    "The town and open country units work in the "
                    "2400-2483,5 MHz band as a wideband data transmission "
                    "system: [BTK, Technical Criteria for Radio Equipment "
@@ -2639,11 +2690,11 @@ LAW = Page(
                    "e.i.r.p. density is at most 100 mW/100 kHz; with other "
                    "wideband modulations at most 10 mW/MHz."),
                 _w("Tablodaki güç sınırları yönetmelikten; kanal "
-                   "kontrolü, süreler ve eşikler TS EN 300 328'den (ETSI "
-                   "EN 300 328 V2.2.2, 4.3.1). Yönetmelik, referans "
-                   "standarttaki tekniklere en az eş değer spektrum erişim "
-                   "ve girişimi azaltma tekniklerini şart koşuyor ([Madde "
-                   "2](" + BTK_EXEMPT + "#page=6)).",
+                   "kontrolü, süreler ve eşikler ise TS EN 300 328'den "
+                   "(ETSI EN 300 328 V2.2.2, 4.3.1) alınmıştır. Yönetmelik, "
+                   "referans standarttaki tekniklere en az eşdeğer spektrum "
+                   "erişim ve girişim azaltma tekniklerini şart koşmaktadır "
+                   "([Madde 2](" + BTK_EXEMPT + "#page=6)).",
                    "The power limits in the table are the regulation's; "
                    "the channel check, the durations and the thresholds "
                    "are TS EN 300 328's (ETSI EN 300 328 V2.2.2, 4.3.1). "
@@ -2651,16 +2702,17 @@ LAW = Page(
                    "interference mitigation techniques at least equivalent "
                    "to those of the reference standard ([Article 2]("
                    + BTK_EXEMPT + "#page=6))."),
-                _w("Bu ölçütlere uyan cihaz ruhsatsız kullanılıyor: "
-                   "telsiz ruhsatnamesi, telsiz kurma ve kullanma izni, "
-                   "frekans tahsisi ve tescili gerekmiyor ([Frekans "
+                _w("Bu ölçütlere uyan cihazlar ruhsatsız kullanılabilmektedir: "
+                   "telsiz ruhsatnamesi, telsiz kurma ve kullanma izni ile "
+                   "frekans tahsisi ve tescili gerekmemektedir ([Frekans "
                    "Tahsisinden Muaf Telsiz Cihaz ve Sistemleri Hakkında "
-                   "Yönetmelik](" + EXEMPT_REGULATION + "), Madde 5). Cihaz "
-                   "başka telsizlere zararlı girişim yapamaz ve onlardan "
-                   "gelen girişime karşı koruma isteyemez (Madde 5(3)). "
-                   "Muafiyet dışında ve mevzuata aykırı kullanımda "
-                   "Elektronik Haberleşme Kanunu'nun 63. maddesine göre "
-                   "işlem yapılıyor (Madde 7).",
+                   "Yönetmelik](" + EXEMPT_REGULATION + "), Madde 5). Bu "
+                   "cihazlar diğer telsiz sistemlerine zararlı girişime "
+                   "neden olamaz ve onlardan kaynaklanan girişime karşı "
+                   "koruma talep edemez (Madde 5(3)). Muafiyet kapsamı "
+                   "dışında ve mevzuata aykırı kullanımda Elektronik "
+                   "Haberleşme Kanunu'nun 63. maddesine göre işlem "
+                   "tesis edilmektedir (Madde 7).",
                    "A device within these criteria is used without a "
                    "licence: no radio licence, no permit to set up and "
                    "use it, no frequency assignment or registration "
@@ -2674,17 +2726,19 @@ LAW = Page(
                 _w("Açık bir soru: Teknik Ölçütler'in [Madde 8]("
                    + BTK_EXEMPT + "#page=17)'i radyo-tespit cihazlarını, "
                    "yani bir nesnenin konumunu telsizle belirleyen "
-                   "cihazları ayrıca düzenliyor; 2400-2483,5 MHz'de sınır "
-                   "25 mW e.i.r.p., referans standart TS EN 300 440. Aynı "
-                   "madde noktadan noktaya ve noktadan çok noktaya telsiz "
-                   "haberleşmesini kapsam dışı sayıyor. YERKON konumu "
-                   "birimler arasındaki paket alışverişiyle bulduğu için "
-                   "iki maddeye de girebilir. Site ve simülasyon Madde 5'i "
-                   "esas alıyor. Madde 8 geçerli sayılırsa yayın gücü "
-                   "dörtte bire (6 dB) iner, menzil kısalır (engelsiz "
-                   "yayılmada kabaca yarıya), daha çok birim gerekir ve "
-                   "km² başına maliyet artar. Kesin cevap BTK'dan görüş "
-                   "istenerek alınacak.",
+                   "cihazları ayrıca düzenlemektedir; 2400-2483,5 MHz'de "
+                   "sınır 25 mW e.i.r.p., referans standart TS EN 300 "
+                   "440'tır. Aynı madde, noktadan noktaya ve noktadan çok "
+                   "noktaya telsiz haberleşmesini kapsam dışında "
+                   "tutmaktadır. YERKON konumu yayın birimleri arasındaki "
+                   "paket alışverişiyle belirlediğinden her iki madde "
+                   "kapsamında da değerlendirilebilir. Site ve simülasyon "
+                   "Madde 5'i esas almaktadır. Madde 8'in uygulanması "
+                   "durumunda yayın gücü dörtte bire (6 dB) inecek, menzil "
+                   "kısalacak (engelsiz yayılımda yaklaşık yarıya), daha "
+                   "fazla yayın birimi gerekecek ve km² başına maliyet "
+                   "artacaktır. Kesin değerlendirme BTK'dan görüş "
+                   "alınarak yapılacaktır.",
                    "An open question: [Article 8](" + BTK_EXEMPT
                    + "#page=17) of the Technical Criteria deals separately "
                    "with radiodetermination devices, those that find an "
@@ -2706,17 +2760,16 @@ LAW = Page(
             kind="table",
             rows=(
                 (_w("Kip", "Mode"), _w("Sınır", "Limit"),
-                 _w("YERKON için ne demek", "What it means for YERKON")),
+                 _w("YERKON açısından anlamı", "What it means for YERKON")),
                 (
                     _w("FHSS olmadan (FHSS dışındaki genişband "
                        "modülasyon)",
                        "Without FHSS (other wideband modulation)"),
                     _w("100 mW e.i.r.p. ve en çok 10 mW/MHz",
                        "100 mW e.i.r.p. and at most 10 mW/MHz"),
-                    _w("Sinyal 1,625 MHz genişliğinde. MHz başına 10 mW "
-                       "sınırı yüzünden toplam yayın gücü 16,25 mW'ı "
-                       "(12,1 dBm) geçemiyor; 100 mW'lık sınıra hiç "
-                       "ulaşılamıyor.",
+                    _w("Sinyal 1,625 MHz genişliğindedir. MHz başına 10 mW sınırı "
+                       "nedeniyle toplam yayın gücü 16,25 mW'ı (12,1 dBm) "
+                       "aşamamakta; 100 mW'lık sınıra ulaşılamamaktadır.",
                        "The signal is 1,625 MHz wide. The 10 mW a MHz "
                        "limit holds the total to 16,25 mW (12,1 dBm), so "
                        "the 100 mW limit is never reached."),
@@ -2733,8 +2786,8 @@ LAW = Page(
                        "gaps of at least 5 ms; at most 15 ms on one "
                        "frequency in 15 ms × N; medium utilisation at most "
                        "10 %"),
-                    _w("Uymuyor: bir ölçüm paketi SF10'da yaklaşık 15 ms "
-                       "sürüyor ve araç sürekli soruyor.",
+                    _w("Uygun değildir: bir ölçüm paketi SF10'da yaklaşık 15 ms "
+                       "sürmekte ve araç sürekli ölçüm talep etmektedir.",
                        "Does not fit: one ranging frame lasts about 15 ms "
                        "at SF10 and a vehicle polls continuously."),
                 ),
@@ -2753,13 +2806,15 @@ LAW = Page(
                        "threshold -70 dBm/MHz; channel occupancy under "
                        "60 ms, then silence of at least 5 % of it; able to "
                        "use at least 70 % of the band"),
-                    _w("YERKON'un seçtiği kip, şehir içi ve kırsalda: tek "
-                       "açık yol. 1,625 MHz'lik sinyalde yoğunluk sınırı "
-                       "bağlamıyor, 100 mW (20 dBm) kalıyor. Bir ölçüm "
-                       "alışverişi 31,8 ms, 60 ms'ye sığıyor. Cevap veren "
-                       "direk de kendi yayınından önce kanalı kontrol "
-                       "ediyor; bu, alışverişe 0,1 ms'den az ekliyor. "
-                       "Laboratuvar testiyle belgelendirilmeli.",
+                    _w("Şehir içi ve kırsal senaryolarda YERKON'un tercih ettiği "
+                       "ve uygulanabilir tek kiptir. 1,625 MHz'lik sinyalde "
+                       "yoğunluk sınırı kısıtlayıcı olmadığından 100 mW (20 dBm) "
+                       "kullanılabilmektedir. Bir ölçüm alışverişi 31,8 ms "
+                       "sürmekte ve 60 ms sınırının içinde kalmaktadır. Yanıt "
+                       "veren yayın birimi de kendi yayınından önce kanalı kontrol"
+                       " etmekte; bu işlem alışverişe 0,1 ms'den daha az süre "
+                       "eklemektedir. Uygunluk laboratuvar testiyle "
+                       "belgelendirilmelidir.",
                        "The mode YERKON uses in town and open country, and "
                        "the one open road. On a 1,625 MHz signal the "
                        "density limit does not bind and 100 mW (20 dBm) "
@@ -2816,19 +2871,22 @@ LAW = Page(
         Part(
             kind="text",
             lines=(
-                _w("Modülün gücü [EBYTE'nin E28-2G4M20S veri sayfasından]("
-                   "https://www.ebyte.com/downpdf/304.html): 100 mW, en az "
-                   "19, tipik 20, en çok 21 dBm; bu antene giden güç. "
-                   "Sınır antenden çıkan güç için: FHSS ve LBT ile 100 mW "
-                   "e.i.r.p. (20 dBm), FHSS olmadan 1,625 MHz'lik sinyalde "
-                   "16,25 mW (12,1 dBm). En yüksek ayar, modülün en çok "
-                   "çıkışıyla bile sınırın aşılmadığı iletilen güç: sınır "
-                   "eksi antenin net kazancı. Tipik çıkış bundan 1 dB "
-                   "aşağıda kalır. Anten takılması serbest, ama TS EN 300 328 "
-                   "cihazın o antenle test edilmesini ve yazılımın izin "
-                   "verdiği hiçbir güç ayarının sınırı aşmamasını istiyor "
-                   "(4.2.4 ve 4.3.1.2). Simülasyon her birimin gücünü antenin "
-                   "en güçlü yönünde sınıra kısıyor; sonuçlar bu güçle.",
+                _w("Modülün gücü [EBYTE E28-2G4M20S veri "
+                   "sayfasından](https://www.ebyte.com/downpdf/304.html) "
+                   "alınmıştır: 100 mW; en az 19, tipik 20, en çok 21 dBm. Bu "
+                   "değer antene iletilen güçtür. Sınır ise antenden yayılan "
+                   "güç için geçerlidir: FHSS ve LBT ile 100 mW e.i.r.p. (20 "
+                   "dBm), FHSS olmadan 1,625 MHz'lik sinyalde 16,25 mW (12,1 "
+                   "dBm). En yüksek ayar, modülün en yüksek çıkışında dahi "
+                   "sınırın aşılmadığı iletilen güç olup sınırdan antenin net "
+                   "kazancı çıkarılarak bulunmaktadır. Tipik çıkış bu değerin "
+                   "1 dB altında kalmaktadır. Harici anten kullanılmasına izin"
+                   " verilmekle birlikte TS EN 300 328, cihazın ilgili antenle"
+                   " test edilmesini ve yazılımın izin verdiği hiçbir güç "
+                   "ayarının sınırı aşmamasını şart koşmaktadır (4.2.4 ve "
+                   "4.3.1.2). Simülasyon, her birimin gücünü antenin en güçlü "
+                   "yayın yaptığı yönde sınıra indirmektedir; sonuçlar bu "
+                   "güçle hesaplanmıştır.",
                    "The module's power is from [EBYTE's E28-2G4M20S "
                    "datasheet](https://www.ebyte.com/downpdf/304.html): "
                    "100 mW, at least 19, typically 20, at most 21 dBm; that "
@@ -2845,10 +2903,11 @@ LAW = Page(
                    "(4.2.4 and 4.3.1.2). The simulation holds every unit to the "
                    "limit in its antenna's strongest direction; the "
                    "results use that power."),
-                _w("UWB birimleri (DWM3000) kendi antenleriyle -41,3 "
-                   "dBm/MHz'te; tünel ve yaya birimi aşağıdaki tabloya "
-                   "olduğu gibi uyuyor; araç alıcısının gücünü denetlemesi "
-                   "(TPC) ve yukarıya doğru harici sınırı uygulaması gerekiyor.",
+                _w("UWB birimleri (DWM3000) kendi antenleriyle -41,3 dBm/MHz "
+                   "seviyesinde çalışmaktadır; tünel birimi ve yaya alıcısı "
+                   "aşağıdaki tabloya doğrudan uymaktadır. Araç alıcısının ise"
+                   " gücünü denetlemesi (TPC) ve yukarı yönde harici sınırı "
+                   "uygulaması gerekmektedir.",
                    "The UWB units (DWM3000) run at -41,3 dBm/MHz on their "
                    "own antennas; the tunnel and pedestrian units fit the "
                    "table below as they are, the vehicle receiver has to "
@@ -2858,12 +2917,12 @@ LAW = Page(
         ),
         Part(
             kind="table",
-            heading=_w("Tünelde UWB, 6-8,5 GHz",
+            heading=_w("Tünelde UWB kullanımı, 6-8,5 GHz",
                        "UWB in the tunnel, 6-8,5 GHz"),
             rows=(
                 (_w("Kullanım", "Use"),
                  _w("Sınır (e.i.r.p.)", "Limit (e.i.r.p.)"),
-                 _w("YERKON için ne demek", "What it means for YERKON")),
+                 _w("YERKON açısından anlamı", "What it means for YERKON")),
                 (
                     _w("Genel amaçlı UWB ([Madde 18(1), Tablo 16]("
                        + BTK_EXEMPT + "#page=28))",
@@ -2871,9 +2930,10 @@ LAW = Page(
                        + BTK_EXEMPT + "#page=28))"),
                     _w("Ortalama -41,3 dBm/MHz, tepe 0 dBm/50 MHz",
                        "Mean -41,3 dBm/MHz, peak 0 dBm/50 MHz"),
-                    _w("Açık alanda sabit kullanılan ya da sabit bir dış "
-                       "antene bağlı cihazlar ve kara taşıtlarındakiler bu "
-                       "maddenin dışında. Yaya alıcısı bu satırda.",
+                    _w("Açık alanda sabit olarak kullanılan veya sabit bir dış "
+                       "antene bağlı cihazlar ile kara taşıtlarındaki cihazlar bu "
+                       "maddenin kapsamı dışındadır. Yaya alıcısı bu satır "
+                       "kapsamındadır.",
                        "Devices fixed outdoors or on a fixed outdoor "
                        "antenna, and those in road vehicles, are outside "
                        "this article. The pedestrian receiver is in this "
@@ -2886,10 +2946,10 @@ LAW = Page(
                        "Table 19](" + BTK_EXEMPT + "#page=31))"),
                     _w("Ortalama -41,3 dBm/MHz, tepe 0 dBm; TS EN 302 065-2",
                        "Mean -41,3 dBm/MHz, peak 0 dBm; TS EN 302 065-2"),
-                    _w("İnsanların ve nesnelerin konumunu izleyen sistemler "
-                       "için. Tünel birimleri bu satırda: 499,2 MHz'lik "
-                       "kanalda -14,3 dBm e.i.r.p., simülasyon da bunu "
-                       "kullanıyor.",
+                    _w("İnsanların ve nesnelerin konumunu izleyen sistemler için "
+                       "geçerlidir. Tünel birimleri bu satır kapsamındadır: 499,2 "
+                       "MHz'lik kanalda -14,3 dBm e.i.r.p.; simülasyonda da bu "
+                       "değer kullanılmaktadır.",
                        "For systems that track where people and objects "
                        "are. The tunnel units are in this row: -14,3 dBm "
                        "e.i.r.p. over a 499,2 MHz channel, which is what "
@@ -2908,15 +2968,16 @@ LAW = Page(
                        "LDC or TPC, mean -41,3 dBm/MHz and peak 0 dBm/50 "
                        "MHz, with an exterior limit of -53,3 dBm/MHz at "
                        "elevation angles above 0°. TS EN 302 065-3"),
-                    _w("Araç alıcısı bu satırda ve gücünü denetleyebilmeli "
-                       "(TPC). Araçtaki cihaz kendi yüksekliğinin üstüne "
-                       "daha az güç yayabiliyor (-53,3 dBm/MHz); altına "
-                       "-41,3 dBm/MHz serbest (EN 302 065-3, 4.3.4.2 ve "
-                       "Tablo 4). Tünel birimleri araç anteninin altında, "
-                       "yoldan 1,2 m yüksekte durunca bu sınıra takılmıyor; "
-                       "simülasyon da böyle hesaplıyor. Kapalı alan için otomatik bir istisna "
-                       "yok, Ek C.1 eşdeğer korumanın kanıtlanmasına izin "
-                       "veriyor.",
+                    _w("Araç alıcısı bu satır kapsamındadır ve gücünü "
+                       "denetleyebilmelidir (TPC). Araçtaki cihaz kendi "
+                       "yüksekliğinin üzerine daha düşük güç (-53,3 dBm/MHz) "
+                       "yayabilmekte, altına ise -41,3 dBm/MHz'e kadar yayın "
+                       "yapabilmektedir (EN 302 065-3, 4.3.4.2 ve Tablo 4). Tünel "
+                       "birimleri araç anteninin altında, yoldan 1,2 m yükseklikte"
+                       " konumlandırıldığında bu sınır aşılmamaktadır; simülasyon "
+                       "da bu düzenle hesaplanmaktadır. Kapalı alanlar için "
+                       "otomatik bir istisna bulunmamakla birlikte Ek C.1, eşdeğer"
+                       " korumanın kanıtlanmasına izin vermektedir.",
                        "The vehicle receiver is in this row and has to "
                        "control its power (TPC). The vehicle's device may "
                        "send less power above its own height (-53,3 "
@@ -2936,7 +2997,7 @@ LAW = Page(
             lines=(
                 _w("Frekans Atlamalı Spektrum Yayılımı (FHSS): alıcı ve "
                    "vericinin eş zamanlı olarak bir frekanstan diğerine "
-                   "atlayabilmesi.",
+                   "geçebilmesi.",
                    "Frequency hopping spread spectrum (FHSS): the receiver "
                    "and transmitter hopping together from one frequency to "
                    "another."),
@@ -2953,9 +3014,10 @@ LAW = Page(
                    "Detect and avoid (DAA): the device checks the channels "
                    "before sending, avoids those other systems are using "
                    "and sends on one it finds free."),
-                _w("e.i.r.p. (etkin izotropik yayılım gücü): antene "
-                   "verilen güç ile antenin o yöndeki, izotropik antene "
-                   "göre kazancının çarpımı. 100 mW 20 dBm, 10 mW 10 dBm.",
+                _w("e.i.r.p. (etkin izotropik yayılım gücü): antene verilen "
+                   "güç ile antenin ilgili yöndeki, izotropik antene göre "
+                   "kazancının çarpımı. 100 mW 20 dBm'e, 10 mW 10 dBm'e "
+                   "karşılık gelmektedir.",
                    "e.i.r.p. (effective isotropic radiated power): the "
                    "power fed to the antenna times the antenna's gain in "
                    "that direction over an isotropic antenna. 100 mW is "
@@ -2983,25 +3045,27 @@ LAW = Page(
             kind="points",
             heading=_w("Anten kazancı", "Antenna gain"),
             lines=(
-                _w("Sınır yayılan güç için; anten kazancı da ona dahil. "
-                   "Daha güçlü bir antenle yayın yapan cihaz gücünü o kadar "
-                   "kısmak zorunda.",
+                _w("Sınır, anten kazancı dahil olmak üzere yayılan güç için "
+                   "geçerlidir. Daha yüksek kazançlı bir antenle yayın yapan "
+                   "cihaz, iletilen gücünü kazanç farkı kadar düşürmek "
+                   "zorundadır.",
                    "The limit is on radiated power, antenna gain included. "
                    "A device transmitting through a stronger antenna has "
                    "to turn its power down by as much."),
-                _w("Alışta sınır yok: güçlü anten zayıf sinyali daha iyi "
-                   "duyar. Her ölçüm iki yönlü olduğu için kazanç iki uçta "
-                   "da gerekiyor.",
+                _w("Alım yönünde bir sınır bulunmamaktadır: yüksek kazançlı "
+                   "anten zayıf sinyali daha iyi almaktadır. Her ölçüm çift "
+                   "yönlü olduğundan kazanç her iki uçta da gereklidir.",
                    "There is no limit on receiving: a stronger antenna "
                    "hears a weak signal better. Every range goes both ways, "
                    "so the gain is needed at both ends."),
-                _w("E28-2G4M20S zaten 20 dBm verdiği için 5 dBi anten "
-                   "yayında bir şey kazandırmıyor: modül 15,3 dBm'ye "
-                   "kısılıyor ve antenden yine 100 mW çıkıyor. Kazanç alışta: "
-                   "her uç karşıyı 4,7 dB daha iyi duyuyor. Modülün kart "
-                   "üstü anteni kutunun içinde kalıyor ve EBYTE kazancını "
-                   "vermiyor; kart üstü antenle kapsanan alan küçülüyor, "
-                   "km² başına maliyet artıyor.",
+                _w("E28-2G4M20S hâlihazırda 20 dBm çıkış verdiğinden 5 dBi "
+                   "anten yayın gücünü artırmamaktadır: modül 15,3 dBm'e "
+                   "düşürülmekte ve antenden yine 100 mW yayılmaktadır. Kazanç"
+                   " alım tarafında sağlanmaktadır: her iki uç karşı tarafın "
+                   "sinyalini 4,7 dB daha güçlü almaktadır. Modülün kart üstü "
+                   "anteni muhafazanın içinde kalmakta ve EBYTE bu antenin "
+                   "kazancını belirtmemektedir; kart üstü antenle kapsanan "
+                   "alan küçülmekte ve km² başına maliyet artmaktadır.",
                    "The E28-2G4M20S already gives 20 dBm, so the 5 dBi "
                    "antenna adds nothing on transmit: the module is turned "
                    "down to 15,3 dBm and 100 mW still leaves the antenna. "
@@ -3009,9 +3073,9 @@ LAW = Page(
                    "better. The module's on-board antenna stays inside the "
                    "box and EBYTE gives no gain for it; with it the covered "
                    "area shrinks and the cost per km² rises."),
-                _w("Güç sınırı antenin en güçlü yayın yaptığı yöne göre "
-                   "uygulanıyor; başka yönlerde alıcıya daha az güç "
-                   "ulaşıyor.",
+                _w("Güç sınırı, antenin en güçlü yayın yaptığı yöne göre "
+                   "uygulanmaktadır; diğer yönlerde alıcıya daha düşük güç "
+                   "ulaşmaktadır.",
                    "The power limit is applied in the direction the "
                    "antenna sends strongest; in other directions less "
                    "power reaches the receiver."),
@@ -3019,60 +3083,65 @@ LAW = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Piyasaya çıkış", "Going to market"),
+            heading=_w("Piyasaya arz", "Going to market"),
             lines=(
-                _w("BTK, 5 Şubat 2021'den beri piyasaya arz öncesi bildirim "
-                   "başvurusu almıyor. Telsiz Ekipmanları Yönetmeliği "
-                   "kapsamında ayrı bir BTK başvurusu ya da ücreti yok.",
+                _w("BTK, 5 Şubat 2021'den bu yana piyasaya arz öncesi bildirim"
+                   " başvurusu almamaktadır. Telsiz Ekipmanları Yönetmeliği "
+                   "kapsamında ayrıca bir BTK başvurusu veya ücreti "
+                   "bulunmamaktadır.",
                    "Since 5 February 2021 the BTK takes no notification "
                    "before a product is placed on the market. Under the "
                    "Radio Equipment Regulation there is no separate BTK "
                    "application or fee."),
-                _w("Üretici CE işaretinden, AB uygunluk beyanından ve temel "
-                   "gereklere uygunluktan sorumlu; kutuda kısa ya da uzun "
-                   "uygunluk beyanı bulunmalı.",
+                _w("Üretici; CE işaretinden, AB uygunluk beyanından ve temel "
+                   "gereklere uygunluktan sorumludur. Ürün kutusunda kısa veya"
+                   " tam uygunluk beyanı bulunmalıdır.",
                    "The manufacturer is responsible for the CE mark, the EU "
                    "declaration of conformity and the essential "
                    "requirements; the box carries the short or the full "
                    "declaration."),
-                _w("Gereken testler: [EN 300 328](" + EN_300_328 + ") "
-                   "(telsiz; FHSS ve LBT burada sınanıyor), EN 301 489-1 ve "
-                   "-17 (elektromanyetik uyumluluk), EN 62368-1 (güvenlik) "
-                   "ve EN 62311 (insanın elektromanyetik alana maruziyeti). "
-                   "Laboratuvarlar teklifle çalışıyor. Yayımlanmış piyasa "
-                   "göstergesine göre dördü birlikte vergi hariç 2500-8000 "
-                   "€, bir kerelik ([LCAS v1.0, Multicert, Haziran 2026]"
-                   "(https://lcas.info/)). Birim merkeze bağlandığı için "
-                   "[Telsiz Ekipmanları Yönetmeliği (2014/53/AB)]"
-                   "(https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) Madde 5(3)'teki ağa zarar "
-                   "vermeme, kişisel verilerin korunması ve sahtekârlığa "
-                   "karşı korunma gerekleri (EN 18031) de kapsama "
-                   "girebilir; Madde 5(4)'e göre bunları BTK kendi "
-                   "düzenlemesiyle uygulamaya alıyor. BTK bunun için "
+                _w("Gerekli testler: [EN 300 328](" + EN_300_328 + ") "
+                   "(telsiz; FHSS ve LBT bu standartla sınanmaktadır), EN "
+                   "301 489-1 ve -17 (elektromanyetik uyumluluk), EN "
+                   "62368-1 (güvenlik) ve EN 62311 (insanın elektromanyetik "
+                   "alana maruziyeti). Laboratuvarlar teklif usulüyle "
+                   "çalışmaktadır. Yayımlanmış bir piyasa göstergesine göre "
+                   "dört testin toplam bedeli vergi hariç 2500-8000 € olup "
+                   "bir kez ödenmektedir ([LCAS v1.0, Multicert, Haziran "
+                   "2026](https://lcas.info/)). Yayın birimi merkeze "
+                   "bağlandığından [Telsiz Ekipmanları Yönetmeliği "
+                   "(2014/53/AB)]"
+                   "(https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) "
+                   "Madde 5(3)'teki ağa zarar vermeme, kişisel verilerin "
+                   "korunması ve sahtekârlığa karşı korunma gerekleri (EN "
+                   "18031) de kapsama girebilir; Madde 5(4)'e göre bu "
+                   "gereklerin uygulamaya alınması BTK'nın kendi "
+                   "düzenlemesiyle yapılmaktadır. BTK bu amaçla "
                    "[İnternet Bağlantılı Telsiz Ekipmanlarının Ek Temel "
                    "Gereklerinin Uygulanmasına Dair Tebliğ Taslağı]("
                    + CYBER_DRAFT + ")'nı 6 Mayıs 2025 tarihli ve "
-                   "2025/İK-TED/128 sayılı kararla görüşe açtı (son gün "
-                   "3 Temmuz 2025); AB'deki karşılığı 2022/30 sayılı "
-                   "tüzük. Tebliğin yürürlüğe girdiğini gösteren bir "
-                   "duyuru bulunamadı (1 Ekim 2026). O kanıtın bedeli bu "
-                   "aralığın dışında. "
-                   "UWB (Qorvo DWM3000) taşıyan tünel birimi, yaya ve araç "
-                   "alıcısına EN 302 065 de gerekiyor: yaya alıcısına genel "
-                   "amaçlı UWB için [-1]"
+                   "2025/İK-TED/128 sayılı kararla görüşe açmıştır (son "
+                   "gün 3 Temmuz 2025); taslağın AB'deki karşılığı 2022/30 "
+                   "sayılı tüzüktür. Tebliğin yürürlüğe girdiğini gösteren "
+                   "bir duyuruya ulaşılamamıştır (1 Ekim 2026). Bu "
+                   "gerekliliklerin kanıtlanma bedeli yukarıdaki aralığa "
+                   "dahil değildir. "
+                   "UWB (Qorvo DWM3000) taşıyan tünel birimi ile yaya ve "
+                   "araç alıcıları için EN 302 065 de gerekmektedir: yaya "
+                   "alıcısı için genel amaçlı UWB'ye yönelik [-1]"
                    "(https://www.etsi.org/deliver/etsi_en/302000_302099/30206501/02.01.01_60/en_30206501v020101p.pdf), "
-                   "tünel birimine konum izleme için [-2]"
+                   "tünel birimi için konum izlemeye yönelik [-2]"
                    "(https://www.etsi.org/deliver/etsi_en/302000_302099/30206502/02.01.01_60/en_30206502v020101p.pdf), "
-                   "araç alıcısına taşıtlar için [-3]"
+                   "araç alıcısı için taşıtlara yönelik [-3]"
                    "(https://www.etsi.org/deliver/etsi_en/302000_302099/30206503/02.01.01_60/en_30206503v020101p.pdf). "
-                   "LCAS aralığı bu testi kapsamıyor. "
-                   "Türkiye'de bu testleri akredite yapan laboratuvarlar "
-                   "var, örneğin [Ege Test Center]"
+                   "LCAS aralığı bu testi kapsamamaktadır. "
+                   "Türkiye'de bu testleri akredite olarak yapan "
+                   "laboratuvarlar bulunmaktadır; örneğin [Ege Test Center]"
                    "(https://www.egetestcenter.com/akredite-red-emc-testleri/) "
                    "ve [TSE Elektroteknik Laboratuvarı]"
-                   "(https://www.tse.org.tr/deney-kalibrasyon-lak-yt-onaylanmis-laboratuvar-hizmetleri/); "
-                   "hiçbiri fiyat yayımlamıyor, bedel teklifle belli "
-                   "olacak.",
+                   "(https://www.tse.org.tr/deney-kalibrasyon-lak-yt-onaylanmis-laboratuvar-hizmetleri/). "
+                   "Bu laboratuvarlar fiyat yayımlamamakta olup bedel "
+                   "teklif alınarak belirlenecektir.",
                    "Tests needed: [EN 300 328](" + EN_300_328 + ") "
                    "(radio; FHSS and LBT are tested here), EN 301 489-1 and -17 "
                    "(electromagnetic compatibility), EN 62368-1 (safety) "
@@ -3110,13 +3179,14 @@ LAW = Page(
                    "(https://www.tse.org.tr/deney-kalibrasyon-lak-yt-onaylanmis-laboratuvar-hizmetleri/); "
                    "none publishes a price, so the cost will come from a "
                    "quotation."),
-                _w("Uyumlaştırılmış standartlar uygulanırsa Onaylanmış "
-                   "Kuruluşa gitme zorunluluğu yok: [Telsiz Ekipmanları "
-                   "Yönetmeliği (2014/53/AB)](https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) Madde 20(3), "
-                   "Ek-2'deki iç üretim kontrolüne izin veriyor. "
-                   "Bu, uygunluğun bedelsiz olduğu anlamına gelmiyor; "
-                   "üretici uygunluğu teknik dosya ve ölçüm sonuçlarıyla "
-                   "göstermek zorunda.",
+                _w("Uyumlaştırılmış standartların uygulanması durumunda "
+                   "Onaylanmış Kuruluşa başvurma zorunluluğu bulunmamaktadır: "
+                   "[Telsiz Ekipmanları Yönetmeliği "
+                   "(2014/53/AB)](https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm)"
+                   " Madde 20(3), Ek-2'deki iç üretim kontrolüne izin "
+                   "vermektedir. Bu durum uygunluğun maliyetsiz olduğu "
+                   "anlamına gelmemektedir; üretici uygunluğu teknik dosya ve "
+                   "ölçüm sonuçlarıyla kanıtlamak zorundadır.",
                    "Where the harmonised standards are applied, a notified "
                    "body is not required: Article 20(3) of Türkiye's "
                    "[Radio Equipment Regulation (2014/53/AB)](https://www.resmigazete.gov.tr/eskiler/2020/11/20201105-6.htm) "
@@ -3128,21 +3198,23 @@ LAW = Page(
         ),
         Part(
             kind="points",
-            heading=_w("Prototip cihazları için frekans",
+            heading=_w("Prototip cihazları için frekans kuralları",
                        "Frequency for the prototype devices"),
             lines=(
-                _w("Prototipteki Meshtastic cihazları 868 MHz ya da 915 MHz "
-                   "bandında çalışıyor. 902-928 MHz bandı Türkiye'de "
-                   "tahsisten muaf değil; yalnız 917,4-919,4 MHz gibi dar "
-                   "alt bantlar koşullu.",
+                _w("Prototipte kullanılacak Meshtastic cihazları 868 MHz veya "
+                   "915 MHz bandında çalışmaktadır. 902-928 MHz bandı "
+                   "Türkiye'de tahsisten muaf değildir; yalnızca 917,4-919,4 "
+                   "MHz gibi dar alt bantlar koşullu olarak "
+                   "kullanılabilmektedir.",
                    "The prototype's Meshtastic devices work at 868 or "
                    "915 MHz. The 902-928 MHz band is not licence-exempt in "
                    "Türkiye; only narrow sub-bands such as 917,4-919,4 MHz "
                    "are, under conditions."),
-                _w("863-870 MHz alt bantlarının çoğunda 25 mW e.r.p. ve "
-                   "%0,1 ile %1 görev çevrimi (vericinin açık kaldığı zaman oranı); "
-                   "869,4-869,65 MHz'de 500 mW ve "
-                   "%10. Prototipler bu koşullara göre ayarlanmalı.",
+                _w("863-870 MHz alt bantlarının çoğunda sınır 25 mW e.r.p. ve "
+                   "%0,1 ile %1 arasında görev çevrimidir (vericinin açık "
+                   "kaldığı zaman oranı); 869,4-869,65 MHz'de ise 500 mW ve "
+                   "%10'dur. Prototipler bu koşullara göre "
+                   "yapılandırılmalıdır.",
                    "Most 863-870 MHz sub-bands allow 25 mW e.r.p. at a "
                    "0,1 to 1 % duty cycle; 869,4-869,65 MHz allows 500 mW "
                    "at 10 %. The prototypes should be set to these."),
@@ -3150,13 +3222,13 @@ LAW = Page(
         ),
         Part(
             kind="text",
-            heading=_w("Kurulumun ve maliyetin dayandığı mevzuat",
+            heading=_w("Kurulum ve maliyete ilişkin mevzuat",
                        "The rules installation and cost rest on"),
             lines=(
-                _w("Buraya kadarki kurallar telsizin kendisi ve piyasaya "
-                   "çıkışı içindi. Aşağıdakiler birimin nereye ve nasıl "
-                   "takıldığı ile kurulum ve bakım maliyetinin hangi "
-                   "kurallara dayandığı.",
+                _w("Önceki bölümlerdeki kurallar telsiz cihazının kendisine ve"
+                   " piyasaya arzına ilişkindir. Aşağıdaki bölümler ise yayın "
+                   "biriminin kurulum yeri ve biçimi ile kurulum ve bakım "
+                   "maliyetinin dayandığı kuralları ele almaktadır.",
                    "The rules so far were for the radio itself and for "
                    "putting it on the market. Those below are about where "
                    "and how a unit is fitted, and which rules the cost of "
@@ -3167,15 +3239,15 @@ LAW = Page(
             kind="points", sub=True,
             heading=_w("Harcırah", "Per diem"),
             lines=(
-                _w("Harcırah, görev yeri dışına geçici bir görevle "
-                   "gönderilen çalışana yol gideriyle birlikte ödenen "
-                   "gündeliktir (6245 sayılı Harcırah Kanunu). Kanun kamu "
-                   "görevlileri için; özel sektörde işveren ödemeyi "
-                   "kendisi belirler, ama vergiden istisna kısım 193 "
-                   "sayılı Gelir Vergisi Kanunu'nun 24. maddesinin 2. "
-                   "bendine göre aynı aylık seviyesindeki devlet "
-                   "memuruna ödenen gündeliktir. Simülasyon bu yüzden kamu "
-                   "cetvelini kullanıyor.",
+                _w("Harcırah, görev yeri dışına geçici görevle gönderilen "
+                   "çalışana yol gideriyle birlikte ödenen gündeliktir (6245 "
+                   "sayılı Harcırah Kanunu). Kanun kamu görevlileri için "
+                   "düzenlenmiştir; özel sektörde ödeme tutarını işveren "
+                   "belirlemekle birlikte, 193 sayılı Gelir Vergisi Kanunu'nun"
+                   " 24. maddesinin 2. bendine göre vergiden istisna tutulan "
+                   "kısım, aynı aylık seviyesindeki devlet memuruna ödenen "
+                   "gündelik kadardır. Bu nedenle simülasyonda kamu cetveli "
+                   "kullanılmaktadır.",
                    "A per diem is the daily allowance paid, with the "
                    "fare, to a worker sent on a temporary duty outside "
                    "the place of duty (Travel Allowance Law 6245). The "
@@ -3184,20 +3256,20 @@ LAW = Page(
                    "a civil servant on the same salary level (Income Tax "
                    "Law 193, Article 24(2)). The simulation uses the public "
                    "schedule for that reason."),
-                _w("Ne kadar: 2026 Merkezi Yönetim Bütçe Kanunu'nun (7567) "
-                   "H Cetveli, aylık/kadro derecesi 5-15 için yurt içi "
-                   "gündelik 850 TL. Bir saha teknisyeninin maaşı bu "
-                   "aralığa düşüyor.",
+                _w("Tutar: 2026 Merkezi Yönetim Bütçe Kanunu'nun (7567) H "
+                   "Cetveli'ne göre aylık/kadro derecesi 5-15 için yurt içi "
+                   "gündelik 850 TL'dir. Bir saha teknisyeninin maaşı bu "
+                   "aralığa karşılık gelmektedir.",
                    "How much: Schedule H of the 2026 Central Government "
                    "Budget Law (7567), grades 5-15, domestic allowance "
                    "850 TL a day. A field technician's salary falls in "
                    "this range."),
-                _w("Nerede: büyükşehirlerde görev yeri, çalışanın bağlı "
-                   "olduğu ilçenin belediye sınırı ve onun devamı olan "
+                _w("Uygulama alanı: büyükşehirlerde görev yeri, çalışanın "
+                   "bağlı olduğu ilçenin belediye sınırı ve bunun devamı olan "
                    "yerleşim yerleridir (Madde 3/g). Çankaya'daki bir ekip "
-                   "Kızılay'a giderken görev yerinde; Polatlı'ya ya da "
-                   "Kızılcahamam'a giderken görev yeri dışında. Görev yeri "
-                   "içinde gündelik ödenmez (Madde 39).",
+                   "Kızılay'a giderken görev yerinde, Polatlı'ya veya "
+                   "Kızılcahamam'a giderken görev yeri dışında sayılmaktadır. "
+                   "Görev yeri içinde gündelik ödenmemektedir (Madde 39).",
                    "Where: in a metropolitan province the place of duty "
                    "is the district the worker belongs to and the "
                    "built-up area that continues it (Article 3(g)). A "
@@ -3205,14 +3277,15 @@ LAW = Page(
                    "Kızılay and away from it in Polatlı or Kızılcahamam. "
                    "No allowance is paid inside the place of duty "
                    "(Article 39)."),
-                _w("Günübirlik görevde: öğle (13.00) ya da akşam (19.00) "
-                   "yemeği zamanlarından birini dışarıda geçirene "
+                _w("Günübirlik görevlerde öğle (13.00) veya akşam (19.00) "
+                   "yemeği saatlerinden birini görev yeri dışında geçirene "
                    "gündeliğin 1/3'ü, ikisini geçirene 2/3'ü, geceyi de "
-                   "geçirene tamamı (Madde 39). Bir bakım ziyareti sabah "
-                   "çıkıp öğleden sonra dönüyor: kişi başı 283,33 TL, "
-                   "iki kişilik ekip için gün başına 566,67 TL. Ekip o gün "
-                   "birkaç birime uğradığı için bu, ziyaretlere bölünüyor: "
-                   "kırsalda günde dört direk, ziyaret başına 141,67 TL.",
+                   "geçirene tamamı ödenmektedir (Madde 39). Bir bakım "
+                   "ziyareti sabah başlayıp öğleden sonra tamamlanmaktadır: "
+                   "kişi başı 283,33 TL, iki kişilik ekip için günlük 566,67 "
+                   "TL. Ekip aynı gün birden fazla birimi ziyaret ettiğinden "
+                   "bu tutar ziyaretlere paylaştırılmaktadır: kırsalda günde "
+                   "dört direk, ziyaret başına 141,67 TL.",
                    "On a day trip: a third of the allowance for being "
                    "away over one of the lunch (13:00) or dinner (19:00) "
                    "times, two thirds for both, all of it for a night "
@@ -3222,12 +3295,13 @@ LAW = Page(
                    "calls at several units that day, so this is shared "
                    "among the visits: four poles a day in open country, "
                    "141,67 TL a visit."),
-                _w("YERKON'da bugün sıfır: şehir içinde ekip kendi "
-                   "ilçesinde; kırsalda ve tünelde bakımı o ilçedeki "
-                   "yerel bir teknik firma yapıyor, yani kimse görev "
-                   "yeri dışına çıkmıyor. Bakım Ankara merkezden "
-                   "yapılsaydı ekip gününe 566,67 TL eklenirdi; kural "
-                   "simülasyonda bu yüzden duruyor.",
+                _w("YERKON'un mevcut senaryolarında bu gider sıfırdır: şehir "
+                   "içinde ekip kendi ilçesinde çalışmakta; kırsalda ve "
+                   "tünelde bakım, ilgili ilçedeki yerel bir teknik firma "
+                   "tarafından yapılmaktadır. Dolayısıyla görev yeri dışına "
+                   "çıkılmamaktadır. Bakımın Ankara merkezden yapılması "
+                   "durumunda ekip gününe 566,67 TL eklenecektir; kuralın "
+                   "simülasyonda korunmasının nedeni budur.",
                    "Zero in YERKON today: in town the crew is in its own "
                    "district; in open country and the tunnel a local "
                    "firm in that district does the maintenance, so "
@@ -3239,13 +3313,14 @@ LAW = Page(
         Part(
             kind="points",
             sub=True,
-            heading=_w("Bakım maliyetinde mevzuat",
+            heading=_w("Bakım maliyetine ilişkin mevzuat",
                        "Regulation in the maintenance cost"),
             lines=(
-                _w("Amortisman (GİB listesi): telsiz cihaz ve sistemleri "
-                   "10 yıl (3.49.4), akümülatörler 5 yıl (3.14.7), güneş "
-                   "enerjisi santrali 10 yıl (45.1.9). Yenileme kalemi her "
-                   "parçayı kendi ömrüne bölüyor.",
+                _w("Amortisman süreleri (GİB listesi): telsiz cihaz ve "
+                   "sistemleri 10 yıl (3.49.4), akümülatörler 5 yıl (3.14.7), "
+                   "güneş enerjisi santrali 10 yıl (45.1.9). Yenileme kalemi, "
+                   "her parçanın maliyetini kendi ekonomik ömrüne bölerek "
+                   "hesaplanmaktadır.",
                    "Depreciation (Revenue Administration list): radio "
                    "devices and systems 10 years (3.49.4), batteries 5 "
                    "years (3.14.7), solar power plant 10 years (45.1.9). "
@@ -3256,42 +3331,44 @@ LAW = Page(
         Part(
             kind="points",
             sub=True,
-            heading=_w("Direk boyunu ve birimin yerini belirleyen kurallar",
+            heading=_w("Direk boyunu ve yayın biriminin konumunu belirleyen "
+                       "kurallar",
                        "The rules that set pole heights and where the "
                        "unit goes"),
             lines=(
                 _w("Aydınlatma direği: TEDAŞ'ın LED'li Yol Aydınlatma "
-                   "Tasarımına İlişkin Usul ve Esasları (Ağustos 2022, Ek-1) "
-                   "direk boyunu yol sınıfına bağlıyor: M1 sınıfı yollarda "
-                   "12-14 m, M2 ve M3'te 10-12 m, M4'te 8-10 m, M5'te 8 m, "
-                   "yaya yollarında (P2, P3) 6-8 m. Bu boyların "
-                   "fiyatları Maliyet sayfasında.",
+                   "Tasarımına İlişkin Usul ve Esasları (Ağustos 2022, Ek-1), "
+                   "direk boyunu yol sınıfına göre belirlemektedir: M1 sınıfı "
+                   "yollarda 12-14 m, M2 ve M3'te 10-12 m, M4'te 8-10 m, M5'te"
+                   " 8 m, yaya yollarında (P2, P3) 6-8 m. Bu boylardaki "
+                   "direklerin fiyatları Maliyet sayfasında yer almaktadır.",
                    "Lighting column: TEDAŞ's rules for LED road lighting "
                    "design (August 2022, annex 1) tie the column height to "
                    "the road class: 12 to 14 m on M1 roads, 10 to 12 m on "
                    "M2 and M3, 8 to 10 m on M4, 8 m on M5, 6 to 8 m on "
                    "footways (P2, P3). What these heights cost is on the "
                    "Cost page."),
-                _w("Dağıtım direği: TEDAŞ-MLZ/99-34 santrifüj betonarme "
-                   "direk şartnamesi boyları 9,3 m'den 25 m'ye kadar "
-                   "sayıyor (9,3-10-11 m, 12-13-14 m, 15-16 m ve üstü). "
-                   "Direğin toprak altında kalan boyunu denetlemek için "
-                   "tabanından 4 m yukarıya bir çizgi çekiliyor.",
+                _w("Dağıtım direği: TEDAŞ-MLZ/99-34 santrifüj betonarme direk "
+                   "şartnamesi 9,3 m'den 25 m'ye kadar direk boyları "
+                   "tanımlamaktadır (9,3-10-11 m, 12-13-14 m, 15-16 m ve "
+                   "üzeri). Direğin toprak altında kalan boyunun denetlenmesi "
+                   "için tabanından 4 m yukarıya bir işaret çizgisi "
+                   "çekilmektedir.",
                    "Distribution pole: TEDAŞ-MLZ/99-34, the specification "
                    "for spun concrete poles, lists lengths from 9,3 m to "
                    "25 m (9,3-10-11 m, 12-13-14 m, 15-16 m and up). A line "
                    "4 m above the base marks where the buried length is "
                    "checked."),
-                _w("Birimle iletkenler arasındaki mesafe: Elektrik Kuvvetli "
-                   "Akım Tesisleri Yönetmeliği'nin hava hattı iletkenlerinin "
-                   "en küçük düşey uzaklıkları çizelgesi, iletkenlerin "
-                   "haberleşme hatlarına en küçük "
-                   "düşey uzaklığını alçak gerilimde 1 m, 1-36 kV orta "
-                   "gerilimde 2,5 m veriyor. Birim bu yüzden orta gerilim "
-                   "iletkenlerinin en az 2,5 m altına takılıyor. Aynı "
-                   "çizelge orta gerilim iletkenlerinin köy ve şehir içi "
-                   "yollarda yerden en az 7 m, tarlada 6 m yüksekte "
-                   "olmasını istiyor.",
+                _w("Yayın birimi ile iletkenler arasındaki mesafe: Elektrik "
+                   "Kuvvetli Akım Tesisleri Yönetmeliği'ndeki hava hattı "
+                   "iletkenlerinin en küçük düşey uzaklıkları çizelgesi, "
+                   "iletkenlerin haberleşme hatlarına en küçük düşey "
+                   "uzaklığını alçak gerilimde 1 m, 1-36 kV orta gerilimde 2,5"
+                   " m olarak belirlemektedir. Bu nedenle yayın birimi orta "
+                   "gerilim iletkenlerinin en az 2,5 m altına "
+                   "yerleştirilmektedir. Aynı çizelge, orta gerilim "
+                   "iletkenlerinin köy ve şehir içi yollarda yerden en az 7 m,"
+                   " tarlada en az 6 m yükseklikte olmasını şart koşmaktadır.",
                    "Distance from the conductors: the table of least "
                    "vertical distances in the Regulation on Electrical "
                    "Power Installations gives the least vertical distance "
@@ -3307,20 +3384,21 @@ LAW = Page(
         Part(
             kind="points",
             sub=True,
-            heading=_w("Kamu yapısında yer kullanımı",
+            heading=_w("Kamu yapılarında yer kullanımı",
                        "Using space on public structures"),
             lines=(
-                _w("3194 sayılı İmar Kanunu, Ek Madde 9/7: kamu kurumları "
-                   "elektronik haberleşme istasyonlarına yer "
-                   "kullandırırken alacakları yıllık bedel, büyükşehirde "
-                   "Ulaştırma ve Altyapı Bakanlığının yer seçim belgesi "
-                   "ücretinin beş katını, diğer yerlerde üç katını geçemez. "
-                   "2025 yer seçim ücreti 27503,44 TL; üst sınır "
-                   "büyükşehirde yılda 137517,20 TL, diğer yerlerde "
-                   "82510,32 TL (Tarım ve Orman Bakanlığı, 2025 rayiç "
-                   "bedelleri). İstanbul Büyükşehir Belediyesi'nin tarifesi "
-                   "bu kuralla kuruluyor. YERKON birimleri kamu protokolüyle "
-                   "konduğu için simülasyonda dağıtım direği kirası sıfır.",
+                _w("3194 sayılı İmar Kanunu, Ek Madde 9/7: kamu kurumlarının "
+                   "elektronik haberleşme istasyonlarına yer kullandırırken "
+                   "alacakları yıllık bedel, büyükşehirlerde Ulaştırma ve "
+                   "Altyapı Bakanlığı yer seçim belgesi ücretinin beş katını, "
+                   "diğer yerlerde üç katını geçemez. 2025 yılı yer seçim "
+                   "ücreti 27503,44 TL'dir; üst sınır büyükşehirlerde yılda "
+                   "137517,20 TL, diğer yerlerde 82510,32 TL'dir (Tarım ve "
+                   "Orman Bakanlığı, 2025 rayiç bedelleri). İstanbul "
+                   "Büyükşehir Belediyesi'nin tarifesi de bu kurala "
+                   "dayanmaktadır. YERKON yayın birimlerinin kamu protokolüyle"
+                   " kurulması öngörüldüğünden simülasyonda dağıtım direği "
+                   "kirası sıfır kabul edilmiştir.",
                    "Zoning Law 3194, Additional Article 9(7): the yearly "
                    "fee a public body charges an electronic communications "
                    "station for space may not exceed five times the "
@@ -3333,10 +3411,11 @@ LAW = Page(
                    "built on this rule. YERKON units go up under a public "
                    "agreement, so the simulation charges no pole rent."),
                 _w("Genel Aydınlatma Yönetmeliği: aydınlatma tesisinin "
-                   "bağlantı noktasından genel aydınlatma dışında bir "
-                   "amaca enerji verilmez; aydınlatma tesisleri TEDAŞ'ın "
-                   "mülkiyetinde. Birim bu yüzden ayrı sayaçlı bir abone "
-                   "sayılıyor ve ticarethane tarifesinden ödüyor.",
+                   "bağlantı noktasından genel aydınlatma dışında bir amaçla "
+                   "enerji verilmemektedir; aydınlatma tesisleri TEDAŞ'ın "
+                   "mülkiyetindedir. Bu nedenle yayın birimi ayrı sayaçlı bir "
+                   "abone olarak kabul edilmekte ve ticarethane tarifesinden "
+                   "ücretlendirilmektedir.",
                    "General Lighting Regulation: no energy may be taken "
                    "from a public lighting connection for anything but "
                    "public lighting, and the lighting installations belong "
@@ -3352,13 +3431,13 @@ LAW = Page(
                 _w("[Elektronik Haberleşme Cihazları Güvenlik Sertifikası "
                    "Yönetmeliği](" + SAFETY_CERTIFICATE + "), elektromanyetik "
                    "alan bakımından sabit vericilerin yerini, kurulumunu, "
-                   "denetimini ve güvenlik sertifikasını düzenliyor. "
+                   "denetimini ve güvenlik sertifikasını düzenlemektedir. "
                    "Yönetmeliğin 2. maddesi, hücresel sistemler dışında, son "
                    "kullanıcı terminal cihazlarını ve çıkış gücü 5 W ve "
-                   "altındaki cihazları kapsam dışı tutuyor. YERKON'un yayın "
-                   "birimleri en çok 100 mW yayıyor, alıcılar son kullanıcı "
-                   "cihazı; bu yüzden hiçbiri için güvenlik sertifikası "
-                   "gerekmiyor.",
+                   "altındaki cihazları kapsam dışı tutmaktadır. YERKON'un yayın "
+                   "birimleri en çok 100 mW yaymakta, alıcılar ise son kullanıcı "
+                   "cihazıdır; bu nedenle hiçbiri için güvenlik sertifikası "
+                   "gerekmemektedir.",
                    "The [Regulation on Safety Certificates for Electronic "
                    "Communications Devices](" + SAFETY_CERTIFICATE + ") "
                    "governs where fixed transmitters go, how they are "
@@ -3376,10 +3455,12 @@ LAW = Page(
             sub=True,
             heading=_w("Harita ve uydu görüntüsü", "Maps and imagery"),
             lines=(
-                _w("Yer seçme haritası OpenStreetMap'in karolarını kullanıyor "
-                   "ve onu anıyor. Uydu görüntüsü Esri World Imagery; atfı: "
-                   "Esri, Maxar, Earthstar Geographics, GIS User Community. "
-                   "Görüntü yalnız zemini boyuyor, hesaba girmiyor.",
+                _w("Yer seçme haritasında OpenStreetMap karoları kaynağı "
+                   "belirtilerek kullanılmaktadır. Uydu görüntüsü Esri World "
+                   "Imagery'den alınmaktadır (atıf: Esri, Maxar, Earthstar "
+                   "Geographics, GIS User Community). Görüntü yalnızca zemin "
+                   "kaplaması olarak kullanılmakta, hesaplamalara dahil "
+                   "edilmemektedir.",
                    "The place picker uses OpenStreetMap's tiles and credits "
                    "it. The imagery is Esri World Imagery, credited to "
                    "Esri, Maxar, Earthstar Geographics and the GIS User "
@@ -3530,9 +3611,10 @@ FOOTER = _w(
 )
 
 WEIGHTING = _w(
-    "Simülasyonun doldurduğu üç satır. Her biri, hataların yüzde "
-    "95'inin altında kaldığı yatay sapmayı gösteriyor ve her biri "
-    "Ankara'nın gerçek arazisi üzerinde çalıştırıldı.",
+    "Simülasyonla hesaplanan üç senaryo. Her biri, hataların "
+    "yüzde 95'inin altında kaldığı yatay sapmayı göstermekte "
+    "olup Ankara'nın gerçek arazi verisi üzerinde "
+    "çalıştırılmıştır.",
     "The three rows the simulation filled. Each shows the horizontal "
     "error that 95 per cent of the measurements stayed under, and each was "
     "run over real ground near Ankara.",
@@ -3948,19 +4030,24 @@ def _headline(published, language: str) -> str:
 
 #: What each drawing is about, and the caveat under it.
 LANDSCAPE = _w(
-    "Ne kadara ne kadar doğruluk",
+    "Maliyet ve doğruluk ilişkisi",
     "What the accuracy costs",
 )
 LANDSCAPE_UNDER = _w(
-    "Yatayda kilometrekare başına kurulum maliyeti, dikeyde yatay hata. "
-    "İki eksen de sıfırdan başlıyor. Sola ve aşağıya doğru daha iyi: ucuz ve "
-    "hassas. Uydu sistemlerinin paydası dünyanın bütün kara yüzeyi, "
-    "YERKON'unki satırın kendi alanı. YERKON'un kırsal satırı uydu "
-    "sistemlerinden ucuz, şehir içi satırı pahalı: şehirde binalar "
-    "sinyali kestiği için kilometrekareye daha çok birim gerekiyor. "
-    "İkisinin de doğruluğu GPS'inkine yakın. Tünel satırı burada yok: o "
-    "kilometreye bölünüyor, yani aynı eksene konamaz. Hem maliyetini "
-    "hem doğruluğunu yayımlamayan sistem de çizilemedi.",
+    "Yatay eksende kilometrekare başına kurulum maliyeti, düşey"
+    " eksende yatay hata gösterilmektedir. Her iki eksen de "
+    "sıfırdan başlamaktadır; sola ve aşağıya doğru gidildikçe "
+    "sistem hem daha ucuz hem daha hassastır. Uydu "
+    "sistemlerinde payda dünyanın tüm kara yüzeyi, YERKON'da "
+    "ise ilgili senaryonun kendi alanıdır. YERKON'un kırsal "
+    "senaryosu uydu sistemlerinden daha düşük, şehir içi "
+    "senaryosu ise daha yüksek maliyetlidir: şehirde binalar "
+    "sinyali engellediğinden kilometrekare başına daha fazla "
+    "yayın birimi gerekmektedir. Her iki senaryonun doğruluğu "
+    "da GPS'e yakındır. Tünel senaryosu kilometre başına "
+    "hesaplandığından aynı eksende gösterilememiştir. "
+    "Maliyetini veya doğruluğunu yayımlamayan sistemler de "
+    "grafiğe dahil edilmemiştir.",
     "Capital per square kilometre across, horizontal error up, both "
     "from nought. Left and down is better: cheap and precise. The "
     "satellite systems are divided by all the land on earth, YERKON by "
@@ -3997,22 +4084,24 @@ CLOCKS = (
                 "clock synchronisation, YERKON (two way ranging)")),
 )
 CLOCKS_UNDER = _w(
-    "TDoA'da birimlerin saatlerinin birbirine eşitlenmesi, birim başına "
-    "atomik saat ve IEEE 1588 PTP gibi pahalı bir altyapı istiyor. "
-    "YERKON mesafeyi çift yönlü ölçtüğü için bu senkronizasyona hiç "
-    "gerek duymuyor.",
+    "TDoA sistemlerinde yayın birimlerinin saatlerinin "
+    "birbirine eşitlenmesi, birim başına atomik saat ve IEEE "
+    "1588 PTP gibi maliyetli bir altyapı gerektirmektedir. "
+    "YERKON mesafeyi çift yönlü ölçtüğünden bu senkronizasyona "
+    "ihtiyaç duymamaktadır.",
     "In TDoA, keeping the units' clocks equal to each other takes costly "
     "infrastructure such as an atomic clock and IEEE 1588 PTP at every "
     "unit. YERKON measures range two ways, so it needs no such "
     "synchronisation at all.",
 )
-SPREAD = _w("Üç satırın hatası: ortancadan en kötü %5'e",
+SPREAD = _w("Üç senaryonun hata dağılımı: ortancadan en kötü %5'e",
             "Each row's error, median to ninety fifth")
 SPREAD_UNDER = _w(
-    "Yol kenarına dizilmiş "
-    "birimlerin hepsi aşağı yukarı aynı yükseklikte, o yüzden yüksekliği "
-    "mesafelerden ölçecek geometri yok; düşeyi yükseklik haritasından "
-    "gelen yükseklik taşıyor.",
+    "Yol kenarına yerleştirilen yayın birimlerinin tamamı "
+    "yaklaşık aynı yükseklikte bulunduğundan yüksekliğin mesafe"
+    " ölçümlerinden belirlenmesine uygun bir geometri "
+    "oluşmamaktadır; düşey konum, yükseklik haritasından elde "
+    "edilen yükseklik bilgisiyle belirlenmektedir.",
     "Units strung "
     "along a roadside are all at much the same height, so there is no "
     "geometry to measure height from ranges; the height from the "
@@ -4021,12 +4110,12 @@ SPREAD_UNDER = _w(
 COST = _w("Kilometrekare başına kurulum maliyeti",
           "Capital per square kilometre")
 COST_UNDER = _w(
-    "Kurulum maliyetini yayımlayan sistemler. Uydu satırlarının paydası "
-    "dünyanın bütün kara yüzeyi, YERKON satırlarınınki kendi alanı. "
-    "Tünel "
-    "satırı burada yok: o kilometrekareye değil güzergâh kilometresine "
-    "bölünüyor, yani aynı eksene konamaz. Tablodaki dipnotu bunu "
-    "anlatıyor.",
+    "Kurulum maliyetini yayımlayan sistemler gösterilmektedir. "
+    "Uydu sistemlerinde payda dünyanın tüm kara yüzeyi, YERKON "
+    "senaryolarında ise senaryonun kendi alanıdır. Tünel "
+    "senaryosu kilometrekareye değil güzergâh kilometresine "
+    "bölündüğünden aynı eksende gösterilememiştir; ayrıntı "
+    "tablodaki dipnotta açıklanmaktadır.",
     "The systems that publish a capital cost. The satellite rows are "
     "divided by all the land on earth, the YERKON rows by their own "
     "area. The tunnel row is absent: it is divided by "
@@ -4036,9 +4125,10 @@ COST_UNDER = _w(
 ACCURACY = _w("Yatay hata, en kötü %5 hariç (HPE P95)",
               "Horizontal error, worst 5 % excluded (HPE P95)")
 ACCURACY_UNDER = _w(
-    "Sola doğru daha iyi. Eksen logaritmik, çünkü "
-    "değerler santimetreden on beş metreye uzanıyor. Hücresi boş olan "
-    "sistem çizilmedi.",
+    "Sola doğru gidildikçe doğruluk artmaktadır. Değerler "
+    "santimetre düzeyinden on beş metreye kadar uzandığından "
+    "eksen logaritmik ölçeklidir. İlgili hücresi boş olan "
+    "sistemler grafiğe dahil edilmemiştir.",
     "Further left is better. The axis is logarithmic because the "
     "figures run from "
     "centimetres to fifteen metres. A system with an empty cell is not "
@@ -4048,21 +4138,22 @@ ACCURACY_UNDER = _w(
 
 #: What each symbol in the drawings means, for the legend under them.
 SYMBOLS = {
-    "ours": _w("YERKON: bu simülasyonun sonucu",
+    "ours": _w("YERKON: simülasyon sonucu",
                "YERKON: what this simulation found"),
-    "others": _w("Diğer sistemler: kendi kaynaklarının yayımladığı değer",
+    "others": _w("Diğer sistemler: kendi kaynaklarında yayımlanan değer",
                  "Other systems: the figure their own sources publish"),
-    "at_most": _w("Üst sınır: kaynak \"en fazla bu kadar\" diyor, gerçek "
-                  "değer okun gösterdiği yönde",
+    "at_most": _w("Üst sınır: kaynak yalnızca azami değeri vermektedir; "
+                  "gerçek değer okun gösterdiği yöndedir",
                   "A ceiling: the source says \"at most this\", the true "
                   "value lies the way the arrow points"),
-    "at_least": _w("Alt sınır: kaynak \"en az bu kadar\" diyor, gerçek "
-                   "değer okun gösterdiği yönde",
+    "at_least": _w("Alt sınır: kaynak yalnızca asgari değeri vermektedir; "
+                   "gerçek değer okun gösterdiği yöndedir",
                    "A floor: the source says \"at least this\", the true "
                    "value lies the way the arrow points"),
-    "below": _w("Üst sınır: gerçek değer işaretin altında",
+    "below": _w("Üst sınır: gerçek değer işaretin altındadır",
                 "A ceiling: the true value lies below the mark"),
-    "pair": _w("İki değer: nokta ortalamada, çizginin ucu en kötü konumda",
+    "pair": _w("İki değer: nokta ortalama konumu, çizginin ucu en kötü "
+               "konumu göstermektedir",
                "Two figures: the dot on the average, the end of the line "
                "on the worst place"),
     "median": _w("Yatay hatanın ortancası (HPE P50)",

@@ -10,8 +10,9 @@ Tablonun CAPEX sütunu kilometrekare başına kurulum maliyetini veriyor.
 Üç YERKON satırının ikisi için bu doğru: şehir içi ve kırsal birer
 alana hizmet ediyor.
 
-Tünel etmiyor. 12 m genişliğinde 2 km'lik bir tünel **0,02 km²**
-kaplıyor, yani bir kilometrekarenin ellide biri. Aynı toplam sermaye bu
+Tünel etmiyor. 12 m genişliğinde 2 km'lik bir tünel **0,024 km²**
+kaplıyor, yani bir kilometrekarenin yaklaşık kırkta biri (2 Ekim 2026
+düzeltmesi; önceki metinde "ellide biri" yazıyordu). Aynı toplam sermaye bu
 kadar küçük bir paydaya bölününce sütunda milyonlarla ölçülen bir sayı
 çıkıyordu — GPS'in 683,80'inin yanında dört bin kat. O sayı tünelin
 pahalı olduğunu söylemiyordu; paydanın küçük olduğunu söylüyordu.

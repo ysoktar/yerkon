@@ -132,25 +132,26 @@ compared as though they came from one protocol."""
 
 [note.gnss-p50]
 sources = ["gps-gov", "gsc-galileo-q2"]
-tr = """GPS, Galileo, GLONASS ve BeiDou için aynı yöntemle ölçülmüş, \
-güncel ve karşılaştırılabilir bir P50 kullanıcı konum hatası \
-yayımlanmıyor. P95'ten P50 türetilmedi."""
+tr = """GPS, Galileo, GLONASS ve BeiDou için aynı yöntemle ölçülmüş, güncel ve \
+karşılaştırılabilir bir P50 kullanıcı konum hatası yayımlanmamaktadır. \
+P95 değerinden P50 türetilmemiştir."""
 en = """No current, comparable P50 user position error measured the same \
 way is published for GPS, Galileo, GLONASS or BeiDou. No P50 was \
 derived from a P95."""
 
 [note.land-area]
 sources = ["cia-land", "nasa-earth-area"]
-tr = """Küresel uydu sistemlerinde alan paydası olarak okyanuslar ve \
-denizler çıkarılmış Dünya kara yüzeyi, yaklaşık 148,94 milyon km² \
-(148940000 km²) kullanıldı. Dünya'nın okyanuslar dahil tüm yüzeyi yaklaşık \
-510,06 milyon km²; kara bunun yaklaşık %29'u. \
-GPS, Galileo, GLONASS ve BeiDou denizde de hizmet verir; bu seçim hizmet \
-alanını karayla sınırlamıyor, yalnızca karada kurulan YERKON ve diğer \
-karasal sistemlerle aynı paydada karşılaştırmayı sağlıyor. Karada GNSS'nin \
-kesin kullanılamadığı tek bir alan da çıkarılamaz: tüneller, yer altı \
-yapıları, bina içleri, derin şehir kanyonları, dağ gölgeleri, sık bitki \
-örtüsü, çok yollu yayılım ve yerel parazit çözümü bozar, ama bunlar \
+tr = """Küresel uydu sistemlerinde alan paydası olarak okyanuslar ve denizler \
+çıkarılmış Dünya kara yüzeyi, yaklaşık 148,94 milyon km² (148940000 \
+km²) kullanılmıştır. Dünya'nın okyanuslar dahil tüm yüzeyi yaklaşık \
+510,06 milyon km² olup kara bunun yaklaşık %29'unu oluşturmaktadır. \
+GPS, Galileo, GLONASS ve BeiDou denizde de hizmet vermektedir; bu \
+tercih hizmet alanını karayla sınırlamamakta, yalnızca karada kurulan \
+YERKON ve diğer karasal sistemlerle aynı payda üzerinden karşılaştırma \
+yapılmasını sağlamaktadır. Karada GNSS'in kesin olarak kullanılamadığı \
+tek bir alan da çıkarılamamaktadır: tüneller, yer altı yapıları, bina \
+içleri, derin kentsel kanyonlar, dağ gölgeleri, sık bitki örtüsü, çok \
+yollu yayılım ve yerel parazit çözümü bozmaktadır; ancak bu etkiler \
 alıcıya, antene, uydu geometrisine ve zamana bağlıdır."""
 en = """For the global satellite systems the area denominator is the \
 earth's land surface with the oceans and seas taken out, about 148,94 \
@@ -167,10 +168,11 @@ receiver, the antenna, the satellite geometry and the time."""
 [note.gps-performance]
 sources = ["gps-gov", "gps-standards"]
 tr = """GPS değerleri 2024 GPS SPS performans analiziyle yeniden kontrol \
-edildi. İlk sayı küresel ortalama, ikinci sayı en kötü konumdur: %95 \
-yatay hata 8 m ve 15 m, dikey 13 m ve 33 m altında; kullanılabilirlik \
-ortalama konumda %99, en kötü konumda %90 üstünde. 2024 analizinde L1 \
-C/A performans taahhütleri karşılandı."""
+edilmiştir. İlk değer küresel ortalamayı, ikinci değer en kötü konumu \
+göstermektedir: %95 yatay hata 8 m ve 15 m'nin, dikey hata 13 m ve 33 \
+m'nin altındadır; kullanılabilirlik ortalama konumda %99'un, en kötü \
+konumda %90'ın üzerindedir. 2024 analizinde L1 C/A performans \
+taahhütlerinin karşılandığı görülmüştür."""
 en = """The GPS figures were checked again against the 2024 GPS SPS \
 performance analysis. The first figure is the global average and the \
 second the worst location: 95 % horizontal error under 8 m and 15 m, \
@@ -180,10 +182,11 @@ C/A commitments met."""
 
 [note.gps-capex]
 sources = ["gps-investment", "tcmb-rates"]
-tr = """GPS CAPEX değeri 7,2 milyar USD tedarik ile araştırma geliştirme \
-toplamından türetilmiş tarihsel bir yatırım vekilidir; bugünkü yeniden \
-kurulum maliyeti ya da muhasebe CAPEX'i değildir. 29 Eylül 2026 TCMB kuruyla \
-TL'ye çevrilip kara paydasına bölündü."""
+tr = """GPS CAPEX değeri, 7,2 milyar USD tutarındaki tedarik ile araştırma \
+geliştirme toplamından türetilmiş tarihsel bir yatırım vekilidir; \
+bugünkü yeniden kurulum maliyeti veya muhasebe CAPEX'i değildir. \
+Tutar, 29 Eylül 2026 TCMB kuruyla TL'ye çevrilerek kara paydasına \
+bölünmüştür."""
 en = """The GPS CAPEX figure is a historical investment proxy derived from \
 7,2 billion USD of procurement plus research and development. It is \
 neither today's cost of building it again nor an accounting CAPEX. It was \
@@ -192,23 +195,24 @@ denominator."""
 
 [note.gps-opex]
 sources = ["gps-sustain", "tcmb-rates"]
-tr = """GPS OPEX değeri 1993 DOD/DOT ortak çalışma grubunun, asgari GPS \
-hizmetini sürdürmek için FY1993 dolarıyla yılda yaklaşık 400 milyon USD \
-tahminidir. Enflasyon düzeltmesi yapılmadı."""
+tr = """GPS OPEX değeri, 1993 DOD/DOT ortak çalışma grubunun asgari GPS \
+hizmetini sürdürmek için FY1993 dolarıyla yılda yaklaşık 400 milyon \
+USD olarak verdiği tahmindir. Enflasyon düzeltmesi yapılmamıştır."""
 en = """The GPS OPEX figure is the 1993 DOD/DOT joint task force's \
 estimate of sustaining a minimum GPS service, about 400 million USD a year \
 in FY1993 dollars. No inflation adjustment was applied."""
 
 [note.galileo-performance]
 sources = ["gsc-galileo-q2", "gsc-galileo"]
-tr = """Galileo hücrelerinde Q2 2026 Açık Servis raporunun tamamlayıcı \
-ölçümü var: yalnız Galileo, çift frekans, 3B; yayılım ve kullanıcı \
-ekipmanı hataları dahil çeyrek boyunca %95 yatay hata 1,41 m, dikey 2,40 \
-m. Bu ölçüm bir asgari performans taahhüdü değildir; 7,5 m ve 15 m ise \
-ölçülmüş hata değil, konum kullanılabilirliği hesabında kullanılan hata \
-koşullarıdır. Sistemin kendi katkısı için ayrıca taahhüt edilen sınırlar \
-çift frekansta yatay 5 m ve dikey 8 m, tek frekansta 10 m ve 16 m; \
-gerçekleşen değerler bunların belirgin biçimde altında."""
+tr = """Galileo hücrelerinde Q2 2026 Açık Servis raporunun tamamlayıcı ölçümü \
+yer almaktadır: yalnız Galileo, çift frekans, 3B; yayılım ve kullanıcı \
+ekipmanı hataları dahil çeyrek boyunca %95 yatay hata 1,41 m, dikey \
+hata 2,40 m'dir. Bu ölçüm bir asgari performans taahhüdü değildir; 7,5 \
+m ve 15 m ise ölçülmüş hata değil, konum kullanılabilirliği hesabında \
+kullanılan hata koşullarıdır. Sistemin kendi katkısı için ayrıca \
+taahhüt edilen sınırlar çift frekansta yatay 5 m ve dikey 8 m, tek \
+frekansta 10 m ve 16 m'dir; gerçekleşen değerler bu sınırların \
+belirgin biçimde altındadır."""
 en = """The Galileo cells hold the complementary measurement in the Q2 \
 2026 Open Service report: Galileo only, dual frequency, 3D, including \
 propagation and user equipment error, 95 % horizontal error 1,41 m and \
@@ -221,11 +225,12 @@ achieved values are well inside them."""
 
 [note.galileo-availability]
 sources = ["gsc-galileo-q2"]
-tr = """Q2 2026'da Galileo konum kullanılabilirliği Nisan'da en kötü \
-kullanıcı konumunda %99,58, ortalama konumda %99,98; Mayıs ve Haziran'da \
-ikisi de %100. Hücrede çeyreğin en düşük sonucu var. Resmî asgari \
-hedefler en kötü konumda %87, ortalama konumda %90; hesap yatayda \
-7,5 m, dikeyde 15 m koşuluyla yapılır."""
+tr = """Q2 2026'da Galileo konum kullanılabilirliği Nisan ayında en kötü \
+kullanıcı konumunda %99,58, ortalama konumda %99,98; Mayıs ve Haziran \
+aylarında ise her ikisinde de %100'dür. Hücrede çeyreğin en düşük \
+sonucu verilmiştir. Resmî asgari hedefler en kötü konumda %87, \
+ortalama konumda %90 olup hesap yatayda 7,5 m, dikeyde 15 m koşuluyla \
+yapılmaktadır."""
 en = """In Q2 2026 Galileo's positioning availability was 99,58 % at the \
 worst user location in April and 99,98 % at the average one; both were \
 100 % in May and June. The cell holds the lowest result of the quarter. \
@@ -243,11 +248,12 @@ development and deployment."""
 
 [note.galileo-opex]
 sources = ["ec-galileo", "tcmb-rates"]
-tr = """Avrupa Komisyonu'nun 2011 maliyet tablosu, 2010 fiyatlarıyla \
-yıllık ortalama tam altyapı işletme maliyetini 800 milyon EUR verir: 590 \
-milyonu Galileo, 110 milyonu EGNOS, 100 milyonu diğer kalemler. Yalnız \
-Galileo'nun 590 milyonu kullanıldı. Bu 2010 fiyatlı tarihsel bir \
-tahmindir, 2026'da gerçekleşen harcama değildir."""
+tr = """Avrupa Komisyonu'nun 2011 maliyet tablosu, 2010 fiyatlarıyla yıllık \
+ortalama tam altyapı işletme maliyetini 800 milyon EUR olarak \
+vermektedir: 590 milyon EUR Galileo, 110 milyon EUR EGNOS, 100 milyon \
+EUR diğer kalemler. Yalnızca Galileo'ya ait 590 milyon EUR \
+kullanılmıştır. Bu değer 2010 fiyatlarıyla tarihsel bir tahmin olup \
+2026'da gerçekleşen harcama değildir."""
 en = """The European Commission's 2011 cost table gives the average yearly \
 cost of operating the full infrastructure, in 2010 prices, as 800 million \
 EUR: 590 million for Galileo, 110 million for EGNOS and 100 million for \
@@ -256,9 +262,9 @@ estimate in 2010 prices, not what was spent in 2026."""
 
 [note.glonass-pair]
 sources = ["icao-annex", "gost-glonass"]
-tr = """GLONASS'ta ilk sayı ortalama, ikinci sayı en kötü konum \
-performansıdır. Aynı tanımla ve aynı istatistikle yayımlanmış daha yeni \
-bir küresel ölçüm bulunamadığı için standardın değerleri tutuldu."""
+tr = """GLONASS'ta ilk değer ortalama, ikinci değer en kötü konum \
+performansıdır. Aynı tanım ve istatistikle yayımlanmış daha güncel bir \
+küresel ölçüm bulunamadığından standardın değerleri kullanılmıştır."""
 en = """For GLONASS the first figure is the average and the second the \
 worst location performance. No newer global measurement published with \
 the same definition and statistic was found, so the standard's figures \
@@ -266,9 +272,9 @@ were kept."""
 
 [note.glonass-capex]
 sources = ["kommersant-build"]
-tr = """GLONASS CAPEX boş bırakıldı. Kamuya açık tarihsel program \
-tutarları geliştirmeyi, kullanımı ve sürdürmeyi saf kurulum \
-yatırımından güvenilir biçimde ayırmıyor."""
+tr = """GLONASS CAPEX hücresi boş bırakılmıştır. Kamuya açık tarihsel program \
+tutarları geliştirme, kullanım ve sürdürme giderlerini saf kurulum \
+yatırımından güvenilir biçimde ayırmamaktadır."""
 en = """The GLONASS CAPEX cell is left empty. The public historical \
 programme figures do not reliably separate development, use and \
 sustainment from pure deployment investment."""
@@ -284,10 +290,11 @@ year average of the 146898,9 million RUB system sustainment budget for \
 
 [note.beidou-accuracy]
 sources = ["beidou-igmas", "beidou-standard"]
-tr = """BeiDou hücrelerinde resmî gerçekleşen performans var: Çin Uydu \
-Navigasyon Ofisi'nin iGMAS değerlendirmesine göre B1C tek frekansta \
-küresel %95 yatay doğruluk yaklaşık 1,52 m, dikey yaklaşık 2,64 m. Hizmet \
-standardının sınırları küreselde yatay ve dikey 10 m, Asya-Pasifik'te 5 m."""
+tr = """BeiDou hücrelerinde resmî gerçekleşen performans yer almaktadır: Çin \
+Uydu Navigasyon Ofisi'nin iGMAS değerlendirmesine göre B1C tek \
+frekansta küresel %95 yatay doğruluk yaklaşık 1,52 m, dikey doğruluk \
+yaklaşık 2,64 m'dir. Hizmet standardının sınırları küresel ölçekte \
+yatay ve dikeyde 10 m, Asya-Pasifik bölgesinde 5 m'dir."""
 en = """The BeiDou cells hold official achieved performance: by the China \
 Satellite Navigation Office's iGMAS assessment, B1C single frequency \
 global 95 % horizontal accuracy is about 1,52 m and vertical about 2,64 m. \
@@ -296,10 +303,11 @@ m in Asia Pacific."""
 
 [note.beidou-availability]
 sources = ["beidou-standard", "beidou-igmas"]
-tr = """BeiDou Açık Servis Performans Standardı 2.0 sistem hizmet \
-kullanılabilirliğini %95'in üstünde tanımlar. Aynı kaynağın 0,99 üstü \
-dediği değer uydu kullanılabilirliğidir; konum hizmeti \
-kullanılabilirliğiyle aynı ölçü olmadığı için hücreye yazılmadı."""
+tr = """BeiDou Açık Servis Performans Standardı 2.0, sistem hizmet \
+kullanılabilirliğini %95'in üzerinde tanımlamaktadır. Aynı kaynağın \
+0,99'un üzerinde verdiği değer uydu kullanılabilirliğidir; konum \
+hizmeti kullanılabilirliğiyle aynı ölçü olmadığından hücreye \
+yazılmamıştır."""
 en = """The BeiDou Open Service Performance Standard 2.0 defines system \
 service availability as over 95 %. The figure the same source puts over \
 0,99 is satellite availability; it is not the same measure as \
@@ -316,9 +324,9 @@ bound. It is not an accounting CAPEX."""
 
 [note.beidou-opex]
 sources = ["casi-beidou"]
-tr = """BDS-3 küresel takımyıldızının ve ana yer segmentinin güncel \
-yıllık işletme toplamı bulunamadı. Bölgesel CORS işletme ihaleleri bu \
-amaçla kullanılmadı."""
+tr = """BDS-3 küresel takımyıldızının ve ana yer segmentinin güncel yıllık \
+işletme toplamına ulaşılamamıştır. Bölgesel CORS işletme ihaleleri bu \
+amaçla kullanılmamıştır."""
 en = """No current yearly operating total for the BDS-3 global \
 constellation and its main ground segment was found. Regional CORS \
 operating tenders were not used as a stand-in."""
@@ -345,11 +353,12 @@ second half is 0,99996. The official minimum specification is 0,9997."""
 
 [note.qzss-area]
 sources = ["qzss-report", "gsi-japan"]
-tr = """SLAS hizmet alanı yarıçapı 100-350 km olan 13 daireden oluşur, \
-ama dairelerin birleşik alanı km² olarak yayımlanmaz ve önemli bir kısmı \
-denizdir. Karayla karşılaştırma için Japonya'nın 1 Nisan 2026 tarihli \
-377974,87 km² ulusal alanı açık bir vekil olarak kullanıldı; gerçek \
-SLAS hizmet alanı değildir."""
+tr = """SLAS hizmet alanı, yarıçapı 100-350 km olan 13 daireden oluşmaktadır; \
+ancak dairelerin birleşik alanı km² olarak yayımlanmamakta ve önemli \
+bir kısmı denizden oluşmaktadır. Karayla karşılaştırma için \
+Japonya'nın 1 Nisan 2026 tarihli 377974,87 km²'lik ulusal alanı açık \
+bir vekil olarak kullanılmıştır; bu değer gerçek SLAS hizmet alanı \
+değildir."""
 en = """The SLAS service area is 13 circles of 100 to 350 km radius, but \
 their combined area is not published in km² and much of it is sea. For \
 a land comparison Japan's national area of 1 April 2026, 377974,87 km², \
@@ -357,9 +366,9 @@ is used as an open proxy. It is not the real SLAS service area."""
 
 [note.qzss-opex]
 sources = ["cao-budget", "cao-archive", "tcmb-rates"]
-tr = """13,294 milyar JPY/yıl, FY2026'da QZSS hizmet sunumuna ayrılan \
-bütçenin tamamıdır, yalnız SLAS değildir. Japonya kara vekiline \
-bölündü; bu yüzden bir üst sınırdır ve "≤" ile yazıldı."""
+tr = """13,294 milyar JPY/yıl, FY2026'da yalnızca SLAS'a değil QZSS hizmet \
+sunumunun tamamına ayrılan bütçedir. Tutar Japonya kara vekiline \
+bölünmüştür; bu nedenle bir üst sınırdır ve "≤" ile gösterilmiştir."""
 en = """13,294 billion JPY a year is the whole FY2026 budget for providing \
 the QZSS service, not SLAS alone. It was divided by the Japanese land \
 proxy, so it is an upper bound and is written with "≤"."""
@@ -367,18 +376,19 @@ proxy, so it is an upper bound and is written with "≤"."""
 [note.qzss-capex]
 sources = ["cao-cost"]
 tr = """Uydular, yer sistemi, fırlatma, geliştirme ve uzun süreli hizmet \
-sözleşmeleri içinden yalnız SLAS'a düşen kurulum payı kamuya açık \
-veriden ayrıştırılamadı."""
+sözleşmeleri içinden yalnızca SLAS'a düşen kurulum payı kamuya açık \
+verilerden ayrıştırılamamıştır."""
 en = """The share of satellites, ground system, launch, development and \
 long service contracts that belongs to SLAS alone cannot be separated \
 out of public data."""
 
 [note.navic-status]
 sources = ["pib-navic"]
-tr = """NavIC satırı güncel durumu yansıtmak için boş. Hindistan \
-hükümetinin 29 Temmuz 2026 açıklamasına göre konum sağlayan yalnız üç \
-uydu çalışıyor: IRNSS-1B, IRNSS-1I ve NVS-01. Bağımsız bir konum \
-çözümü için en az dört gerekir; zamanlama hizmeti sürüyor."""
+tr = """NavIC satırı, güncel durumu yansıtmak amacıyla boş bırakılmıştır. \
+Hindistan hükümetinin 29 Temmuz 2026 tarihli açıklamasına göre konum \
+sağlayan yalnızca üç uydu çalışmaktadır: IRNSS-1B, IRNSS-1I ve NVS-01. \
+Bağımsız bir konum çözümü için en az dört uydu gerekmektedir; \
+zamanlama hizmeti ise sürmektedir."""
 en = """The NavIC row is empty to reflect its current state. By the \
 Indian government's statement of 29 July 2026 only three satellites \
 providing position are working: IRNSS-1B, IRNSS-1I and NVS-01. An \
@@ -387,26 +397,26 @@ continues."""
 
 [note.navic-accuracy]
 sources = ["isro-accuracy", "isro-limits"]
-tr = """NavIC için tarihsel olarak verilen 20 m altı değer 2σ kullanıcı \
-konum doğruluğudur, P95 değildir; P95 sütunlarına yazılmadı."""
+tr = """NavIC için tarihsel olarak verilen 20 m altı değer 2σ kullanıcı konum \
+doğruluğudur, P95 değildir; bu nedenle P95 sütunlarına yazılmamıştır."""
 en = """The under 20 m historically given for NavIC is 2σ user position \
 accuracy, not a P95, so it was not put in the P95 columns."""
 
 [note.navic-area]
 sources = ["isro-limits"]
-tr = """NavIC için kara alanı yayımlanmıyor. ISRO'nun yaklaşık enlem ve \
-boylam sınırlarından çıkan dikdörtgen (33243459 km²) geniş deniz alanları \
-içerdiği için kara karşılaştırmasında kullanılmadı."""
+tr = """NavIC için kara alanı yayımlanmamaktadır. ISRO'nun yaklaşık enlem ve \
+boylam sınırlarından elde edilen dikdörtgen (33243459 km²) geniş deniz \
+alanları içerdiğinden kara karşılaştırmasında kullanılmamıştır."""
 en = """No land area is published for NavIC. The rectangle from ISRO's \
 approximate latitude and longitude limits (33243459 km²) takes in large \
 areas of sea, so it is not used for a land comparison."""
 
 [note.navic-capex]
 sources = ["navic-cost", "navic-scope"]
-tr = """Tarihsel 1420 crore INR bütçe yedi yörünge uydusunu, iki yer \
-yedeğini ve yer segmentini kapsar, fırlatmayı dışarıda bırakır. Güncel \
-bağımsız hizmet ve uygun bir kara paydası olmadığı için TL/km²'ye \
-çevrilmedi."""
+tr = """Tarihsel 1420 crore INR'lik bütçe yedi yörünge uydusunu, iki yer \
+yedeğini ve yer segmentini kapsamakta, fırlatma giderlerini \
+içermemektedir. Güncel bağımsız bir hizmet ve uygun bir kara paydası \
+bulunmadığından TL/km²'ye çevrilmemiştir."""
 en = """The historical 1420 crore INR budget covers seven orbital \
 satellites, two ground spares and the ground segment, and leaves launch \
 out. With no current independent service and no suitable land \
@@ -414,19 +424,19 @@ denominator it was not turned into TL/km²."""
 
 [note.terrapoint-accuracy]
 sources = ["ion-terrapoint"]
-tr = """TerraPoiNT'in yatay P50 ve P95 değerleri ION GNSS+ 2021'de \
-yayımlanan aynı 2B navigasyon testinden. Başka testlerin 9-14 m gibi \
-değerleri bu hücreye alınmadı."""
+tr = """TerraPoiNT'in yatay P50 ve P95 değerleri, ION GNSS+ 2021'de yayımlanan \
+aynı 2B navigasyon testinden alınmıştır. Başka testlerdeki 9-14 m gibi \
+değerler bu hücreye alınmamıştır."""
 en = """TerraPoiNT's horizontal P50 and P95 come from one 2D navigation \
 test published at ION GNSS+ 2021. Figures from other tests, around 9 to 14 \
 m, are not in this cell."""
 
 [note.terrapoint-vertical]
 sources = ["jrc-nextnav"]
-tr = """Dikey 2 m ve %99,96 kullanılabilirlik JRC'nin alternatif \
-konumlandırma değerlendirmesinden; ION yatay testiyle aynı deney \
-değildir. Kullanılabilirlik JRC'nin varsayımları altındadır, ticari bir \
-hizmet taahhüdü gibi okunmamalı."""
+tr = """Dikey 2 m ve %99,96 kullanılabilirlik değerleri JRC'nin alternatif \
+konumlandırma değerlendirmesinden alınmıştır; ION yatay testiyle aynı \
+deney değildir. Kullanılabilirlik JRC'nin varsayımlarına dayanmakta \
+olup ticari bir hizmet taahhüdü olarak yorumlanmamalıdır."""
 en = """The 2 m vertical and 99,96 % availability come from the JRC's \
 alternative positioning assessment, not from the ION horizontal test. \
 The availability is under the JRC's assumptions and must not be read as \
@@ -434,10 +444,11 @@ a commercial service commitment."""
 
 [note.terrapoint-area]
 sources = ["sec-nextnav", "sec-nextnav-s1"]
-tr = """Yaklaşık 900 km², San Francisco Körfez Bölgesi'ndeki yaklaşık \
-100 sahalık ağın bildirilen ölçeğidir, teknolojinin azami kapsaması \
-değil. NextNav sonra başka pazarlarda da ağ kurdu, ama aynı doğruluk ve \
-maliyet kapsamıyla tek bir toplam km² yayımlanmadı."""
+tr = """Yaklaşık 900 km², San Francisco Körfez Bölgesi'ndeki yaklaşık 100 \
+sahalık ağın bildirilen ölçeğidir; teknolojinin azami kapsamasını \
+ifade etmemektedir. NextNav daha sonra başka pazarlarda da ağ \
+kurmuştur; ancak aynı doğruluk ve maliyet kapsamıyla tek bir toplam \
+km² değeri yayımlanmamıştır."""
 en = """About 900 km² is the reported scale of the network of about 100 \
 sites in the San Francisco Bay Area, not the technology's maximum reach. \
 NextNav later built networks elsewhere, but no single total km² with the \
@@ -445,8 +456,8 @@ same accuracy and cost scope has been published."""
 
 [note.terrapoint-capex]
 sources = ["sec-nextnav"]
-tr = """Aynı 900 km²'lik ağın tam kurulum ve tam yıllık işletme \
-maliyeti yayımlanmıyor."""
+tr = """Aynı 900 km²'lik ağın tam kurulum ve tam yıllık işletme maliyeti \
+yayımlanmamaktadır."""
 en = """Neither the full build cost nor the full yearly operating cost of \
 that same 900 km² network is published."""
 
@@ -459,9 +470,9 @@ result in the JRC performance assessment."""
 
 [note.locata-availability]
 sources = ["jrc-locata"]
-tr = """JRC'nin bir günlük gösteriminde ölçülen kullanılabilirlik %100. \
+tr = """JRC'nin bir günlük gösteriminde ölçülen kullanılabilirlik %100'dür. \
 %99,9999 değerleri 14 ve 100 günlük GNSS kesintileri için öngörülen \
-değerlerdir, ölçülmüş uzun dönem çalışma süresi değil."""
+değerler olup ölçülmüş uzun dönem çalışma süresi değildir."""
 en = """The availability measured in the JRC's one day demonstration is \
 100 %. The 99,9999 % figures are projections for 14 and 100 day GNSS \
 outages, not measured long term uptime."""
@@ -469,49 +480,49 @@ outages, not measured long term uptime."""
 [note.locata-area]
 sources = ["insidegnss-locata", "airforce-locata"]
 tr = """Yaklaşık 6475 km², White Sands'te bildirilen yaklaşık 2500 mil²'lik \
-kurulumun km² karşılığı. JRC ölçümüyle aynı kurulum değildir; yalnız \
-gerçek bir kurulum ölçeği örneğidir."""
+kurulumun km² karşılığıdır. JRC ölçümüyle aynı kurulum değildir; \
+yalnızca gerçek bir kurulum ölçeğine örnek olarak verilmiştir."""
 en = """About 6475 km² is the reported White Sands installation of about \
 2500 square miles in km². It is not the installation the JRC measured; \
 it is only an example of real deployment scale."""
 
 [note.locata-capex]
 sources = ["insidegnss-locata"]
-tr = """White Sands kurulumu birden çok sözleşme ve entegrasyon \
-kaleminden oluşuyor; tek bir rakamdan tam kurulum maliyeti \
-çıkarılamadı."""
+tr = """White Sands kurulumu birden fazla sözleşme ve entegrasyon kaleminden \
+oluşmaktadır; tek bir tutardan tam kurulum maliyeti çıkarılamamıştır."""
 en = """The White Sands installation is made of several contracts and \
 integration items; no full deployment cost can be drawn from one \
 figure."""
 
 [note.pozyx-figures]
 sources = ["sensors-pozyx"]
-tr = """Pozyx P50 0,114 m ve P95 0,181 m, hakemli bir çalışmada sekiz \
-çizen yörüngede ölçülen medyan ve 95. yüzdeliktir. Genel bir ürün \
-garantisi değildir."""
+tr = """Pozyx için verilen P50 0,114 m ve P95 0,181 m değerleri, hakemli bir \
+çalışmada sekiz şeklindeki yörüngede ölçülen medyan ve 95. \
+yüzdeliktir. Genel bir ürün garantisi değildir."""
 en = """Pozyx P50 0,114 m and P95 0,181 m are the median and 95th \
 percentile measured on a figure of eight path in a peer reviewed study. \
 They are not a general product guarantee."""
 
 [note.pozyx-area]
 sources = ["pozyx-case"]
-tr = """0,035 km², 2023'te iki Avrupa tesisinden büyük olanında 35000 \
-m² üzerinde ve 250 sabit birimle kurulmuş gerçek bir endüstriyel \
-uygulamadan."""
+tr = """0,035 km², 2023 yılında iki Avrupa tesisinden büyük olanında 35000 m² \
+üzerinde ve 250 sabit birimle kurulmuş gerçek bir endüstriyel \
+uygulamadan alınmıştır."""
 en = """0,035 km² comes from a real industrial installation in 2023, the \
 larger of two European sites, over 35000 m² with 250 anchors."""
 
 [note.pozyx-availability]
 sources = ["pozyx-case"]
-tr = """Vaka çalışmasındaki %99,95 üstü çalışma süresi ölçülmüş bir \
-kullanılabilirlik değil, bir teknik gereksinim; hücre boş bırakıldı."""
+tr = """Vaka çalışmasındaki %99,95'in üzerindeki çalışma süresi ölçülmüş bir \
+kullanılabilirlik değil, bir teknik gereksinimdir; bu nedenle hücre \
+boş bırakılmıştır."""
 en = """The over 99,95 % uptime in the case study is a technical \
 requirement rather than measured availability, so the cell is empty."""
 
 [note.pozyx-capex]
 sources = ["pozyx-case"]
-tr = """Katalog donanım ve lisans fiyatları, 35000 m²'lik ve 250 sabit \
-birimli projenin tam sözleşme ve kurulum maliyetini temsil etmiyor."""
+tr = """Katalog donanım ve lisans fiyatları, 35000 m²'lik ve 250 sabit birimli \
+projenin tam sözleşme ve kurulum maliyetini temsil etmemektedir."""
 en = """Catalogue hardware and licence prices do not represent the full \
 contract and installation cost of the 35000 m², 250 anchor project."""
 
@@ -525,24 +536,26 @@ reported within 30 km of Incheon Port with ASF correction."""
 
 [note.eloran-vertical]
 sources = ["mdpi-eloran"]
-tr = """Tek başına eLoran 2B çözümde irtifa vermez; VPE P95 \
-uygulanabilir değildir."""
+tr = """Tek başına eLoran, 2B çözümde irtifa bilgisi vermemektedir; bu nedenle \
+VPE P95 uygulanabilir değildir."""
 en = """Standalone eLoran gives no altitude in a 2D solution, so VPE P95 \
 does not apply."""
 
 [note.eloran-availability]
 sources = ["jpnt-requirements"]
-tr = """eLoran için %99,7, Kore test yatağında ölçülmüş bir \
-kullanılabilirlik değil gereksinim eşiğidir; hücre boş bırakıldı."""
+tr = """eLoran için verilen %99,7, Kore test yatağında ölçülmüş bir \
+kullanılabilirlik değil, bir gereksinim eşiğidir; bu nedenle hücre boş \
+bırakılmıştır."""
 en = """The 99,7 % for eLoran is a requirement threshold rather than \
 availability measured on the Korean testbed, so the cell is empty."""
 
 [note.eloran-area]
 sources = ["jpnt-korea", "kr-eloran-office"]
-tr = """Üç adet 30 km yarıçaplı dairenin hiç örtüşmediği varsayımı 8482,30 \
-km²'lik teorik bir üst sınır verir; kullanılmadı. Tek bir dairenin \
-geometrik alanı yaklaşık 2827,43 km² olsa da kaynak 15,72 m'nin dairenin \
-her noktasında sağlandığını göstermiyor, o yüzden o da hücreye yazılmadı."""
+tr = """30 km yarıçaplı üç dairenin hiç örtüşmediği varsayımı 8482,30 km²'lik \
+teorik bir üst sınır vermektedir; bu değer kullanılmamıştır. Tek bir \
+dairenin geometrik alanı yaklaşık 2827,43 km² olsa da kaynak, 15,72 \
+m'lik doğruluğun dairenin her noktasında sağlandığını \
+göstermemektedir; bu nedenle bu değer de hücreye yazılmamıştır."""
 en = """Assuming three circles of 30 km radius do not overlap at all gives \
 a theoretical upper bound of 8482,30 km²; it is not used. One circle's \
 geometric area is about 2827,43 km², but the source does not show 15,72 m \
@@ -559,17 +572,18 @@ the accuracy was measured."""
 
 [note.urban-run]
 sources = ["sx1280-datasheet", "sx1280-range", "yerkon-github"]
-tr = """Şehir içi satırın simülasyonu Kızılay'ın gerçek zemini üzerinde \
-çalıştırıldı; alıcılar \
-gerçek sokaklarda sürüyor. Birimlerin yeri için var olan aydınlatma \
-direkleri, trafik ışıkları, levhalar ve duraklar ile tepelere dikilecek \
-direkler denendi; arama bunlar arasından 19 aydınlatma direğini seçti. \
-Bu yerleşim, istenen doğruluğa makul maliyetle ulaşılabildiğini \
-gösterir; birim sayısı ve yerleri değiştirilerek başka yerlerde de \
-istenen doğruluğa ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
-türetilmiştir; sonuç bir simülasyon çıktısıdır, saha ölçümü değildir. \
-Ağaçlar simülasyona eklenmedi; ağacın arkasında kalan bir bağlantı \
-gerçekte daha zayıf olabilir."""
+tr = """Şehir içi satırın simülasyonu Kızılay'ın gerçek arazi verisi üzerinde \
+çalıştırılmıştır; alıcılar gerçek sokaklar boyunca hareket etmektedir. \
+Yayın birimlerinin yerleşimi için mevcut aydınlatma direkleri, trafik \
+ışıkları, levhalar ve duraklar ile tepelere dikilecek direkler \
+değerlendirilmiş; yerleşim araması bunlar arasından 19 aydınlatma \
+direğini seçmiştir. Bu yerleşim, hedeflenen doğruluğa makul bir \
+maliyetle ulaşılabildiğini göstermektedir; yayın birimlerinin sayısı \
+ve konumları değiştirilerek başka bölgelerde de hedeflenen doğruluğa \
+ulaşılabilir. Menzil hata modeli yayımlanmış SX1280 ölçümlerinden \
+türetilmiştir; sonuç bir simülasyon çıktısı olup saha ölçümü değildir. \
+Ağaçlar simülasyona dahil edilmemiştir; ağacın arkasında kalan bir \
+bağlantı gerçekte daha zayıf olabilir."""
 en = """The urban row was run over the real ground at Kızılay; the receivers \
 drive the real streets. Standing lighting columns, traffic lights, signs \
 and stops, and masts to be put up on hilltops, were all tried as places \
@@ -582,22 +596,25 @@ be weaker in reality."""
 
 [note.rural-run]
 sources = ["sx1280-range", "yerkon-github"]
-tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yollarında sürüyor; 52 \
-birim bir yerleşim aramasının seçtiği yerlerde (47 elektrik dağıtım \
-direği, 5 aydınlatma direği). Yol boyundaki elektrik dağıtım direkleri, \
-var olan aydınlatma direkleri ve levhalar ile tepelere dikilecek direkler \
-denendi; çatılar kiralık olduğu için aramaya sokulmuyor. Bu \
-yerleşim, istenen doğruluğa makul maliyetle ulaşılabildiğini gösterir; \
-birim sayısı ve yerleri değiştirilerek başka yerlerde de istenen \
-doğruluğa ulaşılabilir. Hata modeli kısa menzilde yayımlanmış SX1280 \
-ölçümlerinden türetilmiştir. Bu nedenle uzun menzil sonucu doğrudan bir \
-saha ölçümü değil, simülasyon çıktısıdır. Ağaçlar simülasyona eklenmedi; \
-ağacın arkasında kalan bir bağlantı gerçekte daha zayıf olabilir. \
-Dağıtım direği kirası sıfır alındı: \
-birimler kamu protokolüyle konuyor, AUS gibi hazır kamu yapılarına dahil \
-edilebilmeleri öngörülüyor. Yol üzerinde AUS noktası varsa birim ona \
-takılıyor; yoksa güneş paneliyle çalışıyor ve merkeze giden mesajlarını \
-kendi telsiziyle hattı olan en yakın birime iletiyor."""
+tr = """Kırsal satırda alıcılar Polatlı'nın gerçek yolları boyunca hareket \
+etmektedir; 52 yayın birimi bir yerleşim aramasının seçtiği noktalara \
+(47 elektrik dağıtım direği, 5 aydınlatma direği) yerleştirilmiştir. \
+Yol boyundaki elektrik dağıtım direkleri, mevcut aydınlatma direkleri \
+ve levhalar ile tepelere dikilecek direkler değerlendirilmiş; çatılar \
+kira gerektirdiğinden aramaya dahil edilmemiştir. Bu yerleşim, \
+hedeflenen doğruluğa makul bir maliyetle ulaşılabildiğini \
+göstermektedir; yayın birimlerinin sayısı ve konumları değiştirilerek \
+başka bölgelerde de hedeflenen doğruluğa ulaşılabilir. Hata modeli \
+kısa menzilde yayımlanmış SX1280 ölçümlerinden türetilmiştir; bu \
+nedenle uzun menzil sonucu doğrudan bir saha ölçümü değil, simülasyon \
+çıktısıdır. Ağaçlar simülasyona dahil edilmemiştir; ağacın arkasında \
+kalan bir bağlantı gerçekte daha zayıf olabilir. Dağıtım direği kirası \
+sıfır kabul edilmiştir: yayın birimlerinin kamu protokolüyle kurulması \
+ve AUS gibi mevcut kamu yapılarına dahil edilebilmesi öngörülmektedir. \
+Yol üzerinde bir AUS noktası bulunuyorsa yayın birimi bu noktaya \
+yerleştirilmekte; bulunmuyorsa güneş paneliyle çalışmakta ve merkeze \
+giden mesajlarını kendi telsiziyle, haberleşme hattı bulunan en yakın \
+birime iletmektedir."""
 en = """In the rural row the receivers drive Polatlı's real roads; the 52 \
 units stand where a placement search put them (47 distribution poles, \
 5 lighting columns). Distribution poles along the roads, standing \
@@ -617,18 +634,20 @@ nearest unit with a line."""
 
 [note.tunnel-run]
 sources = ["dwm3000-datasheet", "dw3000-datasheet", "tunnel-propagation", "btk-exempt-criteria", "etsi-302065-3", "yerkon-github"]
-tr = """Tünel satırı DWM3000 ile kanal 5'te (6489,6 MHz) hesaplanıyor: BTK \
-konum izleme sınırı (-41,3 dBm/MHz), Qorvo'nun kanal 5 duyarlılığı (-100 \
-dBm) ve modülün kendi anteni (kazancı yayımlanmadığı için 0 dBi). Tünelde \
-kayıp, Molina-Garcia-Pardo ve arkadaşlarının karayolu tünelinde 2,8-5 \
-GHz'de, 50-500 m arasında ölçtüğü modelle (Denklem 2) hesaplanıyor; 6,5 \
-GHz'e taşınmış bir ölçüm, 6,5 GHz'de ölçülmemiş. Araçtaki UWB cihazı \
-kendi yüksekliğinin üstüne daha az güç yayabiliyor (-53,3 dBm/MHz, ETSI \
-EN 302 065-3, 4.3.4.2); birimler araç anteninin altında, yoldan 1,2 m \
-yüksekte durunca bu sınıra takılmıyor. Birimler 40 m arayla, iki duvara \
-sırayla takılıyor. Kaybın ortalama modelden sapması aynı ölçümün 2,7 \
-dB'si (Denklem 3). Sonuç bir Monte Carlo benzetimidir; saha ölçümü \
-değildir."""
+tr = """Tünel satırı, DWM3000 modülüyle kanal 5'te (6489,6 MHz) \
+hesaplanmaktadır: BTK konum izleme sınırı (-41,3 dBm/MHz), Qorvo'nun \
+kanal 5 duyarlılığı (-100 dBm) ve modülün kendi anteni (kazancı \
+yayımlanmadığından 0 dBi). Tüneldeki yol kaybı, Molina-Garcia-Pardo ve \
+arkadaşlarının bir karayolu tünelinde 2,8-5 GHz bandında ve 50-500 m \
+aralığında ölçtüğü modelle (Denklem 2) hesaplanmaktadır; bu model 6,5 \
+GHz'e taşınmış olup 6,5 GHz'de ölçülmemiştir. Araçtaki UWB cihazı \
+kendi yüksekliğinin üzerine daha düşük güç yayabilmektedir (-53,3 \
+dBm/MHz, ETSI EN 302 065-3, 4.3.4.2); yayın birimleri araç anteninin \
+altında, yoldan 1,2 m yükseklikte konumlandırıldığında bu sınır \
+aşılmamaktadır. Yayın birimleri 40 m arayla, iki duvara dönüşümlü \
+olarak yerleştirilmektedir. Kaybın ortalama modelden sapması, aynı \
+ölçümün verdiği 2,7 dB'dir (Denklem 3). Sonuç bir Monte Carlo \
+benzetimi olup saha ölçümü değildir."""
 en = """The tunnel row is worked out with the DWM3000 on channel 5 (6489,6 \
 MHz): the BTK location tracking limit (-41,3 dBm/MHz), Qorvo's channel 5 \
 sensitivity (-100 dBm) and the module's own antenna (0 dBi, as no gain is \
@@ -644,14 +663,15 @@ rather than a field measurement."""
 
 [note.yerkon-availability]
 sources = ["yerkon-github"]
-tr = """YERKON kullanılabilirliği, konumun 10 m hedefini tutacak kadar \
-güvenilir çıktığı ölçüm turlarının oranıdır. Konumu hesaplayan filtre \
-kendi hatasını da tahmin ediyor; bu tahmin yatayda 5,78 m'yi geçerse o \
-turda konum verilmiyor. 5,78 m, hataların %95'inin 10 m içinde kalmasına \
-karşılık gelen sınır: her eksende 10 / 2,45 = 4,08 m, iki eksen birlikte \
-4,08 x 1,41 = 5,78 m. Uydu sağlayıcılarının yayımladığı hizmet \
-kullanılabilirliği farklı test tanımlarına dayanır; yüzdeler aynı ölçü \
-gibi okunmamalıdır."""
+tr = """YERKON kullanılabilirliği, konumun 10 m hedefini karşılayacak \
+güvenilirlikte hesaplandığı ölçüm turlarının oranıdır. Konumu \
+hesaplayan filtre kendi hatasını da tahmin etmektedir; bu tahmin \
+yatayda 5,78 m'yi aşarsa o turda konum verilmemektedir. 5,78 m, \
+hataların %95'inin 10 m içinde kalmasına karşılık gelen sınırdır: her \
+eksende 10 / 2,45 = 4,08 m, iki eksen birlikte 4,08 x 1,41 = 5,78 m. \
+Uydu sağlayıcılarının yayımladığı hizmet kullanılabilirliği farklı \
+test tanımlarına dayandığından yüzdeler aynı ölçü olarak \
+yorumlanmamalıdır."""
 en = """YERKON availability is the share of ranging rounds whose position \
 came out reliable enough to hold the 10 m target. The filter that works \
 out the position also estimates its own error; where that estimate is \
@@ -667,15 +687,17 @@ the percentages must not be read as the same metric."""
 defines = true
 sources = []
 tr = """Tünel satırının iki maliyet hücresi kilometrekareye değil güzergâh \
-kilometresine bölünmüştür ve "/km" ile işaretlidir. 12 m genişliğinde 2 \
-km'lik bir tünel bir kilometrekarenin ellide biri kadar yer kaplar; bu \
-kadar küçük bir alana bölmek sayıyı tünel pahalı olduğu için değil, payda \
-küçük olduğu için büyütür. Tünel bir alana değil bir hatta hizmet eder ve \
-bir tünel işletmecisinin soracağı sayı da kilometre başına olandır. Diğer \
-iki satır alana bölünür, bu yüzden bu hücre onlarla aynı ölçü değildir."""
+kilometresine bölünmüş ve "/km" ile işaretlenmiştir. 12 m genişliğinde \
+ve 2 km uzunluğundaki bir tünel 0,024 km², yani bir kilometrekarenin \
+yaklaşık kırkta biri kadar alan kaplamaktadır; bu kadar küçük bir alana bölmek, değeri \
+tünelin pahalı olmasından değil paydanın küçük olmasından dolayı \
+büyütmektedir. Tünel bir alana değil bir hatta hizmet vermektedir ve \
+bir tünel işletmecisinin ihtiyaç duyacağı değer de kilometre başına \
+maliyettir. Diğer iki satır alana bölündüğünden bu hücre onlarla aynı \
+ölçü değildir."""
 en = """The tunnel row's two cost cells are divided by route kilometre \
 rather than by square kilometre, and are marked "/km". A 2 km tunnel 12 m \
-wide covers a fiftieth of a square kilometre; dividing by something that \
+wide covers 0,024 km², about a fortieth of a square kilometre; dividing by something that \
 small makes the number large because the denominator is small, not because \
 a tunnel is dear. A tunnel serves a line rather than an area, and cost per \
 kilometre is the figure a tunnel operator would ask for. The other two \
@@ -684,21 +706,23 @@ rows are divided by area, so this cell is not the same measure as theirs."""
 [note.yerkon-capex]
 sources = ["digikey", "lcsc", "mouser", "tcmb-rates", "sepetli-ankara", "yevmiye-2026", "dicle-surici", "forelektrik-2026", "zam-nisan-2026", "yazilimci-maaslari-2026", "vds-2026"]
 tr = """YERKON CAPEX, senaryodaki yayın birimlerinin 1000 adetlik malzeme \
-listesi fiyatı ile her birimin yapıya takılma bedelinin (tutucu, işçilik, \
-gerekiyorsa şebeke dışı besleme) toplamının senaryo alanına bölünmesidir. \
-Birim fiyatı kartın bütün parçalarını, kutusunu, baskılı devresini, \
-dizgisini ve lehimini kapsar; test, kalibrasyon, belgelendirme, vergi ve kargo dahil \
-değildir. \
-Konum, radyo mesafe ölçümlerini ve yükseklik haritasından gelen yüksekliği birleştiren \
-bir Kalman filtresinden gelir; atalet ölçüm birimi ve odometri \
+listesi fiyatı ile her birimin yapıya montaj bedelinin (tutucu, \
+işçilik, gerektiğinde şebeke dışı besleme) toplamının senaryo alanına \
+bölünmesiyle hesaplanmaktadır. Birim fiyatı kartın tüm parçalarını, \
+muhafazasını, baskılı devre kartını, dizgi ve lehim işçiliğini \
+kapsamakta; test, kalibrasyon, belgelendirme, vergi ve kargo \
+giderlerini içermemektedir. Konum, radyo mesafe ölçümlerini ve \
+yükseklik haritasından elde edilen yüksekliği birleştiren bir Kalman \
+filtresiyle hesaplanmaktadır; atalet ölçüm birimi ve odometri \
 kullanılmamıştır. YERKON OPEX, yıllık işletme bedelidir: elektrik \
-(ticarethane tarifesi, Nisan 2026 zammıyla 5,62 TL/kWh), yenileme (vergi \
-amortisman ömürleri), bakım ve merkezî sistem. Bir bakım ziyaretinin \
-bedeli, bir ekip gününün (sepetli araç, usta ve yardımcı, 17570 TL) o gün \
-uğranan birim sayısına bölünmesiyle bulunuyor: şehirde 8 aydınlatma \
-direği, kırsalda 4 dağıtım direği, tünelde 4 birim. Merkezî sistem bir \
-yazılımcının haftada bir günü ve iki sunucudur, yılda 237000 TL, 1000 \
-birime yayılır."""
+(ticarethane tarifesi, Nisan 2026 zammıyla 5,62 TL/kWh), yenileme \
+(vergi amortisman ömürleri), bakım ve merkezî sistem. Bir bakım \
+ziyaretinin bedeli, bir ekip gününün (sepetli araç, usta ve yardımcı, \
+17570 TL) o gün ziyaret edilen birim sayısına bölünmesiyle \
+bulunmaktadır: şehir içinde 8 aydınlatma direği, kırsalda 4 dağıtım \
+direği, tünelde 4 birim. Merkezî sistem gideri, bir yazılımcının \
+haftada bir günlük emeği ve iki sunucudan oluşmakta olup yıllık 237000 \
+TL'lik tutar 1000 birime paylaştırılmaktadır."""
 en = """YERKON CAPEX is the thousand unit bill of materials price of a \
 scenario's broadcast units plus what fitting each one costs (bracket, \
 labour and, where needed, a standalone supply), divided by the scenario's \
@@ -717,16 +741,18 @@ spread over 1000 units."""
 
 [note.yerkon-nationwide]
 sources = ["sen-corine", "hgm-yuzolcum"]
-tr = """Tüm Türkiye satırı (tüneller hariç), şehir içi ve kırsal satırlarının \
-alanla ağırlıklı ortalamasıdır. CORINE 2018'e göre Türkiye'nin %1,99'u yapay \
-(kentsel) alan olduğu için yaklaşık %2'si şehir, %98'i kırsal kabul edildi. \
-Alan, Harita Genel Müdürlüğü'nün verdiği Türkiye yüzölçümüdür (780.043 \
-km²). Satır, sistemin ülke ölçeğinde de düşük \
-maliyetli kalacağını göstermek içindir; destek sağlanırsa ülke geneline \
-yayılabilir. Bu kabulle ülke geneli kurulum yaklaşık \
-1,0 milyar TL, işletme yılda yaklaşık 282 milyon TL'dir; bunlar kesin fiyat \
-değil, vergi hariç tahminlerdir. Hata sütunları alan ağırlıklı yaklaşık \
-değerlerdir, ayrı bir simülasyonun çıktısı değildir."""
+tr = """Tüm Türkiye satırı (tüneller hariç), şehir içi ve kırsal satırların \
+alanla ağırlıklandırılmış ortalamasıdır. CORINE 2018 verilerine göre \
+Türkiye'nin %1,99'u yapay (kentsel) alan olduğundan ülke alanının \
+yaklaşık %2'si şehir, %98'i kırsal kabul edilmiştir. Alan, Harita \
+Genel Müdürlüğü'nün verdiği Türkiye yüzölçümüdür (780.043 km²). Bu \
+satır, sistemin ülke ölçeğinde de düşük maliyetli kalacağını göstermek \
+amacıyla verilmiştir; destek sağlanması durumunda sistem ülke geneline \
+yaygınlaştırılabilir. Bu kabulle ülke geneli kurulum maliyeti yaklaşık \
+1,0 milyar TL, işletme gideri ise yılda yaklaşık 282 milyon TL'dir; bu \
+değerler kesin fiyat değil, vergi hariç tahminlerdir. Hata sütunları \
+alanla ağırlıklandırılmış yaklaşık değerler olup ayrı bir simülasyonun \
+çıktısı değildir."""
 en = """The whole Türkiye row (tunnels left out) is the area weighted mean of \
 the urban and rural rows. CORINE 2018 puts 1,99 % of Türkiye under artificial \
 (urban) surfaces, so about 2 % is taken as urban and 98 % as rural. The area \
