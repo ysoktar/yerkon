@@ -1,6 +1,6 @@
 # YERKON
 
-> YERKON, karayolu için uydudan bağımsız, yere kurulu bir konumlandırma katmanıdır: GNSS kesildiğinde konumu o verir, GNSS çalışırken de onun verdiği konumu doğrular. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
+> YERKON, karayolu ulaşımı için uydudan bağımsız, yer tabanlı bir konumlandırma katmanıdır. GNSS sinyali kesildiğinde konum bilgisini sağlamakta, GNSS çalışırken ise uydunun verdiği konumu doğrulamaktadır. Yol kenarında hâlihazırda bulunan direk ve kabinlere düşük maliyetli yayın birimleri yerleştirilmekte; araçtaki alıcı, bu birimlere olan uzaklığını ölçerek kendi konumunu hesaplamaktadır.
 
 > YERKON is a ground-based positioning layer for roads that does not depend on satellites: when GNSS is lost it gives the position, and while GNSS works it checks the position GNSS gives. Low cost broadcast units go onto masts and cabinets already standing by the road, and the receiver in a vehicle works out its own position by measuring its distance to them.
 
@@ -8,11 +8,11 @@
 
 ## Sayfalar (Türkçe)
 
-- [Anasayfa](https://yerkon.com/tr/): YERKON, karayolu için uydudan bağımsız, yere kurulu bir konumlandırma katmanıdır: GNSS kesildiğinde konumu o verir, GNSS çalışırken de onun verdiği konumu doğrular. Yol kenarında zaten duran direklere ve kabinlere düşük maliyetli yayın birimleri takılır; araçtaki alıcı bu birimlere olan uzaklığını ölçerek konumunu kendisi hesaplar.
-- [Sorun](https://yerkon.com/tr/sorun/): Bugün konum bulmanın ve yol tarif etmenin neredeyse tamamı GPS, Galileo, GLONASS ve BeiDou'dan geliyor. Bu bağımlılık araç navigasyonuyla bitmiyor: acil çağrı ekipleri, kamu araç filoları, insansız araçlar ve kargo taşımacılığı da aynı dört sisteme bağlı.
-- [Sistem](https://yerkon.com/tr/sistem/): Üç parça: ölçülmüş konumlarda duran yayın birimleri, konumunu kendi hesaplayan alıcılar ve kimlikleri güncel tutan merkezi yönetim sistemi.
-- [AR-GE](https://yerkon.com/tr/arge/): Proje altı soruya cevap arıyor. Hiçbiri kapanmış değil ve her birinin altında ne yapılacağı yazılı.
-- [Fayda](https://yerkon.com/tr/fayda/): Konumun hayati olduğu, ama uydu sinyalinin kesildiği, zayıfladığı ya da artık güvenilmediği yerlerde ulaşımın ve konuma bağlı hizmetlerin durmaması için; sayfanın sonunda ticarileşmesi.
+- [Anasayfa](https://yerkon.com/tr/): YERKON, karayolu ulaşımı için uydudan bağımsız, yer tabanlı bir konumlandırma katmanıdır. GNSS sinyali kesildiğinde konum bilgisini sağlamakta, GNSS çalışırken ise uydunun verdiği konumu doğrulamaktadır. Yol kenarında hâlihazırda bulunan direk ve kabinlere düşük maliyetli yayın birimleri yerleştirilmekte; araçtaki alıcı, bu birimlere olan uzaklığını ölçerek kendi konumunu hesaplamaktadır.
+- [Sorun](https://yerkon.com/tr/sorun/): Günümüzde konum ve seyrüsefer hizmetlerinin neredeyse tamamı GPS, Galileo, GLONASS ve BeiDou sistemlerinden sağlanmaktadır. Bu bağımlılık yalnızca araç navigasyonunu değil; acil çağrı ekiplerini, kamu araç filolarını, insansız araçları ve kargo taşımacılığını da kapsamaktadır.
+- [Sistem](https://yerkon.com/tr/sistem/): YERKON üç bileşenden oluşmaktadır: koordinatları ölçülmüş noktalara yerleştirilen yayın birimleri, kendi konumunu hesaplayan alıcılar ve yayın birimlerinin kimlik ve açık anahtarlarını güncel tutan Merkezî Yönetim Sistemi.
+- [AR-GE](https://yerkon.com/tr/arge/): YERKON projesi aşağıdaki altı araştırma sorusuna yanıt aramaktadır. Soruların tamamı araştırma süreci boyunca açık kalacak olup her birinin altında izlenecek yöntem açıklanmıştır.
+- [Fayda](https://yerkon.com/tr/fayda/): YERKON, konum bilgisinin hayati önem taşıdığı ancak uydu sinyalinin kesildiği, zayıfladığı veya güvenilirliğini yitirdiği durumlarda ulaşımın ve konuma bağlı hizmetlerin kesintisiz sürmesini amaçlamaktadır. Projenin ticarileşme potansiyeli sayfanın sonunda açıklanmıştır.
 - [Karşılaştırma](https://yerkon.com/tr/sonuclar/): YERKON ve diğer on konumlandırma sistemi, aynı sütunlarla yan yana. Koyu zeminli satırlar YERKON'un simülasyon sonuçları; diğerleri o sistemlerin kendi kaynaklarının yayımladığı değerler.
 - [Maliyet](https://yerkon.com/tr/maliyet/): Tablodaki her maliyet hücresinin kalem kalem dökümü: hangi parça, kaça, kimden; hangi sayı, neye dayanarak. Bu sayfadaki sayılar simülasyondan ve parça listesinden hesaplanıyor; biri değişince sayfa da değişiyor. Yalnız direk fiyatları tablosu kaynaklarından aktarıldı.
 - [Mevzuat](https://yerkon.com/tr/mevzuat/): YERKON'un gücünü, piyasaya çıkışını ve bakım maliyetini belirleyen kurallar, resmî kaynaklarıyla. Güç, bakım ve kira için burada yazan her sınır simülasyonda da aynen kullanılıyor; prototip cihazlarının frekans kuralları sahadaki denemeler için.

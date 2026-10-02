@@ -1201,7 +1201,7 @@ def test_the_research_page_ends_with_the_pilot_hardware():
     from yerkon.viewer.pages import PILOT_ITEMS
 
     drawn = render(page_at("/arge"), "tr", a_record())
-    assert "Uygulama sürecinin ilk adımındaki donanım" in drawn
+    assert "Uygulama sürecinin ilk adımında kullanılacak donanım" in drawn
     for name, _ in PILOT_ITEMS.values():
         assert html.escape(name.tr) in drawn
     assert drawn.rindex('class="slider"') > drawn.index("Uygulama süreci")
