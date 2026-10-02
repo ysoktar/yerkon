@@ -39,6 +39,7 @@ from yerkon.viewer.scene import (
     scene,
     simulate,
     sweep,
+    sweep_step,
 )
 from yerkon.viewer.tasks import (
     budget as budget_task,
@@ -404,6 +405,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(lambda: self._blocks())
         if path == "/api/sweep":
             return self._json(lambda: sweep(self.session.read()))
+        if path == "/api/sweep/step":
+            return self._json(lambda: sweep_step(self.session.read()))
         if path == "/api/simulate":
             return self._json(lambda: simulate(self.session.read()))
         # The same arrangement over every draw of the shadows. Asked for

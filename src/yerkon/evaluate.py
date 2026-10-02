@@ -719,12 +719,17 @@ def coverage_grid(
     resolution_m: float = 250.0,
     margin_m: float = 12_000.0,
     count_up_to: int = 8,
+    rows: Optional[tuple] = None,
 ) -> CoverageGrid:
     """Sweep a grid and count reachable anchors at every cell.
 
     ``count_up_to`` stops counting once a cell has that many anchors in
     reach, because nothing downstream distinguishes eight from nine and
     the sweep is the slowest thing in the project.
+
+    ``rows``, a (first, past the last) pair, sweeps only that band of the
+    grid and leaves the rest empty, so a caller can sweep a little at a
+    time and answer other questions in between.
     """
     xs, ys = sweep_axes(deployment, terrain, resolution_m, margin_m)
 
@@ -739,7 +744,9 @@ def coverage_grid(
     sigmas = np.full((ys.size, xs.size), np.nan)
     dilutions = np.full((ys.size, xs.size), np.nan)
 
-    for row, y in enumerate(ys):
+    first, past = rows if rows is not None else (0, ys.size)
+    for row in range(max(0, first), min(ys.size, past)):
+        y = ys[row]
         for column, x in enumerate(xs):
             here = (
                 float(x), float(y),

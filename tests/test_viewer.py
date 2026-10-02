@@ -500,6 +500,39 @@ def test_the_ground_can_be_asked_for_over_one_window_of_the_site():
     json.dumps(close)
 
 
+def test_a_sweep_taken_a_step_at_a_time_is_the_same_sweep():
+    """In a browser the whole sweep is minutes and held every other
+    question behind it; stepped, the answer at the end is unchanged."""
+    from yerkon.viewer.scene import sweep_step
+
+    state = a_state(sweep_m=1000.0)
+    whole = sweep(state)
+    steps = 0
+    while True:
+        part = sweep_step(state, budget_s=0.0)
+        steps += 1
+        if part.pop("done"):
+            break
+        assert 0.0 < part["share"] < 1.0
+    assert steps > 2, "one step would not show that the steps add up"
+    assert part == whole
+
+
+def test_a_step_for_another_arrangement_starts_the_sweep_again():
+    """A row changed halfway through is swept from its own first row,
+    not finished on the rows of the one before it."""
+    from yerkon.viewer.scene import sweep_step
+
+    first = a_state(sweep_m=1000.0)
+    sweep_step(first, budget_s=0.0)
+    other = a_state(sweep_m=1500.0)
+    while True:
+        part = sweep_step(other, budget_s=0.0)
+        if part.pop("done"):
+            break
+    assert part == sweep(other)
+
+
 def test_the_sweep_reports_both_areas_and_they_differ():
     """ADR-0012, on screen as well as in the table."""
     swept = sweep(a_state(sweep_m=1000.0))

@@ -844,15 +844,77 @@ def sweep(state: ViewState) -> dict:
                 "layers": {}, "bands": _bands(state)}
     deployment = state.deployment(terrain)
 
-    grid = coverage_grid(
-        deployment,
-        terrain,
+    grid = coverage_grid(deployment, terrain, **_sweep_args(state))
+    return _swept(state, grid)
+
+
+def _sweep_args(state: ViewState) -> dict:
+    return dict(
         receiver_height_m=_lowest_unit(state),
         target_sigma_m=state.tolerance_m,
         resolution_m=state.sweep_m,
         margin_m=sweep_margin_m(state),
     )
 
+
+#: The sweep being stepped through, and the arrangement it belongs to.
+#: One at a time: a step asked for any other arrangement starts over.
+_STEPPING: dict = {}
+
+#: How long one step works before it answers, in this runtime's seconds.
+STEP_SECONDS = 1.5
+
+
+def sweep_step(state: ViewState, budget_s: float = STEP_SECONDS) -> dict:
+    """The same sweep as `sweep`, a few rows of cells at a time.
+
+    In the visitor's browser the engine answers one question at a time,
+    and a whole sweep there is minutes. Asked for whole, it held every
+    other question behind it: a row picked while the town was being
+    swept waited four minutes, and Run did too. Stepped, anything asked
+    in the meantime is answered between two steps, and a step for an
+    arrangement that has since changed starts the sweep again rather
+    than finishing one nobody is looking at any more.
+
+    Answers ``{"done": False, "share": ...}`` until the last step, which
+    answers what `sweep` would, with ``"done": True``.
+    """
+    import json
+    import time
+
+    terrain = state.terrain()
+    if not state.anchors(terrain):
+        _STEPPING.clear()
+        return dict(sweep(state), done=True)
+    key = json.dumps(state.as_json(), sort_keys=True, default=str)
+    job = _STEPPING.get("job")
+    if job is None or job["key"] != key:
+        deployment = state.deployment(terrain)
+        args = _sweep_args(state)
+        # No rows swept: the axes and empty layers of the whole grid.
+        job = {"key": key, "deployment": deployment, "terrain": terrain,
+               "args": args, "next": 0,
+               "grid": coverage_grid(deployment, terrain, rows=(0, 0), **args)}
+        _STEPPING["job"] = job
+    grid = job["grid"]
+    total = grid.ys.size
+    began = time.monotonic()
+    while job["next"] < total:
+        row = job["next"]
+        band = coverage_grid(job["deployment"], job["terrain"],
+                             rows=(row, row + 1), **job["args"])
+        for layer in ("counts", "margin_db", "sigma_m", "dilution"):
+            getattr(grid, layer)[row] = getattr(band, layer)[row]
+        job["next"] = row + 1
+        if time.monotonic() - began >= budget_s:
+            break
+    if job["next"] < total:
+        return {"done": False, "share": job["next"] / total}
+    _STEPPING.clear()
+    return dict(_swept(state, grid), done=True)
+
+
+def _swept(state: ViewState, grid) -> dict:
     return {
         "xs": [float(x) for x in grid.xs],
         "ys": [float(y) for y in grid.ys],

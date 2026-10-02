@@ -924,6 +924,8 @@ export const SAY = {
 
   // -- what the engine is doing -------------------------------------------
   "busy.sweep": { tr: "Kapsama hesaplanıyor…", en: "Sweeping coverage…" },
+  "busy.sweep.share": { tr: "Kapsama hesaplanıyor… {share}",
+                        en: "Sweeping coverage… {share}" },
   "busy.working": { tr: "Çalışıyor…", en: "Working…" },
   "busy.starting": { tr: "Başlatılıyor…", en: "Starting…" },
   "fetch.cannot": {

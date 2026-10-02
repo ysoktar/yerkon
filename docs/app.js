@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=3e1d1f1af2";
+import { decimal, say, speak, speaks } from "./words.js?v=5aebb11ad1";
 
 /* The choices whose names are this page's to give.
  *
@@ -118,6 +118,7 @@ function activityOf(path) {
   const known = {
     "/api/scene": "act.scene", "/api/apply": "act.apply",
     "/api/propose": "act.propose", "/api/sweep": "act.sweep",
+    "/api/sweep/step": "act.sweep",
     "/api/simulate": "act.simulate", "/api/simulate/pooled": "act.pooled",
     "/api/ground": "act.ground", "/api/blocks": "act.blocks",
     "/api/mode": "act.mode", "/api/figures": "act.figures",
@@ -1788,9 +1789,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=3e1d1f1af2";
-import * as flat from "./bore.js?v=3e1d1f1af2";
-import * as pick from "./map.js?v=3e1d1f1af2";
+import * as draw from "./draw.js?v=5aebb11ad1";
+import * as flat from "./bore.js?v=5aebb11ad1";
+import * as pick from "./map.js?v=5aebb11ad1";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -4564,10 +4565,19 @@ function scheduleSweep() {
   sweepTimer = setTimeout(async () => {
     try {
       flash(say("busy.sweep"));
-      const swept = await ask("/api/sweep");
-      // Anything but the newest answer is an answer to a question the
-      // page has stopped asking.
-      if (mine !== sweepWanted) return;
+      // A step at a time, so a row picked or a run asked for meanwhile
+      // is answered between two steps rather than after the whole sweep
+      // (in a browser the whole sweep is minutes).
+      let swept;
+      do {
+        swept = await ask("/api/sweep/step");
+        // Anything but the newest answer is an answer to a question the
+        // page has stopped asking.
+        if (mine !== sweepWanted) return;
+        if (!swept.done) {
+          flash(say("busy.sweep.share", { share: percent(swept.share, 0) }));
+        }
+      } while (!swept.done);
       sweepData = swept;
       // The bands travel with the sweep, so the legend is redrawn with
       // it: the error bands are multiples of this row's own tolerance
