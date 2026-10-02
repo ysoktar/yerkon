@@ -140,13 +140,13 @@ GROUPS = (
         ("operating.per_diem_share",
          ("Günübirlik görevde gündeliğin payı", "Share of it on a day trip")),
         ("urban.crew_travels",
-         ("Şehir içinde ekip görev yeri dışına çıkıyor mu",
+         ("Şehir içinde ekibin görev yeri dışına çıkması",
           "Does the town crew leave its duty station")),
         ("rural.crew_travels",
-         ("Kırsalda ekip görev yeri dışına çıkıyor mu",
+         ("Kırsalda ekibin görev yeri dışına çıkması",
           "Does the open-country crew leave its duty station")),
         ("tunnel.crew_travels",
-         ("Tünelde ekip görev yeri dışına çıkıyor mu",
+         ("Tünelde ekibin görev yeri dışına çıkması",
           "Does the tunnel crew leave its duty station")),
     )),
     (("Kira ve veri hattı", "Rent and data"), (
@@ -240,7 +240,7 @@ def rows(published, language: str, table) -> str:
         out.append("<h3>{}</h3><p>{}</p><div class=\"scroll\" tabindex=\"0\">{}</div>".format(
             html.escape(_say(name, language)),
             html.escape(_say((
-                "{} birim ({}), {} {} üzerinde.",
+                "{} yayın birimi ({}), {} {} alan üzerinde.",
                 "{} units ({}), over {} {}.",
             ), language).format(
                 len(deployed.scenario.deployment.anchors), what,
@@ -446,8 +446,8 @@ def structures(language: str, table) -> str:
     ]
     times = round(on_mast / on_column)
     said = _say((
-        "<p><b>Sermayede {} kat.</b> Aynı birim, aynı zemin; tek fark neye "
-        "takıldığı.</p>",
+        "<p><b>Sermaye maliyeti {} katına çıkmaktadır.</b> Birim ve arazi "
+        "aynıdır; tek fark birimin yerleştirildiği yapıdır.</p>",
         "<p><b>{} times, on capital.</b> The same unit on the same ground; "
         "the only difference is what it is fitted to.</p>",
     ), language).format(times)
@@ -513,13 +513,15 @@ def units(published, language: str, table) -> str:
                    for _, _, c in columns])
 
     said = [_say((
-        "<p>Şehir içi ve kırsal satırlar aynı yayın birimini kullanıyor: yükselteçli "
-        "SX1280 modülü E28-2G4M20S, dış ortam tipi 5 dBi çubuk anten, aynı "
-        "mikrodenetleyici ve güvenlik yongası. Tünelde yayın birimi DWM3000 "
-        "UWB modülünü taşıyor. Farkı birim değil, birimin takıldığı yapı "
-        "yaratıyor: şehirde elektriği olan aydınlatma direği, kırsalda "
-        "elektriği olmayan dağıtım direği ve güneş paneli, tünelde şerit "
-        "kapatmaya bağlı bir askı.</p>",
+        "<p>Şehir içi ve kırsal senaryolarda aynı yayın birimi "
+        "kullanılmaktadır: yükselteçli SX1280 modülü E28-2G4M20S, dış "
+        "ortam tipi 5 dBi çubuk anten, aynı mikrodenetleyici ve güvenlik "
+        "yongası. Tünelde ise yayın birimi DWM3000 UWB modülünü "
+        "taşımaktadır. Maliyet farkı birimden değil, birimin yerleştirildiği "
+        "yapıdan kaynaklanmaktadır: şehir içinde elektrik bağlantısı olan "
+        "aydınlatma direği, kırsalda elektrik bağlantısı olmayan dağıtım "
+        "direği ve güneş paneli, tünelde ise şerit kapatma gerektiren bir "
+        "askı.</p>",
         "<p>The town and open country rows use the same broadcast unit: the "
         "amplified SX1280 module E28-2G4M20S, an outdoor 5 dBi rod antenna, the "
         "same microcontroller and secure element. In the tunnel the unit "
@@ -530,8 +532,9 @@ def units(published, language: str, table) -> str:
     ), language)]
     column = dict((m.kind, c) for m, _, c in columns)
     said.append(_say((
-        "<p><b>Dikilen direkte kurulum, aydınlatma direğindekinin {} katı.</b> "
-        "Aynı birim, aynı zemin; tek fark neye takıldığı.</p>",
+        "<p><b>Yeni dikilen direkte kurulum maliyeti, aydınlatma "
+        "direğindekinin {} katıdır.</b> Birim ve arazi aynıdır; tek fark "
+        "birimin yerleştirildiği yapıdır.</p>",
         "<p><b>On a raised mast the build costs {} times what it does on a "
         "lighting column.</b> The same unit on the same ground; the only "
         "difference is what it is fitted to.</p>",
@@ -549,14 +552,16 @@ def units(published, language: str, table) -> str:
     if len(dense) == 2:
         (n1, c1, a1), (n2, c2, a2) = dense
         said.append(_say((
-            "<p>Tablonun kullandığı yapılar içinde bir birim şehirdeki "
-            "aydınlatma direğinde en ucuza kuruluyor ve işletiliyor, ama "
-            "şehir içi satır kilometrekare başına en pahalısı. Sebep "
-            "yoğunluk: binalar sinyali kestiği için şehirde bir birim "
-            "{a1} km²'ye, kırsalda {a2} km²'ye hizmet ediyor. {c1} birim "
-            "{A1} km²'de kilometrekareye {d1} birim, {c2} birim {A2} km²'de "
-            "{d2} birim ediyor. Kilometrekare başına maliyet, birim başına "
-            "maliyetin bu yoğunlukla çarpımı.</p>",
+            "<p>Tabloda kullanılan yapılar arasında bir yayın biriminin "
+            "kurulum ve işletme maliyeti en düşük olan yapı şehirdeki "
+            "aydınlatma direğidir; buna karşın şehir içi senaryo "
+            "kilometrekare başına en yüksek maliyete sahiptir. Bunun nedeni "
+            "birim yoğunluğudur: binalar sinyali engellediğinden şehir "
+            "içinde bir yayın birimi {a1} km²'ye, kırsalda ise {a2} km²'ye "
+            "hizmet vermektedir. {A1} km²'deki {c1} birim kilometrekare "
+            "başına {d1} birime, {A2} km²'deki {c2} birim ise {d2} birime "
+            "karşılık gelmektedir. Kilometrekare başına maliyet, birim "
+            "başına maliyetin bu yoğunlukla çarpımıdır.</p>",
             "<p>Of the structures the table uses, a unit is cheapest to "
             "build and run on a town lighting column, yet the town "
             "row is the dearest per square kilometre. The reason is "
