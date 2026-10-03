@@ -235,16 +235,20 @@ const BARE = [126, 146, 104];
  * the photograph comes through at the resolution somebody is looking at
  * it from (`ground` in scene.py).
  */
-export function groundFaces(view, terrain, light, photo) {
+export function groundFaces(view, terrain, light, photo, step = 1) {
   const { xs, ys, heights } = terrain;
   const out = [];
-  for (let row = 0; row < ys.length - 1; row++) {
-    for (let column = 0; column < xs.length - 1; column++) {
+  // `step` above one draws the mesh a node in `step` each way, for a
+  // moving frame on a device that cannot draw every quad in time.
+  for (let row = 0; row < ys.length - 1; row += step) {
+    const below = Math.min(row + step, ys.length - 1);
+    for (let column = 0; column < xs.length - 1; column += step) {
+      const right = Math.min(column + step, xs.length - 1);
       const corners = [
         [xs[column], ys[row], lift(heights[row][column])],
-        [xs[column + 1], ys[row], lift(heights[row][column + 1])],
-        [xs[column + 1], ys[row + 1], lift(heights[row + 1][column + 1])],
-        [xs[column], ys[row + 1], lift(heights[row + 1][column])],
+        [xs[right], ys[row], lift(heights[row][right])],
+        [xs[right], ys[below], lift(heights[below][right])],
+        [xs[column], ys[below], lift(heights[below][column])],
       ];
       const normal = unit(cross(
         sub(corners[1], corners[0]), sub(corners[3], corners[0]),
@@ -254,7 +258,7 @@ export function groundFaces(view, terrain, light, photo) {
       // one and it covers the whole quad; the site's own picture otherwise.
       const sheet = photo && photo.pick ? photo.pick(corners) : photo;
       const ink = (sheet && sheet.colourAt(
-        (xs[column] + xs[column + 1]) / 2, (ys[row] + ys[row + 1]) / 2,
+        (xs[column] + xs[right]) / 2, (ys[row] + ys[below]) / 2,
       )) || BARE;
       const painted = face(
         view, corners,
@@ -905,14 +909,20 @@ function dimmed(context, screen) {
   context.fill();
 }
 
+/* Back to front, except that the units and the receivers come last
+ * of all: they are drawn at a legible size rather than to scale, and
+ * painted among the ground they sat under the coverage colours and read
+ * as faded, the one thing on the screen a person reaches for. */
+function ordered(items) {
+  const marker = item => (item.kind === "mast" || item.kind === "unit" ? 1 : 0);
+  for (const item of items) item.last = marker(item);
+  items.sort((a, b) => (a.last - b.last) || (b.depth - a.depth));
+  return items;
+}
+
 export function paint(context, width, height, items) {
   context.clearRect(0, 0, width, height);
-  // Back to front, except that the units and the receivers come last
-  // of all: they are drawn at a legible size rather than to scale, and
-  // painted among the ground they sat under the coverage colours and
-  // read as faded, the one thing on the screen a person reaches for.
-  const marker = item => item.kind === "mast" || item.kind === "unit";
-  items.sort((a, b) => (marker(a) - marker(b)) || (b.depth - a.depth));
+  ordered(items);
   texturing.drawn = 0;
   const coarse = texturing.on && texturing.moving && !texturing.still
     ? chooseForMoving(items) : null;
@@ -927,81 +937,122 @@ export function paint(context, width, height, items) {
       context.fillRect(0, 0, width, height);
     }
   }
-  for (const item of items) {
-    if (coarse && item.ground && coarse.covered.has(
-      Math.floor(item.ground[0] / coarse.step) + ","
-      + Math.floor(item.ground[1] / coarse.step))) continue;
-    if (item.kind === "unit") {
-      context.globalAlpha = 1;
-      context.fillStyle = "#b4551d";
-      context.beginPath();
-      if (item.pedestrian) {
-        context.arc(item.at[0], item.at[1], 5, 0, Math.PI * 2);
-      } else {
-        context.rect(item.at[0] - 6, item.at[1] - 4, 12, 8);
-      }
-      context.fill();
-      context.fillStyle = "#22282e";
-      context.font = "11px system-ui, sans-serif";
-      context.fillText(item.label, item.at[0] + 9, item.at[1] + 4);
-      continue;
-    }
-    if (item.kind === "mast") {
-      // A white edge round the stem and the head, so a unit stands out
-      // on the photograph, the grey roofs and the green alike.
-      context.globalAlpha = 1;
-      context.lineCap = "round";
-      context.strokeStyle = "#fff";
-      context.lineWidth = 6;
-      context.beginPath();
-      context.moveTo(item.base[0], item.base[1]);
-      context.lineTo(item.top[0], item.top[1]);
-      context.stroke();
-      context.strokeStyle = item.colour || "#3a4652";
-      context.lineWidth = 3;
-      context.beginPath();
-      context.moveTo(item.base[0], item.base[1]);
-      context.lineTo(item.top[0], item.top[1]);
-      context.stroke();
-      context.lineCap = "butt";
-      context.fillStyle = item.colour || "#22282e";
-      context.strokeStyle = "#fff";
-      context.lineWidth = 2;
-      context.beginPath();
-      context.arc(item.top[0], item.top[1], 6.5, 0, Math.PI * 2);
-      context.fill();
-      context.stroke();
-      continue;
-    }
-    if (item.kind === "face" && item.texture && texturing.on) {
-      context.globalAlpha = 1;
-      if (textured(context, item)) {
-        dimmed(context, item.screen);
-        continue;
-      }
-    }
-    if (item.kind === "face") {
-      context.globalAlpha = item.alpha;
-      context.fillStyle = item.colour;
-      context.beginPath();
-      context.moveTo(item.screen[0][0], item.screen[0][1]);
-      for (const point of item.screen.slice(1)) {
-        context.lineTo(point[0], point[1]);
-      }
-      context.closePath();
-      context.fill();
-      dimmed(context, item.screen);
-    } else if (item.kind === "line") {
-      context.globalAlpha = 1;
-      context.strokeStyle = item.colour;
-      context.lineWidth = item.width;
-      context.beginPath();
-      context.moveTo(item.points[0][0], item.points[0][1]);
-      for (const point of item.points.slice(1)) {
-        context.lineTo(point[0], point[1]);
-      }
-      context.stroke();
-    }
-  }
+  for (const item of items) paintItem(context, item, coarse);
   context.globalAlpha = 1;
 }
+
+/* The still picture, painted a few milliseconds at a time.
+ *
+ * Laying the photograph on every quad of a still frame is the costliest
+ * thing the page does: on a phone it took two seconds, and for those two
+ * seconds after every lift of a finger the page did not answer. Painted
+ * into a canvas nobody sees, a slice per animation frame, it never holds
+ * the page for longer than a slice; the page shows it only once it is
+ * whole, and drops it the moment the scene moves again.
+ *
+ * `step(ms)` paints for about that long and says whether it finished;
+ * `workMs` and `drawn` are what it cost, for the page to learn from.
+ */
+export function paintSliced(context, width, height, items) {
+  context.clearRect(0, 0, width, height);
+  ordered(items);
+  let next = 0;
+  const job = { workMs: 0, drawn: 0, step };
+  function step(ms) {
+    const began = performance.now();
+    const kept = { on: texturing.on, still: texturing.still, moving: texturing.moving,
+                   drawn: texturing.drawn };
+    texturing.on = true;
+    texturing.still = true;
+    texturing.drawn = 0;
+    while (next < items.length) {
+      paintItem(context, items[next], null);
+      next += 1;
+      if ((next & 7) === 0 && performance.now() - began >= ms) break;
+    }
+    context.globalAlpha = 1;
+    job.drawn += texturing.drawn;
+    Object.assign(texturing, kept);
+    job.workMs += performance.now() - began;
+    return next >= items.length;
+  }
+  return job;
+}
+
+function paintItem(context, item, coarse) {
+  if (coarse && item.ground && coarse.covered.has(
+    Math.floor(item.ground[0] / coarse.step) + ","
+    + Math.floor(item.ground[1] / coarse.step))) return;
+  if (item.kind === "unit") {
+    context.globalAlpha = 1;
+    context.fillStyle = "#b4551d";
+    context.beginPath();
+    if (item.pedestrian) {
+      context.arc(item.at[0], item.at[1], 5, 0, Math.PI * 2);
+    } else {
+      context.rect(item.at[0] - 6, item.at[1] - 4, 12, 8);
+    }
+    context.fill();
+    context.fillStyle = "#22282e";
+    context.font = "11px system-ui, sans-serif";
+    context.fillText(item.label, item.at[0] + 9, item.at[1] + 4);
+    return;
+  }
+  if (item.kind === "mast") {
+    // A white edge round the stem and the head, so a unit stands out
+    // on the photograph, the grey roofs and the green alike.
+    context.globalAlpha = 1;
+    context.lineCap = "round";
+    context.strokeStyle = "#fff";
+    context.lineWidth = 6;
+    context.beginPath();
+    context.moveTo(item.base[0], item.base[1]);
+    context.lineTo(item.top[0], item.top[1]);
+    context.stroke();
+    context.strokeStyle = item.colour || "#3a4652";
+    context.lineWidth = 3;
+    context.beginPath();
+    context.moveTo(item.base[0], item.base[1]);
+    context.lineTo(item.top[0], item.top[1]);
+    context.stroke();
+    context.lineCap = "butt";
+    context.fillStyle = item.colour || "#22282e";
+    context.strokeStyle = "#fff";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.arc(item.top[0], item.top[1], 6.5, 0, Math.PI * 2);
+    context.fill();
+    context.stroke();
+    return;
+  }
+  if (item.kind === "face" && item.texture && texturing.on) {
+    context.globalAlpha = 1;
+    if (textured(context, item)) {
+      dimmed(context, item.screen);
+      return;
+    }
+  }
+  if (item.kind === "face") {
+    context.globalAlpha = item.alpha;
+    context.fillStyle = item.colour;
+    context.beginPath();
+    context.moveTo(item.screen[0][0], item.screen[0][1]);
+    for (const point of item.screen.slice(1)) {
+      context.lineTo(point[0], point[1]);
+    }
+    context.closePath();
+    context.fill();
+    dimmed(context, item.screen);
+  } else if (item.kind === "line") {
+    context.globalAlpha = 1;
+    context.strokeStyle = item.colour;
+    context.lineWidth = item.width;
+    context.beginPath();
+    context.moveTo(item.points[0][0], item.points[0][1]);
+    for (const point of item.points.slice(1)) {
+      context.lineTo(point[0], point[1]);
+    }
+    context.stroke();
+  }
+}
+

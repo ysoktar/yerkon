@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=3fd38f6036";
+import { decimal, say, speak, speaks } from "./words.js?v=1092595c7d";
 
 /* The choices whose names are this page's to give.
  *
@@ -78,7 +78,11 @@ async function ask(path, body) {
     ? { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body) }
     : {};
-  const done = doing(activityOf(path), path.split("?")[0]);
+  const bare = path.split("?")[0];
+  // A question that is one step of a longer piece of work is listed as
+  // that work (`progress`), with one clock from its start, rather than
+  // as a line of its own whose seconds start again at every step.
+  const done = doing(UNLISTED.has(bare) ? null : activityOf(path), bare);
   try {
     const response = await fetch(path, options);
     const payload = await response.json();
@@ -127,6 +131,39 @@ function activityOf(path) {
   return known[bare] || "act.engine";
 }
 
+//: A piece of work that has not moved for this long while the engine
+//: answers something else is shown as waiting for it.
+const PAUSED_AFTER_MS = 2500;
+const UNLISTED = new Set(["/api/sweep/step", "/api/simulate", "/api/simulate/pooled"]);
+
+/* Longer work listed as one line: how far it has got where that is
+ * known, how long it has run, and about how long is left. */
+const progress = new Map();
+
+function startProgress(name, key, expectedMs = 0, path = "") {
+  progress.set(name, { key, path, started: performance.now(), share: null,
+                       expected: expectedMs, updated: performance.now() });
+  setTimeout(drawActivity, ACTIVITY_AFTER_MS + 20);
+  return {
+    share(value) {
+      const entry = progress.get(name);
+      if (entry) Object.assign(entry, { share: value, updated: performance.now() });
+      drawActivity();
+    },
+    done() {
+      progress.delete(name);
+      drawActivity();
+    },
+  };
+}
+
+/* "35 sn", or "2 dk" past a minute and a half. */
+function shortTime(ms) {
+  const seconds = Math.max(0, Math.round(ms / 1000));
+  return seconds < 90 ? say("act.seconds", { n: seconds })
+    : say("act.minutes", { n: Math.round(seconds / 60) });
+}
+
 /* Start listing something; the function it returns takes it off. */
 function doing(key, path = "") {
   if (!key) return () => {};
@@ -146,9 +183,11 @@ function drawActivity() {
   const now = performance.now();
   const shown = [...activity.values()]
     .filter(entry => now - entry.started >= ACTIVITY_AFTER_MS);
-  host.hidden = shown.length === 0;
+  const lasting = [...progress.values()]
+    .filter(entry => now - entry.started >= ACTIVITY_AFTER_MS);
+  host.hidden = shown.length + lasting.length === 0;
   clearInterval(activityTimer);
-  if (!shown.length) return;
+  if (!shown.length && !lasting.length) return;
   // Once a second while anything is listed, for the seconds beside it.
   activityTimer = setInterval(drawActivity, 1000);
   // The one the engine is answering, where the engine answers in turn.
@@ -175,6 +214,35 @@ function drawActivity() {
   }
   let running = 0;
   list.innerHTML = "";
+  for (const entry of lasting) {
+    const ran = now - entry.started;
+    // Held up behind something else the engine is answering: a sweep
+    // waits between its steps while a run is worked out, and its
+    // time left would grow for as long as it waits.
+    const blocker = answering && entry.path && answering !== entry.path
+      && now - entry.updated > PAUSED_AFTER_MS ? answeringKey : null;
+    if (!blocker) running++;
+    const row = document.createElement("li");
+    row.className = blocker ? "waiting" : "";
+    row.innerHTML = '<i class="dot"></i><span class="what"></span>'
+      + '<span class="when"></span><span class="why"></span>';
+    row.querySelector(".what").textContent = say(entry.key)
+      + (entry.share != null ? ` · ${percent(entry.share, 0)}` : "");
+    row.querySelector(".when").textContent = shortTime(ran);
+    // What is left: from how fast it has gone where its share is known
+    // and far enough along to say, else from what it usually takes here.
+    let left = null;
+    if (entry.share != null && entry.share >= 0.05) {
+      left = ran * (1 - entry.share) / entry.share;
+    } else if (entry.expected) {
+      left = Math.max(0, entry.expected - ran);
+    }
+    row.querySelector(".why").textContent = blocker
+      ? say("act.paused", { what: say(blocker) })
+      : left == null ? ""
+        : say(left < 1000 ? "act.left.almost" : "act.left", { time: shortTime(left) });
+    list.appendChild(row);
+  }
   for (const entry of grouped.values()) {
     const waiting = Boolean(engineQueue && entry.path.startsWith("/api/")
       && answering && entry.path !== answering);
@@ -1789,9 +1857,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=3fd38f6036";
-import * as flat from "./bore.js?v=3fd38f6036";
-import * as pick from "./map.js?v=3fd38f6036";
+import * as draw from "./draw.js?v=1092595c7d";
+import * as flat from "./bore.js?v=1092595c7d";
+import * as pick from "./map.js?v=1092595c7d";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -2433,8 +2501,10 @@ const MOST_MOVING = 20000;
  * corrected the same way as the photograph's budget, so a fast computer
  * ends up drawing all of them and a slow phone a few hundred. A quarter
  * of a second after the movement stops, the whole picture is drawn. */
-const motion3d = { blocks: 1500, stride: 1, roads: true, photo: true };
+const motion3d = { blocks: 1500, stride: 1, roads: true, photo: true, mesh: 1 };
 const FEWEST_BLOCKS = 120;
+//: Buildings per part of a still frame being built a slice at a time.
+const BLOCK_CHUNK = 400;
 
 function movingFrame() {
   return draw.texturing.moving && !draw.texturing.still;
@@ -2453,11 +2523,15 @@ function tuneMotion(took) {
       motion3d.stride += 1;
     } else if (motion3d.roads) {
       motion3d.roads = false;
-    } else {
+    } else if (motion3d.photo) {
       motion3d.photo = false;
+    } else {
+      motion3d.mesh = Math.min(3, motion3d.mesh + 1);
     }
   } else if (took < SMOOTH_MS * 0.6) {
-    if (!motion3d.photo) {
+    if (motion3d.mesh > 1) {
+      motion3d.mesh -= 1;
+    } else if (!motion3d.photo) {
       motion3d.photo = true;
     } else if (!motion3d.roads) {
       motion3d.roads = true;
@@ -2469,10 +2543,11 @@ function tuneMotion(took) {
   }
 }
 
-/* A still frame slower than this, on automatic quality, takes the
- * device one level down for the rest of the visit: the full picture
- * after every movement should not freeze the page for a second. */
-const STILL_TOO_SLOW_MS = 450;
+/* A whole picture that takes longer than this to paint, on automatic
+ * quality, takes the device one level down for the rest of the visit.
+ * It is painted in slices and freezes nothing, but a picture that
+ * arrives two seconds after the hand stops feels like a slow page. */
+const STILL_TOO_SLOW_MS = 1500;
 let qualityLowered = 0;
 
 function timedPaint() {
@@ -2500,6 +2575,8 @@ function timedPaint() {
 }
 
 function render() {
+  // A still picture still being painted is of a scene that has moved.
+  dropStill();
   // Every path that redraws also reconsiders how fine the ground under
   // the camera should be. Cheap: it only resets a timer, and the window
   // it would ask for is compared with the one already in hand.
@@ -2528,16 +2605,93 @@ function scheduleStill() {
     if (moving()) { stillTimer = setTimeout(settle, 250); return; }
     // Always, photograph or not: the moving frames left buildings and
     // coverage out, and this is where they come back.
+    paintStillInSlices();
+  }, 250);
+}
+
+/* The still picture, painted out of sight a slice per frame and shown
+ * whole (see `draw.paintSliced`). Anything that moves the scene calls
+ * `render`, which drops a still picture still being painted. */
+const stillCanvas = document.createElement("canvas");
+const stillContext = stillCanvas.getContext("2d");
+let stillJob = 0;
+//: How long one slice works, in milliseconds: well inside a frame.
+const STILL_SLICE_MS = 8;
+
+function dropStill() {
+  if (stillJob) cancelAnimationFrame(stillJob);
+  stillJob = 0;
+}
+
+function paintStillInSlices() {
+  dropStill();
+  stillFrame = true;
+  draw.texturing.on = true;
+  draw.texturing.still = true;
+  const parts = paintScene(true);
+  draw.texturing.still = false;
+  stillFrame = false;
+  // The tunnel's flat drawing paints itself and has no slices.
+  if (!parts) {
     stillFrame = true;
-    draw.texturing.on = true;
     draw.texturing.still = true;
     timedPaint();
     draw.texturing.still = false;
     stillFrame = false;
-  }, 250);
+    return;
+  }
+  const ratio = Math.min(window.devicePixelRatio || 1, quality().ratio);
+  stillCanvas.width = canvas.width;
+  stillCanvas.height = canvas.height;
+  stillContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+  // First the parts are built, a slice of time per frame, then painted
+  // the same way; neither holds the page for longer than a slice.
+  const items = [];
+  let built = 0;
+  let job = null;
+  const step = () => {
+    if (built < parts.length) {
+      const began = performance.now();
+      while (built < parts.length && performance.now() - began < STILL_SLICE_MS) {
+        items.push(...parts[built]());
+        built += 1;
+      }
+      stillJob = requestAnimationFrame(step);
+      return;
+    }
+    if (!job) {
+      markers = items.filter(item => item.kind === "mast");
+      job = draw.paintSliced(stillContext, container.clientWidth,
+                             container.clientHeight, items);
+    }
+    if (!job.step(STILL_SLICE_MS)) {
+      stillJob = requestAnimationFrame(step);
+      return;
+    }
+    stillJob = 0;
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(stillCanvas, 0, 0);
+    context.restore();
+    learnFromStill(job.workMs, job.drawn);
+  };
+  stillJob = requestAnimationFrame(step);
 }
 
-function paintScene() {
+/* What the whole picture cost here, kept for the moving frames: how
+ * many photograph pieces fit in a smooth frame, and whether automatic
+ * quality should come down a level so the whole picture arrives sooner. */
+function learnFromStill(workMs, drawn) {
+  if (drawn > 0) {
+    const each = workMs / drawn;
+    draw.texturing.budget = Math.max(FEWEST_MOVING,
+      Math.min(MOST_MOVING, Math.floor(SMOOTH_MS * 0.8 / each)));
+  }
+  if (workMs > STILL_TOO_SLOW_MS) lowerQuality();
+}
+
+function paintScene(sliced = false) {
   if (!latest) return;
   const width = container.clientWidth;
   const height = container.clientHeight;
@@ -2576,13 +2730,23 @@ function paintScene() {
 
   const roadStyle = roadsForward && showRoads ? ROADS.forward : ROADS.rest;
   draw.shade.dim = roadStyle.dim;
-  const items = [
-    ...draw.groundFaces(view, drawnTerrain(), light, photo),
-    ...(showBuildings ? draw.blocks(
-      view, blocksOnDrawnGround(), light, photo, bias) : []),
+  // The frame in parts, so a still frame can be built a few at a time
+  // as well as painted a few at a time (`paintStillInSlices`); a moving
+  // frame runs them all at once. The buildings, the largest part, go in
+  // chunks.
+  const buildings = showBuildings ? blocksOnDrawnGround() : [];
+  const parts = [
+    () => draw.groundFaces(view, drawnTerrain(), light, photo,
+                           moved ? motion3d.mesh : 1),
+  ];
+  for (let at = 0; at < buildings.length; at += BLOCK_CHUNK) {
+    const chunk = buildings.slice(at, at + BLOCK_CHUNK);
+    parts.push(() => draw.blocks(view, chunk, light, photo, bias));
+  }
+  parts.push(() => [
     ...(shownLayer === "ground" ? []
       : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer,
-                       groundEdge(), movingFrame() ? motion3d.stride : 1)),
+                       groundEdge(), moved ? motion3d.stride : 1)),
     // The streets under the route, light: context, not a result, unless
     // they have been brought forward.
     ...(showRoads && (!moved || motion3d.roads)
@@ -2599,47 +2763,54 @@ function paintScene() {
         run.map(p => [p[0], p[1], draw.lift(p[2]) + 10]),
         "#22282e", 2, bias,
       )),
-  ];
+  ]);
 
-  // Each group's reach, in its own colour, once for the group.
-  //
-  // A UWB bracket and a mast on one corridor cover nothing like the same
-  // ground, so the ring is per run — but every anchor within a run has
-  // the same reach, and drawing one each put forty-nine copies of a
-  // single fact over each other. The legend has always called it the
-  // group's range; the code drew each anchor's. The one being dragged
-  // gets its own, because that is the anchor a person is reasoning
-  // about while they drag it.
-  const rings = new Map();
-  for (const anchor of latest.anchors) {
-    if (!anchor.reach_m || !anchor.run) continue;
-    if (!rings.has(anchor.run)) rings.set(anchor.run, []);
-    rings.get(anchor.run).push(anchor);
-  }
-  const shown = [...rings.values()].map(group => group[group.length >> 1]);
-  const held = latest.anchors.find(a => a.id === dragging && a.reach_m);
-  if (held && !shown.includes(held)) shown.push(held);
-  for (const anchor of shown) {
-    items.push(...draw.ring(
-      view,
-      [anchor.x, anchor.y, draw.standingZ(anchor) + 6],
-      anchor.reach_m,
-      colourOf(anchor.run).replace("rgb(", "rgba(").replace(")", ",0.45)"),
-      bias,
-    ));
-  }
+  parts.push(() => {
+    const items = [];
 
-  for (const unit of latest.units || []) {
-    for (const run of onDrawnGround([unit.trail])) {
-      items.push(...draw.polyline(
+    // Each group's reach, in its own colour, once for the group.
+    //
+    // A UWB bracket and a mast on one corridor cover nothing like the same
+    // ground, so the ring is per run — but every anchor within a run has
+    // the same reach, and drawing one each put forty-nine copies of a
+    // single fact over each other. The legend has always called it the
+    // group's range; the code drew each anchor's. The one being dragged
+    // gets its own, because that is the anchor a person is reasoning
+    // about while they drag it.
+    const rings = new Map();
+    for (const anchor of latest.anchors) {
+      if (!anchor.reach_m || !anchor.run) continue;
+      if (!rings.has(anchor.run)) rings.set(anchor.run, []);
+      rings.get(anchor.run).push(anchor);
+    }
+    const shown = [...rings.values()].map(group => group[group.length >> 1]);
+    const held = latest.anchors.find(a => a.id === dragging && a.reach_m);
+    if (held && !shown.includes(held)) shown.push(held);
+    for (const anchor of shown) {
+      items.push(...draw.ring(
         view,
-        run.map(p => [p[0], p[1], draw.lift(p[2]) + 20]),
-        "rgba(180,85,29,0.55)", 1.5, bias,
+        [anchor.x, anchor.y, draw.standingZ(anchor) + 6],
+        anchor.reach_m,
+        colourOf(anchor.run).replace("rgb(", "rgba(").replace(")", ",0.45)"),
+        bias,
       ));
     }
-  }
-  items.push(...draw.units(view, latest.units || [], unitName));
 
+    for (const unit of latest.units || []) {
+      for (const run of onDrawnGround([unit.trail])) {
+        items.push(...draw.polyline(
+          view,
+          run.map(p => [p[0], p[1], draw.lift(p[2]) + 20]),
+          "rgba(180,85,29,0.55)", 1.5, bias,
+        ));
+      }
+    }
+    items.push(...draw.units(view, latest.units || [], unitName));
+    return items;
+  });
+
+  if (sliced) return parts;
+  const items = parts.flatMap(part => part());
   markers = items.filter(item => item.kind === "mast");
   draw.paint(context, width, height, items);
 }
@@ -4654,8 +4825,10 @@ function scheduleSweep() {
   if (latest) showNumbers(latest, simulated);
   clearTimeout(sweepTimer);
   sweepTimer = setTimeout(async () => {
+    // One line in the background list for the whole sweep, with how far
+    // it has got and about how long is left.
+    const shown = startProgress("sweep", "act.sweep", 0, "/api/sweep/step");
     try {
-      flash(say("busy.sweep"));
       // A step at a time, so a row picked or a run asked for meanwhile
       // is answered between two steps rather than after the whole sweep
       // (in a browser the whole sweep is minutes).
@@ -4665,9 +4838,7 @@ function scheduleSweep() {
         // Anything but the newest answer is an answer to a question the
         // page has stopped asking.
         if (mine !== sweepWanted) return;
-        if (!swept.done) {
-          flash(say("busy.sweep.share", { share: percent(swept.share, 0) }));
-        }
+        if (!swept.done) shown.share(swept.share);
       } while (!swept.done);
       sweepData = swept;
       // The bands travel with the sweep, so the legend is redrawn with
@@ -4679,6 +4850,9 @@ function scheduleSweep() {
       flash("");
     } catch (error) {
       if (mine === sweepWanted) flash(error.message, true);
+    } finally {
+      // A newer sweep has listed itself under the same name already.
+      if (mine === sweepWanted) shown.done();
     }
   }, 250);
 }
@@ -4737,11 +4911,16 @@ function aboutTime(seconds) {
   return say("result.time.minutes", { minutes: Math.round(seconds / 60) });
 }
 
+/* Seconds to the first figures on this row, here; 0 where not known. */
+function runSeconds() {
+  const where = window.YERKON_IN_BROWSER ? "browser" : "local";
+  return (state && (RUN_SECONDS[where] || {})[state.scenario]) || 0;
+}
+
 function drawRunTime() {
   const line = document.getElementById("run-time");
   if (!line || !state) return;
-  const where = window.YERKON_IN_BROWSER ? "browser" : "local";
-  const first = (RUN_SECONDS[where] || {})[state.scenario];
+  const first = runSeconds();
   line.hidden = !first;
   if (!first) return;
   line.textContent = hurrying()
@@ -4757,6 +4936,8 @@ async function runSimulation() {
   openReadout(true);
   button.disabled = true;
   button.textContent = say("result.running");
+  const firstMs = runSeconds() * 1000;
+  let shown = startProgress("run", "act.simulate", firstMs, "/api/simulate");
   let first;
   try {
     first = await ask("/api/simulate");
@@ -4772,6 +4953,7 @@ async function runSimulation() {
     if (mine === simulationWanted) {
       button.disabled = false;
       button.textContent = say("result.run");
+      shown.done();
     }
   }
 
@@ -4780,6 +4962,7 @@ async function runSimulation() {
   // run with the button live and replace the figures when they land
   // (ADR-0059). The row above them says which of the two is showing.
   if ((first.draws_wanted || 1) <= (first.draws_done || 1)) return;
+  shown = startProgress("run", "act.pooled", firstMs * 2, "/api/simulate/pooled");
   try {
     const every = await ask("/api/simulate/pooled");
     if (mine !== simulationWanted) return;
@@ -4787,6 +4970,8 @@ async function runSimulation() {
     showNumbers(latest, simulated);
   } catch (error) {
     if (mine === simulationWanted) flash(error.message, true);
+  } finally {
+    if (mine === simulationWanted) shown.done();
   }
 }
 
