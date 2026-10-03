@@ -96,8 +96,9 @@ export const SAY = {
   "ground.roads": { tr: "Yolları göster", en: "Show the roads" },
   "ground.buildings": { tr: "Binaları göster", en: "Show the buildings" },
   "relief.true": { tr: "Yükseklik: gerçek ölçek", en: "Height: true scale" },
-  "relief.two": { tr: "Yükseklik: 2 kat abartılı", en: "Relief doubled" },
-  "relief.five": { tr: "Yükseklik: 5 kat abartılı", en: "Relief five times" },
+  "relief.two": { tr: "Yükseklik: 2 kat abartılı", en: "Height: stretched 2 times" },
+  "relief.three": { tr: "Yükseklik: 3 kat abartılı", en: "Height: stretched 3 times" },
+  "relief.five": { tr: "Yükseklik: 5 kat abartılı", en: "Height: stretched 5 times" },
   "ground.buildings.from": {
     tr: "İndirilen binalar; model her binayı aynı taban alanına sahip "
       + "bir blok olarak ele almaktadır.",
@@ -545,6 +546,19 @@ export const SAY = {
   "result.head": { tr: "Sonuç", en: "Result" },
   "result.run": { tr: "Simülasyonu çalıştır", en: "Run the simulation" },
   "result.running": { tr: "Çalışıyor…", en: "Running…" },
+  "result.time.minutes": { tr: "yaklaşık {minutes} dakika", en: "about {minutes} minutes" },
+  "result.time.seconds": { tr: "yaklaşık {seconds} saniye", en: "about {seconds} seconds" },
+  "result.time.quick": {
+    tr: "Tahmini süre: {first}. Süre cihaza göre değişmektedir.",
+    en: "Expected time: {first}. It varies with the device.",
+  },
+  "result.time.full": {
+    tr: "Tahmini süre: ilk sonuçlar {first}, kesin sonuçlar {all} içinde gelmektedir. "
+      + "Süre cihaza göre değişmektedir.",
+    en: "Expected time: first figures in {first}, final figures in {all}. "
+      + "It varies with the device.",
+  },
+
   "result.reset": { tr: "Sıfırla", en: "Reset" },
   // The fidelity toggle. Not a deployment choice, so it sits beside Run
   // rather than among the ready-made options (ADR-0063).

@@ -65,44 +65,65 @@ def can_ask() -> bool:
 
 
 def get(url: str, params: Optional[dict] = None,
-        timeout: float = DEFAULT_TIMEOUT_S) -> Reply:
+        timeout: float = DEFAULT_TIMEOUT_S,
+        headers: Optional[dict] = None) -> Reply:
     if params:
         url = "{}{}{}".format(url, "&" if "?" in url else "?", urlencode(params))
-    return _ask("GET", url, None, timeout)
+    return _ask("GET", url, None, timeout, headers)
+
+
+def head(url: str, timeout: float = DEFAULT_TIMEOUT_S) -> Reply:
+    """The headers alone: a file's size, before reading parts of it."""
+    return _ask("HEAD", url, None, timeout)
 
 
 def post_form(url: str, data: dict, timeout: float = DEFAULT_TIMEOUT_S) -> Reply:
     return _ask("POST", url, data, timeout)
 
 
-def _ask(method: str, url: str, form: Optional[dict], timeout: float) -> Reply:
+def header(reply: Reply, name: str) -> Optional[str]:
+    """One header of a reply, whatever case the server wrote it in."""
+    wanted = name.lower()
+    for key, value in reply.headers.items():
+        if key.lower() == wanted:
+            return value
+    return None
+
+
+def _ask(method: str, url: str, form: Optional[dict], timeout: float,
+         headers: Optional[dict] = None) -> Reply:
     if IN_A_BROWSER:
         return _in_the_browser(
-            method, url, None if form is None else urlencode(form), timeout)
+            method, url, None if form is None else urlencode(form), timeout,
+            headers)
     try:
         import requests
     except ImportError:
-        return _with_urllib(method, url, form, timeout)
+        return _with_urllib(method, url, form, timeout, headers)
 
+    extra = {"headers": headers} if headers else {}
     try:
         if method == "POST":
-            answer = requests.post(url, data=form, timeout=timeout)
+            answer = requests.post(url, data=form, timeout=timeout, **extra)
+        elif method == "HEAD":
+            answer = requests.head(url, timeout=timeout, **extra)
         else:
-            answer = requests.get(url, timeout=timeout)
+            answer = requests.get(url, timeout=timeout, **extra)
     except Exception as error:  # noqa: BLE001 — every transport failure is one
         raise Failed(_cause(error)) from error
     return Reply(answer.status_code, answer.content, dict(answer.headers))
 
 
 def _with_urllib(method: str, url: str, form: Optional[dict],
-                 timeout: float) -> Reply:
+                 timeout: float, headers: Optional[dict] = None) -> Reply:
     """The standard library's request, for an install without `requests`."""
     import urllib.error
     import urllib.request
 
     body = None if form is None else urlencode(form).encode("utf-8")
     request = urllib.request.Request(
-        url, data=body, method=method, headers={"User-Agent": USER_AGENT})
+        url, data=body, method=method,
+        headers=dict({"User-Agent": USER_AGENT}, **(headers or {})))
     try:
         with urllib.request.urlopen(request, timeout=timeout) as answer:
             return Reply(answer.status, answer.read(), dict(answer.headers))
@@ -113,7 +134,7 @@ def _with_urllib(method: str, url: str, form: Optional[dict],
 
 
 def _in_the_browser(method: str, url: str, form: Optional[str],
-                    timeout: float) -> Reply:
+                    timeout: float, headers: Optional[dict] = None) -> Reply:
     """The worker's own request, waited for.
 
     Synchronous, which a page may not do and a worker may. The browser
@@ -130,6 +151,8 @@ def _in_the_browser(method: str, url: str, form: Optional[str],
     if form is not None:
         request.setRequestHeader(
             "Content-Type", "application/x-www-form-urlencoded")
+    for name, value in (headers or {}).items():
+        request.setRequestHeader(name, value)
     try:
         request.send(form)
     except Exception as error:  # noqa: BLE001 — a JavaScript NetworkError
@@ -143,11 +166,14 @@ def _in_the_browser(method: str, url: str, form: Optional[str],
         content = bytes(body.to_bytes())
     else:
         content = bytes(body.to_py())
-    headers = {}
-    retry = request.getResponseHeader("Retry-After")
-    if retry:
-        headers["Retry-After"] = str(retry)
-    return Reply(int(request.status), content, headers)
+    # Only the headers a page may read across origins come back, and
+    # only these are wanted: when to try again, and how big a file is.
+    kept = {}
+    for name in ("Retry-After", "Content-Length", "Content-Range"):
+        value = request.getResponseHeader(name)
+        if value:
+            kept[name] = str(value)
+    return Reply(int(request.status), content, kept)
 
 
 def _cause(error: Exception) -> str:

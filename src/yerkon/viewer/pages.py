@@ -4763,13 +4763,24 @@ def package_zip() -> bytes:
     import io
     import zipfile
 
+    from yerkon.site.fetch import shipped_overture_release
+
     root = pathlib.Path(__file__).resolve().parent.parent
+    # Of the fetch cache, only the newest Overture release's row-group
+    # indexes: they turn a building fetch in the visitor's browser from
+    # half a gigabyte of file footers into a few megabytes.
+    tiles = root / "site" / "places" / "_tiles"
+    release = shipped_overture_release(tiles)
+    carried = {tiles / "overture-{}-{}.json".format(release, kind)
+               for kind in ("building", "segment", "infrastructure")
+               } if release else set()
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(root.rglob("*")):
             relative = path.relative_to(root)
-            if path.is_dir() or any(part in LEFT_OUT or part.startswith(FETCHED)
-                                    for part in relative.parts):
+            if path.is_dir() or (path not in carried and any(
+                    part in LEFT_OUT or part.startswith(FETCHED)
+                    for part in relative.parts)):
                 continue
             if path.suffix == ".pyc":
                 continue

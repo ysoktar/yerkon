@@ -900,7 +900,12 @@ function dimmed(context, screen) {
 
 export function paint(context, width, height, items) {
   context.clearRect(0, 0, width, height);
-  items.sort((a, b) => b.depth - a.depth);
+  // Back to front, except that the units and the receivers come last
+  // of all: they are drawn at a legible size rather than to scale, and
+  // painted among the ground they sat under the coverage colours and
+  // read as faded, the one thing on the screen a person reaches for.
+  const marker = item => item.kind === "mast" || item.kind === "unit";
+  items.sort((a, b) => (marker(a) - marker(b)) || (b.depth - a.depth));
   texturing.drawn = 0;
   const coarse = texturing.on && texturing.moving && !texturing.still
     ? chooseForMoving(items) : null;

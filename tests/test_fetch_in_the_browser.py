@@ -306,8 +306,14 @@ def test_in_a_browser_the_fetch_uses_only_what_a_browser_reaches(monkeypatch):
         work(lambda line: None)
     kinds = lambda key: [type(s).__name__ for s in seen[key]]  # noqa: E731
     assert kinds("elevation_sources") == ["TerrainTileElevation"]
-    assert kinds("buildings_sources") == ["OpenStreetMapBuildings"]
-    assert kinds("roads_sources") == ["OpenStreetMapRoads"]
+    # Overture first, from the release whose index the page carries, so a
+    # fetch reads a few megabytes rather than every file's footer; Overpass
+    # behind it for when the bucket has moved on.
+    assert kinds("buildings_sources") == ["OvertureBuildings", "OpenStreetMapBuildings"]
+    assert kinds("roads_sources") == ["OvertureRoads", "OpenStreetMapRoads"]
+    assert kinds("furniture_sources") == ["OvertureFurniture"]
+    shipped = source.shipped_overture_release(tasks.SITES / "_tiles")
+    assert shipped and all(s.release == shipped for s in seen["buildings_sources"][:1])
     assert seen["imagery_source"] is None
 
 

@@ -449,6 +449,7 @@ def fetch(state: ViewState, payload: dict) -> Callable:
             better_with,
             build_site,
             fitted_zoom,
+            shipped_overture_release,
             tile_of,
         )
         from yerkon.site.http import IN_A_BROWSER
@@ -521,9 +522,16 @@ def fetch(state: ViewState, payload: dict) -> Callable:
         cache = str(SITES / "_tiles")
         if IN_A_BROWSER:
             ground = (TerrainTileElevation(cache_directory=cache),)
-            built = (OpenStreetMapBuildings(),)
-            driven = (OpenStreetMapRoads(),)
-            standing = ()
+            # Overture first, from the release whose index the page
+            # carries; Overpass after it, for when the bucket has moved on
+            # or a box falls outside what the index knows.
+            shipped = shipped_overture_release(cache)
+            overture = dict(release=shipped, cache_directory=cache)
+            built = ((OvertureBuildings(**overture),) if shipped else ()) + (
+                OpenStreetMapBuildings(),)
+            driven = ((OvertureRoads(**overture),) if shipped else ()) + (
+                OpenStreetMapRoads(),)
+            standing = (OvertureFurniture(**overture),) if shipped else ()
         else:
             # The better sources only where this install can read them,
             # so a plain install's record says what happened rather than

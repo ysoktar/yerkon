@@ -10,6 +10,9 @@
  * fetch is in place before the page asks its first question.
  */
 (() => {
+  // The page reads this to say how long a run takes here, where the
+  // engine is several times slower than on a computer of its own.
+  window.YERKON_IN_BROWSER = true;
   const english = new URLSearchParams(location.search).get("dil") === "en";
   // Said in the reader's terms: somebody opening the page does not need
   // to know what Pyodide or numpy is, only how far along it is.

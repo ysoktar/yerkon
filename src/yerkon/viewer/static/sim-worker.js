@@ -47,7 +47,11 @@ const ready = (async () => {
  */
 let pillow = null;
 function withPillow() {
-  if (!pillow) pillow = ready.then(({ pyodide }) => pyodide.loadPackage("pillow"));
+  // pyarrow too: buildings and roads come from Overture's Parquet files
+  // first. If it will not load, the fetch falls back to Overpass, so its
+  // failure is not the fetch's.
+  if (!pillow) pillow = ready.then(({ pyodide }) => pyodide.loadPackage("pillow")
+    .then(() => pyodide.loadPackage("pyarrow").catch(() => null)));
   return pillow;
 }
 

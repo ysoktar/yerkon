@@ -930,6 +930,27 @@ OVERTURE_ROADS = "theme=transportation/type=segment/"
 OVERTURE_INFRASTRUCTURE = "theme=base/type=infrastructure/"
 
 
+def shipped_overture_release(cache_directory) -> Optional[str]:
+    """The newest Overture release whose building index is on disk.
+
+    Finding which row groups of which of five hundred files cover a box
+    means reading every file's footer first: 475 MB and over a minute for
+    one town, which no visitor's browser should do. With the index on
+    disk it is half a dozen reads and four megabytes. The published site
+    ships the index of one release and reads that release, so its
+    fetches use what it carries (ADR-0086).
+    """
+    folder = pathlib.Path(cache_directory)
+    if not folder.is_dir():
+        return None
+    found = sorted(
+        match.group(1)
+        for match in (re.match(r"overture-(.+)-building\.json$", path.name)
+                      for path in folder.glob("overture-*-building.json"))
+        if match)
+    return found[-1] if found else None
+
+
 @dataclass
 class OvertureBuildings:
     """Building footprints and heights from Overture Maps.
@@ -1034,12 +1055,10 @@ class _OvertureReader:
     # -- the bucket -------------------------------------------------------
 
     def _get(self, url: str, headers: Optional[dict] = None) -> bytes:
+        # Through `yerkon.site.http`, so the published site's worker
+        # reads the bucket too: it answers a page from any address.
         try:
-            import requests
-        except ImportError as error:
-            raise Unreachable(say("site.needs_requests")) from error
-        try:
-            response = requests.get(
+            response = http.get(
                 url, headers=headers or {}, timeout=DEFAULT_TIMEOUT_S * 4)
             response.raise_for_status()
             return response.content
@@ -1243,18 +1262,11 @@ class _RangeFile(io.RawIOBase):
         self.position = 0
         self.size = int(self._head()["Content-Length"])
 
-    def _requests(self):
-        try:
-            import requests
-        except ImportError as error:
-            raise Unreachable(say("site.needs_requests")) from error
-        return requests
-
     def _head(self):
         try:
-            response = self._requests().head(self.url, timeout=DEFAULT_TIMEOUT_S)
+            response = http.head(self.url, timeout=DEFAULT_TIMEOUT_S)
             response.raise_for_status()
-            return response.headers
+            return {"Content-Length": http.header(response, "Content-Length")}
         except Unreachable:
             raise
         except Exception as error:
@@ -1287,7 +1299,7 @@ class _RangeFile(io.RawIOBase):
             return b""
         last = min(self.position + size, self.size) - 1
         try:
-            response = self._requests().get(
+            response = http.get(
                 self.url,
                 headers={"Range": "bytes={}-{}".format(self.position, last)},
                 timeout=DEFAULT_TIMEOUT_S * 4,

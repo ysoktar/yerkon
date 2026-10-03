@@ -28,7 +28,7 @@ const ready = (async () => {
   // nothing about the network.
   if (!pyodide.loadedPackages.numpy) throw new Error("numpy could not be loaded");
   stage("package");
-  const response = await fetch("yerkon.zip?v=5aebb11ad1");
+  const response = await fetch("yerkon.zip?v=847c7fba65");
   if (!response.ok) throw new Error("yerkon.zip: " + response.status);
   pyodide.unpackArchive(await response.arrayBuffer(), "zip",
                         { extractDir: "/home/pyodide/lib" });
@@ -47,7 +47,11 @@ const ready = (async () => {
  */
 let pillow = null;
 function withPillow() {
-  if (!pillow) pillow = ready.then(({ pyodide }) => pyodide.loadPackage("pillow"));
+  // pyarrow too: buildings and roads come from Overture's Parquet files
+  // first. If it will not load, the fetch falls back to Overpass, so its
+  // failure is not the fetch's.
+  if (!pillow) pillow = ready.then(({ pyodide }) => pyodide.loadPackage("pillow")
+    .then(() => pyodide.loadPackage("pyarrow").catch(() => null)));
   return pillow;
 }
 

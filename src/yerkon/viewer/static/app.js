@@ -3751,8 +3751,11 @@ function wireTasks() {
 
 /* ---------- what the ground overlay reads ---------- */
 
-/* Which of the sweep's four readings is painted. */
-let shownLayer = "ground";
+/* Which of the sweep's four readings is painted. The count of units in
+ * reach first: a visitor comes to see where the system works, and the
+ * colours are light enough that the photograph and the buildings show
+ * through them. */
+let shownLayer = "anchors";
 
 /* "ground" draws no cells, so the photograph and the streets show. */
 const LAYERS = ["ground", "anchors", "margin_db", "dilution", "error_m"];
@@ -4616,6 +4619,7 @@ function drawHurry() {
   const on = hurrying();
   button.textContent = say(on ? "result.hurry.on" : "result.hurry");
   button.classList.toggle("on", on);
+  drawRunTime();
 }
 
 //: Which press of the button the answers on screen belong to.
@@ -4625,6 +4629,37 @@ function drawHurry() {
 //: last. Same guard as the sweep's: an answer whose press has been
 //: superseded is dropped rather than shown.
 let simulationWanted = 0;
+
+/* How long Run takes to its first figures, measured on each row as
+ * shipped: in Chromium on a mid-range computer for the published site,
+ * and in Python on the same computer for `yerkon view`. The quick trial
+ * and the full run reach their first figures in the same time; the full
+ * run then carries on with the rest of its shadow draws, about twice as
+ * long again. A rough guide, said as one: a phone is slower, a larger
+ * site or more units longer. */
+const RUN_SECONDS = {
+  browser: { urban: 125, rural: 800, tunnel: 65 },
+  local: { urban: 40, rural: 205, tunnel: 15 },
+};
+
+function aboutTime(seconds) {
+  if (seconds < 90) {
+    return say("result.time.seconds", { seconds: Math.max(5, Math.round(seconds / 5) * 5) });
+  }
+  return say("result.time.minutes", { minutes: Math.round(seconds / 60) });
+}
+
+function drawRunTime() {
+  const line = document.getElementById("run-time");
+  if (!line || !state) return;
+  const where = window.YERKON_IN_BROWSER ? "browser" : "local";
+  const first = (RUN_SECONDS[where] || {})[state.scenario];
+  line.hidden = !first;
+  if (!first) return;
+  line.textContent = hurrying()
+    ? say("result.time.quick", { first: aboutTime(first) })
+    : say("result.time.full", { first: aboutTime(first), all: aboutTime(first * 3) });
+}
 
 async function runSimulation() {
   const button = document.getElementById("run");

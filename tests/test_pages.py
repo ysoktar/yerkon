@@ -1097,7 +1097,14 @@ def test_the_archive_the_browser_imports_answers_on_its_own(tmp_path):
     names = zipfile.ZipFile(io.BytesIO(archive)).namelist()
     assert "yerkon/viewer/server.py" in names
     assert "yerkon/site/places/kizilay/elevation.npy" in names
-    assert not any("_tiles" in n or "__pycache__" in n for n in names)
+    assert not any("__pycache__" in n for n in names)
+    # Of the fetch cache only the Overture indexes go, for one release:
+    # no elevation tiles, no photographs.
+    carried = [n for n in names if "_tiles" in n]
+    assert carried and all(n.split("/")[-1].startswith("overture-")
+                           and n.endswith(".json") for n in carried)
+    releases = {n.split("/")[-1][len("overture-"):].rsplit("-", 1)[0] for n in carried}
+    assert len(releases) == 1, releases
     # A place somebody fetched in the simulator is theirs, not the site's.
     assert not any("/places/yer-" in n for n in names)
 
