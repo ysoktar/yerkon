@@ -1,0 +1,567 @@
+/* The site in front of the simulator.
+ *
+ * Separate from style.css rather than added to it: that one pins the
+ * page to the window and hides the overflow, because a 3D scene fills
+ * the screen and must not scroll. These are documents and have to.
+ *
+ * Two palettes. The page follows the reader's system setting with no
+ * script at all; the button in the header overrides it and the override
+ * is what `data-theme` on the root carries.
+ */
+/* IBM Plex Sans, served from the site itself rather than from Google:
+   a visitor's address goes to nobody else, and the page looks the same
+   when Google is slow or out of reach. One variable file per alphabet
+   covers every weight from 100 to 700; the second carries the Turkish
+   letters (ğ, ş, İ). SIL Open Font License, fonts/OFL.txt. */
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: normal; font-weight: 100 700;
+  font-display: swap;
+  src: url("fonts/ibm-plex-sans-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+@font-face {
+  font-family: "IBM Plex Sans"; font-style: normal; font-weight: 100 700;
+  font-display: swap;
+  src: url("fonts/ibm-plex-sans-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --ink: #12181f;
+  --dim: #2d3a46;
+  --quiet: #61707e;
+  --paper: #ffffff;
+  --shade: #f4f6f8;
+  --line: #ccd4dc;
+  /* The YERKON blue (#2178fe) is the logo and the charts' colour; text,
+     links and buttons take a shade darker so they read at 4,5:1 on
+     white and on the grey footer (WCAG AA). */
+  --accent: #0163fa;
+  --accent-ink: #ffffff;
+  --warn: #b4551d;
+  --plate: #ffffff;
+  --chart-mark: #2178fe;
+  --selection: color-mix(in srgb, var(--chart-mark) 20%, transparent);
+  --chart-context: #7c8b99;
+  /* What the project has done and what it has not, on the home page. */
+  --done-bg: #d3f5dc;
+  --done-ink: #0f5c28;
+  --todo-bg: #fff1a8;
+  --todo-ink: #5c4700;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e8eef4;
+    --dim: #c2cdd8;
+    --quiet: #93a2b0;
+    --paper: #10151b;
+    --shade: #18212a;
+    --line: #2c3742;
+    --accent: #6ba6ff;
+    --accent-ink: #0b1017;
+    --warn: #e2914f;
+    /* Every picture on this site came out of a slide deck and carries a
+     * white background. On a dark page they would each be a lit slab,
+     * so they sit on a plate that is meant to be light in both modes. */
+    --plate: #eef2f6;
+    --chart-mark: #6ba6ff;
+    --selection: color-mix(in srgb, var(--chart-mark) 30%, transparent);
+    --chart-context: #5b6b7a;
+    --done-bg: #183d25;
+    --done-ink: #8be3a5;
+    --todo-bg: #4a3d0a;
+    --todo-ink: #ffe27a;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #e8eef4;
+  --dim: #c2cdd8;
+  --quiet: #93a2b0;
+  --paper: #10151b;
+  --shade: #18212a;
+  --line: #2c3742;
+  --accent: #6ba6ff;
+  --accent-ink: #0b1017;
+  --warn: #e2914f;
+  --plate: #eef2f6;
+  --chart-mark: #6ba6ff;
+  --selection: color-mix(in srgb, var(--chart-mark) 30%, transparent);
+  --chart-context: #5b6b7a;
+  --done-bg: #183d25;
+  --done-ink: #8be3a5;
+  --todo-bg: #4a3d0a;
+  --todo-ink: #ffe27a;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 15px/1.65 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+/* Selected text in the line blue, the colour the charts draw with, see
+   through enough that what is selected stays readable. */
+::selection { background: var(--selection); }
+
+/* --- the chrome --------------------------------------------------------- */
+
+/* Three columns: the brand on the left, the pages in the middle of the
+   page, and the simulator, the theme and the language on the right. The
+   outer two share the space left over, so the page links sit in the middle
+   of the page, over the text. */
+header {
+  position: sticky; top: 0; z-index: 5;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  gap: 10px 18px; padding: 10px 24px; background: var(--paper);
+  border-bottom: 1px solid var(--line);
+}
+header .brand { justify-self: start; }
+header .actions { justify-self: end; display: flex; align-items: center;
+  gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: inherit; }
+.brand img { display: block; width: 26px; height: 26px; border-radius: 6px; }
+.brand b { font-size: 17px; letter-spacing: 0.16em; }
+.brand span { font-size: 11px; color: var(--quiet); }
+nav.pages { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+nav.pages a { font-size: 13px; color: var(--quiet); text-decoration: none; }
+nav.pages a:hover { color: var(--ink); }
+nav.pages a.here { color: var(--ink); font-weight: 600; }
+/* The two languages as one square switch: the one in use is the filled
+   square, the other the empty half of the same box. */
+nav.tongues { display: flex; align-items: center; gap: 6px; }
+nav.tongues a, nav.tongues span {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 24px; border: 1px solid var(--line);
+  background: var(--shade); font: inherit; font-size: 11px; font-weight: 600;
+  color: var(--quiet); text-decoration: none; cursor: pointer;
+}
+nav.tongues > :first-child { border-radius: 4px 0 0 4px; }
+nav.tongues > * + * { margin-left: -6px; border-left: 0; border-radius: 0 4px 4px 0; }
+nav.tongues a:hover { color: var(--ink); }
+/* Light and dark as a two-way switch: the sun and the moon sit in the
+   track, the knob covers the one that is not in use. */
+button.theme { position: relative; display: inline-flex;
+  align-items: center; justify-content: space-between; width: 50px;
+  height: 24px; padding: 0 5px; border: 1px solid var(--line);
+  border-radius: 12px; background: var(--shade); color: var(--quiet);
+  cursor: pointer; }
+button.theme svg { width: 13px; height: 13px; }
+button.theme .knob { position: absolute; top: 2px; left: 2px; width: 18px;
+  height: 18px; border-radius: 50%; background: var(--paper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); transition: left 0.18s ease; }
+button.theme[aria-checked="true"] .knob { left: 28px; }
+/* The language being read: lit, and not a link, so nothing to press. */
+nav.tongues .here { background: var(--accent); border-color: var(--accent);
+  color: var(--accent-ink); cursor: default; }
+button.theme:hover { color: var(--ink); border-color: var(--accent); }
+a.run {
+  padding: 7px 14px; border-radius: 4px; background: var(--accent);
+  color: var(--accent-ink); font-size: 13px; font-weight: 600;
+  text-decoration: none; white-space: nowrap;
+}
+a.run:hover { filter: brightness(1.08); }
+a.run .short { display: none; }
+@media (max-width: 420px) {
+  a.run .long { display: none; }
+  a.run .short { display: inline; }
+}
+/* The narrowest phones: the bar's gaps close up so nothing spills. */
+@media (max-width: 340px) {
+  header .actions { gap: 5px !important; }
+  .brand b { letter-spacing: 0.06em !important; }
+}
+
+footer {
+  margin-top: 56px; padding: 22px 24px 40px;
+  border-top: 1px solid var(--line); background: var(--shade);
+}
+footer p { display: flex; align-items: center; justify-content: flex-end;
+  gap: 6px; margin: 0; color: var(--quiet); font-size: 12px; }
+footer .heart { width: 14px; height: 14px; fill: #e0245e; flex: none; }
+
+/* --- the page ----------------------------------------------------------- */
+
+main { max-width: 720px; margin: 0 auto; padding: 40px 24px 0; }
+h1 { font-size: 30px; line-height: 1.3; margin: 0 0 14px;
+  letter-spacing: -0.01em; }
+.lead { margin: 0 0 8px; font-size: 17px; color: var(--dim); }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--quiet); margin: 0 0 10px; }
+section { margin-top: 34px; }
+p { margin: 0 0 12px; }
+/* Both edges straight, so the column reads as one block in the middle of
+   the page; words are broken the language's own way. A phone's column
+   is too narrow for that: the gaps between words grow wider than the
+   words, so there the right edge stays ragged. */
+@media (min-width: 700px) {
+  main p, main li, figcaption { text-align: justify; hyphens: auto; }
+}
+ul { margin: 0; padding-left: 20px; }
+li { margin-bottom: 9px; }
+strong { font-weight: 650; }
+code { padding: 1px 4px; background: var(--shade); border-radius: 3px;
+  font-size: 0.9em; }
+pre { margin: 0; padding: 14px 16px; overflow-x: auto;
+  background: var(--shade); border: 1px solid var(--line);
+  border-radius: 6px; }
+pre code { padding: 0; background: none; }
+.under { margin-top: 10px; color: var(--quiet); font-size: 12px; }
+.warn { color: var(--warn); }
+a { color: var(--accent); }
+
+/* --- figures and tables ------------------------------------------------- */
+
+/* As many equal columns as there are tiles: three on the home page,
+   two where a pair of numbers is the point. A fixed three left the
+   third cell empty and it read as a grey block. */
+.figures { display: grid; grid-auto-flow: column;
+  grid-auto-columns: 1fr; gap: 1px;
+  background: var(--line); border: 1px solid var(--line); border-radius: 6px;
+  overflow: hidden; }
+/* A tile that holds a number holds it in the middle. */
+.figure { padding: 14px 16px; background: var(--paper); text-align: center; }
+.figure b { display: block; font-size: 22px;
+  font-variant-numeric: tabular-nums; }
+.figure span { font-size: 11px; color: var(--quiet); }
+
+/* The pages, side by side in a strip that scrolls: three in view on a
+   wide window, two on a phone. */
+/* Wider than the text column, so three cards hold their openings in
+   full without growing tall. */
+.slider.pages { width: min(100vw - 32px, 1040px); margin-left: 50%;
+  transform: translateX(-50%); }
+/* Snapping keeps the strip's side padding, so a card's border never lands
+   on the edge the strip cuts at and the first card keeps its left side. */
+.cards { display: flex; gap: 12px; overflow-x: auto; padding: 4px 2px 10px;
+  scroll-padding-inline: 2px;
+  scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.card { display: flex; flex-direction: column; flex: 0 0 calc((100% - 24px) / 3);
+  scroll-snap-align: center; padding: 16px 18px 14px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--paper);
+  color: inherit; text-decoration: none;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s; }
+.card:hover { border-color: var(--accent); transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(33, 120, 254, 0.14); }
+.card i { font-style: normal; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; color: var(--accent); margin-bottom: 6px; }
+.card b { display: block; margin-bottom: 6px; font-size: 15px; }
+/* Each page's opening in full; the link sits at the foot of every card,
+   so cards of different lengths still line up. */
+.card span { font-size: 12.5px; line-height: 1.55; color: var(--quiet); }
+.card em { margin-top: auto; padding-top: 12px; font-style: normal;
+  font-size: 12px; font-weight: 600; color: var(--accent); }
+
+/* A picture is centred on the page and allowed past the reading column,
+   because every one of them is a diagram that stops working when it is
+   shrunk to the width of a paragraph. */
+/* A picture takes the text's own width, so its edges line up with the
+   lines above and below it; a click opens it to the whole screen. */
+figure { width: min(100vw - 32px, 672px); margin: 0 0 0 50%;
+  transform: translateX(-50%); text-align: center; }
+figure img { display: block; width: 100%; height: auto; margin: 0 auto;
+  padding: 14px; background: var(--plate); border: 1px solid var(--line);
+  border-radius: 8px; cursor: zoom-in;
+  transition: transform 0.25s ease, box-shadow 0.25s ease; }
+img { margin-left: auto; margin-right: auto; }
+@media (hover: hover) {
+  figure img:hover { transform: scale(1.015);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14); }
+}
+/* A picture opened to the whole screen; a click or Escape closes it. */
+.lightbox { position: fixed; inset: 0; z-index: 50; display: flex;
+  align-items: center; justify-content: center; padding: 16px;
+  background: rgba(8, 12, 16, 0.9); cursor: zoom-out; }
+/* The picture sits in a frame its arrows hang on, so they stay right
+   beside it whatever its shape rather than at the edges of the screen. */
+.lightbox .frame { position: relative; display: flex; }
+.lightbox img { max-width: calc(100vw - 32px); max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px); object-fit: contain;
+  background: var(--plate); border-radius: 8px; }
+.lightbox.group img { max-width: calc(100vw - 144px);
+  max-height: calc(100vh - 80px); max-height: calc(100dvh - 80px); }
+/* Previous and next, either side of the picture, over the dark backdrop
+   in both themes; the count of where the reader is sits under it. */
+.lightbox .step { position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 64px; border: 0; border-radius: 8px;
+  background: rgba(8, 12, 16, 0.62); color: #fff; font-size: 34px;
+  line-height: 1; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25); }
+.lightbox .step:hover, .lightbox .step:focus-visible {
+  background: rgba(8, 12, 16, 0.85); outline: 2px solid #fff; outline-offset: 2px; }
+.lightbox .back { right: calc(100% + 12px); }
+.lightbox .on { left: calc(100% + 12px); }
+/* A phone has no room beside the picture: the arrows sit on its edges. */
+@media (max-width: 760px) {
+  .lightbox.group img { max-width: calc(100vw - 32px); }
+  .lightbox .back { right: auto; left: 6px; }
+  .lightbox .on { left: auto; right: 6px; }
+}
+.lightbox .count { position: absolute; bottom: 14px; left: 50%;
+  transform: translateX(-50%); color: #fff; font-size: 13px;
+  font-variant-numeric: tabular-nums; opacity: 0.8; }
+figcaption { max-width: 672px; margin: 10px auto 0; color: var(--quiet);
+  font-size: 12px; text-align: left; }
+
+/* The four rows are ten columns wide and the reading column is 720px,
+   so this one block breaks out of it: the table is the thing the whole
+   project exists to produce and it should not arrive pre-scrolled. On a
+   narrow window it scrolls sideways inside itself rather than pushing
+   the page wider. */
+.wide { width: min(100vw - 32px, 1400px); margin-left: 50%;
+  transform: translateX(-50%); }
+/* A table scrolls inside itself rather than pushing the page sideways.
+   Under the published one the note stays put, because a note that slides
+   out of view with the columns it explains is a note nobody reads. */
+.scroll { overflow-x: auto; position: relative; margin-bottom: 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line);
+  text-align: left; vertical-align: top; }
+thead th { color: var(--quiet); font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.num { text-align: right; font-variant-numeric: tabular-nums;
+  white-space: nowrap; }
+.wide table { min-width: 980px; }
+/* This project's own rows, among the systems they are compared with. */
+tr.ours td { background: var(--shade); }
+tr.ours td:first-child { font-weight: 600; }
+
+/* A note marker, and the list it points into. */
+sup.note { font-size: 10px; line-height: 0; }
+sup.note a { text-decoration: none; padding-left: 1px; }
+ol.notes { margin: 18px 0 0; padding-left: 26px; color: var(--quiet);
+  font-size: 12px; }
+ol.notes li { margin-bottom: 7px; }
+ol.notes li:target { color: var(--ink); }
+ol.basis { padding-left: 26px; }
+ol.basis li { margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--line); }
+ol.basis li p { margin: 4px 0; }
+ol.basis .kind, ol.basis .source { color: var(--quiet); }
+ol.basis .source { font-size: 0.92em; }
+a.back { text-decoration: none; }
+details.notes { margin-top: 26px; }
+details.notes > summary > h2 { font-size: 16px; }
+
+/* The button at the end of each row of the comparison table, and the
+   panel it opens over the page. */
+.hide { position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; }
+td.info, th.info { width: 1%; padding-left: 4px; padding-right: 4px;
+  text-align: center; }
+button.rowinfo { display: inline-flex; padding: 3px; border: 0;
+  background: none; color: var(--accent); cursor: pointer; }
+button.rowinfo svg { width: 16px; height: 16px; }
+button.rowinfo:hover { color: var(--ink); }
+.panel { position: fixed; inset: 0; z-index: 50; display: flex;
+  align-items: center; justify-content: center; padding: 16px;
+  background: rgba(8, 12, 16, 0.6); }
+.panel > section { position: relative; max-width: 680px; width: 100%;
+  max-height: 85vh; overflow: auto; padding: 22px 24px 12px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: var(--paper); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
+.panel h2 { margin: 0 32px 14px 0; font-size: 18px;
+  text-transform: none; letter-spacing: 0; }
+.panel ol { padding-left: 26px; font-size: 13px; }
+.panel li { margin-bottom: 12px; }
+.panel button.shut { position: absolute; top: 10px; right: 10px;
+  width: 28px; height: 28px; border: 1px solid var(--line);
+  border-radius: 50%; background: var(--shade); color: var(--ink);
+  font-size: 16px; line-height: 1; cursor: pointer; }
+
+/* A drawing of the table. Shrunk to fit between a phone and a wide
+ * window, where it loses at most a sixth of its size and the labels still
+ * read; a phone gets its own narrow drawing instead of a shrunk one. */
+svg.chart { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+/* A chart breaks out of the 672px reading column the way the table
+   does, because twelve labelled points need the room. It keeps the
+   picture rule's centring and takes its own width. */
+figure.chart { width: min(100vw - 32px, 900px); text-align: left;
+  margin: 24px 0 24px 50%; }
+figure.chart figcaption { margin: 8px auto 0; max-width: 672px; }
+/* The symbols a drawing uses and what each means. */
+ul.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; max-width: 672px;
+  margin: 10px auto 0; padding: 0; list-style: none; text-align: left;
+  font-size: 12px; color: var(--dim); }
+ul.legend li { display: flex; align-items: center; gap: 6px; }
+ul.legend svg.glyph { flex: none; }
+.only-narrow { display: none; }
+@media (max-width: 760px) {
+  .only-wide { display: none; }
+  .only-narrow { display: block; }
+}
+/* The bibliography entries a note rests on, beside the note itself. */
+.cited a { color: var(--accent); }
+
+/* The bibliography, grouped the way the report groups it. */
+h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--quiet); margin: 22px 0 9px; font-weight: 600; }
+section h3:first-child { margin-top: 0; }
+h3 + ul { font-size: 13px; }
+h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
+
+/* The header holds one line while it can: the brand's subtitle goes first,
+   then the page links move to a line of their own. */
+@media (max-width: 1360px) {
+  .brand span { display: none; }
+}
+/* One line for as long as it fits: the links stay in the middle of the
+   page while there is room and are pushed aside when there is not. The
+   gaps close up first; only below 1180 pixels do the links take a row. */
+@media (max-width: 1280px) {
+  header { column-gap: 12px; }
+  nav.pages { flex-wrap: nowrap; gap: 11px; }
+  nav.pages a { white-space: nowrap; }
+  header .actions { gap: 8px; }
+}
+@media (max-width: 1180px) {
+  header { grid-template-columns: 1fr auto; }
+  nav.pages { grid-column: 1 / -1; grid-row: 2; }
+}
+
+@media (max-width: 760px) {
+  header { position: static; padding: 10px 16px; }
+  nav.pages { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px;
+    justify-content: flex-start; }
+  nav.pages a { flex: none; }
+  header .actions { gap: 8px; }
+  a.run { padding: 6px 8px; font-size: 12px; }
+  header { column-gap: 8px; }
+  .brand { gap: 8px; }
+  .brand b { letter-spacing: 0.12em; }
+  main { padding: 28px 16px 0; }
+  h1 { font-size: 24px; }
+  .figures { grid-template-columns: 1fr 1fr; }
+  /* One card and the edge of the next: wide enough to read in full. */
+  .card { flex-basis: 82%; }
+  .wide, figure { width: calc(100vw - 32px); }
+}
+
+/* A section closed until it is opened: the long tables on the cost page
+   that most readers do not need and the ones who do can open. The arrow
+   says it opens; it turns when it has. */
+details.fold > summary { cursor: pointer; list-style: none; }
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary > h2, details.fold > summary > h3 { display: inline; }
+details.fold > summary::before {
+  content: "▸"; display: inline-block; width: 1.1em; color: var(--quiet);
+  transition: transform 0.15s;
+}
+details.fold[open] > summary::before { transform: rotate(90deg); }
+details.fold > summary:hover h2, details.fold > summary:hover h3 { text-decoration: underline; }
+/* A topic inside an opened section: one line each until opened. */
+details.fold.sub { margin: 4px 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
+details.fold.sub > summary > h3 { margin: 0; font-size: 14px; text-transform: none;
+  letter-spacing: 0; color: var(--ink); }
+details.fold.sub[open] > summary { margin-bottom: 10px; }
+
+/* A section inside the one before it: its heading is in plain case and
+   the body's colour, so the capitals above read as the group's name. The
+   small type under a third-level heading is the bibliography's. */
+h3.sub { margin-top: 26px; font-size: 16px; text-transform: none;
+  letter-spacing: 0; color: var(--dim); font-weight: 650; }
+h3.sub + ul, h3.sub + p { font-size: inherit; }
+h3.sub + ul li { margin-bottom: 9px; overflow-wrap: normal; }
+
+/* Parts, one card each, in a strip that slides: three in view on a wide
+   window, one with the edges of its neighbours on a phone. The card
+   looked at rests in the middle. The arrows appear with the script. */
+.slider { position: relative; }
+.slides { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;
+  padding-inline: 2px; scroll-padding-inline: 2px;
+  scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+figure.slide { flex: 0 0 calc((100% - 24px) / 3); width: auto; margin: 0;
+  transform: none;
+  scroll-snap-align: center; border: 1px solid var(--line); border-radius: 6px;
+  overflow: hidden; background: var(--paper); }
+figure.slide .photo { display: flex; align-items: center;
+  justify-content: center; aspect-ratio: 4 / 3; background: var(--shade); }
+figure.slide .photo img { width: 100%; height: 100%; object-fit: contain;
+  background: #fff;
+  border-radius: 0; }
+figure.slide .nophoto svg { width: 44px; height: 44px; color: var(--line); }
+figure.slide figcaption { margin: 0; padding: 10px 12px 12px; max-width: none;
+  text-align: left; }
+figure.slide figcaption b { display: block; margin-bottom: 3px;
+  font-size: 13px; color: var(--ink); }
+figure.slide figcaption span { font-size: 12px; color: var(--quiet); }
+figure.slide figcaption small { display: block; margin-top: 6px;
+  font-size: 11px; color: var(--quiet); }
+figure.slide figcaption small a { color: inherit; }
+/* With the script, a mouse drags the strip as a finger does, so the bar
+   underneath goes, as it does on a phone; the arrows stay for a click. */
+.slides.draggable { scrollbar-width: none; touch-action: pan-y; }
+.slides.draggable::-webkit-scrollbar { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .slides.draggable { cursor: grab; }
+}
+.slides.dragging { cursor: grabbing; scroll-snap-type: none;
+  scroll-behavior: auto; user-select: none; -webkit-user-select: none; }
+/* A card does not lift under the pointer while the strip moves under it. */
+.slides.dragging .card, .slides.dragging .card:hover { transform: none;
+  transition: none; }
+/* The team, one column a person with a hairline between them; one
+   above the other, with the line across, where three do not fit. */
+/* Every column the same width: the line sits in the middle of the gap
+   rather than on a column's edge, so no column gives up room to it. */
+.people { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 40px; margin: 4px 0 18px; }
+.person { position: relative; display: flex; flex-direction: column; gap: 4px;
+  min-width: 0; padding: 2px 0; text-align: center; }
+.person + .person::before { content: ""; position: absolute; top: 2px;
+  bottom: 2px; left: -20px; border-left: 1px solid var(--line); }
+.person p { margin: 0; text-align: center; font-size: 14px; line-height: 1.45; color: var(--dim);
+  overflow-wrap: anywhere; }
+.person p:first-child { font-size: 15px; color: var(--ink); }
+@media (max-width: 640px) {
+  .people { grid-template-columns: minmax(0, 1fr); }
+  .person { padding: 12px 0; }
+  .person + .person::before { display: none; }
+  .person + .person { border-top: 1px solid var(--line); }
+}
+/* The strip's own bar, over it: a thin track, the part in view in blue. */
+.strip-bar { position: relative; height: 4px; margin: 0 2px 8px;
+  border-radius: 2px; background: var(--line); cursor: pointer;
+  touch-action: none; }
+.strip-bar::before { content: ""; position: absolute; inset: -8px 0; }
+.strip-bar i { position: absolute; top: 0; bottom: 0; left: 0;
+  border-radius: 2px; background: var(--accent); }
+.slider > button { position: absolute; top: calc(50% - 36px); z-index: 2;
+  width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 50%;
+  background: var(--paper); color: var(--ink); font-size: 20px; line-height: 1;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+.slider > button.slide-back { left: -14px; }
+.slider > button.slide-on { right: -14px; }
+.slider > button:hover { border-color: var(--accent); }
+.slider > button:disabled { opacity: 0; pointer-events: none; }
+@media (max-width: 760px) {
+  figure.slide { flex-basis: 82%; width: auto; }
+  .slider > button.slide-back { left: -6px; }
+  .slider > button.slide-on { right: -6px; }
+}
+
+/* A heading set in the middle, over the strip of pages. */
+h2.centred { text-align: center; }
+
+/* The team's lines hold an address that cannot break; justified, the
+   words around it spread apart. */
+main li:has(a[href^="mailto:"]) { text-align: left; }
+
+/* The project's state on the home page: what is done in green, what is
+   still to come in yellow, on the label that opens each line. */
+main ul.status li { text-align: left; }
+ul.status li > strong:first-child {
+  padding: 1px 7px; border-radius: 5px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+ul.status li.done > strong:first-child { background: var(--done-bg); color: var(--done-ink); }
+ul.status li.todo > strong:first-child { background: var(--todo-bg); color: var(--todo-ink); }
+
+/* A number range kept on one line (see _marked in pages.py). */
+.nb { white-space: nowrap; }
