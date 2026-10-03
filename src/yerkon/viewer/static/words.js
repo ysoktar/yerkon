@@ -184,6 +184,12 @@ export const SAY = {
     en: "Drag to pan · Wheel to zoom · Move the box, drag its corners · "
         + "Shift-drag or Draw a box to start a new one",
   },
+  "fetch.map.hint.touch": {
+    tr: "Tek parmak: kaydırma · İki parmak: yakınlaştırma · Kutuyu taşımak"
+      + " veya köşelerinden boyutlandırmak mümkündür · Kutu çiz: yeni kutu",
+    en: "One finger to pan · Two fingers to zoom · Move the box, drag its "
+        + "corners · Draw a box to start a new one",
+  },
   "fetch.map.drop": { tr: "Bırak", en: "Drop" },
   "fetch.map.picked": { tr: "Haritadan: {across} × {along} km",
                         en: "From the map: {across} × {along} km" },
@@ -913,6 +919,17 @@ export const SAY = {
   "act.left.almost": { tr: "bitmek üzere", en: "almost done" },
   "act.paused": { tr: "bekliyor: «{what}» bitince sürecek",
                   en: "paused: carries on once “{what}” finishes" },
+  "act.view.moving": { tr: "Hareket sırasında sadeleştirilmiş görüntü",
+                       en: "Simplified view while moving" },
+  "act.view.back": { tr: "bırakıldığında geri gelecek: {what}",
+                     en: "back when you let go: {what}" },
+  "act.view.blocks": { tr: "binaların bir kısmı", en: "some of the buildings" },
+  "act.view.roads": { tr: "yollar", en: "the streets" },
+  "act.view.photo": { tr: "uydu fotoğrafı", en: "the satellite photo" },
+  "act.view.cells": { tr: "kapsama renklerinin ayrıntısı",
+                      en: "the coverage colours' detail" },
+  "act.view.mesh": { tr: "zeminin ayrıntısı", en: "the ground's detail" },
+  "act.view.still": { tr: "Tam görüntü hazırlanıyor", en: "Drawing the full view" },
   "act.scene": { tr: "Sahne hesaplanıyor", en: "Working out the scene" },
   "act.apply": { tr: "Değişiklik uygulanıyor", en: "Applying the change" },
   "act.propose": { tr: "Değişikliğin etkileri hesaplanıyor",

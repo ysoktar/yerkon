@@ -652,6 +652,8 @@ i.prov.assumption { background: var(--warn); }
 .map.drawing { cursor: crosshair; }
 
 .map-tiles { position: absolute; inset: 0; }
+/* Tiles and box together, scaled as one while two fingers pinch. */
+.map-layer { position: absolute; inset: 0; }
 
 .map-tile {
   position: absolute;

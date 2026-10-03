@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=1092595c7d";
+import { decimal, say, speak, speaks } from "./words.js?v=68067deb87";
 
 /* The choices whose names are this page's to give.
  *
@@ -184,7 +184,7 @@ function drawActivity() {
   const shown = [...activity.values()]
     .filter(entry => now - entry.started >= ACTIVITY_AFTER_MS);
   const lasting = [...progress.values()]
-    .filter(entry => now - entry.started >= ACTIVITY_AFTER_MS);
+    .filter(entry => entry.shown || now - entry.started >= ACTIVITY_AFTER_MS);
   host.hidden = shown.length + lasting.length === 0;
   clearInterval(activityTimer);
   if (!shown.length && !lasting.length) return;
@@ -239,6 +239,7 @@ function drawActivity() {
     }
     row.querySelector(".why").textContent = blocker
       ? say("act.paused", { what: say(blocker) })
+      : entry.note ? entry.note
       : left == null ? ""
         : say(left < 1000 ? "act.left.almost" : "act.left", { time: shortTime(left) });
     list.appendChild(row);
@@ -734,6 +735,7 @@ async function switchTo(code) {
   // unlit for half a minute after a press and read as a switch that had
   // not worked.
   const before = speaks();
+  wordsOnly = true;
   speak(code);
   drawWords();
   drawLanguages();
@@ -750,6 +752,12 @@ async function switchTo(code) {
     drawWords();
     drawLanguages();
     flash(error.message, true);
+  } finally {
+    wordsOnly = false;
+    if (wordsRepaint) {
+      wordsRepaint = false;
+      paintStillInSlices();
+    }
   }
 }
 
@@ -1857,9 +1865,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=1092595c7d";
-import * as flat from "./bore.js?v=1092595c7d";
-import * as pick from "./map.js?v=1092595c7d";
+import * as draw from "./draw.js?v=68067deb87";
+import * as flat from "./bore.js?v=68067deb87";
+import * as pick from "./map.js?v=68067deb87";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -2510,6 +2518,71 @@ function movingFrame() {
   return draw.texturing.moving && !draw.texturing.still;
 }
 
+/* What the moving frames leave out, and the whole picture being put back
+ * once the camera stops, as one line in the activity box. Streets,
+ * buildings or the photograph going for a moment and coming back look
+ * like a broken page unless the page says so. No line when nothing was
+ * left out, and the still picture's line only past `ACTIVITY_AFTER_MS`,
+ * so a fast computer shows nothing. */
+const VIEW_LINE = "view";
+//: What the latest moving frame left out, as phrase keys.
+let leftOut = [];
+let viewDrawn = 0;
+
+function setViewLine(key, fields) {
+  const had = progress.get(VIEW_LINE);
+  const now = performance.now();
+  // Taking over from a line already on screen, so the box does not empty
+  // for a moment between the drag and the picture after it.
+  const shown = Boolean(had && (had.shown || now - had.started >= ACTIVITY_AFTER_MS));
+  progress.set(VIEW_LINE, Object.assign({ key, path: "", started: now, share: null,
+                                          expected: 0, updated: now, shown }, fields));
+  if (shown) drawActivity();
+  else setTimeout(drawActivity, ACTIVITY_AFTER_MS + 20);
+}
+
+function clearViewLine(key) {
+  const had = progress.get(VIEW_LINE);
+  if (!had || had.key !== key) return;
+  progress.delete(VIEW_LINE);
+  drawActivity();
+}
+
+/* After a moving frame: everything it left out over the whole gesture,
+ * so the list does not flicker as the budget moves up and down. */
+function noteMovingView() {
+  const had = progress.get(VIEW_LINE);
+  const moving = had && had.key === "act.view.moving";
+  // A still picture dropped half way because the camera moved again.
+  if (!leftOut.length && had && !moving) clearViewLine(had.key);
+  if (!leftOut.length && !moving) return;
+  const left = new Set(moving ? had.left : []);
+  leftOut.forEach(key => left.add(key));
+  if (moving && left.size === had.left.size) return;
+  const order = ["act.view.blocks", "act.view.roads", "act.view.photo",
+                 "act.view.cells", "act.view.mesh"];
+  const listed = order.filter(key => left.has(key));
+  const note = say("act.view.back", { what: listed.map(key => say(key)).join(", ") });
+  if (moving) {
+    Object.assign(had, { left, note });
+    drawActivity();
+  } else {
+    setViewLine("act.view.moving", { left, note });
+  }
+}
+
+/* How far the still picture has got, redrawn at most four times a second. */
+function noteStillShare(share) {
+  const had = progress.get(VIEW_LINE);
+  if (!had || had.key !== "act.view.still") return;
+  had.share = share;
+  had.updated = performance.now();
+  if (had.updated - viewDrawn > 250) {
+    viewDrawn = had.updated;
+    drawActivity();
+  }
+}
+
 /* Slower than smooth, one step down; well inside it, one step back up,
  * in the reverse order. The steps, cheapest to give up first: fewer
  * buildings, coarser coverage colours, then on the slowest devices the
@@ -2555,8 +2628,13 @@ function timedPaint() {
   const started = performance.now();
   paintScene();
   const took = performance.now() - started;
-  if (movingFrame()) tuneMotion(took);
-  else if (draw.texturing.still && took > STILL_TOO_SLOW_MS) lowerQuality();
+  if (movingFrame()) {
+    tuneMotion(took);
+    // Only while a hand moves the scene: a slider or a new answer from
+    // the engine also paints a quick frame first, and a line about
+    // movement there would describe nothing on screen.
+    if (moving()) noteMovingView();
+  } else if (draw.texturing.still && took > STILL_TOO_SLOW_MS) lowerQuality();
   if (!textured) return;
   const drawn = draw.texturing.drawn;
   if (draw.texturing.still) {
@@ -2574,6 +2652,13 @@ function timedPaint() {
   }
 }
 
+/* While the language changes nothing in the scene moves but its words:
+ * the picture on screen stays until the whole one in the new language
+ * is ready, rather than dropping to a moving frame and building back up
+ * as though the scene were new. */
+let wordsOnly = false;
+let wordsRepaint = false;
+
 function render() {
   // A still picture still being painted is of a scene that has moved.
   dropStill();
@@ -2581,6 +2666,13 @@ function render() {
   // the camera should be. Cheap: it only resets a timer, and the window
   // it would ask for is compared with the one already in hand.
   scheduleDetail();
+  // Once, when the switch is over: the switch redraws several times on
+  // its way, and each would start the whole picture again.
+  if (wordsOnly && !moving() && !stillFrame) {
+    clearTimeout(stillTimer);
+    wordsRepaint = true;
+    return;
+  }
   scheduleStill();
   if (framePending) return;
   framePending = true;
@@ -2618,6 +2710,8 @@ let stillJob = 0;
 //: How long one slice works, in milliseconds: well inside a frame.
 const STILL_SLICE_MS = 8;
 
+/* Its line in the activity box stays: the next still picture or moving
+ * frame takes it over, so dragging a slider does not make it blink. */
 function dropStill() {
   if (stillJob) cancelAnimationFrame(stillJob);
   stillJob = 0;
@@ -2633,6 +2727,7 @@ function paintStillInSlices() {
   stillFrame = false;
   // The tunnel's flat drawing paints itself and has no slices.
   if (!parts) {
+    clearViewLine("act.view.still");
     stillFrame = true;
     draw.texturing.still = true;
     timedPaint();
@@ -2644,8 +2739,10 @@ function paintStillInSlices() {
   stillCanvas.width = canvas.width;
   stillCanvas.height = canvas.height;
   stillContext.setTransform(ratio, 0, 0, ratio, 0, 0);
+  setViewLine("act.view.still", { share: 0 });
   // First the parts are built, a slice of time per frame, then painted
-  // the same way; neither holds the page for longer than a slice.
+  // the same way; neither holds the page for longer than a slice. The
+  // painting, photograph and all, is most of the work: counted as 70 %.
   const items = [];
   let built = 0;
   let job = null;
@@ -2656,6 +2753,7 @@ function paintStillInSlices() {
         items.push(...parts[built]());
         built += 1;
       }
+      noteStillShare(0.3 * built / parts.length);
       stillJob = requestAnimationFrame(step);
       return;
     }
@@ -2665,10 +2763,12 @@ function paintStillInSlices() {
                              container.clientHeight, items);
     }
     if (!job.step(STILL_SLICE_MS)) {
+      noteStillShare(0.3 + 0.7 * job.share());
       stillJob = requestAnimationFrame(step);
       return;
     }
     stillJob = 0;
+    clearViewLine("act.view.still");
     context.save();
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -2735,6 +2835,17 @@ function paintScene(sliced = false) {
   // frame runs them all at once. The buildings, the largest part, go in
   // chunks.
   const buildings = showBuildings ? blocksOnDrawnGround() : [];
+  if (moved && !sliced) {
+    const most = quality().blocks;
+    leftOut = [
+      showBuildings && motion3d.blocks < most
+        && buildings.length >= Math.min(motion3d.blocks, most) && "act.view.blocks",
+      showRoads && !motion3d.roads && "act.view.roads",
+      draw.texturing.on && !motion3d.photo && drawnPhotograph() && "act.view.photo",
+      shownLayer !== "ground" && sweepData && motion3d.stride > 1 && "act.view.cells",
+      motion3d.mesh > 1 && "act.view.mesh",
+    ].filter(Boolean);
+  }
   const parts = [
     () => draw.groundFaces(view, drawnTerrain(), light, photo,
                            moved ? motion3d.mesh : 1),
@@ -4237,7 +4348,10 @@ function wireMap() {
   open.onclick = () => {
     sheet.hidden = false;
     document.getElementById("map-credit").textContent = MAP_TILES
-      ? `${say("fetch.map.hint")} · ${say("fetch.map.credit")}`
+      // A phone is told about its fingers, not a wheel and a shift key.
+      ? `${say(matchMedia("(pointer: coarse)").matches
+               && !matchMedia("(any-pointer: fine)").matches
+          ? "fetch.map.hint.touch" : "fetch.map.hint")} · ${say("fetch.map.credit")}`
       : say("fetch.map.none");
     if (!picker) {
       picker = new pick.Picker(document.getElementById("map-canvas"), {

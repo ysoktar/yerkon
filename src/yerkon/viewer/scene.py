@@ -886,7 +886,10 @@ def sweep_step(state: ViewState, budget_s: float = STEP_SECONDS) -> dict:
     if not state.anchors(terrain):
         _STEPPING.clear()
         return dict(sweep(state), done=True)
-    key = json.dumps(state.as_json(), sort_keys=True, default=str)
+    # The language changes the words, not the cells: a sweep half done
+    # when the page switches language carries on.
+    key = json.dumps({k: v for k, v in state.as_json().items() if k != "language"},
+                     sort_keys=True, default=str)
     job = _STEPPING.get("job")
     if job is None or job["key"] != key:
         deployment = state.deployment(terrain)

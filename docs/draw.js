@@ -957,7 +957,7 @@ export function paintSliced(context, width, height, items) {
   context.clearRect(0, 0, width, height);
   ordered(items);
   let next = 0;
-  const job = { workMs: 0, drawn: 0, step };
+  const job = { workMs: 0, drawn: 0, step, share: () => items.length ? next / items.length : 1 };
   function step(ms) {
     const began = performance.now();
     const kept = { on: texturing.on, still: texturing.still, moving: texturing.moving,

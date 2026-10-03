@@ -166,7 +166,9 @@ export class Picker {
       this.box.append(grip);
       this.grips[corner] = grip;
     }
-    host.append(this.tiles, this.box);
+    this.layer = element("div", "map-layer");
+    this.layer.append(this.tiles, this.box);
+    host.append(this.layer);
 
     this.selection = options.box
       || boxAround(this.centre.lat, this.centre.lon, options.sizeKm || 3);
@@ -184,8 +186,66 @@ export class Picker {
    */
   wire() {
     let gesture = null;
+    // Fingers on the map, for the two-finger pinch.
+    const fingers = new Map();
+
+    /* Two fingers: the map slides with their middle and grows with their
+     * spread. The tiles come a zoom level at a time, so between levels
+     * the drawn ones are stretched, and each time the spread doubles or
+     * halves the next level is laid in its place. */
+    const pinchFrom = () => {
+      const [a, b] = [...fingers.values()];
+      return { span: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+               x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    };
+    const stretch = (scale, x, y) => {
+      if (scale === 1) {
+        this.layer.style.transform = "";
+        return;
+      }
+      const rect = this.host.getBoundingClientRect();
+      this.layer.style.transformOrigin = `${x - rect.left}px ${y - rect.top}px`;
+      this.layer.style.transform = `scale(${scale})`;
+    };
+    const pinchMove = () => {
+      const now = pinchFrom();
+      this.panBy(now.x - gesture.x, now.y - gesture.y);
+      gesture.x = now.x;
+      gesture.y = now.y;
+      let scale = now.span / gesture.span;
+      const levels = Math.trunc(Math.log2(scale));
+      if (levels) {
+        stretch(1);
+        this.zoomBy(levels, now.x, now.y);
+        gesture.span = now.span;
+        scale = 1;
+      }
+      gesture.scale = scale;
+      stretch(scale, now.x, now.y);
+    };
+    const pinchEnd = () => {
+      // Whatever is left of the spread goes to the nearer level.
+      const scale = gesture.scale || 1;
+      stretch(1);
+      const step = Math.round(Math.log2(scale));
+      if (step) this.zoomBy(step, gesture.x, gesture.y);
+    };
 
     const start = event => {
+      if (event.pointerType === "touch") {
+        fingers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        this.host.setPointerCapture(event.pointerId);
+        if (fingers.size === 2) {
+          // A box being moved by the first finger goes back where it was.
+          if (gesture && gesture.kind === "move") this.selection = gesture.was;
+          const from = pinchFrom();
+          gesture = Object.assign({ kind: "pinch", moved: 0 }, from);
+          this.draw();
+          event.preventDefault();
+          return;
+        }
+        if (fingers.size > 2) return;
+      }
       const grip = event.target.closest(".map-grip");
       const inBox = event.target.closest(".map-box");
       const anchor = this.at(event.clientX, event.clientY);
@@ -208,7 +268,16 @@ export class Picker {
     };
 
     const move = event => {
+      if (fingers.has(event.pointerId)) {
+        fingers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      }
       if (!gesture) return;
+      if (gesture.kind === "pinch") {
+        if (fingers.size >= 2) pinchMove();
+        return;
+      }
+      // One finger left after a pinch moves nothing until it lifts too.
+      if (gesture.kind === "rest") return;
       const dx = event.clientX - gesture.last.x;
       const dy = event.clientY - gesture.last.y;
       gesture.moved += Math.abs(dx) + Math.abs(dy);
@@ -250,7 +319,14 @@ export class Picker {
       this.draw();
     };
 
-    const stop = () => {
+    const stop = event => {
+      fingers.delete(event.pointerId);
+      if (gesture && gesture.kind === "pinch") {
+        if (fingers.size >= 2) return;
+        pinchEnd();
+        gesture = { kind: "rest" };
+      }
+      if (gesture && gesture.kind === "rest" && fingers.size) return;
       if (gesture && gesture.kind === "draw" && gesture.moved < A_CLICK_PX) {
         // A click in draw mode, not a drag: nobody meant a box of zero
         // kilometres, so leave the one they had.

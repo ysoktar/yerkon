@@ -533,6 +533,18 @@ def test_a_step_for_another_arrangement_starts_the_sweep_again():
     assert part == sweep(other)
 
 
+def test_switching_language_halfway_carries_the_sweep_on():
+    """The language changes the words, not the cells: a sweep half done
+    when the page switches language is not started again."""
+    from yerkon.viewer.scene import sweep_step
+
+    turkish = a_state(sweep_m=1000.0, language="tr")
+    first = sweep_step(turkish, budget_s=0.0)
+    second = sweep_step(turkish.merged({"language": "en"}), budget_s=0.0)
+    assert not second["done"]
+    assert second["share"] > first["share"]
+
+
 def test_the_sweep_reports_both_areas_and_they_differ():
     """ADR-0012, on screen as well as in the table."""
     swept = sweep(a_state(sweep_m=1000.0))
