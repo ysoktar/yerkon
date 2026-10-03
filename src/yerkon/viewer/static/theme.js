@@ -343,15 +343,17 @@
      card. Where it comes to rest follows the throw: a quick flick or a
      drag past a quarter of a card goes on to the next card, a slow short
      drag goes back, and a drag held still before letting go stays on the
-     nearest card. Touch is left to the browser, which already does this;
-     only a mouse is handled here. A drag is not a click, so letting go
-     over a card after moving the strip does not open it. */
+     nearest card. A finger is handled the same way, so a phone feels
+     like the computer: the strip takes sideways movement only, and an
+     upward or downward swipe still scrolls the page (`touch-action` in
+     the stylesheet). A drag is not a click, so letting go over a card
+     after moving the strip does not open it. */
   function draggable(strip, card) {
     var down = null, moved = false, trail = [];
     strip.classList.add("draggable");
 
     strip.addEventListener("pointerdown", function (event) {
-      if (event.pointerType !== "mouse" || event.button !== 0) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
       cancelAnimationFrame(strip._glide || 0);
       strip._target = null;
       down = { x: event.clientX, left: strip.scrollLeft, id: event.pointerId };

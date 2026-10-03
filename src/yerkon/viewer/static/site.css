@@ -496,7 +496,7 @@ figure.slide figcaption small { display: block; margin-top: 6px;
 figure.slide figcaption small a { color: inherit; }
 /* With the script, a mouse drags the strip as a finger does, so the bar
    underneath goes, as it does on a phone; the arrows stay for a click. */
-.slides.draggable { scrollbar-width: none; }
+.slides.draggable { scrollbar-width: none; touch-action: pan-y; }
 .slides.draggable::-webkit-scrollbar { display: none; }
 @media (hover: hover) and (pointer: fine) {
   .slides.draggable { cursor: grab; }
