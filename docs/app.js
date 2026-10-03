@@ -10,7 +10,7 @@
  * and a note says what followed, with a way back. Nothing stops to ask.
  */
 
-import { decimal, say, speak, speaks } from "./words.js?v=847c7fba65";
+import { decimal, say, speak, speaks } from "./words.js?v=3fd38f6036";
 
 /* The choices whose names are this page's to give.
  *
@@ -1789,9 +1789,9 @@ function wireControls() {
 
 /* ---------- the scene ---------- */
 
-import * as draw from "./draw.js?v=847c7fba65";
-import * as flat from "./bore.js?v=847c7fba65";
-import * as pick from "./map.js?v=847c7fba65";
+import * as draw from "./draw.js?v=3fd38f6036";
+import * as flat from "./bore.js?v=3fd38f6036";
+import * as pick from "./map.js?v=3fd38f6036";
 
 const container = document.getElementById("scene");
 const canvas = document.createElement("canvas");
@@ -1902,8 +1902,30 @@ function guessedQuality() {
   return "medium";
 }
 
+const QUALITY_ORDER = ["low", "medium", "high"];
+
+function autoLevel() {
+  const at = QUALITY_ORDER.indexOf(guessedQuality());
+  return QUALITY_ORDER[Math.max(0, at - qualityLowered)];
+}
+
 function qualityName() {
-  return qualityChosen === "auto" ? guessedQuality() : qualityChosen;
+  return qualityChosen === "auto" ? autoLevel() : qualityChosen;
+}
+
+/* One level down, on automatic only, and said in the quality list. At
+ * the lowest level the still frame cuts the picture half as finely. */
+function lowerQuality() {
+  if (qualityChosen !== "auto") return;
+  if (qualityName() === "low") {
+    draw.texturing.stillSlices = 4;
+    return;
+  }
+  qualityLowered += 1;
+  draw.texturing.exact = quality().exact;
+  motion3d.blocks = Math.min(motion3d.blocks, quality().blocks);
+  wireQuality();
+  resize();
 }
 
 function quality() {
@@ -1950,7 +1972,9 @@ function wireQuality() {
   const pick = document.getElementById("quality-pick");
   if (!pick) return;
   pick.innerHTML = options([
-    ["auto", say("quality.auto", { level: say("quality.level." + guessedQuality()) })],
+    // The level automatic is at now: the guess from the device, less
+    // any step it took down after a slow frame.
+    ["auto", say("quality.auto", { level: say("quality.level." + autoLevel()) })],
     ["low", say("quality.low")], ["medium", say("quality.medium")],
     ["high", say("quality.high")],
   ], qualityChosen);
@@ -1996,7 +2020,8 @@ function blocksOnDrawnGround() {
     const [x, y] = block;
     if (x < west || x > east || y < south || y > north) continue;
     out.push(block);
-    if (out.length >= quality().blocks) break;
+    if (out.length >= (movingFrame() ? Math.min(motion3d.blocks, quality().blocks)
+                                     : quality().blocks)) break;
   }
   return out;
 }
@@ -2397,11 +2422,66 @@ const SMOOTH_MS = 33;
 const FEWEST_MOVING = 60;
 const MOST_MOVING = 20000;
 
+/* What a moving frame draws besides the photograph, kept to what this
+ * device paints smoothly.
+ *
+ * The buildings were the frame: Kızılay's five thousand outlines took a
+ * drag down to five frames a second, and every phone to fewer. While the
+ * camera moves, only the largest buildings are drawn, as many as fit in
+ * a smooth frame, and the coverage colours are read a cell in two, three
+ * or four when even that is too much. Measured on every moving frame and
+ * corrected the same way as the photograph's budget, so a fast computer
+ * ends up drawing all of them and a slow phone a few hundred. A quarter
+ * of a second after the movement stops, the whole picture is drawn. */
+const motion3d = { blocks: 1500, stride: 1, roads: true, photo: true };
+const FEWEST_BLOCKS = 120;
+
+function movingFrame() {
+  return draw.texturing.moving && !draw.texturing.still;
+}
+
+/* Slower than smooth, one step down; well inside it, one step back up,
+ * in the reverse order. The steps, cheapest to give up first: fewer
+ * buildings, coarser coverage colours, then on the slowest devices the
+ * streets and last the photograph, both only while the camera moves. */
+function tuneMotion(took) {
+  const most = quality().blocks;
+  if (took > SMOOTH_MS * 1.3) {
+    if (motion3d.blocks > FEWEST_BLOCKS) {
+      motion3d.blocks = Math.max(FEWEST_BLOCKS, Math.floor(motion3d.blocks * 0.6));
+    } else if (motion3d.stride < 4) {
+      motion3d.stride += 1;
+    } else if (motion3d.roads) {
+      motion3d.roads = false;
+    } else {
+      motion3d.photo = false;
+    }
+  } else if (took < SMOOTH_MS * 0.6) {
+    if (!motion3d.photo) {
+      motion3d.photo = true;
+    } else if (!motion3d.roads) {
+      motion3d.roads = true;
+    } else if (motion3d.stride > 1) {
+      motion3d.stride -= 1;
+    } else {
+      motion3d.blocks = Math.min(most, Math.ceil(motion3d.blocks * 1.25));
+    }
+  }
+}
+
+/* A still frame slower than this, on automatic quality, takes the
+ * device one level down for the rest of the visit: the full picture
+ * after every movement should not freeze the page for a second. */
+const STILL_TOO_SLOW_MS = 450;
+let qualityLowered = 0;
+
 function timedPaint() {
   const textured = draw.texturing.on && drawnPhotograph();
   const started = performance.now();
   paintScene();
   const took = performance.now() - started;
+  if (movingFrame()) tuneMotion(took);
+  else if (draw.texturing.still && took > STILL_TOO_SLOW_MS) lowerQuality();
   if (!textured) return;
   const drawn = draw.texturing.drawn;
   if (draw.texturing.still) {
@@ -2441,8 +2521,13 @@ function scheduleStill() {
   draw.texturing.moving = true;
   draw.texturing.still = false;
   clearTimeout(stillTimer);
-  stillTimer = setTimeout(() => {
-    if (!drawnPhotograph()) return;
+  stillTimer = setTimeout(function settle() {
+    // Not while a finger or the mouse still holds the scene: a pause in
+    // a drag is not the end of it, and on a slow device the full frame
+    // froze the drag it interrupted for seconds.
+    if (moving()) { stillTimer = setTimeout(settle, 250); return; }
+    // Always, photograph or not: the moving frames left buildings and
+    // coverage out, and this is where they come back.
     stillFrame = true;
     draw.texturing.on = true;
     draw.texturing.still = true;
@@ -2482,23 +2567,26 @@ function paintScene() {
 
   // The coarse, photographed ground a moving frame can fall back on when
   // there are more quads than it can lay the picture on one by one.
+  const moved = movingFrame();
+  const photo = moved && !motion3d.photo ? null : drawnPhotograph();
   draw.texturing.patches = draw.texturing.on && draw.texturing.moving
-      && !draw.texturing.still && !draw.texturing.exact
-    ? draw.groundPatches(view, drawnTerrain(), drawnPhotograph())
+      && !draw.texturing.still && !draw.texturing.exact && photo
+    ? draw.groundPatches(view, drawnTerrain(), photo)
     : null;
 
   const roadStyle = roadsForward && showRoads ? ROADS.forward : ROADS.rest;
   draw.shade.dim = roadStyle.dim;
   const items = [
-    ...draw.groundFaces(view, drawnTerrain(), light, drawnPhotograph()),
+    ...draw.groundFaces(view, drawnTerrain(), light, photo),
     ...(showBuildings ? draw.blocks(
-      view, blocksOnDrawnGround(), light, drawnPhotograph(), bias) : []),
+      view, blocksOnDrawnGround(), light, photo, bias) : []),
     ...(shownLayer === "ground" ? []
       : draw.cellFaces(view, sweepData, groundAt, bias, shownLayer,
-                       groundEdge())),
+                       groundEdge(), movingFrame() ? motion3d.stride : 1)),
     // The streets under the route, light: context, not a result, unless
     // they have been brought forward.
-    ...(showRoads ? onDrawnGround(latest.terrain.roads || []).flatMap(
+    ...(showRoads && (!moved || motion3d.roads)
+      ? onDrawnGround(latest.terrain.roads || []).flatMap(
       street => draw.polyline(
         view,
         street.map(p => [p[0], p[1], draw.lift(p[2]) + 4]),

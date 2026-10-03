@@ -501,9 +501,13 @@ export const RISING = { anchors: true, margin_db: true,
  * the mesh and was painted over nothing: a ragged frame of pale squares
  * round the site. Each square is cut back to the ground instead. */
 export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors",
-                          within = null) {
+                          within = null, stride = 1) {
   if (!sweep) return [];
-  const { xs, ys, resolution_m: size } = sweep;
+  const { xs, ys } = sweep;
+  // A moving frame on a slow device reads one cell in `stride` each way
+  // and paints it that much larger: the same colours, a fraction of the
+  // faces, and the exact grid back as soon as the camera stops.
+  const size = sweep.resolution_m * stride;
   const values = (sweep.layers && sweep.layers[layer]) || sweep.counts;
   const edges = (sweep.bands && sweep.bands[layer]) || [1, 3, 4, 6];
   const rising = RISING[layer] !== false;
@@ -513,8 +517,8 @@ export function cellFaces(view, sweep, groundAt, bias = 0, layer = "anchors",
   // both are wide, so the two spreads add.
   const over = bias + half;
   const out = [];
-  for (let row = 0; row < ys.length; row++) {
-    for (let column = 0; column < xs.length; column++) {
+  for (let row = 0; row < ys.length; row += stride) {
+    for (let column = 0; column < xs.length; column += stride) {
       const band = bandOf(values[row][column], edges, rising);
       // Ground with no number is left as ground. Painting it would say
       // "nothing reaches here" in the same visual language as "something
@@ -748,7 +752,7 @@ function textured(context, item) {
   // picture too, cut a little less finely: the one-draw quad bends the
   // photograph at its fourth corner, and that bend is what flickers.
   const triangles = (!moving || texturing.exact) && item.texture.slice
-    ? item.texture.slice(moving ? MOVING_SLICES : MOST_SLICES) : null;
+    ? item.texture.slice(moving ? MOVING_SLICES : texturing.stillSlices) : null;
   if (triangles) {
     context.beginPath();
     context.moveTo(item.screen[0][0], item.screen[0][1]);
@@ -847,6 +851,9 @@ export const texturing = {
   drawn: 0,
   // The coarse ground a moving frame may draw instead of every quad.
   patches: null,
+  // How finely a still frame cuts the picture. The page halves it on a
+  // device where the full cut froze the page after every movement.
+  stillSlices: MOST_SLICES,
 };
 
 /* Which quads a moving frame lays the picture on: the largest on screen
