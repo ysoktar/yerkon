@@ -235,12 +235,15 @@ const BARE = [126, 146, 104];
  * the photograph comes through at the resolution somebody is looking at
  * it from (`ground` in scene.py).
  */
-export function groundFaces(view, terrain, light, photo, step = 1) {
+export function groundFaces(view, terrain, light, photo, step = 1, rows = null) {
   const { xs, ys, heights } = terrain;
   const out = [];
+  // `rows`, where given, is the band [first, last) of mesh rows wanted:
+  // a still picture builds the ground a band at a time.
+  const [first, last] = rows || [0, ys.length - 1];
   // `step` above one draws the mesh a node in `step` each way, for a
   // moving frame on a device that cannot draw every quad in time.
-  for (let row = 0; row < ys.length - 1; row += step) {
+  for (let row = first; row < last; row += step) {
     const below = Math.min(row + step, ys.length - 1);
     for (let column = 0; column < xs.length - 1; column += step) {
       const right = Math.min(column + step, xs.length - 1);

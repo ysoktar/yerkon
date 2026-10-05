@@ -1958,9 +1958,9 @@ let blockSet = { site: "", blocks: [] };
  * processors, its memory, and whether it is held in the hand.
  */
 const QUALITIES = {
-  low: { ratio: 1, blocks: 2500, tiles: 24, reach: 1.0, exact: false },
-  medium: { ratio: 1.5, blocks: 6000, tiles: 48, reach: 1.3, exact: false },
-  high: { ratio: 2, blocks: 15000, tiles: 96, reach: 1.8, exact: true },
+  low: { ratio: 1, blocks: 2500, tiles: 24, sheet: 64, reach: 1.0, exact: false },
+  medium: { ratio: 1.5, blocks: 6000, tiles: 48, sheet: 144, reach: 1.3, exact: false },
+  high: { ratio: 2, blocks: 15000, tiles: 96, sheet: Infinity, reach: 1.8, exact: true },
 };
 const QUALITY_KEY = "yerkon-quality";
 let qualityChosen = "auto";
@@ -1969,7 +1969,16 @@ try {
   if (kept && (kept === "auto" || QUALITIES[kept])) qualityChosen = kept;
 } catch (error) { /* storage blocked: automatic, for this visit */ }
 
+/* Read once: the device does not change while the page is open, and
+ * this was asked on every frame. */
+let guessed = null;
+
 function guessedQuality() {
+  if (!guessed) guessed = guessQuality();
+  return guessed;
+}
+
+function guessQuality() {
   const cores = navigator.hardwareConcurrency || 4;
   const memory = navigator.deviceMemory || 4;
   const hand = window.matchMedia("(pointer: coarse)").matches;
@@ -2132,9 +2141,16 @@ function loadPhotograph() {
   const stillWanted = () => photographUrl === aerial.url;
   const dropped = () => { if (stillWanted()) photograph = null; };
 
+  // Switching back to a row already seen: its picture is in hand.
+  const kept = photoKept.get(aerial.url);
+  if (kept) {
+    photograph = kept;
+    render();
+    return;
+  }
   if (aerial.tiles) {
     const done = doing("act.photo");
-    stitchTiles(aerial.tiles).then(sheet => {
+    stitchTiles(aerial.tiles, quality().sheet).then(sheet => {
       done();
       if (stillWanted()) takePhotograph(sheet, aerial);
     }, () => { done(); dropped(); });
@@ -2147,7 +2163,7 @@ function loadPhotograph() {
     const sheet = document.createElement("canvas");
     sheet.width = picture.naturalWidth;
     sheet.height = picture.naturalHeight;
-    sheet.getContext("2d", { willReadFrequently: true }).drawImage(picture, 0, 0);
+    sheet.getContext("2d").drawImage(picture, 0, 0);
     takePhotograph(sheet, aerial);
   };
   picture.onerror = dropped;
@@ -2170,18 +2186,55 @@ function loadPhotograph() {
 
 /* The pixels of a finished sheet, read out once for the painter. */
 function takePhotograph(sheet, aerial) {
-  const pen = sheet.getContext("2d", { willReadFrequently: true });
+  const sampler = samplerOf(sheet, aerial.extent_m);
+  // A canvas the browser considers tainted. Same ground, no picture.
+  photograph = sampler;
+  if (sampler) {
+    photoKept.set(aerial.url, sampler);
+    // The two most recent: a row and the one before it. A town's sheet
+    // is tens of megabytes, and a phone has few of those to spare.
+    while (photoKept.size > 2) photoKept.delete(photoKept.keys().next().value);
+  }
+  render();
+}
+
+//: Photographs already put together, by address, newest last.
+const photoKept = new Map();
+
+//: The longest side, in pixels, of the copy a photograph's colours are
+//: read from.
+const COLOUR_SIDE = 1024;
+
+/* What the painter needs of a photograph: the picture itself, to lay
+ * across the ground, and a colour per spot, for the quads it does not.
+ *
+ * The colours come from a small copy. A town's sheet is fourteen
+ * hundred tiles' worth of pixels, fifty megabytes read back in one go,
+ * and on a phone that held the page still for a second and a half;
+ * a quad takes one colour, and a thousand pixels a side is finer than
+ * any quad that is not laid with the picture itself. Null for a canvas
+ * the browser will not let a page read. */
+function samplerOf(sheet, extent) {
+  const scale = Math.min(1, COLOUR_SIDE / Math.max(sheet.width, sheet.height));
+  const small = document.createElement("canvas");
+  small.width = Math.max(1, Math.round(sheet.width * scale));
+  small.height = Math.max(1, Math.round(sheet.height * scale));
+  const pen = small.getContext("2d", { willReadFrequently: true });
+  pen.drawImage(sheet, 0, 0, small.width, small.height);
   let pixels;
   try {
-    pixels = pen.getImageData(0, 0, sheet.width, sheet.height).data;
+    pixels = pen.getImageData(0, 0, small.width, small.height).data;
   } catch {
-    // A canvas the browser considers tainted. Same ground, no picture.
-    photograph = null;
-    return;
+    return null;
   }
-  photograph = draw.photoSampler(
-    pixels, sheet.width, sheet.height, aerial.extent_m, sheet);
-  render();
+  const sampler = draw.photoSampler(pixels, small.width, small.height, extent, sheet);
+  // Where a point falls on the picture itself, not on the small copy.
+  const [west, south, east, north] = extent;
+  const across = Math.max(east - west, 1e-9);
+  const down = Math.max(north - south, 1e-9);
+  sampler.pixelOf = (x, y) => [(x - west) / across * sheet.width,
+                               (north - y) / down * sheet.height];
+  return sampler;
 }
 
 /* A photograph put together here from the provider's tiles (ADR-0087).
@@ -2191,30 +2244,48 @@ function takePhotograph(sheet, aerial) {
  * Asked for as anonymous requests so the sheet can be read back, and a
  * tile that does not come is a grey square rather than no picture.
  */
-function stitchTiles(tiles) {
-  const side = 256;
+function stitchTiles(tiles, most = Infinity) {
   const columns = tiles.east_x - tiles.west_x + 1;
   const rows = tiles.south_y - tiles.north_y + 1;
+  // Past `most` tiles, the same window from a zoom level or two out: a
+  // quarter of the tiles and of the memory a level, on a phone that
+  // would otherwise fetch, decode and hold a couple of hundred. Close
+  // to the ground the sharper picture under the camera takes over
+  // (`loadFinePhoto`), so the whole site's sheet need not be the sharpest.
+  let out = 0;
+  while (out < 3 && tiles.zoom - out > 1
+         && Math.ceil(columns / 2 ** out) * Math.ceil(rows / 2 ** out) > most) {
+    out += 1;
+  }
+  const shrink = 2 ** out;
+  // Each tile of the window keeps its place on the sheet; a coarser
+  // tile covers `shrink` of them each way and is drawn across them.
+  const side = 256 / shrink;
   const sheet = document.createElement("canvas");
   sheet.width = columns * side;
   sheet.height = rows * side;
-  const pen = sheet.getContext("2d", { willReadFrequently: true });
+  // Not read back from: the colours come from a small copy
+  // (`samplerOf`), so this one stays where the browser draws fastest.
+  const pen = sheet.getContext("2d");
   pen.fillStyle = "rgb(128, 128, 128)";
   pen.fillRect(0, 0, sheet.width, sheet.height);
   const arrivals = [];
-  for (let y = tiles.north_y; y <= tiles.south_y; y++) {
-    for (let x = tiles.west_x; x <= tiles.east_x; x++) {
+  const zoom = tiles.zoom - out;
+  for (let y = Math.floor(tiles.north_y / shrink); y <= Math.floor(tiles.south_y / shrink); y++) {
+    for (let x = Math.floor(tiles.west_x / shrink); x <= Math.floor(tiles.east_x / shrink); x++) {
       arrivals.push(new Promise(settle => {
         const tile = new Image();
         tile.crossOrigin = "anonymous";
-        tile.onload = () => {
-          pen.drawImage(tile, (x - tiles.west_x) * side,
-                        (y - tiles.north_y) * side, side, side);
-          settle(true);
-        };
-        tile.onerror = () => settle(false);
-        tile.src = tiles.template.replace("{z}", tiles.zoom)
+        tile.src = tiles.template.replace("{z}", zoom)
           .replace("{x}", x).replace("{y}", y);
+        // Decoded away from the page before it is drawn: drawn as it
+        // arrived, each tile was decoded on the spot, and two hundred of
+        // them arriving together held the page for seconds on a phone.
+        tile.decode().then(() => {
+          pen.drawImage(tile, (x * shrink - tiles.west_x) * side,
+                        (y * shrink - tiles.north_y) * side, 256, 256);
+          settle(true);
+        }, () => settle(false));
       }));
     }
   }
@@ -2313,19 +2384,9 @@ function loadFinePhoto(box) {
   stitchTiles(t).then(sheet => {
     done();
     if (fineAsked !== key) return;
-    let pixels;
-    try {
-      pixels = sheet.getContext("2d", { willReadFrequently: true })
-        .getImageData(0, 0, sheet.width, sheet.height).data;
-    } catch {
-      return;
-    }
-    finePhoto = {
-      key,
-      extent: chosen.extent,
-      sampler: draw.photoSampler(pixels, sheet.width, sheet.height,
-                                 chosen.extent, sheet),
-    };
+    const sampler = samplerOf(sheet, chosen.extent);
+    if (!sampler) return;
+    finePhoto = { key, extent: chosen.extent, sampler };
     render();
   }, done);
 }
@@ -2513,6 +2574,8 @@ const motion3d = { blocks: 1500, stride: 1, roads: true, photo: true, mesh: 1 };
 const FEWEST_BLOCKS = 120;
 //: Buildings per part of a still frame being built a slice at a time.
 const BLOCK_CHUNK = 400;
+//: Rows of ground per part of the same.
+const GROUND_BAND = 8;
 
 function movingFrame() {
   return draw.texturing.moving && !draw.texturing.still;
@@ -2583,36 +2646,64 @@ function noteStillShare(share) {
   }
 }
 
-/* Slower than smooth, one step down; well inside it, one step back up,
- * in the reverse order. The steps, cheapest to give up first: fewer
- * buildings, coarser coverage colours, then on the slowest devices the
- * streets and last the photograph, both only while the camera moves. */
+/* What a moving frame keeps, richest first. A slow frame steps down as
+ * many rungs as it was slow (twice smooth, one; eight times, three), so
+ * a phone finds its rung in a frame or two instead of a dozen; five
+ * quick frames in a row step back up one, so the picture does not flick
+ * between two rungs. The order is what is cheapest to give up while the
+ * camera moves: buildings first, then the ground's mesh read a node in
+ * two (most of a frame is the ground), the coverage colours, the
+ * streets, and last the photograph. */
+const MOTION_LADDER = [
+  { blocks: Infinity, stride: 1, roads: true, photo: true, mesh: 1 },
+  { blocks: 1500, stride: 1, roads: true, photo: true, mesh: 1 },
+  { blocks: 800, stride: 1, roads: true, photo: true, mesh: 1 },
+  { blocks: 400, stride: 1, roads: true, photo: true, mesh: 1 },
+  { blocks: 200, stride: 1, roads: true, photo: true, mesh: 2 },
+  { blocks: FEWEST_BLOCKS, stride: 2, roads: true, photo: true, mesh: 2 },
+  { blocks: FEWEST_BLOCKS, stride: 3, roads: false, photo: true, mesh: 2 },
+  { blocks: FEWEST_BLOCKS, stride: 4, roads: false, photo: true, mesh: 3 },
+  { blocks: FEWEST_BLOCKS, stride: 4, roads: false, photo: false, mesh: 3 },
+  { blocks: FEWEST_BLOCKS, stride: 4, roads: false, photo: false, mesh: 4 },
+];
+const QUICK_FRAMES_UP = 5;
+let motionRung = 1;
+let quickFrames = 0;
+
+function setRung(rung) {
+  motionRung = Math.max(0, Math.min(MOTION_LADDER.length - 1, rung));
+  Object.assign(motion3d, MOTION_LADDER[motionRung]);
+}
+
+/* The rung this device ended on last time, so the first drag of a visit
+ * starts where the last one settled rather than at the top. */
+function motionKey() {
+  return "yerkon-motion-" + qualityName();
+}
+
+function recallRung() {
+  try {
+    const kept = localStorage.getItem(motionKey());
+    if (kept !== null && Number.isInteger(Number(kept))) setRung(Number(kept));
+  } catch { /* storage blocked: the ladder starts at the top */ }
+}
+
+function keepRung() {
+  try { localStorage.setItem(motionKey(), String(motionRung)); } catch { /* none */ }
+}
+
 function tuneMotion(took) {
-  const most = quality().blocks;
   if (took > SMOOTH_MS * 1.3) {
-    if (motion3d.blocks > FEWEST_BLOCKS) {
-      motion3d.blocks = Math.max(FEWEST_BLOCKS, Math.floor(motion3d.blocks * 0.6));
-    } else if (motion3d.stride < 4) {
-      motion3d.stride += 1;
-    } else if (motion3d.roads) {
-      motion3d.roads = false;
-    } else if (motion3d.photo) {
-      motion3d.photo = false;
-    } else {
-      motion3d.mesh = Math.min(3, motion3d.mesh + 1);
-    }
+    quickFrames = 0;
+    setRung(motionRung + Math.max(1, Math.ceil(Math.log2(took / SMOOTH_MS))));
   } else if (took < SMOOTH_MS * 0.6) {
-    if (motion3d.mesh > 1) {
-      motion3d.mesh -= 1;
-    } else if (!motion3d.photo) {
-      motion3d.photo = true;
-    } else if (!motion3d.roads) {
-      motion3d.roads = true;
-    } else if (motion3d.stride > 1) {
-      motion3d.stride -= 1;
-    } else {
-      motion3d.blocks = Math.min(most, Math.ceil(motion3d.blocks * 1.25));
+    quickFrames += 1;
+    if (quickFrames >= QUICK_FRAMES_UP) {
+      quickFrames = 0;
+      setRung(motionRung - 1);
     }
+  } else {
+    quickFrames = 0;
   }
 }
 
@@ -2789,6 +2880,7 @@ function learnFromStill(workMs, drawn) {
       Math.min(MOST_MOVING, Math.floor(SMOOTH_MS * 0.8 / each)));
   }
   if (workMs > STILL_TOO_SLOW_MS) lowerQuality();
+  keepRung();
 }
 
 function paintScene(sliced = false) {
@@ -2846,10 +2938,17 @@ function paintScene(sliced = false) {
       motion3d.mesh > 1 && "act.view.mesh",
     ].filter(Boolean);
   }
-  const parts = [
-    () => draw.groundFaces(view, drawnTerrain(), light, photo,
-                           moved ? motion3d.mesh : 1),
-  ];
+  // The ground in bands of rows for a still picture built a slice at a
+  // time: whole, it was the one part that took a phone half a second.
+  const ground = drawnTerrain();
+  const rows = ground && ground.ys ? ground.ys.length - 1 : 0;
+  const band = sliced ? GROUND_BAND : Math.max(rows, 1);
+  const parts = [];
+  for (let from = 0; from < Math.max(rows, 1); from += band) {
+    parts.push(() => draw.groundFaces(view, ground, light, photo,
+                                      moved ? motion3d.mesh : 1,
+                                      [from, Math.min(from + band, rows)]));
+  }
   for (let at = 0; at < buildings.length; at += BLOCK_CHUNK) {
     const chunk = buildings.slice(at, at + BLOCK_CHUNK);
     parts.push(() => draw.blocks(view, chunk, light, photo, bias));
@@ -5155,6 +5254,7 @@ async function runSimulation() {
 }
 
 (async function start() {
+  recallRung();
   // The language the session is in, before anything is drawn in it.
   speak(document.documentElement.lang === "en" ? "en" : "tr");
   drawWords();
