@@ -812,9 +812,9 @@ def test_the_folder_carries_both_languages_and_every_page(tmp_path):
     onward += sum(1 for page in PAGES if page.slug_in("en") != page.slug)
     photos = sum(1 for path in (STATIC / "photos").iterdir()
                  if path.suffix == ".webp")
-    # robots.txt, sitemap.xml and llms.txt, for readers that are not
-    # people.
-    readers = 3
+    # robots.txt, sitemap.xml, llms.txt and the IndexNow key, for
+    # readers that are not people.
+    readers = 4
     # The typeface, served from the site, and its licence.
     from yerkon.viewer.pages import FONTS
     assert {"fonts/" + name for name in FONTS} <= names
@@ -1257,3 +1257,14 @@ def test_an_issue_of_the_gazette_is_a_number_not_an_amount():
         "Resmî Gazete, 5 November 2020, issue 31295")
     assert grouped("Resmî Gazete, 5 Kasım 2020, sayı 31295") == (
         "Resmî Gazete, 5 Kasım 2020, sayı 31295")
+
+
+def test_the_indexnow_key_is_served_where_search_engines_look(tmp_path):
+    """IndexNow reads the key at /<key>.txt; the file holds the key alone,
+    and the key is 8 to 128 letters, digits or dashes."""
+    import re
+    from yerkon.viewer.pages import INDEXNOW_KEY
+
+    write_pages_of(tmp_path)
+    assert re.fullmatch(r"[A-Za-z0-9-]{8,128}", INDEXNOW_KEY)
+    assert (tmp_path / (INDEXNOW_KEY + ".txt")).read_text() == INDEXNOW_KEY

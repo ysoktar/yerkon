@@ -4633,6 +4633,10 @@ BROWSER_SIMULATOR_PAGE = "calistir/index.html"
 #: domain, and the folder is pushed afresh each time, so it is drawn with
 #: the pages rather than set once by hand (ADR-0112).
 DOMAIN = "yerkon.com"
+#: The site's IndexNow key. Public by design: search engines read it at
+#: /<key>.txt to know that whoever announces the site's pages owns it,
+#: and the publishing workflow announces them with it after each deploy.
+INDEXNOW_KEY = "5d28cf145e8036647499e9be3d04c744"
 BROWSER_SCRIPTS = ("app.js", "draw.js", "bore.js", "words.js", "map.js",
                    "style.css", "local.js", "sim-worker.js")
 #: What of the package the browser does not need: caches, the fetch
@@ -4842,6 +4846,7 @@ def write_pages(into, published=None) -> tuple:
     put("robots.txt", _robots())
     put("sitemap.xml", _sitemap())
     put("llms.txt", _llms())
+    put(INDEXNOW_KEY + ".txt", INDEXNOW_KEY.encode("utf-8"))
     for page in PAGES:
         # The front pages are tr/ and en/ themselves: en/index.html is the
         # English front page, not a way to it.

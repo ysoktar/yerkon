@@ -52,6 +52,56 @@ jobs:
             "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -q -m "The site, as GitHub Pages serves it"
-          git push -qf \
-            "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}" \
-            gh-pages
+          # The pages this deploy changes, against what gh-pages serves
+          # now, for the announcement below. Every page on a first push.
+          remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}"
+          if git fetch -q --depth 1 "$remote" gh-pages 2>/dev/null; then
+            git diff --name-only FETCH_HEAD HEAD > "$RUNNER_TEMP/changed"
+          else
+            git ls-files > "$RUNNER_TEMP/changed"
+          fi
+          git push -qf "$remote" gh-pages
+
+      # IndexNow: tells Bing, Yandex and the other engines that share it
+      # which pages changed, so they need not wait for their next crawl.
+      # Only pages in the sitemap are announced, never the addresses that
+      # send a visitor on. It waits until the site serves the new files,
+      # since an engine that reads a page at once should find the new one,
+      # and a failure here never fails the deploy.
+      - name: Announce the changed pages
+        continue-on-error: true
+        run: |
+          set -u
+          key="$(basename "$(ls docs | grep -E '^[0-9a-f]{32}\.txt$' | head -1)" .txt)"
+          [ -n "$key" ] || { echo "no IndexNow key in docs/"; exit 0; }
+          urls=()
+          while read -r path; do
+            case "$path" in
+              index.html) url="https://yerkon.com/" ;;
+              */index.html) url="https://yerkon.com/${path%index.html}" ;;
+              *) continue ;;
+            esac
+            grep -q "<loc>${url}</loc>" docs/sitemap.xml && urls+=("$url")
+          done < "$RUNNER_TEMP/changed"
+          # The key's own first deploy announces every page once.
+          if grep -qx "${key}.txt" "$RUNNER_TEMP/changed"; then
+            mapfile -t urls < <(grep -o '<loc>[^<]*</loc>' docs/sitemap.xml \
+                                | sed -e 's/<loc>//' -e 's/<\/loc>//')
+          fi
+          [ "${#urls[@]}" -gt 0 ] || { echo "no page changed"; exit 0; }
+          # Served once the first changed page reads as it does here.
+          first="${urls[0]}"
+          local_file="docs/${first#https://yerkon.com/}index.html"
+          want="$(sha256sum "$local_file" | cut -d' ' -f1)"
+          for _ in $(seq 1 40); do
+            got="$(curl -fsS "$first" | sha256sum | cut -d' ' -f1)" || got=""
+            [ "$got" = "$want" ] && break
+            sleep 15
+          done
+          list="$(printf '"%s",' "${urls[@]}")"
+          body="{\"host\":\"yerkon.com\",\"key\":\"${key}\",\"keyLocation\":\"https://yerkon.com/${key}.txt\",\"urlList\":[${list%,}]}"
+          echo "announcing ${#urls[@]} pages"
+          curl -sS -o /dev/null -w "IndexNow answered %{http_code}\n" \
+            -X POST "https://api.indexnow.org/indexnow" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            --data "$body"
