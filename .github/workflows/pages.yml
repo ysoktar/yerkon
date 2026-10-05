@@ -83,21 +83,31 @@ jobs:
             esac
             grep -q "<loc>${url}</loc>" docs/sitemap.xml && urls+=("$url")
           done < "$RUNNER_TEMP/changed"
-          # The key's own first deploy announces every page once.
-          if grep -qx "${key}.txt" "$RUNNER_TEMP/changed"; then
+          # The key's own first deploy, or a run started by hand,
+          # announces every page once.
+          if grep -qx "${key}.txt" "$RUNNER_TEMP/changed" \
+             || [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
             mapfile -t urls < <(grep -o '<loc>[^<]*</loc>' docs/sitemap.xml \
                                 | sed -e 's/<loc>//' -e 's/<\/loc>//')
           fi
           [ "${#urls[@]}" -gt 0 ] || { echo "no page changed"; exit 0; }
-          # Served once the first changed page reads as it does here.
-          first="${urls[0]}"
-          local_file="docs/${first#https://yerkon.com/}index.html"
-          want="$(sha256sum "$local_file" | cut -d' ' -f1)"
+          # Served once the key and every page to announce read as they
+          # do here: an engine checks the key when it is told, and reads
+          # the pages soon after.
+          served() {
+            [ "$(curl -fsS "https://yerkon.com/${key}.txt")" = "$key" ] || return 1
+            for url in "${urls[@]}"; do
+              file="docs/${url#https://yerkon.com/}index.html"
+              [ "$(curl -fsS "$url" | sha256sum | cut -d' ' -f1)" \
+                = "$(sha256sum "$file" | cut -d' ' -f1)" ] || return 1
+            done
+          }
+          ready=no
           for _ in $(seq 1 40); do
-            got="$(curl -fsS "$first" | sha256sum | cut -d' ' -f1)" || got=""
-            [ "$got" = "$want" ] && break
+            if served; then ready=yes; break; fi
             sleep 15
           done
+          [ "$ready" = yes ] || { echo "the site did not serve the new files in time"; exit 0; }
           list="$(printf '"%s",' "${urls[@]}")"
           body="{\"host\":\"yerkon.com\",\"key\":\"${key}\",\"keyLocation\":\"https://yerkon.com/${key}.txt\",\"urlList\":[${list%,}]}"
           echo "announcing ${#urls[@]} pages"
