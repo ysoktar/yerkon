@@ -387,3 +387,56 @@ def test_a_plain_install_does_not_try_what_it_cannot_read(monkeypatch, tmp_path)
     assert kinds("buildings_sources") == ["OpenStreetMapBuildings"]
     assert kinds("roads_sources") == ["OpenStreetMapRoads"]
     assert kinds("furniture_sources") == []
+
+
+def test_a_request_the_phone_dropped_is_asked_again(monkeypatch):
+    """A phone drops every open request when its owner switches app; the
+    request fails as the page wakes, and asked again it goes through."""
+    from yerkon.site import http
+
+    monkeypatch.setattr(http, "IN_A_BROWSER", True)
+    monkeypatch.setattr(http, "BROWSER_RETRY_WAITS_S", (0.0, 0.0, 0.0))
+    tries = []
+
+    def once(method, url, form, timeout, headers=None):
+        tries.append(url)
+        if len(tries) == 1:
+            raise http.Failed("NetworkError")
+        if len(tries) == 2:
+            return http.Reply(0)
+        return http.Reply(200, b"ok")
+
+    monkeypatch.setattr(http, "_once_in_the_browser", once)
+    assert http.get("https://example.org/tile").content == b"ok"
+    assert len(tries) == 3
+
+
+def test_a_server_s_refusal_is_not_asked_again(monkeypatch):
+    """A refusal is an answer: the fetchers decide what to do with it."""
+    from yerkon.site import http
+
+    monkeypatch.setattr(http, "IN_A_BROWSER", True)
+    monkeypatch.setattr(http, "BROWSER_RETRY_WAITS_S", (0.0, 0.0, 0.0))
+    tries = []
+
+    def once(method, url, form, timeout, headers=None):
+        tries.append(url)
+        return http.Reply(404)
+
+    monkeypatch.setattr(http, "_once_in_the_browser", once)
+    assert http.get("https://example.org/tile").status_code == 404
+    assert len(tries) == 1
+
+
+def test_a_request_that_never_comes_back_fails_in_the_end(monkeypatch):
+    from yerkon.site import http
+
+    monkeypatch.setattr(http, "IN_A_BROWSER", True)
+    monkeypatch.setattr(http, "BROWSER_RETRY_WAITS_S", (0.0, 0.0))
+
+    def once(method, url, form, timeout, headers=None):
+        raise http.Failed("NetworkError")
+
+    monkeypatch.setattr(http, "_once_in_the_browser", once)
+    with pytest.raises(http.Failed):
+        http.get("https://example.org/tile")

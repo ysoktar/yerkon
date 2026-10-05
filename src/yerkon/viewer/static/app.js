@@ -4537,72 +4537,93 @@ async function quickStart(box, span) {
   // A note about an earlier change would sit over the new ground and
   // offer to undo something this path is about to replace anyway.
   document.getElementById("notice").hidden = true;
-  let at = 0;
-  try {
+  // Kept for the tab: a phone that closes the page while its owner is in
+  // another app opens it afresh on their return, and this carries on.
+  remember(QUICK_KEY, { box, span });
+  let fetched = null;
+  let row = null;
+  const work = [
     // 1. The ground, its buildings, its roads and its photograph.
-    doing(0);
-    const name = "yer-" + Date.now().toString(36);
-    const fetched = await jobResult("fetch", {
-      where: {
-        name,
-        centre: `${(box.south + box.north) / 2} ${(box.west + box.east) / 2}`,
-        size_km: Math.max(span.across, span.along),
-        spacing_m: 30,
-        buildings: true,
-        imagery: true,
-        ...box,
-      },
-    }, line => doing(0, line));
-    done(0);
-    if (fetched.buildings_missed) {
-      const warn = document.createElement("li");
-      warn.className = "bad";
-      warn.textContent = say("quick.nobuildings");
-      items[0].after(warn);
-    }
-
+    async () => {
+      const name = "yer-" + Date.now().toString(36);
+      fetched = await jobResult("fetch", {
+        where: {
+          name,
+          centre: `${(box.south + box.north) / 2} ${(box.west + box.east) / 2}`,
+          size_km: Math.max(span.across, span.along),
+          spacing_m: 30,
+          buildings: true,
+          imagery: true,
+          ...box,
+        },
+      }, line => doing(0, line));
+      if (fetched.buildings_missed) {
+        const warn = document.createElement("li");
+        warn.className = "bad";
+        warn.textContent = say("quick.nobuildings");
+        items[0].after(warn);
+      }
+    },
     // 2. The row that fits the box, standing on the whole of it.
-    at = 1;
-    doing(1);
-    const row = quickRow(span);
-    if (state.scenario !== row) await showRow(row);
-    framed = false;
-    // A plain lattice over the whole of the new ground, as the search's
-    // starting point. The tab's own layout was found for other ground and
-    // keeps that ground's coordinates, which is not where this one is.
-    const lattice = Object.assign({}, state.runs[0], {
-      identifier: "A", method: "grid", spots: [],
-      from_m: 0, to_m: fetched.width_m, offset_m: 0,
-    });
-    await apply({
-      site: fetched.name,
-      corridor_m: fetched.width_m,
-      width_m: fetched.height_m,
-      runs: [lattice],
-      moved: {},
-      removed: [],
-    });
-    done(1);
-
+    async () => {
+      row = quickRow(span);
+      if (state.scenario !== row) await showRow(row);
+      framed = false;
+      // A plain lattice over the whole of the new ground, as the search's
+      // starting point. The tab's own layout was found for other ground
+      // and keeps that ground's coordinates, which is not where this one is.
+      const lattice = Object.assign({}, state.runs[0], {
+        identifier: "A", method: "grid", spots: [],
+        from_m: 0, to_m: fetched.width_m, offset_m: 0,
+      });
+      await apply({
+        site: fetched.name,
+        corridor_m: fetched.width_m,
+        width_m: fetched.height_m,
+        runs: [lattice],
+        moved: {},
+        removed: [],
+      });
+    },
     // 3. The best of what already stands there. The town is searched for
     // the same cover at less cost and the country for more cover at the
     // same cost, as the table's own rows were (ADR-0096).
-    at = 2;
-    doing(2);
-    const placed = await jobResult("place",
-      { aim: row === "urban" ? "cheaper" : "better" }, line => doing(2, line));
-    await apply(placed.changes);
-    done(2);
-
+    async () => {
+      const placed = await jobResult("place",
+        { aim: row === "urban" ? "cheaper" : "better" }, line => doing(2, line));
+      await apply(placed.changes);
+    },
     // 4. A quick run: the model read coarsely, not a different model.
-    at = 3;
-    doing(3);
-    if (!hurrying()) {
-      await apply({ overrides: Object.assign({}, state.overrides, HURRIED) });
-      drawHurry();
+    async () => {
+      if (!hurrying()) {
+        await apply({ overrides: Object.assign({}, state.overrides, HURRIED) });
+        drawHurry();
+      }
+      await runSimulation();
+    },
+  ];
+  let at = 0;
+  let again = 0;
+  try {
+    while (at < work.length) {
+      doing(at);
+      // Whether the person left the page while this step ran: a phone
+      // drops what was being downloaded when its owner switches app.
+      const left = leftDuring();
+      try {
+        await work[at]();
+      } catch (error) {
+        // Tried again once they are back, rather than ending the whole
+        // path on a dropped connection nobody here caused.
+        if (!left() || again >= QUICK_AGAIN) throw error;
+        again += 1;
+        items[at].textContent = `${say(steps[at])} · ${say("quick.again")}`;
+        await visibleAgain();
+        continue;
+      }
+      done(at);
+      at += 1;
     }
-    await runSimulation();
-    done(3);
     const last = document.createElement("li");
     last.className = "done";
     last.textContent = say("quick.done");
@@ -4613,8 +4634,52 @@ async function quickStart(box, span) {
     items[at].textContent = say("quick.failed", { why: error.message });
     flash(error.message, true);
   } finally {
+    forget(QUICK_KEY);
     go.disabled = false;
   }
+}
+
+/* Whether the page went out of sight, from now until the function it
+ * returns is asked. */
+function leftDuring() {
+  let left = document.hidden;
+  const note = () => { if (document.hidden) left = true; };
+  document.addEventListener("visibilitychange", note);
+  return () => {
+    document.removeEventListener("visibilitychange", note);
+    return left || document.hidden;
+  };
+}
+
+function visibleAgain() {
+  if (!document.hidden) return Promise.resolve();
+  return new Promise(resume => {
+    const back = () => {
+      if (document.hidden) return;
+      document.removeEventListener("visibilitychange", back);
+      resume();
+    };
+    document.addEventListener("visibilitychange", back);
+  });
+}
+
+//: How many times a quick start tries a step again after the page was
+//: left and came back.
+const QUICK_AGAIN = 3;
+const QUICK_KEY = "yerkon-quick";
+
+/* The tab's own storage, which a private window or a blocked site may
+ * refuse: then there is nothing to carry on with, and nothing breaks. */
+function remember(key, value) {
+  try { sessionStorage.setItem(key, JSON.stringify(value)); } catch { /* none */ }
+}
+
+function recalled(key) {
+  try { return JSON.parse(sessionStorage.getItem(key) || "null"); } catch { return null; }
+}
+
+function forget(key) {
+  try { sessionStorage.removeItem(key); } catch { /* none */ }
 }
 
 /* Where the map opens: whatever is in the centre box, else Ankara.
@@ -5104,4 +5169,10 @@ async function runSimulation() {
   await loadFigures();
   await loadOptions();
   scheduleSweep();
+  // A quick start the browser cut short by closing the page while its
+  // owner was in another app: started again from the same box.
+  const unfinished = recalled(QUICK_KEY);
+  if (unfinished && unfinished.box && unfinished.span) {
+    quickStart(unfinished.box, unfinished.span);
+  }
 })();

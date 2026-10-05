@@ -22,6 +22,7 @@
     package: "Getting the simulator ready (3 of 4): unpacking the YERKON model and the Ankara maps…",
     ready: "Getting the simulator ready (4 of 4): drawing the first scene…",
     failed: "The simulator could not start in this browser. Try a current Chrome, Edge, Firefox or Safari. Detail: ",
+    again: "The connection dropped while the simulator was loading; trying again…",
     note: "The simulation runs on this device; nothing is sent anywhere. The first visit can take a minute or two; later visits are quicker, because the downloaded files stay in the browser.",
     home: "Back to the site",
   } : {
@@ -30,6 +31,7 @@
     package: "Simülatör hazırlanıyor (3/4): YERKON modeli ve Ankara haritaları açılıyor…",
     ready: "Simülatör hazırlanıyor (4/4): ilk sahne çiziliyor…",
     failed: "Simülatör bu tarayıcıda açılamadı. Güncel bir Chrome, Edge, Firefox ya da Safari ile deneyiniz. Ayrıntı: ",
+    again: "Simülatör yüklenirken bağlantı kesildi; yeniden deneniyor…",
     note: "Simülasyon bu cihazda çalışmakta, hiçbir veri dışarı gönderilmemektedir. İlk açılış bir iki dakika sürebilir; indirilen dosyalar tarayıcıda kaldığı için sonraki açılışlar daha hızlıdır.",
     home: "Siteye dön",
   };
@@ -70,12 +72,14 @@
   const show = () => document.body.append(cover);
   if (document.body) show(); else addEventListener("DOMContentLoaded", show);
 
-  const worker = new Worker("sim-worker.js?v=68067deb87", { type: "module" });
-  // A worker that dies while loading says nothing on its own, and the
-  // cover would promise a load that is never coming.
-  worker.onerror = event => {
-    line.textContent = words.failed + (event.message || "worker");
-  };
+  // A phone drops every download when its owner switches to another app
+  // and freezes the page until they return, and a worker caught loading
+  // then gives up. It is started again once the page is back in sight,
+  // and the questions it never answered are put to the new one.
+  const STARTS = 3;
+  let starts = 0;
+  let worker = null;
+  let up = false;
   const waiting = new Map();
   let next = 1;
   // What the worker is answering and what waits behind it, oldest first.
@@ -95,26 +99,65 @@
     cover.remove();
   };
 
-  worker.onmessage = event => {
-    const message = event.data;
-    if (message.stage) {
-      if (message.stage === "failed") {
-        line.textContent = words.failed + message.detail;
-      } else line.textContent = words[message.stage] || message.stage;
+  // Both the worker's error and its own report of the failure arrive
+  // for one failed load; one new start follows them.
+  let restarting = false;
+
+  function failed(detail) {
+    if (restarting) return;
+    if (up || starts >= STARTS) {
+      line.textContent = words.failed + detail;
       return;
     }
-    const settle = waiting.get(message.id);
-    waiting.delete(message.id);
-    const at = queue.findIndex(entry => entry.id === message.id);
-    if (at >= 0) { queue.splice(at, 1); tell(); }
-    if (settle) settle(message);
-  };
+    restarting = true;
+    line.textContent = words.again;
+    const again = () => {
+      if (document.hidden || !restarting) return;
+      document.removeEventListener("visibilitychange", again);
+      start();
+    };
+    document.addEventListener("visibilitychange", again);
+    // Out of sight it waits for the return; in sight it tries at once.
+    setTimeout(again, 1500);
+  }
+
+  function start() {
+    restarting = false;
+    starts += 1;
+    if (worker) worker.terminate();
+    worker = new Worker("sim-worker.js?v=db352a4666", { type: "module" });
+    // A worker that dies while loading says nothing on its own, and the
+    // cover would promise a load that is never coming.
+    worker.onerror = event => failed(event.message || "worker");
+    worker.onmessage = event => {
+      const message = event.data;
+      if (message.stage) {
+        if (message.stage === "failed") failed(message.detail);
+        else {
+          if (message.stage === "ready") up = true;
+          line.textContent = words[message.stage] || message.stage;
+        }
+        return;
+      }
+      const settle = waiting.get(message.id);
+      waiting.delete(message.id);
+      const at = queue.findIndex(entry => entry.id === message.id);
+      if (at >= 0) { queue.splice(at, 1); tell(); }
+      if (settle) settle(message);
+    };
+    // Whatever was asked of a worker that never came up, in order.
+    for (const entry of queue) {
+      worker.postMessage({ id: entry.id, method: entry.method, path: entry.path,
+                           body: entry.body });
+    }
+  }
+  start();
 
   function ask(method, path, body) {
     return new Promise(settle => {
       const id = next++;
       waiting.set(id, settle);
-      queue.push({ id, path });
+      queue.push({ id, method, path, body: body || "" });
       tell();
       worker.postMessage({ id, method, path, body: body || "" });
     });

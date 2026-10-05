@@ -70,8 +70,16 @@ onmessage = async event => {
   let type = "application/json; charset=utf-8";
   let text;
   let encoding = "";
+  // A load that failed answers nothing: the page starts a new worker
+  // and puts the same questions to it, and an error here would reach the
+  // page first and be taken for the answer.
+  let answer;
   try {
-    const { answer } = await ready;
+    ({ answer } = await ready);
+  } catch {
+    return;
+  }
+  try {
     if (isAFetch(path, body)) await withPillow();
     [status, type, text, encoding = ""] = JSON.parse(answer(method, path, body || ""));
   } catch (error) {

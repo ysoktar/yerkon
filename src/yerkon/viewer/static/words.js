@@ -689,6 +689,8 @@ export const SAY = {
         + "“Quick trial: on” off and press “Run the simulation”.",
   },
   "quick.failed": { tr: "Durdu: {why}", en: "Stopped: {why}" },
+  "quick.again": { tr: "bağlantı kesildi, yeniden deneniyor",
+                   en: "the connection dropped, trying again" },
   "quick.nobuildings": {
     tr: "Bina verisi alınamadı: harita sunucularının hiçbiri yanıt vermedi. "
       + "Zemin binasız kuruldu; bir süre sonra yeniden deneyiniz.",

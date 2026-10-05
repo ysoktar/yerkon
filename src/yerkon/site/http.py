@@ -133,8 +133,42 @@ def _with_urllib(method: str, url: str, form: Optional[dict],
         raise Failed(_cause(error)) from error
 
 
+#: Seconds waited before each further try of a request the browser
+#: dropped. A phone drops every open request when its owner switches to
+#: another app and freezes the page until they come back; the request
+#: then fails the moment the page wakes, and asked again it goes through.
+BROWSER_RETRY_WAITS_S = (1.0, 3.0, 8.0)
+
+
 def _in_the_browser(method: str, url: str, form: Optional[str],
                     timeout: float, headers: Optional[dict] = None) -> Reply:
+    """The worker's own request, tried again while the browser drops it.
+
+    Only a request that never came back is tried again: a server's own
+    refusal is an answer, and the fetchers decide what to do with it.
+    """
+    import time
+
+    for wait in BROWSER_RETRY_WAITS_S + (None,):
+        try:
+            reply = _once_in_the_browser(method, url, form, timeout, headers)
+        except Failed:
+            if wait is None:
+                raise
+        else:
+            # Status 0 is the browser's word for no answer at all.
+            if reply.status_code != 0 or wait is None:
+                return reply
+        # Counted out rather than slept: this runtime's sleep does not
+        # reliably wait, and the worker has nothing else to do meanwhile.
+        until = time.monotonic() + wait
+        while time.monotonic() < until:
+            pass
+    raise AssertionError("unreachable")
+
+
+def _once_in_the_browser(method: str, url: str, form: Optional[str],
+                         timeout: float, headers: Optional[dict] = None) -> Reply:
     """The worker's own request, waited for.
 
     Synchronous, which a page may not do and a worker may. The browser
