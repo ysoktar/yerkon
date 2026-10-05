@@ -90,7 +90,7 @@ jobs:
             mapfile -t urls < <(grep -o '<loc>[^<]*</loc>' docs/sitemap.xml \
                                 | sed -e 's/<loc>//' -e 's/<\/loc>//')
           fi
-          [ "${#urls[@]}" -gt 0 ] || { echo "no page changed"; exit 0; }
+          [ "${#urls[@]}" -gt 0 ] || { echo "::notice title=IndexNow::no page changed"; exit 0; }
           # Served once the key and every page to announce read as they
           # do here: an engine checks the key when it is told, and reads
           # the pages soon after.
@@ -107,11 +107,12 @@ jobs:
             if served; then ready=yes; break; fi
             sleep 15
           done
-          [ "$ready" = yes ] || { echo "the site did not serve the new files in time"; exit 0; }
+          [ "$ready" = yes ] || { echo "::warning title=IndexNow::the site did not serve the new files in time"; exit 0; }
           list="$(printf '"%s",' "${urls[@]}")"
           body="{\"host\":\"yerkon.com\",\"key\":\"${key}\",\"keyLocation\":\"https://yerkon.com/${key}.txt\",\"urlList\":[${list%,}]}"
-          echo "announcing ${#urls[@]} pages"
-          curl -sS -o /dev/null -w "IndexNow answered %{http_code}\n" \
+          # Said as a notice, so the answer shows on the run's page.
+          code="$(curl -sS -o /dev/null -w "%{http_code}" \
             -X POST "https://api.indexnow.org/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            --data "$body"
+            --data "$body")"
+          echo "::notice title=IndexNow::${#urls[@]} pages announced, answer ${code}"
