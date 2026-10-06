@@ -4083,8 +4083,8 @@ WHEN_TITLE = _w("Olayların tarihi", "When the events happened")
 CLOCKS = (
     ("~270000 TL", _w("birim başına atomik saat, TDoA",
                        "an atomic clock per unit, TDoA")),
-    ("0 TL", _w("saat senkronizasyonu, YERKON (çift yönlü ölçüm)",
-                "clock synchronisation, YERKON (two way ranging)")),
+    ("0 TL", _w("saat senkronizasyonu yok, YERKON (çift yönlü ölçüm)",
+                "no clock synchronisation, YERKON (two way ranging)")),
 )
 CLOCKS_UNDER = _w(
     "TDoA sistemlerinde yayın birimlerinin saatlerinin "
