@@ -449,8 +449,14 @@ h3 + ul li { margin-bottom: 5px; overflow-wrap: anywhere; }
 details.fold > summary { cursor: pointer; list-style: none; }
 details.fold > summary::-webkit-details-marker { display: none; }
 details.fold > summary > h2, details.fold > summary > h3 { display: inline; }
+/* Drawn rather than a "▸" character: a character sits low in its own
+   box, so turned about that box it rose above the heading once open. A
+   drawn triangle turns about its own middle and stays on the line. */
 details.fold > summary::before {
-  content: "▸"; display: inline-block; width: 1.1em; color: var(--quiet);
+  content: ""; display: inline-block; vertical-align: middle;
+  width: 0; height: 0; margin: 0 0.55em 0.12em 0.1em;
+  border-left: 0.42em solid var(--quiet);
+  border-top: 0.27em solid transparent; border-bottom: 0.27em solid transparent;
   transition: transform 0.15s;
 }
 details.fold[open] > summary::before { transform: rotate(90deg); }
