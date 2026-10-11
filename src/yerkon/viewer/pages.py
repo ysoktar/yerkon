@@ -2332,32 +2332,53 @@ SOURCES = Page(
             kind="points",
             heading=_w("Standartlar ve veri", "Standards and data"),
             lines=(
-                _w("ITU-R P.526-15 §4.5.2, delta-Bullington kırınımı.",
-                   "ITU-R P.526-15 §4.5.2, delta Bullington diffraction."),
-                _w("ITU-R P.452 ve P.1812: sinyalin yol boyunca zayıflaması.",
-                   "ITU-R P.452 and P.1812: how the signal weakens on its way."),
-                _w("3GPP TR 38.901 Tablo 7.4.1-1: gölgeleme genişlikleri.",
-                   "3GPP TR 38.901 Table 7.4.1-1: shadowing widths."),
-                _w("Copernicus DEM 30 m: arazi yükseklikleri.",
-                   "Copernicus DEM 30 m: ground heights."),
+                # Each with its source at the end of the line, where the
+                # reader who wants it looks.
+                _w("ITU-R P.526-15 §4.5.2, delta-Bullington kırınımı. "
+                   "[itu.int](https://www.itu.int/rec/R-REC-P.526-15-201910-S/en)",
+                   "ITU-R P.526-15 §4.5.2, delta Bullington diffraction. "
+                   "[itu.int](https://www.itu.int/rec/R-REC-P.526-15-201910-S/en)"),
+                _w("ITU-R P.452 ve P.1812: sinyalin yol boyunca zayıflaması. "
+                   "[P.452](https://www.itu.int/rec/R-REC-P.452/en) · [P.1812](https://www.itu.int/rec/R-REC-P.1812/en)",
+                   "ITU-R P.452 and P.1812: how the signal weakens on its way. "
+                   "[P.452](https://www.itu.int/rec/R-REC-P.452/en) · [P.1812](https://www.itu.int/rec/R-REC-P.1812/en)"),
+                _w("3GPP TR 38.901 Tablo 7.4.1-1: gölgeleme genişlikleri. "
+                   "[3gpp.org](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3173)",
+                   "3GPP TR 38.901 Table 7.4.1-1: shadowing widths. "
+                   "[3gpp.org](https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3173)"),
+                _w("Copernicus DEM 30 m: arazi yükseklikleri. "
+                   "[copernicus.eu](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM)",
+                   "Copernicus DEM 30 m: ground heights. "
+                   "[copernicus.eu](https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM)"),
                 _w("OpenStreetMap ve Overture: binalar ile yol kenarındaki "
-                   "direkler, levhalar ve panolar.",
+                   "direkler, levhalar ve panolar. "
+                   "[openstreetmap.org](https://www.openstreetmap.org/copyright) · [overturemaps.org](https://overturemaps.org/)",
                    "OpenStreetMap and Overture: buildings, and the masts, "
-                   "signs and boards along the road."),
+                   "signs and boards along the road. "
+                   "[openstreetmap.org](https://www.openstreetmap.org/copyright) · [overturemaps.org](https://overturemaps.org/)"),
                 _w("Semtech SX1280, EBYTE E28-2G4M20S ve E28-2G4M12S, Qorvo "
-                   "DWM3000 veri sayfaları ve SX1280 uzun menzil testi.",
+                   "DWM3000 veri sayfaları ve SX1280 uzun menzil testi. "
+                   "[SX1280](https://www.semtech.com/products/wireless-rf/lora-connect/sx1280) · [E28-2G4M20S](https://www.ebyte.com/product/304.html) · "
+                   "[E28-2G4M12S](https://www.cdebyte.com/products/E28-2G4M12S) · [DWM3000](https://www.qorvo.com/products/p/DWM3000) · "
+                   "[menzil testi](https://stuartsprojects.github.io/2019/04/26/Semtech-SX1280-2-4Ghz-LoRa-ranging-tranceivers.html)",
                    "Semtech SX1280, EBYTE E28-2G4M20S and E28-2G4M12S, "
                    "Qorvo DWM3000 datasheets, and the SX1280 long range "
-                   "test."),
+                   "test. [SX1280](https://www.semtech.com/products/wireless-rf/lora-connect/sx1280) · [E28-2G4M20S](https://www.ebyte.com/product/304.html) · "
+                   "[E28-2G4M12S](https://www.cdebyte.com/products/E28-2G4M12S) · [DWM3000](https://www.qorvo.com/products/p/DWM3000) · "
+                   "[range test](https://stuartsprojects.github.io/2019/04/26/Semtech-SX1280-2-4Ghz-LoRa-ranging-tranceivers.html)"),
                 _w("DigiKey, LCSC, JLCPCB, Mouser, Gainta ve diğer "
                    "satıcıların kademe fiyatları, 24-30 Eylül 2026. Kur: "
                    "TCMB'nin 29 Eylül 2026 gösterge niteliğindeki döviz "
-                   "satış kurları, 49,0013 TL/USD ve 55,6103 TL/EUR.",
+                   "satış kurları, 49,0013 TL/USD ve 55,6103 TL/EUR. "
+                   "[Fiyatların bağlantıları](https://yerkon.com/tr/maliyet/) · "
+                   "[tcmb.gov.tr](https://www.tcmb.gov.tr/kurlar/202609/29092026.xml)",
                    "Tier prices from DigiKey, LCSC, JLCPCB, Mouser, Gainta "
                    "and other sellers, 24 to 30 September 2026. Exchange "
                    "rates: the central bank's indicative forex selling "
                    "rates of 29 September 2026, 49,0013 TL a dollar and "
-                   "55,6103 TL a euro."),
+                   "55,6103 TL a euro. "
+                   "[Each price's link](https://yerkon.com/en/cost/) · "
+                   "[tcmb.gov.tr](https://www.tcmb.gov.tr/kurlar/202609/29092026.xml)"),
                 _w("Karşılaştırma tablosunda YERKON dışındaki satırların "
                    "değerleri aşağıdaki kaynakçadan alınmıştır. Tablonun "
                    "altındaki her dipnot, dayandığı kaynağa bağlantı "
