@@ -100,7 +100,9 @@
     function show(index) {
       at = (index + group.length) % group.length;
       var shown = group[at];
-      big.src = shown.currentSrc || shown.src;
+      // The picture's own file, not the small copy a narrow page drew:
+      // the box shows it as large as the screen allows.
+      big.src = shown.src || shown.currentSrc;
       big.alt = shown.alt;
       count.textContent = (at + 1) + " / " + group.length;
     }

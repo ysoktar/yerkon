@@ -3678,6 +3678,13 @@ def render(
     ]
     for part in page.parts:
         body.append(_part(part, language, published, where))
+    # The first picture on a page is near its top, and on the front page
+    # it is the largest thing drawn: asked for at once and first, not
+    # when the reader scrolls to it. The rest wait until they are near.
+    for at, piece in enumerate(body):
+        if '<figure><img ' in piece and ' loading="lazy"' in piece:
+            body[at] = piece.replace(' loading="lazy"', ' fetchpriority="high"', 1)
+            break
     body += ['</main>', _footer(language)]
     # The home page is called YERKON, and "YERKON · YERKON" is not a
     # title.
@@ -3909,6 +3916,12 @@ def _part(part: Part, language: str, published, where: Optional[Where] = None) -
         # arrives, and a picture below the fold waits until it is near.
         wide, high = PICTURE_SIZES.get(part.picture, (0, 0))
         size = ' width="{}" height="{}"'.format(wide, high) if wide else ""
+        small = PICTURE_SMALL.get(part.picture)
+        if small:
+            size += (' srcset="{} 720w, {} {}w" sizes="(max-width: 704px) '
+                     'calc(100vw - 32px), 672px"').format(
+                html.escape(where.asset(small), quote=True),
+                html.escape(where.asset(part.picture), quote=True), wide)
         drawn = '<figure><img src="{}"{} loading="lazy" decoding="async" ' \
             'alt="{}"><figcaption>{}</figcaption></figure>'.format(
                 html.escape(where.asset(part.picture), quote=True),
@@ -4628,7 +4641,8 @@ def _table(
 
 #: Files copied beside the pages rather than rendered.
 CARRIED = ("site.css", "theme.js", "road.webp", "gnss.webp",
-           "architecture.webp", "simulator.webp", "yerkon-rapor.pdf",
+           "architecture.webp", "simulator.webp", "road-720.webp",
+           "architecture-720.webp", "simulator-720.webp", "yerkon-rapor.pdf",
            "favicon.svg",
            "favicon.ico", "apple-touch-icon.png", "icon-192.png",
            "icon-512.png")
@@ -4641,6 +4655,15 @@ PICTURE_SIZES = {
     "gnss.webp": (700, 701),
     "architecture.webp": (1200, 800),
     "simulator.webp": (1600, 1000),
+}
+#: A copy 720 pixels wide of each picture wider than the text column,
+#: which is at most 672 pixels: a screen drawing one pixel to a pixel
+#: takes the copy, at about half the bytes; a sharper screen still takes
+#: the whole picture.
+PICTURE_SMALL = {
+    "road.webp": "road-720.webp",
+    "architecture.webp": "architecture-720.webp",
+    "simulator.webp": "simulator-720.webp",
 }
 
 STATIC = pathlib.Path(__file__).parent / "static"

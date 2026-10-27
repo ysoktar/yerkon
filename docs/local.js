@@ -125,7 +125,7 @@
     restarting = false;
     starts += 1;
     if (worker) worker.terminate();
-    worker = new Worker("sim-worker.js?v=64bd8bf36a", { type: "module" });
+    worker = new Worker("sim-worker.js?v=c3f1e67b3e", { type: "module" });
     // A worker that dies while loading says nothing on its own, and the
     // cover would promise a load that is never coming.
     worker.onerror = event => failed(event.message || "worker");
